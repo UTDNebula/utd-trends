@@ -5,18 +5,51 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prepare": "husky install"
   },
   "dependencies": {
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
+    "@mui/material": "^5.4.2",
     "next": "12.0.10",
     "react": "17.0.2",
     "react-dom": "17.0.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "^16.2.1",
+    "@commitlint/config-conventional": "^16.2.1",
     "@types/node": "17.0.18",
     "@types/react": "17.0.39",
-    "eslint": "8.9.0",
+    "autoprefixer": "^10.4.2",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^8.9.0",
     "eslint-config-next": "12.0.10",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.3.4",
+    "postcss": "^8.4.6",
+    "prettier": "^2.5.1",
+    "tailwindcss": "^3.0.22",
     "typescript": "4.5.5"
+  },
+  "lint-staged": {
+    "*.{tsx,ts,js}": [
+      "eslint --cache --fix .",
+      "prettier --write {pages,components,modules}/**/*.{tsx,ts,js}"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog",
+      "disableSubjectLowerCase": true,
+      "maxHeaderWidth": 72,
+      "maxLineWidth": 80,
+      "defaultType": "chore"
+    }
   }
 }

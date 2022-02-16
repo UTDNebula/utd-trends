@@ -1,3 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  --lm-primary-light: '#4659A7',
+  --lm-primary-DEFAULT: '#7486CE',
+  --lm-primary-dark: '#BCC9FD',
+  
+  --lm-secondary-light: '#FBBB78',
+  --lm-secondary-DEFAULT: '#FFCF9D',
+  --lm-secondary-dark: '#FFE2C5',
+
+  --dm-primary-light: '#4659A7',
+  --dm-primary-DEFAULT: '#7486CE',
+  --dm-primary-dark: '#BCC9FD',
+
+  --dm-secondary-light: '#4BA6A0',
+  --dm-secondary-DEFAULT: '#69CCC6',
+  --dm-secondary-dark: '#A7EDE9',
+
+}
+
 html,
 body {
   padding: 0;
@@ -6,10 +29,12 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+@layer base{
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+} 
 
 * {
   box-sizing: border-box;

@@ -1,0 +1,195 @@
+[
+  {
+    "term": "2020 Summer",
+    "grades": {
+      "A": 3,
+      "C+": 3,
+      "C": 8,
+      "B": 8,
+      "D+": 6,
+      "F": 2,
+      "B-": 2,
+      "A+": 4,
+      "A-": 1,
+      "B+": 4,
+      "D-": 6
+    },
+    "Catalog\nNumber": "2301",
+    "sect": "5U1",
+    "prof": "Zhou, Yibin",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": {
+      "A": 4,
+      "C+": 4,
+      "C": 2,
+      "B": 7,
+      "F": 1,
+      "B-": 4,
+      "A+": 1,
+      "A-": 22,
+      "B+": 16
+    },
+    "Catalog\nNumber": "2302",
+    "sect": "5U1",
+    "prof": "Hes, Christopher A",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": { "A": 6, "C": 7, "B": 10, "D": 1, "A-": 1, "B+": 1 },
+    "Catalog\nNumber": "3331",
+    "sect": "5U1",
+    "prof": "Cready, William M",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": {
+      "A": 5,
+      "C+": 1,
+      "B": 3,
+      "B-": 1,
+      "A+": 10,
+      "A-": 13,
+      "B+": 11
+    },
+    "Catalog\nNumber": "3341",
+    "sect": "5U1",
+    "prof": "Kromer, Jeffrey",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": { "A": 10, "A+": 10, "B": 4, "A-": 9, "B+": 4 },
+    "Catalog\nNumber": "3350",
+    "sect": "5U1",
+    "prof": "Gamino, John P",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": {
+      "A": 2,
+      "C+": 2,
+      "C": 2,
+      "B": 6,
+      "D": 1,
+      "B-": 8,
+      "A-": 6,
+      "B+": 5
+    },
+    "Catalog\nNumber": "4334",
+    "sect": "5U1",
+    "prof": "Hes, Christopher A",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": { "A": 4, "B": 3, "A-": 4, "B+": 3 },
+    "Catalog\nNumber": "4336",
+    "sect": "5U1",
+    "prof": "Gurun, Umit",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": {
+      "A": 9,
+      "C+": 2,
+      "B": 4,
+      "D+": 1,
+      "F": 2,
+      "B-": 3,
+      "A+": 8,
+      "A-": 3,
+      "B+": 3
+    },
+    "Catalog\nNumber": "4340",
+    "sect": "0U1",
+    "prof": "Johnson, Jennifer",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": { "B": 1, "B-": 3, "A+": 1, "A-": 7, "B+": 3, "D-": 1 },
+    "Catalog\nNumber": "4342",
+    "sect": "5U1",
+    "prof": "Johnson, Jennifer",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": { "A": 9, "C": 1, "B": 2, "F": 1 },
+    "Catalog\nNumber": "6194",
+    "sect": "SW1",
+    "prof": "Johnson, Jennifer",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": { "A": 5, "C+": 4, "C": 3, "B": 5, "B-": 9, "A-": 13, "B+": 14 },
+    "Catalog\nNumber": "6202",
+    "sect": "0W1",
+    "prof": "Janakiraman, Surya",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": { "A": 31, "A-": 1, "B+": 1 },
+    "Catalog\nNumber": "6287",
+    "sect": "XU1",
+    "prof": "McNulty, Diane S",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": { "A": 8, "B": 1, "F": 1 },
+    "Catalog\nNumber": "6292",
+    "sect": "SW1",
+    "prof": "Linsteadt, Chris C",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": { "A": 12, "B-": 2, "B": 2, "A-": 8, "B+": 7 },
+    "Catalog\nNumber": "6301",
+    "sect": "5U1",
+    "prof": "Ali, Ashiq",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": { "A": 3, "C+": 2, "B": 5, "B-": 4, "A-": 11, "B+": 4 },
+    "Catalog\nNumber": "6305",
+    "sect": "0W1",
+    "prof": "Janakiraman, Surya",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": { "B": 1, "A-": 8, "B+": 5 },
+    "Catalog\nNumber": "6313",
+    "sect": "5U1",
+    "prof": "Lahiri, Atanu",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": { "A": 2, "C+": 1, "B": 3, "B-": 1, "A-": 2, "B+": 3 },
+    "Catalog\nNumber": "6320",
+    "sect": "0W1",
+    "prof": "Cavusoglu, Huseyin",
+    "subj": "ACCT"
+  },
+  {
+    "term": "2020 Summer",
+    "grades": { "A": 5, "C": 2, "B": 7 },
+    "Catalog\nNumber": "6330",
+    "sect": "0W1",
+    "prof": "Cready, William M",
+    "subj": "ACCT"
+  }
+]
