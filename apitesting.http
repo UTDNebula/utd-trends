@@ -1,0 +1,2 @@
+GET https://api.utdnebula.com/course/search?subject_prefix=CS&course_number=4337 HTTP/1.1
+Authorization: dd1h55UQUb8x5nQIPW2iJ1ABaIDx9iv7
