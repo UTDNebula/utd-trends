@@ -14,6 +14,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { FlatLogoIcon } from '../components/common/flatLogoIcon';
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -27,19 +28,16 @@ ChartJS.register(
 const Home: NextPage = () => {
   return (
     <>
-      <div className="flex h-screen w-screen justify-center items-center bg-gradient-to-b from-primary-light to-primary-dark">
+      <div className="flex h-screen w-screen justify-center items-center bg-gradient-to-b from-primary to-primary-light text-primary-darker">
         <div>
-          <div className="m-auto ">
-            <img
-              src="./Project_Nebula_Logo.svg"
-              className="m-auto w-1/3 shadow-black"
-            ></img>
+          <div className="m-auto text-primary-darker w-1/2 h-56">
+            <FlatLogoIcon></FlatLogoIcon>
           </div>
-          <div className="text-center">
+          <div className="text-center pb-2">
             <h1 className={styles.title}>Welcome to Athena!</h1>
           </div>
-          <p className="text-center pb-8">
-            Your new dashboard for UTD Grades and course information
+          <p className="text-center pb-8 text-headline5">
+            Your <i>new</i> dashboard for UTD Grades and course information
           </p>
           <SearchBar/>
         </div>
