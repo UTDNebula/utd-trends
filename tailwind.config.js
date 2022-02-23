@@ -10,11 +10,13 @@ module.exports = {
           light: '#BCC9FD',
           DEFAULT: '#7486CE',
           dark: '#4659A7',
+          darker: '#314287'
         },
         secondary: {
-          light: '#2FEEAB',
-          DEFAULT: '#11D08D',
-          dark: '#0C9766',
+          light: '#FFE2C5',
+          DEFAULT: '#FFCF9D',
+          dark: '#FBBB78',
+          darker: '#ffaf5c'
         },
         navigation: {
           DEFAULT: '#878FD6',
@@ -23,6 +25,7 @@ module.exports = {
         },
         light: '#F9F9FA',
         dark: '#1F201F',
+        surface: '#858585'
       },
       fontSize: {
         headline1: [
