@@ -72,10 +72,9 @@ const VisualBubble = (props:BubbleProps) => {
         <div className='absolute bottom-0 p-4 text-dark'>
             <h1 className='italic'>{props.title}</h1>
         </div>
-            
-    
-        
+
     </Card>
+    
         
     </>
 }
