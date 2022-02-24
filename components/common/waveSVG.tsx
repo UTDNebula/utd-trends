@@ -1,11 +1,7 @@
-/*
-Title: WaveSVG
-Last Updated: 2/24/2022
-LastUpdated By: Eric Boysen - Project Nebula Team Athena
-
-This is the wave SVG used in the background of the home page
-
-Only hear for abstraction and keeping source code clean
+/**
+ * This is the wave SVG used in the background of the home page
+ *
+ * Only hear for abstraction and keeping source code clean
 */
 export const WaveSVG = () => {
   return (

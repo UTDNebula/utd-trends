@@ -31,12 +31,8 @@ ChartJS.register(
   Filler,
 );
 
-/*
-Title: BubbleProps
-Last Updated: 2/24/2022
-LastUpdated By: Eric Boysen - Project Nebula Team Athena
-
-This is a type the contains the props used by the VisualBubble and GraphChoice components
+/**
+ * This is a type the contains the props used by the VisualBubble and GraphChoice components
 */
 type BubbleProps = {
   //Determine which of the charts will be used
@@ -55,13 +51,9 @@ type BubbleProps = {
   dataset3data?: number[];
 };
 
-/*
-Title: VisualBubble
-Last Updated: 2/24/2022
-LastUpdated By: Eric Boysen - Project Nebula Team Athena
-
-This component returns a set of overlapping cards one for a visual description and another for
-a GraphChoice component. 
+/**
+ * This component returns a set of overlapping cards one for a visual description and another for
+ * a GraphChoice component. 
 */
 const VisualBubble = (props: BubbleProps) => {
   return (
