@@ -3,12 +3,27 @@ import * as React from 'react';
 import { withStyles } from '@mui/material';
 import { SvgIcon } from '@mui/material';
 
+/*
+Title: SearchProps
+Last Updated: 2/24/2022
+LastUpdated By: Eric Boysen - Project Nebula Team Athena
+
+Props type used by the SearchBar component
+*/
 type SearchProps = {
+  // setSearch: the setter function from the parent component to set the search value
   setSearch: Function;
 };
 
+/*
+Title: SearchBar
+Last Updated: 2/24/2022
+LastUpdated By: Eric Boysen - Project Nebula Team Athena
+
+This component returns a custom search bar component that makes use of the Search Icon component
+Sends the input value to the parent component on 'Enter' 
+*/
 export const SearchBar = (props: SearchProps) => {
-  const [count, setCount] = React.useState(0);
   return (
     <>
       <div className=" text-primary m-auto w-11/12 -translate-y-1/2">

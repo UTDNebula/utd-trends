@@ -18,6 +18,7 @@ import {
 } from 'chart.js';
 import { FlatLogoIcon } from '../components/common/flatLogoIcon';
 import { useState } from 'react';
+import Head from 'next/head';
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -28,6 +29,13 @@ ChartJS.register(
   Legend,
 );
 
+/*
+Title: Home
+Last Updated: 2/24/2022
+LastUpdated By: Eric Boysen - Project Nebula Team Athena
+
+Returns the home page with Nebula Branding, waved background, and SearchBar Components
+*/
 const Home: NextPage = () => {
   const [searchVal, setSearchVal] = useState('');
   return (
