@@ -29,12 +29,8 @@ ChartJS.register(
   Filler,
 );
 
-/*
-Title: BubbleProps
-Last Updated: 2/24/2022
-LastUpdated By: Eric Boysen - Project Nebula Team Athena
-
-This is a type the contains the props used by the VisualBubble and GraphChoice components
+/**
+ * This is a type the contains the props used by the VisualBubble and GraphChoice components
 */
 type BubbleProps = {
   // Determine which of the charts will be used
@@ -53,13 +49,9 @@ type BubbleProps = {
   dataset3data?: number[];
 };
 
-/*
-Title: GraphChoice
-Last Updated: 2/24/2022
-LastUpdated By: Eric Boysen - Project Nebula Team Athena
-
-This component returns a ChartJS Component built using the props passed to it
-Simplifies the use of Graphs for use in the page components
+/**
+ * This component returns a ChartJS Component built using the props passed to it
+ * Simplifies the use of Graphs for use in the page components
 */
 export const GraphChoice = (props: BubbleProps) => {
   // set chart options

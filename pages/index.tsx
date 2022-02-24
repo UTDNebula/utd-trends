@@ -29,12 +29,8 @@ ChartJS.register(
   Legend,
 );
 
-/*
-Title: Home
-Last Updated: 2/24/2022
-LastUpdated By: Eric Boysen - Project Nebula Team Athena
-
-Returns the home page with Nebula Branding, waved background, and SearchBar Components
+/**
+ * Returns the home page with Nebula Branding, waved background, and SearchBar Components
 */
 const Home: NextPage = () => {
   const [searchVal, setSearchVal] = useState('');
