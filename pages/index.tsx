@@ -1,37 +1,15 @@
 import type { NextPage } from 'next';
 import Card from '@mui/material/Card';
 import styles from '../styles/Home.module.css';
-import VisualBubble from '../components/graph/visual-bubble';
+import { FlatLogoIcon } from '../components/common/flatLogoIcon';
 import { SearchBar } from '../components/common/searchBar';
 import { WaveSVG } from '../components/common/waveSVG';
 import { Wave2SVG } from '../components/common/wave2SVG';
-import router from 'next';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-import { FlatLogoIcon } from '../components/common/flatLogoIcon';
 import { useState } from 'react';
-import Head from 'next/head';
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-);
 
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
-*/
+ */
 const Home: NextPage = () => {
   const [searchVal, setSearchVal] = useState('');
   return (
