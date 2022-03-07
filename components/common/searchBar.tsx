@@ -9,7 +9,10 @@ import topFilms from '../../data/autocomplete_dummy_data.json';
  */
 type SearchProps = {
   // setSearch: the setter function from the parent component to set the search value
-  setSearch: Function;
+  selectSearchValue: Function;
+  value: Film[] | undefined;
+  setValue: Function;
+  disabled?: boolean;
 };
 
 interface Film {
@@ -26,7 +29,6 @@ export const SearchBar = (props: SearchProps) => {
   const [options, setOptions] = React.useState<readonly Film[]>([]);
   const loading = open && options.length === 0;
 
-  const [value, setValue] = React.useState<Film | null>(null);
   const [inputValue, setInputValue] = React.useState('');
 
   const fetch = React.useMemo(
@@ -51,10 +53,6 @@ export const SearchBar = (props: SearchProps) => {
         if (active) {
           let newOptions: readonly Film[] = [];
 
-          if (value) {
-            newOptions = [value];
-          }
-
           if (results) {
             newOptions = [...newOptions, ...results];
           }
@@ -72,7 +70,7 @@ export const SearchBar = (props: SearchProps) => {
     return () => {
       active = false;
     };
-  }, [value, inputValue, fetch]);
+  }, [props.value, inputValue, fetch]);
 
   React.useEffect(() => {
     if (!open) {
@@ -87,11 +85,13 @@ export const SearchBar = (props: SearchProps) => {
           <SearchIcon />
         </div>
         <Autocomplete
-          className="w-full h-12 text-primary-dark placeholder-primary-dark font-bold"
-          sx={{
-            display: 'inline-block',
-            '& input': {},
-          }}
+          multiple={true}
+          disabled={props.disabled}
+          className="w-full h-12"
+          // sx={{
+          //   display: 'inline-block',
+          //   '& input': {},
+          // }}
           open={open}
           onOpen={() => {
             setOpen(true);
@@ -99,13 +99,23 @@ export const SearchBar = (props: SearchProps) => {
           onClose={() => {
             setOpen(false);
           }}
-          isOptionEqualToValue={(option, value) => option.title === value.title}
+          filterSelectedOptions
           getOptionLabel={(option) => option.title}
           options={options}
           loading={loading}
-          value={value}
-          onChange={(event: any, newValue: Film | null) => {
-            setValue(newValue);
+          value={props.value}
+          onChange={(event: any, newValue: Film[] | undefined) => {
+            // @ts-ignore
+            let intersection = props.value
+              ? newValue
+                ? newValue.filter((x) => !props.value.includes(x))
+                : []
+              : newValue
+              ? newValue
+              : [];
+            props.selectSearchValue(intersection[0].title);
+            // props.selectSearchValue("testing");
+            props.setValue(newValue);
           }}
           inputValue={inputValue}
           onInputChange={(event, newInputValue) => {
@@ -119,14 +129,19 @@ export const SearchBar = (props: SearchProps) => {
                 id="mainSearch"
                 className="rounded-md border-primary-dark border-2 w-full h-12 pl-12 bg-white text-primary-dark placeholder-primary-dark font-bold"
                 placeholder="Search section number, professor name, course number...."
-                onKeyPress={(e) =>
-                  e.key === 'Enter' && props.setSearch(e.currentTarget.value)
-                }
+                // onKeyPress={(e) =>
+                //   e.key === 'Enter' && props.setSearch(e.currentTarget.value)
+                // }
               />
             </div>
           )}
+          defaultValue={[]}
         />
       </div>
     </>
   );
+};
+
+SearchBar.defaultProps = {
+  disabled: true,
 };
