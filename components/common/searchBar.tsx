@@ -5,7 +5,7 @@ import { SvgIcon } from '@mui/material';
 
 /**
  * Props type used by the SearchBar component
-*/
+ */
 type SearchProps = {
   // setSearch: the setter function from the parent component to set the search value
   setSearch: Function;
@@ -13,8 +13,8 @@ type SearchProps = {
 
 /**
  * This component returns a custom search bar component that makes use of the Search Icon component
- * Sends the input value to the parent component on 'Enter' 
-*/
+ * Sends the input value to the parent component on 'Enter'
+ */
 export const SearchBar = (props: SearchProps) => {
   return (
     <>

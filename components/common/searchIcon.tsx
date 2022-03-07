@@ -4,7 +4,7 @@
  * This component simply returns the source of the svg so that it can be manipulated directly in
  * the DOM rather than using an IMG tag. Change color of the svg by changing the text color of the
  * surrouding div.
-*/
+ */
 export const SearchIcon = () => {
   return (
     <>

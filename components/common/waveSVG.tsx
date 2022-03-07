@@ -2,7 +2,7 @@
  * This is the wave SVG used in the background of the home page
  *
  * Only hear for abstraction and keeping source code clean
-*/
+ */
 export const WaveSVG = () => {
   return (
     <svg
