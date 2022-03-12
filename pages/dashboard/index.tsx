@@ -4,7 +4,10 @@ import { ReactNode, useState } from 'react';
 import Carousel from '../../components/common/carousel';
 import { SearchBar } from '../../components/common/searchBar';
 import { BarGraph } from '../../components/graph/BarGraph';
+import { GraphChoice } from '../../components/graph/GraphChoice';
 import { LineGraph } from '../../components/graph/LineGraph';
+import { RadarChart } from '../../components/graph/RadarChart';
+import { RadialBarChart } from '../../components/graph/RadialBarChart';
 import SearchGrid from '../../components/navigation/searchGrid';
 import TopMenu from '../../components/navigation/topMenu';
 
@@ -43,10 +46,11 @@ export const Dashboard: NextPage = () => {
   function searchAutocomplete() {}
 
   var dat = [
-    { name: 'Smith', data: [1, 2, 3, 4, 1, 2, 6, 1, 8] },
-    { name: 'Jason', data: [2, 5, 1, 6] },
-    { name: 'Suzy', data: [2, 5, 2, 1] },
+    { name: 'Smith', data: [1, 2, 3, 4, 1] },
+    { name: 'Jason', data: [2, 5, 1, 6,9] },
+    { name: 'Suzy', data: [2, 5, 2, 1,1] },
   ];
+  var diffDat = [31,87,65];
 
   return (
     <>
@@ -58,25 +62,13 @@ export const Dashboard: NextPage = () => {
             <Carousel>
               <div className="grid grid-cols-2 gap-4 p-4 h-full lg:grid-cols-4 ">
                 <Card className="row-span-4 col-span-2 p-4 h-screen lg:h-full">
-                  <BarGraph
-                    xaxisLabels={['A', 'B', 'C', 'D', 'F', 'W', 'CR', 'NC']}
-                    series={dat}
-                    title="Grades Distribution"
-                  />
+                  <GraphChoice form='Radial' title='Grades Distribution' labels = {['Smith', 'Jason', 'Suzy']} series = {diffDat} ></GraphChoice>
                 </Card>
                 <Card className="col-span-2 row-span-4 lg:row-span-2 p-4 h-screen lg:h-full">
-                  <BarGraph
-                    xaxisLabels={['A', 'B', 'C', 'D', 'F', 'W', 'CR', 'NC']}
-                    series={dat}
-                    title=""
-                  />
+                  <GraphChoice form='Radar' title='Grades Distribution' xaxisLabels={['A','B','C','D','F','CR','NC']} series = {dat} ></GraphChoice>
                 </Card>
                 <Card className="col-span-2 row-span-4 lg:row-span-2 p-4 h-screen lg:h-full">
-                  <BarGraph
-                    xaxisLabels={['A', 'B', 'C', 'D', 'F', 'W', 'CR', 'NC']}
-                    series={dat}
-                    title=""
-                  />
+                  <GraphChoice form='Bar' title='Grades Distribution' xaxisLabels={['A','B','C','D','F','CR','NC']} series = {dat} ></GraphChoice>
                 </Card>
               </div>
               <div className="grid grid-cols-1 gap-4 p-4 h-full sm:grid-cols-2 md:grid-cols-4">

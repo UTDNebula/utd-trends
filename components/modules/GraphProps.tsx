@@ -3,6 +3,6 @@ type GraphProps = {
     xaxisLabels?: string[];
     series: any[];
     title: string;
-    dataLabels?: string[];
+    labels?: string[]
   };
 export default GraphProps;

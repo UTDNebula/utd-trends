@@ -12,9 +12,7 @@ import GraphProps from '../modules/GraphProps';
           enabled: false,
         },
       },
-      dataLabels: {
-        enabled: true,
-      },
+      labels: props.labels,
       colors: ['#ffadad', '#9bf6ff', '#caffbf'],
       stroke: {
         width: 2,
@@ -43,7 +41,6 @@ import GraphProps from '../modules/GraphProps';
           <Chart
             options={options}
             series={props.series}
-            dataLabels = {props.dataLabels}
             type="radialBar"
             height={'100%'}
           />
