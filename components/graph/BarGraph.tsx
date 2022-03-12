@@ -1,12 +1,7 @@
 import { useMediaQuery } from '@mui/material';
 import { HorizontalBarGraph } from './HorizontalBarGraph';
 import { VerticalBarGraph } from './VerticalBarGraph';
-
-type GraphProps = {
-  xaxisLabels: string[];
-  series: any[];
-  title: string;
-};
+import GraphProps from '../modules/GraphProps';
 
 export function BarGraph(props: GraphProps) {
   const smallScreen = useMediaQuery('(min-width:600px)');

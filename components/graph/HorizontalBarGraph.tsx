@@ -2,12 +2,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
-
-type GraphProps = {
-  xaxisLabels: string[];
-  series: any[];
-  title: string;
-};
+import GraphProps from '../modules/GraphProps';
 
 export function HorizontalBarGraph(props: GraphProps) {
   const options: ApexOptions = {

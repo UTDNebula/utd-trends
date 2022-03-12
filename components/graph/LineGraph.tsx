@@ -2,12 +2,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
-
-type GraphProps = {
-  xaxisLabels: string[];
-  series: any[];
-  title: string;
-};
+import GraphProps from '../modules/GraphProps';
 
 export function LineGraph(props: GraphProps) {
   const options: ApexOptions = {
@@ -57,7 +52,7 @@ export function LineGraph(props: GraphProps) {
         <Chart
           options={options}
           series={props.series}
-          type="bar"
+          type="line"
           height={'100%'}
         />
       </div>
