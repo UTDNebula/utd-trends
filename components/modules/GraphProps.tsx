@@ -1,5 +1,5 @@
 type GraphProps = {
-    form?: 'Bar' | 'Line' | 'Radar' | 'Radial';
+    form?: 'Bar' | 'Line' | 'Radar' | 'Vertical' | 'Horizontal' |'Radial';
     xaxisLabels?: string[];
     series: any[];
     title: string;

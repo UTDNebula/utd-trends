@@ -65,7 +65,7 @@ export const Dashboard: NextPage = () => {
                   <GraphChoice form='Radial' title='Grades Distribution' labels = {['Smith', 'Jason', 'Suzy']} series = {diffDat} ></GraphChoice>
                 </Card>
                 <Card className="col-span-2 row-span-4 lg:row-span-2 p-4 h-screen lg:h-full">
-                  <GraphChoice form='Radar' title='Grades Distribution' xaxisLabels={['A','B','C','D','F','CR','NC']} series = {dat} ></GraphChoice>
+                  <GraphChoice form='Horizontal' title='Grades Distribution' xaxisLabels={['A','B','C','D','F','CR','NC']} series = {dat} ></GraphChoice>
                 </Card>
                 <Card className="col-span-2 row-span-4 lg:row-span-2 p-4 h-screen lg:h-full">
                   <GraphChoice form='Bar' title='Grades Distribution' xaxisLabels={['A','B','C','D','F','CR','NC']} series = {dat} ></GraphChoice>

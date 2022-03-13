@@ -7,6 +7,8 @@ import { LineGraph } from './LineGraph';
 import { RadarChart } from './RadarChart';
 import { RadialBarChart } from './RadialBarChart';
 import GraphProps from '../modules/GraphProps';
+import { VerticalBarGraph } from './VerticalBarGraph';
+import { HorizontalBarGraph } from './HorizontalBarGraph';
 
 export function GraphChoice(props: GraphProps) {
 
@@ -28,6 +30,24 @@ export function GraphChoice(props: GraphProps) {
             title = {props.title}
             ></LineGraph>
             );
+        }
+        case 'Vertical' : {
+            return(
+                <VerticalBarGraph
+                xaxisLabels={props.xaxisLabels}
+                series={props.series}
+                title = {props.title}
+                ></VerticalBarGraph>
+                );
+        }
+        case 'Horizontal' : {
+            return(
+                <HorizontalBarGraph
+                xaxisLabels={props.xaxisLabels}
+                series={props.series}
+                title = {props.title}
+                ></HorizontalBarGraph>
+                );
         }
         case "Radar" : {
             return(
