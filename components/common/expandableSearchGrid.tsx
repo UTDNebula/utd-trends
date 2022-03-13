@@ -46,12 +46,13 @@ export const ExpandableSearchGrid = () => {
         />
       ))}
       {searchTerms.length < 3 ? (
-        <Card className="bg-secondary" sx={{ borderRadius: 0 }}>
+        <Card className="bg-primary-light" sx={{ borderRadius: 0 }}>
           <CardContent
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'space-around',
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
           >
             <SearchBar
