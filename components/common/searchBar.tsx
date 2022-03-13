@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { SearchIcon } from './searchIcon';
 import Autocomplete from '@mui/material/Autocomplete';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import topFilms from '../../data/autocomplete_dummy_data.json';
 import Popper from '@mui/material/Popper';
 import { Box, Paper } from '@mui/material';
@@ -103,13 +103,21 @@ export const SearchBar = (props: SearchProps) => {
           loading={loading}
           value={props.value}
           onChange={(event: any, newValue: Film[] | undefined) => {
-            let intersection = props.value
-              ? newValue
-                ? newValue.filter((x) => !props.value.includes(x))
-                : []
-              : newValue
-              ? newValue
-              : [];
+            let intersection: Film[];
+            if (props.value !== undefined) {
+              if (newValue !== undefined) {
+                // @ts-ignore
+                intersection = newValue.filter((x) => !props.value.includes(x));
+              } else {
+                intersection = [];
+              }
+            } else {
+              if (newValue !== undefined) {
+                intersection = newValue;
+              } else {
+                intersection = [];
+              }
+            }
             props.selectSearchValue(
               intersection[0] ? intersection[0].title : '',
             );
