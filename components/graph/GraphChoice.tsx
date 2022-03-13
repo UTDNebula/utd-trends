@@ -10,6 +10,9 @@ import GraphProps from '../modules/GraphProps';
 import { VerticalBarGraph } from './VerticalBarGraph';
 import { HorizontalBarGraph } from './HorizontalBarGraph';
 
+/**
+ * Creates the appropriate graph with it's corresponding props when given a graph type 
+ */
 export function GraphChoice(props: GraphProps) {
 
     switch(props.form){

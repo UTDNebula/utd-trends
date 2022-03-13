@@ -50,6 +50,7 @@ export const Dashboard: NextPage = () => {
     { name: 'Jason', data: [2, 5, 1, 6,9] },
     { name: 'Suzy', data: [2, 5, 2, 1,1] },
   ];
+  /* Radial bar charts only take in one value per class, labels are passed seperately through labels prop in corresponding order*/ 
   var diffDat = [31,87,65];
 
   return (
