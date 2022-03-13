@@ -3,8 +3,6 @@ import { SearchIcon } from './searchIcon';
 import Autocomplete from '@mui/material/Autocomplete';
 import { throttle } from 'lodash';
 import topFilms from '../../data/autocomplete_dummy_data.json';
-import Popper from '@mui/material/Popper';
-import { Box, Paper } from '@mui/material';
 
 /**
  * Props type used by the SearchBar component
@@ -26,7 +24,7 @@ interface Film {
  * This component returns a custom search bar component that makes use of the Search Icon component
  * Sends the input value to the parent component on 'Enter'
  */
-export const SearchBar = (props: SearchProps) => {
+export const SplashPageSearchBar = (props: SearchProps) => {
   const [open, setOpen] = React.useState(false);
   const [options, setOptions] = React.useState<readonly Film[]>([]);
   const loading = open && options.length === 0;
@@ -82,14 +80,14 @@ export const SearchBar = (props: SearchProps) => {
 
   return (
     <>
-      <div className="text-primary w-11/12 h-fit flex flex-row items-center">
-        <div className="translate-x-12 w-8 h-8 text-primary">
+      <div className="text-primary m-auto w-11/12 -translate-y-1/2">
+        <div className="translate-y-10 translate-x-4 w-8 h-8 text-primary-light">
           <SearchIcon />
         </div>
         <Autocomplete
           multiple={true}
           disabled={props.disabled}
-          className="w-full h-12 bg-primary-light outline-0 active:outline-0 focus:outline-0 font-sans"
+          className="w-full h-12"
           open={open}
           onOpen={() => {
             setOpen(true);
@@ -120,48 +118,23 @@ export const SearchBar = (props: SearchProps) => {
             setInputValue(newInputValue);
           }}
           renderInput={(params) => (
-            <div
-              ref={params.InputProps.ref}
-              className="outline-0 active:outline-0 focus:outline-0 font-sans"
-            >
+            <div ref={params.InputProps.ref}>
               <input
                 {...params.inputProps}
                 type="search"
                 id="mainSearch"
-                className="outline-0 active:outline-0 focus:outline-0 w-full h-12 pl-16 bg-primary-light text-gray-600 placeholder-dark"
+                className="rounded-md border-primary-dark border-2 w-full h-12 pl-12 bg-white text-primary-dark placeholder-primary-dark font-bold"
                 placeholder="Search section number, professor name, course number...."
               />
             </div>
           )}
-          renderOption={(props, option, { selected }) => (
-            <li {...props} className="bg-white/25 my-4 mx-8 font-sans">
-              <Box className="text-lg text-gray-600">
-                {option.title}
-                <br />
-                <span className="text-base text-gray-600">{option.year}</span>
-              </Box>
-            </li>
-          )}
-          PopperComponent={(props) => {
-            return (
-              <Popper {...props} className="rounded-none" placement="bottom" />
-            );
-          }}
-          PaperComponent={({ children }) => {
-            return (
-              <Paper className="bg-primary-light rounded-none">
-                {children}
-              </Paper>
-            );
-          }}
           defaultValue={[]}
         />
-        <div className="w-8 h-8" />
       </div>
     </>
   );
 };
 
-SearchBar.defaultProps = {
+SplashPageSearchBar.defaultProps = {
   disabled: true,
 };

@@ -17,7 +17,7 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
 
   return (
     <Card
-      className="bg-secondary"
+      className="bg-primary-light"
       sx={{
         display: 'flex',
         flexDirection: 'row',
