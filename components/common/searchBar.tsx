@@ -17,14 +17,19 @@ type SearchProps = {
   disabled?: boolean;
 };
 
+/**
+ * Data type used by the dummy data
+ */
 interface Film {
   title: string;
   year: number;
 }
 
 /**
- * This component returns a custom search bar component that makes use of the Search Icon component
- * Sends the input value to the parent component on 'Enter'
+ * This component returns a custom search bar component that makes use of the Material UI autocomplete component
+ * Sends a new search value to the parent component when the user selects it from the options list
+ *
+ * Styled for the ExpandableSearchGrid component
  */
 export const SearchBar = (props: SearchProps) => {
   const [open, setOpen] = React.useState(false);
@@ -102,25 +107,26 @@ export const SearchBar = (props: SearchProps) => {
           options={options}
           loading={loading}
           value={props.value}
+          // When a new option is selected, find the new selected option by getting the
+          // difference between the current and new value, then return that to the parent
+          // component using selectSearchValue prop
           onChange={(event: any, newValue: Film[] | undefined) => {
-            let intersection: Film[];
+            let difference: Film[];
             if (props.value !== undefined) {
               if (newValue !== undefined) {
                 // @ts-ignore
-                intersection = newValue.filter((x) => !props.value.includes(x));
+                difference = newValue.filter((x) => !props.value.includes(x));
               } else {
-                intersection = [];
+                difference = [];
               }
             } else {
               if (newValue !== undefined) {
-                intersection = newValue;
+                difference = newValue;
               } else {
-                intersection = [];
+                difference = [];
               }
             }
-            props.selectSearchValue(
-              intersection[0] ? intersection[0].title : '',
-            );
+            props.selectSearchValue(difference[0] ? difference[0].title : '');
             props.setValue(newValue);
           }}
           inputValue={inputValue}

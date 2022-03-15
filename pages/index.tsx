@@ -43,10 +43,10 @@ const Home: NextPage = () => {
   return (
     <>
       <div className="w-full justify-center items-center bg-gradient-to-b from-primary to-light text-primary-darker ">
-        <div className="w-full h-4/5 absolute translate-y-1/4 overflow-x-hidden overflow-hidden">
+        <div className="w-full h-2/3 absolute translate-y-1/4 overflow-x-hidden overflow-hidden">
           <WaveSVG />
         </div>
-        <div className="w-full h-4/5 absolute translate-y-1/3 overflow-x-hidden overflow-hidden">
+        <div className="w-full h-2/3 absolute translate-y-1/3 overflow-x-hidden overflow-hidden">
           <Wave2SVG />
         </div>
         <div className="flex justify-center content-center h-screen translate-y-">

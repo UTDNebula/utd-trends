@@ -9,6 +9,11 @@ interface Film {
   year: number;
 }
 
+/**
+ * This component returns a bar that will allow users to add and remove search terms (up to 3 max)
+ * using the SearchBar component. The currently selected search terms are represented by
+ * SearchTermCard components, and are displayed from left to right in this grid.
+ */
 export const ExpandableSearchGrid = () => {
   const [value, setValue] = useState<Film[] | undefined>([]);
   const [searchTerms, setSearchTerms] = useState<string[]>([]);
@@ -26,7 +31,6 @@ export const ExpandableSearchGrid = () => {
   }
 
   useEffect(() => {
-    // console.log("The searchTerms have updated to ", searchTerms);
     if (searchTerms.length >= 3) {
       setSearchDisable(true);
     } else {
@@ -41,7 +45,7 @@ export const ExpandableSearchGrid = () => {
           initialValue={option}
           key={option}
           index={index}
-          color={colors[index]}
+          legendColor={colors[index]}
           onCloseButtonClicked={deleteSearchTerm}
         />
       ))}
