@@ -21,8 +21,10 @@ interface Film {
 }
 
 /**
- * This component returns a custom search bar component that makes use of the Search Icon component
- * Sends the input value to the parent component on 'Enter'
+ * This component returns a custom search bar component that makes use of the Material UI autocomplete component
+ * Sends a new search value to the parent component when the user selects it from the options list
+ *
+ * Styled for the splash page
  */
 export const SplashPageSearchBar = (props: SearchProps) => {
   const [open, setOpen] = React.useState(false);

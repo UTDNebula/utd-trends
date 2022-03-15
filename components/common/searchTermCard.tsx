@@ -3,15 +3,23 @@ import Card from '@mui/material/Card';
 import { Box, IconButton, Typography } from '@mui/material';
 import { Close } from '@mui/icons-material';
 
+/**
+ * Props type used by the SearchTermCard component
+ */
 type SearchTermCardProps = {
   initialValue: string;
   index: number;
   onCloseButtonClicked: Function;
-  color: string;
+  legendColor: string;
 };
 
+/**
+ * This component returns a custom Card that shows the search term and a colored circle
+ * next to it representing the corresponding data's color
+ *
+ */
 export const SearchTermCard = (props: SearchTermCardProps) => {
-  function handleClick() {
+  function handleCloseClick() {
     props.onCloseButtonClicked(props.initialValue);
   }
 
@@ -29,7 +37,7 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
       <div className="float-left flex align-middle place-items-center">
         <Box
           sx={{
-            backgroundColor: props.color,
+            backgroundColor: props.legendColor,
             borderRadius: 100,
             width: '20px',
             height: '20px',
@@ -43,7 +51,7 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
         </Typography>
       </div>
       <div className="float-right">
-        <IconButton aria-label="play/pause" onClick={handleClick}>
+        <IconButton aria-label="play/pause" onClick={handleCloseClick}>
           <Close />
         </IconButton>
       </div>
