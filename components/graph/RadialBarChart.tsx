@@ -33,6 +33,18 @@ import GraphProps from '../modules/GraphProps';
           fontFamily: undefined,
         },
       },
+      plotOptions:{
+        radialBar:{
+          dataLabels:{
+            show:true,
+            total:{
+              show:true,
+              label:"Average",
+              color:"#000000"
+            }
+          }
+        }
+      }
     };
   
     return (

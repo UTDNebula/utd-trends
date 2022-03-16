@@ -51,7 +51,7 @@ export const Dashboard: NextPage = () => {
     { name: 'Suzy', data: [2, 5, 2, 1,1] },
   ];
   /* Radial bar charts only take in one value per class, labels are passed seperately through labels prop in corresponding order*/ 
-  var diffDat = [31,87,65];
+  var diffDat = [3.1/4*100,2.6/4*100,3.9/4*100];
 
   return (
     <>
@@ -66,10 +66,10 @@ export const Dashboard: NextPage = () => {
                   <GraphChoice form='Radial' title='Grades Distribution' labels = {['Smith', 'Jason', 'Suzy']} series = {diffDat} ></GraphChoice>
                 </Card>
                 <Card className="col-span-2 row-span-4 lg:row-span-2 p-4 h-screen lg:h-full">
-                  <GraphChoice form='Horizontal' title='Grades Distribution' xaxisLabels={['A','B','C','D','F','CR','NC']} series = {dat} ></GraphChoice>
+                  <GraphChoice form='Bar' title='Grades Distribution' xaxisLabels={['A','B','C','D','F','CR','NC']} series = {dat} ></GraphChoice>
                 </Card>
                 <Card className="col-span-2 row-span-4 lg:row-span-2 p-4 h-screen lg:h-full">
-                  <GraphChoice form='Bar' title='Grades Distribution' xaxisLabels={['A','B','C','D','F','CR','NC']} series = {dat} ></GraphChoice>
+                  <GraphChoice form='Line' title='Class Averages' xaxisLabels={['A','B','C','D','F','CR','NC']} series = {dat} ></GraphChoice>
                 </Card>
               </div>
               <div className="grid grid-cols-1 gap-4 p-4 h-full sm:grid-cols-2 md:grid-cols-4">

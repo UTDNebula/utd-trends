@@ -81,9 +81,9 @@ export const Carousel: FC<CarouselProps> = (props: CarouselProps) => {
                 opacity: { duration: 0.2 },
               }}
             >
-              <Card className="w-full h-max lg:h-full rounded-md ">
+              <div className="w-full h-max lg:h-full rounded-md ">
                 {props.children[currentCard]}
-              </Card>
+              </div>
             </motion.div>
           </div>
         </AnimatePresence>
