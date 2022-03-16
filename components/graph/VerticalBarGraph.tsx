@@ -4,6 +4,11 @@ import { ApexOptions } from 'apexcharts';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import GraphProps from '../modules/GraphProps';
 
+/**
+ * Creates a pre-configured Apexcharts vertical bar graph component
+ * @param props 
+ * @returns vertical bar graph
+ */
 export function VerticalBarGraph(props: GraphProps) {
   const options: ApexOptions = {
     chart: {

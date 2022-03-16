@@ -4,6 +4,11 @@ import { ApexOptions } from 'apexcharts';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import GraphProps from '../modules/GraphProps';
 
+/**
+ * Creates a pre-configured Apexcharts radar graph component
+ * @param props 
+ * @returns horizontal bar graph
+ */
   export function RadarChart(props: GraphProps) {
     const options: ApexOptions = {
       chart: {

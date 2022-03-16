@@ -4,6 +4,11 @@ import { ApexOptions } from 'apexcharts';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import GraphProps from '../modules/GraphProps';
 
+/**
+ * Creates a pre-configured Apexcharts radial bar graph component
+ * @param props 
+ * @returns radial bar graph
+ */
   export function RadialBarChart(props: GraphProps) {
     const options: ApexOptions = {
       chart: {

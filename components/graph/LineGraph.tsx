@@ -4,6 +4,11 @@ import { ApexOptions } from 'apexcharts';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import GraphProps from '../modules/GraphProps';
 
+/**
+ * Creates a pre-configured Apexcharts line graph component
+ * @param props 
+ * @returns line graph
+ */
 export function LineGraph(props: GraphProps) {
   const options: ApexOptions = {
     chart: {
