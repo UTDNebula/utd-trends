@@ -3,6 +3,7 @@ import { SearchIcon } from './searchIcon';
 import Autocomplete from '@mui/material/Autocomplete';
 import throttle from 'lodash/throttle';
 import topFilms from '../../data/autocomplete_dummy_data.json';
+import axios from 'axios';
 
 /**
  * Props type used by the SearchBar component
@@ -10,7 +11,7 @@ import topFilms from '../../data/autocomplete_dummy_data.json';
 type SearchProps = {
   // setSearch: the setter function from the parent component to set the search value
   selectSearchValue: Function;
-  value: Film[] | undefined;
+  value: Suggestion[] | undefined;
   setValue: Function;
   disabled?: boolean;
 };
@@ -18,6 +19,16 @@ type SearchProps = {
 interface Film {
   title: string;
   year: number;
+}
+
+interface Components {
+  subject:string;
+  course:string;
+  professor:string;
+}
+interface Suggestion {
+  suggestion:string;
+  components: Components;
 }
 
 /**
@@ -28,7 +39,7 @@ interface Film {
  */
 export const SplashPageSearchBar = (props: SearchProps) => {
   const [open, setOpen] = React.useState(false);
-  const [options, setOptions] = React.useState<readonly Film[]>([]);
+  const [options, setOptions] = React.useState<readonly Suggestion[]>([]);
   const loading = open && options.length === 0;
 
   const [inputValue, setInputValue] = React.useState('');
@@ -36,13 +47,25 @@ export const SplashPageSearchBar = (props: SearchProps) => {
   const fetch = React.useMemo(
     () =>
       throttle(
-        (
+        async (
           request: { input: string },
-          callback: (results?: readonly Film[]) => void,
+          callback: (results?: readonly Suggestion[]) => void,
         ) => {
           console.log('"called" the api again');
+          if(request.input != ""){
+            let dat = await (await axios.get('http://45.79.48.79/suggestions/'+request.input)).data; //fetch to get JSON object containing results
+            let fin:Suggestion[] = [];
+            for(var key in dat){
+              if(dat.hasOwnProperty(key)){
+                fin.push(dat[key]);
+              }
+            }
+            console.log(dat);
+            console.log(fin);
+            callback(fin);
+          }
         },
-        2000,
+        200,
       ),
     [],
   );
@@ -51,9 +74,9 @@ export const SplashPageSearchBar = (props: SearchProps) => {
     let active = true;
 
     (async () => {
-      fetch({ input: inputValue }, (results?: readonly Film[]) => {
+      fetch({ input: inputValue }, (results?: readonly Suggestion[]) => {
         if (active) {
-          let newOptions: readonly Film[] = [];
+          let newOptions: readonly Suggestion[] = [];
 
           if (results) {
             newOptions = [...newOptions, ...results];
@@ -65,7 +88,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
 
       if (active) {
         console.log('options updated');
-        setOptions([...topFilms]);
+        setOptions([...[]]);
       }
     })();
 
@@ -98,12 +121,12 @@ export const SplashPageSearchBar = (props: SearchProps) => {
             setOpen(false);
           }}
           filterSelectedOptions
-          getOptionLabel={(option) => option.title}
+          getOptionLabel={(option) => option.suggestion}
           options={options}
           loading={loading}
           value={props.value}
-          onChange={(event: any, newValue: Film[] | undefined) => {
-            let intersection: Film[];
+          onChange={(event: any, newValue: Suggestion[] | undefined) => {
+            let intersection: Suggestion[];
             if (props.value !== undefined) {
               if (newValue !== undefined) {
                 // @ts-ignore
@@ -119,7 +142,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
               }
             }
             props.selectSearchValue(
-              intersection[0] ? intersection[0].title : '',
+              intersection[0] ? intersection[0].suggestion : '',
             );
             props.setValue(newValue);
           }}

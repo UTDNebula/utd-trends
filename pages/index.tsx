@@ -29,12 +29,21 @@ interface Film {
   title: string;
   year: number;
 }
+interface Components {
+  subject:string;
+  course:string;
+  professor:string;
+}
+interface Suggestion {
+  suggestion:string;
+  components: Components;
+}
 
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
 const Home: NextPage = () => {
-  const [value, setValue] = useState<Film[] | undefined>([]);
+  const [value, setValue] = useState<Suggestion[] | undefined>([]);
 
   function searchOptionChosen(chosenOption: any) {
     console.log('The option chosen was: ', chosenOption);
