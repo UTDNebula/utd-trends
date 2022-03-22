@@ -72,4 +72,4 @@ export const ExpandableSearchGrid = () => {
   );
 };
 
-const colors = ['#b71c1c', '#0d47a1', '#1b5e20'];
+const colors = ['#ffadad', '#9bf6ff', '#caffbf'];
