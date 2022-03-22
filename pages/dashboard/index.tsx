@@ -10,6 +10,7 @@ import { RadarChart } from '../../components/graph/RadarChart';
 import { RadialBarChart } from '../../components/graph/RadialBarChart';
 import SearchGrid from '../../components/navigation/searchGrid';
 import TopMenu from '../../components/navigation/topMenu';
+import { ExpandableSearchGrid } from '../../components/common/expandableSearchGrid';
 
 export const Dashboard: NextPage = () => {
   var data1 = [1, 2, 8, 2, 1, 3, 4, 7, 9];
@@ -47,29 +48,44 @@ export const Dashboard: NextPage = () => {
 
   var dat = [
     { name: 'Smith', data: [1, 2, 3, 4, 1] },
-    { name: 'Jason', data: [2, 5, 1, 6,9] },
-    { name: 'Suzy', data: [2, 5, 2, 1,1] },
+    { name: 'Jason', data: [2, 5, 1, 6, 9] },
+    { name: 'Suzy', data: [2, 5, 2, 1, 1] },
   ];
-  /* Radial bar charts only take in one value per class, labels are passed seperately through labels prop in corresponding order*/ 
-  var diffDat = [3.1/4*100,2.6/4*100,3.9/4*100];
+  /* Radial bar charts only take in one value per class, labels are passed seperately through labels prop in corresponding order*/
+  var diffDat = [(3.1 / 4) * 100, (2.6 / 4) * 100, (3.9 / 4) * 100];
 
   return (
     <>
       <div className="h-full lg:h-screen w-full bg-light">
         <TopMenu />
-        <SearchGrid></SearchGrid>
+        <ExpandableSearchGrid></ExpandableSearchGrid>
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 p-10 relative lg:min-h-full">
             <Carousel>
               <div className="grid grid-cols-2 gap-4 p-4 h-full lg:grid-cols-4 ">
                 <Card className="row-span-4 col-span-2 p-4 h-screen lg:h-full">
-                  <GraphChoice form='Radial' title='Grades Distribution' labels = {['Smith', 'Jason', 'Suzy']} series = {diffDat} ></GraphChoice>
+                  <GraphChoice
+                    form="Radial"
+                    title="Grades Distribution"
+                    labels={['Smith', 'Jason', 'Suzy']}
+                    series={diffDat}
+                  ></GraphChoice>
                 </Card>
                 <Card className="col-span-2 row-span-4 lg:row-span-2 p-4 h-screen lg:h-full">
-                  <GraphChoice form='Bar' title='Grades Distribution' xaxisLabels={['A','B','C','D','F','CR','NC']} series = {dat} ></GraphChoice>
+                  <GraphChoice
+                    form="Bar"
+                    title="Grades Distribution"
+                    xaxisLabels={['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
+                    series={dat}
+                  ></GraphChoice>
                 </Card>
                 <Card className="col-span-2 row-span-4 lg:row-span-2 p-4 h-screen lg:h-full">
-                  <GraphChoice form='Line' title='Class Averages' xaxisLabels={['A','B','C','D','F','CR','NC']} series = {dat} ></GraphChoice>
+                  <GraphChoice
+                    form="Line"
+                    title="Class Averages"
+                    xaxisLabels={['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
+                    series={dat}
+                  ></GraphChoice>
                 </Card>
               </div>
               <div className="grid grid-cols-1 gap-4 p-4 h-full sm:grid-cols-2 md:grid-cols-4">
