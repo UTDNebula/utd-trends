@@ -5,7 +5,6 @@
  * the DOM rather than using an IMG tag. Change color of the svg by changing the text color of the
  * surrouding div.
  */
- 
 
 export const FlatLogoIcon = () => {
   return (

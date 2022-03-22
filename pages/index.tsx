@@ -3,33 +3,14 @@ import Card from '@mui/material/Card';
 import { SplashPageSearchBar } from '../components/common/splashPageSearchBar';
 import { WaveSVG } from '../components/common/waveSVG';
 import { Wave2SVG } from '../components/common/wave2SVG';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
 import { FlatLogoIcon } from '../components/common/flatLogoIcon';
 import { useState } from 'react';
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-);
+import styles from '../styles/Home.module.css';
 
 interface Film {
   title: string;
   year: number;
 }
-
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
