@@ -20,8 +20,10 @@ export const ExpandableSearchGrid = () => {
   const [searchDisabled, setSearchDisable] = useState<boolean>(false);
 
   function addSearchTerm(newSearchTerm: Film) {
-    console.log('adding ' + newSearchTerm + ' to the search terms.');
-    setSearchTerms([...searchTerms, newSearchTerm]);
+    if (newSearchTerm != null) {
+      console.log('adding ' + newSearchTerm + ' to the search terms.');
+      setSearchTerms([...searchTerms, newSearchTerm]);
+    }
   }
 
   function deleteSearchTerm(searchTerm: string) {
