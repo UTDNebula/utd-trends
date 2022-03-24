@@ -126,7 +126,7 @@ export const SearchBar = (props: SearchProps) => {
                 difference = [];
               }
             }
-            props.selectSearchValue(difference[0] ? difference[0].title : '');
+            props.selectSearchValue(difference[0] ? difference[0] : '');
             props.setValue(newValue);
           }}
           inputValue={inputValue}
@@ -149,7 +149,7 @@ export const SearchBar = (props: SearchProps) => {
           )}
           renderOption={(props, option, { selected }) => (
             <li {...props} className="bg-white/25 my-4 mx-8 font-sans">
-              <Box className="text-lg text-gray-600">
+              <Box className="text-lg text-gray-600 pl-5 py-5">
                 {option.title}
                 <br />
                 <span className="text-base text-gray-600">{option.year}</span>

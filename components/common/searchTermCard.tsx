@@ -7,7 +7,8 @@ import { Close } from '@mui/icons-material';
  * Props type used by the SearchTermCard component
  */
 type SearchTermCardProps = {
-  initialValue: string;
+  primaryText: string;
+  secondaryText: string;
   index: number;
   onCloseButtonClicked: Function;
   legendColor: string;
@@ -20,7 +21,7 @@ type SearchTermCardProps = {
  */
 export const SearchTermCard = (props: SearchTermCardProps) => {
   function handleCloseClick() {
-    props.onCloseButtonClicked(props.initialValue);
+    props.onCloseButtonClicked(props.primaryText);
   }
 
   return (
@@ -46,8 +47,10 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
             marginLeft: '8px',
           }}
         />
-        <Typography component="div" variant="h5" sx={{ float: 'right' }}>
-          {props.initialValue}
+        <Typography className="text-lg text-gray-600">
+          {props.primaryText}
+          <br />
+          <span className="text-base text-gray-600">{props.secondaryText}</span>
         </Typography>
       </div>
       <div className="float-right">

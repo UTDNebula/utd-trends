@@ -16,17 +16,17 @@ interface Film {
  */
 export const ExpandableSearchGrid = () => {
   const [value, setValue] = useState<Film[] | undefined>([]);
-  const [searchTerms, setSearchTerms] = useState<string[]>([]);
+  const [searchTerms, setSearchTerms] = useState<Film[]>([]);
   const [searchDisabled, setSearchDisable] = useState<boolean>(false);
 
-  function addSearchTerm(newSearchTerm: string) {
+  function addSearchTerm(newSearchTerm: Film) {
     console.log('adding ' + newSearchTerm + ' to the search terms.');
     setSearchTerms([...searchTerms, newSearchTerm]);
   }
 
   function deleteSearchTerm(searchTerm: string) {
     console.log('deleteSearchTerm called on ' + searchTerm);
-    setSearchTerms(searchTerms.filter((item) => item !== searchTerm));
+    setSearchTerms(searchTerms.filter((item) => item.title !== searchTerm));
     setValue(value?.filter((item) => item.title !== searchTerm));
   }
 
@@ -39,11 +39,12 @@ export const ExpandableSearchGrid = () => {
   }, [searchTerms]);
 
   return (
-    <div className="w-full min-h-[75px] grid grid-flow-row auto-cols-fr md:grid-flow-col justify-center">
-      {searchTerms.map((option: string, index: number) => (
+    <div className="w-full min-h-[72px] grid grid-flow-row auto-cols-fr md:grid-flow-col justify-center">
+      {searchTerms.map((option: Film, index: number) => (
         <SearchTermCard
-          initialValue={option}
-          key={option}
+          primaryText={option.title}
+          secondaryText={'' + option.year}
+          key={option.title}
           index={index}
           legendColor={colors[index]}
           onCloseButtonClicked={deleteSearchTerm}
@@ -57,6 +58,10 @@ export const ExpandableSearchGrid = () => {
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
+              padding: 1.5,
+              '&:last-child': {
+                paddingBottom: 1.5,
+              },
             }}
           >
             <SearchBar
