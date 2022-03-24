@@ -110,7 +110,10 @@ export const SearchBar = (props: SearchProps) => {
           // When a new option is selected, find the new selected option by getting the
           // difference between the current and new value, then return that to the parent
           // component using selectSearchValue prop
-          onChange={(event: any, newValue: Film[] | undefined) => {
+          onChange={(event: any, newValue: Film[] | undefined, reason) => {
+            if (reason === 'removeOption') {
+              return;
+            }
             let difference: Film[];
             if (props.value !== undefined) {
               if (newValue !== undefined) {
@@ -126,7 +129,7 @@ export const SearchBar = (props: SearchProps) => {
                 difference = [];
               }
             }
-            props.selectSearchValue(difference[0] ? difference[0] : '');
+            props.selectSearchValue(difference[0] ? difference[0] : null);
             props.setValue(newValue);
           }}
           inputValue={inputValue}
