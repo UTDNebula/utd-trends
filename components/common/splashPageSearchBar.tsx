@@ -2,7 +2,6 @@ import * as React from 'react';
 import { SearchIcon } from './searchIcon';
 import Autocomplete from '@mui/material/Autocomplete';
 import throttle from 'lodash/throttle';
-import topFilms from '../../data/autocomplete_dummy_data.json';
 import axios from 'axios';
 
 /**
@@ -16,11 +15,9 @@ type SearchProps = {
   disabled?: boolean;
 };
 
-interface Film {
-  title: string;
-  year: number;
-}
-
+/**
+ * Data types used by the options
+ */
 interface Components {
   subject:string;
   course:string;
@@ -120,15 +117,19 @@ export const SplashPageSearchBar = (props: SearchProps) => {
           onClose={() => {
             setOpen(false);
           }}
+          // Keeps already selected options from appearing in the options list
           filterSelectedOptions
           getOptionLabel={(option) => option.suggestion}
           options={options}
           loading={loading}
           value={props.value}
           onChange={(event: any, newValue: Suggestion[] | undefined, reason) => {
+            // Removes ability to deselect options with delete key while focusing the input
             if (reason === 'removeOption') {
               return;
             }
+
+            // Finds the newly selected option by finding difference between previous set and new set
             let difference: Suggestion[];
             if (props.value !== undefined) {
               if (newValue !== undefined) {
@@ -144,9 +145,13 @@ export const SplashPageSearchBar = (props: SearchProps) => {
                 difference = [];
               }
             }
+
+            // Returns the difference if there is one, otherwise null
             props.selectSearchValue(
-              difference[0] ? difference[0] : '',
+              difference[0] ? difference[0] : null,
             );
+
+            // Sets the new value
             props.setValue(newValue);
           }}
           inputValue={inputValue}

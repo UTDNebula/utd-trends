@@ -4,11 +4,9 @@ import Card from '@mui/material/Card';
 import { CardContent } from '@mui/material';
 import { SearchBar } from './searchBar';
 
-interface Film {
-  title: string;
-  year: number;
-}
-
+/**
+ * Data types used by the options
+ */
 interface Components {
   subject:string;
   course:string;
@@ -29,6 +27,10 @@ export const ExpandableSearchGrid = () => {
   const [searchTerms, setSearchTerms] = useState<Suggestion[]>([]);
   const [searchDisabled, setSearchDisable] = useState<boolean>(false);
 
+  /**
+   * Add a search term to the search grid (max 3).
+   * @param newSearchTerm The Suggestion to add and display with a card
+   */
   function addSearchTerm(newSearchTerm: Suggestion) {
     if (newSearchTerm != null) {
       console.log('adding ' + newSearchTerm + ' to the search terms.');
@@ -36,6 +38,11 @@ export const ExpandableSearchGrid = () => {
     }
   }
 
+  /**
+   * Remove a search term from the grid.
+   * @param searchTerm The suggestion string (unique to each search term) used to filter out the corresponding
+   *                   Suggestion from the values and stored terms
+   */
   function deleteSearchTerm(searchTerm: string) {
     console.log('deleteSearchTerm called on ' + searchTerm);
     setSearchTerms(searchTerms.filter((item) => item.suggestion !== searchTerm));
