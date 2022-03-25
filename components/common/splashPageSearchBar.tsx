@@ -125,24 +125,27 @@ export const SplashPageSearchBar = (props: SearchProps) => {
           options={options}
           loading={loading}
           value={props.value}
-          onChange={(event: any, newValue: Suggestion[] | undefined) => {
-            let intersection: Suggestion[];
+          onChange={(event: any, newValue: Suggestion[] | undefined, reason) => {
+            if (reason === 'removeOption') {
+              return;
+            }
+            let difference: Suggestion[];
             if (props.value !== undefined) {
               if (newValue !== undefined) {
                 // @ts-ignore
-                intersection = newValue.filter((x) => !props.value.includes(x));
+                difference = newValue.filter((x) => !props.value.includes(x));
               } else {
-                intersection = [];
+                difference = [];
               }
             } else {
               if (newValue !== undefined) {
-                intersection = newValue;
+                difference = newValue;
               } else {
-                intersection = [];
+                difference = [];
               }
             }
             props.selectSearchValue(
-              intersection[0] ? intersection[0].suggestion : '',
+              difference[0] ? difference[0] : '',
             );
             props.setValue(newValue);
           }}
