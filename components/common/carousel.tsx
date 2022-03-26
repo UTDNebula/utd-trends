@@ -45,25 +45,17 @@ export const Carousel: FC<CarouselProps> = (props: CarouselProps) => {
   /**
    * Turn
    * This function slides the active component back and forth based upon whether it is fed a positive or negative value
-   * @param newDir a positive value will cause the card to move right, negative value cause card to move left
+   * @param displacement a positive value will cause the card to move right, negative value cause card to move left
    */
-  const turn = (newDir: number) => {
+  const turn = (displacement: number) => {
     //set direction
-    setDir(newDir);
-    //check for edges of arrayay
-    if (currentCard === 0 && newDir < 0) {
-      setCard(props.children.length - 1);
-    } else if (currentCard === props.children.length - 1 && newDir > 0) {
-      setCard(0);
-    } else {
-      //otherwise just add the direction (1 or -1 should be used for a single move)
-      setCard(currentCard + newDir);
-    }
+    setDir(displacement);
+    setCard(currentCard + displacement);
   };
 
   return (
     <>
-      <TabNavMenu value={currentCard} setValue={setCard}/>
+      <TabNavMenu value={currentCard} turner={turn}/>
       <div className="relative p-10 pt-0" style={{ height: '90%' }}>
         <AnimatePresence>
           <div className="h-full">
