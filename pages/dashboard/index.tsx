@@ -1,14 +1,8 @@
-import { Autocomplete, Input, Card } from '@mui/material';
+import { Card } from '@mui/material';
 import type { NextPage } from 'next';
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
 import Carousel from '../../components/common/carousel';
-import { SearchBar } from '../../components/common/searchBar';
-import { BarGraph } from '../../components/graph/BarGraph';
 import { GraphChoice } from '../../components/graph/GraphChoice';
-import { LineGraph } from '../../components/graph/LineGraph';
-import { RadarChart } from '../../components/graph/RadarChart';
-import { RadialBarChart } from '../../components/graph/RadialBarChart';
-import SearchGrid from '../../components/navigation/searchGrid';
 import TopMenu from '../../components/navigation/topMenu';
 import { ExpandableSearchGrid } from '../../components/common/expandableSearchGrid';
 
@@ -58,9 +52,9 @@ export const Dashboard: NextPage = () => {
     <>
       <div className="h-full lg:h-screen w-full bg-light">
         <TopMenu />
-        <ExpandableSearchGrid></ExpandableSearchGrid>
+        <ExpandableSearchGrid/>
         <div className="w-full h-5/6 justify-center">
-          <div className="w-full h-5/6 p-10 relative lg:min-h-full">
+          <div className="w-full h-5/6 relative lg:min-h-full">
             <Carousel>
               <div className="grid grid-cols-2 gap-4 p-4 h-full lg:grid-cols-4 ">
                 <Card className="row-span-4 col-span-2 p-4 h-screen lg:h-full">
@@ -69,7 +63,7 @@ export const Dashboard: NextPage = () => {
                     title="Grades Distribution"
                     labels={['Smith', 'Jason', 'Suzy']}
                     series={diffDat}
-                  ></GraphChoice>
+                  />
                 </Card>
                 <Card className="col-span-2 row-span-4 lg:row-span-2 p-4 h-screen lg:h-full">
                   <GraphChoice
@@ -77,7 +71,7 @@ export const Dashboard: NextPage = () => {
                     title="Grades Distribution"
                     xaxisLabels={['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
                     series={dat}
-                  ></GraphChoice>
+                  />
                 </Card>
                 <Card className="col-span-2 row-span-4 lg:row-span-2 p-4 h-screen lg:h-full">
                   <GraphChoice
@@ -85,7 +79,7 @@ export const Dashboard: NextPage = () => {
                     title="Class Averages"
                     xaxisLabels={['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
                     series={dat}
-                  ></GraphChoice>
+                  />
                 </Card>
               </div>
               <div className="grid grid-cols-1 gap-4 p-4 h-full sm:grid-cols-2 md:grid-cols-4">

@@ -1,9 +1,7 @@
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
-import { Button, Card } from '@mui/material';
 import React, { FC, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import {TabNavMenu} from "../navigation/tabNavMenu";
 
 type CarouselProps = {
   children: ReactJSXElement[];
@@ -65,7 +63,8 @@ export const Carousel: FC<CarouselProps> = (props: CarouselProps) => {
 
   return (
     <>
-      <div className="relative" style={{ height: '90%' }}>
+      <TabNavMenu value={currentCard} setValue={setCard}/>
+      <div className="relative p-10 pt-0" style={{ height: '90%' }}>
         <AnimatePresence>
           <div className="h-full">
             <motion.div
