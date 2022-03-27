@@ -9,6 +9,7 @@ import { RadialBarChart } from './RadialBarChart';
 import GraphProps from '../modules/GraphProps';
 import { VerticalBarGraph } from './VerticalBarGraph';
 import { HorizontalBarGraph } from './HorizontalBarGraph';
+import { BoxGraph } from './BoxGraph';
 
 /**
  * Creates the appropriate graph with it's corresponding props when given a graph type 
@@ -32,6 +33,15 @@ export function GraphChoice(props: GraphProps) {
             series={props.series}
             title = {props.title}
             ></LineGraph>
+            );
+        }
+        case 'BoxWhisker' : {
+            return(
+            <BoxGraph
+            xaxisLabels={props.xaxisLabels}
+            series={props.series}
+            title = {props.title}
+            ></BoxGraph>
             );
         }
         case 'Vertical' : {

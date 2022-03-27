@@ -45,27 +45,24 @@ export const Dashboard: NextPage = () => {
     { name: 'Jason', data: [2, 5, 1, 6, 9] },
     { name: 'Suzy', data: [2, 5, 2, 1, 1] },
   ];
+  var Boxdat = [
+    { x: 'Smith', y: [1, 2, 3, 4, 1] },
+    { x: 'Jason', y: [2, 5, 1, 6, 9] },
+    { x: 'Suzy', y: [2, 5, 2, 1, 1] },
+  ];
   /* Radial bar charts only take in one value per class, labels are passed seperately through labels prop in corresponding order*/
   var diffDat = [(3.1 / 4) * 100, (2.6 / 4) * 100, (3.9 / 4) * 100];
 
   return (
     <>
-      <div className="h-full lg:h-screen w-full bg-light">
+      <div className=" w-full bg-light h-full">
         <TopMenu />
         <ExpandableSearchGrid/>
         <div className="w-full h-5/6 justify-center">
-          <div className="w-full h-5/6 relative lg:min-h-full">
+          <div className="w-full h-5/6 relative min-h-full">
             <Carousel>
-              <div className="grid grid-cols-2 gap-4 p-4 h-full lg:grid-cols-4 ">
-                <Card className="row-span-4 col-span-2 p-4 h-screen lg:h-full">
-                  <GraphChoice
-                    form="Radial"
-                    title="Grades Distribution"
-                    labels={['Smith', 'Jason', 'Suzy']}
-                    series={diffDat}
-                  />
-                </Card>
-                <Card className="col-span-2 row-span-4 lg:row-span-2 p-4 h-screen lg:h-full">
+              <div className="h-full m-4 ">
+                <Card className="h-96 p-4 m-4">
                   <GraphChoice
                     form="Bar"
                     title="Grades Distribution"
@@ -73,7 +70,7 @@ export const Dashboard: NextPage = () => {
                     series={dat}
                   />
                 </Card>
-                <Card className="col-span-2 row-span-4 lg:row-span-2 p-4 h-screen lg:h-full">
+                <Card className="h-96 p-4 m-4">
                   <GraphChoice
                     form="Line"
                     title="Class Averages"
@@ -82,10 +79,40 @@ export const Dashboard: NextPage = () => {
                   />
                 </Card>
               </div>
-              <div className="grid grid-cols-1 gap-4 p-4 h-full sm:grid-cols-2 md:grid-cols-4">
-                <Card className="max-h-40">
-                  <p>Average</p>
-                  <p>3.1</p>
+              <div className="p-4 h-full">
+                <div className='grid grid-cols-1 md:grid-cols-3'>
+                  <Card className='after:block m-4'>
+                  <GraphChoice
+                      form="Radial"
+                      title="Class Averages"
+                      labels={['Jason','Kelly','Smith']}
+                      series={diffDat}
+                    />
+                  </Card>
+                  <Card className='after:block m-4'>
+                    <GraphChoice
+                      form="Radial"
+                      title="Class Averages"
+                      labels={['Jason','Kelly','Smith']}
+                      series={diffDat}
+                    />
+                  </Card>
+                  <Card className='after:block m-4'>
+                    <GraphChoice
+                      form="Radial"
+                      title="Class Averages"
+                      labels={['Jason','Kelly','Smith']}
+                      series={diffDat}
+                    />
+                  </Card>
+                </div>
+                <Card className="h-96 p-4 m-4">
+                  <GraphChoice
+                    form="BoxWhisker"
+                    title="Class Averages"
+                    xaxisLabels={['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
+                    series={Boxdat}
+                  />
                 </Card>
               </div>
               <div className=" ">Hi</div>

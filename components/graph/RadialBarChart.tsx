@@ -59,7 +59,7 @@ import GraphProps from '../modules/GraphProps';
             options={options}
             series={props.series}
             type="radialBar"
-            height={'100%'}
+            width={'100%'}
           />
         </div>
       </>

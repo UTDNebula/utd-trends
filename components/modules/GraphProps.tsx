@@ -4,7 +4,7 @@
  * labels is only needed for the radial bar component
  */
 type GraphProps = {
-    form?: 'Bar' | 'Line' | 'Radar' | 'Vertical' | 'Horizontal' |'Radial';
+    form?: 'Bar' | 'Line' | 'Radar' | 'Vertical' | 'Horizontal' |'Radial'|'BoxWhisker';
     xaxisLabels?: string[];
     series: any[];
     title: string;
