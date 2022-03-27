@@ -4,9 +4,17 @@ import Card from '@mui/material/Card';
 import { CardContent } from '@mui/material';
 import { SearchBar } from './searchBar';
 
-interface Film {
-  title: string;
-  year: number;
+/**
+ * Data types used by the options
+ */
+interface Components {
+  subject:string;
+  course:string;
+  professor:string;
+}
+interface Suggestion {
+  suggestion:string;
+  components: Components;
 }
 
 /**
@@ -15,21 +23,30 @@ interface Film {
  * SearchTermCard components, and are displayed from left to right in this grid.
  */
 export const ExpandableSearchGrid = () => {
-  const [value, setValue] = useState<Film[] | undefined>([]);
-  const [searchTerms, setSearchTerms] = useState<Film[]>([]);
+  const [value, setValue] = useState<Suggestion[] | undefined>([]);
+  const [searchTerms, setSearchTerms] = useState<Suggestion[]>([]);
   const [searchDisabled, setSearchDisable] = useState<boolean>(false);
 
-  function addSearchTerm(newSearchTerm: Film) {
+  /**
+   * Add a search term to the search grid (max 3).
+   * @param newSearchTerm The Suggestion to add and display with a card
+   */
+  function addSearchTerm(newSearchTerm: Suggestion) {
     if (newSearchTerm != null) {
       console.log('adding ' + newSearchTerm + ' to the search terms.');
       setSearchTerms([...searchTerms, newSearchTerm]);
     }
   }
 
+  /**
+   * Remove a search term from the grid.
+   * @param searchTerm The suggestion string (unique to each search term) used to filter out the corresponding
+   *                   Suggestion from the values and stored terms
+   */
   function deleteSearchTerm(searchTerm: string) {
     console.log('deleteSearchTerm called on ' + searchTerm);
-    setSearchTerms(searchTerms.filter((item) => item.title !== searchTerm));
-    setValue(value?.filter((item) => item.title !== searchTerm));
+    setSearchTerms(searchTerms.filter((item) => item.suggestion !== searchTerm));
+    setValue(value?.filter((item) => item.suggestion !== searchTerm));
   }
 
   useEffect(() => {
@@ -42,14 +59,15 @@ export const ExpandableSearchGrid = () => {
 
   return (
     <div className="w-full min-h-[72px] grid grid-flow-row auto-cols-fr md:grid-flow-col justify-center">
-      {searchTerms.map((option: Film, index: number) => (
+      {searchTerms.map((option: Suggestion, index: number) => (
         <SearchTermCard
-          primaryText={option.title}
-          secondaryText={'' + option.year}
-          key={option.title}
+          primaryText={option.components.subject + " " + option.components.course}
+          secondaryText={option.components.professor}
+          key={option.components.subject + option.components.course + option.components.professor}
           index={index}
           legendColor={colors[index]}
           onCloseButtonClicked={deleteSearchTerm}
+          suggestion={option.suggestion}
         />
       ))}
       {searchTerms.length < 3 ? (

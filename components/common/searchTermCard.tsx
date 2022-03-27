@@ -12,6 +12,7 @@ type SearchTermCardProps = {
   index: number;
   onCloseButtonClicked: Function;
   legendColor: string;
+  suggestion: string;
 };
 
 /**
@@ -21,7 +22,7 @@ type SearchTermCardProps = {
  */
 export const SearchTermCard = (props: SearchTermCardProps) => {
   function handleCloseClick() {
-    props.onCloseButtonClicked(props.primaryText);
+    props.onCloseButtonClicked(props.suggestion);
   }
 
   return (

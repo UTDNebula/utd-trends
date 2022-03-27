@@ -2,9 +2,9 @@ import * as React from 'react';
 import { SearchIcon } from './searchIcon';
 import Autocomplete from '@mui/material/Autocomplete';
 import throttle from 'lodash/throttle';
-import topFilms from '../../data/autocomplete_dummy_data.json';
 import Popper from '@mui/material/Popper';
 import { Box, Paper } from '@mui/material';
+import axios from "axios";
 
 /**
  * Props type used by the SearchBar component
@@ -12,17 +12,22 @@ import { Box, Paper } from '@mui/material';
 type SearchProps = {
   // setSearch: the setter function from the parent component to set the search value
   selectSearchValue: Function;
-  value: Film[] | undefined;
+  value: Suggestion[] | undefined;
   setValue: Function;
   disabled?: boolean;
 };
 
 /**
- * Data type used by the dummy data
+ * Data types used by the options
  */
-interface Film {
-  title: string;
-  year: number;
+interface Components {
+  subject:string;
+  course:string;
+  professor:string;
+}
+interface Suggestion {
+  suggestion:string;
+  components: Components;
 }
 
 /**
@@ -33,32 +38,44 @@ interface Film {
  */
 export const SearchBar = (props: SearchProps) => {
   const [open, setOpen] = React.useState(false);
-  const [options, setOptions] = React.useState<readonly Film[]>([]);
+  const [options, setOptions] = React.useState<readonly Suggestion[]>([]);
   const loading = open && options.length === 0;
 
   const [inputValue, setInputValue] = React.useState('');
 
   const fetch = React.useMemo(
-    () =>
-      throttle(
-        (
-          request: { input: string },
-          callback: (results?: readonly Film[]) => void,
-        ) => {
-          console.log('"called" the api again');
-        },
-        2000,
-      ),
-    [],
+      () =>
+          throttle(
+              async (
+                  request: { input: string },
+                  callback: (results?: readonly Suggestion[]) => void,
+              ) => {
+                console.log('"called" the api again');
+                if(request.input != ""){
+                  let dat = await (await axios.get('http://45.79.48.79/suggestions/'+request.input)).data; //fetch to get JSON object containing results
+                  let fin:Suggestion[] = [];
+                  for(var key in dat){
+                    if(dat.hasOwnProperty(key)){
+                      fin.push(dat[key]);
+                    }
+                  }
+                  console.log("dat=", dat);
+                  console.log("fin=", fin);
+                  callback(fin);
+                }
+              },
+              200,
+          ),
+      [],
   );
 
   React.useEffect(() => {
     let active = true;
 
     (async () => {
-      fetch({ input: inputValue }, (results?: readonly Film[]) => {
+      fetch({ input: inputValue }, (results?: readonly Suggestion[]) => {
         if (active) {
-          let newOptions: readonly Film[] = [];
+          let newOptions: readonly Suggestion[] = [];
 
           if (results) {
             newOptions = [...newOptions, ...results];
@@ -70,7 +87,7 @@ export const SearchBar = (props: SearchProps) => {
 
       if (active) {
         console.log('options updated');
-        setOptions([...topFilms]);
+        setOptions([...[]]);
       }
     })();
 
@@ -102,19 +119,20 @@ export const SearchBar = (props: SearchProps) => {
           onClose={() => {
             setOpen(false);
           }}
+          // Keeps already selected options from appearing in the options list
           filterSelectedOptions
-          getOptionLabel={(option) => option.title}
+          getOptionLabel={(option) => option.suggestion}
           options={options}
           loading={loading}
           value={props.value}
-          // When a new option is selected, find the new selected option by getting the
-          // difference between the current and new value, then return that to the parent
-          // component using selectSearchValue prop
-          onChange={(event: any, newValue: Film[] | undefined, reason) => {
+          onChange={(event: any, newValue: Suggestion[] | undefined, reason) => {
+            // Removes ability to deselect options with delete key while focusing the input
             if (reason === 'removeOption') {
               return;
             }
-            let difference: Film[];
+
+            // Finds the newly selected option by finding difference between previous set and new set
+            let difference: Suggestion[];
             if (props.value !== undefined) {
               if (newValue !== undefined) {
                 // @ts-ignore
@@ -129,7 +147,13 @@ export const SearchBar = (props: SearchProps) => {
                 difference = [];
               }
             }
-            props.selectSearchValue(difference[0] ? difference[0] : null);
+
+            // Returns the difference if there is one, otherwise null
+            props.selectSearchValue(
+                difference[0] ? difference[0] : null
+            );
+
+            // Sets the new value
             props.setValue(newValue);
           }}
           inputValue={inputValue}
@@ -153,9 +177,9 @@ export const SearchBar = (props: SearchProps) => {
           renderOption={(props, option, { selected }) => (
             <li {...props} className="bg-white/25 my-4 mx-8 font-sans">
               <Box className="text-lg text-gray-600 pl-5 py-5">
-                {option.title}
+                {option.components.subject + " " + option.components.course}
                 <br />
-                <span className="text-base text-gray-600">{option.year}</span>
+                <span className="text-base text-gray-600">{option.components.professor}</span>
               </Box>
             </li>
           )}
