@@ -1,12 +1,17 @@
 import { Icon } from '@mui/material';
 import { FlatLogoIcon } from '../common/flatLogoIcon';
 import HandymanIcon from '@mui/icons-material/Handyman';
+import { useRouter } from 'next/router';
 
 export const TopMenu = () => {
+  const router = useRouter()
+  function backHome(){
+    router.push('/')
+  }
   return (
     <div className="bg-primary-dark h-16 text-light relative p-4">
       <div className="h-full float-left flex w-1/4 ">
-        <div className="h-full flex align-middle place-items-center justify-center">
+        <div className="h-full flex align-middle place-items-center justify-center" onClick={backHome}>
           <div className="h-full float-left mr-2">
             <FlatLogoIcon />
           </div>

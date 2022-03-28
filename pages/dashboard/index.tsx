@@ -5,8 +5,9 @@ import Carousel from '../../components/common/carousel';
 import { GraphChoice } from '../../components/graph/GraphChoice';
 import TopMenu from '../../components/navigation/topMenu';
 import { ExpandableSearchGrid } from '../../components/common/expandableSearchGrid';
+import dashboardLayout from '../../layouts/dashboardLayout';
 
-export const Dashboard: NextPage = () => {
+export function Dashboard() {
   var data1 = [1, 2, 8, 2, 1, 3, 4, 7, 9];
   var data2 = [1, 3, 7, 4, 6, 8, 2, 1, 6];
   var data3 = [4, 9, 1, 1, 5, 8, 5, 2, 8];
@@ -38,7 +39,7 @@ export const Dashboard: NextPage = () => {
     }
   }
 
-  function searchAutocomplete() {}
+  function searchAutocomplete() { }
 
   var dat = [
     { name: 'Smith', data: [1, 2, 3, 4, 1] },
@@ -55,72 +56,69 @@ export const Dashboard: NextPage = () => {
 
   return (
     <>
-      <div className=" w-full bg-light h-full">
-        <TopMenu />
-        <ExpandableSearchGrid/>
-        <div className="w-full h-5/6 justify-center">
-          <div className="w-full h-5/6 relative min-h-full">
-            <Carousel>
-              <div className="h-full m-4 ">
-                <Card className="h-96 p-4 m-4">
-                  <GraphChoice
-                    form="Bar"
-                    title="Grades Distribution"
-                    xaxisLabels={['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
-                    series={dat}
-                  />
-                </Card>
-                <Card className="h-96 p-4 m-4">
-                  <GraphChoice
-                    form="Line"
-                    title="Class Averages"
-                    xaxisLabels={['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
-                    series={dat}
-                  />
-                </Card>
-              </div>
-              <div className="p-4 h-full">
-                <div className='grid grid-cols-1 md:grid-cols-3'>
-                  <Card className='after:block m-4'>
-                  <GraphChoice
-                      form="Radial"
-                      title="Class Averages"
-                      labels={['Jason','Kelly','Smith']}
-                      series={diffDat}
-                    />
-                  </Card>
-                  <Card className='after:block m-4'>
-                    <GraphChoice
-                      form="Radial"
-                      title="Class Averages"
-                      labels={['Jason','Kelly','Smith']}
-                      series={diffDat}
-                    />
-                  </Card>
-                  <Card className='after:block m-4'>
-                    <GraphChoice
-                      form="Radial"
-                      title="Class Averages"
-                      labels={['Jason','Kelly','Smith']}
-                      series={diffDat}
-                    />
-                  </Card>
-                </div>
-                <Card className="h-96 p-4 m-4">
-                  <GraphChoice
-                    form="BoxWhisker"
-                    title="Class Averages"
-                    xaxisLabels={['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
-                    series={Boxdat}
-                  />
-                </Card>
-              </div>
-              <div className=" ">Hi</div>
-            </Carousel>
-          </div>
+
+      <Carousel>
+        <div className="h-full m-4 ">
+          <Card className="h-96 p-4 m-4">
+            <GraphChoice
+              form="Bar"
+              title="Grades Distribution"
+              xaxisLabels={['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
+              series={dat}
+            />
+          </Card>
+          <Card className="h-96 p-4 m-4">
+            <GraphChoice
+              form="Line"
+              title="Class Averages"
+              xaxisLabels={['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
+              series={dat}
+            />
+          </Card>
         </div>
-      </div>
+        <div className="p-4 h-full">
+          <div className='grid grid-cols-1 md:grid-cols-3'>
+            <Card className='after:block m-4'>
+              <GraphChoice
+                form="Radial"
+                title="Class Averages"
+                labels={['Jason', 'Kelly', 'Smith']}
+                series={diffDat}
+              />
+            </Card>
+            <Card className='after:block m-4'>
+              <GraphChoice
+                form="Radial"
+                title="Class Averages"
+                labels={['Jason', 'Kelly', 'Smith']}
+                series={diffDat}
+              />
+            </Card>
+            <Card className='after:block m-4'>
+              <GraphChoice
+                form="Radial"
+                title="Class Averages"
+                labels={['Jason', 'Kelly', 'Smith']}
+                series={diffDat}
+              />
+            </Card>
+          </div>
+          <Card className="h-96 p-4 m-4">
+            <GraphChoice
+              form="BoxWhisker"
+              title="Class Averages"
+              xaxisLabels={['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
+              series={Boxdat}
+            />
+          </Card>
+        </div>
+        <div className=" ">Hi</div>
+      </Carousel>
+
     </>
   );
 };
+
+Dashboard.PageLayout = dashboardLayout
+
 export default Dashboard;

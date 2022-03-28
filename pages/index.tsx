@@ -6,6 +6,7 @@ import { Wave2SVG } from '../components/common/wave2SVG';
 import { FlatLogoIcon } from '../components/common/flatLogoIcon';
 import { useState } from 'react';
 import styles from '../styles/Home.module.css';
+import dashboardLayout from '../layouts/dashboardLayout';
 
 interface Film {
   title: string;
@@ -14,7 +15,7 @@ interface Film {
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
-const Home: NextPage = () => {
+function Home(){
   const [value, setValue] = useState<Film[] | undefined>([]);
 
   function searchOptionChosen(chosenOption: any) {

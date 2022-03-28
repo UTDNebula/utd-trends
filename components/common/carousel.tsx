@@ -55,29 +55,31 @@ export const Carousel: FC<CarouselProps> = (props: CarouselProps) => {
 
   return (
     <>
-      <TabNavMenu value={currentCard} turner={turn}/>
-      <div className="relative p-2 pt-0 lg:p-10" style={{ height: '90%' }}>
-        <AnimatePresence>
-          <div className="h-full">
-            <motion.div
-              className="h-full"
-              key={currentCard}
-              custom={direction}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{
-                x: { type: 'spring', stiffness: 300, damping: 30 },
-                opacity: { duration: 0.2 },
-              }}
-            >
-              <div className="w-full h-full lg:h-full rounded-md mb-10">
-                {props.children[currentCard]}
-              </div>
-            </motion.div>
-          </div>
-        </AnimatePresence>
+      <div>
+        <TabNavMenu value={currentCard} turner={turn}/>
+        <div className="relative p-2 pt-0 lg:p-10" style={{ height: '90%' }}>
+          <AnimatePresence>
+            <div className="h-full">
+              <motion.div
+                className="h-full"
+                key={currentCard}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{
+                  x: { type: 'spring', stiffness: 300, damping: 30 },
+                  opacity: { duration: 0.2 },
+                }}
+              >
+                <div className="w-full h-full lg:h-full rounded-md mb-10">
+                  {props.children[currentCard]}
+                </div>
+              </motion.div>
+            </div>
+          </AnimatePresence>
+        </div>
       </div>
     </>
   );
