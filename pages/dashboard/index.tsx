@@ -1,13 +1,14 @@
 import { Card } from '@mui/material';
-import type { NextPage } from 'next';
-import { useState } from 'react';
+import {useContext, useState} from 'react';
 import Carousel from '../../components/common/carousel';
 import { GraphChoice } from '../../components/graph/GraphChoice';
-import TopMenu from '../../components/navigation/topMenu';
-import { ExpandableSearchGrid } from '../../components/common/expandableSearchGrid';
 import dashboardLayout from '../../layouts/dashboardLayout';
+import {SearchTermsContext} from "../../context/dashboardState";
 
 export function Dashboard() {
+
+  const { state: searchTerms, update: setSearchTerms } = useContext(SearchTermsContext);
+
   var data1 = [1, 2, 8, 2, 1, 3, 4, 7, 9];
   var data2 = [1, 3, 7, 4, 6, 8, 2, 1, 6];
   var data3 = [4, 9, 1, 1, 5, 8, 5, 2, 8];
@@ -112,12 +113,11 @@ export function Dashboard() {
             />
           </Card>
         </div>
-        <div className=" ">Hi</div>
       </Carousel>
 
     </>
   );
-};
+}
 
 Dashboard.PageLayout = dashboardLayout
 
