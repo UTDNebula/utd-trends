@@ -34,7 +34,7 @@ const Home: NextPage = () => {
           <div className="w-full relative m-auto">
             <Card className="bg-light relative overflow-visible drop-shadow-lg rounded-xl bg-opacity-75 m-auto sm:w-5/12 xs:w-11/12 md:w-3/5 ">
               <div className='' style={{margin: "1rem"}}>
-                <div className="m-auto" style={{margin: "1rem", width: "145px"}}>
+                <div className="m-auto" style={{margin: "1rem", width: "145px", color: "black"}}>
                   <br />
                   <FlatLogoIcon />
                 </div>

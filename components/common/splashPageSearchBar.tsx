@@ -134,7 +134,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
                 type="search"
                 id="mainSearch"
                 className="rounded-md border-primary-dark border-2 w-full h-12 pl-12 bg-white text-primary-dark placeholder-primary-light font-bold"
-                placeholder="CS1337..."
+                placeholder="Search section number, professor name, course number...."
               />
             </div>
           )}
