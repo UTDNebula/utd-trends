@@ -30,27 +30,24 @@ const Home: NextPage = () => {
         <div className="w-full h-2/3 absolute translate-y-1/3 overflow-x-hidden overflow-hidden">
           <Wave2SVG />
         </div>
-        <div className="flex justify-center content-center h-screen translate-y-">
-          <div className="h-1/4 w-full relative m-auto">
-            <Card className="bg-light relative sm:w-5/12 overflow-visible drop-shadow-lg rounded-xl bg-opacity-50 m-auto xs:w-11/12">
-              <div className="bottom-0 absolute text-dark w-full h-1/4 m-auto pb-12 mt-4 mb-4">
-                <SplashPageSearchBar
-                  selectSearchValue={searchOptionChosen}
-                  value={value}
-                  setValue={setValue}
-                  disabled={false}
-                />
+        <div className="flex justify-center content-center h-screen">
+          <div className="w-full relative m-auto">
+            <Card className="bg-light relative overflow-visible drop-shadow-lg rounded-xl bg-opacity-75 m-auto sm:w-5/12 xs:w-11/12 md:w-3/5 ">
+              <div className='' style={{margin: "1rem"}}>
+                <div className="m-auto w-1/6" style={{margin: "1rem"}}>
+                  <br />
+                  <FlatLogoIcon />
+                </div>
               </div>
-              <div className="w-11/12 h-3/4 m-auto -translate-y-1/2 relative">
-                <Card className="bg-primary-dark rounded-xl drop-shadow-lg text-light p-8 relative h-full">
-                  <div className="m-auto  w-1/5">
-                    <FlatLogoIcon />
-                  </div>
-                  <div className="text-center pb-2">
-                    <h2 className="text-headline4">Welcome to Athena!</h2>
-                  </div>
-                </Card>
+              <div className="text-center pb-2" style={{fontWeight: "300", fontSize: "5rem", color: "#4F4F4F"}}>
+                <h2>Welcome to Athena</h2>
               </div>
+              <SplashPageSearchBar
+                    selectSearchValue={searchOptionChosen}
+                    value={value}
+                    setValue={setValue}
+                    disabled={false}
+                  />
             </Card>
           </div>
         </div>

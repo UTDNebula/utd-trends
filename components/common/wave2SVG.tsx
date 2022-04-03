@@ -6,8 +6,8 @@
 export const Wave2SVG = () => {
   return (
     <svg
-      width="2100"
-      height="500"
+      width="100%"
+      height="100%"
       viewBox="0 0 1920 471"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
