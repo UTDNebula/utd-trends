@@ -32,10 +32,12 @@ const Home: NextPage = () => {
         </div>
         <div className="flex justify-center content-center h-screen" style={{marginLeft: "10vw", marginRight: "10vw"}}>
           <div className="w-full relative m-auto">
-            <Card className="bg-light relative overflow-visible drop-shadow-lg rounded-xl bg-opacity-75 m-auto sm:w-3/4 xs:w-11/12 md:w-3/4 h-1/2">
+            <Card className="bg-light relative overflow-visible drop-shadow-lg rounded-xl bg-opacity-75 m-auto sm:w-3/4 xs:w-11/12 md:w-3/4">
               <div className='' style={{margin: "1rem"}}>
                 <div className="m-auto" style={{margin: "1rem", width: "145px", color: "black"}}>
-                  <br />
+                  <br/>
+                  <br/>
+                  <br/>
                   <FlatLogoIcon />
                 </div>
               </div>
