@@ -23,7 +23,7 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <div className="w-full justify-center items-center bg-gradient-to-b from-primary to-primary-light text-primary-darker ">
+      <div className="w-full justify-center items-center bg-gradient-to-b from-primary to-primary-light text-primary-darker overflow-hidden">
         <div className="w-full h-2/3 absolute translate-y-1/4 overflow-x-hidden overflow-hidden"> 
           <WaveSVG />
         </div>
@@ -32,14 +32,12 @@ const Home: NextPage = () => {
         </div>
         <div className="flex justify-center content-center h-screen" style={{marginLeft: "10vw", marginRight: "10vw"}}>
           <div className="w-full relative m-auto">
-            <Card className="bg-light relative overflow-visible drop-shadow-lg rounded-xl bg-opacity-75 m-auto sm:w-3/4 xs:w-11/12 md:w-3/4">
-              <div className='' style={{margin: "1rem"}}>
-                <div className="m-auto" style={{margin: "1rem", width: "145px", color: "black"}}>
-                  <br/>
-                  <br/>
-                  <br/>
-                  <FlatLogoIcon />
-                </div>
+            <Card className="bg-light relative overflow-visible drop-shadow-lg rounded-xl bg-opacity-75 sm:w-3/4 xs:w-11/12 md:w-3/4" style={{marginTop: "1rem", marginBottom: "1rem", marginLeft: "auto", marginRight: "auto"}}>
+              <div className="m-auto md:w-1/6 sm:w-1/8 xs:w-1/8" style={{maxWidth: "50%", color: "black"}}>
+                <br/>
+                <br/>
+                <br/>
+                <FlatLogoIcon />
               </div>
               <div className="text-center pb-4 m-5" style={{fontWeight: "300", fontSize: "calc(40px + 10 * ((100vw - 320px) / 680))", color: "#4F4F4F"}}>
                 <h1>Welcome to Athena</h1>
