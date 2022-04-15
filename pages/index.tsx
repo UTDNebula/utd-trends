@@ -32,14 +32,11 @@ const Home: NextPage = () => {
         </div>
         <div className="flex justify-center content-center h-screen" style={{marginLeft: "10vw", marginRight: "10vw"}}>
           <div className="w-full relative m-auto">
-            <Card className="bg-light relative overflow-visible drop-shadow-lg rounded-xl bg-opacity-75 sm:w-3/4 xs:w-11/12 md:w-3/4" style={{marginTop: "1rem", marginBottom: "1rem", marginLeft: "auto", marginRight: "auto"}}>
-              <div className="m-auto md:w-1/6 sm:w-1/8 xs:w-1/8" style={{maxWidth: "50%", color: "black"}}>
-                <br/>
-                <br/>
-                <br/>
+            <Card className="bg-light relative overflow-visible drop-shadow-lg rounded-xl bg-opacity-75 sm:w-3/4 xs:w-11/12 md:w-3/4 mx-auto my-4">
+              <div className="m-auto md:w-32 sm:w-3/12 xs:w-3/12 xxs:w-4/12 translate-y-1/4 lg:translate-y-5" style={{color: "black"}}>
                 <FlatLogoIcon />
               </div>
-              <div className="text-center pb-4 m-5" style={{fontWeight: "300", fontSize: "calc(40px + 10 * ((100vw - 320px) / 680))", color: "#4F4F4F"}}>
+              <div className="text-center pb-4 m-5 mt-8 text-3xl lg:text-5xl 2xl:text-6xl font-light" style={{color: "#4F4F4F"}}>
                 <h1>Welcome to Athena</h1>
               </div>
               <SplashPageSearchBar

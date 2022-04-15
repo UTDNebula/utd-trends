@@ -8,6 +8,7 @@ module.exports = {
     screens: {
 
       'short':{'raw': '(max-height: 200px)'},
+      'xxs':{'raw': '(min-width: 200px)'},
       'xs': '400px',
       'sm': '640px',
       // => @media (min-width: 640px) { ... }
