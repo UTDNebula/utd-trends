@@ -1,9 +1,9 @@
 import type { NextPage } from 'next';
 import Card from '@mui/material/Card';
-import { SplashPageSearchBar } from '../components/common/splashPageSearchBar';
-import { WaveSVG } from '../components/common/waveSVG';
-import { Wave2SVG } from '../components/common/wave2SVG';
-import { FlatLogoIcon } from '../components/common/flatLogoIcon';
+import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
+import { WaveSVG } from '../components/icons/Wave/waveSVG';
+import { Wave2SVG } from '../components/icons/Wave2/wave2SVG';
+import { FlatLogoIcon } from '../components/icons/FlatLogoIcon/flatLogoIcon';
 import { useState } from 'react';
 import styles from '../styles/Home.module.css';
 
