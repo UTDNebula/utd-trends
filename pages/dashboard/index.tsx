@@ -1,10 +1,10 @@
 import { Card } from '@mui/material';
 import type { NextPage } from 'next';
 import { useState } from 'react';
-import Carousel from '../../components/common/carousel';
-import { GraphChoice } from '../../components/graph/GraphChoice';
-import TopMenu from '../../components/navigation/topMenu';
-import { ExpandableSearchGrid } from '../../components/common/expandableSearchGrid';
+import Carousel from '../../components/common/Carousel/carousel';
+import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
+import TopMenu from '../../components/navigation/topMenu/topMenu';
+import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
 
 export const Dashboard: NextPage = () => {
   var data1 = [1, 2, 8, 2, 1, 3, 4, 7, 9];

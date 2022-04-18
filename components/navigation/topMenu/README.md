@@ -1,0 +1,4 @@
+### TopMenu Example
+```ts
+<TopMenu />
+```
