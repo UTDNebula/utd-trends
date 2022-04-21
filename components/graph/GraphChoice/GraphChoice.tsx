@@ -10,9 +10,10 @@ import GraphProps from '../../../modules/GraphProps';
 import { VerticalBarGraph } from '../VerticalBarGraph/VerticalBarGraph';
 import { HorizontalBarGraph } from '../HorizontalBarGraph/HorizontalBarGraph';
 import { BoxGraph } from '../BoxGraph/BoxGraph';
+import React from 'react';
 
 /**
- * Creates the appropriate graph with it's corresponding props when given a graph type 
+ * Creates the appropriate graph with it's corresponding props when given a graph type.  
  */
 export function GraphChoice(props: GraphProps) {
 
