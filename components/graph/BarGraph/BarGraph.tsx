@@ -6,7 +6,7 @@ import React from 'react';
 
 /**
  * The purpose of this component is to offer an automatically responsive bar chart feature. 
- * As the width of a screen gets smaller, the
+ * As the width of a screen gets smaller (below 600px width), the
  * component returns a vertical bar graph instead of a horizontal bar graph. 
  * @param props 
  * @returns bar graph component
