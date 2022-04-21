@@ -6,7 +6,7 @@ import GraphProps from '../../../modules/GraphProps';
 import React from 'react';
 
 /**
- * Creates a pre-configured Apexcharts vertical bar graph component
+ * Creates a pre-configured ApexCharts vertical bar graph component. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`. This component also gets returned from a BarGraph component on a large screen. 
  * @param props 
  * @returns vertical bar graph
  */

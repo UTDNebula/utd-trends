@@ -6,7 +6,7 @@ import GraphProps from '../../../modules/GraphProps';
 import React from "react";
 
 /**
- * Creates a pre-configured Apexcharts radial bar graph component
+ * Creates a pre-configured ApexCharts radial bar graph component. Takes in `series`, `title`, and `labels` via `GraphProps`. 
  * @param props 
  * @returns radial bar graph
  */

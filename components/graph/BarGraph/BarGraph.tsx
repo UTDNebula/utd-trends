@@ -5,9 +5,10 @@ import GraphProps from '../../../modules/GraphProps';
 import React from 'react';
 
 /**
- * The purpose of this component is to offer an automatically responsive bar chart feature. 
- * As the width of a screen gets smaller (below 600px width), the
- * component returns a vertical bar graph instead of a horizontal bar graph. 
+ * The purpose of this component is to offer an automatically responsive bar chart feature. It simply returns a `VerticalBarGraph` or a `HorizontalBarGraph`
+ *  (you can read about these components below) based on screen width. 
+ * When the width of a screen gets below 600px, the
+ * component returns a `HorizontalBarGraph` instead of a `VerticalBarGraph`. 
  * @param props 
  * @returns bar graph component
  */

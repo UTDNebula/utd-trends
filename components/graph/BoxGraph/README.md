@@ -2,9 +2,9 @@
 ``` ts
 const axisLabel = ['A','B','C','D','F'];
 const data= [
-    { x: 'Smith', y: [1, 2, 3, 4, 1] },
+    { x: 'Smith', y: [1, 2, 5, 4, 1] },
     { x: 'Jason', y: [2, 5, 1, 6, 9] },
-    { x: 'Suzy', y: [2, 5, 2, 1, 1] },
+    { x: 'Suzy', y: [2, 5, 3, 3, 1] },
   ];
 const name="Bar Graph Example";
 <div style={{width:"100%", height:"400px"}}>

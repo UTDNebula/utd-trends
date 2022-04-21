@@ -20,6 +20,7 @@ const name="Graph Choice Example";
       xaxisLabels={axisLabel}
       series={data}
       title={name}
+      labels={axisLabel}
   ></GraphChoice>
   <div style={{display: "flex", flexDirection: "horizontal", margin: "1.5rem", marginTop: "2.5rem"}}>
     <button style={{border: "1px solid black", borderRadius: "6px", margin: "0.65rem", padding: "0.5rem"}} onClick={(e)=>(setMyForm("Bar"))}>Bar</button>
@@ -32,24 +33,3 @@ const name="Graph Choice Example";
 
 ```
 
-### GraphProps
-
-Form specifies the type of graph for the GraphChoice component
-labels is only needed for the radial bar component. 
-
-
->`type GraphProps = {  `
->  
->`  form?: 'Bar' | 'Line' | 'Radar' | 'Vertical' | 'Horizontal' |'Radial'|'BoxWhisker';  `
->  
->`  xaxisLabels?: string[];  `
->  
->`  series: any[];  `
->  
->`  title: string;  `
->  
->`  labels?: string[]  `
->  
->`};  `
->  
->`export default GraphProps;  `

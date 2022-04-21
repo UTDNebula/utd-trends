@@ -6,7 +6,7 @@ import GraphProps from '../../../modules/GraphProps';
 import React from 'react';
 
 /**
- * Creates a pre-configured Apexcharts horizontal bar graph component
+ * Creates a pre-configured ApexCharts horizontal bar graph component. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`. This component also gets returned from a BarGraph component on a small screen. 
  * @param props 
  * @returns horizontal bar graph
  */
