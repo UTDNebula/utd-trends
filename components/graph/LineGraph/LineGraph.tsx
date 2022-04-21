@@ -6,7 +6,7 @@ import GraphProps from '../../../modules/GraphProps';
 import React from "react";
 
 /**
- * Creates a pre-configured Apexcharts line graph component
+ * Creates a pre-configured ApexCharts line graph component. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`. 
  * @param props 
  * @returns line graph
  */

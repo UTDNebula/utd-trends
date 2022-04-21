@@ -37,6 +37,7 @@ module.exports = {
     },
     {
       name:'Graph Components',
+      content: './components/graph/GraphProps.md',
       components: [
         './components/graph/**/*.tsx',
       ]

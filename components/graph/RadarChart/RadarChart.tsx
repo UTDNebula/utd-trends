@@ -6,7 +6,7 @@ import GraphProps from '../../../modules/GraphProps';
 import React from "react";
 
 /**
- * Creates a pre-configured Apexcharts radar graph component
+ * Creates a pre-configured ApexCharts radar graph component. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`. 
  * @param props 
  * @returns horizontal bar graph
  */

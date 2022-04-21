@@ -13,7 +13,7 @@ import { BoxGraph } from '../BoxGraph/BoxGraph';
 import React from 'react';
 
 /**
- * Creates the appropriate graph with it's corresponding props when given a graph type.  
+ * This is a special graph component that creates the appropriate graph with it's corresponding props when given a graph type.  
  */
 export function GraphChoice(props: GraphProps) {
 
