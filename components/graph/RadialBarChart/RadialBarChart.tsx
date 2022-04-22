@@ -6,11 +6,17 @@ import GraphProps from '../../../modules/GraphProps';
 import React from "react";
 
 /**
- * Creates a pre-configured ApexCharts radial bar graph component. Takes in `series`, `title`, and `labels` via `GraphProps`. 
+ * Creates a pre-configured ApexCharts radial bar graph component. Takes in `series` and `title` `GraphProps`. The `data` fields in `series` need to each be arrays with just one entry. 
  * @param props 
  * @returns radial bar graph
  */
   export function RadialBarChart(props: GraphProps) {
+    //make series accepted as normal { name: "", data: [num] } structure. 
+    //labels array will be created by taking the 'name' from every entry in series
+    //series array will be created by taking the 'data' from every entry in series
+    const compiledLabels = props.series.map(value => value.name);
+    const compiledSeries = props.series.map(value => value.data);
+
     const options: ApexOptions = {
       chart: {
         id: 'bar',
@@ -18,7 +24,7 @@ import React from "react";
           enabled: false,
         },
       },
-      labels: props.labels,
+      labels: compiledLabels,
       colors: ['#ffadad', '#9bf6ff', '#caffbf'],
       stroke: {
         width: 2,
@@ -58,7 +64,7 @@ import React from "react";
         <div className="h-full">
           <Chart
             options={options}
-            series={props.series}
+            series={compiledSeries}
             type="radialBar"
             width={'100%'}
           />

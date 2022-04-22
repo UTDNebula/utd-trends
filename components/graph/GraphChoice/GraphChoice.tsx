@@ -75,9 +75,8 @@ export function GraphChoice(props: GraphProps) {
         case 'Radial' : {
             return(
             <RadialBarChart
-            labels={props.labels}
             series={props.series}
-            title = {props.title}
+            title={props.title}
             ></RadialBarChart>
             );
         }
