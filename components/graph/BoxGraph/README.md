@@ -1,3 +1,6 @@
+
+The `BoxGraph` component takes in props in a different form. It uses `xaxisLabels` and `series`, but `series` should be an array of objects, each with an `x` and `y`, where `x` is a string label and `y` is an array of numbers. 
+
 ### Box Graph Example
 ``` ts
 const axisLabel = ['A','B','C','D','F'];
@@ -11,7 +14,7 @@ const name="Bar Graph Example";
     <BoxGraph 
         xaxisLabels={axisLabel}
         series={data}
-        title = {name}
+        title={name}
     ></BoxGraph>
 </div>
 ```
