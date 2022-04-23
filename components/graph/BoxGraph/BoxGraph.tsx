@@ -11,8 +11,12 @@ import React from 'react';
  * @returns line graph
  */
 export function BoxGraph(props: GraphProps) {
-  for (let x = 0; x<props.series.length;x++){
-    props.series[x].y.sort()
+  //This map() will create a new 'series' array "formattedSeries" that has x,y format instead of name,data format. 
+  //Contents are the same, this just changes the labels to match what Apex wants for a Boxplot. 
+  //This is done to preserve the name,data format being passed into all chart types. 
+  const formattedSeries = props.series.map((value) => { return { x: value.name, y: value.data} })
+  for (let i = 0; i<formattedSeries.length; i++){
+    formattedSeries[i].y.sort()
   }
   const options: ApexOptions = {
     chart: {
@@ -63,7 +67,7 @@ export function BoxGraph(props: GraphProps) {
           series={[
             {
               type: 'boxPlot',
-              data: props.series
+              data: formattedSeries
             }
           ]}
           type="boxPlot"

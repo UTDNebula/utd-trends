@@ -52,12 +52,12 @@ const incrementDataSetCount = () => {
   //if a Radial, then add an object with data.length == 1, and mult by 100 for proper scaling as a percentage
   if (currentForm == "Radial") {
     newData = [ ...currentData,
-    { name: 'Jason', data: [Math.floor(Math.random()*100)] },
+    { name: Math.random().toString().substr(2, 8), data: [Math.floor(Math.random()*100)] },
   ];
   //otherwise, add 5 each random from 1-10 to the end of the previous currentData array
   } else {
     newData = [ ...currentData,
-    { name: 'Jason', data: [Math.floor(Math.random()*10), Math.floor(Math.random()*10), Math.floor(Math.random()*10), Math.floor(Math.random()*10), Math.floor(Math.random()*10)] },
+    { name: Math.random().toString().substr(2, 8), data: [Math.floor(Math.random()*10), Math.floor(Math.random()*10), Math.floor(Math.random()*10), Math.floor(Math.random()*10), Math.floor(Math.random()*10)] },
   ];}
   setCurrentData(newData);
 };
@@ -83,6 +83,7 @@ const name="Graph Choice Example";
     <button style={{border: "1px solid black", borderRadius: "6px", margin: "0.65rem", padding: "0.5rem"}} onClick={(e)=>(changeToNonRadial("Line"))}>Line</button>
     <button style={{border: "1px solid black", borderRadius: "6px", margin: "0.65rem", padding: "0.5rem"}} onClick={(e)=>(changeToNonRadial("Radar"))}>Radar</button>
     <button style={{border: "1px solid black", borderRadius: "6px", margin: "0.65rem", padding: "0.5rem"}} onClick={(e)=>(changeToRadial())}>Radial</button>
+    <button style={{border: "1px solid black", borderRadius: "6px", margin: "0.65rem", padding: "0.5rem"}} onClick={(e)=>(changeToNonRadial("BoxWhisker"))}>BoxWhisker</button>
   </div>
   <div style={{display: "flex", flexDirection: "horizontal", margin: "0.5rem"}}>
     <button style={{border: "1px solid black", borderRadius: "6px", margin: "0.65rem", padding: "0.5rem"}} onClick={(e)=>(resetData())}>Reset Data</button>
