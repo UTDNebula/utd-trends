@@ -46,13 +46,16 @@ export const Dashboard: NextPage = () => {
     { name: 'Suzy', data: [2, 5, 2, 1, 1] },
   ];
   var Boxdat = [
-    { x: 'Smith', y: [1, 2, 3, 4, 1] },
-    { x: 'Jason', y: [2, 5, 1, 6, 9] },
-    { x: 'Suzy', y: [2, 5, 2, 1, 1] },
+    { name: 'Smith', data: [1, 2, 3, 4, 1] },
+    { name: 'Jason', data: [2, 5, 1, 6, 9] },
+    { name: 'Suzy', data: [2, 5, 2, 1, 1] },
   ];
-
-  var radialData = [ { name: "Jason", data: [(3.1/4)*100]}, { name: "Kelly", data: [(2.6/4)*100]}, { name: "Smith", data: [(3.9/4)*100]}];
-  // was previously: 
+  var radialData = [
+    { name: "Jason", data: [(3.1/4)*100]}, 
+    { name: "Kelly", data: [(2.6/4)*100]}, 
+    { name: "Smith", data: [(3.9/4)*100]}
+  ];
+  // radialData was previously: 
   // var radialData = [(3.1 / 4) * 100, (2.6 / 4) * 100, (3.9 / 4) * 100];
   // but RadialBarChart has been refactored to now take series props in the same format as other graph components. 
 
