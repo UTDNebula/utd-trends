@@ -20,7 +20,7 @@ const decrementDataSetCount = () => {
 };
 const incrementDataSetCount = () => {
   const newData = [ ...currentData,
-    { name: 'Jason', data: [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)] },
+    { name: Math.random().toString().substr(2, 8), data: [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)] },
   ];
   setCurrentData(newData);
 };

@@ -33,3 +33,5 @@ The structure of `GraphProps` is shown below.
 `xaxisLabels` can take the form of an array of strings, such as:
 
 `xaxisLabels = ['A', 'B', 'C', 'D']`
+
+Some components (`BoxGraph`, `LineGraph`, `RadarChart` and `RadialBarChart`) will ignore extra `xaxisLabels`, "extra" meaning that there are more labels than there are entries in the data. Other components (`BarGraph`, `HorizontalBarGraph` and `VerticalBarGraph`) will display the extra labels and all the labels will be misaligned, so for these three bar graph components, make sure the correct number of `xaxisLabels` are passed in. 
