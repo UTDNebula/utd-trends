@@ -11,10 +11,13 @@ import {Film} from "../../../types";
  * Props type used by the SearchBar component
  */
 type SearchProps = {
-  // setSearch: the setter function from the parent component to set the search value
+  /** Function called when a value is selected */
   selectSearchValue: Function;
+  /** The value state variable */
   value: Film[] | undefined;
+  /** The setter for the value state variable */
   setValue: Function;
+  /** Whether the component is disabled or not */
   disabled?: boolean;
 };
 
