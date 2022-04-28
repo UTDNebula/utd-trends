@@ -3,6 +3,7 @@ import { SearchIcon } from '../../icons/SearchIcon/searchIcon';
 import Autocomplete from '@mui/material/Autocomplete';
 import throttle from 'lodash/throttle';
 import topFilms from '../../../data/autocomplete_dummy_data.json';
+import {Film} from "../../../types";
 
 /**
  * Props type used by the SearchBar component
@@ -14,11 +15,6 @@ type SearchProps = {
   setValue: Function;
   disabled?: boolean;
 };
-
-interface Film {
-  title: string;
-  year: number;
-}
 
 /**
  * This component returns a custom search bar component that makes use of the Material UI autocomplete component

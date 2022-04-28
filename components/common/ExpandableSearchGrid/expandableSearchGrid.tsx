@@ -4,11 +4,7 @@ import Card from '@mui/material/Card';
 import { CardContent } from '@mui/material';
 import { SearchBar } from '../SearchBar/searchBar';
 import React from 'react';
-
-interface Film {
-  title: string;
-  year: number;
-}
+import {Film} from "../../../types";
 
 /**
  * This component returns a bar that will allow users to add and remove search terms (up to 3 max)

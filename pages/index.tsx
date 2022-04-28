@@ -6,11 +6,8 @@ import { Wave2SVG } from '../components/icons/Wave2/wave2SVG';
 import { FlatLogoIcon } from '../components/icons/FlatLogoIcon/flatLogoIcon';
 import { useState } from 'react';
 import styles from '../styles/Home.module.css';
+import {Film} from "../types";
 
-interface Film {
-  title: string;
-  year: number;
-}
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */

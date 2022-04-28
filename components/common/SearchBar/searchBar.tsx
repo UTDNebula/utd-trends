@@ -5,6 +5,7 @@ import throttle from 'lodash/throttle';
 import topFilms from '../../../data/autocomplete_dummy_data.json';
 import Popper from '@mui/material/Popper';
 import { Box, Paper } from '@mui/material';
+import {Film} from "../../../types";
 
 /**
  * Props type used by the SearchBar component
@@ -17,13 +18,6 @@ type SearchProps = {
   disabled?: boolean;
 };
 
-/**
- * Data type used by the dummy data
- */
-interface Film {
-  title: string;
-  year: number;
-}
 
 /**
  * This component returns a custom search bar component that makes use of the Material UI autocomplete component

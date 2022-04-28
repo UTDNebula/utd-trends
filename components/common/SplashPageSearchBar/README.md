@@ -1,4 +1,15 @@
 ### Splash Page Search Example
-``` ts
-<SplashPageSearchBar />
+```ts
+import {useState} from 'react';
+
+const [value, setValue] = useState([]);
+
+const onSelectOption = () => {}
+
+<SplashPageSearchBar
+    selectSearchValue={onSelectOption}
+    value={value}
+    setValue={setValue}
+    disabled={false}
+    />
 ```
