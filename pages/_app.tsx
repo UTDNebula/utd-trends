@@ -6,7 +6,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Athena</title>
+        <title>UTD-Trends</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Component {...pageProps} />
