@@ -3,7 +3,7 @@
 
 # Here for later as implementation becomes larger
 # Request Project maintainers for any of the major src directories
-# components/**/*   @UTDNebula/athena
-# modules/**/*   @UTDNebula/athena
-# pages/**/*   @UTDNebula/athena
-# styles/**/*   @UTDNebula/athena
+# components/**/*   @UTDNebula/utd-trends
+# modules/**/*   @UTDNebula/utd-trends
+# pages/**/*   @UTDNebula/utd-trends
+# styles/**/*   @UTDNebula/utd-trends
