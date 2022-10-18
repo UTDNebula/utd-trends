@@ -11,12 +11,14 @@ export function TopMenu(){
   return (
     <div className="bg-primary-dark h-16 text-light relative p-4">
       <div className="h-full float-left flex w-1/4 " >
-        <div className="h-full flex align-middle place-items-center justify-center" >
-          <div className="h-full float-left mr-2">
-            <FlatLogoIcon />
+	    <a href="/">
+          <div className="h-full flex align-middle place-items-center justify-center" >
+            <div className="h-full float-left mr-2">
+              <FlatLogoIcon />
+            </div>
+            <h1 className=" float-right text-xl" >UTD Trends</h1>
           </div>
-          <h1 className=" float-right text-xl" >UTD Trends</h1>
-        </div>
+		</a>
       </div>
     </div>
   );
