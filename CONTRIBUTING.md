@@ -1,4 +1,4 @@
-# Athena Contributor's Guide
+# UTD-Trends Contributor's Guide
 
 _Information on how to contribute to this project._
 
@@ -7,7 +7,7 @@ _Information on how to contribute to this project._
 If you want to make a non-code contribution to this project like design, writing,
 or other types of additions/modifications, contact
 [core-maintainers@utdnebula.com](mailto:core-maintainers@utdnebula.com)
-with the subject line [nebula-athena] and your proposed set of changes. If
+with the subject line [nebula-UTD-Trends] and your proposed set of changes. If
 applicable, make sure to link specifically where in the project the changes
 should be made. More detail is better.
 
@@ -34,7 +34,7 @@ This is the process for contributing code to the repository:
 
 ### Opening an Issue
 
-Athena uses the following issue labels to designate between type:
+UTD-Trends uses the following issue labels to designate between type:
 
 - `Type: Feature Request` for user-facing or API feature requests
 - `Type: Security Vulnerability` for security vulnerability reports
@@ -89,13 +89,13 @@ you commit to.
 Instead of doing this:
 
 ```shell script
-git clone https://github.com/UTDNebula/athena.git
+git clone https://github.com/UTDNebula/UTD-Trends.git
 ```
 
 You would do this:
 
 ```shell script
-git clone https://github.com/<your-username>/athena.git
+git clone https://github.com/<your-username>/UTD-Trends.git
 ```
 
 ### Branching Strategy
@@ -188,7 +188,7 @@ specific parts of your code. Project maintainers will try their best to address
 them and help you as you finish your pull request. As much as possible, try to
 keep questions about code embedded within the pull request itself. For anything
 else, post them in the relevant Project Nebula channel in the [ACM Discord](https://acmutd.co/discord)
-or open a [Github Discussion](https://github.com/UTDNebula/athena/discussions).
+or open a [Github Discussion](https://github.com/UTDNebula/UTD-Trends/discussions).
 
 All pull requests must pass all status checks and must be approved by one
 maintainer before being merged into the default `develop` branch. Once a pull
@@ -212,9 +212,10 @@ version format. In the case of projects that have largely symbolic "major"
 versions, it is up to the maintainers to determine what meets the qualification
 as a "breaking change" and label commits accordingly when merging into `master
 For more information, see the [FAQ](https://www.conventionalcommits.org/en/v1.0.0/#how-does-this-relate-to-semver):
+
 > `fix` type commits should be translated to PATCH releases. `feat` type commits
 > should be translated to MINOR releases. Commits with `BREAKING CHANGE` in the
 > commits, regardless of type, should be translated to MAJOR releases.
-Deployment and hosting for this project is handled by ACM Development. Project
-maintainers (not contributors) are responsible for service upkeep and responding
-to issues in hosting and database management.
+> Deployment and hosting for this project is handled by ACM Development. Project
+> maintainers (not contributors) are responsible for service upkeep and responding
+> to issues in hosting and database management.
