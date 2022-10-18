@@ -47,7 +47,7 @@ const Home: NextPage = () => {
                     <FlatLogoIcon />
                   </div>
                   <div className="text-center pb-2">
-                    <h2 className="text-headline4">Welcome to Athena!</h2>
+                    <h2 className="text-headline4">Welcome to UTD Trends!</h2>
                   </div>
                 </Card>
               </div>
