@@ -187,7 +187,7 @@ While you are working on your contribution, you'll likely have questions about
 specific parts of your code. Project maintainers will try their best to address
 them and help you as you finish your pull request. As much as possible, try to
 keep questions about code embedded within the pull request itself. For anything
-else, post them in the relevant Project Nebula channel in the [ACM Discord](https://acmutd.co/discord)
+else, post them in the relevant channel in the [Nebula Labs Discord](https://discord.gg/tcpcnfxmeQ)
 or open a [Github Discussion](https://github.com/UTDNebula/UTD-Trends/discussions).
 
 All pull requests must pass all status checks and must be approved by one
@@ -207,7 +207,7 @@ certain you're ready to release. The process goes like this:
 And that's it. The release GitHub Action will take care of the rest. Semantic
 Release will automatically version the project.
 
-Releases names use Semantic Versioning (SemVer), following the `MAJOR.MINOR.FIX`
+Release names use Semantic Versioning (SemVer), following the `MAJOR.MINOR.FIX`
 version format. In the case of projects that have largely symbolic "major"
 versions, it is up to the maintainers to determine what meets the qualification
 as a "breaking change" and label commits accordingly when merging into `master
