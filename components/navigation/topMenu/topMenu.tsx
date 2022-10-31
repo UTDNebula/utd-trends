@@ -10,9 +10,9 @@ import React from 'react';
 export function TopMenu(){
   return (
     <div className="bg-primary-dark h-16 text-light relative p-4">
-      <div className="h-full float-left flex w-1/4 " >
+      <div className="h-full float-left flex min-w-fit w-1/4 justify-center" >
         <div className="h-full flex align-middle place-items-center justify-center" >
-          <div className="h-full float-left mr-2">
+          <div className="h-full float-left mr-2 w-7">
             <FlatLogoIcon />
           </div>
           <h1 className=" float-right text-xl" >UTD Trends</h1>
