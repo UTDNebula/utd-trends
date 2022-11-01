@@ -1,5 +1,5 @@
 {
-  "name": "athena",
+  "name": "UTD-Trends",
   "private": true,
   "scripts": {
     "dev": "next dev",

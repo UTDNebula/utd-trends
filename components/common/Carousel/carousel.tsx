@@ -56,7 +56,13 @@ export const Carousel: FC<CarouselProps> = (props: CarouselProps) => {
   return (
     <>
       <TabNavMenu value={currentCard} turner={turn}/>
-      <div className="relative p-2 pt-0 lg:p-10" style={{ height: '90%' }}>
+      <div
+        className="relative p-2 pt-0 lg:p-10"
+        style={{
+          height: '90%',
+          overflowX: 'hidden',
+        }}
+      >
         <AnimatePresence>
           <div className="h-full">
             <motion.div
