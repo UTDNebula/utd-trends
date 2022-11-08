@@ -17,6 +17,20 @@ export function VerticalBarGraph(props: GraphProps) {
       zoom: {
         enabled: false,
       },
+      toolbar: {
+        show: true,
+        tools: {
+          customIcons: [{
+            icon: '<div class="apexcharts-menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path transform="rotate(90)" d="m3-3h2 4v-2h-4v-4h-2v4 2zm0-12h2v-4h4v-2h-6v6zm12 12h4 2v-6h-2v4h-4v2zm0-16h4v4h2v-6h-2-4v2z" stroke-width="0"/></svg></div>',
+            index: 0,
+            title: 'Fullscreen',
+            class: 'custom-icon',
+            click: function (chart, options, e) {
+			  console.log("fullscreen presses! chart info: ", chart, options, e);
+            },
+          }],
+        },
+      },
     },
     plotOptions: {
       bar: {
