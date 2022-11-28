@@ -1,10 +1,11 @@
 import { Card } from '@mui/material';
 import type { NextPage } from 'next';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Carousel from '../../components/common/Carousel/carousel';
 import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
+import { getProfessorGradeList, setNebulaAPIKey } from './nebula.js';
 
 export const Dashboard: NextPage = () => {
   var data1 = [1, 2, 8, 2, 1, 3, 4, 7, 9];
@@ -39,26 +40,81 @@ export const Dashboard: NextPage = () => {
   }
 
   function searchAutocomplete() {}
+  
+  setNebulaAPIKey('');
+  //const params = new URLSearchParams(document.location.search);
+  const subjectPrefix = 'CS';//params.get('subjectPrefix');
+  const courseNumber = '1200';//params.get('courseNumber');
+  const professors = ['John Cole'];//params.get('professors').split(',');
+  //console.log(subjectPrefix, courseNumber, professors);
 
-  var dat = [
+  const [dat, setDat] = useState([
     { name: 'Smith', data: [1, 2, 3, 4, 1] },
     { name: 'Jason', data: [2, 5, 1, 6, 9] },
     { name: 'Suzy', data: [2, 5, 2, 1, 1] },
-  ];
-  var Boxdat = [
+  ]);
+  const [Boxdat, setBoxdat] = useState([
     { name: 'Smith', data: [1, 2, 3, 4, 1] },
     { name: 'Jason', data: [2, 5, 1, 6, 9] },
     { name: 'Suzy', data: [2, 5, 2, 1, 1] },
-  ];
-  var radialData = [
-    { name: "Jason", data: [(3.1/4)*100]}, 
-    { name: "Kelly", data: [(2.6/4)*100]}, 
-    { name: "Smith", data: [(3.9/4)*100]}
-  ];
+  ]);
+  const [radialData, setRadialData] = useState([
+    { name: 'Jason', data: [(3.1/4)*100]}, 
+    { name: 'Kelly', data: [(2.6/4)*100]}, 
+    { name: 'Smith', data: [(3.9/4)*100]}
+  ]);
   // radialData was previously: 
   // var radialData = [(3.1 / 4) * 100, (2.6 / 4) * 100, (3.9 / 4) * 100];
   // but RadialBarChart has been refactored to now take series props in the same format as other graph components. 
 
+  const [state, setState] = useState('');
+  useEffect(() => {
+    setState('loading');
+    getProfessorGradeList(subjectPrefix, courseNumber, professors).then((resolve) => {
+      console.log(resolve);
+      let newDat = [];
+      for (let i = 0; i < resolve.length; i++) {
+        for (let j = 0; j < resolve[i].grades.length; j++) {
+         newDat.push({name: resolve[i].professor + ' ' + resolve[i].grades[j].section + ' ' + resolve[i].grades[j].academicSession, data: resolve[i].grades[j].distribution});
+        }
+      }
+      setDat(newDat);
+	  setBoxdat(newDat);
+      setState('success');
+    }).catch((reject) => {
+      console.error('Error:', reject);
+      setState('error');
+    });
+  }, []);
+  if (state === 'error' || state === 'loading') {
+    return (
+      <>
+      <div className=" w-full bg-light h-full">
+        <TopMenu />
+        <ExpandableSearchGrid/>
+        <div className="w-full h-5/6 justify-center">
+          <div className="w-full h-5/6 relative min-h-full">
+            <Carousel>
+              <div className="h-full m-4 ">
+                <Card className="h-96 p-4 m-4"></Card>
+                <Card className="h-96 p-4 m-4"></Card>
+              </div>
+              <div className="p-4 h-full">
+                <div className='grid grid-cols-1 md:grid-cols-3'>
+                  <Card className='after:block m-4'></Card>
+                  <Card className='after:block m-4'></Card>
+                  <Card className='after:block m-4'></Card>
+                </div>
+                <Card className="h-96 p-4 m-4"></Card>
+              </div>
+              <div className=" ">Hi</div>
+            </Carousel>
+          </div>
+        </div>
+      </div>
+    </>
+    );
+  }
   return (
     <>
       <div className=" w-full bg-light h-full">
@@ -72,7 +128,7 @@ export const Dashboard: NextPage = () => {
                   <GraphChoice
                     form="Bar"
                     title="Grades Distribution"
-                    xaxisLabels={['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
+                    xaxisLabels={['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'W']}//{['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
                     series={dat}
                   />
                 </Card>
@@ -80,7 +136,7 @@ export const Dashboard: NextPage = () => {
                   <GraphChoice
                     form="Line"
                     title="Class Averages"
-                    xaxisLabels={['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
+                    xaxisLabels={['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'W']}
                     series={dat}
                   />
                 </Card>
@@ -113,7 +169,7 @@ export const Dashboard: NextPage = () => {
                   <GraphChoice
                     form="BoxWhisker"
                     title="Class Averages"
-                    xaxisLabels={['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
+                    xaxisLabels={['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'W']}
                     series={Boxdat}
                   />
                 </Card>

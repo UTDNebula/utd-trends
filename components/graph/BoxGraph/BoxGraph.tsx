@@ -14,10 +14,20 @@ export function BoxGraph(props: GraphProps) {
   //This map() will create a new 'series' array "formattedSeries" that has x,y format instead of name,data format. 
   //Contents are the same, this just changes the labels to match what Apex wants for a Boxplot. 
   //This is done to preserve the name,data format being passed into all chart types. 
-  const formattedSeries = props.series.map((value) => { return { x: value.name, y: value.data} })
-  for (let i = 0; i<formattedSeries.length; i++){
-    formattedSeries[i].y.sort()
-  }
+  function quantile(arr, q) {
+    const sorted = [...arr].sort(function(a, b) {
+      return a - b;
+    });
+    const pos = (sorted.length - 1) * q;
+    const base = Math.floor(pos);
+    const rest = pos - base;
+    if (sorted[base + 1] !== undefined) {
+      return sorted[base] + rest * (sorted[base + 1] - sorted[base]);
+    } else {
+      return sorted[base];
+    }
+  };
+  const formattedSeries = props.series.map((value) => { return { x: value.name, y: [Math.min(...value.data), quantile(value.data, .25), quantile(value.data, .5), quantile(value.data, .75), Math.max(...value.data)]} })
   const options: ApexOptions = {
     chart: {
       id: 'line-chart',
