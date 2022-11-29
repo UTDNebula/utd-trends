@@ -7,7 +7,7 @@ import TopMenu from '../../components/navigation/topMenu/topMenu';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
 import { getProfessorGradeList, setNebulaAPIKey } from './nebula.js';
 
-export const Dashboard: NextPage = () => {
+export const Dashboard: NextPage = (props) => {
   var data1 = [1, 2, 8, 2, 1, 3, 4, 7, 9];
   var data2 = [1, 3, 7, 4, 6, 8, 2, 1, 6];
   var data3 = [4, 9, 1, 1, 5, 8, 5, 2, 8];
@@ -41,14 +41,30 @@ export const Dashboard: NextPage = () => {
 
   function searchAutocomplete() {}
   
-  setNebulaAPIKey('');
-  //const params = new URLSearchParams(document.location.search);
-  const subjectPrefix = 'CS';//params.get('subjectPrefix');
-  const courseNumber = '1200';//params.get('courseNumber');
-  const professors = ['John Cole'];//params.get('professors').split(',');
-  //console.log(subjectPrefix, courseNumber, professors);
+  let dat = [
+    { name: 'Smith', data: [1, 2, 3, 4, 1] },
+    { name: 'Jason', data: [2, 5, 1, 6, 9] },
+    { name: 'Suzy', data: [2, 5, 2, 1, 1] },
+  ];
+  let Boxdat = [
+    { name: 'Smith', data: [1, 2, 3, 4, 1] },
+    { name: 'Jason', data: [2, 5, 1, 6, 9] },
+    { name: 'Suzy', data: [2, 5, 2, 1, 1] },
+  ];
+  let radialData = [
+    { name: 'Jason', data: [(3.1/4)*100]}, 
+    { name: 'Kelly', data: [(2.6/4)*100]}, 
+    { name: 'Smith', data: [(3.9/4)*100]}
+  ];
+  if (props.promise) {
+    console.log(props.promise);
+    dat = [];
+    for (const section of props.promise) {
+      dat.push({name: section.data.section_number + ' ' + section.data.academic_session.name, data: section.data.grade_distribution});
+    }
+  }
 
-  const [dat, setDat] = useState([
+  /*const [dat, setDat] = useState([
     { name: 'Smith', data: [1, 2, 3, 4, 1] },
     { name: 'Jason', data: [2, 5, 1, 6, 9] },
     { name: 'Suzy', data: [2, 5, 2, 1, 1] },
@@ -62,13 +78,13 @@ export const Dashboard: NextPage = () => {
     { name: 'Jason', data: [(3.1/4)*100]}, 
     { name: 'Kelly', data: [(2.6/4)*100]}, 
     { name: 'Smith', data: [(3.9/4)*100]}
-  ]);
+  ]);*/
   // radialData was previously: 
   // var radialData = [(3.1 / 4) * 100, (2.6 / 4) * 100, (3.9 / 4) * 100];
   // but RadialBarChart has been refactored to now take series props in the same format as other graph components. 
 
-  const [state, setState] = useState('');
-  useEffect(() => {
+  //const [state, setState] = useState('');
+  /*useEffect(() => {
     setState('loading');
     getProfessorGradeList(subjectPrefix, courseNumber, professors).then((resolve) => {
       console.log(resolve);
@@ -79,14 +95,14 @@ export const Dashboard: NextPage = () => {
         }
       }
       setDat(newDat);
-	  setBoxdat(newDat);
+      setBoxdat(newDat);
       setState('success');
     }).catch((reject) => {
       console.error('Error:', reject);
       setState('error');
     });
-  }, []);
-  if (state === 'error' || state === 'loading') {
+  }, []);*/
+  /*if (state === 'error' || state === 'loading') {
     return (
       <>
       <div className=" w-full bg-light h-full">
@@ -114,7 +130,7 @@ export const Dashboard: NextPage = () => {
       </div>
     </>
     );
-  }
+  }*/
   return (
     <>
       <div className=" w-full bg-light h-full">
@@ -182,4 +198,82 @@ export const Dashboard: NextPage = () => {
     </>
   );
 };
+
+export async function getServerSideProps(context) {
+  console.log('hiiiiiiiii!!!', context.query, process.env.REACT_APP_NEBULA_API_KEY);
+  const searchOptions = ["course_number", "subject_prefix", "title", "description", "school", "credit_hours", "class_level", "activity_type", "grading", "internal_course_number", "lecture_contact_hours", "laboratory_contact_hours", "offering_frequency"];
+  let params = "";
+  for (const searchOption of searchOptions) {
+    if (context.query.hasOwnProperty(searchOption)) {
+      params += "&" + searchOption + "=" + context.query[searchOption];
+    }
+  }
+  console.log(params);
+  const headers = {
+    "x-api-key": process.env.REACT_APP_NEBULA_API_KEY,
+    Accept: "application/json",
+  };
+  
+  let sectionPromises = [];
+  
+  await new Promise((resolve, reject) => {
+    try {
+      fetch(
+        `https://api.utdnebula.com/course?` + params,
+        {
+          method: "GET",
+          headers: headers,
+        }
+      )
+        .then(function (res) {
+          resolve(res.json());
+        })
+        .catch(function (err) {
+          console.log("Nebula error is: ",err);
+          reject(err);
+        });
+    } catch (err) {
+      console.log("Error getting data: " + err);
+      reject(err);
+    }
+  }).then(function(result) {
+    console.log(result);
+    for (const uniqueClass of result.data) {
+      for (const section of uniqueClass.sections) {
+		sectionPromises.push(new Promise((resolve, reject) => {
+          try {
+            fetch(
+              `https://api.utdnebula.com/section/` + section,
+              {
+                method: "GET",
+                headers: headers,
+              }
+            )
+              .then(function (res) {
+                resolve(res.json());
+              })
+              .catch(function (err) {
+                console.log("Nebula error is: ",err);
+                reject(err);
+              });
+          } catch (err) {
+            console.log("Error getting data: " + err);
+            reject(err);
+          }
+        }));
+      }
+    }
+  });
+  
+  //return getClassesPromise;
+  return {
+    props: {
+      promise: await Promise.all(sectionPromises).then((values) => {
+        console.log(values);
+		return values;
+      })
+    },
+  }
+}
+
 export default Dashboard;
