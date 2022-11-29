@@ -63,6 +63,7 @@ a local development server at [`localhost:3000`](https://localhost:3000) by defa
 ```bash
 git clone https://github.com/UTDNebula/UTD-Trends.git
 cd UTD-Trends
+npm install
 npm run dev
 ```
 
