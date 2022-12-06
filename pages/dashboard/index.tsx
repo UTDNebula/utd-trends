@@ -1,6 +1,6 @@
 import { Card } from '@mui/material';
 import type { NextPage } from 'next';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Carousel from '../../components/common/Carousel/carousel';
 import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
@@ -41,11 +41,7 @@ export const Dashboard: NextPage = (props) => {
 
   function searchAutocomplete() {}
   
-  let dat = [
-    { name: 'Smith', data: [1, 2, 3, 4, 1] },
-    { name: 'Jason', data: [2, 5, 1, 6, 9] },
-    { name: 'Suzy', data: [2, 5, 2, 1, 1] },
-  ];
+  let dat = [];
   let Boxdat = [
     { name: 'Smith', data: [1, 2, 3, 4, 1] },
     { name: 'Jason', data: [2, 5, 1, 6, 9] },
@@ -56,81 +52,14 @@ export const Dashboard: NextPage = (props) => {
     { name: 'Kelly', data: [(2.6/4)*100]}, 
     { name: 'Smith', data: [(3.9/4)*100]}
   ];
-  if (props.promise) {
-    console.log(props.promise);
-    dat = [];
-    for (const section of props.promise) {
-      dat.push({name: section.data.section_number + ' ' + section.data.academic_session.name, data: section.data.grade_distribution});
+  console.log(props.sections);
+  if (props && props.sections) {
+    for (const section of props.sections) {
+      dat.push({name: section.section_number + ' ' + section.academic_session.name, data: section.grade_distribution});
     }
   }
+  console.log(dat);
 
-  /*const [dat, setDat] = useState([
-    { name: 'Smith', data: [1, 2, 3, 4, 1] },
-    { name: 'Jason', data: [2, 5, 1, 6, 9] },
-    { name: 'Suzy', data: [2, 5, 2, 1, 1] },
-  ]);
-  const [Boxdat, setBoxdat] = useState([
-    { name: 'Smith', data: [1, 2, 3, 4, 1] },
-    { name: 'Jason', data: [2, 5, 1, 6, 9] },
-    { name: 'Suzy', data: [2, 5, 2, 1, 1] },
-  ]);
-  const [radialData, setRadialData] = useState([
-    { name: 'Jason', data: [(3.1/4)*100]}, 
-    { name: 'Kelly', data: [(2.6/4)*100]}, 
-    { name: 'Smith', data: [(3.9/4)*100]}
-  ]);*/
-  // radialData was previously: 
-  // var radialData = [(3.1 / 4) * 100, (2.6 / 4) * 100, (3.9 / 4) * 100];
-  // but RadialBarChart has been refactored to now take series props in the same format as other graph components. 
-
-  //const [state, setState] = useState('');
-  /*useEffect(() => {
-    setState('loading');
-    getProfessorGradeList(subjectPrefix, courseNumber, professors).then((resolve) => {
-      console.log(resolve);
-      let newDat = [];
-      for (let i = 0; i < resolve.length; i++) {
-        for (let j = 0; j < resolve[i].grades.length; j++) {
-         newDat.push({name: resolve[i].professor + ' ' + resolve[i].grades[j].section + ' ' + resolve[i].grades[j].academicSession, data: resolve[i].grades[j].distribution});
-        }
-      }
-      setDat(newDat);
-      setBoxdat(newDat);
-      setState('success');
-    }).catch((reject) => {
-      console.error('Error:', reject);
-      setState('error');
-    });
-  }, []);*/
-  /*if (state === 'error' || state === 'loading') {
-    return (
-      <>
-      <div className=" w-full bg-light h-full">
-        <TopMenu />
-        <ExpandableSearchGrid/>
-        <div className="w-full h-5/6 justify-center">
-          <div className="w-full h-5/6 relative min-h-full">
-            <Carousel>
-              <div className="h-full m-4 ">
-                <Card className="h-96 p-4 m-4"></Card>
-                <Card className="h-96 p-4 m-4"></Card>
-              </div>
-              <div className="p-4 h-full">
-                <div className='grid grid-cols-1 md:grid-cols-3'>
-                  <Card className='after:block m-4'></Card>
-                  <Card className='after:block m-4'></Card>
-                  <Card className='after:block m-4'></Card>
-                </div>
-                <Card className="h-96 p-4 m-4"></Card>
-              </div>
-              <div className=" ">Hi</div>
-            </Carousel>
-          </div>
-        </div>
-      </div>
-    </>
-    );
-  }*/
   return (
     <>
       <div className=" w-full bg-light h-full">
@@ -143,37 +72,37 @@ export const Dashboard: NextPage = (props) => {
                 <Card className="h-96 p-4 m-4">
                   <GraphChoice
                     form="Bar"
-                    title="Grades Distribution"
-                    xaxisLabels={['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'W']}//{['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
+                    title="Grades"
+                    xaxisLabels={["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F", "W"]}
                     series={dat}
                   />
                 </Card>
                 <Card className="h-96 p-4 m-4">
                   <GraphChoice
                     form="Line"
-                    title="Class Averages"
-                    xaxisLabels={['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'W']}
+                    title="Grades"
+                    xaxisLabels={["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F", "W"]}
                     series={dat}
                   />
                 </Card>
               </div>
               <div className="p-4 h-full">
-                <div className='grid grid-cols-1 md:grid-cols-3'>
-                  <Card className='after:block m-4'>
+                <div className="grid grid-cols-1 md:grid-cols-3">
+                  <Card className="after:block m-4">
                   <GraphChoice
                       form="Radial"
                       title="Class Averages"
                       series={radialData}
                     />
                   </Card>
-                  <Card className='after:block m-4'>
+                  <Card className="after:block m-4">
                     <GraphChoice
                       form="Radial"
                       title="Class Averages"
                       series={radialData}
                     />
                   </Card>
-                  <Card className='after:block m-4'>
+                  <Card className="after:block m-4">
                     <GraphChoice
                       form="Radial"
                       title="Class Averages"
@@ -185,7 +114,7 @@ export const Dashboard: NextPage = (props) => {
                   <GraphChoice
                     form="BoxWhisker"
                     title="Class Averages"
-                    xaxisLabels={['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'W']}
+                    xaxisLabels={["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F", "W"]}
                     series={Boxdat}
                   />
                 </Card>
@@ -199,80 +128,40 @@ export const Dashboard: NextPage = (props) => {
   );
 };
 
-export async function getServerSideProps(context) {
-  console.log('hiiiiiiiii!!!', context.query, process.env.REACT_APP_NEBULA_API_KEY);
-  const searchOptions = ["course_number", "subject_prefix", "title", "description", "school", "credit_hours", "class_level", "activity_type", "grading", "internal_course_number", "lecture_contact_hours", "laboratory_contact_hours", "offering_frequency"];
-  let params = "";
-  for (const searchOption of searchOptions) {
-    if (context.query.hasOwnProperty(searchOption)) {
-      params += "&" + searchOption + "=" + context.query[searchOption];
-    }
-  }
-  console.log(params);
-  const headers = {
-    "x-api-key": process.env.REACT_APP_NEBULA_API_KEY,
-    Accept: "application/json",
-  };
-  
-  let sectionPromises = [];
-  
-  await new Promise((resolve, reject) => {
-    try {
-      fetch(
-        `https://api.utdnebula.com/course?` + params,
-        {
-          method: "GET",
-          headers: headers,
-        }
-      )
-        .then(function (res) {
-          resolve(res.json());
-        })
-        .catch(function (err) {
-          console.log("Nebula error is: ",err);
-          reject(err);
-        });
-    } catch (err) {
-      console.log("Error getting data: " + err);
-      reject(err);
-    }
-  }).then(function(result) {
-    console.log(result);
-    for (const uniqueClass of result.data) {
-      for (const section of uniqueClass.sections) {
-		sectionPromises.push(new Promise((resolve, reject) => {
-          try {
-            fetch(
-              `https://api.utdnebula.com/section/` + section,
-              {
-                method: "GET",
-                headers: headers,
-              }
-            )
-              .then(function (res) {
-                resolve(res.json());
-              })
-              .catch(function (err) {
-                console.log("Nebula error is: ",err);
-                reject(err);
-              });
-          } catch (err) {
-            console.log("Error getting data: " + err);
-            reject(err);
-          }
-        }));
+export async function getServerSideProps(context) { //read url props, ex: ?sections=624026d53b93c05ddb026bcc,62410a2ce27d0c74c4093d8d,62410a2de27d0c74c4093d8f
+  if (!context.query.hasOwnProperty('sections')) {
+	return {
+      props: {
+        sections: []
       }
-    }
-  });
-  
-  //return getClassesPromise;
+	}
+  }
+
   return {
     props: {
-      promise: await Promise.all(sectionPromises).then((values) => {
-        console.log(values);
-		return values;
-      })
-    },
+      sections: await Promise.all(
+        context.query.sections.split(',').map(section => fetch(
+            'https://api.utdnebula.com/section/' + section,
+            {
+              method: 'GET',
+              headers: {
+                'x-api-key': process.env.REACT_APP_NEBULA_API_KEY,
+                Accept: 'application/json',
+              },
+            }
+          )
+          .then(response => response.json())
+          .then(data => {
+            if (data.message !== 'success') {
+              throw new Error('Nebula API Error', data.data);
+            }
+            return data.data;
+          })
+        )
+      )
+	  .then(responses => responses)
+	  .catch(error => [])
+    }
   }
 }
 
