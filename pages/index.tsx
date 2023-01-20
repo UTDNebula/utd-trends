@@ -6,6 +6,7 @@ import { Wave2SVG } from '../components/icons/Wave2/wave2SVG';
 import { FlatLogoIcon } from '../components/icons/FlatLogoIcon/flatLogoIcon';
 import { useState } from 'react';
 import styles from '../styles/Home.module.css';
+import { Navigate } from 'react-router-dom';
 
 interface Film {
   title: string;
@@ -19,6 +20,7 @@ const Home: NextPage = () => {
 
   function searchOptionChosen(chosenOption: any) {
     console.log('The option chosen was: ', chosenOption);
+    <Navigate to="/dashboard" />
   }
 
   return (
