@@ -1,13 +1,14 @@
 import { Card } from '@mui/material';
 import type { NextPage } from 'next';
-import { useState } from 'react';
+import { useRouter } from 'next/router'
+import { useState, useEffect } from 'react';
 import Carousel from '../../components/common/Carousel/carousel';
 import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
 import { getProfessorGradeList, setNebulaAPIKey } from './nebula.js';
 
-export const Dashboard: NextPage = (props) => {
+export const Dashboard: NextPage = () => {
   var data1 = [1, 2, 8, 2, 1, 3, 4, 7, 9];
   var data2 = [1, 3, 7, 4, 6, 8, 2, 1, 6];
   var data3 = [4, 9, 1, 1, 5, 8, 5, 2, 8];
@@ -41,7 +42,7 @@ export const Dashboard: NextPage = (props) => {
 
   function searchAutocomplete() {}
   
-  let dat = [];
+  const [dat, setDat] = useState([]);
   let Boxdat = [
     { name: 'Smith', data: [1, 2, 3, 4, 1] },
     { name: 'Jason', data: [2, 5, 1, 6, 9] },
@@ -52,14 +53,58 @@ export const Dashboard: NextPage = (props) => {
     { name: 'Kelly', data: [(2.6/4)*100]}, 
     { name: 'Smith', data: [(3.9/4)*100]}
   ];
-  console.log(props.sections);
-  if (props && props.sections) {
-    for (const section of props.sections) {
-      dat.push({name: section.section_number + ' ' + section.academic_session.name, data: section.grade_distribution});
+  const router = useRouter();
+  const [state, setState] = useState('loading');
+  useEffect(() => {
+    setState('loading');
+    if(!router.isReady) return;
+    if (typeof router.query.sections !== 'undefined') {
+	  fetch(
+        '/api/nebulaAPI?sections=' + router.query.sections,
+        {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+          },
+      }).then(response => response.json()).then(data => {
+        setDat(data.data);
+        setState('success');
+      }).catch(error => {
+        setState('error');
+        console.error('Nebula API Error', error.error);
+      });
     }
+  }, [router.isReady]);
+  
+  if (state === 'error' || state === 'loading') {
+    return (
+      <>
+      <div className=" w-full bg-light h-full">
+        <TopMenu />
+        <ExpandableSearchGrid/>
+        <div className="w-full h-5/6 justify-center">
+          <div className="w-full h-5/6 relative min-h-full">
+            <Carousel>
+              <div className="h-full m-4 ">
+                <Card className="h-96 p-4 m-4"></Card>
+                <Card className="h-96 p-4 m-4"></Card>
+              </div>
+              <div className="p-4 h-full">
+                <div className='grid grid-cols-1 md:grid-cols-3'>
+                  <Card className='after:block m-4'></Card>
+                  <Card className='after:block m-4'></Card>
+                  <Card className='after:block m-4'></Card>
+                </div>
+                <Card className="h-96 p-4 m-4"></Card>
+              </div>
+              <div className=" ">Hi</div>
+            </Carousel>
+          </div>
+        </div>
+      </div>
+    </>
+    );
   }
-  console.log(dat);
-
   return (
     <>
       <div className=" w-full bg-light h-full">
@@ -127,42 +172,5 @@ export const Dashboard: NextPage = (props) => {
     </>
   );
 };
-
-export async function getServerSideProps(context) { //read url props, ex: ?sections=624026d53b93c05ddb026bcc,62410a2ce27d0c74c4093d8d,62410a2de27d0c74c4093d8f
-  if (!context.query.hasOwnProperty('sections')) {
-	return {
-      props: {
-        sections: []
-      }
-	}
-  }
-
-  return {
-    props: {
-      sections: await Promise.all(
-        context.query.sections.split(',').map(section => fetch(
-            'https://api.utdnebula.com/section/' + section,
-            {
-              method: 'GET',
-              headers: {
-                'x-api-key': process.env.REACT_APP_NEBULA_API_KEY,
-                Accept: 'application/json',
-              },
-            }
-          )
-          .then(response => response.json())
-          .then(data => {
-            if (data.message !== 'success') {
-              throw new Error('Nebula API Error', data.data);
-            }
-            return data.data;
-          })
-        )
-      )
-	  .then(responses => responses)
-	  .catch(error => [])
-    }
-  }
-}
 
 export default Dashboard;
