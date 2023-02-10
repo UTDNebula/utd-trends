@@ -1,12 +1,11 @@
 import { Card } from '@mui/material';
 import type { NextPage } from 'next';
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Carousel from '../../components/common/Carousel/carousel';
 import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
-import { getProfessorGradeList, setNebulaAPIKey } from './nebula.js';
 
 export const Dashboard: NextPage = () => {
   var data1 = [1, 2, 8, 2, 1, 3, 4, 7, 9];
@@ -41,7 +40,7 @@ export const Dashboard: NextPage = () => {
   }
 
   function searchAutocomplete() {}
-  
+
   const [dat, setDat] = useState([]);
   let Boxdat = [
     { name: 'Smith', data: [1, 2, 3, 4, 1] },
@@ -49,67 +48,68 @@ export const Dashboard: NextPage = () => {
     { name: 'Suzy', data: [2, 5, 2, 1, 1] },
   ];
   let radialData = [
-    { name: 'Jason', data: [(3.1/4)*100]}, 
-    { name: 'Kelly', data: [(2.6/4)*100]}, 
-    { name: 'Smith', data: [(3.9/4)*100]}
+    { name: 'Jason', data: [(3.1 / 4) * 100] },
+    { name: 'Kelly', data: [(2.6 / 4) * 100] },
+    { name: 'Smith', data: [(3.9 / 4) * 100] },
   ];
   const router = useRouter();
   const [state, setState] = useState('loading');
   useEffect(() => {
     setState('loading');
-    if(!router.isReady) return;
+    if (!router.isReady) return;
     if (typeof router.query.sections !== 'undefined') {
-	  fetch(
-        '/api/nebulaAPI?sections=' + router.query.sections,
-        {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-          },
-      }).then(response => response.json()).then(data => {
-        setDat(data.data);
-        setState('success');
-      }).catch(error => {
-        setState('error');
-        console.error('Nebula API Error', error.error);
-      });
+      fetch('/api/nebulaAPI?sections=' + router.query.sections, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setDat(data.data);
+          setState('success');
+        })
+        .catch((error) => {
+          setState('error');
+          console.error('Nebula API Error', error.error);
+        });
     }
-  }, [router.isReady]);
-  
+  }, [router.isReady, router.query.sections]);
+
   if (state === 'error' || state === 'loading') {
     return (
       <>
-      <div className=" w-full bg-light h-full">
-        <TopMenu />
-        <ExpandableSearchGrid/>
-        <div className="w-full h-5/6 justify-center">
-          <div className="w-full h-5/6 relative min-h-full">
-            <Carousel>
-              <div className="h-full m-4 ">
-                <Card className="h-96 p-4 m-4"></Card>
-                <Card className="h-96 p-4 m-4"></Card>
-              </div>
-              <div className="p-4 h-full">
-                <div className='grid grid-cols-1 md:grid-cols-3'>
-                  <Card className='after:block m-4'></Card>
-                  <Card className='after:block m-4'></Card>
-                  <Card className='after:block m-4'></Card>
+        <div className=" w-full bg-light h-full">
+          <TopMenu />
+          <ExpandableSearchGrid />
+          <div className="w-full h-5/6 justify-center">
+            <div className="w-full h-5/6 relative min-h-full">
+              <Carousel>
+                <div className="h-full m-4 ">
+                  <Card className="h-96 p-4 m-4"></Card>
+                  <Card className="h-96 p-4 m-4"></Card>
                 </div>
-                <Card className="h-96 p-4 m-4"></Card>
-              </div>
-              <div className=" ">Hi</div>
-            </Carousel>
+                <div className="p-4 h-full">
+                  <div className="grid grid-cols-1 md:grid-cols-3">
+                    <Card className="after:block m-4"></Card>
+                    <Card className="after:block m-4"></Card>
+                    <Card className="after:block m-4"></Card>
+                  </div>
+                  <Card className="h-96 p-4 m-4"></Card>
+                </div>
+                <div className=" ">Hi</div>
+              </Carousel>
+            </div>
           </div>
         </div>
-      </div>
-    </>
+      </>
     );
   }
   return (
     <>
       <div className=" w-full bg-light h-full">
         <TopMenu />
-        <ExpandableSearchGrid/>
+        <ExpandableSearchGrid />
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">
             <Carousel>
@@ -118,7 +118,22 @@ export const Dashboard: NextPage = () => {
                   <GraphChoice
                     form="Bar"
                     title="Grades"
-                    xaxisLabels={["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F", "W"]}
+                    xaxisLabels={[
+                      'A+',
+                      'A',
+                      'A-',
+                      'B+',
+                      'B',
+                      'B-',
+                      'C+',
+                      'C',
+                      'C-',
+                      'D+',
+                      'D',
+                      'D-',
+                      'F',
+                      'W',
+                    ]}
                     series={dat}
                   />
                 </Card>
@@ -126,7 +141,22 @@ export const Dashboard: NextPage = () => {
                   <GraphChoice
                     form="Line"
                     title="Grades"
-                    xaxisLabels={["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F", "W"]}
+                    xaxisLabels={[
+                      'A+',
+                      'A',
+                      'A-',
+                      'B+',
+                      'B',
+                      'B-',
+                      'C+',
+                      'C',
+                      'C-',
+                      'D+',
+                      'D',
+                      'D-',
+                      'F',
+                      'W',
+                    ]}
                     series={dat}
                   />
                 </Card>
@@ -134,7 +164,7 @@ export const Dashboard: NextPage = () => {
               <div className="p-4 h-full">
                 <div className="grid grid-cols-1 md:grid-cols-3">
                   <Card className="after:block m-4">
-                  <GraphChoice
+                    <GraphChoice
                       form="Radial"
                       title="Class Averages"
                       series={radialData}
@@ -159,7 +189,22 @@ export const Dashboard: NextPage = () => {
                   <GraphChoice
                     form="BoxWhisker"
                     title="Class Averages"
-                    xaxisLabels={["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F", "W"]}
+                    xaxisLabels={[
+                      'A+',
+                      'A',
+                      'A-',
+                      'B+',
+                      'B',
+                      'B-',
+                      'C+',
+                      'C',
+                      'C-',
+                      'D+',
+                      'D',
+                      'D-',
+                      'F',
+                      'W',
+                    ]}
                     series={Boxdat}
                   />
                 </Card>

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -6,16 +5,16 @@ import GraphProps from '../../../modules/GraphProps';
 import React from 'react';
 
 /**
- * Creates a pre-configured ApexCharts box-and-whisker graph. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`. 
- * @param props 
+ * Creates a pre-configured ApexCharts box-and-whisker graph. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`.
+ * @param props
  * @returns line graph
  */
 export function BoxGraph(props: GraphProps) {
-  //This map() will create a new 'series' array "formattedSeries" that has x,y format instead of name,data format. 
-  //Contents are the same, this just changes the labels to match what Apex wants for a Boxplot. 
-  //This is done to preserve the name,data format being passed into all chart types. 
-  function quantile(arr, q) {
-    const sorted = [...arr].sort(function(a, b) {
+  //This map() will create a new 'series' array "formattedSeries" that has x,y format instead of name,data format.
+  //Contents are the same, this just changes the labels to match what Apex wants for a Boxplot.
+  //This is done to preserve the name,data format being passed into all chart types.
+  function quantile(arr: number[], q: number) {
+    const sorted = [...arr].sort(function (a, b) {
       return a - b;
     });
     const pos = (sorted.length - 1) * q;
@@ -26,8 +25,19 @@ export function BoxGraph(props: GraphProps) {
     } else {
       return sorted[base];
     }
-  };
-  const formattedSeries = props.series.map((value) => { return { x: value.name, y: [Math.min(...value.data), quantile(value.data, .25), quantile(value.data, .5), quantile(value.data, .75), Math.max(...value.data)]} })
+  }
+  const formattedSeries = props.series.map((value) => {
+    return {
+      x: value.name,
+      y: [
+        Math.min(...value.data),
+        quantile(value.data, 0.25),
+        quantile(value.data, 0.5),
+        quantile(value.data, 0.75),
+        Math.max(...value.data),
+      ],
+    };
+  });
   const options: ApexOptions = {
     chart: {
       id: 'line-chart',
@@ -77,8 +87,8 @@ export function BoxGraph(props: GraphProps) {
           series={[
             {
               type: 'boxPlot',
-              data: formattedSeries
-            }
+              data: formattedSeries,
+            },
           ]}
           type="boxPlot"
           height={'100%'}
