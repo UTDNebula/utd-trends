@@ -54,6 +54,15 @@ export const Dashboard: NextPage = () => {
   ];
   const router = useRouter();
   const [state, setState] = useState('loading');
+
+  useEffect(() => {
+    fetch('/api/ratemyprofessorScraper?professors=Greg%20Ozbirn,John%20Cole', {
+      method: 'GET',
+    })
+      .then((response) => response.json())
+      .then((data) => console.log(data));
+  });
+
   useEffect(() => {
     setState('loading');
     if (!router.isReady) return;
