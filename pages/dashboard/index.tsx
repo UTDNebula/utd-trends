@@ -41,7 +41,11 @@ export const Dashboard: NextPage = () => {
 
   function searchAutocomplete() {}
 
-  const [dat, setDat] = useState([]);
+  type datType = {
+    name: string;
+    data: number[];
+  };
+  const [dat, setDat] = useState<datType[] | []>([]);
   let Boxdat = [
     { name: 'Smith', data: [1, 2, 3, 4, 1] },
     { name: 'Jason', data: [2, 5, 1, 6, 9] },
@@ -66,22 +70,30 @@ export const Dashboard: NextPage = () => {
   useEffect(() => {
     setState('loading');
     if (!router.isReady) return;
-    if (typeof router.query.sections !== 'undefined') {
-      fetch('/api/nebulaAPI?sections=' + router.query.sections, {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          setDat(data.data);
+    if ('sections' in router.query && typeof router.query.sections === 'string') {
+      Promise.all(
+        router.query.sections.split(',').map((section) =>
+          fetch('/api/nebulaAPI/section?id=' + section, {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+            },
+          })
+            .then((response) => response.json())
+        ),
+      )
+        .then((responses) => {
+          setDat(responses.map(data => {
+            let newDat:datType = {name: '', data: data.data.grade_distribution};
+            return newDat;
+          }));
           setState('success');
         })
         .catch((error) => {
           setState('error');
           console.error('Nebula API Error', error.error);
         });
+      
     }
   }, [router.isReady, router.query.sections]);
 
