@@ -46,16 +46,7 @@ export const Dashboard: NextPage = () => {
     data: number[];
   };
   const [dat, setDat] = useState<datType[] | []>([]);
-  let Boxdat = [
-    { name: 'Smith', data: [1, 2, 3, 4, 1] },
-    { name: 'Jason', data: [2, 5, 1, 6, 9] },
-    { name: 'Suzy', data: [2, 5, 2, 1, 1] },
-  ];
-  let radialData = [
-    { name: 'Jason', data: [(3.1 / 4) * 100] },
-    { name: 'Kelly', data: [(2.6 / 4) * 100] },
-    { name: 'Smith', data: [(3.9 / 4) * 100] },
-  ];
+  const [GPAdat, setGPADat] = useState<datType[] | []>([]);
   const router = useRouter();
   const [state, setState] = useState('loading');
 
@@ -84,8 +75,16 @@ export const Dashboard: NextPage = () => {
       )
         .then((responses) => {
           setDat(responses.map(data => {
-            let newDat:datType = {name: '', data: data.data.grade_distribution};
+            let newDat: datType = {name: data.data.name, data: data.data.grade_distribution};
             return newDat;
+          }));
+          setGPADat(responses.map(data => { //replace categorical data with GPA
+            const GPALookup = [4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0];
+            let GPAGrades: number[] = [];
+            for (let i = 0; i < data.data.grade_distribution.length - 1; i++) {
+              GPAGrades = GPAGrades.concat(Array(data.data.grade_distribution[i]).fill(GPALookup[i]));
+            }
+            return {name: data.data.name, data: GPAGrades};
           }));
           setState('success');
         })
@@ -108,14 +107,8 @@ export const Dashboard: NextPage = () => {
               <Carousel>
                 <div className="h-full m-4 ">
                   <Card className="h-96 p-4 m-4"></Card>
-                  <Card className="h-96 p-4 m-4"></Card>
                 </div>
                 <div className="p-4 h-full">
-                  <div className="grid grid-cols-1 md:grid-cols-3">
-                    <Card className="after:block m-4"></Card>
-                    <Card className="after:block m-4"></Card>
-                    <Card className="after:block m-4"></Card>
-                  </div>
                   <Card className="h-96 p-4 m-4"></Card>
                 </div>
                 <div className=" ">Hi</div>
@@ -158,58 +151,12 @@ export const Dashboard: NextPage = () => {
                     series={dat}
                   />
                 </Card>
-                <Card className="h-96 p-4 m-4">
-                  <GraphChoice
-                    form="Line"
-                    title="Grades"
-                    xaxisLabels={[
-                      'A+',
-                      'A',
-                      'A-',
-                      'B+',
-                      'B',
-                      'B-',
-                      'C+',
-                      'C',
-                      'C-',
-                      'D+',
-                      'D',
-                      'D-',
-                      'F',
-                      'W',
-                    ]}
-                    series={dat}
-                  />
-                </Card>
               </div>
               <div className="p-4 h-full">
-                <div className="grid grid-cols-1 md:grid-cols-3">
-                  <Card className="after:block m-4">
-                    <GraphChoice
-                      form="Radial"
-                      title="Class Averages"
-                      series={radialData}
-                    />
-                  </Card>
-                  <Card className="after:block m-4">
-                    <GraphChoice
-                      form="Radial"
-                      title="Class Averages"
-                      series={radialData}
-                    />
-                  </Card>
-                  <Card className="after:block m-4">
-                    <GraphChoice
-                      form="Radial"
-                      title="Class Averages"
-                      series={radialData}
-                    />
-                  </Card>
-                </div>
                 <Card className="h-96 p-4 m-4">
                   <GraphChoice
                     form="BoxWhisker"
-                    title="Class Averages"
+                    title="GPA Box and Whisker"
                     xaxisLabels={[
                       'A+',
                       'A',
@@ -226,7 +173,7 @@ export const Dashboard: NextPage = () => {
                       'F',
                       'W',
                     ]}
-                    series={Boxdat}
+                    series={GPAdat}
                   />
                 </Card>
               </div>

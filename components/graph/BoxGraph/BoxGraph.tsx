@@ -49,6 +49,12 @@ export function BoxGraph(props: GraphProps) {
       bar: {
         horizontal: false,
       },
+      boxPlot: {
+        colors: {
+          upper: '#eb5757',
+          lower: '#2d9cdb',
+        },
+      },
     },
     dataLabels: {
       enabled: false,
@@ -56,7 +62,6 @@ export function BoxGraph(props: GraphProps) {
     xaxis: {
       categories: props.xaxisLabels,
     },
-    colors: ['#ffadad', '#9bf6ff', '#caffbf'],
     stroke: {
       width: 2,
       curve: 'smooth',

@@ -25,7 +25,7 @@ import React from "react";
         },
       },
       labels: compiledLabels,
-      colors: ['#ffadad', '#9bf6ff', '#caffbf'],
+      colors: ['#eb5757', '#2d9cdb', '#499F68'],
       stroke: {
         width: 2,
       },
