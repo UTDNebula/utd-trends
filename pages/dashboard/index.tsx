@@ -45,8 +45,13 @@ export const Dashboard: NextPage = () => {
     name: string;
     data: number[];
   };
-  const [dat, setDat] = useState<datType[] | []>([]);
-  const [GPAdat, setGPADat] = useState<datType[] | []>([]);
+  const [dat, setDat] = useState<datType[]>([]);
+  const [GPAdat, setGPADat] = useState<datType[]>([]);
+  const [averageDat, setAverageDat] = useState<datType[]>([]);
+  const [stdevDat, setStdevDat] = useState<datType[]>([]);
+  function round(val: number) {
+    return Math.round((val + Number.EPSILON) * 100) / 100;
+  }
   const router = useRouter();
   const [state, setState] = useState('loading');
 
@@ -78,19 +83,31 @@ export const Dashboard: NextPage = () => {
             let newDat: datType = {name: data.data.name, data: data.data.grade_distribution};
             return newDat;
           }));
-          setGPADat(responses.map(data => { //replace categorical data with GPA
+          
+          let newGPADat:datType[] = [];
+          let newAverageDat:datType[] = [];
+          let newStdevDat:datType[] = [];
+          for (let i = 0; i < responses.length; i++) {
             const GPALookup = [4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0];
             let GPAGrades: number[] = [];
-            for (let i = 0; i < data.data.grade_distribution.length - 1; i++) {
-              GPAGrades = GPAGrades.concat(Array(data.data.grade_distribution[i]).fill(GPALookup[i]));
+            for (let j = 0; j < responses[i].data.grade_distribution.length - 1; j++) {
+              GPAGrades = GPAGrades.concat(Array(responses[i].data.grade_distribution[j]).fill(GPALookup[j]));
             }
-            return {name: data.data.name, data: GPAGrades};
-          }));
+            newGPADat.push({name: responses[i].data.name, data: GPAGrades});
+            const mean = GPAGrades.reduce((partialSum, a) => partialSum + a, 0) / GPAGrades.length;
+            newAverageDat.push({name: responses[i].data.name, data: [round(mean)]});
+            const stdev = Math.sqrt(GPAGrades.reduce((partialSum, a) => partialSum + (a - mean)**2, 0) / GPAGrades.length);
+            newStdevDat.push({name: responses[i].data.name, data: [round(stdev)]});
+          }
+          setGPADat(newGPADat);
+          setAverageDat(newAverageDat);
+          setStdevDat(newStdevDat);
+          
           setState('success');
         })
         .catch((error) => {
           setState('error');
-          console.error('Nebula API Error', error.error);
+          console.error('Nebula API Error', error);
         });
       
     }
@@ -110,6 +127,10 @@ export const Dashboard: NextPage = () => {
                 </div>
                 <div className="p-4 h-full">
                   <Card className="h-96 p-4 m-4"></Card>
+                  <div className="grid grid-cols-1 md:grid-cols-2">
+                    <Card className="h-96 p-4 m-4"></Card>
+                    <Card className="h-96 p-4 m-4"></Card>
+                  </div>
                 </div>
                 <div className=" ">Hi</div>
               </Carousel>
@@ -176,6 +197,29 @@ export const Dashboard: NextPage = () => {
                     series={GPAdat}
                   />
                 </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2">
+                  <Card className="h-96 p-4 m-4">
+                    <GraphChoice
+                      form="Bar"
+                      title="GPA Averages"
+                      xaxisLabels={[
+                        'Average',
+                      ]}
+                      series={averageDat}
+                    />
+                  </Card>
+                  <Card className="h-96 p-4 m-4">
+                    <GraphChoice
+                      form="Bar"
+                      title="GPA Standard Deviations"
+                      xaxisLabels={[
+                        'Standard Deviation',
+                        'hi',
+                      ]}
+                      series={stdevDat}
+                    />
+                  </Card>
+                </div>
               </div>
               <div className=" ">Hi</div>
             </Carousel>
