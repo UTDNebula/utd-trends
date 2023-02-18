@@ -68,7 +68,7 @@ export const Dashboard: NextPage = () => {
     if (!router.isReady) return;
     if ('sections' in router.query && typeof router.query.sections === 'string') {
       Promise.all(
-        router.query.sections.split(',').map((section) =>
+        router.query.sections.split(',').map(section =>
           fetch('/api/nebulaAPI/section?id=' + section, {
             method: 'GET',
             headers: {
@@ -76,7 +76,7 @@ export const Dashboard: NextPage = () => {
             },
           })
             .then((response) => response.json())
-        ),
+        )
       )
         .then((responses) => {
           setDat(responses.map(data => {
@@ -214,7 +214,6 @@ export const Dashboard: NextPage = () => {
                       title="GPA Standard Deviations"
                       xaxisLabels={[
                         'Standard Deviation',
-                        'hi',
                       ]}
                       series={stdevDat}
                     />

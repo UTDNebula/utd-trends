@@ -24,37 +24,39 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         )}&sid=U2Nob29sLTEyNzM=`,
       );
     }
-
-    Promise.all(professorUrls.map((u) => fetch(u)))
-      .then((responses) => Promise.all(responses.map((res) => res.text())))
-      .then((texts) => {
-        const regex =
-          /"legacyId":(\w+),"avgRating":([\d.]+),"numRatings":(\d+),"wouldTakeAgainPercent":([\d.]+),"avgDifficulty":([\d.]+),"department":"([\w\s]+)","school":.+?,"firstName":"([\w-]+)","lastName":"([\w-]+)"/;
-        const result = texts.map((page) => {
-          var parsedData: RateMyProfessorInfo = {
-            averageRating: 0,
-            averageDifficulty: 0,
-            department: '',
-            firstName: '',
-            lastName: '',
-            legacyId: '',
-            numRatings: 0,
-            wouldTakeAgainPercentage: 0,
-          };
-          const regexArray = page.match(regex);
-          if (regexArray != null) {
-            parsedData.legacyId = regexArray[1];
-            parsedData.averageRating = Number(regexArray[2]);
-            parsedData.numRatings = Number(regexArray[3]);
-            parsedData.wouldTakeAgainPercentage = Number(regexArray[4]);
-            parsedData.averageDifficulty = Number(regexArray[5]);
-            parsedData.department = regexArray[6];
-            parsedData.firstName = regexArray[7];
-            parsedData.lastName = regexArray[8];
-          }
-          return parsedData;
+    return new Promise<void>((resolve, reject) => {
+      Promise.all(professorUrls.map((u) => fetch(u)))
+        .then((responses) => Promise.all(responses.map((res) => res.text())))
+        .then((texts) => {
+          const regex =
+            /"legacyId":(\w+),"avgRating":([\d.]+),"numRatings":(\d+),"wouldTakeAgainPercent":([\d.]+),"avgDifficulty":([\d.]+),"department":"([\w\s]+)","school":.+?,"firstName":"([\w-]+)","lastName":"([\w-]+)"/;
+          const result = texts.map((page) => {
+            var parsedData: RateMyProfessorInfo = {
+              averageRating: 0,
+              averageDifficulty: 0,
+              department: '',
+              firstName: '',
+              lastName: '',
+              legacyId: '',
+              numRatings: 0,
+              wouldTakeAgainPercentage: 0,
+            };
+            const regexArray = page.match(regex);
+            if (regexArray != null) {
+              parsedData.legacyId = regexArray[1];
+              parsedData.averageRating = Number(regexArray[2]);
+              parsedData.numRatings = Number(regexArray[3]);
+              parsedData.wouldTakeAgainPercentage = Number(regexArray[4]);
+              parsedData.averageDifficulty = Number(regexArray[5]);
+              parsedData.department = regexArray[6];
+              parsedData.firstName = regexArray[7];
+              parsedData.lastName = regexArray[8];
+            }
+            return parsedData;
+          });
+          res.status(200).json(result);
+          resolve();
         });
-        res.status(200).json(result);
-      });
+    });
   }
 }
