@@ -66,52 +66,81 @@ export const Dashboard: NextPage = () => {
   useEffect(() => {
     setState('loading');
     if (!router.isReady) return;
-    if ('sections' in router.query && typeof router.query.sections === 'string') {
+    if (
+      'sections' in router.query &&
+      typeof router.query.sections === 'string'
+    ) {
       Promise.all(
-        router.query.sections.split(',').map(section =>
+        router.query.sections.split(',').map((section) =>
           fetch('/api/nebulaAPI/section?id=' + section, {
             method: 'GET',
             headers: {
               Accept: 'application/json',
             },
-          })
-            .then((response) => response.json())
-        )
+          }).then((response) => response.json()),
+        ),
       )
         .then((responses) => {
-          setDat(responses.map(data => {
-            let newDat: datType = {name: data.data.name, data: data.data.grade_distribution};
-            return newDat;
-          }));
-          
-          let newGPADat:datType[] = [];
-          let newAverageDat:datType[] = [];
-          let newStdevDat:datType[] = [];
+          setDat(
+            responses.map((data) => {
+              let newDat: datType = {
+                name: data.data.name,
+                data: data.data.grade_distribution,
+              };
+              return newDat;
+            }),
+          );
+
+          let newGPADat: datType[] = [];
+          let newAverageDat: datType[] = [];
+          let newStdevDat: datType[] = [];
           for (let i = 0; i < responses.length; i++) {
-            const GPALookup = [4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0];
+            const GPALookup = [
+              4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
+            ];
             let GPAGrades: number[] = [];
-            for (let j = 0; j < responses[i].data.grade_distribution.length - 1; j++) {
-              GPAGrades = GPAGrades.concat(Array(responses[i].data.grade_distribution[j]).fill(GPALookup[j]));
+            for (
+              let j = 0;
+              j < responses[i].data.grade_distribution.length - 1;
+              j++
+            ) {
+              GPAGrades = GPAGrades.concat(
+                Array(responses[i].data.grade_distribution[j]).fill(
+                  GPALookup[j],
+                ),
+              );
             }
-            newGPADat.push({name: responses[i].data.name, data: GPAGrades});
-            const mean = GPAGrades.reduce((partialSum, a) => partialSum + a, 0) / GPAGrades.length;
-            newAverageDat.push({name: responses[i].data.name, data: [round(mean)]});
-            const stdev = Math.sqrt(GPAGrades.reduce((partialSum, a) => partialSum + (a - mean)**2, 0) / GPAGrades.length);
-            newStdevDat.push({name: responses[i].data.name, data: [round(stdev)]});
+            newGPADat.push({ name: responses[i].data.name, data: GPAGrades });
+            const mean =
+              GPAGrades.reduce((partialSum, a) => partialSum + a, 0) /
+              GPAGrades.length;
+            newAverageDat.push({
+              name: responses[i].data.name,
+              data: [round(mean)],
+            });
+            const stdev = Math.sqrt(
+              GPAGrades.reduce(
+                (partialSum, a) => partialSum + (a - mean) ** 2,
+                0,
+              ) / GPAGrades.length,
+            );
+            newStdevDat.push({
+              name: responses[i].data.name,
+              data: [round(stdev)],
+            });
           }
           setGPADat(newGPADat);
           setAverageDat(newAverageDat);
           setStdevDat(newStdevDat);
-          
+
           setState('success');
         })
         .catch((error) => {
           setState('error');
           console.error('Nebula API Error', error);
         });
-      
     }
-  }, [router.isReady, router.query.sections]);
+  }, [router.isReady, router.query, router.query.sections]);
 
   if (state === 'error' || state === 'loading') {
     return (
@@ -202,9 +231,7 @@ export const Dashboard: NextPage = () => {
                     <GraphChoice
                       form="Bar"
                       title="GPA Averages"
-                      xaxisLabels={[
-                        'Average',
-                      ]}
+                      xaxisLabels={['Average']}
                       series={averageDat}
                     />
                   </Card>
@@ -212,9 +239,7 @@ export const Dashboard: NextPage = () => {
                     <GraphChoice
                       form="Bar"
                       title="GPA Standard Deviations"
-                      xaxisLabels={[
-                        'Standard Deviation',
-                      ]}
+                      xaxisLabels={['Standard Deviation']}
                       series={stdevDat}
                     />
                   </Card>

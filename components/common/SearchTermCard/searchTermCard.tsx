@@ -21,7 +21,7 @@ type SearchTermCardProps = {
  */
 export const SearchTermCard = (props: SearchTermCardProps) => {
   function handleCloseClick() {
-    props.onCloseButtonClicked(props.primaryText);
+    props.onCloseButtonClicked(props.index);
   }
 
   return (
