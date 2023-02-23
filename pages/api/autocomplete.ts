@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { DirectedGraph } from 'graphology';
 
 type SearchQuery = {
   prefix?: string;
@@ -25,243 +26,267 @@ type Professor = {
   lastName: string;
 };
 
-const classes: Class[] = [];
-const prefixes: Prefix[] = [];
-const professors: Professor[] = [];
+let myProfessors: Professor[] = [
+  { classes: [], firstName: 'arcs', lastName: 'test' },
+  { classes: [], firstName: 'csre', lastName: 'acse' },
+];
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  if ('input' in req.query && typeof req.query.input === 'string') {
-    const parsedInput = decodeURIComponent(req.query.input).trim().split(' ');
-    console.log('parsed input=', parsedInput);
-    switch (parsedInput.length) {
-      case 0:
-        res.status(400).json({ error: 'No fields detected in input' });
-        break;
-      case 1:
-        res
-          .status(200)
-          .json({ data: singleFieldSearchResults(parsedInput[0]) });
-        break;
-      case 2:
-        res
-          .status(200)
-          .json({
-            data: doubleFieldSearchResults(parsedInput[0], parsedInput[1]),
-          });
-        break;
-      case 3:
-        res
-          .status(200)
-          .json({
-            data: tripleFieldSearchResults(
-              parsedInput[0],
-              parsedInput[1],
-              parsedInput[2],
-            ),
-          });
-        break;
-      case 4:
-        res
-          .status(200)
-          .json({
-            data: quadrupleFieldSearchResults(
-              parsedInput[0],
-              parsedInput[1],
-              parsedInput[2],
-              parsedInput[3],
-            ),
-          });
-        break;
-      default:
-        res
-          .status(400)
-          .json({
-            error:
-              'Something went wrong with the input, such as too many fields',
-          });
+let myPrefixes: Prefix[] = [
+  { classes: [], professors: myProfessors, value: 'CS' },
+  { classes: [], professors: [], value: 'ECS' },
+  { classes: [], professors: [], value: 'CE' },
+];
+
+let myClasses: Class[] = [
+  { prefix: myPrefixes[0], number: 1337, professors: [myProfessors[0]] },
+  { prefix: myPrefixes[0], number: 1336, professors: [myProfessors[1]] },
+  {
+    prefix: myPrefixes[0],
+    number: 2337,
+    professors: Array.of(myProfessors[0]),
+  },
+];
+
+myProfessors[0].classes.push(myClasses[0], myClasses[1]);
+myProfessors[1].classes.push(myClasses[0]);
+
+myPrefixes[0].classes.push(myClasses[0], myClasses[1]);
+myPrefixes[2].classes.push(myClasses[0], myClasses[1]);
+
+type NodeAttributes = {
+  character: string;
+  data?: SearchQuery;
+};
+
+const graph: DirectedGraph<NodeAttributes> = new DirectedGraph({
+  allowSelfLoops: false,
+});
+let numNodes = 0; //allows a unique name for each node
+const root = graph.addNode(numNodes++, { character: '' });
+
+function addSearchQueryCharacter(
+  node: string,
+  characters: string,
+  data: SearchQuery,
+): string {
+  let preExisting = graph.findOutNeighbor(
+    node,
+    (neighbor, attributes) => attributes.character === characters[0],
+  );
+  if (typeof preExisting === 'string') {
+    if (characters.length <= 1) {
+      //console.log('found: ', characters[0], 'end');
+      return preExisting;
     }
+    //console.log('found: ', characters[0]);
+    return addSearchQueryCharacter(preExisting, characters.slice(1), data);
+  }
+  if (characters.length <= 1) {
+    //console.log('new: ', characters[0], 'end');
+    const newNode = graph.addNode(numNodes++, {
+      character: characters[0],
+      data: data,
+    });
+    graph.addEdge(node, newNode);
+    return newNode;
+  }
+  //console.log('new: ', characters[0]);
+  const newNode = graph.addNode(numNodes++, {
+    character: characters[0],
+  });
+  graph.addEdge(node, newNode);
+  return addSearchQueryCharacter(newNode, characters.slice(1), data);
+}
+
+for (let i = 0; i < myPrefixes.length; i++) {
+  //add all nodes
+  //console.log(myPrefixes[i].value);
+  const prefixNode = addSearchQueryCharacter(root, myPrefixes[i].value, {
+    prefix: myPrefixes[i].value,
+  });
+  const prefixSpaceNode = graph.addNode(numNodes++, {
+    character: ' ',
+  });
+  graph.addEdge(prefixNode, prefixSpaceNode);
+  for (let j = 0; j < myPrefixes[i].classes.length; j++) {
+    //console.log(myPrefixes[i].classes[j].number);
+    const classNode = addSearchQueryCharacter(
+      prefixSpaceNode,
+      myPrefixes[i].classes[j].number.toString(),
+      {
+        prefix: myPrefixes[i].value,
+        number: myPrefixes[i].classes[j].number,
+      },
+    );
+    const classSpaceNode = graph.addNode(numNodes++, {
+      character: ' ',
+    });
+    graph.addEdge(classNode, classSpaceNode);
+    for (let k = 0; k < myPrefixes[i].classes[j].professors.length; k++) {
+      //console.log(myPrefixes[i].classes[j].professors[k].firstName + myPrefixes[i].classes[j].professors[k].lastName);
+      const professorNode = addSearchQueryCharacter(
+        classSpaceNode,
+        myPrefixes[i].classes[j].professors[k].firstName +
+          myPrefixes[i].classes[j].professors[k].lastName,
+        {
+          prefix: myPrefixes[i].value,
+          number: myPrefixes[i].classes[j].number,
+          professorName:
+            myPrefixes[i].classes[j].professors[k].firstName +
+            ' ' +
+            myPrefixes[i].classes[j].professors[k].lastName,
+        },
+      );
+    }
+  }
+}
+
+/*reduces graph size by compressing chains of nodes each with only one child
+to a single node with a character value of several characters. I couldn't get
+this work with my bfs implemintation as the bfs needs to know the difference
+between each character.
+Requires readding an attribute to nodes representing their place as either a
+prefix, number, or prof name. I called this depth: 0, 1, 2.
+-Tyler
+*/
+/*function checkForSingleChild(node: string) {
+  if (graph.outDegree(node) > 1) {
+    graph.forEachOutNeighbor(node, neighbor => checkForSingleChild(neighbor));
+  } else {
+    graph.forEachOutNeighbor(node, (singleChild, attributes) => { //will only return once
+      if (graph.getNodeAttribute(node, 'depth') !== attributes.depth) {
+        checkForSingleChild(singleChild);
+      } else {
+        graph.updateNodeAttribute(node, 'character', n => n + attributes.character);
+        if (typeof attributes.data !== 'undefined') {
+          graph.setNodeAttribute(node, 'data', attributes.data);
+        }
+        graph.forEachOutNeighbor(singleChild, grandchild => {
+          graph.dropEdge(singleChild, grandchild);
+          graph.addEdge(node, grandchild);
+        });
+        graph.dropNode(singleChild);
+        checkForSingleChild(node);
+      }
+    });
+  }
+}
+checkForSingleChild(root);*/
+
+type QueueItem = {
+  node: string;
+  characters?: string;
+  matched: boolean;
+};
+
+function bfsToNextData(queue: QueueItem[]) {
+  const queueItem = queue.shift();
+  const data = graph.getNodeAttribute(queueItem?.node, 'data');
+  if (typeof data !== 'undefined') {
+    return data;
+  } else {
+    graph.forEachOutNeighbor(queueItem?.node, (neighbor) => {
+      queue.push({
+        node: neighbor,
+        matched: false,
+      });
+    });
+  }
+  return;
+}
+
+function bfsRecursion(queue: QueueItem[]) {
+  const queueItem = queue.shift();
+  const data = graph.getNodeAttribute(queueItem?.node, 'data');
+  const hasData = graph.getNodeAttribute(queueItem?.node, 'data');
+  const lastChar = queueItem?.characters?.length === 1;
+  if (
+    queueItem?.characters?.[0] ===
+    graph.getNodeAttribute(queueItem?.node, 'character')
+  ) {
+    //match
+    if (lastChar) {
+      graph.forEachOutNeighbor(queueItem?.node, (neighbor) => {
+        queue.push({
+          node: neighbor,
+          matched: false,
+        });
+      });
+      if (hasData) {
+        return data;
+      }
+    } else {
+      graph.forEachOutNeighbor(queueItem?.node, (neighbor) => {
+        queue.push({
+          node: neighbor,
+          characters: queueItem?.characters?.slice(1),
+          matched: true,
+        });
+      });
+    }
+  } else {
+    if (lastChar) {
+      if (!hasData) {
+        graph.forEachOutNeighbor(queueItem?.node, (neighbor) => {
+          queue.push({
+            node: neighbor,
+            matched: false,
+          });
+        });
+      }
+    }
+  }
+}
+
+type bfsReturn = SearchQuery | undefined;
+
+function bfs(node: string, characters: string) {
+  let queue: QueueItem[] = [];
+  graph.forEachOutNeighbor(node, (neighbor) => {
+    queue.push({
+      node: neighbor,
+      characters: characters,
+      matched: true,
+    });
+  });
+  let results: SearchQuery[] = [];
+  while (queue.length) {
+    let response: bfsReturn;
+    if (queue[0].matched) {
+      response = bfsRecursion(queue);
+    } else {
+      response = bfsToNextData(queue);
+    }
+    if (typeof response !== 'undefined') {
+      results.push(response);
+    }
+  }
+  return results;
+}
+
+type ErrorState = {
+  error: string;
+};
+type SuccessState = {
+  data: SearchQuery[];
+};
+type Data = ErrorState | SuccessState;
+
+export default function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Data>,
+) {
+  if ('input' in req.query && typeof req.query.input === 'string') {
+    const parsedInput = decodeURIComponent(req.query.input).trim();
+    /*console.log(bfs(root, 'C'));
+    console.log(bfs(root, 'CS'));
+    console.log(bfs(root, 'CS '));
+    console.log(bfs(root, 'CS 1'));
+    console.log(bfs(root, 'CS 133'));
+    console.log(bfs(root, 'CS 1336'));
+    console.log(bfs(root, 'CS 1336 '));*/
+    res.status(200).json({ data: bfs(root, parsedInput) });
   } else {
     res.status(400).json({ error: 'No input, or invalid type of input' });
   }
-}
-
-function singleFieldSearchResults(field1: string): SearchQuery[] {
-  let myProfessors: Professor[] = [
-    { classes: [], firstName: 'arcs', lastName: 'test' },
-    { classes: [], firstName: 'csre', lastName: 'acse' },
-  ];
-
-  let myPrefixes: Prefix[] = [
-    { classes: [], professors: myProfessors, value: 'CS' },
-    { classes: [], professors: [], value: 'ECS' },
-    { classes: [], professors: [], value: 'CE' },
-  ];
-
-  let myClasses: Class[] = [
-    { prefix: myPrefixes[0], number: 1337, professors: myProfessors },
-    {
-      prefix: myPrefixes[0],
-      number: 2337,
-      professors: Array.of(myProfessors[0]),
-    },
-  ];
-
-  myProfessors[0].classes.push(myClasses[0], myClasses[1]);
-  myProfessors[1].classes.push(myClasses[0]);
-
-  myPrefixes[0].classes.push(myClasses[0], myClasses[1]);
-
-  const resultingSet: SearchQuery[] = [];
-
-  let fullPrefixMatched: boolean = false;
-  let fullMatchedPrefix: Prefix;
-
-  for (const prefix of myPrefixes) {
-    if (prefix.value.toLowerCase() === field1.toLowerCase()) {
-      fullPrefixMatched = true;
-      fullMatchedPrefix = prefix;
-      break;
-    }
-  }
-
-  if (fullPrefixMatched) {
-    // @ts-ignore
-    resultingSet.push({ prefix: fullMatchedPrefix.value });
-    // @ts-ignore
-    fullMatchedPrefix.classes.forEach((_class) => {
-      resultingSet.push({
-        prefix: fullMatchedPrefix.value,
-        number: _class.number,
-      });
-    });
-    return Array.from(
-      new Set(resultingSet.map((query) => JSON.stringify(query))),
-    ).map((queryString) => JSON.parse(queryString));
-  } else {
-    let fullProfMatched: boolean = false;
-    let fullMatchedProf: Professor;
-
-    for (const prof of myProfessors) {
-      if (
-        prof.firstName.toLowerCase() === field1.toLowerCase() ||
-        prof.lastName.toLowerCase() === field1.toLowerCase()
-      ) {
-        fullProfMatched = true;
-        fullMatchedProf = prof;
-        break;
-      }
-    }
-
-    if (fullProfMatched) {
-      // @ts-ignore
-      resultingSet.push({
-        professorName:
-          fullMatchedProf.firstName + ' ' + fullMatchedProf.lastName,
-      });
-      // @ts-ignore
-      fullMatchedProf.classes.forEach((_class) => {
-        resultingSet.push({
-          prefix: _class.prefix.value,
-          number: _class.number,
-          professorName:
-            fullMatchedProf.firstName + ' ' + fullMatchedProf.lastName,
-        });
-      });
-      return Array.from(
-        new Set(resultingSet.map((query) => JSON.stringify(query))),
-      ).map((queryString) => JSON.parse(queryString));
-    } else {
-      const patternFromField: RegExp = new RegExp(field1, 'i');
-
-      myPrefixes
-        .filter((prefix) => {
-          return patternFromField.exec(prefix.value) != null;
-        })
-        .sort((a, b) => {
-          const aMatch = patternFromField.exec(a.value);
-          const bMatch = patternFromField.exec(b.value);
-          if (!aMatch) {
-            return 1;
-          } else if (!bMatch) {
-            return -1;
-          } else {
-            return aMatch.index - bMatch.index;
-          }
-        })
-        .forEach((prefix) => {
-          resultingSet.push({ prefix: prefix.value });
-        });
-      myProfessors
-        .filter((professor) => {
-          return patternFromField.exec(professor.lastName) != null;
-        })
-        .sort((a, b) => {
-          const aMatch = patternFromField.exec(a.lastName);
-          const bMatch = patternFromField.exec(b.lastName);
-          if (!aMatch) {
-            return 1;
-          } else if (!bMatch) {
-            return -1;
-          } else {
-            return aMatch.index - bMatch.index;
-          }
-        })
-        .forEach((professor) => {
-          resultingSet.push({
-            professorName: professor.firstName + ' ' + professor.lastName,
-          });
-        });
-      myProfessors
-        .filter((professor) => {
-          return patternFromField.exec(professor.firstName) != null;
-        })
-        .sort((a, b) => {
-          const aMatch = patternFromField.exec(a.firstName);
-          const bMatch = patternFromField.exec(b.firstName);
-          if (!aMatch) {
-            return 1;
-          } else if (!bMatch) {
-            return -1;
-          } else {
-            return aMatch.index - bMatch.index;
-          }
-        })
-        .forEach((professor) => {
-          resultingSet.push({
-            professorName: professor.firstName + ' ' + professor.lastName,
-          });
-        });
-
-      return Array.from(
-        new Set(resultingSet.map((query) => JSON.stringify(query))),
-      ).map((queryString) => JSON.parse(queryString));
-    }
-  }
-}
-
-//TODO: method for two fields
-function doubleFieldSearchResults(
-  field1: string,
-  field2: string,
-): SearchQuery[] {
-  return [];
-}
-
-//TODO: method for three fields
-function tripleFieldSearchResults(
-  field1: string,
-  field2: string,
-  field3: string,
-): SearchQuery[] {
-  return [];
-}
-
-//TODO: method for four fields
-function quadrupleFieldSearchResults(
-  field1: string,
-  field2: string,
-  field3: string,
-  field4: string,
-): SearchQuery[] {
-  return [];
 }

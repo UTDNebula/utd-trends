@@ -62,6 +62,14 @@ export const Dashboard: NextPage = () => {
       .then((response) => response.json())
       .then((data) => console.log(data));
   });
+  
+  useEffect(() => {
+    fetch('/api/autocomplete?input=CS', {
+      method: 'GET',
+    })
+      .then((response) => response.json())
+      .then((data) => console.log(data.data));
+  });
 
   useEffect(() => {
     setState('loading');
