@@ -47,8 +47,8 @@ let myClasses: Class[] = [
   },
 ];
 
-myProfessors[0].classes.push(myClasses[0], myClasses[1]);
-myProfessors[1].classes.push(myClasses[0]);
+myProfessors[0].classes.push(myClasses[0]);
+myProfessors[1].classes.push(myClasses[1]);
 
 myPrefixes[0].classes.push(myClasses[0], myClasses[1]);
 myPrefixes[2].classes.push(myClasses[0], myClasses[1]);
@@ -105,6 +105,7 @@ function addSearchQueryCharacter(
   return addSearchQueryCharacter(newNode, characters.slice(1), data);
 }
 
+//Add nodes in format: (<prefix> <number> or <prefix><number>) (<professorLast> or <professorFirst> <professorLast>)
 for (let i = 0; i < myPrefixes.length; i++) {
   //add all nodes
   //console.log(myPrefixes[i].value);
@@ -158,6 +159,11 @@ for (let i = 0; i < myPrefixes.length; i++) {
       );
     }
   }
+  console.log(myPrefixes[i].value);
+  graph.forEachOutNeighbor(prefixSpaceNode, child => { //support no space between prefix and number
+    console.log(graph.getNodeAttribute(child, 'character'));
+    graph.addEdge(prefixNode, child);
+  });
 }
 
 /*reduces graph size by compressing chains of nodes each with only one child
@@ -307,17 +313,19 @@ export default function handler(
 ) {
   if ('input' in req.query && typeof req.query.input === 'string') {
     const parsedInput = decodeURIComponent(req.query.input).trim().toUpperCase();
-    /*console.log(bfs(root, 'C'));
-    console.log(bfs(root, 'CS'));
-    console.log(bfs(root, 'CS '));
-    console.log(bfs(root, 'CS 1'));
-    console.log(bfs(root, 'CS 133'));
-    console.log(bfs(root, 'CS 1336'));
-    console.log(bfs(root, 'CS 1336 '));
-    console.log(bfs(root, 'CS 1336 C'));
-    console.log(bfs(root, 'CS 1336 A'));
-    console.log(bfs(root, 'CS 1336 CS'));
-    console.log(bfs(root, 'CS 1336 AC'));*/
+    /*console.log('C', bfs(root, 'C'));
+    console.log('CS', bfs(root, 'CS'));
+    console.log('CS ', bfs(root, 'CS '));
+    console.log('CS 1', bfs(root, 'CS 1'))
+    console.log('CS1', bfs(root, 'CS1'));
+    console.log('CS 133', bfs(root, 'CS 133'));
+    console.log('CS133', bfs(root, 'CS133'));
+    console.log('CS 1336', bfs(root, 'CS 1336'));
+    console.log('CS 1336 ', bfs(root, 'CS 1336 '));
+    console.log('CS 1336 C', bfs(root, 'CS 1336 C'));
+    console.log('CS 1336 A', bfs(root, 'CS 1336 A'));
+    console.log('CS 1336 CS', bfs(root, 'CS 1336 CS'));
+    console.log('CS 1336 AC', bfs(root, 'CS 1336 AC'));*/
     res.status(200).json({ data: bfs(root, parsedInput) });
   } else {
     res.status(400).json({ error: 'No input, or invalid type of input' });
