@@ -11,6 +11,7 @@ import { useEffect } from 'react';
  * Props type used by the SearchBar component
  */
 type SearchProps = {
+  searchAutocomplete: Function;
   // setSearch: the setter function from the parent component to set the search value
   selectSearchValue: Function;
   value: SearchQuery[] | undefined;
@@ -40,18 +41,7 @@ export const SearchBar = (props: SearchProps) => {
 
   useEffect(() => {
     if (inputValue !== '') {
-      fetch('/api/autocomplete?input=' + encodeURIComponent(inputValue), {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("The data I'm getting back is :", data);
-          console.log('the value is currently: ', props.value);
-          setOptions(data.data.concat(props.value));
-        });
+      setOptions(props.searchAutocomplete(inputValue).concat(props.value))
     } else {
     }
   }, [props.value, inputValue]);
