@@ -1,5 +1,5 @@
 import { Card } from '@mui/material';
-import type { NextPage, GetStaticProps  } from 'next';
+import type { NextPage, GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Carousel from '../../components/common/Carousel/carousel';
@@ -43,10 +43,9 @@ type Props = {
     nodes: GraphNode[];
     edges: GraphEdge[];
   };
-}
+};
 
 export const Dashboard: NextPage<Props> = ({ autocompleteGraph }) => {
-  console.log(autocompleteGraph);
   const graph: DirectedGraph<NodeAttributes> = new DirectedGraph({
     allowSelfLoops: false,
   });
@@ -84,9 +83,11 @@ export const Dashboard: NextPage<Props> = ({ autocompleteGraph }) => {
     if (
       queueItem?.characters?.[0] ===
       graph.getNodeAttribute(queueItem?.node, 'character')
-    ) { //match
+    ) {
+      //match
       //console.log('match: ', queueItem?.characters, queueItem?.characters?.length === 1);
-      if (queueItem?.characters?.length === 1) { //last character
+      if (queueItem?.characters?.length === 1) {
+        //last character
         graph.forEachOutNeighbor(queueItem?.node, (neighbor) => {
           //console.log('toNext: ', graph.getNodeAttribute(neighbor, 'character'));
           queue.push({
@@ -95,7 +96,8 @@ export const Dashboard: NextPage<Props> = ({ autocompleteGraph }) => {
           });
         });
         const data = graph.getNodeAttribute(queueItem?.node, 'data');
-        if (typeof data !== 'undefined') { //has data
+        if (typeof data !== 'undefined') {
+          //has data
           return data;
         }
       } else {
@@ -142,7 +144,7 @@ export const Dashboard: NextPage<Props> = ({ autocompleteGraph }) => {
     }
     return results;
   }
-  
+
   function searchAutocomplete(query: string) {
     return bfs(root, query);
   }
@@ -168,39 +170,83 @@ export const Dashboard: NextPage<Props> = ({ autocompleteGraph }) => {
       .then((response) => response.json())
       .then((data) => console.log(data));
   });
-  
+
   function searchTermsChange(searchTerms: SearchQuery[]) {
+    //called from expandableSearchGrid when data being compared is changed
     console.log('Index search terms: ', searchTerms);
     /*if (searchTerms.length === 0) {
       setState('loading');
     }*/
-    /*Promise.all(
-      searchTerms.map((searchTerm: searchQuery) => {
+    Promise.all(
+      searchTerms.map((searchTerm: SearchQuery) => {
         let apiRoute = '';
-        if (searchTerm.prefix !== undefined && searchTerm.number !== undefined) { //course
-          apiRoute = 'course';
-        } else if (searchTerm.professorName !== undefined) { //professor
-          apiRoute = 'professor';
-        } else if (searchTerm.prefix !== undefined && searchTerm.number !== undefined && searchTerm.professorName !== undefined) { //section
+        if (
+          'prefix' in searchTerm &&
+          typeof searchTerm.prefix === 'string' &&
+          'number' in searchTerm &&
+          typeof searchTerm.number === 'number' &&
+          'professorName' in searchTerm &&
+          typeof searchTerm.professorName === 'string' &&
+          'section' in searchTerm &&
+          typeof searchTerm.sectionNumber === 'string'
+        ) {
+          //section
           apiRoute = 'section';
-        } else if (searchTerm.prefix !== undefined && searchTerm.number !== undefined && searchTerm.professorName !== undefined) { //course+professor
+        } /*else if (
+          'prefix' in searchTerm &&
+          typeof searchTerm.prefix === 'string' &&
+          'number' in searchTerm &&
+          typeof searchTerm.number === 'number' &&
+          'professorName' in searchTerm &&
+          typeof searchTerm.professorName === 'string'
+        ) { //course+professor
           apiRoute = '';
+        }*/ else if (
+          'prefix' in searchTerm &&
+          typeof searchTerm.prefix === 'string' &&
+          'number' in searchTerm &&
+          typeof searchTerm.number === 'number'
+        ) {
+          //course
+          apiRoute = 'course';
+        } else if (
+          'professorName' in searchTerm &&
+          typeof searchTerm.professorName === 'string'
+        ) {
+          //professor
+          apiRoute = 'professor';
         }
-        return fetch('/api/nebulaAPI/' + apiRoute + '?' + Object.keys(searchTerm).map(key => key + '=' + searchTerm[key]).join('&'), {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
+        console.log('apiRoute', apiRoute, typeof searchTerm.number);
+        return fetch(
+          '/api/nebulaAPI/' +
+            apiRoute +
+            '?' +
+            Object.keys(searchTerm)
+              .map(
+                (key) =>
+                  key +
+                  '=' +
+                  encodeURIComponent(
+                    String(searchTerm[key as keyof SearchQuery]),
+                  ),
+              )
+              .join('&'),
+          {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+            },
           },
-        }).then((response) => response.json());
+        ).then((response) => response.json());
       }),
     )
       .then((responses) => {
-        console.log(responses);
+        console.log('data from grid: ', responses);
       })
       .catch((error) => {
         setState('error');
         console.error('Nebula API Error', error);
-      });*/
+      });
   }
 
   useEffect(() => {
@@ -447,7 +493,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   myProfessors[0].classes.push(myClasses[0]);
   myProfessors[0].classes.push(myClasses[2]);
   myProfessors[1].classes.push(myClasses[1]);
-  myProfessors[1].classes.push(myClasses[3])
+  myProfessors[1].classes.push(myClasses[3]);
 
   myPrefixes[0].classes.push(myClasses[0], myClasses[1]);
   myPrefixes[2].classes.push(myClasses[2], myClasses[3]);
@@ -508,10 +554,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     const prefixNode = addSearchQueryCharacter(root, myPrefixes[i].value, {
       prefix: myPrefixes[i].value,
     });
-    const prefixSpaceNode = addSearchQueryCharacter(
-      prefixNode,
-      ' ',
-    );
+    const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
     for (let j = 0; j < myPrefixes[i].classes.length; j++) {
       //console.log(myPrefixes[i].classes[j].number);
       const classNode = addSearchQueryCharacter(
@@ -522,10 +565,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
           number: myPrefixes[i].classes[j].number,
         },
       );
-      const classSpaceNode = addSearchQueryCharacter(
-        classNode,
-        ' ',
-      );
+      const classSpaceNode = addSearchQueryCharacter(classNode, ' ');
       for (let k = 0; k < myPrefixes[i].classes[j].professors.length; k++) {
         //console.log(myPrefixes[i].classes[j].professors[k].firstName + myPrefixes[i].classes[j].professors[k].lastName);
         //class -> first name -> last name
@@ -553,7 +593,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
         );
       }
     }
-    graph.forEachOutNeighbor(prefixSpaceNode, child => { //support no space between prefix and number
+    graph.forEachOutNeighbor(prefixSpaceNode, (child) => {
+      //support no space between prefix and number
       graph.addEdge(prefixNode, child);
     });
   }
@@ -577,9 +618,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
       myProfessors[i].lastName.slice(1) + ' ',
       {
         professorName:
-          myProfessors[i].firstName +
-          ' ' +
-          myProfessors[i].lastName,
+          myProfessors[i].firstName + ' ' + myProfessors[i].lastName,
       },
     );
     for (let j = 0; j < myProfessors[i].classes.length; j++) {
@@ -588,10 +627,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         professorLastNameNode,
         myProfessors[i].classes[j].prefix.value,
       );
-      const prefixSpaceNode = addSearchQueryCharacter(
-        prefixNode,
-        ' ',
-      );
+      const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
       const classNodeFirstChar = addSearchQueryCharacter(
         prefixSpaceNode,
         myProfessors[i].classes[j].number.toString()[0],
@@ -604,14 +640,12 @@ export const getStaticProps: GetStaticProps = async (context) => {
           prefix: myProfessors[i].classes[j].prefix.value,
           number: myProfessors[i].classes[j].number,
           professorName:
-            myProfessors[i].firstName +
-            ' ' +
-            myProfessors[i].lastName,
+            myProfessors[i].firstName + ' ' + myProfessors[i].lastName,
         },
       );
     }
   }
   return {
-    props: {autocompleteGraph: graph.export()},
-  }
-}
+    props: { autocompleteGraph: graph.export() },
+  };
+};
