@@ -14,12 +14,6 @@ type SearchQuery = {
   sectionNumber?: string;
 };
 
-type NodeAttributes = {
-  character: string;
-  data?: SearchQuery;
-  visited: boolean;
-};
-
 export const Dashboard: NextPage = () => {
   type datType = {
     name: string;
@@ -34,6 +28,44 @@ export const Dashboard: NextPage = () => {
   }
   const router = useRouter();
   const [state, setState] = useState('loading');
+  
+  //load data from home search if present
+  const startingData: SearchQuery = {};
+  if (
+    'prefix' in router.query &&
+    typeof router.query.prefix === 'string' ||
+    'number' in router.query &&
+    typeof router.query.number === 'string' ||
+    'professorName' in router.query &&
+    typeof router.query.professorName === 'string' ||
+    'sectionNumber' in router.query &&
+    typeof router.query.sectionNumber === 'string'
+  ) {
+    if (
+      'prefix' in router.query &&
+      typeof router.query.prefix === 'string'
+    ) {
+      startingData.prefix = router.query.prefix;
+    }
+    if (
+      'number' in router.query &&
+      typeof router.query.number === 'string'
+    ) {
+      startingData.number = parseInt(router.query.number);
+    }
+    if (
+      'professorName' in router.query &&
+      typeof router.query.professorName === 'string'
+    ) {
+      startingData.professorName = router.query.professorName;
+    }
+    if (
+      'sectionNumber' in router.query &&
+      typeof router.query.sectionNumber === 'string'
+    ) {
+      startingData.sectionNumber = router.query.sectionNumber;
+    }
+  }
 
   useEffect(() => {
     fetch('/api/ratemyprofessorScraper?professors=Greg%20Ozbirn,John%20Cole', {
@@ -43,8 +75,8 @@ export const Dashboard: NextPage = () => {
       .then((data) => console.log(data));
   });
 
+  //called from expandableSearchGrid when data being compared is changed
   function searchTermsChange(searchTerms: SearchQuery[]) {
-    //called from expandableSearchGrid when data being compared is changed
     console.log('Index search terms: ', searchTerms);
     /*if (searchTerms.length === 0) {
       setState('loading');
@@ -198,7 +230,7 @@ export const Dashboard: NextPage = () => {
           console.error('Nebula API Error', error);
         });
     }
-  }, [router.isReady, router.query, router.query.sections]);
+  }, [router.isReady, router.query.sections]);
 
   if (state === 'error' || state === 'loading') {
     return (
@@ -207,6 +239,7 @@ export const Dashboard: NextPage = () => {
           <TopMenu />
           <ExpandableSearchGrid
             onChange={searchTermsChange}
+            startingData={startingData}
           />
           <div className="w-full h-5/6 justify-center">
             <div className="w-full h-5/6 relative min-h-full">
@@ -235,6 +268,7 @@ export const Dashboard: NextPage = () => {
         <TopMenu />
         <ExpandableSearchGrid
           onChange={searchTermsChange}
+          startingData={startingData}
         />
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">
