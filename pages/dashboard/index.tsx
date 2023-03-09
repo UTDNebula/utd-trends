@@ -121,27 +121,39 @@ export const Dashboard: NextPage = () => {
           apiRoute = 'professor';
         }
         //console.log('apiRoute', apiRoute, typeof searchTerm.number);
+        const url = '/api/nebulaAPI/' +
+          apiRoute +
+          '?' +
+          Object.keys(searchTerm)
+            .map(
+              (key) =>
+                key +
+                '=' +
+                encodeURIComponent(
+                  String(searchTerm[key as keyof SearchQuery]),
+                ),
+            )
+            .join('&');
+        if(process.env.NODE_ENV !== 'development'){
+          const getItem = localStorage.getItem(url);
+          if (getItem !== null) {
+            return JSON.parse(getItem);
+          }
+        }
         return fetch(
-          '/api/nebulaAPI/' +
-            apiRoute +
-            '?' +
-            Object.keys(searchTerm)
-              .map(
-                (key) =>
-                  key +
-                  '=' +
-                  encodeURIComponent(
-                    String(searchTerm[key as keyof SearchQuery]),
-                  ),
-              )
-              .join('&'),
+          url,
           {
             method: 'GET',
             headers: {
               Accept: 'application/json',
             },
           },
-        ).then((response) => response.json());
+        )
+          .then((response) => response.json())
+          .then((response) => {
+            localStorage.setItem(url, JSON.stringify(response));
+            return response;
+        });
       }),
     )
       .then((responses) => {
