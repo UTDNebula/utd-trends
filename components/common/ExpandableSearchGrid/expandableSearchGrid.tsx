@@ -14,6 +14,7 @@ type SearchQuery = {
 
 type ExpandableSearchGridProps = {
   onChange: Function;
+  startingData: SearchQuery;
 }
 
 /**
@@ -29,6 +30,12 @@ export const ExpandableSearchGrid = (props: ExpandableSearchGridProps) => {
   useEffect(() => {
     props.onChange(searchTerms);
   }, [searchTerms]);
+  
+  useEffect(() => {
+    if (Object.keys(props.startingData).length !== 0) {
+      setSearchTerms([props.startingData]);
+    }
+  }, [props.startingData]);
 
   function addSearchTerm(newSearchTerm: SearchQuery) {
     if (newSearchTerm != null) {

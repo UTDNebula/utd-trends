@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { SearchIcon } from '../../icons/SearchIcon/searchIcon';
 import Autocomplete from '@mui/material/Autocomplete';
-import throttle from 'lodash/throttle';
-import topFilms from '../../../data/autocomplete_dummy_data.json';
 import Popper from '@mui/material/Popper';
 import { Box, Paper } from '@mui/material';
 import { useEffect } from 'react';
