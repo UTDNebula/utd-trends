@@ -13,7 +13,6 @@ type SearchQuery = {
 };
 
 type ExpandableSearchGridProps = {
-  searchAutocomplete: Function;
   onChange: Function;
 }
 
@@ -23,7 +22,7 @@ type ExpandableSearchGridProps = {
  * SearchTermCard components, and are displayed from left to right in this grid.
  */
 export const ExpandableSearchGrid = (props: ExpandableSearchGridProps) => {
-  const [value, setValue] = useState<SearchQuery[] | undefined>([]);
+  const [value, setValue] = useState<SearchQuery[]>([]);
   const [searchTerms, setSearchTerms] = useState<SearchQuery[]>([]);
   const [searchDisabled, setSearchDisable] = useState<boolean>(false);
   
@@ -87,7 +86,6 @@ export const ExpandableSearchGrid = (props: ExpandableSearchGridProps) => {
             }}
           >
             <SearchBar
-              searchAutocomplete={props.searchAutocomplete}
               selectSearchValue={addSearchTerm}
               value={value}
               setValue={setValue}

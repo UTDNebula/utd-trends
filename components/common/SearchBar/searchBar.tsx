@@ -6,15 +6,15 @@ import topFilms from '../../../data/autocomplete_dummy_data.json';
 import Popper from '@mui/material/Popper';
 import { Box, Paper } from '@mui/material';
 import { useEffect } from 'react';
+import { searchAutocomplete } from '../../autocomplete';
 
 /**
  * Props type used by the SearchBar component
  */
 type SearchProps = {
-  searchAutocomplete: Function;
   // setSearch: the setter function from the parent component to set the search value
   selectSearchValue: Function;
-  value: SearchQuery[] | undefined;
+  value: SearchQuery[];
   setValue: Function;
   disabled?: boolean;
 };
@@ -39,7 +39,7 @@ export const SearchBar = (props: SearchProps) => {
   const [inputValue, setInputValue] = React.useState('');
 
   useEffect(() => {
-    setOptions(props.searchAutocomplete(inputValue).concat(props.value));
+    setOptions(searchAutocomplete(inputValue).concat(props.value));
   }, [props.value, inputValue]);
 
   useEffect(() => {

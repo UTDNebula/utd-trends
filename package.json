@@ -2,7 +2,9 @@
   "name": "UTD-Trends",
   "private": true,
   "scripts": {
+    "predev": "node scripts/generateAutocompleteGraph.js",
     "dev": "next dev",
+    "prebuild": "node scripts/generateAutocompleteGraph.js",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
