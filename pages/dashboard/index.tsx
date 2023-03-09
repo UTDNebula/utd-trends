@@ -127,7 +127,7 @@ export const Dashboard: NextPage<Props> = ({ autocompleteGraph }) => {
       queue.push({
         node: neighbor,
         characters: characters,
-        toNext: false,
+        toNext: characters.length === 0, //bfsToNext if blank search string
       });
     });
     let results: SearchQuery[] = [];
@@ -146,7 +146,7 @@ export const Dashboard: NextPage<Props> = ({ autocompleteGraph }) => {
   }
 
   function searchAutocomplete(query: string) {
-    return bfs(root, query);
+    return bfs(root, query.trim().toUpperCase());
   }
 
   type datType = {
@@ -187,7 +187,7 @@ export const Dashboard: NextPage<Props> = ({ autocompleteGraph }) => {
           typeof searchTerm.number === 'number' &&
           'professorName' in searchTerm &&
           typeof searchTerm.professorName === 'string' &&
-          'section' in searchTerm &&
+          'sectionNumber' in searchTerm &&
           typeof searchTerm.sectionNumber === 'string'
         ) {
           //section
@@ -216,7 +216,7 @@ export const Dashboard: NextPage<Props> = ({ autocompleteGraph }) => {
           //professor
           apiRoute = 'professor';
         }
-        console.log('apiRoute', apiRoute, typeof searchTerm.number);
+        //console.log('apiRoute', apiRoute, typeof searchTerm.number);
         return fetch(
           '/api/nebulaAPI/' +
             apiRoute +
@@ -507,6 +507,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     visited: false,
   });
 
+  //recusively add a string to the graph, character by character, returning the last node. Doesn't create duplicate nodes with the same character
   function addSearchQueryCharacter(
     node: string,
     characters: string,
@@ -547,102 +548,129 @@ export const getStaticProps: GetStaticProps = async (context) => {
     return addSearchQueryCharacter(newNode, characters.slice(1), data);
   }
 
-  //Add nodes in format: (<prefix> <number> or <prefix><number>) (<professorLast> or <professorFirst> <professorLast>)
-  for (let i = 0; i < myPrefixes.length; i++) {
-    //add all nodes
-    //console.log(myPrefixes[i].value);
-    const prefixNode = addSearchQueryCharacter(root, myPrefixes[i].value, {
-      prefix: myPrefixes[i].value,
+  //Add node in format: (<prefix> <number> or <prefix><number>) (<professorLast> or <professorFirst> <professorLast>)
+  function addPrefixFirst(
+    prefix: string,
+    number: number,
+    profFirst: string,
+    profLast: string,
+  ) {
+    const prefixNode = addSearchQueryCharacter(root, prefix, {
+      prefix: prefix,
     });
     const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
-    for (let j = 0; j < myPrefixes[i].classes.length; j++) {
-      //console.log(myPrefixes[i].classes[j].number);
-      const classNode = addSearchQueryCharacter(
-        prefixSpaceNode,
-        myPrefixes[i].classes[j].number.toString(),
-        {
-          prefix: myPrefixes[i].value,
-          number: myPrefixes[i].classes[j].number,
-        },
-      );
-      const classSpaceNode = addSearchQueryCharacter(classNode, ' ');
-      for (let k = 0; k < myPrefixes[i].classes[j].professors.length; k++) {
-        //console.log(myPrefixes[i].classes[j].professors[k].firstName + myPrefixes[i].classes[j].professors[k].lastName);
-        //class -> first name -> last name
-        //class -> last name
-        const professorFirstNameNode = addSearchQueryCharacter(
-          classSpaceNode,
-          myPrefixes[i].classes[j].professors[k].firstName + ' ',
-        );
-        const professorLastNameFirstCharNode = addSearchQueryCharacter(
-          classSpaceNode,
-          myPrefixes[i].classes[j].professors[k].lastName[0],
-        );
-        graph.addEdge(professorFirstNameNode, professorLastNameFirstCharNode);
-        const professorLastNameNode = addSearchQueryCharacter(
-          professorLastNameFirstCharNode,
-          myPrefixes[i].classes[j].professors[k].lastName.slice(1),
-          {
-            prefix: myPrefixes[i].value,
-            number: myPrefixes[i].classes[j].number,
-            professorName:
-              myPrefixes[i].classes[j].professors[k].firstName +
-              ' ' +
-              myPrefixes[i].classes[j].professors[k].lastName,
-          },
-        );
-      }
+    const classNodeFirstChar = addSearchQueryCharacter(
+      prefixSpaceNode,
+      number.toString()[0],
+    );
+    if (!graph.hasEdge(prefixNode, classNodeFirstChar)) {
+      graph.addEdge(prefixNode, classNodeFirstChar);
     }
-    graph.forEachOutNeighbor(prefixSpaceNode, (child) => {
-      //support no space between prefix and number
-      graph.addEdge(prefixNode, child);
-    });
+    const classNode = addSearchQueryCharacter(
+      classNodeFirstChar,
+      number.toString().slice(1),
+      {
+        prefix: prefix,
+        number: number,
+      },
+    );
+    const classSpaceNode = addSearchQueryCharacter(classNode, ' ');
+
+    const professorFirstNameNode = addSearchQueryCharacter(
+      classSpaceNode,
+      profFirst + ' ',
+    );
+    const professorLastNameFirstCharNode = addSearchQueryCharacter(
+      classSpaceNode,
+      profLast[0],
+    );
+    if (
+      !graph.hasEdge(professorFirstNameNode, professorLastNameFirstCharNode)
+    ) {
+      graph.addEdge(professorFirstNameNode, professorLastNameFirstCharNode);
+    }
+    const professorLastNameNode = addSearchQueryCharacter(
+      professorLastNameFirstCharNode,
+      profLast.slice(1),
+      {
+        prefix: prefix,
+        number: number,
+        professorName: profFirst + ' ' + profLast,
+      },
+    );
   }
 
   //Add nodes in format: (<professorLast> or <professorFirst> <professorLast>) (<prefix> <number> or <prefix><number>)
-  for (let i = 0; i < myProfessors.length; i++) {
-    //console.log(myProfessors[i].firstName + ' ' + myProfessors[i].lastName);
-    //root -> first name -> last name
-    //root -> last name
+  function addProfFirst(
+    prefix: string,
+    number: number,
+    profFirst: string,
+    profLast: string,
+  ) {
     const professorFirstNameNode = addSearchQueryCharacter(
       root,
-      myProfessors[i].firstName + ' ',
+      profFirst + ' ',
     );
     const professorLastNameFirstCharNode = addSearchQueryCharacter(
       root,
-      myProfessors[i].lastName[0],
+      profLast[0],
     );
-    graph.addEdge(professorFirstNameNode, professorLastNameFirstCharNode);
+    if (
+      !graph.hasEdge(professorFirstNameNode, professorLastNameFirstCharNode)
+    ) {
+      graph.addEdge(professorFirstNameNode, professorLastNameFirstCharNode);
+    }
     const professorLastNameNode = addSearchQueryCharacter(
       professorLastNameFirstCharNode,
-      myProfessors[i].lastName.slice(1) + ' ',
+      profLast.slice(1),
       {
-        professorName:
-          myProfessors[i].firstName + ' ' + myProfessors[i].lastName,
+        professorName: profFirst + ' ' + profLast,
       },
     );
-    for (let j = 0; j < myProfessors[i].classes.length; j++) {
-      //console.log(myProfessors[i].classes[j].prefix.value + ' ' + myProfessors[i].classes[j].number);
-      const prefixNode = addSearchQueryCharacter(
-        professorLastNameNode,
-        myProfessors[i].classes[j].prefix.value,
-      );
-      const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
-      const classNodeFirstChar = addSearchQueryCharacter(
-        prefixSpaceNode,
-        myProfessors[i].classes[j].number.toString()[0],
-      );
+    const professorSpaceNode = addSearchQueryCharacter(
+      professorLastNameNode,
+      ' ',
+    );
+
+    const prefixNode = addSearchQueryCharacter(professorSpaceNode, prefix);
+    const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
+    const classNodeFirstChar = addSearchQueryCharacter(
+      prefixSpaceNode,
+      number.toString()[0],
+    );
+    if (!graph.hasEdge(prefixNode, classNodeFirstChar)) {
       graph.addEdge(prefixNode, classNodeFirstChar);
-      const classNode = addSearchQueryCharacter(
-        classNodeFirstChar,
-        myProfessors[i].classes[j].number.toString().slice(1),
-        {
-          prefix: myProfessors[i].classes[j].prefix.value,
-          number: myProfessors[i].classes[j].number,
-          professorName:
-            myProfessors[i].firstName + ' ' + myProfessors[i].lastName,
-        },
-      );
+    }
+    const classNode = addSearchQueryCharacter(
+      classNodeFirstChar,
+      number.toString().slice(1),
+      {
+        prefix: prefix,
+        number: number,
+        professorName: profFirst + ' ' + profLast,
+      },
+    );
+  }
+
+  for (let i = 0; i < myPrefixes.length; i++) {
+    //console.log(myPrefixes[i].value);
+    for (let j = 0; j < myPrefixes[i].classes.length; j++) {
+      //console.log(myPrefixes[i].classes[j].number);
+      for (let k = 0; k < myPrefixes[i].classes[j].professors.length; k++) {
+        //console.log(myPrefixes[i].classes[j].professors[k].firstName + myPrefixes[i].classes[j].professors[k].lastName);
+        addPrefixFirst(
+          myPrefixes[i].value,
+          myPrefixes[i].classes[j].number,
+          myPrefixes[i].classes[j].professors[k].firstName,
+          myPrefixes[i].classes[j].professors[k].lastName,
+        );
+        addProfFirst(
+          myPrefixes[i].value,
+          myPrefixes[i].classes[j].number,
+          myPrefixes[i].classes[j].professors[k].firstName,
+          myPrefixes[i].classes[j].professors[k].lastName,
+        );
+      }
     }
   }
   return {
