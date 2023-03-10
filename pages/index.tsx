@@ -1,9 +1,10 @@
 import type { NextPage } from 'next';
+import Head from 'next/head';
 import Card from '@mui/material/Card';
 import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
 import { WaveSVG } from '../components/icons/Wave/waveSVG';
 import { Wave2SVG } from '../components/icons/Wave2/wave2SVG';
-import { FlatLogoIcon } from '../components/icons/FlatLogoIcon/flatLogoIcon';
+import { LogoIcon } from '../components/icons/LogoIcon/logoIcon';
 import { useState } from 'react';
 import styles from '../styles/Home.module.css';
 
@@ -23,6 +24,10 @@ const Home: NextPage = () => {
 
   return (
     <>
+      <Head>
+        <link rel="canonical" href="https://trends.utdnebula.com" key="canonical" />
+        <meta property="og:url" content="https://trends.utdnebula.com" />
+      </Head>
       <div className="w-full justify-center items-center bg-gradient-to-b from-primary to-light text-primary-darker ">
         <div className="w-full h-2/3 absolute translate-y-1/4 overflow-x-hidden overflow-hidden">
           <WaveSVG />
@@ -42,12 +47,12 @@ const Home: NextPage = () => {
                 />
               </div>
               <div className="w-11/12 h-3/4 m-auto -translate-y-1/2 relative">
-                <Card className="bg-primary-dark rounded-xl drop-shadow-lg text-light p-8 relative h-full">
+                <Card className="bg-primary rounded-xl drop-shadow-lg text-light p-8 relative h-full">
                   <div className="m-auto  w-1/5">
-                    <FlatLogoIcon />
+                    <LogoIcon />
                   </div>
                   <div className="text-center pb-2">
-                    <h2 className="text-headline4">Welcome to UTD-Trends!</h2>
+                    <h2 className="text-headline4">Welcome to UTD Trends!</h2>
                   </div>
                 </Card>
               </div>

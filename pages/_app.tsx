@@ -6,8 +6,8 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>UTD-Trends</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>UTD Trends</title>
+        <link rel="icon" href="/Project_Nebula_Logo.svg" />
       </Head>
       <Component {...pageProps} />
     </>
