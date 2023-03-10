@@ -1,5 +1,6 @@
 import { Card } from '@mui/material';
 import type { NextPage } from 'next';
+import Head from 'next/head';
 import { useState } from 'react';
 import Carousel from '../../components/common/Carousel/carousel';
 import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
@@ -61,6 +62,10 @@ export const Dashboard: NextPage = () => {
 
   return (
     <>
+      <Head>
+        <link rel="canonical" href="https://trends.utdnebula.com/dashboard" key="canonical" />
+        <meta property="og:url" content="https://trends.utdnebula.com/dashboard" />
+      </Head>
       <div className=" w-full bg-light h-full">
         <TopMenu />
         <ExpandableSearchGrid/>
