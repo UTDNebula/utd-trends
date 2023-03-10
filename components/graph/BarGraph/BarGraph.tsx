@@ -21,6 +21,9 @@ export function BarGraph(props: GraphProps) {
         series={props.series}
         title={props.title}
       />
+
+
+      
     );
   }
   return (

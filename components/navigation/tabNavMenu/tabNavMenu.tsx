@@ -23,6 +23,7 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
         <Tabs
             value={props.value}
             onChange={(event, newValue) => props.turner(newValue - props.value)}
+
             aria-label="basic tabs example"
             centered
             className="w-full grid grid-flow-row justify-center shadow"
@@ -30,6 +31,8 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
             <Tab label="Grades" className="text-lg text-gray-600 normal-case" value={0}/>
             <Tab label="" icon={<Divider orientation="vertical" />} disabled value={-1} className="w-px min-w-[1px]"/>
             <Tab label="Detailed" className="text-lg text-gray-600 normal-case" value={1}/>
+            <Tab label="" icon={<Divider orientation="vertical" />} disabled value={-1} className="w-px min-w-[1px]"/>
+            <Tab label="Professor Ratings" className="text-lg text-gray-600 normal-case" value={2}/>
         </Tabs>
     );
 };

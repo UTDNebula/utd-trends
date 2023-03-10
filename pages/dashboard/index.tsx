@@ -5,6 +5,22 @@ import Carousel from '../../components/common/Carousel/carousel';
 import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
+import Box from '@mui/material/Box';
+import { ProfessorCard } from "../../components/common/ProfessorCard/ProfessorCard"
+
+import { useMediaQuery } from '@mui/material';
+
+//import useWindowSize from './windowHook'
+
+var i = 1;
+
+
+
+ 
+ 
+ 
+ 
+
 
 export const Dashboard: NextPage = () => {
   var data1 = [1, 2, 8, 2, 1, 3, 4, 7, 9];
@@ -23,6 +39,51 @@ export const Dashboard: NextPage = () => {
   const [search1, setSearch1] = useState('');
   const [search2, setSearch2] = useState('');
   const [search3, setSearch3] = useState('');
+
+  const ratings = [];
+
+  let profDifficulty = 5;
+  let avgRating = 2;
+  let profRetake = 10;
+
+  //const size = useWindowSize();
+
+  console.log("yes, this function calls again"+i);
+  
+
+
+
+
+
+  
+
+
+  ratings.push(5 - profDifficulty, avgRating, profRetake/20);
+  const colorCodes = [];
+
+  for (let i=0; i < ratings.length; i++){
+    console.log(ratings[i]);
+    if (ratings[i] >= 0 && ratings[i] <  1.7){
+      var colorCode =  "#ec5353";
+      console.log("Red");
+      colorCodes.push(colorCode);
+    }else if(ratings[i] > 1.6 && ratings[i] <  2.7){
+      var colorCode =  "#ecb653";
+      colorCodes.push(colorCode);
+      console.log("Orange");
+   }else if(ratings[i] > 2.6 && ratings[i] < 4){
+
+      var colorCode = "#f4ee5a"
+      colorCodes.push(colorCode);
+      console.log("Yellow");
+  }else if(ratings[i] > 3.9 && ratings[i] <= 5){
+
+    var colorCode = "#75f340"
+    colorCodes.push(colorCode);
+    console.log("Green");
+}
+
+  }
 
   function swap() {
     if (st) {
@@ -58,6 +119,10 @@ export const Dashboard: NextPage = () => {
   // radialData was previously: 
   // var radialData = [(3.1 / 4) * 100, (2.6 / 4) * 100, (3.9 / 4) * 100];
   // but RadialBarChart has been refactored to now take series props in the same format as other graph components. 
+
+  
+
+
 
   return (
     <>
@@ -101,8 +166,10 @@ export const Dashboard: NextPage = () => {
                       series={radialData}
                     />
                   </Card>
+
                   <Card className='after:block m-4'>
                     <GraphChoice
+
                       form="Radial"
                       title="Class Averages"
                       series={radialData}
@@ -112,14 +179,55 @@ export const Dashboard: NextPage = () => {
                 <Card className="h-96 p-4 m-4">
                   <GraphChoice
                     form="BoxWhisker"
-                    title="Class Averages"
+                    title="Class Average"
                     xaxisLabels={['A', 'B', 'C', 'D', 'F', 'CR', 'NC']}
                     series={Boxdat}
                   />
                 </Card>
               </div>
-              <div className=" ">Hi</div>
+
+            <div className="grid grid-cols-2 md:grid-cols-6 grid-container-2"  >
+             
+                 
+
+
+            
+          <div classname = ".TabDivider">           
+          </div>
+
+          
+        <div className="w-full md:w-1/2 p-4" style={{ paddingBottom: "100%"}}>      
+          <div className=".profcard-container" style = {{position: "relative", top: "-19%", left: "-90", paddingBottom: "10%", padding: "9rem"}}> 
+            
+               
+                 <Card className="h-100 p-4 m-4 md:h-full md:w-1700" style = {{ width: "1200px", height: "600%"}}>  
+                   <ProfessorCard
+                        position = "relative"
+                        Element = "Card"
+                        top = "100%"
+                        left = "0%"
+                        height = "320%"
+                        ProfessorRating = {avgRating}
+                        avgDifficulty = {profDifficulty}
+                        takingAgain = {profRetake}
+                        colorCode = {colorCodes}
+                        name = "Timothy Farage"
+                        department = "Computer Science"
+  
+                       />
+  
+  
+                     </Card>
+
+
+         
+                </div>
+              </div>
+             </div>
+                 
+           
             </Carousel>
+
           </div>
         </div>
       </div>

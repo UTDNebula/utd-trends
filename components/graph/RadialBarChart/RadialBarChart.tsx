@@ -17,7 +17,7 @@ import React from "react";
     const compiledLabels = props.series.map(value => value.name);
     const compiledSeries = props.series.map(value => value.data);
 
-    const options: ApexOptions = {
+   const options: ApexOptions = {
       chart: {
         id: 'bar',
         zoom: {

@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {TabNavMenu} from "../../navigation/tabNavMenu/tabNavMenu";
 
 interface CarouselProps {
-  children: ReactJSXElement[];
+ children: ReactJSXElement[];
 };
 
 /**
@@ -51,6 +51,8 @@ export const Carousel: FC<CarouselProps> = (props: CarouselProps) => {
     //set direction
     setDir(displacement);
     setCard(currentCard + displacement);
+
+    console.log(currentCard)
   };
 
   return (
@@ -75,7 +77,7 @@ export const Carousel: FC<CarouselProps> = (props: CarouselProps) => {
               exit="exit"
               transition={{
                 x: { type: 'spring', stiffness: 300, damping: 30 },
-                opacity: { duration: 0.2 },
+                opacity: { duration: .2 },
               }}
             >
               <div className="w-full h-full lg:h-full rounded-md mb-10">
