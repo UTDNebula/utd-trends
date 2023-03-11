@@ -7,7 +7,6 @@ import { FlatLogoIcon } from '../components/icons/FlatLogoIcon/flatLogoIcon';
 import { useState } from 'react';
 import styles from '../styles/Home.module.css';
 
-
 interface Film {
   title: string;
   year: number;
