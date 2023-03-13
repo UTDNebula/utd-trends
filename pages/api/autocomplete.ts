@@ -52,7 +52,7 @@ let myClasses: Class[] = [
 myProfessors[0].classes.push(myClasses[0]);
 myProfessors[0].classes.push(myClasses[2]);
 myProfessors[1].classes.push(myClasses[1]);
-myProfessors[1].classes.push(myClasses[3])
+myProfessors[1].classes.push(myClasses[3]);
 
 myPrefixes[0].classes.push(myClasses[0], myClasses[1]);
 myPrefixes[2].classes.push(myClasses[2], myClasses[3]);
@@ -116,10 +116,7 @@ for (let i = 0; i < myPrefixes.length; i++) {
   const prefixNode = addSearchQueryCharacter(root, myPrefixes[i].value, {
     prefix: myPrefixes[i].value,
   });
-  const prefixSpaceNode = addSearchQueryCharacter(
-    prefixNode,
-    ' ',
-  );
+  const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
   for (let j = 0; j < myPrefixes[i].classes.length; j++) {
     //console.log(myPrefixes[i].classes[j].number);
     const classNode = addSearchQueryCharacter(
@@ -130,10 +127,7 @@ for (let i = 0; i < myPrefixes.length; i++) {
         number: myPrefixes[i].classes[j].number,
       },
     );
-    const classSpaceNode = addSearchQueryCharacter(
-      classNode,
-      ' ',
-    );
+    const classSpaceNode = addSearchQueryCharacter(classNode, ' ');
     for (let k = 0; k < myPrefixes[i].classes[j].professors.length; k++) {
       //console.log(myPrefixes[i].classes[j].professors[k].firstName + myPrefixes[i].classes[j].professors[k].lastName);
       //class -> first name -> last name
@@ -161,7 +155,8 @@ for (let i = 0; i < myPrefixes.length; i++) {
       );
     }
   }
-  graph.forEachOutNeighbor(prefixSpaceNode, child => { //support no space between prefix and number
+  graph.forEachOutNeighbor(prefixSpaceNode, (child) => {
+    //support no space between prefix and number
     graph.addEdge(prefixNode, child);
   });
 }
@@ -184,22 +179,20 @@ for (let i = 0; i < myProfessors.length; i++) {
     professorLastNameFirstCharNode,
     myProfessors[i].lastName.slice(1) + ' ',
     {
-      professorName:
-        myProfessors[i].firstName +
-        ' ' +
-        myProfessors[i].lastName,
+      professorName: myProfessors[i].firstName + ' ' + myProfessors[i].lastName,
     },
   );
   for (let j = 0; j < myProfessors[i].classes.length; j++) {
-    console.log(myProfessors[i].classes[j].prefix.value + ' ' + myProfessors[i].classes[j].number);
+    console.log(
+      myProfessors[i].classes[j].prefix.value +
+        ' ' +
+        myProfessors[i].classes[j].number,
+    );
     const prefixNode = addSearchQueryCharacter(
       professorLastNameNode,
       myProfessors[i].classes[j].prefix.value,
     );
-    const prefixSpaceNode = addSearchQueryCharacter(
-      prefixNode,
-      ' ',
-    );
+    const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
     const classNodeFirstChar = addSearchQueryCharacter(
       prefixSpaceNode,
       myProfessors[i].classes[j].number.toString()[0],
@@ -212,14 +205,11 @@ for (let i = 0; i < myProfessors.length; i++) {
         prefix: myProfessors[i].classes[j].prefix.value,
         number: myProfessors[i].classes[j].number,
         professorName:
-          myProfessors[i].firstName +
-          ' ' +
-          myProfessors[i].lastName,
+          myProfessors[i].firstName + ' ' + myProfessors[i].lastName,
       },
     );
   }
 }
-
 
 /*reduces graph size by compressing chains of nodes each with only one child
 to a single node with a character value of several characters. I couldn't get
@@ -285,9 +275,11 @@ function bfsRecursion(queue: QueueItem[]) {
   if (
     queueItem?.characters?.[0] ===
     graph.getNodeAttribute(queueItem?.node, 'character')
-  ) { //match
+  ) {
+    //match
     //console.log('match: ', queueItem?.characters, queueItem?.characters?.length === 1);
-    if (queueItem?.characters?.length === 1) { //last character
+    if (queueItem?.characters?.length === 1) {
+      //last character
       graph.forEachOutNeighbor(queueItem?.node, (neighbor) => {
         //console.log('toNext: ', graph.getNodeAttribute(neighbor, 'character'));
         queue.push({
@@ -296,7 +288,8 @@ function bfsRecursion(queue: QueueItem[]) {
         });
       });
       const data = graph.getNodeAttribute(queueItem?.node, 'data');
-      if (typeof data !== 'undefined') { //has data
+      if (typeof data !== 'undefined') {
+        //has data
         return data;
       }
     } else {
@@ -357,7 +350,9 @@ export default function handler(
   res: NextApiResponse<Data>,
 ) {
   if ('input' in req.query && typeof req.query.input === 'string') {
-    const parsedInput = decodeURIComponent(req.query.input).trim().toUpperCase();
+    const parsedInput = decodeURIComponent(req.query.input)
+      .trim()
+      .toUpperCase();
     /*console.log('C', bfs(root, 'C'));
     console.log('CS', bfs(root, 'CS'));
     console.log('CS ', bfs(root, 'CS '));
