@@ -1,19 +1,12 @@
 import { Card } from '@mui/material';
-import type { NextPage, GetStaticProps } from 'next';
+import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Carousel from '../../components/common/Carousel/carousel';
 import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
-import Box from '@mui/material/Box';
 import { ProfessorCard } from '../../components/common/ProfessorCard/ProfessorCard';
-
-import { useMediaQuery } from '@mui/material';
-
-//import useWindowSize from './windowHook'
-
-var i = 1;
 
 type SearchQuery = {
   prefix?: string;
@@ -36,6 +29,29 @@ export const Dashboard: NextPage = () => {
   }
   const router = useRouter();
   const [state, setState] = useState('loading');
+
+  const ratings = [];
+
+  let profDifficulty = 5;
+  let avgRating = 2;
+  let profRetake = 10;
+
+  ratings.push(5 - profDifficulty, avgRating, profRetake / 20);
+
+  const colorCodes = [];
+
+  for (let i = 0; i < ratings.length; i++) {
+    console.log(ratings[i]);
+    if (ratings[i] >= 0 && ratings[i] < 1.7) {
+      colorCodes.push('#ec5353');
+    } else if (ratings[i] > 1.6 && ratings[i] < 2.7) {
+      colorCodes.push('#ecb653');
+    } else if (ratings[i] > 2.6 && ratings[i] < 4) {
+      colorCodes.push('#f4ee5a');
+    } else if (ratings[i] > 3.9 && ratings[i] <= 5) {
+      colorCodes.push('#75f340');
+    }
+  }
 
   //load data from home search if present
   const startingData: SearchQuery = {};
@@ -357,9 +373,9 @@ export const Dashboard: NextPage = () => {
                   <ProfessorCard
                     position="relative"
                     element="Card"
-                    professorRating={avgRating}
-                    averageDifficulty={profDifficulty}
-                    takingAgain={profRetake}
+                    professorRating={ratings[0]}
+                    averageDifficulty={ratings[1]}
+                    takingAgain={ratings[2]}
                     colorCode={colorCodes}
                     name="Timothy Farage"
                     department="Computer Science"
