@@ -6,7 +6,8 @@ type ErrorState = {
 };
 type SuccessState = {
   data: {
-    name: string;
+    name?: string;
+    id?: string;
     /*grade_distribution: number[];*/
   };
 };
@@ -33,13 +34,44 @@ export default function handler(
           if (data.message !== 'success') {
             throw new Error(data.data);
           }
-          res.status(200).json({data: {
-            name:
-              data.data.first_name +
-              ' ' +
-              data.data.last_name,
-            /*data: data.data.grade_distribution,*/
-          }});
+          res.status(200).json({
+            data: {
+              name: data.data.first_name + ' ' + data.data.last_name,
+              /*data: data.data.grade_distribution,*/
+            },
+          });
+        })
+        .catch((error) => {
+          res.status(400).json({ error: error });
+        });
+    } else if (
+      'professorName' in req.query &&
+      typeof req.query.professorName === 'string'
+    ) {
+      const Url = new URL('https://api.utdnebula.com/professor/');
+      Url.searchParams.append(
+        'first_name',
+        req.query.professorName.split(' ')[0],
+      );
+      Url.searchParams.append(
+        'last_name',
+        req.query.professorName.split(' ')[1],
+      );
+      fetch(Url.href, {
+        method: 'GET',
+        headers: headers,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message !== 'success') {
+            throw new Error(data.data);
+          }
+          res.status(200).json({
+            data: {
+              id: data.data[0]._id,
+              /*grade_distribution: data.data[0].grade_distribution,*/
+            },
+          });
         })
         .catch((error) => {
           res.status(400).json({ error: error });

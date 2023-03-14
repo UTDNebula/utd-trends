@@ -1,11 +1,10 @@
 import * as React from 'react';
 import { SearchIcon } from '../../icons/SearchIcon/searchIcon';
 import Autocomplete from '@mui/material/Autocomplete';
-import throttle from 'lodash/throttle';
-import topFilms from '../../../data/autocomplete_dummy_data.json';
 import Popper from '@mui/material/Popper';
 import { Box, Paper } from '@mui/material';
 import { useEffect } from 'react';
+import { searchAutocomplete } from '../../autocomplete';
 
 /**
  * Props type used by the SearchBar component
@@ -13,7 +12,7 @@ import { useEffect } from 'react';
 type SearchProps = {
   // setSearch: the setter function from the parent component to set the search value
   selectSearchValue: Function;
-  value: SearchQuery[] | undefined;
+  value: SearchQuery[];
   setValue: Function;
   disabled?: boolean;
 };
@@ -34,26 +33,11 @@ type SearchQuery = {
 export const SearchBar = (props: SearchProps) => {
   const [open, setOpen] = React.useState(false);
   const [options, setOptions] = React.useState<readonly SearchQuery[]>([]);
-  const loading = open && options.length === 0;
 
   const [inputValue, setInputValue] = React.useState('');
 
   useEffect(() => {
-    if (inputValue !== '') {
-      fetch('/api/autocomplete?input=' + encodeURIComponent(inputValue), {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("The data I'm getting back is :", data);
-          console.log('the value is currently: ', props.value);
-          setOptions(data.data.concat(props.value));
-        });
-    } else {
-    }
+    setOptions(searchAutocomplete(inputValue).concat(props.value));
   }, [props.value, inputValue]);
 
   useEffect(() => {
@@ -82,7 +66,7 @@ export const SearchBar = (props: SearchProps) => {
           filterSelectedOptions
           getOptionLabel={(option) => searchQueryLabel(option)}
           options={options}
-          loading={loading}
+          filterOptions={(options) => options}
           value={props.value}
           // When a new option is selected, find the new selected option by getting the
           // difference between the current and new value, then return that to the parent

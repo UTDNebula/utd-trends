@@ -1,4 +1,5 @@
 import type { NextPage } from 'next';
+import { useRouter } from 'next/router';
 import Card from '@mui/material/Card';
 import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
 import { WaveSVG } from '../components/icons/Wave/waveSVG';
@@ -7,18 +8,28 @@ import { FlatLogoIcon } from '../components/icons/FlatLogoIcon/flatLogoIcon';
 import { useState } from 'react';
 import styles from '../styles/Home.module.css';
 
-interface Film {
-  title: string;
-  year: number;
-}
+type SearchQuery = {
+  prefix?: string;
+  number?: number;
+  professorName?: string;
+  sectionNumber?: string;
+};
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
 const Home: NextPage = () => {
-  const [value, setValue] = useState<Film[] | undefined>([]);
+  const [value, setValue] = useState<SearchQuery[]>([]);
 
-  function searchOptionChosen(chosenOption: any) {
+  const router = useRouter();
+  function searchOptionChosen(chosenOption: SearchQuery) {
     console.log('The option chosen was: ', chosenOption);
+    router.push(
+      {
+        pathname: '/dashboard',
+        query: chosenOption,
+      },
+      '/dashboard',
+    );
   }
 
   return (

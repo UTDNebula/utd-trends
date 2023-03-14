@@ -1,5 +1,5 @@
 import { Card } from '@mui/material';
-import type { NextPage } from 'next';
+import type { NextPage, GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Carousel from '../../components/common/Carousel/carousel';
@@ -15,74 +15,14 @@ import { useMediaQuery } from '@mui/material';
 
 var i = 1;
 
+type SearchQuery = {
+  prefix?: string;
+  number?: number;
+  professorName?: string;
+  sectionNumber?: string;
+};
+
 export const Dashboard: NextPage = () => {
-  var data1 = [1, 2, 8, 2, 1, 3, 4, 7, 9];
-  var data2 = [1, 3, 7, 4, 6, 8, 2, 1, 6];
-  var data3 = [4, 9, 1, 1, 5, 8, 5, 2, 8];
-  var data4 = [5, 1, 7, 1, 7, 9, 6, 2, 5];
-  var data5 = [1, 2, 7, 1, 4, 6, 7, 3, 2];
-  var data6 = [5, 5, 5, 1, 5, 1, 5, 1, 2];
-  const [dataset1, setDataSet1] = useState<number[] | undefined>(data1);
-  const [datalabel1, setDataLabel1] = useState('data1');
-  const [dataset2, setDataSet2] = useState<number[] | undefined>(data2);
-  const [datalabel2, setDataLabel2] = useState('data2');
-  const [dataset3, setDataSet3] = useState<number[] | undefined>(data3);
-  const [datalabel3, setDataLabel3] = useState('data3');
-  const [st, setSt] = useState(true);
-  const [search1, setSearch1] = useState('');
-  const [search2, setSearch2] = useState('');
-  const [search3, setSearch3] = useState('');
-
-  const ratings = [];
-
-  let profDifficulty = 5;
-  let avgRating = 2;
-  let profRetake = 10;
-
-  //const size = useWindowSize();
-
-  console.log('yes, this function calls again' + i);
-
-  ratings.push(5 - profDifficulty, avgRating, profRetake / 20);
-  const colorCodes: string[] = [];
-
-  for (let i = 0; i < ratings.length; i++) {
-    console.log(ratings[i]);
-    if (ratings[i] >= 0 && ratings[i] < 1.7) {
-      var colorCode = '#ec5353';
-      console.log('Red');
-      colorCodes.push(colorCode);
-    } else if (ratings[i] > 1.6 && ratings[i] < 2.7) {
-      var colorCode = '#ecb653';
-      colorCodes.push(colorCode);
-      console.log('Orange');
-    } else if (ratings[i] > 2.6 && ratings[i] < 4) {
-      var colorCode = '#f4ee5a';
-      colorCodes.push(colorCode);
-      console.log('Yellow');
-    } else if (ratings[i] > 3.9 && ratings[i] <= 5) {
-      var colorCode = '#75f340';
-      colorCodes.push(colorCode);
-      console.log('Green');
-    }
-  }
-
-  function swap() {
-    if (st) {
-      setDataSet1(data4);
-      setDataSet2(data5);
-      setDataSet3(data6);
-      setSt(false);
-    } else {
-      setDataSet1(undefined);
-      setDataSet2(data2);
-      setDataSet3(data3);
-      setSt(true);
-    }
-  }
-
-  function searchAutocomplete() {}
-
   type datType = {
     name: string;
     data: number[];
@@ -97,6 +37,36 @@ export const Dashboard: NextPage = () => {
   const router = useRouter();
   const [state, setState] = useState('loading');
 
+  //load data from home search if present
+  const startingData: SearchQuery = {};
+  if (
+    ('prefix' in router.query && typeof router.query.prefix === 'string') ||
+    ('number' in router.query && typeof router.query.number === 'string') ||
+    ('professorName' in router.query &&
+      typeof router.query.professorName === 'string') ||
+    ('sectionNumber' in router.query &&
+      typeof router.query.sectionNumber === 'string')
+  ) {
+    if ('prefix' in router.query && typeof router.query.prefix === 'string') {
+      startingData.prefix = router.query.prefix;
+    }
+    if ('number' in router.query && typeof router.query.number === 'string') {
+      startingData.number = parseInt(router.query.number);
+    }
+    if (
+      'professorName' in router.query &&
+      typeof router.query.professorName === 'string'
+    ) {
+      startingData.professorName = router.query.professorName;
+    }
+    if (
+      'sectionNumber' in router.query &&
+      typeof router.query.sectionNumber === 'string'
+    ) {
+      startingData.sectionNumber = router.query.sectionNumber;
+    }
+  }
+
   useEffect(() => {
     fetch('/api/ratemyprofessorScraper?professors=Greg%20Ozbirn,John%20Cole', {
       method: 'GET',
@@ -105,13 +75,93 @@ export const Dashboard: NextPage = () => {
       .then((data) => console.log(data));
   });
 
-  useEffect(() => {
-    fetch('/api/autocomplete?input=CS', {
-      method: 'GET',
-    })
-      .then((response) => response.json())
-      .then((data) => console.log(data.data));
-  });
+  //called from expandableSearchGrid when data being compared is changed
+  function searchTermsChange(searchTerms: SearchQuery[]) {
+    console.log('Index search terms: ', searchTerms);
+    /*if (searchTerms.length === 0) {
+      setState('loading');
+    }*/
+    Promise.all(
+      searchTerms.map((searchTerm: SearchQuery) => {
+        let apiRoute = '';
+        if (
+          'prefix' in searchTerm &&
+          typeof searchTerm.prefix === 'string' &&
+          'number' in searchTerm &&
+          typeof searchTerm.number === 'number' &&
+          'professorName' in searchTerm &&
+          typeof searchTerm.professorName === 'string' &&
+          'sectionNumber' in searchTerm &&
+          typeof searchTerm.sectionNumber === 'string'
+        ) {
+          //section
+          apiRoute = 'section';
+        } /*else if (
+          'prefix' in searchTerm &&
+          typeof searchTerm.prefix === 'string' &&
+          'number' in searchTerm &&
+          typeof searchTerm.number === 'number' &&
+          'professorName' in searchTerm &&
+          typeof searchTerm.professorName === 'string'
+        ) { //course+professor
+          apiRoute = '';
+        }*/ else if (
+          'prefix' in searchTerm &&
+          typeof searchTerm.prefix === 'string' &&
+          'number' in searchTerm &&
+          typeof searchTerm.number === 'number'
+        ) {
+          //course
+          apiRoute = 'course';
+        } else if (
+          'professorName' in searchTerm &&
+          typeof searchTerm.professorName === 'string'
+        ) {
+          //professor
+          apiRoute = 'professor';
+        }
+        //console.log('apiRoute', apiRoute, typeof searchTerm.number);
+        const url =
+          '/api/nebulaAPI/' +
+          apiRoute +
+          '?' +
+          Object.keys(searchTerm)
+            .map(
+              (key) =>
+                key +
+                '=' +
+                encodeURIComponent(
+                  String(searchTerm[key as keyof SearchQuery]),
+                ),
+            )
+            .join('&');
+        if (process.env.NODE_ENV !== 'development') {
+          const getItem = localStorage.getItem(url);
+          if (getItem !== null) {
+            return JSON.parse(getItem);
+          }
+        }
+        return fetch(url, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+          },
+        })
+          .then((response) => response.json())
+          .then((response) => {
+            localStorage.setItem(url, JSON.stringify(response));
+            return response;
+          });
+      }),
+    )
+      .then((responses) => {
+        console.log('data from grid: ', responses);
+      })
+      .catch((error) => {
+        setState('error');
+        console.error('Nebula API Error', error);
+      });
+  }
 
   useEffect(() => {
     setState('loading');
@@ -190,14 +240,17 @@ export const Dashboard: NextPage = () => {
           console.error('Nebula API Error', error);
         });
     }
-  }, [router.isReady, router.query, router.query.sections]);
+  }, [router.isReady, router.query.sections]);
 
   if (state === 'error' || state === 'loading') {
     return (
       <>
         <div className=" w-full bg-light h-full">
           <TopMenu />
-          <ExpandableSearchGrid />
+          <ExpandableSearchGrid
+            onChange={searchTermsChange}
+            startingData={startingData}
+          />
           <div className="w-full h-5/6 justify-center">
             <div className="w-full h-5/6 relative min-h-full">
               <Carousel>
@@ -223,7 +276,10 @@ export const Dashboard: NextPage = () => {
     <>
       <div className=" w-full bg-light h-full">
         <TopMenu />
-        <ExpandableSearchGrid />
+        <ExpandableSearchGrid
+          onChange={searchTermsChange}
+          startingData={startingData}
+        />
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">
             <Carousel>

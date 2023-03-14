@@ -6,7 +6,8 @@ type ErrorState = {
 };
 type SuccessState = {
   data: {
-    name: string;
+    name?: string;
+    id?: string;
     /*grade_distribution: number[];*/
   };
 };
@@ -33,13 +34,40 @@ export default function handler(
           if (data.message !== 'success') {
             throw new Error(data.data);
           }
-          res.status(200).json({data: {
-            name:
-              data.data.subject_prefix +
-              ' ' +
-              data.data.course_number,
-            /*grade_distribution: data.data.grade_distribution,*/
-          }});
+          res.status(200).json({
+            data: {
+              name: data.data.subject_prefix + ' ' + data.data.course_number,
+              /*grade_distribution: data.data.grade_distribution,*/
+            },
+          });
+        })
+        .catch((error) => {
+          res.status(400).json({ error: error });
+        });
+    } else if (
+      'prefix' in req.query &&
+      typeof req.query.prefix === 'string' &&
+      'number' in req.query &&
+      typeof req.query.number === 'string'
+    ) {
+      const Url = new URL('https://api.utdnebula.com/course/');
+      Url.searchParams.append('course_number', req.query.number);
+      Url.searchParams.append('subject_prefix', req.query.prefix);
+      fetch(Url.href, {
+        method: 'GET',
+        headers: headers,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message !== 'success') {
+            throw new Error(data.data);
+          }
+          res.status(200).json({
+            data: {
+              id: data.data[0]._id,
+              /*grade_distribution: data.data[0].grade_distribution,*/
+            },
+          });
         })
         .catch((error) => {
           res.status(400).json({ error: error });

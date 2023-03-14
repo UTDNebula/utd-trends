@@ -12,15 +12,30 @@ type SearchQuery = {
   sectionNumber?: string;
 };
 
+type ExpandableSearchGridProps = {
+  onChange: Function;
+  startingData: SearchQuery;
+};
+
 /**
  * This component returns a bar that will allow users to add and remove search terms (up to 3 max)
  * using the SearchBar component. The currently selected search terms are represented by
  * SearchTermCard components, and are displayed from left to right in this grid.
  */
-export const ExpandableSearchGrid = () => {
-  const [value, setValue] = useState<SearchQuery[] | undefined>([]);
+export const ExpandableSearchGrid = (props: ExpandableSearchGridProps) => {
+  const [value, setValue] = useState<SearchQuery[]>([]);
   const [searchTerms, setSearchTerms] = useState<SearchQuery[]>([]);
   const [searchDisabled, setSearchDisable] = useState<boolean>(false);
+
+  useEffect(() => {
+    props.onChange(searchTerms);
+  }, [searchTerms]);
+
+  useEffect(() => {
+    if (Object.keys(props.startingData).length !== 0) {
+      setSearchTerms([props.startingData]);
+    }
+  }, [props.startingData]);
 
   function addSearchTerm(newSearchTerm: SearchQuery) {
     if (newSearchTerm != null) {
@@ -107,4 +122,4 @@ function searchQueryLabel(query: SearchQuery): string {
   return result.trim();
 }
 
-const colors = ['#ffadad', '#9bf6ff', '#caffbf'];
+const colors = ['#eb5757', '#2d9cdb', '#499F68'];

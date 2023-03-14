@@ -3,6 +3,8 @@ import { SearchIcon } from '../../icons/SearchIcon/searchIcon';
 import Autocomplete from '@mui/material/Autocomplete';
 import throttle from 'lodash/throttle';
 import topFilms from '../../../data/autocomplete_dummy_data.json';
+import { useEffect } from 'react';
+import { searchAutocomplete } from '../../autocomplete';
 
 /**
  * Props type used by the SearchBar component
@@ -10,15 +12,17 @@ import topFilms from '../../../data/autocomplete_dummy_data.json';
 type SearchProps = {
   // setSearch: the setter function from the parent component to set the search value
   selectSearchValue: Function;
-  value: Film[] | undefined;
+  value: SearchQuery[];
   setValue: Function;
   disabled?: boolean;
 };
 
-interface Film {
-  title: string;
-  year: number;
-}
+type SearchQuery = {
+  prefix?: string;
+  number?: number;
+  professorName?: string;
+  sectionNumber?: string;
+};
 
 /**
  * This component returns a custom search bar component that makes use of the Material UI autocomplete component
@@ -28,53 +32,15 @@ interface Film {
  */
 export const SplashPageSearchBar = (props: SearchProps) => {
   const [open, setOpen] = React.useState(false);
-  const [options, setOptions] = React.useState<readonly Film[]>([]);
-  const loading = open && options.length === 0;
+  const [options, setOptions] = React.useState<readonly SearchQuery[]>([]);
 
   const [inputValue, setInputValue] = React.useState('');
 
-  const fetch = React.useMemo(
-    () =>
-      throttle(
-        (
-          request: { input: string },
-          callback: (results?: readonly Film[]) => void,
-        ) => {
-          console.log('"called" the api again');
-        },
-        2000,
-      ),
-    [],
-  );
+  useEffect(() => {
+    setOptions(searchAutocomplete(inputValue).concat(props.value));
+  }, [props.value, inputValue]);
 
-  React.useEffect(() => {
-    let active = true;
-
-    (async () => {
-      fetch({ input: inputValue }, (results?: readonly Film[]) => {
-        if (active) {
-          let newOptions: readonly Film[] = [];
-
-          if (results) {
-            newOptions = [...newOptions, ...results];
-          }
-
-          setOptions(newOptions);
-        }
-      });
-
-      if (active) {
-        console.log('options updated');
-        setOptions([...topFilms]);
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [props.value, inputValue, fetch]);
-
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open) {
       setOptions([]);
     }
@@ -98,29 +64,34 @@ export const SplashPageSearchBar = (props: SearchProps) => {
             setOpen(false);
           }}
           filterSelectedOptions
-          getOptionLabel={(option) => option.title}
+          getOptionLabel={(option) => searchQueryLabel(option)}
           options={options}
-          loading={loading}
+          filterOptions={(options) => options}
           value={props.value}
-          onChange={(event: any, newValue: Film[] | undefined) => {
-            let intersection: Film[];
+          // When a new option is selected, find the new selected option by getting the
+          // difference between the current and new value, then return that to the parent
+          // component using selectSearchValue prop
+          onChange={(
+            event: any,
+            newValue: SearchQuery[] | undefined,
+            reason,
+          ) => {
+            let difference: SearchQuery[];
             if (props.value !== undefined) {
               if (newValue !== undefined) {
                 // @ts-ignore
-                intersection = newValue.filter((x) => !props.value.includes(x));
+                difference = newValue.filter((x) => !props.value.includes(x));
               } else {
-                intersection = [];
+                difference = [];
               }
             } else {
               if (newValue !== undefined) {
-                intersection = newValue;
+                difference = newValue;
               } else {
-                intersection = [];
+                difference = [];
               }
             }
-            props.selectSearchValue(
-              intersection[0] ? intersection[0].title : '',
-            );
+            props.selectSearchValue(difference[0] ? difference[0] : null);
             props.setValue(newValue);
           }}
           inputValue={inputValue}
@@ -148,3 +119,20 @@ export const SplashPageSearchBar = (props: SearchProps) => {
 SplashPageSearchBar.defaultProps = {
   disabled: true,
 };
+
+function searchQueryLabel(query: SearchQuery): string {
+  let result = '';
+  if (query.prefix !== undefined) {
+    result += query.prefix;
+  }
+  if (query.number !== undefined) {
+    result += ' ' + query.number;
+  }
+  if (query.professorName !== undefined) {
+    result += ' ' + query.professorName;
+  }
+  if (query.sectionNumber !== undefined) {
+    result += ' ' + query.sectionNumber;
+  }
+  return result.trim();
+}
