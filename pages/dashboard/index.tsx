@@ -44,7 +44,7 @@ export const Dashboard: NextPage = () => {
   console.log('yes, this function calls again' + i);
 
   ratings.push(5 - profDifficulty, avgRating, profRetake / 20);
-  const colorCodes = [];
+  const colorCodes: string[] = [];
 
   for (let i = 0; i < ratings.length; i++) {
     console.log(ratings[i]);
@@ -296,43 +296,19 @@ export const Dashboard: NextPage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-6 grid-container-2">
-                <div className=".TabDivider"></div>
-
-                <div
-                  className="w-full md:w-1/2 p-4"
-                  style={{ paddingBottom: '100%' }}
-                >
-                  <div
-                    className=".profcard-container"
-                    style={{
-                      position: 'relative',
-                      top: '-19%',
-                      left: '-90',
-                      paddingBottom: '10%',
-                      padding: '9rem',
-                    }}
-                  >
-                    <Card
-                      className="h-100 p-4 m-4 md:h-full md:w-1700"
-                      style={{ width: '1200px', height: '600%' }}
-                    >
-                      <ProfessorCard
-                        position="relative"
-                        Element="Card"
-                        top="100%"
-                        left="0%"
-                        height="320%"
-                        ProfessorRating={avgRating}
-                        avgDifficulty={profDifficulty}
-                        takingAgain={profRetake}
-                        colorCode={colorCodes}
-                        name="Timothy Farage"
-                        department="Computer Science"
-                      />
-                    </Card>
-                  </div>
-                </div>
+              <div className="p-4 h-full">
+                <Card className="h-96 p-4 m-4">
+                  <ProfessorCard
+                    position="relative"
+                    element="Card"
+                    professorRating={avgRating}
+                    averageDifficulty={profDifficulty}
+                    takingAgain={profRetake}
+                    colorCode={colorCodes}
+                    name="Timothy Farage"
+                    department="Computer Science"
+                  />
+                </Card>
               </div>
             </Carousel>
           </div>

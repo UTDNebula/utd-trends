@@ -1,24 +1,26 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { CardContents } from './CardContents';
+import { Property } from 'csstype';
 
-export function ProfessorCard({
-  Element,
-  top,
-  left,
-  height,
-  width,
-  name,
-  position,
-  text,
-  department,
-  fontSize,
-  colorCode,
-  ProfessorRating,
-  avgDifficulty,
-  takingAgain,
-}) {
-  switch (Element) {
+interface ProfessorCardProps {
+  element: string;
+  top?: string;
+  left?: string;
+  height?: string;
+  width?: string;
+  name: string;
+  position: Property.Position;
+  text?: string;
+  department: string;
+  fontSize?: string;
+  colorCode: string[];
+  professorRating: number;
+  averageDifficulty: number;
+  takingAgain: number;
+}
+
+export const ProfessorCard = (props: ProfessorCardProps) => {
+  switch (props.element) {
     case 'Background': {
       return (
         <>
@@ -35,11 +37,11 @@ export function ProfessorCard({
           <div
             style={{
               display: 'flex',
-              position: position,
-              top: top,
-              left: left,
-              height: height,
-              width: width,
+              position: props.position,
+              top: props.top,
+              left: props.left,
+              height: props.height,
+              width: props.width,
               backgroundColor: '#BCC9FD',
               boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
             }}
@@ -51,45 +53,38 @@ export function ProfessorCard({
       return (
         <div
           style={{
-            position: position,
-            top: top,
-            left: left,
-            height: height,
-            fontSize: fontSize,
+            position: props.position,
+            top: props.top,
+            left: props.left,
+            height: props.height,
+            fontSize: props.fontSize,
           }}
         >
-          <h1>{text}</h1>
+          <h1>{props.text}</h1>
         </div>
       );
     }
-    case 'Card': {
+    case 'Card':
+    default: {
       return (
         <CardContents
           position="relative"
-          top={top}
-          left={left}
-          width={width}
-          height={height}
-          name={name}
-          department={department}
-          colorCode={colorCode}
+          top={props.top}
+          left={props.left}
+          width={props.width}
+          height={props.height}
+          name={props.name}
+          department={props.department}
+          colorCode={props.colorCode}
+          professorRating={props.professorRating}
+          averageDifficulty={props.averageDifficulty}
+          takingAgain={props.takingAgain}
+          fontSize={props.fontSize}
+          text={props.text}
         ></CardContents>
       );
     }
   }
-}
-
-ProfessorCard.propTypes = {
-  top: PropTypes.string.isRequired,
-  left: PropTypes.string.isRequired,
-  height: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  position: PropTypes.string.isRequired,
-  text: PropTypes.string.isRequired,
-  department: PropTypes.string.isRequired,
-  fontSize: PropTypes.string.isRequired,
-  colorCode: PropTypes.string.isRequired,
-  ProfessorRating: PropTypes.string.isRequired,
-  avgRating: PropTypes.string.isRequired,
-  takingAgain: PropTypes.string.isRequired,
 };
+
+export default ProfessorCard;

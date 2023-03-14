@@ -1,22 +1,23 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { Card } from '@mui/material';
+import { Property } from 'csstype';
 
-export function CardContents({
-  top,
-  left,
-  height,
-  width,
-  name,
-  position,
-  text,
-  department,
-  fontSize,
-  colorCode,
-  ProfessorRating,
-  avgDifficulty,
-  takingAgain,
-}) {
+interface CardContentProps {
+  top?: string;
+  left?: string;
+  height?: string;
+  width?: string;
+  name: string;
+  position: Property.Position;
+  text?: string;
+  department: string;
+  fontSize?: string;
+  colorCode: string[];
+  professorRating: number;
+  averageDifficulty: number;
+  takingAgain: number;
+}
+
+export const CardContents = (props: CardContentProps) => {
   return (
     <>
       <div
@@ -51,7 +52,7 @@ export function CardContents({
           fontSize: '45px',
         }}
       >
-        <h1>{name}</h1>
+        <h1>{props.name}</h1>
       </div>
 
       <div
@@ -63,7 +64,7 @@ export function CardContents({
           fontSize: '24px',
         }}
       >
-        <h1>Department of {department}</h1>
+        <h1>Department of {props.department}</h1>
         <h1>at The University of Texas at Dallas</h1>
       </div>
 
@@ -158,7 +159,7 @@ export function CardContents({
           left: '80%',
           top: '40%',
           border: '4px solid #BDBDBD',
-          backgroundColor: colorCode[0],
+          backgroundColor: props.colorCode[0],
         }}
       ></div>
 
@@ -172,7 +173,7 @@ export function CardContents({
           left: '220%',
           top: '40%',
           border: '4px solid #BDBDBD',
-          backgroundColor: colorCode[1],
+          backgroundColor: props.colorCode[1],
         }}
       ></div>
 
@@ -186,7 +187,7 @@ export function CardContents({
           left: '360%',
           top: '40%',
           border: '4px solid #BDBDBD',
-          backgroundColor: colorCode[2],
+          backgroundColor: props.colorCode[2],
         }}
       ></div>
 
@@ -236,20 +237,6 @@ export function CardContents({
       </div>
     </>
   );
-}
-
-CardContents.propTypes = {
-  top: PropTypes.string.isRequired,
-  left: PropTypes.string.isRequired,
-  height: PropTypes.string.isRequired,
-  width: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  position: PropTypes.string.isRequired,
-  text: PropTypes.string.isRequired,
-  department: PropTypes.string.isRequired,
-  fontSize: PropTypes.string.isRequired,
-  colorCode: PropTypes.string.isRequired,
-  ProfessorRating: PropTypes.string.isRequired,
-  avgRating: PropTypes.string.isRequired,
-  takingAgain: PropTypes.string.isRequired,
 };
+
+export default CardContents;
