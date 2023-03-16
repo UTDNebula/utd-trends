@@ -6,13 +6,24 @@ import Carousel from '../../components/common/Carousel/carousel';
 import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
-import { ProfessorCard } from '../../components/common/ProfessorCard/ProfessorCard';
+import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 
 type SearchQuery = {
   prefix?: string;
   number?: number;
   professorName?: string;
   sectionNumber?: string;
+};
+
+type RMPData = {
+  averageRating: number;
+  averageDifficulty: number;
+  department: string;
+  firstName: string;
+  lastName: string;
+  legacyId: string;
+  numRatings: number;
+  wouldTakeAgainPercentage: number;
 };
 
 export const Dashboard: NextPage = () => {
@@ -24,6 +35,18 @@ export const Dashboard: NextPage = () => {
   const [GPAdat, setGPADat] = useState<datType[]>([]);
   const [averageDat, setAverageDat] = useState<datType[]>([]);
   const [stdevDat, setStdevDat] = useState<datType[]>([]);
+  const [profData, setProfData] = useState<RMPData[]>([
+    {
+      averageRating: 5,
+      averageDifficulty: 3,
+      department: 'Computer Science',
+      firstName: 'Timothy',
+      lastName: 'Farage',
+      legacyId: '',
+      numRatings: 100,
+      wouldTakeAgainPercentage: 88,
+    },
+  ]);
   function round(val: number) {
     return Math.round((val + Number.EPSILON) * 100) / 100;
   }
@@ -37,21 +60,6 @@ export const Dashboard: NextPage = () => {
   let profRetake = 10;
 
   ratings.push(5 - profDifficulty, avgRating, profRetake / 20);
-
-  const colorCodes = [];
-
-  for (let i = 0; i < ratings.length; i++) {
-    console.log(ratings[i]);
-    if (ratings[i] >= 0 && ratings[i] < 1.7) {
-      colorCodes.push('#ec5353');
-    } else if (ratings[i] > 1.6 && ratings[i] < 2.7) {
-      colorCodes.push('#ecb653');
-    } else if (ratings[i] > 2.6 && ratings[i] < 4) {
-      colorCodes.push('#f4ee5a');
-    } else if (ratings[i] > 3.9 && ratings[i] <= 5) {
-      colorCodes.push('#75f340');
-    }
-  }
 
   //load data from home search if present
   const startingData: SearchQuery = {};
@@ -369,18 +377,21 @@ export const Dashboard: NextPage = () => {
               </div>
 
               <div className="p-4 h-full">
-                <Card className="h-96 p-4 m-4">
-                  <ProfessorCard
-                    position="relative"
-                    element="Card"
-                    professorRating={ratings[0]}
-                    averageDifficulty={ratings[1]}
-                    takingAgain={ratings[2]}
-                    colorCode={colorCodes}
-                    name="Timothy Farage"
-                    department="Computer Science"
-                  />
-                </Card>
+                {profData.map((data: RMPData, index: number) => (
+                  <Card className="h-fit m-4" key={index}>
+                    <ProfessorCard
+                      position="relative"
+                      element="Card"
+                      professorRating={data.averageRating}
+                      averageDifficulty={data.averageDifficulty}
+                      takingAgain={data.wouldTakeAgainPercentage}
+                      numRatings={data.numRatings}
+                      name={data.firstName + ' ' + data.lastName}
+                      department={data.department}
+                      key={index}
+                    />
+                  </Card>
+                ))}
               </div>
             </Carousel>
           </div>

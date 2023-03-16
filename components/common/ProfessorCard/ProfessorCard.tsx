@@ -1,5 +1,5 @@
-import React from 'react';
-import { CardContents } from './CardContents';
+import React, { FC } from 'react';
+import CardContents from './CardContents';
 import { Property } from 'csstype';
 
 interface ProfessorCardProps {
@@ -13,13 +13,15 @@ interface ProfessorCardProps {
   text?: string;
   department: string;
   fontSize?: string;
-  colorCode: string[];
   professorRating: number;
   averageDifficulty: number;
   takingAgain: number;
+  numRatings: number;
 }
 
-export const ProfessorCard = (props: ProfessorCardProps) => {
+export const ProfessorCard: FC<ProfessorCardProps> = (
+  props: ProfessorCardProps,
+) => {
   switch (props.element) {
     case 'Background': {
       return (
@@ -68,19 +70,12 @@ export const ProfessorCard = (props: ProfessorCardProps) => {
     default: {
       return (
         <CardContents
-          position="relative"
-          top={props.top}
-          left={props.left}
-          width={props.width}
-          height={props.height}
           name={props.name}
           department={props.department}
-          colorCode={props.colorCode}
           professorRating={props.professorRating}
           averageDifficulty={props.averageDifficulty}
           takingAgain={props.takingAgain}
-          fontSize={props.fontSize}
-          text={props.text}
+          numRatings={props.numRatings}
         ></CardContents>
       );
     }
