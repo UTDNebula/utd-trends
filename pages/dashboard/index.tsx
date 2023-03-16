@@ -53,14 +53,6 @@ export const Dashboard: NextPage = () => {
   const router = useRouter();
   const [state, setState] = useState('loading');
 
-  const ratings = [];
-
-  let profDifficulty = 5;
-  let avgRating = 2;
-  let profRetake = 10;
-
-  ratings.push(5 - profDifficulty, avgRating, profRetake / 20);
-
   //load data from home search if present
   const startingData: SearchQuery = {};
   if (
@@ -96,8 +88,11 @@ export const Dashboard: NextPage = () => {
       method: 'GET',
     })
       .then((response) => response.json())
-      .then((data) => console.log(data));
-  });
+      .then((data) => {
+        console.log(data);
+        setProfData(data);
+      });
+  }, [dat]);
 
   //called from expandableSearchGrid when data being compared is changed
   function searchTermsChange(searchTerms: SearchQuery[]) {
