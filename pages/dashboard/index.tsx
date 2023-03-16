@@ -1,4 +1,4 @@
-import { Card } from '@mui/material';
+import { Card, LinearProgress } from '@mui/material';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
@@ -261,7 +261,7 @@ export const Dashboard: NextPage = () => {
     }
   }, [router.isReady, router.query.sections]);
 
-  if (state === 'error' || state === 'loading') {
+  if (state === 'loading') {
     return (
       <>
         <div className=" w-full bg-light h-full">
@@ -274,16 +274,162 @@ export const Dashboard: NextPage = () => {
             <div className="w-full h-5/6 relative min-h-full">
               <Carousel>
                 <div className="h-full m-4 ">
-                  <Card className="h-96 p-4 m-4"></Card>
+                  <LinearProgress className="mt-8 pt-2"></LinearProgress>
+                </div>
+                <div className="h-full m-4">
+                  <LinearProgress className="mt-8 pt-2"></LinearProgress>
+                </div>
+                <div className="h-full m-4">
+                  <LinearProgress className="mt-8 pt-2"></LinearProgress>
+                </div>
+              </Carousel>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  } else if (state === 'error') {
+    return (
+      <>
+        <div className=" w-full bg-light h-full">
+          <TopMenu />
+          <ExpandableSearchGrid
+            onChange={searchTermsChange}
+            startingData={startingData}
+          />
+          <div className="w-full h-5/6 justify-center">
+            <div className="w-full h-5/6 relative min-h-full">
+              <Carousel>
+                <div className="h-full m-4 ">
+                  <h1 className="text-3xl text-center text-gray-600 font-semibold">
+                    An error occurred! Please reload the page, and if this
+                    problem persists, contact Nebula Labs.
+                  </h1>
+                </div>
+                <div className="h-full m-4">
+                  <h1 className="text-3xl text-center text-gray-600 font-semibold">
+                    An error occurred! Please reload the page, and if this
+                    problem persists, contact Nebula Labs.
+                  </h1>
+                </div>
+                <div className="h-full m-4">
+                  <h1 className="text-3xl text-center text-gray-600 font-semibold">
+                    An error occurred! Please reload the page, and if this
+                    problem persists, contact Nebula Labs.
+                  </h1>
+                </div>
+              </Carousel>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  } else {
+    return (
+      <>
+        <div className=" w-full bg-light h-full">
+          <TopMenu />
+          <ExpandableSearchGrid
+            onChange={searchTermsChange}
+            startingData={startingData}
+          />
+          <div className="w-full h-5/6 justify-center">
+            <div className="w-full h-5/6 relative min-h-full">
+              <Carousel>
+                <div className="h-full m-4 ">
+                  <Card className="h-96 p-4 m-4">
+                    <GraphChoice
+                      form="Bar"
+                      title="Grades"
+                      xaxisLabels={[
+                        'A+',
+                        'A',
+                        'A-',
+                        'B+',
+                        'B',
+                        'B-',
+                        'C+',
+                        'C',
+                        'C-',
+                        'D+',
+                        'D',
+                        'D-',
+                        'F',
+                        'W',
+                      ]}
+                      series={dat}
+                    />
+                  </Card>
                 </div>
                 <div className="p-4 h-full">
-                  <Card className="h-96 p-4 m-4"></Card>
+                  <Card className="h-96 p-4 m-4">
+                    <GraphChoice
+                      form="BoxWhisker"
+                      title="GPA Box and Whisker"
+                      xaxisLabels={[
+                        'A+',
+                        'A',
+                        'A-',
+                        'B+',
+                        'B',
+                        'B-',
+                        'C+',
+                        'C',
+                        'C-',
+                        'D+',
+                        'D',
+                        'D-',
+                        'F',
+                        'W',
+                      ]}
+                      series={GPAdat}
+                    />
+                  </Card>
                   <div className="grid grid-cols-1 md:grid-cols-2">
-                    <Card className="h-96 p-4 m-4"></Card>
-                    <Card className="h-96 p-4 m-4"></Card>
+                    <Card className="h-96 p-4 m-4">
+                      <GraphChoice
+                        form="Bar"
+                        title="GPA Averages"
+                        xaxisLabels={['Average']}
+                        series={averageDat}
+                      />
+                    </Card>
+                    <Card className="h-96 p-4 m-4">
+                      <GraphChoice
+                        form="Bar"
+                        title="GPA Standard Deviations"
+                        xaxisLabels={['Standard Deviation']}
+                        series={stdevDat}
+                      />
+                    </Card>
                   </div>
                 </div>
-                <div className=" ">Hi</div>
+
+                <div className="p-4 h-full">
+                  {profData.length > 0 ? (
+                    profData.map((data: RMPData, index: number) => (
+                      <Card className="h-fit m-4" key={index}>
+                        <ProfessorCard
+                          position="relative"
+                          element="Card"
+                          professorRating={data.averageRating}
+                          averageDifficulty={data.averageDifficulty}
+                          takingAgain={data.wouldTakeAgainPercentage}
+                          numRatings={data.numRatings}
+                          name={data.firstName + ' ' + data.lastName}
+                          department={data.department}
+                          key={index}
+                        />
+                      </Card>
+                    ))
+                  ) : (
+                    <h1 className="text-3xl text-center text-gray-600 font-semibold">
+                      No professors selected! Search for a professor or one of
+                      their courses/sections in the search bar to see data about
+                      that professors specifically.
+                    </h1>
+                  )}
+                </div>
               </Carousel>
             </div>
           </div>
@@ -291,109 +437,6 @@ export const Dashboard: NextPage = () => {
       </>
     );
   }
-  return (
-    <>
-      <div className=" w-full bg-light h-full">
-        <TopMenu />
-        <ExpandableSearchGrid
-          onChange={searchTermsChange}
-          startingData={startingData}
-        />
-        <div className="w-full h-5/6 justify-center">
-          <div className="w-full h-5/6 relative min-h-full">
-            <Carousel>
-              <div className="h-full m-4 ">
-                <Card className="h-96 p-4 m-4">
-                  <GraphChoice
-                    form="Bar"
-                    title="Grades"
-                    xaxisLabels={[
-                      'A+',
-                      'A',
-                      'A-',
-                      'B+',
-                      'B',
-                      'B-',
-                      'C+',
-                      'C',
-                      'C-',
-                      'D+',
-                      'D',
-                      'D-',
-                      'F',
-                      'W',
-                    ]}
-                    series={dat}
-                  />
-                </Card>
-              </div>
-              <div className="p-4 h-full">
-                <Card className="h-96 p-4 m-4">
-                  <GraphChoice
-                    form="BoxWhisker"
-                    title="GPA Box and Whisker"
-                    xaxisLabels={[
-                      'A+',
-                      'A',
-                      'A-',
-                      'B+',
-                      'B',
-                      'B-',
-                      'C+',
-                      'C',
-                      'C-',
-                      'D+',
-                      'D',
-                      'D-',
-                      'F',
-                      'W',
-                    ]}
-                    series={GPAdat}
-                  />
-                </Card>
-                <div className="grid grid-cols-1 md:grid-cols-2">
-                  <Card className="h-96 p-4 m-4">
-                    <GraphChoice
-                      form="Bar"
-                      title="GPA Averages"
-                      xaxisLabels={['Average']}
-                      series={averageDat}
-                    />
-                  </Card>
-                  <Card className="h-96 p-4 m-4">
-                    <GraphChoice
-                      form="Bar"
-                      title="GPA Standard Deviations"
-                      xaxisLabels={['Standard Deviation']}
-                      series={stdevDat}
-                    />
-                  </Card>
-                </div>
-              </div>
-
-              <div className="p-4 h-full">
-                {profData.map((data: RMPData, index: number) => (
-                  <Card className="h-fit m-4" key={index}>
-                    <ProfessorCard
-                      position="relative"
-                      element="Card"
-                      professorRating={data.averageRating}
-                      averageDifficulty={data.averageDifficulty}
-                      takingAgain={data.wouldTakeAgainPercentage}
-                      numRatings={data.numRatings}
-                      name={data.firstName + ' ' + data.lastName}
-                      department={data.department}
-                      key={index}
-                    />
-                  </Card>
-                ))}
-              </div>
-            </Carousel>
-          </div>
-        </div>
-      </div>
-    </>
-  );
 };
 
 export default Dashboard;
