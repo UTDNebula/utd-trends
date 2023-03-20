@@ -8,32 +8,90 @@ run to compile to .js file that can be run at predev and prebuild
 var fs = require('fs');
 var graphology_1 = require('graphology');
 var nodeFetch = require('node-fetch');
-var myProfessors = [
-  { classes: [], firstName: 'arcs', lastName: 'test' },
-  { classes: [], firstName: 'csre', lastName: 'acse' },
-];
-var myPrefixes = [
-  { classes: [], professors: myProfessors, value: 'CS' },
-  { classes: [], professors: [], value: 'ECS' },
-  { classes: [], professors: [], value: 'CE' },
-];
-var myClasses = [
-  { prefix: myPrefixes[0], number: 1337, professors: [myProfessors[0]] },
-  { prefix: myPrefixes[0], number: 1336, professors: [myProfessors[1]] },
-  { prefix: myPrefixes[2], number: 1337, professors: [myProfessors[0]] },
-  { prefix: myPrefixes[2], number: 1336, professors: [myProfessors[1]] },
-  {
-    prefix: myPrefixes[0],
-    number: 2337,
-    professors: Array.of(myProfessors[0]),
-  },
-];
-myProfessors[0].classes.push(myClasses[0]);
-myProfessors[0].classes.push(myClasses[2]);
-myProfessors[1].classes.push(myClasses[1]);
-myProfessors[1].classes.push(myClasses[3]);
-myPrefixes[0].classes.push(myClasses[0], myClasses[1]);
-myPrefixes[2].classes.push(myClasses[2], myClasses[3]);
+var aggregatedData = require('../data/aggregate_data.json');
+var prefixList = [];
+var classList = [];
+var professorList = [];
+var sectionList = [];
+aggregatedData.data.forEach(function (prefix) {
+  var newPrefix = { classes: [], professors: [], value: prefix.subject_prefix };
+  prefixList.push(newPrefix);
+  prefix.course_numbers.forEach(function (course) {
+    var newCourse = {
+      prefix: newPrefix,
+      number: course.course_number,
+      professors: [],
+      sections: [],
+    };
+    if (course.course_number == undefined) {
+      console.log(course);
+    }
+    newPrefix.classes.push(newCourse);
+    classList.push(newCourse);
+    course.academic_sessions.forEach(function (session) {
+      session.sections.forEach(function (section) {
+        var newSection = {
+          class: newCourse,
+          professors: [],
+          section_number: section.section_number,
+        };
+        newCourse.sections.push(newSection);
+        sectionList.push(newSection);
+        section.professors.forEach(function (professor) {
+          // @ts-ignore
+          if (
+            professor.first_name != undefined &&
+            professor.last_name != undefined
+          ) {
+            var profExists_1 = false;
+            var preExistingProf_1;
+            professorList.forEach(function (existingProfessor) {
+              // @ts-ignore
+              if (
+                !profExists_1 &&
+                existingProfessor.firstName == professor.first_name &&
+                existingProfessor.lastName == professor.last_name
+              ) {
+                profExists_1 = true;
+                preExistingProf_1 = existingProfessor;
+              }
+            });
+            if (profExists_1) {
+              // @ts-ignore
+              if (!preExistingProf_1.classes.includes(newCourse)) {
+                // @ts-ignore
+                preExistingProf_1.classes.push(newCourse);
+              }
+              // @ts-ignore
+              newSection.professors.push(preExistingProf_1);
+              // @ts-ignore
+              if (!newCourse.professors.includes(preExistingProf_1)) {
+                // @ts-ignore
+                newCourse.professors.push(preExistingProf_1);
+              }
+              // @ts-ignore
+              if (!newPrefix.professors.includes(preExistingProf_1)) {
+                // @ts-ignore
+                newPrefix.professors.push(preExistingProf_1);
+              }
+            } else {
+              // @ts-ignore
+              var newProf = {
+                classes: [newCourse],
+                firstName: professor.first_name,
+                lastName: professor.last_name,
+              };
+              professorList.push(newProf);
+              newSection.professors.push(newProf);
+              newCourse.professors.push(newProf);
+              newPrefix.professors.push(newProf);
+            }
+          }
+        });
+      });
+    });
+  });
+});
 nodeFetch['default']('https://catfact.ninja/fact', { method: 'GET' })
   // @ts-ignore
   .then(function (response) {
@@ -178,23 +236,23 @@ nodeFetch['default']('https://catfact.ninja/fact', { method: 'GET' })
         },
       );
     }
-    for (var i = 0; i < myPrefixes.length; i++) {
+    for (var i = 0; i < prefixList.length; i++) {
       //console.log(myPrefixes[i].value);
-      for (var j = 0; j < myPrefixes[i].classes.length; j++) {
+      for (var j = 0; j < prefixList[i].classes.length; j++) {
         //console.log(myPrefixes[i].classes[j].number);
-        for (var k = 0; k < myPrefixes[i].classes[j].professors.length; k++) {
+        for (var k = 0; k < prefixList[i].classes[j].professors.length; k++) {
           //console.log(myPrefixes[i].classes[j].professors[k].firstName + myPrefixes[i].classes[j].professors[k].lastName);
           addPrefixFirst(
-            myPrefixes[i].value,
-            myPrefixes[i].classes[j].number,
-            myPrefixes[i].classes[j].professors[k].firstName,
-            myPrefixes[i].classes[j].professors[k].lastName,
+            prefixList[i].value,
+            prefixList[i].classes[j].number,
+            prefixList[i].classes[j].professors[k].firstName,
+            prefixList[i].classes[j].professors[k].lastName,
           );
           addProfFirst(
-            myPrefixes[i].value,
-            myPrefixes[i].classes[j].number,
-            myPrefixes[i].classes[j].professors[k].firstName,
-            myPrefixes[i].classes[j].professors[k].lastName,
+            prefixList[i].value,
+            prefixList[i].classes[j].number,
+            prefixList[i].classes[j].professors[k].firstName,
+            prefixList[i].classes[j].professors[k].lastName,
           );
         }
       }

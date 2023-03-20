@@ -6,10 +6,11 @@ run to compile to .js file that can be run at predev and prebuild
 const fs = require('fs');
 import { DirectedGraph } from 'graphology';
 const nodeFetch = require('node-fetch');
+import * as aggregatedData from '../data/aggregate_data.json';
 
 type SearchQuery = {
   prefix?: string;
-  number?: number;
+  number?: string;
   professorName?: string;
   sectionNumber?: string;
 };
@@ -28,8 +29,9 @@ type Prefix = {
 
 type Class = {
   prefix: Prefix;
-  number: number;
+  number: string;
   professors: Professor[];
+  sections: Section[];
 };
 
 type Professor = {
@@ -38,36 +40,100 @@ type Professor = {
   lastName: string;
 };
 
-let myProfessors: Professor[] = [
-  { classes: [], firstName: 'arcs', lastName: 'test' },
-  { classes: [], firstName: 'csre', lastName: 'acse' },
-];
+type Section = {
+  class: Class;
+  professors: Professor[];
+  section_number: string;
+};
 
-let myPrefixes: Prefix[] = [
-  { classes: [], professors: myProfessors, value: 'CS' },
-  { classes: [], professors: [], value: 'ECS' },
-  { classes: [], professors: [], value: 'CE' },
-];
+const prefixList: Prefix[] = [];
+const classList: Class[] = [];
+const professorList: Professor[] = [];
+const sectionList: Section[] = [];
 
-let myClasses: Class[] = [
-  { prefix: myPrefixes[0], number: 1337, professors: [myProfessors[0]] },
-  { prefix: myPrefixes[0], number: 1336, professors: [myProfessors[1]] },
-  { prefix: myPrefixes[2], number: 1337, professors: [myProfessors[0]] },
-  { prefix: myPrefixes[2], number: 1336, professors: [myProfessors[1]] },
-  {
-    prefix: myPrefixes[0],
-    number: 2337,
-    professors: Array.of(myProfessors[0]),
-  },
-];
-
-myProfessors[0].classes.push(myClasses[0]);
-myProfessors[0].classes.push(myClasses[2]);
-myProfessors[1].classes.push(myClasses[1]);
-myProfessors[1].classes.push(myClasses[3]);
-
-myPrefixes[0].classes.push(myClasses[0], myClasses[1]);
-myPrefixes[2].classes.push(myClasses[2], myClasses[3]);
+aggregatedData.data.forEach((prefix) => {
+  let newPrefix: Prefix = {
+    classes: [],
+    professors: [],
+    value: prefix.subject_prefix,
+  };
+  prefixList.push(newPrefix);
+  prefix.course_numbers.forEach((course) => {
+    let newCourse: Class = {
+      prefix: newPrefix,
+      number: course.course_number,
+      professors: [],
+      sections: [],
+    };
+    if (course.course_number == undefined) {
+      console.log(course);
+    }
+    newPrefix.classes.push(newCourse);
+    classList.push(newCourse);
+    course.academic_sessions.forEach((session) => {
+      session.sections.forEach((section) => {
+        let newSection: Section = {
+          class: newCourse,
+          professors: [],
+          section_number: section.section_number,
+        };
+        newCourse.sections.push(newSection);
+        sectionList.push(newSection);
+        section.professors.forEach((professor) => {
+          // @ts-ignore
+          if (
+            professor.first_name != undefined &&
+            professor.last_name != undefined
+          ) {
+            let profExists = false;
+            let preExistingProf: Professor;
+            professorList.forEach((existingProfessor) => {
+              // @ts-ignore
+              if (
+                !profExists &&
+                existingProfessor.firstName == professor.first_name &&
+                existingProfessor.lastName == professor.last_name
+              ) {
+                profExists = true;
+                preExistingProf = existingProfessor;
+              }
+            });
+            if (profExists) {
+              // @ts-ignore
+              if (!preExistingProf.classes.includes(newCourse)) {
+                // @ts-ignore
+                preExistingProf.classes.push(newCourse);
+              }
+              // @ts-ignore
+              newSection.professors.push(preExistingProf);
+              // @ts-ignore
+              if (!newCourse.professors.includes(preExistingProf)) {
+                // @ts-ignore
+                newCourse.professors.push(preExistingProf);
+              }
+              // @ts-ignore
+              if (!newPrefix.professors.includes(preExistingProf)) {
+                // @ts-ignore
+                newPrefix.professors.push(preExistingProf);
+              }
+            } else {
+              // @ts-ignore
+              let newProf: Professor = {
+                classes: [newCourse],
+                firstName: professor.first_name,
+                lastName: professor.last_name,
+              };
+              professorList.push(newProf);
+              newSection.professors.push(newProf);
+              newCourse.professors.push(newProf);
+              newPrefix.professors.push(newProf);
+            }
+          }
+        });
+      });
+    });
+  });
+});
 
 nodeFetch
   .default('https://catfact.ninja/fact', { method: 'GET' })
@@ -130,7 +196,7 @@ nodeFetch
     //Add node in format: (<prefix> <number> or <prefix><number>) (<professorLast> or <professorFirst> <professorLast>)
     function addPrefixFirst(
       prefix: string,
-      number: number,
+      number: string,
       profFirst: string,
       profLast: string,
     ) {
@@ -182,7 +248,7 @@ nodeFetch
     //Add nodes in format: (<professorLast> or <professorFirst> <professorLast>) (<prefix> <number> or <prefix><number>)
     function addProfFirst(
       prefix: string,
-      number: number,
+      number: string,
       profFirst: string,
       profLast: string,
     ) {
@@ -231,23 +297,23 @@ nodeFetch
       );
     }
 
-    for (let i = 0; i < myPrefixes.length; i++) {
+    for (let i = 0; i < prefixList.length; i++) {
       //console.log(myPrefixes[i].value);
-      for (let j = 0; j < myPrefixes[i].classes.length; j++) {
+      for (let j = 0; j < prefixList[i].classes.length; j++) {
         //console.log(myPrefixes[i].classes[j].number);
-        for (let k = 0; k < myPrefixes[i].classes[j].professors.length; k++) {
+        for (let k = 0; k < prefixList[i].classes[j].professors.length; k++) {
           //console.log(myPrefixes[i].classes[j].professors[k].firstName + myPrefixes[i].classes[j].professors[k].lastName);
           addPrefixFirst(
-            myPrefixes[i].value,
-            myPrefixes[i].classes[j].number,
-            myPrefixes[i].classes[j].professors[k].firstName,
-            myPrefixes[i].classes[j].professors[k].lastName,
+            prefixList[i].value,
+            prefixList[i].classes[j].number,
+            prefixList[i].classes[j].professors[k].firstName,
+            prefixList[i].classes[j].professors[k].lastName,
           );
           addProfFirst(
-            myPrefixes[i].value,
-            myPrefixes[i].classes[j].number,
-            myPrefixes[i].classes[j].professors[k].firstName,
-            myPrefixes[i].classes[j].professors[k].lastName,
+            prefixList[i].value,
+            prefixList[i].classes[j].number,
+            prefixList[i].classes[j].professors[k].firstName,
+            prefixList[i].classes[j].professors[k].lastName,
           );
         }
       }
