@@ -117,6 +117,15 @@ export const Dashboard: NextPage = () => {
 
   //called from expandableSearchGrid when data being compared is changed
   function searchTermsChange(searchTerms: SearchQuery[]) {
+    let newURL = '';
+    searchTerms.forEach((term: SearchQuery) => {
+      newURL += searchTermURIEncode(term) + ',';
+    });
+    router.push(
+      '/dashboard?searchTerms=' + newURL.substring(0, newURL.length - 1),
+      undefined,
+      { shallow: true },
+    );
     setProfessorInvolvingSearchTerms(
       searchTerms.filter(
         (searchQuery) => searchQuery.professorName != undefined,
@@ -475,5 +484,22 @@ export const Dashboard: NextPage = () => {
     </>
   );
 };
+
+function searchTermURIEncode(query: SearchQuery): string {
+  let result = '';
+  if (query.prefix !== undefined) {
+    result += query.prefix;
+  }
+  if (query.number !== undefined) {
+    result += ' ' + query.number;
+  }
+  if (query.professorName !== undefined) {
+    result += ' ' + query.professorName;
+  }
+  if (query.sectionNumber !== undefined) {
+    result += ' ' + query.sectionNumber;
+  }
+  return encodeURIComponent(result.trim());
+}
 
 export default Dashboard;
