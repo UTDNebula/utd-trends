@@ -51,8 +51,6 @@ export const Carousel: FC<CarouselProps> = (props: CarouselProps) => {
     //set direction
     setDir(displacement);
     setCard(currentCard + displacement);
-
-    console.log(currentCard);
   };
 
   return (

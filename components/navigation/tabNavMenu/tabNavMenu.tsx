@@ -39,21 +39,9 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
         className="w-px min-w-[1px]"
       />
       <Tab
-        label="Detailed"
-        className="text-lg text-gray-600 normal-case"
-        value={1}
-      />
-      <Tab
-        label=""
-        icon={<Divider orientation="vertical" />}
-        disabled
-        value={-1}
-        className="w-px min-w-[1px]"
-      />
-      <Tab
         label="Professor Ratings"
         className="text-lg text-gray-600 normal-case"
-        value={2}
+        value={1}
       />
     </Tabs>
   );

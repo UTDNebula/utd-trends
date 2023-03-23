@@ -30,11 +30,11 @@ export function BoxGraph(props: GraphProps) {
     return {
       x: value.name,
       y: [
-        Math.min(...value.data),
+        value.data.reduce((a: number, b: number) => Math.min(a, b), Infinity),
         quantile(value.data, 0.25),
         quantile(value.data, 0.5),
         quantile(value.data, 0.75),
-        Math.max(...value.data),
+        value.data.reduce((a: number, b: number) => Math.max(a, b), -Infinity),
       ],
     };
   });
