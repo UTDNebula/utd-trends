@@ -107,166 +107,51 @@ export const Dashboard: NextPage = ({ initialState }) => {
       ),
     );
     console.log('Index search terms: ', searchTerms);
-    // Promise.all(
-    //   searchTerms.map((searchTerm: SearchQuery) => {
-    //     let apiRoute = '';
-    //     if (
-    //       'prefix' in searchTerm &&
-    //       typeof searchTerm.prefix === 'string' &&
-    //       'number' in searchTerm &&
-    //       typeof searchTerm.number === 'number' &&
-    //       'professorName' in searchTerm &&
-    //       typeof searchTerm.professorName === 'string' &&
-    //       'sectionNumber' in searchTerm &&
-    //       typeof searchTerm.sectionNumber === 'string'
-    //     ) {
-    //       //section
-    //       apiRoute = 'section';
-    //     } /*else if (
-    //       'prefix' in searchTerm &&
-    //       typeof searchTerm.prefix === 'string' &&
-    //       'number' in searchTerm &&
-    //       typeof searchTerm.number === 'number' &&
-    //       'professorName' in searchTerm &&
-    //       typeof searchTerm.professorName === 'string'
-    //     ) { //course+professor
-    //       apiRoute = '';
-    //     }*/ else if (
-    //       'prefix' in searchTerm &&
-    //       typeof searchTerm.prefix === 'string' &&
-    //       'number' in searchTerm &&
-    //       typeof searchTerm.number === 'number'
-    //     ) {
-    //       //course
-    //       apiRoute = 'course';
-    //     } else if (
-    //       'professorName' in searchTerm &&
-    //       typeof searchTerm.professorName === 'string'
-    //     ) {
-    //       //professor
-    //       apiRoute = 'professor';
-    //     }
-    //     //console.log('apiRoute', apiRoute, typeof searchTerm.number);
-    //     const url =
-    //       '/api/nebulaAPI/' +
-    //       apiRoute +
-    //       '?' +
-    //       Object.keys(searchTerm)
-    //         .map(
-    //           (key) =>
-    //             key +
-    //             '=' +
-    //             encodeURIComponent(
-    //               String(searchTerm[key as keyof SearchQuery]),
-    //             ),
-    //         )
-    //         .join('&');
-    //     if (process.env.NODE_ENV !== 'development') {
-    //       const getItem = localStorage.getItem(url);
-    //       if (getItem !== null) {
-    //         return JSON.parse(getItem);
-    //       }
-    //     }
-    //     return fetch(url, {
-    //       method: 'GET',
-    //       headers: {
-    //         Accept: 'application/json',
-    //       },
-    //     })
-    //       .then((response) => response.json())
-    //       .then((response) => {
-    //         localStorage.setItem(url, JSON.stringify(response));
-    //         return response;
-    //       });
-    //   }),
-    // )
-    //   .then((responses) => {
-    //     console.log('data from grid: ', responses);
-    //   })
-    //   .catch((error) => {
-    //     setGradesState('error');
-    //     console.error('Nebula API Error', error);
-    //   });
+    /*Promise.all(
+      searchTerms.map((searchTerm: SearchQuery) => {
+        const url =
+          '/api/grades?' +
+          Object.keys(searchTerm)
+            .map(
+              (key) =>
+                key +
+                '=' +
+                encodeURIComponent(
+                  String(searchTerm[key as keyof SearchQuery]),
+                ),
+            )
+            .join('&') +
+          '&representation=semester';
+        if (process.env.NODE_ENV !== 'development') {
+          const getItem = localStorage.getItem(url);
+          if (getItem !== null) {
+            return JSON.parse(getItem);
+          }
+        }
+        return fetch(url, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.message !== 'success') {
+              throw new Error(data.message);
+            }
+            localStorage.setItem(url, JSON.stringify(data));
+            return data;
+          });
+      }),
+    )
+      .then((responses) => {
+        console.log('data from grid: ', responses);
+      })
+      .catch((error) => {
+        setGradesState('error');
+        console.error('Nebula API', error);
+      });*/
   }
-
-  // useEffect(() => {
-  //   setGradesState('loading');
-  //   if (!router.isReady) return;
-  //   if (
-  //     'sections' in router.query &&
-  //     typeof router.query.sections === 'string'
-  //   ) {
-  //     Promise.all(
-  //       router.query.sections.split(',').map((section) =>
-  //         fetch('/api/nebulaAPI/section?id=' + section, {
-  //           method: 'GET',
-  //           headers: {
-  //             Accept: 'application/json',
-  //           },
-  //         }).then((response) => response.json()),
-  //       ),
-  //     )
-  //       .then((responses) => {
-  //         setDat(
-  //           responses.map((data) => {
-  //             let newDat: datType = {
-  //               name: data.data.name,
-  //               data: data.data.grade_distribution,
-  //             };
-  //             return newDat;
-  //           }),
-  //         );
-  //
-  //         let newGPADat: datType[] = [];
-  //         let newAverageDat: datType[] = [];
-  //         let newStdevDat: datType[] = [];
-  //         for (let i = 0; i < responses.length; i++) {
-  //           const GPALookup = [
-  //             4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
-  //           ];
-  //           let GPAGrades: number[] = [];
-  //           for (
-  //             let j = 0;
-  //             j < responses[i].data.grade_distribution.length - 1;
-  //             j++
-  //           ) {
-  //             GPAGrades = GPAGrades.concat(
-  //               Array(responses[i].data.grade_distribution[j]).fill(
-  //                 GPALookup[j],
-  //               ),
-  //             );
-  //           }
-  //           newGPADat.push({ name: responses[i].data.name, data: GPAGrades });
-  //           const mean =
-  //             GPAGrades.reduce((partialSum, a) => partialSum + a, 0) /
-  //             GPAGrades.length;
-  //           newAverageDat.push({
-  //             name: responses[i].data.name,
-  //             data: [round(mean)],
-  //           });
-  //           const stdev = Math.sqrt(
-  //             GPAGrades.reduce(
-  //               (partialSum, a) => partialSum + (a - mean) ** 2,
-  //               0,
-  //             ) / GPAGrades.length,
-  //           );
-  //           newStdevDat.push({
-  //             name: responses[i].data.name,
-  //             data: [round(stdev)],
-  //           });
-  //         }
-  //         setGPADat(newGPADat);
-  //         setAverageDat(newAverageDat);
-  //         setStdevDat(newStdevDat);
-  //
-  //         setGradesState('success');
-  //       })
-  //       .catch((error) => {
-  //         setGradesState('error');
-  //         console.error('Nebula API Error', error);
-  //       });
-  //   }
-  // }, [router.isReady, router.query.sections]);
 
   let mainGradesPage;
   let detailedGradesPage;

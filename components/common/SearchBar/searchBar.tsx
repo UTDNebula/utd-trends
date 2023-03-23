@@ -53,6 +53,7 @@ export const SearchBar = (props: SearchProps) => {
           <SearchIcon />
         </div>
         <Autocomplete
+          autoHighlight={true}
           multiple={true}
           disabled={props.disabled}
           className="w-full h-12 bg-primary-light outline-0 active:outline-0 focus:outline-0 font-sans"
@@ -116,7 +117,10 @@ export const SearchBar = (props: SearchProps) => {
             </div>
           )}
           renderOption={(props, option, { selected }) => (
-            <li {...props} className="bg-white/25 my-4 mx-8 font-sans">
+            <li
+              {...props}
+              className="bg-white/25 active:bg-white/50 focus:bg-white/50 hover:bg-white/50 my-4 mx-8 font-sans"
+            >
               <Box className="text-lg text-gray-600 pl-5 py-5">
                 {searchQueryLabel(option)}
                 <br />
