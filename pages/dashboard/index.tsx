@@ -1,7 +1,7 @@
 import { Card, LinearProgress } from '@mui/material';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Carousel from '../../components/common/Carousel/carousel';
 import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
@@ -86,8 +86,7 @@ export const Dashboard: NextPage = ({ initialState }) => {
     }
   }, [professorInvolvingSearchTerms]);
 
-  //called from expandableSearchGrid when data being compared is changed
-  function searchTermsChange(searchTerms: SearchQuery[]) {
+  const searchTermsChange = useCallback((searchTerms: SearchQuery[]) => {
     if (searchTerms.length > 0) {
       let newURL = '';
       searchTerms.forEach((term: SearchQuery) => {
@@ -107,51 +106,7 @@ export const Dashboard: NextPage = ({ initialState }) => {
       ),
     );
     console.log('Index search terms: ', searchTerms);
-    /*Promise.all(
-      searchTerms.map((searchTerm: SearchQuery) => {
-        const url =
-          '/api/grades?' +
-          Object.keys(searchTerm)
-            .map(
-              (key) =>
-                key +
-                '=' +
-                encodeURIComponent(
-                  String(searchTerm[key as keyof SearchQuery]),
-                ),
-            )
-            .join('&') +
-          '&representation=semester';
-        if (process.env.NODE_ENV !== 'development') {
-          const getItem = localStorage.getItem(url);
-          if (getItem !== null) {
-            return JSON.parse(getItem);
-          }
-        }
-        return fetch(url, {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.message !== 'success') {
-              throw new Error(data.message);
-            }
-            localStorage.setItem(url, JSON.stringify(data));
-            return data;
-          });
-      }),
-    )
-      .then((responses) => {
-        console.log('data from grid: ', responses);
-      })
-      .catch((error) => {
-        setGradesState('error');
-        console.error('Nebula API', error);
-      });*/
-  }
+  }, []);
 
   let mainGradesPage;
   let detailedGradesPage;
