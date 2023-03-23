@@ -22,18 +22,21 @@ type ExpandableSearchGridProps = {
  * using the SearchBar component. The currently selected search terms are represented by
  * SearchTermCard components, and are displayed from left to right in this grid.
  */
-export const ExpandableSearchGrid = (props: ExpandableSearchGridProps) => {
+export const ExpandableSearchGrid = ({
+  onChange,
+  startingData,
+}: ExpandableSearchGridProps) => {
   const [value, setValue] = useState<SearchQuery[]>([]);
   const [searchTerms, setSearchTerms] = useState<SearchQuery[]>([]);
   const [searchDisabled, setSearchDisable] = useState<boolean>(false);
 
   useEffect(() => {
-    props.onChange(searchTerms);
-  }, [searchTerms]);
+    onChange(searchTerms);
+  }, [onChange, searchTerms]);
 
   useEffect(() => {
-    setSearchTerms(props.startingData);
-  }, [props.startingData]);
+    setSearchTerms(startingData);
+  }, [startingData]);
 
   function addSearchTerm(newSearchTerm: SearchQuery) {
     if (newSearchTerm != null) {
