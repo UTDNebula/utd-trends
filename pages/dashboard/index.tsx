@@ -88,12 +88,11 @@ export const Dashboard: NextPage = ({ initialState }) => {
 
   const searchTermsChange = useCallback((searchTerms: SearchQuery[]) => {
     if (searchTerms.length > 0) {
-      let newURL = '';
-      searchTerms.forEach((term: SearchQuery) => {
-        newURL += searchTermURIEncode(term) + ',';
-      });
       router.replace(
-        '/dashboard?searchTerms=' + newURL.substring(0, newURL.length - 1),
+        {
+          pathname: '/dashboard',
+          query: { searchTerms: searchTermsURIString(searchTerms) },
+        },
         undefined,
         { shallow: true },
       );
@@ -300,7 +299,11 @@ export const Dashboard: NextPage = ({ initialState }) => {
   );
 };
 
-function searchTermURIEncode(query: SearchQuery): string {
+function searchTermsURIString(querys: SearchQuery[]): string {
+  return querys.map((query) => searchTermURIString(query)).join(',');
+}
+
+function searchTermURIString(query: SearchQuery): string {
   let result = '';
   if (query.prefix !== undefined) {
     result += query.prefix;
@@ -314,7 +317,7 @@ function searchTermURIEncode(query: SearchQuery): string {
   if (query.professorName !== undefined) {
     result += ' ' + query.professorName;
   }
-  return encodeURIComponent(result.trim());
+  return result.trim();
 }
 
 function parseURIEncodedSearchTerms(
