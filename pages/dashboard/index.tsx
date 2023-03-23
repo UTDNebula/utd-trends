@@ -27,7 +27,7 @@ type RMPData = {
 };
 
 // @ts-ignore
-export const Dashboard: NextPage = ({ initialState }) => {
+export const Dashboard: NextPage = () => {
   type datType = {
     name: string;
     data: number[];
@@ -58,6 +58,13 @@ export const Dashboard: NextPage = ({ initialState }) => {
   const router = useRouter();
   const [gradesState, setGradesState] = useState('loading');
   const [professorRatingsState, setProfessorRatingsState] = useState('loading');
+
+  const [searchBar, setSearchBar] = useState(
+    <ExpandableSearchGrid
+      onChange={(result: SearchQuery[]) => console.log(result)}
+      startingData={[]}
+    />,
+  );
 
   useEffect(() => {
     if (professorInvolvingSearchTerms.length > 0) {
@@ -106,6 +113,18 @@ export const Dashboard: NextPage = ({ initialState }) => {
     );
     console.log('Index search terms: ', searchTerms);
   }, []);
+
+  useEffect(() => {
+    if (router.isReady) {
+      console.log('search bar updated');
+      setSearchBar(
+        <ExpandableSearchGrid
+          onChange={searchTermsChange}
+          startingData={parseURIEncodedSearchTerms(router.query.searchTerms)}
+        />,
+      );
+    }
+  }, [router.isReady]);
 
   let mainGradesPage;
   let detailedGradesPage;
@@ -281,10 +300,7 @@ export const Dashboard: NextPage = ({ initialState }) => {
     <>
       <div className=" w-full bg-light h-full">
         <TopMenu />
-        <ExpandableSearchGrid
-          onChange={searchTermsChange}
-          startingData={initialState}
-        />
+        {searchBar}
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">
             <Carousel>
@@ -390,10 +406,5 @@ function parseURIEncodedSearchTerm(encodedSearchTerm: string): SearchQuery {
     return { professorName: encodedSearchTerm.trim() };
   }
 }
-
-Dashboard.getInitialProps = async (context) => {
-  const initialState = parseURIEncodedSearchTerms(context.query.searchTerms);
-  return { initialState: initialState };
-};
 
 export default Dashboard;
