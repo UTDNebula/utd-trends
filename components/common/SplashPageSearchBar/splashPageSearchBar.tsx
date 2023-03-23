@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { SearchIcon } from '../../icons/SearchIcon/searchIcon';
 import Autocomplete from '@mui/material/Autocomplete';
-import throttle from 'lodash/throttle';
-import topFilms from '../../../data/autocomplete_dummy_data.json';
 import { useEffect } from 'react';
 import { searchAutocomplete } from '../../autocomplete';
 
@@ -10,7 +8,6 @@ import { searchAutocomplete } from '../../autocomplete';
  * Props type used by the SearchBar component
  */
 type SearchProps = {
-  // setSearch: the setter function from the parent component to set the search value
   selectSearchValue: Function;
   value: SearchQuery[];
   setValue: Function;
@@ -19,7 +16,7 @@ type SearchProps = {
 
 type SearchQuery = {
   prefix?: string;
-  number?: number;
+  number?: string;
   professorName?: string;
   sectionNumber?: string;
 };

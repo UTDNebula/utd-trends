@@ -6,11 +6,10 @@ import { WaveSVG } from '../components/icons/Wave/waveSVG';
 import { Wave2SVG } from '../components/icons/Wave2/wave2SVG';
 import { FlatLogoIcon } from '../components/icons/FlatLogoIcon/flatLogoIcon';
 import { useState } from 'react';
-import styles from '../styles/Home.module.css';
 
 type SearchQuery = {
   prefix?: string;
-  number?: number;
+  number?: string;
   professorName?: string;
   sectionNumber?: string;
 };
@@ -26,7 +25,7 @@ const Home: NextPage = () => {
     router.push(
       {
         pathname: '/dashboard',
-        query: chosenOption,
+        query: { searchTerms: searchTermURIString(chosenOption) },
       },
       '/dashboard',
     );
@@ -69,5 +68,22 @@ const Home: NextPage = () => {
     </>
   );
 };
+
+function searchTermURIString(query: SearchQuery): string {
+  let result = '';
+  if (query.prefix !== undefined) {
+    result += query.prefix;
+  }
+  if (query.number !== undefined) {
+    result += ' ' + query.number;
+  }
+  if (query.sectionNumber !== undefined) {
+    result += '.' + query.sectionNumber;
+  }
+  if (query.professorName !== undefined) {
+    result += ' ' + query.professorName;
+  }
+  return result.trim();
+}
 
 export default Home;

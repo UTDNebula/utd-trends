@@ -10,7 +10,7 @@ import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 
 type SearchQuery = {
   prefix?: string;
-  number?: number;
+  number?: string;
   professorName?: string;
   sectionNumber?: string;
 };
@@ -26,7 +26,8 @@ type RMPData = {
   wouldTakeAgainPercentage: number;
 };
 
-export const Dashboard: NextPage = () => {
+// @ts-ignore
+export const Dashboard: NextPage = ({ initialState }) => {
   type datType = {
     name: string;
     data: number[];
@@ -58,36 +59,6 @@ export const Dashboard: NextPage = () => {
   const [gradesState, setGradesState] = useState('loading');
   const [professorRatingsState, setProfessorRatingsState] = useState('loading');
 
-  //load data from home search if present
-  const startingData: SearchQuery = {};
-  if (
-    ('prefix' in router.query && typeof router.query.prefix === 'string') ||
-    ('number' in router.query && typeof router.query.number === 'string') ||
-    ('professorName' in router.query &&
-      typeof router.query.professorName === 'string') ||
-    ('sectionNumber' in router.query &&
-      typeof router.query.sectionNumber === 'string')
-  ) {
-    if ('prefix' in router.query && typeof router.query.prefix === 'string') {
-      startingData.prefix = router.query.prefix;
-    }
-    if ('number' in router.query && typeof router.query.number === 'string') {
-      startingData.number = parseInt(router.query.number);
-    }
-    if (
-      'professorName' in router.query &&
-      typeof router.query.professorName === 'string'
-    ) {
-      startingData.professorName = router.query.professorName;
-    }
-    if (
-      'sectionNumber' in router.query &&
-      typeof router.query.sectionNumber === 'string'
-    ) {
-      startingData.sectionNumber = router.query.sectionNumber;
-    }
-  }
-
   useEffect(() => {
     if (professorInvolvingSearchTerms.length > 0) {
       setProfessorRatingsState('loading');
@@ -117,181 +88,185 @@ export const Dashboard: NextPage = () => {
 
   //called from expandableSearchGrid when data being compared is changed
   function searchTermsChange(searchTerms: SearchQuery[]) {
-    let newURL = '';
-    searchTerms.forEach((term: SearchQuery) => {
-      newURL += searchTermURIEncode(term) + ',';
-    });
-    router.push(
-      '/dashboard?searchTerms=' + newURL.substring(0, newURL.length - 1),
-      undefined,
-      { shallow: true },
-    );
+    if (searchTerms.length > 0) {
+      let newURL = '';
+      searchTerms.forEach((term: SearchQuery) => {
+        newURL += searchTermURIEncode(term) + ',';
+      });
+      router.replace(
+        '/dashboard?searchTerms=' + newURL.substring(0, newURL.length - 1),
+        undefined,
+        { shallow: true },
+      );
+    } else {
+      router.replace('/dashboard', undefined, { shallow: true });
+    }
     setProfessorInvolvingSearchTerms(
       searchTerms.filter(
         (searchQuery) => searchQuery.professorName != undefined,
       ),
     );
     console.log('Index search terms: ', searchTerms);
-    Promise.all(
-      searchTerms.map((searchTerm: SearchQuery) => {
-        let apiRoute = '';
-        if (
-          'prefix' in searchTerm &&
-          typeof searchTerm.prefix === 'string' &&
-          'number' in searchTerm &&
-          typeof searchTerm.number === 'number' &&
-          'professorName' in searchTerm &&
-          typeof searchTerm.professorName === 'string' &&
-          'sectionNumber' in searchTerm &&
-          typeof searchTerm.sectionNumber === 'string'
-        ) {
-          //section
-          apiRoute = 'section';
-        } /*else if (
-          'prefix' in searchTerm &&
-          typeof searchTerm.prefix === 'string' &&
-          'number' in searchTerm &&
-          typeof searchTerm.number === 'number' &&
-          'professorName' in searchTerm &&
-          typeof searchTerm.professorName === 'string'
-        ) { //course+professor
-          apiRoute = '';
-        }*/ else if (
-          'prefix' in searchTerm &&
-          typeof searchTerm.prefix === 'string' &&
-          'number' in searchTerm &&
-          typeof searchTerm.number === 'number'
-        ) {
-          //course
-          apiRoute = 'course';
-        } else if (
-          'professorName' in searchTerm &&
-          typeof searchTerm.professorName === 'string'
-        ) {
-          //professor
-          apiRoute = 'professor';
-        }
-        //console.log('apiRoute', apiRoute, typeof searchTerm.number);
-        const url =
-          '/api/nebulaAPI/' +
-          apiRoute +
-          '?' +
-          Object.keys(searchTerm)
-            .map(
-              (key) =>
-                key +
-                '=' +
-                encodeURIComponent(
-                  String(searchTerm[key as keyof SearchQuery]),
-                ),
-            )
-            .join('&');
-        if (process.env.NODE_ENV !== 'development') {
-          const getItem = localStorage.getItem(url);
-          if (getItem !== null) {
-            return JSON.parse(getItem);
-          }
-        }
-        return fetch(url, {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-          },
-        })
-          .then((response) => response.json())
-          .then((response) => {
-            localStorage.setItem(url, JSON.stringify(response));
-            return response;
-          });
-      }),
-    )
-      .then((responses) => {
-        console.log('data from grid: ', responses);
-      })
-      .catch((error) => {
-        setGradesState('error');
-        console.error('Nebula API Error', error);
-      });
+    // Promise.all(
+    //   searchTerms.map((searchTerm: SearchQuery) => {
+    //     let apiRoute = '';
+    //     if (
+    //       'prefix' in searchTerm &&
+    //       typeof searchTerm.prefix === 'string' &&
+    //       'number' in searchTerm &&
+    //       typeof searchTerm.number === 'number' &&
+    //       'professorName' in searchTerm &&
+    //       typeof searchTerm.professorName === 'string' &&
+    //       'sectionNumber' in searchTerm &&
+    //       typeof searchTerm.sectionNumber === 'string'
+    //     ) {
+    //       //section
+    //       apiRoute = 'section';
+    //     } /*else if (
+    //       'prefix' in searchTerm &&
+    //       typeof searchTerm.prefix === 'string' &&
+    //       'number' in searchTerm &&
+    //       typeof searchTerm.number === 'number' &&
+    //       'professorName' in searchTerm &&
+    //       typeof searchTerm.professorName === 'string'
+    //     ) { //course+professor
+    //       apiRoute = '';
+    //     }*/ else if (
+    //       'prefix' in searchTerm &&
+    //       typeof searchTerm.prefix === 'string' &&
+    //       'number' in searchTerm &&
+    //       typeof searchTerm.number === 'number'
+    //     ) {
+    //       //course
+    //       apiRoute = 'course';
+    //     } else if (
+    //       'professorName' in searchTerm &&
+    //       typeof searchTerm.professorName === 'string'
+    //     ) {
+    //       //professor
+    //       apiRoute = 'professor';
+    //     }
+    //     //console.log('apiRoute', apiRoute, typeof searchTerm.number);
+    //     const url =
+    //       '/api/nebulaAPI/' +
+    //       apiRoute +
+    //       '?' +
+    //       Object.keys(searchTerm)
+    //         .map(
+    //           (key) =>
+    //             key +
+    //             '=' +
+    //             encodeURIComponent(
+    //               String(searchTerm[key as keyof SearchQuery]),
+    //             ),
+    //         )
+    //         .join('&');
+    //     if (process.env.NODE_ENV !== 'development') {
+    //       const getItem = localStorage.getItem(url);
+    //       if (getItem !== null) {
+    //         return JSON.parse(getItem);
+    //       }
+    //     }
+    //     return fetch(url, {
+    //       method: 'GET',
+    //       headers: {
+    //         Accept: 'application/json',
+    //       },
+    //     })
+    //       .then((response) => response.json())
+    //       .then((response) => {
+    //         localStorage.setItem(url, JSON.stringify(response));
+    //         return response;
+    //       });
+    //   }),
+    // )
+    //   .then((responses) => {
+    //     console.log('data from grid: ', responses);
+    //   })
+    //   .catch((error) => {
+    //     setGradesState('error');
+    //     console.error('Nebula API Error', error);
+    //   });
   }
 
-  useEffect(() => {
-    setGradesState('loading');
-    if (!router.isReady) return;
-    if (
-      'sections' in router.query &&
-      typeof router.query.sections === 'string'
-    ) {
-      Promise.all(
-        router.query.sections.split(',').map((section) =>
-          fetch('/api/nebulaAPI/section?id=' + section, {
-            method: 'GET',
-            headers: {
-              Accept: 'application/json',
-            },
-          }).then((response) => response.json()),
-        ),
-      )
-        .then((responses) => {
-          setDat(
-            responses.map((data) => {
-              let newDat: datType = {
-                name: data.data.name,
-                data: data.data.grade_distribution,
-              };
-              return newDat;
-            }),
-          );
-
-          let newGPADat: datType[] = [];
-          let newAverageDat: datType[] = [];
-          let newStdevDat: datType[] = [];
-          for (let i = 0; i < responses.length; i++) {
-            const GPALookup = [
-              4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
-            ];
-            let GPAGrades: number[] = [];
-            for (
-              let j = 0;
-              j < responses[i].data.grade_distribution.length - 1;
-              j++
-            ) {
-              GPAGrades = GPAGrades.concat(
-                Array(responses[i].data.grade_distribution[j]).fill(
-                  GPALookup[j],
-                ),
-              );
-            }
-            newGPADat.push({ name: responses[i].data.name, data: GPAGrades });
-            const mean =
-              GPAGrades.reduce((partialSum, a) => partialSum + a, 0) /
-              GPAGrades.length;
-            newAverageDat.push({
-              name: responses[i].data.name,
-              data: [round(mean)],
-            });
-            const stdev = Math.sqrt(
-              GPAGrades.reduce(
-                (partialSum, a) => partialSum + (a - mean) ** 2,
-                0,
-              ) / GPAGrades.length,
-            );
-            newStdevDat.push({
-              name: responses[i].data.name,
-              data: [round(stdev)],
-            });
-          }
-          setGPADat(newGPADat);
-          setAverageDat(newAverageDat);
-          setStdevDat(newStdevDat);
-
-          setGradesState('success');
-        })
-        .catch((error) => {
-          setGradesState('error');
-          console.error('Nebula API Error', error);
-        });
-    }
-  }, [router.isReady, router.query.sections]);
+  // useEffect(() => {
+  //   setGradesState('loading');
+  //   if (!router.isReady) return;
+  //   if (
+  //     'sections' in router.query &&
+  //     typeof router.query.sections === 'string'
+  //   ) {
+  //     Promise.all(
+  //       router.query.sections.split(',').map((section) =>
+  //         fetch('/api/nebulaAPI/section?id=' + section, {
+  //           method: 'GET',
+  //           headers: {
+  //             Accept: 'application/json',
+  //           },
+  //         }).then((response) => response.json()),
+  //       ),
+  //     )
+  //       .then((responses) => {
+  //         setDat(
+  //           responses.map((data) => {
+  //             let newDat: datType = {
+  //               name: data.data.name,
+  //               data: data.data.grade_distribution,
+  //             };
+  //             return newDat;
+  //           }),
+  //         );
+  //
+  //         let newGPADat: datType[] = [];
+  //         let newAverageDat: datType[] = [];
+  //         let newStdevDat: datType[] = [];
+  //         for (let i = 0; i < responses.length; i++) {
+  //           const GPALookup = [
+  //             4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
+  //           ];
+  //           let GPAGrades: number[] = [];
+  //           for (
+  //             let j = 0;
+  //             j < responses[i].data.grade_distribution.length - 1;
+  //             j++
+  //           ) {
+  //             GPAGrades = GPAGrades.concat(
+  //               Array(responses[i].data.grade_distribution[j]).fill(
+  //                 GPALookup[j],
+  //               ),
+  //             );
+  //           }
+  //           newGPADat.push({ name: responses[i].data.name, data: GPAGrades });
+  //           const mean =
+  //             GPAGrades.reduce((partialSum, a) => partialSum + a, 0) /
+  //             GPAGrades.length;
+  //           newAverageDat.push({
+  //             name: responses[i].data.name,
+  //             data: [round(mean)],
+  //           });
+  //           const stdev = Math.sqrt(
+  //             GPAGrades.reduce(
+  //               (partialSum, a) => partialSum + (a - mean) ** 2,
+  //               0,
+  //             ) / GPAGrades.length,
+  //           );
+  //           newStdevDat.push({
+  //             name: responses[i].data.name,
+  //             data: [round(stdev)],
+  //           });
+  //         }
+  //         setGPADat(newGPADat);
+  //         setAverageDat(newAverageDat);
+  //         setStdevDat(newStdevDat);
+  //
+  //         setGradesState('success');
+  //       })
+  //       .catch((error) => {
+  //         setGradesState('error');
+  //         console.error('Nebula API Error', error);
+  //       });
+  //   }
+  // }, [router.isReady, router.query.sections]);
 
   let mainGradesPage;
   let detailedGradesPage;
@@ -469,7 +444,7 @@ export const Dashboard: NextPage = () => {
         <TopMenu />
         <ExpandableSearchGrid
           onChange={searchTermsChange}
-          startingData={startingData}
+          startingData={initialState}
         />
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">
@@ -493,13 +468,89 @@ function searchTermURIEncode(query: SearchQuery): string {
   if (query.number !== undefined) {
     result += ' ' + query.number;
   }
+  if (query.sectionNumber !== undefined) {
+    result += '.' + query.sectionNumber;
+  }
   if (query.professorName !== undefined) {
     result += ' ' + query.professorName;
   }
-  if (query.sectionNumber !== undefined) {
-    result += ' ' + query.sectionNumber;
-  }
   return encodeURIComponent(result.trim());
 }
+
+function parseURIEncodedSearchTerms(
+  encodedSearchTerms: string | string[] | undefined,
+): SearchQuery[] {
+  if (encodedSearchTerms === undefined) {
+    return [];
+  } else if (typeof encodedSearchTerms === 'string') {
+    return encodedSearchTerms
+      .split(',')
+      .map((term) => parseURIEncodedSearchTerm(term));
+  } else {
+    return encodedSearchTerms.map((term) => parseURIEncodedSearchTerm(term));
+  }
+}
+
+function parseURIEncodedSearchTerm(encodedSearchTerm: string): SearchQuery {
+  let encodedSearchTermParts = encodedSearchTerm.split(' ');
+  // Does it start with prefix
+  if (/^([A-Z]{2,4})$/.test(encodedSearchTermParts[0])) {
+    // If it is just the prefix, return that
+    if (encodedSearchTermParts.length == 1) {
+      return { prefix: encodedSearchTermParts[0] };
+    }
+    // Is the second part a course number only
+    if (/^([0-9A-Z]{4})$/.test(encodedSearchTermParts[1])) {
+      if (encodedSearchTermParts.length == 2) {
+        return {
+          prefix: encodedSearchTermParts[0],
+          number: encodedSearchTermParts[1],
+        };
+      } else {
+        return {
+          prefix: encodedSearchTermParts[0],
+          number: encodedSearchTermParts[1],
+          professorName:
+            encodedSearchTermParts[2] + ' ' + encodedSearchTermParts[3],
+        };
+      }
+    }
+    // Is the second part a course number and section
+    else if (/^([0-9A-Z]{4}\.[0-9A-Z]{3})$/.test(encodedSearchTermParts[1])) {
+      let courseNumberAndSection: string[] =
+        encodedSearchTermParts[1].split('.');
+      if (encodedSearchTermParts.length == 2) {
+        return {
+          prefix: encodedSearchTermParts[0],
+          number: courseNumberAndSection[0],
+          sectionNumber: courseNumberAndSection[1],
+        };
+      } else {
+        return {
+          prefix: encodedSearchTermParts[0],
+          number: courseNumberAndSection[0],
+          sectionNumber: courseNumberAndSection[1],
+          professorName:
+            encodedSearchTermParts[2] + ' ' + encodedSearchTermParts[3],
+        };
+      }
+    }
+    // the second part is the start of the name
+    else {
+      return {
+        prefix: encodedSearchTermParts[0],
+        professorName:
+          encodedSearchTermParts[1] + ' ' + encodedSearchTermParts[2],
+      };
+    }
+  } else {
+    return { professorName: encodedSearchTerm.trim() };
+  }
+}
+
+Dashboard.getInitialProps = async (context) => {
+  const initialState = parseURIEncodedSearchTerms(context.query.searchTerms);
+  return { initialState: initialState };
+};
 
 export default Dashboard;

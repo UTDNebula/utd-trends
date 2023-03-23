@@ -7,14 +7,14 @@ import React from 'react';
 
 type SearchQuery = {
   prefix?: string;
-  number?: number;
+  number?: string;
   professorName?: string;
   sectionNumber?: string;
 };
 
 type ExpandableSearchGridProps = {
   onChange: Function;
-  startingData: SearchQuery;
+  startingData: SearchQuery[];
 };
 
 /**
@@ -32,9 +32,7 @@ export const ExpandableSearchGrid = (props: ExpandableSearchGridProps) => {
   }, [searchTerms]);
 
   useEffect(() => {
-    if (Object.keys(props.startingData).length !== 0) {
-      setSearchTerms([props.startingData]);
-    }
+    setSearchTerms(props.startingData);
   }, [props.startingData]);
 
   function addSearchTerm(newSearchTerm: SearchQuery) {
