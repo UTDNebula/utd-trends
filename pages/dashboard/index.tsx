@@ -10,7 +10,7 @@ import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 
 type SearchQuery = {
   prefix?: string;
-  number?: number;
+  number?: string;
   professorName?: string;
   sectionNumber?: string;
 };
