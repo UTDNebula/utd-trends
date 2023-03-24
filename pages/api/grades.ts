@@ -30,24 +30,23 @@ export default function handler(
       'representation' in req.query &&
       typeof req.query.representation === 'string'
     ) {
-      const url = new URL('https://api.utdnebula.com/grades/');
-      url.searchParams.append('representation', req.query.representation);
+      const url = new URL('https://api.utdnebula.com/grades/semester');
       if ('prefix' in req.query && typeof req.query.prefix === 'string') {
-        url.searchParams.append('subject_prefix', req.query.prefix);
+        url.searchParams.append('prefix', req.query.prefix);
       }
       if ('number' in req.query && typeof req.query.number === 'string') {
-        url.searchParams.append('course_number', req.query.number);
+        url.searchParams.append('number', req.query.number);
       }
       if (
         'professorName' in req.query &&
         typeof req.query.professorName === 'string'
       ) {
         url.searchParams.append(
-          'professors.first_name',
+          'first_name',
           req.query.professorName.split(' ')[0],
         );
         url.searchParams.append(
-          'professors.last_name',
+          'last_name',
           req.query.professorName.split(' ')[1],
         );
       }

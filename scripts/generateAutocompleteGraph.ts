@@ -6,7 +6,7 @@ run to compile to .js file that can be run at predev and prebuild
 const fs = require('fs');
 import { DirectedGraph } from 'graphology';
 const nodeFetch = require('node-fetch');
-import * as aggregatedData from '../data/aggregate_data.json';
+import * as aggregatedData from '../data/autocomplete-min.json';
 
 type SearchQuery = {
   prefix?: string;
@@ -55,44 +55,41 @@ aggregatedData.data.forEach((prefix) => {
   let newPrefix: Prefix = {
     classes: [],
     professors: [],
-    value: prefix.subject_prefix,
+    value: prefix.sp,
   };
   prefixList.push(newPrefix);
-  prefix.course_numbers.forEach((course) => {
+  prefix.cns.forEach((course) => {
     let newCourse: Class = {
       prefix: newPrefix,
-      number: course.course_number,
+      number: course.cn,
       professors: [],
       sections: [],
     };
-    if (course.course_number == undefined) {
+    if (course.cn == undefined) {
       console.log(course);
     }
     newPrefix.classes.push(newCourse);
     classList.push(newCourse);
-    course.academic_sessions.forEach((session) => {
-      session.sections.forEach((section) => {
+    course.ass.forEach((session) => {
+      session.s.forEach((section) => {
         let newSection: Section = {
           class: newCourse,
           professors: [],
-          section_number: section.section_number,
+          section_number: section.sn,
         };
         newCourse.sections.push(newSection);
         sectionList.push(newSection);
-        section.professors.forEach((professor) => {
+        section.p.forEach((professor) => {
           // @ts-ignore
-          if (
-            professor.first_name != undefined &&
-            professor.last_name != undefined
-          ) {
+          if (professor.fn != undefined && professor.ln != undefined) {
             let profExists = false;
             let preExistingProf: Professor;
             professorList.forEach((existingProfessor) => {
               // @ts-ignore
               if (
                 !profExists &&
-                existingProfessor.firstName == professor.first_name &&
-                existingProfessor.lastName == professor.last_name
+                existingProfessor.firstName == professor.fn &&
+                existingProfessor.lastName == professor.ln
               ) {
                 profExists = true;
                 preExistingProf = existingProfessor;
@@ -120,8 +117,8 @@ aggregatedData.data.forEach((prefix) => {
               // @ts-ignore
               let newProf: Professor = {
                 classes: [newCourse],
-                firstName: professor.first_name,
-                lastName: professor.last_name,
+                firstName: professor.fn,
+                lastName: professor.ln,
               };
               professorList.push(newProf);
               newSection.professors.push(newProf);

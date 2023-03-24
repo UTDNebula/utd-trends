@@ -8,49 +8,50 @@ run to compile to .js file that can be run at predev and prebuild
 var fs = require('fs');
 var graphology_1 = require('graphology');
 var nodeFetch = require('node-fetch');
-var aggregatedData = require('../data/aggregate_data.json');
+var aggregatedData = require('../data/autocomplete-min.json');
 var prefixList = [];
 var classList = [];
 var professorList = [];
 var sectionList = [];
 aggregatedData.data.forEach(function (prefix) {
-  var newPrefix = { classes: [], professors: [], value: prefix.subject_prefix };
+  var newPrefix = {
+    classes: [],
+    professors: [],
+    value: prefix.sp,
+  };
   prefixList.push(newPrefix);
-  prefix.course_numbers.forEach(function (course) {
+  prefix.cns.forEach(function (course) {
     var newCourse = {
       prefix: newPrefix,
-      number: course.course_number,
+      number: course.cn,
       professors: [],
       sections: [],
     };
-    if (course.course_number == undefined) {
+    if (course.cn == undefined) {
       console.log(course);
     }
     newPrefix.classes.push(newCourse);
     classList.push(newCourse);
-    course.academic_sessions.forEach(function (session) {
-      session.sections.forEach(function (section) {
+    course.ass.forEach(function (session) {
+      session.s.forEach(function (section) {
         var newSection = {
           class: newCourse,
           professors: [],
-          section_number: section.section_number,
+          section_number: section.sn,
         };
         newCourse.sections.push(newSection);
         sectionList.push(newSection);
-        section.professors.forEach(function (professor) {
+        section.p.forEach(function (professor) {
           // @ts-ignore
-          if (
-            professor.first_name != undefined &&
-            professor.last_name != undefined
-          ) {
+          if (professor.fn != undefined && professor.ln != undefined) {
             var profExists_1 = false;
             var preExistingProf_1;
             professorList.forEach(function (existingProfessor) {
               // @ts-ignore
               if (
                 !profExists_1 &&
-                existingProfessor.firstName == professor.first_name &&
-                existingProfessor.lastName == professor.last_name
+                existingProfessor.firstName == professor.fn &&
+                existingProfessor.lastName == professor.ln
               ) {
                 profExists_1 = true;
                 preExistingProf_1 = existingProfessor;
@@ -78,8 +79,8 @@ aggregatedData.data.forEach(function (prefix) {
               // @ts-ignore
               var newProf = {
                 classes: [newCourse],
-                firstName: professor.first_name,
-                lastName: professor.last_name,
+                firstName: professor.fn,
+                lastName: professor.ln,
               };
               professorList.push(newProf);
               newSection.professors.push(newProf);
