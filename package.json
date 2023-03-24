@@ -5,7 +5,7 @@
     "predev": "node scripts/generateAutocompleteGraph.js",
     "dev": "next dev",
     "prebuild": "node scripts/generateAutocompleteGraph.js",
-    "build": "cross-env NODE_OPTIONS='--max-old-space-size=8000' next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "prepare": "husky install",
