@@ -37,7 +37,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
     fetch('/api/autocomplete?input=' + inputValue, { method: 'GET' })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
+        setOptions(data.output.concat(props.value));
       })
       .catch((error) => {
         console.log(error);
