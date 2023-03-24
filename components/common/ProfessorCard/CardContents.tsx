@@ -53,7 +53,9 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
           <Box
             className="h-32 w-32 border-2 border-neutral-400 flex items-center justify-center my-4 md:mt-0 mb-8 text-5xl text-neutral-600 font-bold"
             sx={{
-              backgroundColor: getColorForRating(Math.ceil(props.takingAgain)),
+              backgroundColor: getColorForRating(
+                Math.ceil(props.takingAgain * (1 / 100.0)),
+              ),
             }}
           >
             {Math.ceil(props.takingAgain)}%
