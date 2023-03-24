@@ -110,7 +110,7 @@ export const Dashboard: NextPage = () => {
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
+          //console.log(data);
           setProfData(data);
           setProfessorRatingsState('success');
         })
@@ -253,7 +253,7 @@ export const Dashboard: NextPage = () => {
 
   useEffect(() => {
     if (router.isReady) {
-      console.log('search bar updated');
+      //console.log('search bar updated');
       setSearchBar(
         <ExpandableSearchGrid
           onChange={searchTermsChange}

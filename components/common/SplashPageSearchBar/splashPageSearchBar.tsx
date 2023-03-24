@@ -32,18 +32,38 @@ export const SplashPageSearchBar = (props: SearchProps) => {
   const [options, setOptions] = React.useState<readonly SearchQuery[]>([]);
 
   const [inputValue, setInputValue] = React.useState('');
+  const [controller, setController] = React.useState(new AbortController());
+  const [loading, setLoading] = React.useState(false);
 
   useEffect(() => {
-    fetch('/api/autocomplete?input=' + inputValue, { method: 'GET' })
-      .then((response) => response.json())
-      .then((data) => {
-        setOptions(data.output.concat(props.value));
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    // setOptions(searchAutocomplete(inputValue).concat(props.value));
+    if (loading) {
+      controller.abort();
+    }
+    setController(new AbortController());
+    setLoading(true);
   }, [props.value, inputValue]);
+
+  useEffect(() => {
+    if (loading) {
+      fetch('/api/autocomplete?input=' + inputValue, {
+        signal: controller.signal,
+        method: 'GET',
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setLoading(false);
+          setOptions(data.output.concat(props.value));
+        })
+        .catch((error) => {
+          if (error instanceof DOMException) {
+            // ignore aborts
+          } else {
+            setLoading(false);
+            console.log(error);
+          }
+        });
+    }
+  }, [controller, loading]);
 
   useEffect(() => {
     if (!open) {
@@ -58,6 +78,8 @@ export const SplashPageSearchBar = (props: SearchProps) => {
           <SearchIcon />
         </div>
         <Autocomplete
+          loading={loading}
+          autoHighlight={true}
           multiple={true}
           disabled={props.disabled}
           className="w-full h-12"
