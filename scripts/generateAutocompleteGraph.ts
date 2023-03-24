@@ -85,10 +85,11 @@ aggregatedData.data.forEach((prefix) => {
             let profExists = false;
             let preExistingProf: Professor;
             professorList.forEach((existingProfessor) => {
-              // @ts-ignore
               if (
                 !profExists &&
+                // @ts-ignore
                 existingProfessor.firstName == professor.fn &&
+                // @ts-ignore
                 existingProfessor.lastName == professor.ln
               ) {
                 profExists = true;
@@ -114,10 +115,11 @@ aggregatedData.data.forEach((prefix) => {
                 newPrefix.professors.push(preExistingProf);
               }
             } else {
-              // @ts-ignore
               let newProf: Professor = {
                 classes: [newCourse],
+                // @ts-ignore
                 firstName: professor.fn,
+                // @ts-ignore
                 lastName: professor.ln,
               };
               professorList.push(newProf);
