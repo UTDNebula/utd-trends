@@ -4,7 +4,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import Popper from '@mui/material/Popper';
 import { Box, Paper } from '@mui/material';
 import { useEffect } from 'react';
-import { searchAutocomplete } from '../../autocomplete';
+// import { searchAutocomplete } from '../../autocomplete';
 
 /**
  * Props type used by the SearchBar component
@@ -37,7 +37,15 @@ export const SearchBar = (props: SearchProps) => {
   const [inputValue, setInputValue] = React.useState('');
 
   useEffect(() => {
-    setOptions(searchAutocomplete(inputValue).concat(props.value));
+    fetch('/api/autocomplete?input=' + inputValue, { method: 'GET' })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    // setOptions(searchAutocomplete(inputValue).concat(props.value));
   }, [props.value, inputValue]);
 
   useEffect(() => {

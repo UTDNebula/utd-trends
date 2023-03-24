@@ -2,7 +2,7 @@ import * as React from 'react';
 import { SearchIcon } from '../../icons/SearchIcon/searchIcon';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useEffect } from 'react';
-import { searchAutocomplete } from '../../autocomplete';
+// import { searchAutocomplete } from '../../autocomplete';
 
 /**
  * Props type used by the SearchBar component
@@ -34,7 +34,15 @@ export const SplashPageSearchBar = (props: SearchProps) => {
   const [inputValue, setInputValue] = React.useState('');
 
   useEffect(() => {
-    setOptions(searchAutocomplete(inputValue).concat(props.value));
+    fetch('/api/autocomplete?input=' + inputValue, { method: 'GET' })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    // setOptions(searchAutocomplete(inputValue).concat(props.value));
   }, [props.value, inputValue]);
 
   useEffect(() => {
