@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { SearchIcon } from '../../icons/SearchIcon/searchIcon';
 import Autocomplete from '@mui/material/Autocomplete';
-import throttle from 'lodash/throttle';
-import topFilms from '../../../data/autocomplete_dummy_data.json';
 import Popper from '@mui/material/Popper';
 import { Box, Paper } from '@mui/material';
+import { useEffect } from 'react';
+// import { searchAutocomplete } from '../../autocomplete';
 
 /**
  * Props type used by the SearchBar component
@@ -12,18 +12,17 @@ import { Box, Paper } from '@mui/material';
 type SearchProps = {
   // setSearch: the setter function from the parent component to set the search value
   selectSearchValue: Function;
-  value: Film[] | undefined;
+  value: SearchQuery[];
   setValue: Function;
   disabled?: boolean;
 };
 
-/**
- * Data type used by the dummy data
- */
-interface Film {
-  title: string;
-  year: number;
-}
+type SearchQuery = {
+  prefix?: string;
+  number?: string;
+  professorName?: string;
+  sectionNumber?: string;
+};
 
 /**
  * This component returns a custom search bar component that makes use of the Material UI autocomplete component
@@ -33,53 +32,23 @@ interface Film {
  */
 export const SearchBar = (props: SearchProps) => {
   const [open, setOpen] = React.useState(false);
-  const [options, setOptions] = React.useState<readonly Film[]>([]);
-  const loading = open && options.length === 0;
+  const [options, setOptions] = React.useState<readonly SearchQuery[]>([]);
 
   const [inputValue, setInputValue] = React.useState('');
 
-  const fetch = React.useMemo(
-    () =>
-      throttle(
-        (
-          request: { input: string },
-          callback: (results?: readonly Film[]) => void,
-        ) => {
-          console.log('"called" the api again');
-        },
-        2000,
-      ),
-    [],
-  );
-
-  React.useEffect(() => {
-    let active = true;
-
-    (async () => {
-      fetch({ input: inputValue }, (results?: readonly Film[]) => {
-        if (active) {
-          let newOptions: readonly Film[] = [];
-
-          if (results) {
-            newOptions = [...newOptions, ...results];
-          }
-
-          setOptions(newOptions);
-        }
+  useEffect(() => {
+    fetch('/api/autocomplete?input=' + inputValue, { method: 'GET' })
+      .then((response) => response.json())
+      .then((data) => {
+        setOptions(data.output.concat(props.value));
+      })
+      .catch((error) => {
+        console.log(error);
       });
+    // setOptions(searchAutocomplete(inputValue).concat(props.value));
+  }, [props.value, inputValue]);
 
-      if (active) {
-        console.log('options updated');
-        setOptions([...topFilms]);
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [props.value, inputValue, fetch]);
-
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open) {
       setOptions([]);
     }
@@ -92,6 +61,7 @@ export const SearchBar = (props: SearchProps) => {
           <SearchIcon />
         </div>
         <Autocomplete
+          autoHighlight={true}
           multiple={true}
           disabled={props.disabled}
           className="w-full h-12 bg-primary-light outline-0 active:outline-0 focus:outline-0 font-sans"
@@ -103,18 +73,22 @@ export const SearchBar = (props: SearchProps) => {
             setOpen(false);
           }}
           filterSelectedOptions
-          getOptionLabel={(option) => option.title}
+          getOptionLabel={(option) => searchQueryLabel(option)}
           options={options}
-          loading={loading}
+          filterOptions={(options) => options}
           value={props.value}
           // When a new option is selected, find the new selected option by getting the
           // difference between the current and new value, then return that to the parent
           // component using selectSearchValue prop
-          onChange={(event: any, newValue: Film[] | undefined, reason) => {
+          onChange={(
+            event: any,
+            newValue: SearchQuery[] | undefined,
+            reason,
+          ) => {
             if (reason === 'removeOption') {
               return;
             }
-            let difference: Film[];
+            let difference: SearchQuery[];
             if (props.value !== undefined) {
               if (newValue !== undefined) {
                 // @ts-ignore
@@ -151,14 +125,34 @@ export const SearchBar = (props: SearchProps) => {
             </div>
           )}
           renderOption={(props, option, { selected }) => (
-            <li {...props} className="bg-white/25 my-4 mx-8 font-sans">
+            <li
+              {...props}
+              className="bg-white/25 active:bg-white/50 focus:bg-white/50 hover:bg-white/50 my-4 mx-8 font-sans"
+            >
               <Box className="text-lg text-gray-600 pl-5 py-5">
-                {option.title}
+                {searchQueryLabel(option)}
                 <br />
-                <span className="text-base text-gray-600">{option.year}</span>
+                <span className="text-base text-gray-600">
+                  {option.sectionNumber}
+                </span>
               </Box>
             </li>
           )}
+          isOptionEqualToValue={(option, value) => {
+            if (option.prefix !== value.prefix) {
+              return false;
+            }
+            if (option.professorName !== value.professorName) {
+              return false;
+            }
+            if (option.number !== value.number) {
+              return false;
+            }
+            if (option.sectionNumber !== value.sectionNumber) {
+              return false;
+            }
+            return true;
+          }}
           PopperComponent={(props) => {
             return (
               <Popper {...props} className="rounded-none" placement="bottom" />
@@ -182,3 +176,20 @@ export const SearchBar = (props: SearchProps) => {
 SearchBar.defaultProps = {
   disabled: true,
 };
+
+function searchQueryLabel(query: SearchQuery): string {
+  let result = '';
+  if (query.prefix !== undefined) {
+    result += query.prefix;
+  }
+  if (query.number !== undefined) {
+    result += ' ' + query.number;
+  }
+  if (query.professorName !== undefined) {
+    result += ' ' + query.professorName;
+  }
+  if (query.sectionNumber !== undefined) {
+    result += ' ' + query.sectionNumber;
+  }
+  return result.trim();
+}

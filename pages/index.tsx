@@ -1,31 +1,45 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import Card from '@mui/material/Card';
 import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
 import { WaveSVG } from '../components/icons/Wave/waveSVG';
 import { Wave2SVG } from '../components/icons/Wave2/wave2SVG';
 import { LogoIcon } from '../components/icons/LogoIcon/logoIcon';
 import { useState } from 'react';
-import styles from '../styles/Home.module.css';
 
-interface Film {
-  title: string;
-  year: number;
-}
+type SearchQuery = {
+  prefix?: string;
+  number?: string;
+  professorName?: string;
+  sectionNumber?: string;
+};
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
 const Home: NextPage = () => {
-  const [value, setValue] = useState<Film[] | undefined>([]);
+  const [value, setValue] = useState<SearchQuery[]>([]);
 
-  function searchOptionChosen(chosenOption: any) {
+  const router = useRouter();
+  function searchOptionChosen(chosenOption: SearchQuery) {
     console.log('The option chosen was: ', chosenOption);
+    router.push(
+      {
+        pathname: '/dashboard',
+        query: { searchTerms: searchTermURIString(chosenOption) },
+      },
+      '/dashboard',
+    );
   }
 
   return (
     <>
       <Head>
-        <link rel="canonical" href="https://trends.utdnebula.com" key="canonical" />
+        <link
+          rel="canonical"
+          href="https://trends.utdnebula.com"
+          key="canonical"
+        />
         <meta property="og:url" content="https://trends.utdnebula.com" />
       </Head>
       <div className="w-full justify-center items-center bg-gradient-to-b from-primary to-light text-primary-darker ">
@@ -63,5 +77,22 @@ const Home: NextPage = () => {
     </>
   );
 };
+
+function searchTermURIString(query: SearchQuery): string {
+  let result = '';
+  if (query.prefix !== undefined) {
+    result += query.prefix;
+  }
+  if (query.number !== undefined) {
+    result += ' ' + query.number;
+  }
+  if (query.sectionNumber !== undefined) {
+    result += '.' + query.sectionNumber;
+  }
+  if (query.professorName !== undefined) {
+    result += ' ' + query.professorName;
+  }
+  return result.trim();
+}
 
 export default Home;

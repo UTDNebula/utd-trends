@@ -5,32 +5,58 @@ import { CardContent } from '@mui/material';
 import { SearchBar } from '../SearchBar/searchBar';
 import React from 'react';
 
-interface Film {
-  title: string;
-  year: number;
-}
+type SearchQuery = {
+  prefix?: string;
+  number?: string;
+  professorName?: string;
+  sectionNumber?: string;
+};
+
+type ExpandableSearchGridProps = {
+  onChange: Function;
+  startingData: SearchQuery[];
+};
 
 /**
  * This component returns a bar that will allow users to add and remove search terms (up to 3 max)
  * using the SearchBar component. The currently selected search terms are represented by
  * SearchTermCard components, and are displayed from left to right in this grid.
  */
-export const ExpandableSearchGrid = () => {
-  const [value, setValue] = useState<Film[] | undefined>([]);
-  const [searchTerms, setSearchTerms] = useState<Film[]>([]);
+export const ExpandableSearchGrid = ({
+  onChange,
+  startingData,
+}: ExpandableSearchGridProps) => {
+  const [value, setValue] = useState<SearchQuery[]>([]);
+  const [searchTerms, setSearchTerms] = useState<SearchQuery[]>([]);
   const [searchDisabled, setSearchDisable] = useState<boolean>(false);
 
-  function addSearchTerm(newSearchTerm: Film) {
+  useEffect(() => {
+    onChange(searchTerms);
+  }, [onChange, searchTerms]);
+
+  useEffect(() => {
+    setSearchTerms(startingData);
+  }, [startingData]);
+
+  function addSearchTerm(newSearchTerm: SearchQuery) {
     if (newSearchTerm != null) {
       console.log('adding ' + newSearchTerm + ' to the search terms.');
       setSearchTerms([...searchTerms, newSearchTerm]);
     }
   }
 
-  function deleteSearchTerm(searchTerm: string) {
-    console.log('deleteSearchTerm called on ' + searchTerm);
-    setSearchTerms(searchTerms.filter((item) => item.title !== searchTerm));
-    setValue(value?.filter((item) => item.title !== searchTerm));
+  function deleteSearchTerm(searchTermIndex: number) {
+    console.log('deleteSearchTerm called on ' + searchTermIndex);
+    setSearchTerms(
+      searchTerms
+        .slice(0, searchTermIndex)
+        .concat(searchTerms.slice(searchTermIndex + 1)),
+    );
+    setValue(
+      value
+        ?.slice(0, searchTermIndex)
+        .concat(searchTerms.slice(searchTermIndex + 1)),
+    );
   }
 
   useEffect(() => {
@@ -43,11 +69,11 @@ export const ExpandableSearchGrid = () => {
 
   return (
     <div className="w-full min-h-[72px] grid grid-flow-row auto-cols-fr md:grid-flow-col justify-center">
-      {searchTerms.map((option: Film, index: number) => (
+      {searchTerms.map((option: SearchQuery, index: number) => (
         <SearchTermCard
-          primaryText={option.title}
-          secondaryText={'' + option.year}
-          key={option.title}
+          primaryText={searchQueryLabel(option)}
+          secondaryText={''}
+          key={index}
           index={index}
           legendColor={colors[index]}
           onCloseButtonClicked={deleteSearchTerm}
@@ -80,4 +106,21 @@ export const ExpandableSearchGrid = () => {
   );
 };
 
-const colors = ['#ffadad', '#9bf6ff', '#caffbf'];
+function searchQueryLabel(query: SearchQuery): string {
+  let result = '';
+  if (query.prefix !== undefined) {
+    result += query.prefix;
+  }
+  if (query.number !== undefined) {
+    result += ' ' + query.number;
+  }
+  if (query.professorName !== undefined) {
+    result += ' ' + query.professorName;
+  }
+  if (query.sectionNumber !== undefined) {
+    result += ' ' + query.sectionNumber;
+  }
+  return result.trim();
+}
+
+const colors = ['#eb5757', '#2d9cdb', '#499F68'];

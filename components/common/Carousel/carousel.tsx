@@ -1,11 +1,11 @@
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
 import React, { FC, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import {TabNavMenu} from "../../navigation/tabNavMenu/tabNavMenu";
+import { TabNavMenu } from '../../navigation/tabNavMenu/tabNavMenu';
 
 interface CarouselProps {
   children: ReactJSXElement[];
-};
+}
 
 /**
  * Variants represent the different keyframes that the children are in during the animation
@@ -55,7 +55,7 @@ export const Carousel: FC<CarouselProps> = (props: CarouselProps) => {
 
   return (
     <>
-      <TabNavMenu value={currentCard} turner={turn}/>
+      <TabNavMenu value={currentCard} turner={turn} />
       <div
         className="relative p-2 pt-0 lg:p-10"
         style={{
