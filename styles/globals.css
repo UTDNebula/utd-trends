@@ -3,21 +3,25 @@
 @tailwind utilities;
 
 :root{
-  --lm-primary-light: '#4659A7',
-  --lm-primary-DEFAULT: '#7486CE',
-  --lm-primary-dark: '#BCC9FD',
-  
-  --lm-secondary-light: '#FBBB78',
-  --lm-secondary-DEFAULT: '#FFCF9D',
-  --lm-secondary-dark: '#FFE2C5',
+  --lm-primary-light: #BCC9FD;
+  --lm-primary-DEFAULT: #7486CE;
+  --lm-primary-dark: #4659A7;
 
-  --dm-primary-light: '#4659A7',
-  --dm-primary-DEFAULT: '#7486CE',
-  --dm-primary-dark: '#BCC9FD',
+  --lm-secondary-light: #FBBB78;
+  --lm-secondary-DEFAULT: #FFCF9D;
+  --lm-secondary-dark: #FFE2C5;
 
-  --dm-secondary-light: '#4BA6A0',
-  --dm-secondary-DEFAULT: '#69CCC6',
-  --dm-secondary-dark: '#A7EDE9',
+  --dm-primary-light: #4659A7;
+  --dm-primary-DEFAULT: #7486CE;
+  --dm-primary-dark: #BCC9FD;
+
+  --dm-secondary-light: #4BA6A0;
+  --dm-secondary-DEFAULT: #69CCC6;
+  --dm-secondary-dark: #A7EDE9;
+
+  --light: #F9F9FA;
+  --dark: #1F201F;
+  --surface: #858585;
 
 }
 

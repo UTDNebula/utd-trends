@@ -1,20 +1,42 @@
 module.exports = {
+  important:true,
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
+    screens: {
+
+      'short':{'raw': '(max-height: 200px)'},
+      'xs': '400px',
+      'sm': '640px',
+      // => @media (min-width: 640px) { ... }
+
+      'md': '768px',
+      // => @media (min-width: 768px) { ... }
+
+      'lg': '1024px',
+      // => @media (min-width: 1024px) { ... }
+
+      'xl': '1280px',
+      // => @media (min-width: 1280px) { ... }
+
+      '2xl': '1536px',
+      // => @media (min-width: 1536px) { ... }
+    },
     extend: {
       colors: {
         primary: {
-          light: '#6470F7',
-          DEFAULT: '#2F3FF4',
-          dark: '#0B1CD5',
+          light: '#BCC9FD',
+          DEFAULT: '#7486CE',
+          dark: '#4659A7',
+          darker: '#314287'
         },
         secondary: {
-          light: '#2FEEAB',
-          DEFAULT: '#11D08D',
-          dark: '#0C9766',
+          light: '#FFE2C5',
+          DEFAULT: '#FFCF9D',
+          dark: '#FBBB78',
+          darker: '#ffaf5c'
         },
         navigation: {
           DEFAULT: '#878FD6',
@@ -23,6 +45,7 @@ module.exports = {
         },
         light: '#F9F9FA',
         dark: '#1F201F',
+        surface: '#858585'
       },
       fontSize: {
         headline1: [
