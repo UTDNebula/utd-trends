@@ -6,6 +6,7 @@ import {
   InputLabel,
 } from '@mui/material';
 import type { NextPage } from 'next';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState, useEffect, useCallback } from 'react';
 import Carousel from '../../components/common/Carousel/carousel';
@@ -524,6 +525,17 @@ export const Dashboard: NextPage = () => {
 
   return (
     <>
+      <Head>
+        <link
+          rel="canonical"
+          href="https://trends.utdnebula.com/dashboard"
+          key="canonical"
+        />
+        <meta
+          property="og:url"
+          content="https://trends.utdnebula.com/dashboard"
+        />
+      </Head>
       <div className=" w-full bg-light h-full">
         <TopMenu />
         {searchBar}
