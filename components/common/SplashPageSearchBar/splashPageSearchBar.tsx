@@ -58,6 +58,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
           <SearchIcon />
         </div>
         <Autocomplete
+          autoHighlight={true}
           multiple={true}
           disabled={props.disabled}
           className="w-full h-12"
