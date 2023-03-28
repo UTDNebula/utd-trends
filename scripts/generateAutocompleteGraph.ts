@@ -192,10 +192,11 @@ nodeFetch
       return addSearchQueryCharacter(newNode, characters.slice(1), data);
     }
 
-    //Add node in format: (<prefix> <number> or <prefix><number>) (<professorLast> or <professorFirst> <professorLast>)
+    //Add node in format: <prefix>[<number>| <number>[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]]
     function addPrefixFirst(
       prefix: string,
       number: string,
+      sectionNumber: string,
       profFirst: string,
       profLast: string,
     ) {
@@ -205,40 +206,74 @@ nodeFetch
       const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
       const classNodeFirstChar = addSearchQueryCharacter(
         prefixSpaceNode,
-        number.toString()[0],
+        number[0],
       );
       if (!graph.hasEdge(prefixNode, classNodeFirstChar)) {
         graph.addEdge(prefixNode, classNodeFirstChar);
       }
       const classNode = addSearchQueryCharacter(
         classNodeFirstChar,
-        number.toString().slice(1),
+        number.slice(1),
         {
           prefix: prefix,
           number: number,
         },
       );
-      const classSpaceNode = addSearchQueryCharacter(classNode, ' ');
-
+      
+      //<prefix>[<number>| <number>[ <professorLast>|(<professorFirst> <professorLast>)]]
       const professorFirstNameNode = addSearchQueryCharacter(
-        classSpaceNode,
-        profFirst + ' ',
+        classNode,
+        ' ' + profFirst + ' ',
       );
       const professorLastNameFirstCharNode = addSearchQueryCharacter(
-        classSpaceNode,
-        profLast[0],
+        classNode,
+        ' ' + profLast[0],
       );
       if (
         !graph.hasEdge(professorFirstNameNode, professorLastNameFirstCharNode)
       ) {
         graph.addEdge(professorFirstNameNode, professorLastNameFirstCharNode);
       }
-      const professorLastNameNode = addSearchQueryCharacter(
+      addSearchQueryCharacter(
         professorLastNameFirstCharNode,
         profLast.slice(1),
         {
           prefix: prefix,
           number: number,
+          professorName: profFirst + ' ' + profLast,
+        },
+      );
+      
+      //<prefix>[<number>| <number>[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]]
+      const sectionNode = addSearchQueryCharacter(
+        classNode,
+        '.' + sectionNumber,
+        {
+          prefix: prefix,
+          number: number,
+          sectionNumber: sectionNumber,
+        },
+      );
+      const professorFirstNameNode1 = addSearchQueryCharacter(
+        sectionNode,
+        ' ' + profFirst + ' ',
+      );
+      const professorLastNameFirstCharNode1 = addSearchQueryCharacter(
+        sectionNode,
+        ' ' + profLast[0],
+      );
+      if (
+        !graph.hasEdge(professorFirstNameNode1, professorLastNameFirstCharNode1)
+      ) {
+        graph.addEdge(professorFirstNameNode1, professorLastNameFirstCharNode1);
+      }
+      addSearchQueryCharacter(
+        professorLastNameFirstCharNode1,
+        profLast.slice(1),
+        {
+          prefix: prefix,
+          number: number,
+          sectionNumber: sectionNumber,
           professorName: profFirst + ' ' + profLast,
         },
       );
@@ -248,6 +283,7 @@ nodeFetch
     function addProfFirst(
       prefix: string,
       number: string,
+      sectionNumber: string,
       profFirst: string,
       profLast: string,
     ) {
@@ -280,40 +316,55 @@ nodeFetch
       const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
       const classNodeFirstChar = addSearchQueryCharacter(
         prefixSpaceNode,
-        number.toString()[0],
+        number[0],
       );
       if (!graph.hasEdge(prefixNode, classNodeFirstChar)) {
         graph.addEdge(prefixNode, classNodeFirstChar);
       }
       const classNode = addSearchQueryCharacter(
         classNodeFirstChar,
-        number.toString().slice(1),
+        number.slice(1),
         {
           prefix: prefix,
           number: number,
           professorName: profFirst + ' ' + profLast,
         },
       );
+      
+      addSearchQueryCharacter(
+        classNode,
+        '.' + sectionNumber,
+        {
+          prefix: prefix,
+          number: number,
+          sectionNumber: sectionNumber,
+          professorName: profFirst + ' ' + profLast,
+        },
+      );
     }
 
-    for (let i = 0; i < prefixList.length; i++) {
-      //console.log(myPrefixes[i].value);
-      for (let j = 0; j < prefixList[i].classes.length; j++) {
-        //console.log(myPrefixes[i].classes[j].number);
-        for (let k = 0; k < prefixList[i].classes[j].professors.length; k++) {
-          //console.log(myPrefixes[i].classes[j].professors[k].firstName + myPrefixes[i].classes[j].professors[k].lastName);
-          addPrefixFirst(
-            prefixList[i].value,
-            prefixList[i].classes[j].number,
-            prefixList[i].classes[j].professors[k].firstName,
-            prefixList[i].classes[j].professors[k].lastName,
-          );
-          addProfFirst(
-            prefixList[i].value,
-            prefixList[i].classes[j].number,
-            prefixList[i].classes[j].professors[k].firstName,
-            prefixList[i].classes[j].professors[k].lastName,
-          );
+    for (let prefixItr = 0; prefixItr < prefixList.length; prefixItr++) {
+      //console.log(myPrefixes[prefixItr].value);
+      for (let classItr = 0; classItr < prefixList[prefixItr].classes.length; classItr++) {
+        for (let sectionItr = 0; sectionItr < prefixList[prefixItr].classes[classItr].sections.length; sectionItr++) {
+          //console.log(myPrefixes[prefixItr].classes[classItr].number);
+          for (let professorItr = 0; professorItr < prefixList[prefixItr].classes[classItr].sections[sectionItr].professors.length; professorItr++) {
+            //console.log(myPrefixes[prefixItr].classes[classItr].professors[professorItr].firstName + myPrefixes[prefixItr].classes[classItr].professors[professorItr].lastName);
+            addPrefixFirst(
+              prefixList[prefixItr].value,
+              prefixList[prefixItr].classes[classItr].number,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr].section_number,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr].professors[professorItr].firstName,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr].professors[professorItr].lastName,
+            );
+            addProfFirst(
+              prefixList[prefixItr].value,
+              prefixList[prefixItr].classes[classItr].number,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr].section_number,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr].professors[professorItr].firstName,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr].professors[professorItr].lastName,
+            );
+          }
         }
       }
     }
@@ -323,9 +374,5 @@ nodeFetch
       JSON.stringify(graph.export()),
     );
 
-    console.log(
-      `Generated a ${
-        process.env.VERCEL_ENV === 'production' ? 'crawlable' : 'non-crawlable'
-      } public/robots.txt`,
-    );
+    console.log('Autocomplete graph generation done.');
   });

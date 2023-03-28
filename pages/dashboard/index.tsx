@@ -155,8 +155,7 @@ export const Dashboard: NextPage = () => {
                   String(searchTerm[key as keyof SearchQuery]),
                 ),
             )
-            .join('&') +
-          '&representation=semester';
+            .join('&');
         if (process.env.NODE_ENV !== 'development') {
           const getItem = localStorage.getItem(url);
           if (getItem !== null) {
