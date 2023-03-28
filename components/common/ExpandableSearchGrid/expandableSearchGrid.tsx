@@ -115,7 +115,7 @@ function studentTotalFormatter(total: number) {
   if (total === -1) {
     return 'Loading...';
   }
-  return total + ' students';
+  return total.toLocaleString("en-US") + ' students';
 }
 
 function searchQueryLabel(query: SearchQuery): string {
