@@ -6,8 +6,8 @@ import GraphProps from '../../../modules/GraphProps';
 import React from 'react';
 
 /**
- * Creates a pre-configured ApexCharts vertical bar graph component. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`. This component also gets returned from a BarGraph component on a large screen. 
- * @param props 
+ * Creates a pre-configured ApexCharts vertical bar graph component. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`. This component also gets returned from a BarGraph component on a large screen.
+ * @param props
  * @returns vertical bar graph
  */
 export function VerticalBarGraph(props: GraphProps) {
@@ -28,6 +28,11 @@ export function VerticalBarGraph(props: GraphProps) {
     },
     xaxis: {
       categories: props.xaxisLabels,
+    },
+    yaxis: {
+      labels: {
+        formatter: props.yaxisFormatter,
+      },
     },
     colors: ['#eb5757', '#2d9cdb', '#499F68'],
     stroke: {

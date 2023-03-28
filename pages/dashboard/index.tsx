@@ -292,8 +292,8 @@ export const Dashboard: NextPage = () => {
           (accumulator, currentValue) => accumulator + currentValue,
           0,
         );
-        const normalized: number[] = datPoint.data.map((value) =>
-          round(value / total),
+        const normalized: number[] = datPoint.data.map(
+          (value) => round((value / total) * 10) * 10,
         );
         return {
           name: datPoint.name,
@@ -423,6 +423,7 @@ export const Dashboard: NextPage = () => {
                 'F',
                 'W',
               ]}
+              yaxisFormatter={(value) => value + '%'}
               series={dat}
             />
           </Card>
@@ -446,6 +447,7 @@ export const Dashboard: NextPage = () => {
                 'F',
                 'W',
               ]}
+              yaxisFormatter={(value) => value.toFixed(2)}
               series={GPAdat}
             />
           </Card>
@@ -455,6 +457,7 @@ export const Dashboard: NextPage = () => {
                 form="Bar"
                 title="GPA Averages"
                 xaxisLabels={['Average']}
+                yaxisFormatter={(value) => value.toFixed(2)}
                 series={averageDat}
               />
             </Card>
@@ -463,6 +466,7 @@ export const Dashboard: NextPage = () => {
                 form="Bar"
                 title="GPA Standard Deviations"
                 xaxisLabels={['Standard Deviation']}
+                yaxisFormatter={(value) => value.toFixed(2)}
                 series={stdevDat}
               />
             </Card>
