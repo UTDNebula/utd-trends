@@ -267,7 +267,7 @@ export const Dashboard: NextPage = () => {
         data: combined,
       };
     });
-    
+
     let newDat: datType[] = [];
     let newStudentTotals = [-1, -1, -1];
     for (let i = 0; i < partialGradesData.length; i++) {
@@ -285,7 +285,6 @@ export const Dashboard: NextPage = () => {
       };
     }
     setDat(newDat);
-    console.log(newStudentTotals);
     setStudentTotals(newStudentTotals);
 
     let newGPADat: datType[] = [];
