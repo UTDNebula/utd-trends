@@ -86,13 +86,7 @@ export const Dashboard: NextPage = () => {
   const router = useRouter();
   const [gradesState, setGradesState] = useState('loading');
   const [professorRatingsState, setProfessorRatingsState] = useState('loading');
-
-  const [searchBar, setSearchBar] = useState(
-    <ExpandableSearchGrid
-      onChange={(result: SearchQuery[]) => console.log(result)}
-      startingData={[]}
-    />,
-  );
+  const [studentTotals, setStudentTotals] = useState([-1, -1, -1]);
 
   useEffect(() => {
     if (professorInvolvingSearchTerms.length > 0) {
@@ -249,18 +243,6 @@ export const Dashboard: NextPage = () => {
   }, []);
 
   useEffect(() => {
-    if (router.isReady) {
-      //console.log('search bar updated');
-      setSearchBar(
-        <ExpandableSearchGrid
-          onChange={searchTermsChange}
-          startingData={parseURIEncodedSearchTerms(router.query.searchTerms)}
-        />,
-      );
-    }
-  }, [router.isReady]);
-
-  useEffect(() => {
     const partialGradesData: datType[] = fullGradesData.map((datPoint) => {
       const combined = datPoint.data.reduce(
         (accumulator, academicSession) => {
@@ -283,21 +265,24 @@ export const Dashboard: NextPage = () => {
       };
     });
 
-    setDat(
-      partialGradesData.map((datPoint) => {
-        const total: number = datPoint.data.reduce(
-          (accumulator, currentValue) => accumulator + currentValue,
-          0,
-        );
-        const normalized: number[] = datPoint.data.map(
-          (value) => (value / total) * 100,
-        );
-        return {
-          name: datPoint.name,
-          data: normalized,
-        };
-      }),
-    );
+    let newDat: datType[] = [];
+    let newStudentTotals = [-1, -1, -1];
+    for (let i = 0; i < partialGradesData.length; i++) {
+      const total: number = partialGradesData[i].data.reduce(
+        (accumulator, currentValue) => accumulator + currentValue,
+        0,
+      );
+      newStudentTotals[i] = total;
+      const normalized: number[] = partialGradesData[i].data.map(
+        (value) => (value / total) * 100,
+      );
+      newDat[i] = {
+        name: partialGradesData[i].name,
+        data: normalized,
+      };
+    }
+    setDat(newDat);
+    setStudentTotals(newStudentTotals);
 
     let newGPADat: datType[] = [];
     let newAverageDat: datType[] = [];
@@ -523,7 +508,10 @@ export const Dashboard: NextPage = () => {
       </Head>
       <div className=" w-full bg-light h-full">
         <TopMenu />
-        {searchBar}
+        <ExpandableSearchGrid
+          onChange={searchTermsChange}
+          studentTotals={studentTotals}
+        />
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">
             <Carousel>
@@ -556,77 +544,6 @@ function searchTermURIString(query: SearchQuery): string {
     result += ' ' + query.professorName;
   }
   return result.trim();
-}
-
-function parseURIEncodedSearchTerms(
-  encodedSearchTerms: string | string[] | undefined,
-): SearchQuery[] {
-  if (encodedSearchTerms === undefined) {
-    return [];
-  } else if (typeof encodedSearchTerms === 'string') {
-    return encodedSearchTerms
-      .split(',')
-      .map((term) => parseURIEncodedSearchTerm(term));
-  } else {
-    return encodedSearchTerms.map((term) => parseURIEncodedSearchTerm(term));
-  }
-}
-
-function parseURIEncodedSearchTerm(encodedSearchTerm: string): SearchQuery {
-  let encodedSearchTermParts = encodedSearchTerm.split(' ');
-  // Does it start with prefix
-  if (/^([A-Z]{2,4})$/.test(encodedSearchTermParts[0])) {
-    // If it is just the prefix, return that
-    if (encodedSearchTermParts.length == 1) {
-      return { prefix: encodedSearchTermParts[0] };
-    }
-    // Is the second part a course number only
-    if (/^([0-9A-Z]{4})$/.test(encodedSearchTermParts[1])) {
-      if (encodedSearchTermParts.length == 2) {
-        return {
-          prefix: encodedSearchTermParts[0],
-          number: encodedSearchTermParts[1],
-        };
-      } else {
-        return {
-          prefix: encodedSearchTermParts[0],
-          number: encodedSearchTermParts[1],
-          professorName:
-            encodedSearchTermParts[2] + ' ' + encodedSearchTermParts[3],
-        };
-      }
-    }
-    // Is the second part a course number and section
-    else if (/^([0-9A-Z]{4}\.[0-9A-Z]{3})$/.test(encodedSearchTermParts[1])) {
-      let courseNumberAndSection: string[] =
-        encodedSearchTermParts[1].split('.');
-      if (encodedSearchTermParts.length == 2) {
-        return {
-          prefix: encodedSearchTermParts[0],
-          number: courseNumberAndSection[0],
-          sectionNumber: courseNumberAndSection[1],
-        };
-      } else {
-        return {
-          prefix: encodedSearchTermParts[0],
-          number: courseNumberAndSection[0],
-          sectionNumber: courseNumberAndSection[1],
-          professorName:
-            encodedSearchTermParts[2] + ' ' + encodedSearchTermParts[3],
-        };
-      }
-    }
-    // the second part is the start of the name
-    else {
-      return {
-        prefix: encodedSearchTermParts[0],
-        professorName:
-          encodedSearchTermParts[1] + ' ' + encodedSearchTermParts[2],
-      };
-    }
-  } else {
-    return { professorName: encodedSearchTerm.trim() };
-  }
 }
 
 export default Dashboard;
