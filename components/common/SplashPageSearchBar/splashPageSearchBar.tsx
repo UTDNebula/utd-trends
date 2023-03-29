@@ -9,8 +9,6 @@ import { useEffect } from 'react';
  */
 type SearchProps = {
   selectSearchValue: Function;
-  value: SearchQuery[];
-  setValue: Function;
   disabled?: boolean;
 };
 
@@ -41,7 +39,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        setOptions(data.output.concat(props.value));
+        setOptions(data.output);
       })
       .catch((error) => {
         if (error instanceof DOMException) {
@@ -53,7 +51,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
     return () => {
       controller.abort();
     };
-  }, [props.value, inputValue]);
+  }, [inputValue]);
 
   useEffect(() => {
     if (!open) {
@@ -83,7 +81,6 @@ export const SplashPageSearchBar = (props: SearchProps) => {
           getOptionLabel={(option) => searchQueryLabel(option)}
           options={options}
           filterOptions={(options) => options}
-          value={props.value}
           // When a new option is selected, find the new selected option by getting the
           // difference between the current and new value, then return that to the parent
           // component using selectSearchValue prop
@@ -93,22 +90,12 @@ export const SplashPageSearchBar = (props: SearchProps) => {
             reason,
           ) => {
             let difference: SearchQuery[];
-            if (props.value !== undefined) {
-              if (newValue !== undefined) {
-                // @ts-ignore
-                difference = newValue.filter((x) => !props.value.includes(x));
-              } else {
-                difference = [];
-              }
+            if (newValue !== undefined) {
+              difference = newValue;
             } else {
-              if (newValue !== undefined) {
-                difference = newValue;
-              } else {
-                difference = [];
-              }
+              difference = [];
             }
             props.selectSearchValue(difference[0] ? difference[0] : null);
-            props.setValue(newValue);
           }}
           inputValue={inputValue}
           onInputChange={(event, newInputValue) => {
