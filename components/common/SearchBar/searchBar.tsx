@@ -129,7 +129,7 @@ export const SearchBar = (props: SearchProps) => {
               {...props}
               className="bg-white/25 active:bg-white/50 focus:bg-white/50 hover:bg-white/50 my-4 mx-8 font-sans"
             >
-              <Box className="text-lg text-gray-600 pl-5 py-5">
+              <Box className="cursor-pointer text-lg text-gray-600 pl-5 py-5">
                 {searchQueryLabel(option)}
                 <br />
                 <span className="text-base text-gray-600">
