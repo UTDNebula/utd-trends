@@ -18,6 +18,7 @@ export function BarGraph(props: GraphProps) {
     return (
       <VerticalBarGraph
         xaxisLabels={props.xaxisLabels}
+        yaxisFormatter={props.yaxisFormatter}
         series={props.series}
         title={props.title}
       />
@@ -26,6 +27,7 @@ export function BarGraph(props: GraphProps) {
   return (
     <HorizontalBarGraph
       xaxisLabels={props.xaxisLabels}
+      yaxisFormatter={props.yaxisFormatter}
       series={props.series}
       title={props.title}
     />

@@ -29,6 +29,11 @@ export function HorizontalBarGraph(props: GraphProps) {
     xaxis: {
       categories: props.xaxisLabels,
     },
+    yaxis: {
+      labels: {
+        formatter: props.yaxisFormatter,
+      },
+    },
     colors: ['#eb5757', '#2d9cdb', '#499F68'],
     stroke: {
       width: 2,

@@ -83,9 +83,6 @@ export const Dashboard: NextPage = () => {
   const [startingSession, setStartingSession] = useState<number>(0);
   const [endingSession, setEndingSession] = useState<number>(9999);
 
-  function round(val: number) {
-    return Math.round((val + Number.EPSILON) * 100) / 100;
-  }
   const router = useRouter();
   const [gradesState, setGradesState] = useState('loading');
   const [professorRatingsState, setProfessorRatingsState] = useState('loading');
@@ -292,8 +289,8 @@ export const Dashboard: NextPage = () => {
           (accumulator, currentValue) => accumulator + currentValue,
           0,
         );
-        const normalized: number[] = datPoint.data.map((value) =>
-          round(value / total),
+        const normalized: number[] = datPoint.data.map(
+          (value) => (value / total) * 100,
         );
         return {
           name: datPoint.name,
@@ -321,7 +318,7 @@ export const Dashboard: NextPage = () => {
         GPAGrades.length;
       newAverageDat.push({
         name: partialGradesData[i].name,
-        data: [round(mean)],
+        data: [mean],
       });
       const stdev = Math.sqrt(
         GPAGrades.reduce((partialSum, a) => partialSum + (a - mean) ** 2, 0) /
@@ -329,7 +326,7 @@ export const Dashboard: NextPage = () => {
       );
       newStdevDat.push({
         name: partialGradesData[i].name,
-        data: [round(stdev)],
+        data: [stdev],
       });
     }
     setGPADat(newGPADat);
@@ -423,6 +420,7 @@ export const Dashboard: NextPage = () => {
                 'F',
                 'W',
               ]}
+              yaxisFormatter={(value) => value.toFixed(0) + '%'}
               series={dat}
             />
           </Card>
@@ -430,22 +428,7 @@ export const Dashboard: NextPage = () => {
             <GraphChoice
               form="BoxWhisker"
               title="GPA Box and Whisker"
-              xaxisLabels={[
-                'A+',
-                'A',
-                'A-',
-                'B+',
-                'B',
-                'B-',
-                'C+',
-                'C',
-                'C-',
-                'D+',
-                'D',
-                'D-',
-                'F',
-                'W',
-              ]}
+              yaxisFormatter={(value) => value.toFixed(2)}
               series={GPAdat}
             />
           </Card>
@@ -455,6 +438,7 @@ export const Dashboard: NextPage = () => {
                 form="Vertical"
                 title="GPA Averages"
                 xaxisLabels={['Average']}
+                yaxisFormatter={(value) => value.toFixed(2)}
                 series={averageDat}
               />
             </Card>
@@ -463,6 +447,7 @@ export const Dashboard: NextPage = () => {
                 form="Vertical"
                 title="GPA Standard Deviations"
                 xaxisLabels={['Standard Deviation']}
+                yaxisFormatter={(value) => value.toFixed(2)}
                 series={stdevDat}
               />
             </Card>
