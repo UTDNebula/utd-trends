@@ -37,15 +37,25 @@ export const SearchBar = (props: SearchProps) => {
   const [inputValue, setInputValue] = React.useState('');
 
   useEffect(() => {
-    fetch('/api/autocomplete?input=' + inputValue, { method: 'GET' })
+    const controller = new AbortController();
+    fetch('/api/autocomplete?input=' + inputValue, {
+      signal: controller.signal,
+      method: 'GET',
+    })
       .then((response) => response.json())
       .then((data) => {
         setOptions(data.output.concat(props.value));
       })
       .catch((error) => {
-        console.log(error);
+        if (error instanceof DOMException) {
+          // ignore aborts
+        } else {
+          console.log(error);
+        }
       });
-    // setOptions(searchAutocomplete(inputValue).concat(props.value));
+    return () => {
+      controller.abort();
+    };
   }, [props.value, inputValue]);
 
   useEffect(() => {
