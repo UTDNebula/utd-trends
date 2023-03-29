@@ -18,8 +18,6 @@ type SearchQuery = {
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
 const Home: NextPage = () => {
-  const [value, setValue] = useState<SearchQuery[]>([]);
-
   const router = useRouter();
   function searchOptionChosen(chosenOption: SearchQuery) {
     console.log('The option chosen was: ', chosenOption);
@@ -55,8 +53,6 @@ const Home: NextPage = () => {
               <div className="bottom-0 absolute text-dark w-full h-1/4 m-auto pb-12 mt-4 mb-4">
                 <SplashPageSearchBar
                   selectSearchValue={searchOptionChosen}
-                  value={value}
-                  setValue={setValue}
                   disabled={false}
                 />
               </div>

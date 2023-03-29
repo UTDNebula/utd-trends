@@ -9,8 +9,6 @@ import { useEffect } from 'react';
  */
 type SearchProps = {
   selectSearchValue: Function;
-  value: SearchQuery[];
-  setValue: Function;
   disabled?: boolean;
 };
 
@@ -34,16 +32,26 @@ export const SplashPageSearchBar = (props: SearchProps) => {
   const [inputValue, setInputValue] = React.useState('');
 
   useEffect(() => {
-    fetch('/api/autocomplete?input=' + inputValue, { method: 'GET' })
+    const controller = new AbortController();
+    fetch('/api/autocomplete?input=' + inputValue, {
+      signal: controller.signal,
+      method: 'GET',
+    })
       .then((response) => response.json())
       .then((data) => {
-        setOptions(data.output.concat(props.value));
+        setOptions(data.output);
       })
       .catch((error) => {
-        console.log(error);
+        if (error instanceof DOMException) {
+          // ignore aborts
+        } else {
+          console.log(error);
+        }
       });
-    // setOptions(searchAutocomplete(inputValue).concat(props.value));
-  }, [props.value, inputValue]);
+    return () => {
+      controller.abort();
+    };
+  }, [inputValue]);
 
   useEffect(() => {
     if (!open) {
@@ -58,6 +66,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
           <SearchIcon />
         </div>
         <Autocomplete
+          autoHighlight={true}
           multiple={true}
           disabled={props.disabled}
           className="w-full h-12"
@@ -72,7 +81,6 @@ export const SplashPageSearchBar = (props: SearchProps) => {
           getOptionLabel={(option) => searchQueryLabel(option)}
           options={options}
           filterOptions={(options) => options}
-          value={props.value}
           // When a new option is selected, find the new selected option by getting the
           // difference between the current and new value, then return that to the parent
           // component using selectSearchValue prop
@@ -82,22 +90,12 @@ export const SplashPageSearchBar = (props: SearchProps) => {
             reason,
           ) => {
             let difference: SearchQuery[];
-            if (props.value !== undefined) {
-              if (newValue !== undefined) {
-                // @ts-ignore
-                difference = newValue.filter((x) => !props.value.includes(x));
-              } else {
-                difference = [];
-              }
+            if (newValue !== undefined) {
+              difference = newValue;
             } else {
-              if (newValue !== undefined) {
-                difference = newValue;
-              } else {
-                difference = [];
-              }
+              difference = [];
             }
             props.selectSearchValue(difference[0] ? difference[0] : null);
-            props.setValue(newValue);
           }}
           inputValue={inputValue}
           onInputChange={(event, newInputValue) => {

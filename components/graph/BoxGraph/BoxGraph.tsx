@@ -62,6 +62,11 @@ export function BoxGraph(props: GraphProps) {
     xaxis: {
       categories: props.xaxisLabels,
     },
+    yaxis: {
+      labels: {
+        formatter: props.yaxisFormatter,
+      },
+    },
     stroke: {
       width: 2,
       curve: 'smooth',

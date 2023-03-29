@@ -20,7 +20,7 @@ export function HorizontalBarGraph(props: GraphProps) {
     },
     plotOptions: {
       bar: {
-        horizontal: false,
+        horizontal: true,
       },
     },
     dataLabels: {
@@ -28,6 +28,11 @@ export function HorizontalBarGraph(props: GraphProps) {
     },
     xaxis: {
       categories: props.xaxisLabels,
+    },
+    yaxis: {
+      labels: {
+        formatter: props.yaxisFormatter,
+      },
     },
     colors: ['#eb5757', '#2d9cdb', '#499F68'],
     stroke: {

@@ -3,11 +3,11 @@ import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import GraphProps from '../../../modules/GraphProps';
-import React from "react";
+import React from 'react';
 
 /**
- * Creates a pre-configured ApexCharts line graph component. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`. 
- * @param props 
+ * Creates a pre-configured ApexCharts line graph component. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`.
+ * @param props
  * @returns line graph
  */
 export function LineGraph(props: GraphProps) {
@@ -28,6 +28,11 @@ export function LineGraph(props: GraphProps) {
     },
     xaxis: {
       categories: props.xaxisLabels,
+    },
+    yaxis: {
+      labels: {
+        formatter: props.yaxisFormatter,
+      },
     },
     colors: ['#eb5757', '#2d9cdb', '#499F68'],
     stroke: {

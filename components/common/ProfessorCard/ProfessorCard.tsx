@@ -1,4 +1,6 @@
 import React, { FC } from 'react';
+import Card from '@mui/material/Card';
+import { Box, Typography } from '@mui/material';
 import CardContents from './CardContents';
 import { Property } from 'csstype';
 
@@ -26,18 +28,18 @@ export const ProfessorCard: FC<ProfessorCardProps> = (
     case 'Background': {
       return (
         <>
-          <div
-            style={{
+          <Box
+            sx={{
               position: 'relative',
               top: '90px',
               left: '200px',
               height: '50px',
               backgroundColor: '#ffffff',
             }}
-          ></div>
+          ></Box>
 
-          <div
-            style={{
+          <Box
+            sx={{
               display: 'flex',
               position: props.position,
               top: props.top,
@@ -47,14 +49,14 @@ export const ProfessorCard: FC<ProfessorCardProps> = (
               backgroundColor: '#BCC9FD',
               boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
             }}
-          ></div>
+          ></Box>
         </>
       );
     }
     case 'Title': {
       return (
-        <div
-          style={{
+        <Box
+          sx={{
             position: props.position,
             top: props.top,
             left: props.left,
@@ -62,8 +64,8 @@ export const ProfessorCard: FC<ProfessorCardProps> = (
             fontSize: props.fontSize,
           }}
         >
-          <h1>{props.text}</h1>
-        </div>
+          <Typography>{props.text}</Typography>
+        </Box>
       );
     }
     case 'Card':

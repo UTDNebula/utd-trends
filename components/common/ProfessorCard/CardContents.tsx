@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Box } from '@mui/material';
+import {Box, Typography} from '@mui/material';
 
 interface CardContentProps {
   name: string;
@@ -13,61 +13,61 @@ interface CardContentProps {
 export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
   return (
     <>
-      <div className="flex flex-col md:flex-row w-full h-1/6">
-        <div className="basis-1/2 flex flex-row items-center justify-center border-b-2 md:border-b-0 md:border-r-2 border-neutral-400 bg-inherit p-2">
-          <h1 className="text-2xl text-center">{props.name}</h1>
-        </div>
-        <div className="basis-1/2 flex flex-row items-center justify-center border-b-2 md:border-b-0 border-neutral-400 bg-inherit p-2">
-          <h1 className="text-2xl text-center">
+      <Box className="flex flex-col md:flex-row w-full h-1/6">
+        <Box className="basis-1/2 flex flex-row items-center justify-center border-b-2 md:border-b-0 md:border-r-2 border-neutral-400 bg-inherit p-2">
+          <Typography className="text-2xl text-center">{props.name}</Typography>
+        </Box>
+        <Box className="basis-1/2 flex flex-row items-center justify-center border-b-2 md:border-b-0 border-neutral-400 bg-inherit p-2">
+          <Typography className="text-2xl text-center">
             Department of {props.department} at University of Texas at Dallas
-          </h1>
-        </div>
-      </div>
-      <div className="flex flex-col md:flex-row w-full h-4/6">
-        <div className="flex flex-col justify-between items-center border-b-2 md:border-b-0 md:border-r-2 border-neutral-400 bg-primary-light w-full">
-          <h2 className="text-3xl text-neutral-600 text-center font-semibold mt-4 lg:mb-8">
+          </Typography>
+        </Box>
+      </Box>
+      <Box className="flex flex-col md:flex-row w-full h-4/6">
+        <Box className="flex flex-col justify-between items-center border-b-2 md:border-b-0 md:border-r-2 border-neutral-400 bg-primary-light w-full">
+          <Typography className="text-3xl text-neutral-600 text-center font-semibold mt-4 lg:mb-8">
             Average Difficulty
-          </h2>
+          </Typography>
           <Box
             className="h-32 w-32 border-2 border-neutral-400 flex items-center justify-center my-4 md:mt-0 mb-8 text-5xl text-neutral-600 font-bold"
-            sx={{ backgroundColor: getColorForRating(props.averageDifficulty) }}
+            sx={{ backgroundColor: getColorForRating(5 - props.averageDifficulty) }}
           >
             {props.averageDifficulty}
           </Box>
-        </div>
-        <div className="flex flex-col justify-between items-center border-b-2 md:border-b-0 md:border-r-2 border-neutral-400 bg-primary-light w-full">
-          <h2 className="text-3xl text-neutral-600 text-center font-semibold mt-4 lg:mb-8">
+        </Box>
+        <Box className="flex flex-col justify-between items-center border-b-2 md:border-b-0 md:border-r-2 border-neutral-400 bg-primary-light w-full">
+          <Typography className="text-3xl text-neutral-600 text-center font-semibold mt-4 lg:mb-8">
             Average Rating
-          </h2>
+          </Typography>
           <Box
             className="h-32 w-32 border-2 border-neutral-400 flex items-center justify-center my-4 md:mt-0 md:mb-8 text-5xl text-neutral-600 font-bold"
             sx={{ backgroundColor: getColorForRating(props.professorRating) }}
           >
             {props.professorRating}
           </Box>
-        </div>
-        <div className="flex flex-col justify-between items-center border-b-2 md:border-b-0 border-neutral-400 bg-primary-light w-full">
-          <h2 className="text-3xl text-neutral-600 text-center font-semibold mt-4 lg:mb-8">
+        </Box>
+        <Box className="flex flex-col justify-between items-center border-b-2 md:border-b-0 border-neutral-400 bg-primary-light w-full">
+          <Typography className="text-3xl text-neutral-600 text-center font-semibold mt-4 lg:mb-8">
             Percentage Taking Again
-          </h2>
+          </Typography>
           <Box
             className="h-32 w-32 border-2 border-neutral-400 flex items-center justify-center my-4 md:mt-0 mb-8 text-5xl text-neutral-600 font-bold"
             sx={{
               backgroundColor: getColorForRating(
-                Math.ceil(props.takingAgain * (1 / 100.0)),
+                Math.ceil(props.takingAgain * (5 / 100.0)),
               ),
             }}
           >
             {Math.ceil(props.takingAgain)}%
           </Box>
-        </div>
-      </div>
-      <div className="flex flex-row justify-center md:justify-start w-full h-1/6">
-        <h2 className="text-2xl text-neutral-600 text-center md:text-left font-semibold ml-8 my-4">
+        </Box>
+      </Box>
+      <Box className="flex flex-row justify-center md:justify-start w-full h-1/6">
+        <Typography className="text-2xl text-neutral-600 text-center md:text-left font-semibold ml-8 my-4">
           Based on {props.numRatings} ratings
-        </h2>
-      </div>
-      {/*<div*/}
+        </Typography>
+      </Box>
+      {/*<Box*/}
       {/*  className=".profcard-container"*/}
       {/*  style={{*/}
       {/*    position: 'relative',*/}
@@ -77,7 +77,7 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       {/*    paddingBottom: '520px',*/}
       {/*  }}*/}
       {/*>*/}
-      {/*  <div*/}
+      {/*  <Box*/}
       {/*    style={{*/}
       {/*      position: 'absolute',*/}
       {/*      top: '120px',*/}
@@ -88,9 +88,9 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       {/*      backgroundColor: '#BCC9FD',*/}
       {/*      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',*/}
       {/*    }}*/}
-      {/*  ></div>*/}
-      {/*</div>*/}
-      {/*<div*/}
+      {/*  ></Box>*/}
+      {/*</Box>*/}
+      {/*<Box*/}
       {/*  style={{*/}
       {/*    position: 'relative',*/}
       {/*    top: '-510px',*/}
@@ -99,10 +99,10 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       {/*    fontSize: '45px',*/}
       {/*  }}*/}
       {/*>*/}
-      {/*  <h1>{props.name}</h1>*/}
-      {/*</div>*/}
+      {/*  <Typography>{props.name}</Typography>*/}
+      {/*</Box>*/}
 
-      {/*<div*/}
+      {/*<Box*/}
       {/*  style={{*/}
       {/*    position: 'relative',*/}
       {/*    top: '-610px',*/}
@@ -111,11 +111,11 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       {/*    fontSize: '24px',*/}
       {/*  }}*/}
       {/*>*/}
-      {/*  <h1>Department of {props.department}</h1>*/}
-      {/*  <h1>at The University of Texas at Dallas</h1>*/}
-      {/*</div>*/}
+      {/*  <Typography>Department of {props.department}</Typography>*/}
+      {/*  <Typography>at The University of Texas at Dallas</Typography>*/}
+      {/*</Box>*/}
 
-      {/*<div*/}
+      {/*<Box*/}
       {/*  style={{*/}
       {/*    position: 'relative',*/}
       {/*    width: '70px',*/}
@@ -125,9 +125,9 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       {/*    border: '2px solid #BDBDBD',*/}
       {/*    transform: 'rotate(-90deg)',*/}
       {/*  }}*/}
-      {/*></div>*/}
+      {/*></Box>*/}
 
-      {/*<div*/}
+      {/*<Box*/}
       {/*  style={{*/}
       {/*    position: 'relative',*/}
       {/*    width: '530px',*/}
@@ -137,9 +137,9 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       {/*    border: '2px solid #BDBDBD',*/}
       {/*    transform: 'rotate(-90deg)',*/}
       {/*  }}*/}
-      {/*></div>*/}
+      {/*></Box>*/}
 
-      {/*<div*/}
+      {/*<Box*/}
       {/*  style={{*/}
       {/*    position: 'relative',*/}
       {/*    width: '530px',*/}
@@ -149,10 +149,10 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       {/*    border: '2px solid #BDBDBD',*/}
       {/*    transform: 'rotate(-90deg)',*/}
       {/*  }}*/}
-      {/*></div>*/}
+      {/*></Box>*/}
 
       {/*/!*Average Difficulty*!/*/}
-      {/*<div*/}
+      {/*<Box*/}
       {/*  style={{*/}
       {/*    position: 'relative',*/}
       {/*    width: '530px',*/}
@@ -163,11 +163,11 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       {/*    color: 'gray',*/}
       {/*  }}*/}
       {/*>*/}
-      {/*  <h2> Average Difficulty </h2>*/}
-      {/*</div>*/}
+      {/*  <Typography> Average Difficulty </Typography>*/}
+      {/*</Box>*/}
 
       {/*/!*Average Rating*!/*/}
-      {/*<div*/}
+      {/*<Box*/}
       {/*  style={{*/}
       {/*    position: 'relative',*/}
       {/*    width: '530px',*/}
@@ -178,11 +178,11 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       {/*    color: 'gray',*/}
       {/*  }}*/}
       {/*>*/}
-      {/*  <h2> Rating </h2>*/}
-      {/*</div>*/}
+      {/*  <Typography> Rating </Typography>*/}
+      {/*</Box>*/}
 
       {/*/!*Percent Taking Again*!/*/}
-      {/*<div*/}
+      {/*<Box*/}
       {/*  style={{*/}
       {/*    position: 'relative',*/}
       {/*    width: '530px',*/}
@@ -193,12 +193,12 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       {/*    color: 'gray',*/}
       {/*  }}*/}
       {/*>*/}
-      {/*  <h2> Percent Taking Again </h2>*/}
-      {/*</div>*/}
+      {/*  <Typography> Percent Taking Again </Typography>*/}
+      {/*</Box>*/}
 
       {/*/!*Square 1*!/*/}
 
-      {/*<div*/}
+      {/*<Box*/}
       {/*  style={{*/}
       {/*    position: 'absolute',*/}
       {/*    width: '250px',*/}
@@ -208,11 +208,11 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       {/*    border: '4px solid #BDBDBD',*/}
       {/*    backgroundColor: props.colorCode[0],*/}
       {/*  }}*/}
-      {/*></div>*/}
+      {/*></Box>*/}
 
       {/*/!*Square 2*!/*/}
 
-      {/*<div*/}
+      {/*<Box*/}
       {/*  style={{*/}
       {/*    position: 'absolute',*/}
       {/*    width: '250px',*/}
@@ -222,11 +222,11 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       {/*    border: '4px solid #BDBDBD',*/}
       {/*    backgroundColor: props.colorCode[1],*/}
       {/*  }}*/}
-      {/*></div>*/}
+      {/*></Box>*/}
 
       {/*/!*Square 3*!/*/}
 
-      {/*<div*/}
+      {/*<Box*/}
       {/*  style={{*/}
       {/*    position: 'absolute',*/}
       {/*    width: '250px',*/}
@@ -236,10 +236,10 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       {/*    border: '4px solid #BDBDBD',*/}
       {/*    backgroundColor: props.colorCode[2],*/}
       {/*  }}*/}
-      {/*></div>*/}
+      {/*></Box>*/}
 
       {/*/!*Average difficulty Numbers*!/*/}
-      {/*<div*/}
+      {/*<Box*/}
       {/*  style={{*/}
       {/*    position: 'relative',*/}
       {/*    width: '530px',*/}
@@ -250,11 +250,11 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       {/*    color: 'black',*/}
       {/*  }}*/}
       {/*>*/}
-      {/*  <h2> 2.1 </h2>*/}
-      {/*</div>*/}
+      {/*  <Typography> 2.1 </Typography>*/}
+      {/*</Box>*/}
 
       {/*/!*Average Rating Number*!/*/}
-      {/*<div*/}
+      {/*<Box*/}
       {/*  style={{*/}
       {/*    position: 'relative',*/}
       {/*    width: '530px',*/}
@@ -265,11 +265,11 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       {/*    color: 'black',*/}
       {/*  }}*/}
       {/*>*/}
-      {/*  <h2> 4.2 </h2>*/}
-      {/*</div>*/}
+      {/*  <Typography> 4.2 </Typography>*/}
+      {/*</Box>*/}
 
       {/*/!*Percent Taking Again Numbers*!/*/}
-      {/*<div*/}
+      {/*<Box*/}
       {/*  style={{*/}
       {/*    position: 'relative',*/}
       {/*    width: '530px',*/}
@@ -280,8 +280,8 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       {/*    color: 'black',*/}
       {/*  }}*/}
       {/*>*/}
-      {/*  <h2> 80% </h2>*/}
-      {/*</div>*/}
+      {/*  <Typography> 80% </Typography>*/}
+      {/*</Box>*/}
     </>
   );
 };
@@ -289,9 +289,9 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
 function getColorForRating(rating: number): string {
   if (rating < 1.7) {
     return '#ec5353';
-  } else if (rating > 1.6 && rating < 2.7) {
+  } else if (rating >= 1.7 && rating < 2.7) {
     return '#ecb653';
-  } else if (rating > 2.6 && rating < 4) {
+  } else if (rating >= 2.7 && rating < 4) {
     return '#f4ee5a';
   } else {
     //if (rating > 3.9) {

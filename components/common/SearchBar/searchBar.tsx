@@ -37,15 +37,25 @@ export const SearchBar = (props: SearchProps) => {
   const [inputValue, setInputValue] = React.useState('');
 
   useEffect(() => {
-    fetch('/api/autocomplete?input=' + inputValue, { method: 'GET' })
+    const controller = new AbortController();
+    fetch('/api/autocomplete?input=' + inputValue, {
+      signal: controller.signal,
+      method: 'GET',
+    })
       .then((response) => response.json())
       .then((data) => {
-        setOptions(data.output.concat(props.value));
+        setOptions(data.output);
       })
       .catch((error) => {
-        console.log(error);
+        if (error instanceof DOMException) {
+          // ignore aborts
+        } else {
+          console.log(error);
+        }
       });
-    // setOptions(searchAutocomplete(inputValue).concat(props.value));
+    return () => {
+      controller.abort();
+    };
   }, [props.value, inputValue]);
 
   useEffect(() => {
@@ -129,7 +139,7 @@ export const SearchBar = (props: SearchProps) => {
               {...props}
               className="bg-white/25 active:bg-white/50 focus:bg-white/50 hover:bg-white/50 my-4 mx-8 font-sans"
             >
-              <Box className="text-lg text-gray-600 pl-5 py-5">
+              <Box className="cursor-pointer text-lg text-gray-600 pl-5 py-5">
                 {searchQueryLabel(option)}
                 <br />
                 <span className="text-base text-gray-600">
