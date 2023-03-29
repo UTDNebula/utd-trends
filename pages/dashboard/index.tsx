@@ -452,7 +452,7 @@ export const Dashboard: NextPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2">
             <Card className="h-96 p-4 m-4">
               <GraphChoice
-                form="Bar"
+                form="Vertical"
                 title="GPA Averages"
                 xaxisLabels={['Average']}
                 series={averageDat}
@@ -460,7 +460,7 @@ export const Dashboard: NextPage = () => {
             </Card>
             <Card className="h-96 p-4 m-4">
               <GraphChoice
-                form="Bar"
+                form="Vertical"
                 title="GPA Standard Deviations"
                 xaxisLabels={['Standard Deviation']}
                 series={stdevDat}

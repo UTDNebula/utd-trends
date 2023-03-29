@@ -20,7 +20,7 @@ export function HorizontalBarGraph(props: GraphProps) {
     },
     plotOptions: {
       bar: {
-        horizontal: false,
+        horizontal: true,
       },
     },
     dataLabels: {
