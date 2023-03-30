@@ -105,13 +105,13 @@ nodeFetch["default"]('https://catfact.ninja/fact', { method: 'GET' })
     });
     var numNodes = 0; //allows a unique name for each node
     var root = graph.addNode(numNodes++, {
-        character: '',
+        c: '',
         visited: false
     });
     // recursively add a string to the graph, character by character, returning the last node. Doesn't create duplicate nodes with the same character
     function addSearchQueryCharacter(node, characters, data) {
         characters = characters.toUpperCase();
-        var preExisting = graph.findOutNeighbor(node, function (neighbor, attributes) { return attributes.character === characters[0]; });
+        var preExisting = graph.findOutNeighbor(node, function (neighbor, attributes) { return attributes.c === characters[0]; });
         if (typeof preExisting === 'string') {
             if (characters.length <= 1) {
                 //console.log('found: ', characters[0], 'end');
@@ -123,11 +123,11 @@ nodeFetch["default"]('https://catfact.ninja/fact', { method: 'GET' })
         if (characters.length <= 1) {
             //console.log('new: ', characters[0], 'end');
             var newData = {
-                character: characters[0],
+                c: characters[0],
                 visited: false
             };
             if (typeof data !== 'undefined') {
-                newData.data = data;
+                newData.d = data;
             }
             var newNode_1 = graph.addNode(numNodes++, newData);
             graph.addEdge(node, newNode_1);
@@ -135,7 +135,7 @@ nodeFetch["default"]('https://catfact.ninja/fact', { method: 'GET' })
         }
         //console.log('new: ', characters[0]);
         var newNode = graph.addNode(numNodes++, {
-            character: characters[0],
+            c: characters[0],
             visited: false
         });
         graph.addEdge(node, newNode);
@@ -226,6 +226,63 @@ nodeFetch["default"]('https://catfact.ninja/fact', { method: 'GET' })
             }
         }
     }
+    /*reduces graph size by compressing chains of nodes each with only one child
+    to a single node with a character value of several characters. I couldn't get
+    this work with my bfs implemintation as the bfs needs to know the difference
+    between each character.
+    Requires readding an attribute to nodes representing their place as either a
+    prefix, number, or prof name. I called this depth: 0, 1, 2.
+    -Tyler
+    */
+    function checkForSingleChild(parent) {
+        if (graph.getNodeAttribute(parent, 'visited')) {
+            return;
+        }
+        //console.log(parent, graph.getNodeAttribute(parent, 'c'));
+        if (graph.outDegree(parent) > 1 || graph.hasNodeAttribute(parent, 'd')) {
+            if (graph.hasNodeAttribute(parent, 'd')) {
+                //console.log('  has data, children:', graph.outDegree(parent));
+            }
+            else {
+                //console.log('  has children:', graph.outDegree(parent));
+            }
+            graph.setNodeAttribute(parent, 'visited', true);
+            graph.forEachOutNeighbor(parent, function (child) {
+                //console.log('    child', graph.getNodeAttribute(parent, 'c'), graph.getNodeAttribute(child, 'c'))
+                checkForSingleChild(child);
+            });
+        }
+        else { //one child, no data
+            graph.forEachOutNeighbor(parent, function (singleChild, attributes) {
+                if (graph.inDegree(singleChild) > 1) {
+                    //skip, should already be called on
+                    //console.log('  child has parents', attributes.c);
+                    //checkForSingleChild(singleChild); //move on
+                }
+                else { //one child, no data, child has one parent
+                    //console.log('  single');
+                    graph.updateNodeAttribute(parent, 'c', function (n) { return n + attributes.c; });
+                    graph.forEachOutNeighbor(singleChild, function (grandchild) {
+                        graph.dropEdge(singleChild, grandchild);
+                        if (!graph.hasEdge(parent, grandchild) && parent !== grandchild) {
+                            graph.addEdge(parent, grandchild);
+                        }
+                    });
+                    graph.dropNode(singleChild);
+                    if (typeof attributes.d !== 'undefined') {
+                        graph.setNodeAttribute(parent, 'd', attributes.d);
+                        graph.setNodeAttribute(parent, 'visited', true);
+                        graph.forEachOutNeighbor(parent, function (child) { return checkForSingleChild(child); });
+                    }
+                    else {
+                        checkForSingleChild(parent);
+                    }
+                }
+            });
+        }
+    }
+    checkForSingleChild(root);
+    graph.forEachNode(function (node) { return graph.removeNodeAttribute(node, 'visited'); });
     fs.writeFileSync('data/autocomplete_graph.json', JSON.stringify(graph["export"]()));
     console.log('Autocomplete graph generation done.');
 });

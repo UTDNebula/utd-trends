@@ -16,9 +16,9 @@ type SearchQuery = {
 };
 
 type NodeAttributes = {
-  character: string;
-  data?: SearchQuery;
-  visited: boolean;
+  c: string;
+  d?: SearchQuery;
+  visited?: boolean;
 };
 
 type Prefix = {
@@ -147,7 +147,7 @@ nodeFetch
     });
     let numNodes = 0; //allows a unique name for each node
     const root = graph.addNode(numNodes++, {
-      character: '',
+      c: '',
       visited: false,
     });
 
@@ -160,7 +160,7 @@ nodeFetch
       characters = characters.toUpperCase();
       let preExisting = graph.findOutNeighbor(
         node,
-        (neighbor, attributes) => attributes.character === characters[0],
+        (neighbor, attributes) => attributes.c === characters[0],
       );
       if (typeof preExisting === 'string') {
         if (characters.length <= 1) {
@@ -173,11 +173,11 @@ nodeFetch
       if (characters.length <= 1) {
         //console.log('new: ', characters[0], 'end');
         let newData: NodeAttributes = {
-          character: characters[0],
+          c: characters[0],
           visited: false,
         };
         if (typeof data !== 'undefined') {
-          newData.data = data;
+          newData.d = data;
         }
         const newNode = graph.addNode(numNodes++, newData);
         graph.addEdge(node, newNode);
@@ -185,7 +185,7 @@ nodeFetch
       }
       //console.log('new: ', characters[0]);
       const newNode = graph.addNode(numNodes++, {
-        character: characters[0],
+        c: characters[0],
         visited: false,
       });
       graph.addEdge(node, newNode);
@@ -368,7 +368,62 @@ nodeFetch
         }
       }
     }
-
+    
+    /*reduces graph size by compressing chains of nodes each with only one child
+    to a single node with a character value of several characters. I couldn't get
+    this work with my bfs implemintation as the bfs needs to know the difference
+    between each character.
+    Requires readding an attribute to nodes representing their place as either a
+    prefix, number, or prof name. I called this depth: 0, 1, 2.
+    -Tyler
+    */
+    function checkForSingleChild(parent: string) {
+      if (graph.getNodeAttribute(parent, 'visited')) {
+        return;
+      }
+      //console.log(parent, graph.getNodeAttribute(parent, 'c'));
+      if (graph.outDegree(parent) > 1 || graph.hasNodeAttribute(parent, 'd')) {
+        if (graph.hasNodeAttribute(parent, 'd')) {
+          //console.log('  has data, children:', graph.outDegree(parent));
+        } else {
+          //console.log('  has children:', graph.outDegree(parent));
+        }
+        graph.setNodeAttribute(parent, 'visited', true);
+        graph.forEachOutNeighbor(parent, child => {
+          //console.log('    child', graph.getNodeAttribute(parent, 'c'), graph.getNodeAttribute(child, 'c'))
+          checkForSingleChild(child)
+        });
+      } else { //one child, no data
+        graph.forEachOutNeighbor(parent, (singleChild, attributes) => { //will only return once
+          if (graph.inDegree(singleChild) > 1) {
+            //skip, should already be called on
+            //console.log('  child has parents', attributes.c);
+            //checkForSingleChild(singleChild); //move on
+          } else { //one child, no data, child has one parent
+            //console.log('  single');
+            graph.updateNodeAttribute(parent, 'c', n => n + attributes.c);
+            graph.forEachOutNeighbor(singleChild, grandchild => {
+              graph.dropEdge(singleChild, grandchild);
+              if (!graph.hasEdge(parent, grandchild) && parent !== grandchild) {
+                graph.addEdge(parent, grandchild);
+              }
+            });
+            graph.dropNode(singleChild);
+            if (typeof attributes.d !== 'undefined') {
+              graph.setNodeAttribute(parent, 'd', attributes.d);
+              graph.setNodeAttribute(parent, 'visited', true);
+              graph.forEachOutNeighbor(parent, child => checkForSingleChild(child));
+            } else {
+              checkForSingleChild(parent);
+            }
+          }
+        });
+      }
+    }
+    checkForSingleChild(root);
+    
+    graph.forEachNode((node) => graph.removeNodeAttribute(node, 'visited'));
+    
     fs.writeFileSync(
       'data/autocomplete_graph.json',
       JSON.stringify(graph.export()),

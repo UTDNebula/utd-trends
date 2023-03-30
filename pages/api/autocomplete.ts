@@ -10,9 +10,9 @@ type SearchQuery = {
 };
 
 type NodeAttributes = {
-  character: string;
-  data?: SearchQuery;
-  visited: boolean;
+  c: string;
+  d?: SearchQuery;
+  visited?: boolean;
 };
 
 const graph: DirectedGraph<NodeAttributes> = new DirectedGraph({
@@ -20,26 +20,34 @@ const graph: DirectedGraph<NodeAttributes> = new DirectedGraph({
 });
 graph.import(autocompleteGraph as Object);
 const root = '0';
+graph.updateEachNodeAttributes((node, attr) => {
+  return {
+    ...attr,
+    visited: false,
+  };
+});
+
 type QueueItem = {
   node: string;
-  characters?: string;
+  characters: string;
   toNext: boolean;
 };
 
 function bfsRecursionToNextData(queue: QueueItem[]) {
   const queueItem = queue.shift();
-  //console.log(graph.getNodeAttribute(queueItem?.node, 'character'));
+  //console.log(graph.getNodeAttribute(queueItem?.node, 'c'));
   if (graph.getNodeAttribute(queueItem?.node, 'visited')) {
     return;
   }
   graph.setNodeAttribute(queueItem?.node, 'visited', true);
-  const data = graph.getNodeAttribute(queueItem?.node, 'data');
+  const data = graph.getNodeAttribute(queueItem?.node, 'd');
   if (typeof data !== 'undefined') {
     return data;
   } else {
     graph.forEachOutNeighbor(queueItem?.node, (neighbor) => {
       queue.push({
         node: neighbor,
+        characters: '',
         toNext: true,
       });
     });
@@ -49,35 +57,75 @@ function bfsRecursionToNextData(queue: QueueItem[]) {
 
 function bfsRecursion(queue: QueueItem[]) {
   const queueItem = queue.shift();
+  if (typeof queueItem === 'undefined') {
+    //satisfy typescript possibly undefined error
+    return;
+  }
+  
+  //results
+  let queueRecursion = false;
+  let queueToNext = false;
+  let returnData = false;
+  
+  //# of characters matched
+  const nodeCharacters = graph.getNodeAttribute(queueItem?.node, 'c');
+  let matches = 0;
+  while (matches < nodeCharacters.length && queueItem?.characters?.[0] === nodeCharacters[0]) {
+    matches++;
+  }
+  
   if (
-    queueItem?.characters?.[0] ===
-    graph.getNodeAttribute(queueItem?.node, 'character')
+    /*queueItem?.characters?.[0] ===
+    graph.getNodeAttribute(queueItem?.node, 'c')*/
+    nodeCharacters.length === matches ||
+    queueItem?.characters?.length === matches
   ) {
-    //match
+    //full match or end of characters to match but all matched
     //console.log('match: ', queueItem?.characters, queueItem?.characters?.length === 1);
-    if (queueItem?.characters?.length === 1) {
-      //last character
-      graph.forEachOutNeighbor(queueItem?.node, (neighbor) => {
-        //console.log('toNext: ', graph.getNodeAttribute(neighbor, 'character'));
-        queue.push({
-          node: neighbor,
-          toNext: true,
-        });
-      });
-      const data = graph.getNodeAttribute(queueItem?.node, 'data');
-      if (typeof data !== 'undefined') {
-        //has data
-        return data;
+    if (queueItem?.characters?.length <= nodeCharacters.length) {
+      //last characters
+      if (queueItem?.characters?.length == nodeCharacters.length) {
+        queueToNext = true;
       }
+      returnData = true;
     } else {
-      graph.forEachOutNeighbor(queueItem?.node, (neighbor) => {
-        //console.log('queue: ', graph.getNodeAttribute(neighbor, 'character'));
-        queue.push({
-          node: neighbor,
-          characters: queueItem?.characters?.slice(1),
-          toNext: false,
-        });
+      queueRecursion = true;
+    }
+  } else if (matches > 0 && queueItem?.characters?.length < nodeCharacters.length) {
+    //partial match
+    const data = graph.getNodeAttribute(queueItem?.node, 'd');
+    if (typeof data !== 'undefined') {
+      //has data
+      return data;
+    } else {
+      queueToNext = true;
+    }
+  }
+  if (queueRecursion) {
+    graph.forEachOutNeighbor(queueItem?.node, (neighbor) => {
+      //console.log('queue: ', graph.getNodeAttribute(neighbor, 'c'));
+      queue.push({
+        node: neighbor,
+        characters: queueItem?.characters?.slice(matches),
+        toNext: false,
       });
+    });
+  }
+  if (queueToNext) {
+    graph.forEachOutNeighbor(queueItem?.node, (neighbor) => {
+      //console.log('toNext: ', graph.getNodeAttribute(neighbor, 'c'));
+      queue.push({
+        node: neighbor,
+        characters: '',
+        toNext: true,
+      });
+    });
+  }
+  if (returnData) {
+    const data = graph.getNodeAttribute(queueItem?.node, 'd');
+    if (typeof data !== 'undefined') {
+      //has data
+      return data;
     }
   }
 }
@@ -101,7 +149,7 @@ export function searchAutocomplete(query: string) {
     });
   });
   let results: SearchQuery[] = [];
-  while (queue.length) {
+  while (queue.length && results.length < 20) {
     let response: bfsReturn;
     if (queue[0].toNext) {
       response = bfsRecursionToNextData(queue);
@@ -117,9 +165,12 @@ export function searchAutocomplete(query: string) {
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if ('input' in req.query && typeof req.query.input === 'string') {
-    res
-      .status(200)
-      .json({ success: true, output: searchAutocomplete(req.query.input) });
+    return new Promise<void>((resolve, reject) => {
+      res
+        .status(200)
+        .json({ success: true, output: searchAutocomplete(req.query.input as string) });
+      resolve();
+    });
   } else {
     res.status(400).json({ message: 'Incorrect query parameters' });
   }
