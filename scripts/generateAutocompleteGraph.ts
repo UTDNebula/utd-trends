@@ -219,7 +219,7 @@ nodeFetch
           number: number,
         },
       );
-      
+
       //<prefix>[<number>| <number>[ <professorLast>|(<professorFirst> <professorLast>)]]
       const professorFirstNameNode = addSearchQueryCharacter(
         classNode,
@@ -243,7 +243,7 @@ nodeFetch
           professorName: profFirst + ' ' + profLast,
         },
       );
-      
+
       //<prefix>[<number>| <number>[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]]
       const sectionNode = addSearchQueryCharacter(
         classNode,
@@ -330,45 +330,61 @@ nodeFetch
           professorName: profFirst + ' ' + profLast,
         },
       );
-      
-      addSearchQueryCharacter(
-        classNode,
-        '.' + sectionNumber,
-        {
-          prefix: prefix,
-          number: number,
-          sectionNumber: sectionNumber,
-          professorName: profFirst + ' ' + profLast,
-        },
-      );
+
+      addSearchQueryCharacter(classNode, '.' + sectionNumber, {
+        prefix: prefix,
+        number: number,
+        sectionNumber: sectionNumber,
+        professorName: profFirst + ' ' + profLast,
+      });
     }
 
     for (let prefixItr = 0; prefixItr < prefixList.length; prefixItr++) {
       //console.log(myPrefixes[prefixItr].value);
-      for (let classItr = 0; classItr < prefixList[prefixItr].classes.length; classItr++) {
-        for (let sectionItr = 0; sectionItr < prefixList[prefixItr].classes[classItr].sections.length; sectionItr++) {
+      for (
+        let classItr = 0;
+        classItr < prefixList[prefixItr].classes.length;
+        classItr++
+      ) {
+        for (
+          let sectionItr = 0;
+          sectionItr < prefixList[prefixItr].classes[classItr].sections.length;
+          sectionItr++
+        ) {
           //console.log(myPrefixes[prefixItr].classes[classItr].number);
-          for (let professorItr = 0; professorItr < prefixList[prefixItr].classes[classItr].sections[sectionItr].professors.length; professorItr++) {
+          for (
+            let professorItr = 0;
+            professorItr <
+            prefixList[prefixItr].classes[classItr].sections[sectionItr]
+              .professors.length;
+            professorItr++
+          ) {
             //console.log(myPrefixes[prefixItr].classes[classItr].professors[professorItr].firstName + myPrefixes[prefixItr].classes[classItr].professors[professorItr].lastName);
             addPrefixFirst(
               prefixList[prefixItr].value,
               prefixList[prefixItr].classes[classItr].number,
-              prefixList[prefixItr].classes[classItr].sections[sectionItr].section_number,
-              prefixList[prefixItr].classes[classItr].sections[sectionItr].professors[professorItr].firstName,
-              prefixList[prefixItr].classes[classItr].sections[sectionItr].professors[professorItr].lastName,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                .section_number,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                .professors[professorItr].firstName,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                .professors[professorItr].lastName,
             );
             addProfFirst(
               prefixList[prefixItr].value,
               prefixList[prefixItr].classes[classItr].number,
-              prefixList[prefixItr].classes[classItr].sections[sectionItr].section_number,
-              prefixList[prefixItr].classes[classItr].sections[sectionItr].professors[professorItr].firstName,
-              prefixList[prefixItr].classes[classItr].sections[sectionItr].professors[professorItr].lastName,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                .section_number,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                .professors[professorItr].firstName,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                .professors[professorItr].lastName,
             );
           }
         }
       }
     }
-    
+
     /*reduces graph size by compressing chains of nodes each with only one child
     to a single node with a character value of several characters. I couldn't get
     this work with my bfs implemintation as the bfs needs to know the difference
@@ -389,20 +405,23 @@ nodeFetch
           //console.log('  has children:', graph.outDegree(parent));
         }
         graph.setNodeAttribute(parent, 'visited', true);
-        graph.forEachOutNeighbor(parent, child => {
+        graph.forEachOutNeighbor(parent, (child) => {
           //console.log('    child', graph.getNodeAttribute(parent, 'c'), graph.getNodeAttribute(child, 'c'))
-          checkForSingleChild(child)
+          checkForSingleChild(child);
         });
-      } else { //one child, no data
-        graph.forEachOutNeighbor(parent, (singleChild, attributes) => { //will only return once
+      } else {
+        //one child, no data
+        graph.forEachOutNeighbor(parent, (singleChild, attributes) => {
+          //will only return once
           if (graph.inDegree(singleChild) > 1) {
             //skip, should already be called on
             //console.log('  child has parents', attributes.c);
             //checkForSingleChild(singleChild); //move on
-          } else { //one child, no data, child has one parent
+          } else {
+            //one child, no data, child has one parent
             //console.log('  single');
-            graph.updateNodeAttribute(parent, 'c', n => n + attributes.c);
-            graph.forEachOutNeighbor(singleChild, grandchild => {
+            graph.updateNodeAttribute(parent, 'c', (n) => n + attributes.c);
+            graph.forEachOutNeighbor(singleChild, (grandchild) => {
               graph.dropEdge(singleChild, grandchild);
               if (!graph.hasEdge(parent, grandchild) && parent !== grandchild) {
                 graph.addEdge(parent, grandchild);
@@ -412,7 +431,9 @@ nodeFetch
             if (typeof attributes.d !== 'undefined') {
               graph.setNodeAttribute(parent, 'd', attributes.d);
               graph.setNodeAttribute(parent, 'visited', true);
-              graph.forEachOutNeighbor(parent, child => checkForSingleChild(child));
+              graph.forEachOutNeighbor(parent, (child) =>
+                checkForSingleChild(child),
+              );
             } else {
               checkForSingleChild(parent);
             }
@@ -421,9 +442,9 @@ nodeFetch
       }
     }
     checkForSingleChild(root);
-    
+
     graph.forEachNode((node) => graph.removeNodeAttribute(node, 'visited'));
-    
+
     fs.writeFileSync(
       'data/autocomplete_graph.json',
       JSON.stringify(graph.export()),

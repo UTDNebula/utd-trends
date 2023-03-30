@@ -61,19 +61,22 @@ function bfsRecursion(queue: QueueItem[]) {
     //satisfy typescript possibly undefined error
     return;
   }
-  
+
   //results
   let queueRecursion = false;
   let queueToNext = false;
   let returnData = false;
-  
+
   //# of characters matched
   const nodeCharacters = graph.getNodeAttribute(queueItem?.node, 'c');
   let matches = 0;
-  while (matches < nodeCharacters.length && queueItem?.characters?.[0] === nodeCharacters[0]) {
+  while (
+    matches < nodeCharacters.length &&
+    queueItem?.characters?.[0] === nodeCharacters[0]
+  ) {
     matches++;
   }
-  
+
   if (
     /*queueItem?.characters?.[0] ===
     graph.getNodeAttribute(queueItem?.node, 'c')*/
@@ -84,23 +87,20 @@ function bfsRecursion(queue: QueueItem[]) {
     //console.log('match: ', queueItem?.characters, queueItem?.characters?.length === 1);
     if (queueItem?.characters?.length <= nodeCharacters.length) {
       //last characters
-      if (queueItem?.characters?.length == nodeCharacters.length) {
-        queueToNext = true;
-      }
+      queueToNext = true;
       returnData = true;
     } else {
       queueRecursion = true;
     }
-  } else if (matches > 0 && queueItem?.characters?.length < nodeCharacters.length) {
+  } else if (
+    matches > 0 &&
+    queueItem?.characters?.length < nodeCharacters.length
+  ) {
     //partial match
-    const data = graph.getNodeAttribute(queueItem?.node, 'd');
-    if (typeof data !== 'undefined') {
-      //has data
-      return data;
-    } else {
-      queueToNext = true;
-    }
+    queueToNext = true;
+    returnData = true;
   }
+
   if (queueRecursion) {
     graph.forEachOutNeighbor(queueItem?.node, (neighbor) => {
       //console.log('queue: ', graph.getNodeAttribute(neighbor, 'c'));
@@ -168,7 +168,10 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     return new Promise<void>((resolve, reject) => {
       res
         .status(200)
-        .json({ success: true, output: searchAutocomplete(req.query.input as string) });
+        .json({
+          success: true,
+          output: searchAutocomplete(req.query.input as string),
+        });
       resolve();
     });
   } else {
