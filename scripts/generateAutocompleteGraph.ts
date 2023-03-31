@@ -1,6 +1,6 @@
 /*
 RUN ON CHANGE:
-"tsc scripts/generateAutocompleteGraph.ts"
+"tsc scripts/generateAutocompleteGraph.ts --resolveJsonModule"
 run to compile to .js file that can be run at predev and prebuild
 */
 const fs = require('fs');
@@ -244,39 +244,41 @@ nodeFetch
         },
       );
 
-      //<prefix>[<number>| <number>[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]]
-      const sectionNode = addSearchQueryCharacter(
-        classNode,
-        '.' + sectionNumber,
-        {
-          prefix: prefix,
-          number: number,
-          sectionNumber: sectionNumber,
-        },
-      );
-      const professorFirstNameNode1 = addSearchQueryCharacter(
-        sectionNode,
-        ' ' + profFirst + ' ',
-      );
-      const professorLastNameFirstCharNode1 = addSearchQueryCharacter(
-        sectionNode,
-        ' ' + profLast[0],
-      );
-      if (
-        !graph.hasEdge(professorFirstNameNode1, professorLastNameFirstCharNode1)
-      ) {
-        graph.addEdge(professorFirstNameNode1, professorLastNameFirstCharNode1);
+      if (sectionNumber === 'HON') {
+        //<prefix>[<number>| <number>[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]]
+        const sectionNode = addSearchQueryCharacter(
+          classNode,
+          '.' + sectionNumber,
+          {
+            prefix: prefix,
+            number: number,
+            sectionNumber: sectionNumber,
+          },
+        );
+        const professorFirstNameNode1 = addSearchQueryCharacter(
+          sectionNode,
+          ' ' + profFirst + ' ',
+        );
+        const professorLastNameFirstCharNode1 = addSearchQueryCharacter(
+          sectionNode,
+          ' ' + profLast[0],
+        );
+        if (
+          !graph.hasEdge(professorFirstNameNode1, professorLastNameFirstCharNode1)
+        ) {
+          graph.addEdge(professorFirstNameNode1, professorLastNameFirstCharNode1);
+        }
+        addSearchQueryCharacter(
+          professorLastNameFirstCharNode1,
+          profLast.slice(1),
+          {
+            prefix: prefix,
+            number: number,
+            sectionNumber: sectionNumber,
+            professorName: profFirst + ' ' + profLast,
+          },
+        );
       }
-      addSearchQueryCharacter(
-        professorLastNameFirstCharNode1,
-        profLast.slice(1),
-        {
-          prefix: prefix,
-          number: number,
-          sectionNumber: sectionNumber,
-          professorName: profFirst + ' ' + profLast,
-        },
-      );
     }
 
     //Add nodes in format: (<professorLast> or <professorFirst> <professorLast>) (<prefix> <number> or <prefix><number>)
@@ -331,12 +333,14 @@ nodeFetch
         },
       );
 
-      addSearchQueryCharacter(classNode, '.' + sectionNumber, {
-        prefix: prefix,
-        number: number,
-        sectionNumber: sectionNumber,
-        professorName: profFirst + ' ' + profLast,
-      });
+      if (sectionNumber === 'HON') {
+        addSearchQueryCharacter(classNode, '.' + sectionNumber, {
+          prefix: prefix,
+          number: number,
+          sectionNumber: sectionNumber,
+          professorName: profFirst + ' ' + profLast,
+        });
+      }
     }
 
     for (let prefixItr = 0; prefixItr < prefixList.length; prefixItr++) {

@@ -2,7 +2,7 @@
 exports.__esModule = true;
 /*
 RUN ON CHANGE:
-"tsc scripts/generateAutocompleteGraph.ts"
+"tsc scripts/generateAutocompleteGraph.ts --resolveJsonModule"
 run to compile to .js file that can be run at predev and prebuild
 */
 var fs = require('fs');
@@ -166,23 +166,25 @@ nodeFetch["default"]('https://catfact.ninja/fact', { method: 'GET' })
             number: number,
             professorName: profFirst + ' ' + profLast
         });
-        //<prefix>[<number>| <number>[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]]
-        var sectionNode = addSearchQueryCharacter(classNode, '.' + sectionNumber, {
-            prefix: prefix,
-            number: number,
-            sectionNumber: sectionNumber
-        });
-        var professorFirstNameNode1 = addSearchQueryCharacter(sectionNode, ' ' + profFirst + ' ');
-        var professorLastNameFirstCharNode1 = addSearchQueryCharacter(sectionNode, ' ' + profLast[0]);
-        if (!graph.hasEdge(professorFirstNameNode1, professorLastNameFirstCharNode1)) {
-            graph.addEdge(professorFirstNameNode1, professorLastNameFirstCharNode1);
+        if (sectionNumber === 'HON') {
+            //<prefix>[<number>| <number>[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]]
+            var sectionNode = addSearchQueryCharacter(classNode, '.' + sectionNumber, {
+                prefix: prefix,
+                number: number,
+                sectionNumber: sectionNumber
+            });
+            var professorFirstNameNode1 = addSearchQueryCharacter(sectionNode, ' ' + profFirst + ' ');
+            var professorLastNameFirstCharNode1 = addSearchQueryCharacter(sectionNode, ' ' + profLast[0]);
+            if (!graph.hasEdge(professorFirstNameNode1, professorLastNameFirstCharNode1)) {
+                graph.addEdge(professorFirstNameNode1, professorLastNameFirstCharNode1);
+            }
+            addSearchQueryCharacter(professorLastNameFirstCharNode1, profLast.slice(1), {
+                prefix: prefix,
+                number: number,
+                sectionNumber: sectionNumber,
+                professorName: profFirst + ' ' + profLast
+            });
         }
-        addSearchQueryCharacter(professorLastNameFirstCharNode1, profLast.slice(1), {
-            prefix: prefix,
-            number: number,
-            sectionNumber: sectionNumber,
-            professorName: profFirst + ' ' + profLast
-        });
     }
     //Add nodes in format: (<professorLast> or <professorFirst> <professorLast>) (<prefix> <number> or <prefix><number>)
     function addProfFirst(prefix, number, sectionNumber, profFirst, profLast) {
@@ -206,22 +208,32 @@ nodeFetch["default"]('https://catfact.ninja/fact', { method: 'GET' })
             number: number,
             professorName: profFirst + ' ' + profLast
         });
-        addSearchQueryCharacter(classNode, '.' + sectionNumber, {
-            prefix: prefix,
-            number: number,
-            sectionNumber: sectionNumber,
-            professorName: profFirst + ' ' + profLast
-        });
+        if (sectionNumber === 'HON') {
+            addSearchQueryCharacter(classNode, '.' + sectionNumber, {
+                prefix: prefix,
+                number: number,
+                sectionNumber: sectionNumber,
+                professorName: profFirst + ' ' + profLast
+            });
+        }
     }
     for (var prefixItr = 0; prefixItr < prefixList.length; prefixItr++) {
         //console.log(myPrefixes[prefixItr].value);
         for (var classItr = 0; classItr < prefixList[prefixItr].classes.length; classItr++) {
             for (var sectionItr = 0; sectionItr < prefixList[prefixItr].classes[classItr].sections.length; sectionItr++) {
                 //console.log(myPrefixes[prefixItr].classes[classItr].number);
-                for (var professorItr = 0; professorItr < prefixList[prefixItr].classes[classItr].sections[sectionItr].professors.length; professorItr++) {
+                for (var professorItr = 0; professorItr <
+                    prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                        .professors.length; professorItr++) {
                     //console.log(myPrefixes[prefixItr].classes[classItr].professors[professorItr].firstName + myPrefixes[prefixItr].classes[classItr].professors[professorItr].lastName);
-                    addPrefixFirst(prefixList[prefixItr].value, prefixList[prefixItr].classes[classItr].number, prefixList[prefixItr].classes[classItr].sections[sectionItr].section_number, prefixList[prefixItr].classes[classItr].sections[sectionItr].professors[professorItr].firstName, prefixList[prefixItr].classes[classItr].sections[sectionItr].professors[professorItr].lastName);
-                    addProfFirst(prefixList[prefixItr].value, prefixList[prefixItr].classes[classItr].number, prefixList[prefixItr].classes[classItr].sections[sectionItr].section_number, prefixList[prefixItr].classes[classItr].sections[sectionItr].professors[professorItr].firstName, prefixList[prefixItr].classes[classItr].sections[sectionItr].professors[professorItr].lastName);
+                    addPrefixFirst(prefixList[prefixItr].value, prefixList[prefixItr].classes[classItr].number, prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                        .section_number, prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                        .professors[professorItr].firstName, prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                        .professors[professorItr].lastName);
+                    addProfFirst(prefixList[prefixItr].value, prefixList[prefixItr].classes[classItr].number, prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                        .section_number, prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                        .professors[professorItr].firstName, prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                        .professors[professorItr].lastName);
                 }
             }
         }
@@ -252,14 +264,17 @@ nodeFetch["default"]('https://catfact.ninja/fact', { method: 'GET' })
                 checkForSingleChild(child);
             });
         }
-        else { //one child, no data
+        else {
+            //one child, no data
             graph.forEachOutNeighbor(parent, function (singleChild, attributes) {
+                //will only return once
                 if (graph.inDegree(singleChild) > 1) {
                     //skip, should already be called on
                     //console.log('  child has parents', attributes.c);
                     //checkForSingleChild(singleChild); //move on
                 }
-                else { //one child, no data, child has one parent
+                else {
+                    //one child, no data, child has one parent
                     //console.log('  single');
                     graph.updateNodeAttribute(parent, 'c', function (n) { return n + attributes.c; });
                     graph.forEachOutNeighbor(singleChild, function (grandchild) {
@@ -272,7 +287,9 @@ nodeFetch["default"]('https://catfact.ninja/fact', { method: 'GET' })
                     if (typeof attributes.d !== 'undefined') {
                         graph.setNodeAttribute(parent, 'd', attributes.d);
                         graph.setNodeAttribute(parent, 'visited', true);
-                        graph.forEachOutNeighbor(parent, function (child) { return checkForSingleChild(child); });
+                        graph.forEachOutNeighbor(parent, function (child) {
+                            return checkForSingleChild(child);
+                        });
                     }
                     else {
                         checkForSingleChild(parent);
