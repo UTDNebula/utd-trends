@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import {Box, Typography} from '@mui/material';
+import Link from 'next/link';
 
 interface CardContentProps {
   name: string;
@@ -15,7 +16,13 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
     <>
       <Box className="flex flex-col md:flex-row w-full h-1/6">
         <Box className="basis-1/2 flex flex-row items-center justify-center border-b-2 md:border-b-0 md:border-r-2 border-neutral-400 bg-inherit p-2">
-          <Typography className="text-2xl text-center">{props.name}</Typography>
+          <Link href="https://www.ratemyprofessors.com/search/teachers?query=${encodeURIComponent(
+          props.name,
+          )}&sid=U2Nob29sLTEyNzM=">
+            <a>
+              <Typography className="text-2xl text-center">{props.name}</Typography>
+            </a>
+          </Link>
         </Box>
         <Box className="basis-1/2 flex flex-row items-center justify-center border-b-2 md:border-b-0 border-neutral-400 bg-inherit p-2">
           <Typography className="text-2xl text-center">
