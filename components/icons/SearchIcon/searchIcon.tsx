@@ -6,7 +6,7 @@ import React from 'react';
  * the DOM rather than using an IMG tag. Change color of the svg by changing the text color of the
  * surrounding div.
  */
-export function SearchIcon(){
+export function SearchIcon() {
   return (
     <>
       <svg
@@ -29,4 +29,4 @@ export function SearchIcon(){
       </svg>
     </>
   );
-};
+}

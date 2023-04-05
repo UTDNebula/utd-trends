@@ -63,9 +63,9 @@ export const ExpandableSearchGrid = ({
       setSearchDisable(false);
     }
   }, [searchTerms]);
-  
+
   const router = useRouter();
-  
+
   useEffect(() => {
     if (router.isReady) {
       setSearchTerms(parseURIEncodedSearchTerms(router.query.searchTerms));
@@ -115,7 +115,7 @@ function studentTotalFormatter(total: number) {
   if (total === -1) {
     return 'Loading...';
   }
-  return total.toLocaleString("en-US") + ' students';
+  return total.toLocaleString('en-US') + ' students';
 }
 
 function searchQueryLabel(query: SearchQuery): string {

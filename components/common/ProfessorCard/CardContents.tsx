@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import {Box, Typography} from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 interface CardContentProps {
   name: string;
@@ -30,7 +30,9 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
           </Typography>
           <Box
             className="h-32 w-32 border-2 border-neutral-400 flex items-center justify-center my-4 md:mt-0 mb-8 text-5xl text-neutral-600 font-bold"
-            sx={{ backgroundColor: getColorForRating(5 - props.averageDifficulty) }}
+            sx={{
+              backgroundColor: getColorForRating(5 - props.averageDifficulty),
+            }}
           >
             {props.averageDifficulty}
           </Box>

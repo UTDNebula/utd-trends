@@ -5,3 +5,5 @@
 package.json
 package-lock.json
 public
+styleguide/build
+data

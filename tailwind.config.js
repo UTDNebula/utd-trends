@@ -1,24 +1,23 @@
 module.exports = {
-  important:true,
+  important: true,
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     screens: {
-
-      'short':{'raw': '(max-height: 200px)'},
-      'xs': '400px',
-      'sm': '640px',
+      short: { raw: '(max-height: 200px)' },
+      xs: '400px',
+      sm: '640px',
       // => @media (min-width: 640px) { ... }
 
-      'md': '768px',
+      md: '768px',
       // => @media (min-width: 768px) { ... }
 
-      'lg': '1024px',
+      lg: '1024px',
       // => @media (min-width: 1024px) { ... }
 
-      'xl': '1280px',
+      xl: '1280px',
       // => @media (min-width: 1280px) { ... }
 
       '2xl': '1536px',
@@ -30,13 +29,13 @@ module.exports = {
           light: '#BCC9FD',
           DEFAULT: '#7486CE',
           dark: '#4659A7',
-          darker: '#314287'
+          darker: '#314287',
         },
         secondary: {
           light: '#FFE2C5',
           DEFAULT: '#FFCF9D',
           dark: '#FBBB78',
-          darker: '#ffaf5c'
+          darker: '#ffaf5c',
         },
         navigation: {
           DEFAULT: '#878FD6',
@@ -45,7 +44,7 @@ module.exports = {
         },
         light: '#F9F9FA',
         dark: '#1F201F',
-        surface: '#858585'
+        surface: '#858585',
       },
       fontSize: {
         headline1: [
