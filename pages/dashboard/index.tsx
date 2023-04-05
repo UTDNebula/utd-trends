@@ -91,23 +91,52 @@ export const Dashboard: NextPage = () => {
   useEffect(() => {
     if (professorInvolvingSearchTerms.length > 0) {
       setProfessorRatingsState('loading');
-      let call: string = '/api/ratemyprofessorScraper?professors=';
-      professorInvolvingSearchTerms.forEach((searchTerm) => {
-        // @ts-ignore
-        call += encodeURIComponent(searchTerm.professorName) + ',';
-      });
-      fetch(call.substring(0, call.length - 2), {
-        method: 'GET',
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          //console.log(data);
-          setProfData(data);
+      Promise.all(
+        professorInvolvingSearchTerms.map((searchTerm) => {
+          const url =
+            '/api/ratemyprofessorScraper?professor=' +
+            encodeURIComponent(searchTerm.professorName!);
+          if (process.env.NODE_ENV !== 'development') {
+            const getItem = localStorage.getItem(url);
+            if (getItem !== null) {
+              const parsedItem = JSON.parse(getItem);
+              if (
+                !('expiry' in parsedItem) ||
+                !('value' in parsedItem) ||
+                new Date().getTime() > parsedItem.expiry
+              ) {
+                localStorage.removeItem(url);
+              } else {
+                return parsedItem.value;
+              }
+            }
+          }
+          return fetch(url, {
+            method: 'GET',
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.message !== 'success') {
+                throw new Error(data.message);
+              }
+              localStorage.setItem(
+                url,
+                JSON.stringify({
+                  value: data.data,
+                  expiry: new Date().getTime() + 7889400000, //3months
+                }),
+              );
+              return data.data;
+            });
+        }),
+      )
+        .then((responses) => {
+          setProfData(responses);
           setProfessorRatingsState('success');
         })
         .catch((error) => {
           setProfessorRatingsState('error');
-          console.log(error);
+          console.error('Professor Scraper', error);
         });
     } else {
       setProfessorRatingsState('success');
@@ -146,12 +175,20 @@ export const Dashboard: NextPage = () => {
                   String(searchTerm[key as keyof SearchQuery]),
                 ),
             )
-            .join('&') +
-          '&representation=semester';
+            .join('&');
         if (process.env.NODE_ENV !== 'development') {
           const getItem = localStorage.getItem(url);
           if (getItem !== null) {
-            return JSON.parse(getItem);
+            const parsedItem = JSON.parse(getItem);
+            if (
+              !('expiry' in parsedItem) ||
+              !('value' in parsedItem) ||
+              new Date().getTime() > parsedItem.expiry
+            ) {
+              localStorage.removeItem(url);
+            } else {
+              return parsedItem.value;
+            }
           }
         }
         return fetch(url, {
@@ -165,7 +202,13 @@ export const Dashboard: NextPage = () => {
             if (data.message !== 'success') {
               throw new Error(data.message);
             }
-            localStorage.setItem(url, JSON.stringify(data));
+            localStorage.setItem(
+              url,
+              JSON.stringify({
+                value: data,
+                expiry: new Date().getTime() + 7889400000, //3months
+              }),
+            );
             return data;
           });
       }),
