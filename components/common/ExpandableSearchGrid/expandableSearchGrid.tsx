@@ -37,13 +37,13 @@ export const ExpandableSearchGrid = ({
 
   function addSearchTerm(newSearchTerm: SearchQuery) {
     if (newSearchTerm != null) {
-      console.log('adding ' + newSearchTerm + ' to the search terms.');
+      //console.log('adding ' + newSearchTerm + ' to the search terms.');
       setSearchTerms([...searchTerms, newSearchTerm]);
     }
   }
 
   function deleteSearchTerm(searchTermIndex: number) {
-    console.log('deleteSearchTerm called on ' + searchTermIndex);
+    //console.log('deleteSearchTerm called on ' + searchTermIndex);
     setSearchTerms(
       searchTerms
         .slice(0, searchTermIndex)
@@ -115,7 +115,7 @@ function studentTotalFormatter(total: number) {
   if (total === -1) {
     return 'Loading...';
   }
-  return total.toLocaleString("en-US") + ' students';
+  return total.toLocaleString("en-US") + ' grades';
 }
 
 function searchQueryLabel(query: SearchQuery): string {
