@@ -54,6 +54,9 @@ export default function handler(
           parsedData.department = regexArray[6];
           parsedData.firstName = regexArray[7];
           parsedData.lastName = regexArray[8];
+        } else {
+          return res.status(200).json({ message: 'notFound' });
+          resolve();
         }
         res.status(200).json({
           message: 'success',

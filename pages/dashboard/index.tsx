@@ -116,6 +116,9 @@ export const Dashboard: NextPage = () => {
           })
             .then((response) => response.json())
             .then((data) => {
+              if (data.message === 'notFound') {
+                return undefined;
+              }
               if (data.message !== 'success') {
                 throw new Error(data.message);
               }
@@ -131,7 +134,9 @@ export const Dashboard: NextPage = () => {
         }),
       )
         .then((responses) => {
-          setProfData(responses);
+          setProfData(
+            responses.filter((response) => typeof response !== 'undefined'),
+          );
           setProfessorRatingsState('success');
         })
         .catch((error) => {
