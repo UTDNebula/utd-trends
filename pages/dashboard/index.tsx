@@ -32,7 +32,7 @@ export const Dashboard: NextPage = () => {
   const cacheIndexGrades = 0;
   const cacheIndexProfessor = 0;
 
-  function getCache(key, cacheIndex) {
+  function getCache(key: string, cacheIndex: number) {
     if (process.env.NODE_ENV !== 'development') {
       const getItem = localStorage.getItem(key);
       if (getItem !== null) {
@@ -53,7 +53,12 @@ export const Dashboard: NextPage = () => {
     return false;
   }
 
-  function setCache(key, cacheIndex, data, expireTime) {
+  function setCache(
+    key: string,
+    cacheIndex: number,
+    data: any,
+    expireTime: number,
+  ) {
     localStorage.setItem(
       key,
       JSON.stringify({
@@ -64,7 +69,7 @@ export const Dashboard: NextPage = () => {
     );
   }
 
-  function fetchData(urls, cacheIndex, expireTime) {
+  function fetchData(urls: string[], cacheIndex: number, expireTime: number) {
     return Promise.all(
       urls.map((url) => {
         const cache = getCache(url, cacheIndexProfessor);
@@ -115,7 +120,7 @@ export const Dashboard: NextPage = () => {
   const [studentTotals, setStudentTotals] = useState([-1, -1, -1]);
 
   const [professorInvolvingSearchTerms, setProfessorInvolvingSearchTerms] =
-    useState<SearchQuery[]>([]);
+    useState<string[]>([]);
 
   type academicSessionType = {
     name: string;
@@ -168,9 +173,14 @@ export const Dashboard: NextPage = () => {
       router.replace('/dashboard', undefined, { shallow: true });
     }
     setProfessorInvolvingSearchTerms(
-      searchTerms.filter(
-        (searchQuery) => searchQuery.professorName != undefined,
-      ),
+      searchTerms
+        .filter(
+          (searchQuery) => typeof searchQuery.professorName !== 'undefined',
+        )
+        .map((searchQuery) => searchQuery.professorName)
+        .filter(
+          (professorName, index, self) => self.indexOf(professorName) == index,
+        ) as string[],
     );
     fetchData(
       searchTerms.map(
@@ -484,9 +494,9 @@ export const Dashboard: NextPage = () => {
       setProfessorRatingsState('loading');
       fetchData(
         professorInvolvingSearchTerms.map(
-          (searchTerm) =>
+          (professorName) =>
             '/api/ratemyprofessorScraper?professor=' +
-            encodeURIComponent(searchTerm.professorName!),
+            encodeURIComponent(professorName),
         ),
         cacheIndexProfessor,
         7889400000, //3 months
@@ -535,13 +545,9 @@ export const Dashboard: NextPage = () => {
               if (!data.found) {
                 let text = 'Data not found';
                 if (
-                  typeof professorInvolvingSearchTerms[index] !== 'undefined' &&
-                  'professorName' in professorInvolvingSearchTerms[index] &&
-                  typeof professorInvolvingSearchTerms[index] === 'string'
+                  typeof professorInvolvingSearchTerms[index] !== 'undefined'
                 ) {
-                  text +=
-                    ' for ' +
-                    professorInvolvingSearchTerms[index].professorName;
+                  text += ' for ' + professorInvolvingSearchTerms[index];
                 }
                 return (
                   <Card className="h-fit m-4" key={index}>
