@@ -10,15 +10,15 @@ interface ProfessorCardProps {
   left?: string;
   height?: string;
   width?: string;
-  name: string;
+  name?: string;
   position: Property.Position;
   text?: string;
-  department: string;
+  department?: string;
   fontSize?: string;
-  professorRating: number;
-  averageDifficulty: number;
-  takingAgain: number;
-  numRatings: number;
+  professorRating?: number;
+  averageDifficulty?: number;
+  takingAgain?: number;
+  numRatings?: number;
 }
 
 export const ProfessorCard: FC<ProfessorCardProps> = (
@@ -64,7 +64,7 @@ export const ProfessorCard: FC<ProfessorCardProps> = (
             fontSize: props.fontSize,
           }}
         >
-          <Typography>{props.text}</Typography>
+          <Typography className="text-2xl text-center">{props.text}</Typography>
         </Box>
       );
     }
@@ -72,12 +72,12 @@ export const ProfessorCard: FC<ProfessorCardProps> = (
     default: {
       return (
         <CardContents
-          name={props.name}
-          department={props.department}
-          professorRating={props.professorRating}
-          averageDifficulty={props.averageDifficulty}
-          takingAgain={props.takingAgain}
-          numRatings={props.numRatings}
+          name={props.name as string}
+          department={props.department as string}
+          professorRating={props.professorRating as number}
+          averageDifficulty={props.averageDifficulty as number}
+          takingAgain={props.takingAgain as number}
+          numRatings={props.numRatings as number}
         ></CardContents>
       );
     }

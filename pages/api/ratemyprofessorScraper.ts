@@ -1,14 +1,17 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 type RateMyProfessorInfo = {
-  legacyId: string;
-  averageRating: number;
-  numRatings: number;
-  wouldTakeAgainPercentage: number;
-  averageDifficulty: number;
-  department: string;
-  firstName: string;
-  lastName: string;
+  found: boolean;
+  data?: {
+    legacyId: string;
+    averageRating: number;
+    numRatings: number;
+    wouldTakeAgainPercentage: number;
+    averageDifficulty: number;
+    department: string;
+    firstName: string;
+    lastName: string;
+  };
 };
 
 type Data = {
@@ -34,35 +37,37 @@ export default function handler(
       .then((text) => {
         const regex =
           /"legacyId":(\w+),"avgRating":([\d.]+),"numRatings":(\d+),"wouldTakeAgainPercent":([\d.]+),"avgDifficulty":([\d.]+),"department":"([\w\s]+)","school":.+?,"firstName":"([\w-]+)","lastName":"([\w-]+)"/;
-        var parsedData: RateMyProfessorInfo = {
-          averageRating: 0,
-          averageDifficulty: 0,
-          department: '',
-          firstName: '',
-          lastName: '',
-          legacyId: '',
-          numRatings: 0,
-          wouldTakeAgainPercentage: 0,
+        let parsedData: RateMyProfessorInfo = {
+          found: true,
         };
         const regexArray = text.match(regex);
         if (regexArray != null) {
-          parsedData.legacyId = regexArray[1];
-          parsedData.averageRating = Number(regexArray[2]);
-          parsedData.numRatings = Number(regexArray[3]);
-          parsedData.wouldTakeAgainPercentage = Number(regexArray[4]);
-          parsedData.averageDifficulty = Number(regexArray[5]);
-          parsedData.department = regexArray[6];
-          parsedData.firstName = regexArray[7];
-          parsedData.lastName = regexArray[8];
+          res.status(200).json({
+            message: 'success',
+            data: {
+              found: true,
+              data: {
+                legacyId: regexArray[1],
+                averageRating: Number(regexArray[2]),
+                numRatings: Number(regexArray[3]),
+                wouldTakeAgainPercentage: Number(regexArray[4]),
+                averageDifficulty: Number(regexArray[5]),
+                department: regexArray[6],
+                firstName: regexArray[7],
+                lastName: regexArray[8],
+              },
+            },
+          });
+          resolve();
         } else {
-          return res.status(200).json({ message: 'notFound' });
+          res.status(200).json({
+            message: 'success',
+            data: {
+              found: false,
+            },
+          });
           resolve();
         }
-        res.status(200).json({
-          message: 'success',
-          data: parsedData,
-        });
-        resolve();
       })
       .catch((error) => {
         res.status(400).json({ message: error.message });

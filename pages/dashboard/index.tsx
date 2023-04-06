@@ -23,14 +23,17 @@ type SearchQuery = {
 };
 
 type RMPData = {
-  averageRating: number;
-  averageDifficulty: number;
-  department: string;
-  firstName: string;
-  lastName: string;
-  legacyId: string;
-  numRatings: number;
-  wouldTakeAgainPercentage: number;
+  found: boolean;
+  data: {
+    averageRating: number;
+    averageDifficulty: number;
+    department: string;
+    firstName: string;
+    lastName: string;
+    legacyId: string;
+    numRatings: number;
+    wouldTakeAgainPercentage: number;
+  };
 };
 
 // @ts-ignore
@@ -51,18 +54,7 @@ export const Dashboard: NextPage = () => {
   const [GPAdat, setGPADat] = useState<datType[]>([]);
   const [averageDat, setAverageDat] = useState<datType[]>([]);
   const [stdevDat, setStdevDat] = useState<datType[]>([]);
-  const [profData, setProfData] = useState<RMPData[]>([
-    {
-      averageRating: 5,
-      averageDifficulty: 3,
-      department: 'Computer Science',
-      firstName: 'Timothy',
-      lastName: 'Farage',
-      legacyId: '',
-      numRatings: 100,
-      wouldTakeAgainPercentage: 88,
-    },
-  ]);
+  const [profData, setProfData] = useState<RMPData[]>([]);
 
   const [professorInvolvingSearchTerms, setProfessorInvolvingSearchTerms] =
     useState<SearchQuery[]>([]);
@@ -116,9 +108,6 @@ export const Dashboard: NextPage = () => {
           })
             .then((response) => response.json())
             .then((data) => {
-              if (data.message === 'notFound') {
-                return undefined;
-              }
               if (data.message !== 'success') {
                 throw new Error(data.message);
               }
@@ -134,9 +123,7 @@ export const Dashboard: NextPage = () => {
         }),
       )
         .then((responses) => {
-          setProfData(
-            responses.filter((response) => typeof response !== 'undefined'),
-          );
+          setProfData(responses);
           setProfessorRatingsState('success');
         })
         .catch((error) => {
@@ -453,7 +440,7 @@ export const Dashboard: NextPage = () => {
                 'F',
                 'W',
               ]}
-              yaxisFormatter={(value) => value.toFixed(0) + '%'}
+              yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
               series={dat}
             />
           </Card>
@@ -461,7 +448,7 @@ export const Dashboard: NextPage = () => {
             <GraphChoice
               form="BoxWhisker"
               title="GPA Box and Whisker"
-              yaxisFormatter={(value) => value.toFixed(2)}
+              yaxisFormatter={(value) => Number(value).toFixed(2)}
               series={GPAdat}
             />
           </Card>
@@ -471,7 +458,7 @@ export const Dashboard: NextPage = () => {
                 form="Vertical"
                 title="GPA Averages"
                 xaxisLabels={['Average']}
-                yaxisFormatter={(value) => value.toFixed(2)}
+                yaxisFormatter={(value) => Number(value).toFixed(2)}
                 series={averageDat}
               />
             </Card>
@@ -480,7 +467,7 @@ export const Dashboard: NextPage = () => {
                 form="Vertical"
                 title="GPA Standard Deviations"
                 xaxisLabels={['Standard Deviation']}
-                yaxisFormatter={(value) => value.toFixed(2)}
+                yaxisFormatter={(value) => Number(value).toFixed(2)}
                 series={stdevDat}
               />
             </Card>
@@ -514,21 +501,45 @@ export const Dashboard: NextPage = () => {
       <>
         <div className="h-full m-4">
           {profData.length > 0 ? (
-            profData.map((data: RMPData, index: number) => (
-              <Card className="h-fit m-4" key={index}>
-                <ProfessorCard
-                  position="relative"
-                  element="Card"
-                  professorRating={data.averageRating}
-                  averageDifficulty={data.averageDifficulty}
-                  takingAgain={data.wouldTakeAgainPercentage}
-                  numRatings={data.numRatings}
-                  name={data.firstName + ' ' + data.lastName}
-                  department={data.department}
-                  key={index}
-                />
-              </Card>
-            ))
+            profData.map((data: RMPData, index: number) => {
+              if (!data.found) {
+                let text = 'Data not found';
+                if (
+                  typeof professorInvolvingSearchTerms[index] !== 'undefined' &&
+                  'professorName' in professorInvolvingSearchTerms[index] &&
+                  typeof professorInvolvingSearchTerms[index] === 'string'
+                ) {
+                  text +=
+                    ' for ' +
+                    professorInvolvingSearchTerms[index].professorName;
+                }
+                return (
+                  <Card className="h-fit m-4" key={index}>
+                    <ProfessorCard
+                      position="relative"
+                      element="Title"
+                      text={text}
+                      key={index}
+                    />
+                  </Card>
+                );
+              }
+              return (
+                <Card className="h-fit m-4" key={index}>
+                  <ProfessorCard
+                    position="relative"
+                    element="Card"
+                    professorRating={data.data.averageRating}
+                    averageDifficulty={data.data.averageDifficulty}
+                    takingAgain={data.data.wouldTakeAgainPercentage}
+                    numRatings={data.data.numRatings}
+                    name={data.data.firstName + ' ' + data.data.lastName}
+                    department={data.data.department}
+                    key={index}
+                  />
+                </Card>
+              );
+            })
           ) : (
             <h1 className="text-3xl text-center text-gray-600 font-semibold">
               No professors selected! Search for a professor or one of their
