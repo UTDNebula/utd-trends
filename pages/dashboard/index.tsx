@@ -74,7 +74,6 @@ export const Dashboard: NextPage = () => {
       urls.map((url) => {
         const cache = getCache(url, cacheIndexProfessor);
         if (cache) {
-          console.log('cached', cache);
           return cache;
         }
         return fetch(url, {
