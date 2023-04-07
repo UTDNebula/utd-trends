@@ -63,7 +63,7 @@ export const Dashboard: NextPage = () => {
       key,
       JSON.stringify({
         value: data,
-        expiry: new Date().getTime() + expireTime, //3 months
+        expiry: new Date().getTime() + expireTime,
         cacheIndex: cacheIndex,
       }),
     );
@@ -498,7 +498,7 @@ export const Dashboard: NextPage = () => {
             encodeURIComponent(professorName),
         ),
         cacheIndexProfessor,
-        7889400000, //3 months
+        2629800000, //1 month
       )
         .then((responses) => {
           setProfData(responses);
