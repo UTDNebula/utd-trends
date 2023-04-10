@@ -28,8 +28,6 @@ export function HorizontalBarGraph(props: GraphProps) {
     },
     xaxis: {
       categories: props.xaxisLabels,
-    },
-    yaxis: {
       labels: {
         formatter: props.yaxisFormatter,
       },
