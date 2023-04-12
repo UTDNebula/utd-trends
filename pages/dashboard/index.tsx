@@ -4,6 +4,8 @@ import {
   Select,
   MenuItem,
   InputLabel,
+  Box,
+  Typography,
 } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
@@ -22,50 +24,104 @@ type SearchQuery = {
   sectionNumber?: string;
 };
 
-type RMPData = {
-  averageRating: number;
-  averageDifficulty: number;
-  department: string;
-  firstName: string;
-  lastName: string;
-  legacyId: string;
-  numRatings: number;
-  wouldTakeAgainPercentage: number;
-};
-
 // @ts-ignore
 export const Dashboard: NextPage = () => {
-  type fullDatType = {
+  /* Helper functions */
+
+  const router = useRouter();
+
+  //Increment these to reset cache on next deployment
+  const cacheIndexGrades = 0;
+  const cacheIndexProfessor = 0;
+
+  function getCache(key: string, cacheIndex: number) {
+    if (process.env.NODE_ENV !== 'development') {
+      const getItem = localStorage.getItem(key);
+      if (getItem !== null) {
+        const parsedItem = JSON.parse(getItem);
+        if (
+          !('cacheIndex' in parsedItem) ||
+          cacheIndex !== parsedItem.cacheIndex ||
+          !('expiry' in parsedItem) ||
+          !('value' in parsedItem) ||
+          new Date().getTime() > parsedItem.expiry
+        ) {
+          localStorage.removeItem(key);
+        } else {
+          return parsedItem.value;
+        }
+      }
+    }
+    return false;
+  }
+
+  function setCache(
+    key: string,
+    cacheIndex: number,
+    data: any,
+    expireTime: number,
+  ) {
+    localStorage.setItem(
+      key,
+      JSON.stringify({
+        value: data,
+        expiry: new Date().getTime() + expireTime,
+        cacheIndex: cacheIndex,
+      }),
+    );
+  }
+
+  function fetchData(urls: string[], cacheIndex: number, expireTime: number) {
+    return Promise.all(
+      urls.map((url) => {
+        const cache = getCache(url, cacheIndexProfessor);
+        if (cache) {
+          return cache;
+        }
+        return fetch(url, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.message !== 'success') {
+              throw new Error(data.message);
+            }
+            setCache(url, cacheIndex, data.data, expireTime);
+            return data.data;
+          });
+      }),
+    );
+  }
+
+  /* Grades data */
+
+  type fullGradesType = {
     name: string;
     data: {
       session: number;
       grade_distribution: number[];
     }[];
   };
-  type datType = {
+
+  type gradesType = {
     name: string;
     data: number[];
   };
-  const [fullGradesData, setFullGradesData] = useState<fullDatType[]>([]);
-  const [dat, setDat] = useState<datType[]>([]);
-  const [GPAdat, setGPADat] = useState<datType[]>([]);
-  const [averageDat, setAverageDat] = useState<datType[]>([]);
-  const [stdevDat, setStdevDat] = useState<datType[]>([]);
-  const [profData, setProfData] = useState<RMPData[]>([
-    {
-      averageRating: 5,
-      averageDifficulty: 3,
-      department: 'Computer Science',
-      firstName: 'Timothy',
-      lastName: 'Farage',
-      legacyId: '',
-      numRatings: 100,
-      wouldTakeAgainPercentage: 88,
-    },
-  ]);
+
+  const [gradesState, setGradesState] = useState('loading');
+
+  const [fullGradesData, setFullGradesData] = useState<fullGradesType[]>([]);
+  const [gradesData, setGradesData] = useState<gradesType[]>([]);
+  const [GPAData, setGPAData] = useState<gradesType[]>([]);
+  const [averageData, setAverageData] = useState<gradesType[]>([]);
+  const [stdevData, setStdevData] = useState<gradesType[]>([]);
+  const [studentTotals, setStudentTotals] = useState([-1, -1, -1]);
 
   const [professorInvolvingSearchTerms, setProfessorInvolvingSearchTerms] =
-    useState<SearchQuery[]>([]);
+    useState<string[]>([]);
 
   type academicSessionType = {
     name: string;
@@ -83,37 +139,26 @@ export const Dashboard: NextPage = () => {
   const [startingSession, setStartingSession] = useState<number>(0);
   const [endingSession, setEndingSession] = useState<number>(9999);
 
-  const router = useRouter();
-  const [gradesState, setGradesState] = useState('loading');
-  const [professorRatingsState, setProfessorRatingsState] = useState('loading');
-  const [studentTotals, setStudentTotals] = useState([-1, -1, -1]);
+  function searchTermsURIString(querys: SearchQuery[]): string {
+    return querys.map((query) => searchTermURIString(query)).join(',');
+  }
 
-  useEffect(() => {
-    if (professorInvolvingSearchTerms.length > 0) {
-      setProfessorRatingsState('loading');
-      let call: string = '/api/ratemyprofessorScraper?professors=';
-      professorInvolvingSearchTerms.forEach((searchTerm) => {
-        // @ts-ignore
-        call += encodeURIComponent(searchTerm.professorName) + ',';
-      });
-      fetch(call.substring(0, call.length - 2), {
-        method: 'GET',
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          //console.log(data);
-          setProfData(data);
-          setProfessorRatingsState('success');
-        })
-        .catch((error) => {
-          setProfessorRatingsState('error');
-          console.log(error);
-        });
-    } else {
-      setProfessorRatingsState('success');
-      setProfData([]);
+  function searchTermURIString(query: SearchQuery): string {
+    let result = '';
+    if (query.prefix !== undefined) {
+      result += query.prefix;
     }
-  }, [professorInvolvingSearchTerms]);
+    if (query.number !== undefined) {
+      result += ' ' + query.number;
+    }
+    if (query.sectionNumber !== undefined) {
+      result += '.' + query.sectionNumber;
+    }
+    if (query.professorName !== undefined) {
+      result += ' ' + query.professorName;
+    }
+    return result.trim();
+  }
 
   const searchTermsChange = useCallback((searchTerms: SearchQuery[]) => {
     if (searchTerms.length > 0) {
@@ -129,13 +174,18 @@ export const Dashboard: NextPage = () => {
       router.replace('/dashboard', undefined, { shallow: true });
     }
     setProfessorInvolvingSearchTerms(
-      searchTerms.filter(
-        (searchQuery) => searchQuery.professorName != undefined,
-      ),
+      searchTerms
+        .filter(
+          (searchQuery) => typeof searchQuery.professorName !== 'undefined',
+        )
+        .map((searchQuery) => searchQuery.professorName)
+        .filter(
+          (professorName, index, self) => self.indexOf(professorName) == index,
+        ) as string[],
     );
-    Promise.all(
-      searchTerms.map((searchTerm: SearchQuery) => {
-        const url =
+    fetchData(
+      searchTerms.map(
+        (searchTerm: SearchQuery) =>
           '/api/grades?' +
           Object.keys(searchTerm)
             .map(
@@ -146,28 +196,10 @@ export const Dashboard: NextPage = () => {
                   String(searchTerm[key as keyof SearchQuery]),
                 ),
             )
-            .join('&');
-        if (process.env.NODE_ENV !== 'development') {
-          const getItem = localStorage.getItem(url);
-          if (getItem !== null) {
-            return JSON.parse(getItem);
-          }
-        }
-        return fetch(url, {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.message !== 'success') {
-              throw new Error(data.message);
-            }
-            localStorage.setItem(url, JSON.stringify(data));
-            return data;
-          });
-      }),
+            .join('&'),
+      ),
+      cacheIndexGrades,
+      7889400000, //3 months
     )
       .then((responses) => {
         //console.log('data from grid: ', responses);
@@ -180,7 +212,7 @@ export const Dashboard: NextPage = () => {
         setPossibleAcademicSessions(
           responses
             .map((response) =>
-              response.data.map((data: individualacademicSessionResponse) => {
+              response.map((data: individualacademicSessionResponse) => {
                 let name: string = data._id;
                 name = '20' + name;
                 name = name
@@ -214,22 +246,20 @@ export const Dashboard: NextPage = () => {
           responses.map((response, index) => {
             return {
               name: searchTermURIString(searchTerms[index]),
-              data: response.data.map(
-                (data: individualacademicSessionResponse) => {
-                  let session: number = parseInt('20' + data._id);
-                  if (data._id.includes('S')) {
-                    session += 0.1;
-                  } else if (data._id.includes('U')) {
-                    session += 0.2;
-                  } else {
-                    session += 0.3;
-                  }
-                  return {
-                    session: session,
-                    grade_distribution: data.grade_distribution,
-                  };
-                },
-              ),
+              data: response.map((data: individualacademicSessionResponse) => {
+                let session: number = parseInt('20' + data._id);
+                if (data._id.includes('S')) {
+                  session += 0.1;
+                } else if (data._id.includes('U')) {
+                  session += 0.2;
+                } else {
+                  session += 0.3;
+                }
+                return {
+                  session: session,
+                  grade_distribution: data.grade_distribution,
+                };
+              }),
             };
           }),
         );
@@ -242,7 +272,7 @@ export const Dashboard: NextPage = () => {
   }, []);
 
   useEffect(() => {
-    const partialGradesData: datType[] = fullGradesData.map((datPoint) => {
+    const partialGradesData: gradesType[] = fullGradesData.map((datPoint) => {
       const combined = datPoint.data.reduce(
         (accumulator, academicSession) => {
           if (
@@ -264,7 +294,7 @@ export const Dashboard: NextPage = () => {
       };
     });
 
-    let newDat: datType[] = [];
+    let newDat: gradesType[] = [];
     let newStudentTotals = [-1, -1, -1];
     for (let i = 0; i < partialGradesData.length; i++) {
       const total: number = partialGradesData[i].data.reduce(
@@ -280,12 +310,12 @@ export const Dashboard: NextPage = () => {
         data: normalized,
       };
     }
-    setDat(newDat);
+    setGradesData(newDat);
     setStudentTotals(newStudentTotals);
 
-    let newGPADat: datType[] = [];
-    let newAverageDat: datType[] = [];
-    let newStdevDat: datType[] = [];
+    let newGPADat: gradesType[] = [];
+    let newAverageDat: gradesType[] = [];
+    let newStdevDat: gradesType[] = [];
     for (let i = 0; i < partialGradesData.length; i++) {
       const GPALookup = [
         4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
@@ -313,13 +343,12 @@ export const Dashboard: NextPage = () => {
         data: [stdev],
       });
     }
-    setGPADat(newGPADat);
-    setAverageDat(newAverageDat);
-    setStdevDat(newStdevDat);
+    setGPAData(newGPADat);
+    setAverageData(newAverageDat);
+    setStdevData(newStdevDat);
   }, [fullGradesData, startingSession, endingSession]);
 
   let gradesPage;
-  let professorRatingsPage;
 
   if (gradesState === 'loading') {
     gradesPage = (
@@ -404,16 +433,16 @@ export const Dashboard: NextPage = () => {
                 'F',
                 'W',
               ]}
-              yaxisFormatter={(value) => value.toFixed(0) + '%'}
-              series={dat}
+              yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
+              series={gradesData}
             />
           </Card>
           <Card className="h-96 p-4 m-4">
             <GraphChoice
               form="BoxWhisker"
               title="GPA Box and Whisker"
-              yaxisFormatter={(value) => value.toFixed(2)}
-              series={GPAdat}
+              yaxisFormatter={(value) => Number(value).toFixed(2)}
+              series={GPAData}
             />
           </Card>
           <div className="grid grid-cols-1 md:grid-cols-2">
@@ -422,8 +451,8 @@ export const Dashboard: NextPage = () => {
                 form="Vertical"
                 title="GPA Averages"
                 xaxisLabels={['Average']}
-                yaxisFormatter={(value) => value.toFixed(2)}
-                series={averageDat}
+                yaxisFormatter={(value) => Number(value).toFixed(2)}
+                series={averageData}
               />
             </Card>
             <Card className="h-96 p-4 m-4">
@@ -431,8 +460,8 @@ export const Dashboard: NextPage = () => {
                 form="Vertical"
                 title="GPA Standard Deviations"
                 xaxisLabels={['Standard Deviation']}
-                yaxisFormatter={(value) => value.toFixed(2)}
-                series={stdevDat}
+                yaxisFormatter={(value) => Number(value).toFixed(2)}
+                series={stdevData}
               />
             </Card>
           </div>
@@ -440,6 +469,54 @@ export const Dashboard: NextPage = () => {
       </>
     );
   }
+
+  /* Professor Data */
+
+  type profType = {
+    found: boolean;
+    data: {
+      averageRating: number;
+      averageDifficulty: number;
+      department: string;
+      firstName: string;
+      lastName: string;
+      legacyId: string;
+      numRatings: number;
+      wouldTakeAgainPercentage: number;
+    };
+  };
+
+  const [professorRatingsState, setProfessorRatingsState] = useState('loading');
+
+  const [profData, setProfData] = useState<profType[]>([]);
+
+  useEffect(() => {
+    if (professorInvolvingSearchTerms.length > 0) {
+      setProfessorRatingsState('loading');
+      fetchData(
+        professorInvolvingSearchTerms.map(
+          (professorName) =>
+            '/api/ratemyprofessorScraper?professor=' +
+            encodeURIComponent(professorName),
+        ),
+        cacheIndexProfessor,
+        2629800000, //1 month
+      )
+        .then((responses) => {
+          setProfData(responses);
+          setProfessorRatingsState('success');
+        })
+        .catch((error) => {
+          setProfessorRatingsState('error');
+          console.error('Professor Scraper', error);
+        });
+    } else {
+      setProfessorRatingsState('success');
+      setProfData([]);
+    }
+  }, [professorInvolvingSearchTerms]);
+
+  let professorRatingsPage;
 
   if (professorRatingsState === 'loading') {
     professorRatingsPage = (
@@ -465,21 +542,38 @@ export const Dashboard: NextPage = () => {
       <>
         <div className="h-full m-4">
           {profData.length > 0 ? (
-            profData.map((data: RMPData, index: number) => (
-              <Card className="h-fit m-4" key={index}>
-                <ProfessorCard
-                  position="relative"
-                  element="Card"
-                  professorRating={data.averageRating}
-                  averageDifficulty={data.averageDifficulty}
-                  takingAgain={data.wouldTakeAgainPercentage}
-                  numRatings={data.numRatings}
-                  name={data.firstName + ' ' + data.lastName}
-                  department={data.department}
-                  key={index}
-                />
-              </Card>
-            ))
+            profData.map((data: profType, index: number) => {
+              if (!data.found) {
+                let text = 'Data not found';
+                if (
+                  typeof professorInvolvingSearchTerms[index] !== 'undefined'
+                ) {
+                  text += ' for ' + professorInvolvingSearchTerms[index];
+                }
+                return (
+                  <Card className="h-fit m-4" key={index}>
+                    <Typography className="text-2xl text-center m-4">
+                      {text}
+                    </Typography>
+                  </Card>
+                );
+              }
+              return (
+                <Card className="h-fit m-4" key={index}>
+                  <ProfessorCard
+                    position="relative"
+                    element="Card"
+                    professorRating={data.data.averageRating}
+                    averageDifficulty={data.data.averageDifficulty}
+                    takingAgain={data.data.wouldTakeAgainPercentage}
+                    numRatings={data.data.numRatings}
+                    name={data.data.firstName + ' ' + data.data.lastName}
+                    department={data.data.department}
+                    key={index}
+                  />
+                </Card>
+              );
+            })
           ) : (
             <h1 className="text-3xl text-center text-gray-600 font-semibold">
               No professors selected! Search for a professor or one of their
@@ -491,6 +585,8 @@ export const Dashboard: NextPage = () => {
       </>
     );
   }
+
+  /* Final page */
 
   return (
     <>
@@ -523,26 +619,5 @@ export const Dashboard: NextPage = () => {
     </>
   );
 };
-
-function searchTermsURIString(querys: SearchQuery[]): string {
-  return querys.map((query) => searchTermURIString(query)).join(',');
-}
-
-function searchTermURIString(query: SearchQuery): string {
-  let result = '';
-  if (query.prefix !== undefined) {
-    result += query.prefix;
-  }
-  if (query.number !== undefined) {
-    result += ' ' + query.number;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += '.' + query.sectionNumber;
-  }
-  if (query.professorName !== undefined) {
-    result += ' ' + query.professorName;
-  }
-  return result.trim();
-}
 
 export default Dashboard;
