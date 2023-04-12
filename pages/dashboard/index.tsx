@@ -4,6 +4,8 @@ import {
   Select,
   MenuItem,
   InputLabel,
+  Box,
+  Typography,
 } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
@@ -550,12 +552,7 @@ export const Dashboard: NextPage = () => {
                 }
                 return (
                   <Card className="h-fit m-4" key={index}>
-                    <ProfessorCard
-                      position="relative"
-                      element="Title"
-                      text={text}
-                      key={index}
-                    />
+                    <Typography className="text-2xl text-center m-4">{text}</Typography>
                   </Card>
                 );
               }
