@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react';
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
@@ -10,6 +11,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <link rel="icon" href="/Project_Nebula_Logo.svg" />
       </Head>
       <Component {...pageProps} />
+      <Analytics />
     </>
   );
 }
