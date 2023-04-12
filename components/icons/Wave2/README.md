@@ -1,4 +1,5 @@
 ### Wave 2 SVG Example
-``` ts
+
+```ts
 <Wave2SVG />
 ```

@@ -1,4 +1,5 @@
 ### Splash Page Search Example
-``` ts
+
+```ts
 <SplashPageSearchBar />
 ```

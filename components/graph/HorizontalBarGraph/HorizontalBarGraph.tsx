@@ -11,6 +11,13 @@ import React from 'react';
  * @returns horizontal bar graph
  */
 export function HorizontalBarGraph(props: GraphProps) {
+  function xaxisFormatter(value: string) {
+    if (typeof props.yaxisFormatter === 'undefined') {
+      return value;
+    }
+    return props.yaxisFormatter(Number(value));
+  }
+
   const options: ApexOptions = {
     chart: {
       id: 'line-chart',
@@ -28,10 +35,8 @@ export function HorizontalBarGraph(props: GraphProps) {
     },
     xaxis: {
       categories: props.xaxisLabels,
-    },
-    yaxis: {
       labels: {
-        formatter: props.yaxisFormatter,
+        formatter: xaxisFormatter,
       },
     },
     colors: ['#eb5757', '#2d9cdb', '#499F68'],

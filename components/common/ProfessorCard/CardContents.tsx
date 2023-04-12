@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import {Box, Typography} from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 interface CardContentProps {
   name: string;
@@ -19,7 +19,7 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
         </Box>
         <Box className="basis-1/2 flex flex-row items-center justify-center border-b-2 md:border-b-0 border-neutral-400 bg-inherit p-2">
           <Typography className="text-2xl text-center">
-            Department of {props.department} at University of Texas at Dallas
+            {props.department}
           </Typography>
         </Box>
       </Box>
@@ -30,7 +30,9 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
           </Typography>
           <Box
             className="h-32 w-32 border-2 border-neutral-400 flex items-center justify-center my-4 md:mt-0 mb-8 text-5xl text-neutral-600 font-bold"
-            sx={{ backgroundColor: getColorForRating(5 - props.averageDifficulty) }}
+            sx={{
+              backgroundColor: getColorForRating(5 - props.averageDifficulty),
+            }}
           >
             {props.averageDifficulty}
           </Box>
@@ -48,7 +50,7 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
         </Box>
         <Box className="flex flex-col justify-between items-center border-b-2 md:border-b-0 border-neutral-400 bg-primary-light w-full">
           <Typography className="text-3xl text-neutral-600 text-center font-semibold mt-4 lg:mb-8">
-            Percentage Taking Again
+            Would Take Again
           </Typography>
           <Box
             className="h-32 w-32 border-2 border-neutral-400 flex items-center justify-center my-4 md:mt-0 mb-8 text-5xl text-neutral-600 font-bold"

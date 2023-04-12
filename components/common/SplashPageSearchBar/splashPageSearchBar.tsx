@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { SearchIcon } from '../../icons/SearchIcon/searchIcon';
-import Autocomplete from '@mui/material/Autocomplete';
+import { Search } from '@mui/icons-material';
+import { Autocomplete, InputBase, InputAdornment } from '@mui/material';
 import { useEffect } from 'react';
 // import { searchAutocomplete } from '../../autocomplete';
 
@@ -61,10 +61,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
 
   return (
     <>
-      <div className="text-primary m-auto w-11/12 -translate-y-1/2">
-        <div className="translate-y-10 translate-x-4 w-8 h-8 text-primary-light">
-          <SearchIcon />
-        </div>
+      <div className="text-primary m-auto w-11/12 -translate-y-1/4">
         <Autocomplete
           autoHighlight={true}
           multiple={true}
@@ -102,15 +99,18 @@ export const SplashPageSearchBar = (props: SearchProps) => {
             setInputValue(newInputValue);
           }}
           renderInput={(params) => (
-            <div ref={params.InputProps.ref}>
-              <input
-                {...params.inputProps}
-                type="search"
-                id="mainSearch"
-                className="rounded-md border-primary-dark border-2 w-full h-12 pl-12 bg-white text-primary-dark placeholder-primary-dark font-bold"
-                placeholder="Search section number, professor name, course number...."
-              />
-            </div>
+            <InputBase
+              ref={params.InputProps.ref}
+              inputProps={params.inputProps}
+              autoFocus={true}
+              className="rounded-md border-primary-dark border-2 w-full h-12 px-2 bg-white text-primary-dark placeholder-primary-dark font-bold"
+              placeholder="Search section number, professor name, course number...."
+              startAdornment={
+                <InputAdornment position="start">
+                  <Search className="fill-primary text-4xl" />
+                </InputAdornment>
+              }
+            />
           )}
           defaultValue={[]}
         />
@@ -131,11 +131,11 @@ function searchQueryLabel(query: SearchQuery): string {
   if (query.number !== undefined) {
     result += ' ' + query.number;
   }
+  if (query.sectionNumber !== undefined) {
+    result += '.' + query.sectionNumber;
+  }
   if (query.professorName !== undefined) {
     result += ' ' + query.professorName;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += ' ' + query.sectionNumber;
   }
   return result.trim();
 }
