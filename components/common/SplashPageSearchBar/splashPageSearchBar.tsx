@@ -102,7 +102,6 @@ export const SplashPageSearchBar = (props: SearchProps) => {
             <InputBase
               ref={params.InputProps.ref}
               inputProps={params.inputProps}
-              autoFocus={true}
               className="rounded-md border-primary-dark border-2 w-full h-12 px-2 bg-white text-primary-dark placeholder-primary-dark font-bold"
               placeholder="Search section number, professor name, course number...."
               startAdornment={
