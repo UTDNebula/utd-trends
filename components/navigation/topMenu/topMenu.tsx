@@ -15,7 +15,7 @@ export function TopMenu() {
   const [openCopied, setOpenCopied] = useState<boolean>(false);
 
   function shareLink(url: string) {
-    if (false && navigator.share) {
+    if (navigator.share) {
       navigator
         .share({
           title: 'UTD Trends',
