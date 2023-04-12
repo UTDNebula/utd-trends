@@ -37,13 +37,13 @@ export const ExpandableSearchGrid = ({
 
   function addSearchTerm(newSearchTerm: SearchQuery) {
     if (newSearchTerm != null) {
-      console.log('adding ' + newSearchTerm + ' to the search terms.');
+      //console.log('adding ' + newSearchTerm + ' to the search terms.');
       setSearchTerms([...searchTerms, newSearchTerm]);
     }
   }
 
   function deleteSearchTerm(searchTermIndex: number) {
-    console.log('deleteSearchTerm called on ' + searchTermIndex);
+    //console.log('deleteSearchTerm called on ' + searchTermIndex);
     setSearchTerms(
       searchTerms
         .slice(0, searchTermIndex)
@@ -85,19 +85,8 @@ export const ExpandableSearchGrid = ({
         />
       ))}
       {searchTerms.length < 3 ? (
-        <Card className="bg-primary-light" sx={{ borderRadius: 0 }}>
-          <CardContent
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              padding: 1.5,
-              '&:last-child': {
-                paddingBottom: 1.5,
-              },
-            }}
-          >
+        <Card className="bg-primary-light rounded-none">
+          <CardContent className="flex flex-col justify-center items-start p-3">
             <SearchBar
               selectSearchValue={addSearchTerm}
               value={value}
@@ -115,7 +104,7 @@ function studentTotalFormatter(total: number) {
   if (total === -1) {
     return 'Loading...';
   }
-  return total.toLocaleString('en-US') + ' students';
+  return total.toLocaleString('en-US') + ' grades';
 }
 
 function searchQueryLabel(query: SearchQuery): string {
@@ -126,11 +115,11 @@ function searchQueryLabel(query: SearchQuery): string {
   if (query.number !== undefined) {
     result += ' ' + query.number;
   }
+  if (query.sectionNumber !== undefined) {
+    result += '.' + query.sectionNumber;
+  }
   if (query.professorName !== undefined) {
     result += ' ' + query.professorName;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += ' ' + query.sectionNumber;
   }
   return result.trim();
 }
