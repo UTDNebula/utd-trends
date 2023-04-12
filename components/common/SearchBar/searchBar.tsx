@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { SearchIcon } from '../../icons/SearchIcon/searchIcon';
-import Autocomplete from '@mui/material/Autocomplete';
+import { Search } from '@mui/icons-material';
+import { Autocomplete, InputBase, InputAdornment } from '@mui/material';
 import Popper from '@mui/material/Popper';
 import { Box, Paper } from '@mui/material';
 import { useEffect } from 'react';
@@ -66,15 +66,12 @@ export const SearchBar = (props: SearchProps) => {
 
   return (
     <>
-      <div className="text-primary w-11/12 h-fit flex flex-row items-center">
-        <div className="translate-x-12 w-8 h-8 text-primary">
-          <SearchIcon />
-        </div>
+      <div className="text-primary w-full max-w-2xl h-fit flex flex-row items-start">
         <Autocomplete
           autoHighlight={true}
           multiple={true}
           disabled={props.disabled}
-          className="w-full h-12 bg-primary-light outline-0 active:outline-0 focus:outline-0 font-sans"
+          className="w-full h-12 bg-primary-light font-sans"
           open={open}
           onOpen={() => {
             setOpen(true);
@@ -121,18 +118,18 @@ export const SearchBar = (props: SearchProps) => {
             setInputValue(newInputValue);
           }}
           renderInput={(params) => (
-            <div
+            <InputBase
               ref={params.InputProps.ref}
-              className="outline-0 active:outline-0 focus:outline-0 font-sans"
-            >
-              <input
-                {...params.inputProps}
-                type="search"
-                id="mainSearch"
-                className="outline-0 active:outline-0 focus:outline-0 w-full h-12 pl-16 bg-primary-light text-gray-600 placeholder-dark"
-                placeholder="Search section number, professor name, course number...."
-              />
-            </div>
+              inputProps={params.inputProps}
+              fullWidth={true}
+              className="font-sans w-full h-12 bg-primary-light text-gray-600 placeholder-dark"
+              placeholder="Search section number, professor name, course number...."
+              startAdornment={
+                <InputAdornment position="start">
+                  <Search className="fill-primary text-4xl" />
+                </InputAdornment>
+              }
+            />
           )}
           renderOption={(props, option, { selected }) => (
             <li

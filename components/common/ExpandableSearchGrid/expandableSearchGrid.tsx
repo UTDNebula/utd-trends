@@ -63,9 +63,9 @@ export const ExpandableSearchGrid = ({
       setSearchDisable(false);
     }
   }, [searchTerms]);
-  
+
   const router = useRouter();
-  
+
   useEffect(() => {
     if (router.isReady) {
       setSearchTerms(parseURIEncodedSearchTerms(router.query.searchTerms));
@@ -85,19 +85,8 @@ export const ExpandableSearchGrid = ({
         />
       ))}
       {searchTerms.length < 3 ? (
-        <Card className="bg-primary-light" sx={{ borderRadius: 0 }}>
-          <CardContent
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              padding: 1.5,
-              '&:last-child': {
-                paddingBottom: 1.5,
-              },
-            }}
-          >
+        <Card className="bg-primary-light rounded-none">
+          <CardContent className="flex flex-col justify-center items-start p-3">
             <SearchBar
               selectSearchValue={addSearchTerm}
               value={value}
@@ -115,7 +104,7 @@ function studentTotalFormatter(total: number) {
   if (total === -1) {
     return 'Loading...';
   }
-  return total.toLocaleString("en-US") + ' grades';
+  return total.toLocaleString('en-US') + ' grades';
 }
 
 function searchQueryLabel(query: SearchQuery): string {
