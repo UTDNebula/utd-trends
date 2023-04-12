@@ -552,7 +552,9 @@ export const Dashboard: NextPage = () => {
                 }
                 return (
                   <Card className="h-fit m-4" key={index}>
-                    <Typography className="text-2xl text-center m-4">{text}</Typography>
+                    <Typography className="text-2xl text-center m-4">
+                      {text}
+                    </Typography>
                   </Card>
                 );
               }
