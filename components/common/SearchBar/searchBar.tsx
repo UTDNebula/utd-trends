@@ -138,10 +138,6 @@ export const SearchBar = (props: SearchProps) => {
             >
               <Box className="cursor-pointer text-lg text-gray-600 pl-5 py-5">
                 {searchQueryLabel(option)}
-                <br />
-                <span className="text-base text-gray-600">
-                  {option.sectionNumber}
-                </span>
               </Box>
             </li>
           )}
@@ -192,11 +188,11 @@ function searchQueryLabel(query: SearchQuery): string {
   if (query.number !== undefined) {
     result += ' ' + query.number;
   }
+  if (query.sectionNumber !== undefined) {
+    result += '.' + query.sectionNumber;
+  }
   if (query.professorName !== undefined) {
     result += ' ' + query.professorName;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += ' ' + query.sectionNumber;
   }
   return result.trim();
 }

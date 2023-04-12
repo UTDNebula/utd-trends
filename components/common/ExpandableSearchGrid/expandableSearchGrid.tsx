@@ -115,11 +115,11 @@ function searchQueryLabel(query: SearchQuery): string {
   if (query.number !== undefined) {
     result += ' ' + query.number;
   }
+  if (query.sectionNumber !== undefined) {
+    result += '.' + query.sectionNumber;
+  }
   if (query.professorName !== undefined) {
     result += ' ' + query.professorName;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += ' ' + query.sectionNumber;
   }
   return result.trim();
 }

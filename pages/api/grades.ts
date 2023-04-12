@@ -21,14 +21,12 @@ export default function handler(
       Accept: 'application/json',
     };
     if (
-      (('prefix' in req.query && typeof req.query.prefix === 'string') ||
-        ('number' in req.query && typeof req.query.number === 'string') ||
-        ('professorName' in req.query &&
-          typeof req.query.professorName === 'string') ||
-        ('sectionNumber' in req.query &&
-          typeof req.query.sectionNumber === 'string')) &&
-      'representation' in req.query &&
-      typeof req.query.representation === 'string'
+      ('prefix' in req.query && typeof req.query.prefix === 'string') ||
+      ('number' in req.query && typeof req.query.number === 'string') ||
+      ('professorName' in req.query &&
+        typeof req.query.professorName === 'string') ||
+      ('sectionNumber' in req.query &&
+        typeof req.query.sectionNumber === 'string')
     ) {
       const url = new URL('https://api.utdnebula.com/grades/semester');
       if ('prefix' in req.query && typeof req.query.prefix === 'string') {
