@@ -17,7 +17,7 @@ export function HorizontalBarGraph(props: GraphProps) {
     }
     return props.yaxisFormatter(Number(value));
   }
-  
+
   const options: ApexOptions = {
     chart: {
       id: 'line-chart',

@@ -264,9 +264,15 @@ nodeFetch
           ' ' + profLast[0],
         );
         if (
-          !graph.hasEdge(professorFirstNameNode1, professorLastNameFirstCharNode1)
+          !graph.hasEdge(
+            professorFirstNameNode1,
+            professorLastNameFirstCharNode1,
+          )
         ) {
-          graph.addEdge(professorFirstNameNode1, professorLastNameFirstCharNode1);
+          graph.addEdge(
+            professorFirstNameNode1,
+            professorLastNameFirstCharNode1,
+          );
         }
         addSearchQueryCharacter(
           professorLastNameFirstCharNode1,

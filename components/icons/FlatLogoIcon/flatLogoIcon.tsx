@@ -1,12 +1,12 @@
 import React from 'react';
 /**
  * This is the flattened Nebula Logo SVG
- * 
+ *
  * This component simply returns the source of the svg so that it can be manipulated directly in
  * the DOM rather than using an IMG tag. Change color of the svg by changing the text color of the
  * surrouding div.
  */
-export function FlatLogoIcon (){
+export function FlatLogoIcon() {
   return (
     <>
       <svg
@@ -29,4 +29,4 @@ export function FlatLogoIcon (){
       </svg>
     </>
   );
-};
+}

@@ -2,27 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-:root{
-  --lm-primary-light: #BCC9FD;
-  --lm-primary-DEFAULT: #7486CE;
-  --lm-primary-dark: #4659A7;
+:root {
+  --lm-primary-light: #bcc9fd;
+  --lm-primary-DEFAULT: #7486ce;
+  --lm-primary-dark: #4659a7;
 
-  --lm-secondary-light: #FBBB78;
-  --lm-secondary-DEFAULT: #FFCF9D;
-  --lm-secondary-dark: #FFE2C5;
+  --lm-secondary-light: #fbbb78;
+  --lm-secondary-DEFAULT: #ffcf9d;
+  --lm-secondary-dark: #ffe2c5;
 
-  --dm-primary-light: #4659A7;
-  --dm-primary-DEFAULT: #7486CE;
-  --dm-primary-dark: #BCC9FD;
+  --dm-primary-light: #4659a7;
+  --dm-primary-DEFAULT: #7486ce;
+  --dm-primary-dark: #bcc9fd;
 
-  --dm-secondary-light: #4BA6A0;
-  --dm-secondary-DEFAULT: #69CCC6;
-  --dm-secondary-dark: #A7EDE9;
+  --dm-secondary-light: #4ba6a0;
+  --dm-secondary-DEFAULT: #69ccc6;
+  --dm-secondary-dark: #a7ede9;
 
-  --light: #F9F9FA;
-  --dark: #1F201F;
+  --light: #f9f9fa;
+  --dark: #1f201f;
   --surface: #858585;
-
 }
 
 html,
@@ -33,12 +32,12 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
-@layer base{
+@layer base {
   a {
     color: inherit;
     text-decoration: none;
   }
-} 
+}
 
 * {
   box-sizing: border-box;

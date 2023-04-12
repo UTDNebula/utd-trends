@@ -166,12 +166,10 @@ export function searchAutocomplete(query: string) {
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if ('input' in req.query && typeof req.query.input === 'string') {
     return new Promise<void>((resolve, reject) => {
-      res
-        .status(200)
-        .json({
-          success: true,
-          output: searchAutocomplete(req.query.input as string),
-        });
+      res.status(200).json({
+        success: true,
+        output: searchAutocomplete(req.query.input as string),
+      });
       resolve();
     });
   } else {
