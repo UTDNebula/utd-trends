@@ -79,7 +79,6 @@ export const SearchBar = (props: SearchProps) => {
           onClose={() => {
             setOpen(false);
           }}
-          filterSelectedOptions
           getOptionLabel={(option) => searchQueryLabel(option)}
           options={options}
           filterOptions={(options) => options}
