@@ -197,11 +197,11 @@ nodeFetch['default']('https://catfact.ninja/fact', { method: 'GET' })
       });
       //...[ <professorLast>|(<professorFirst> <professorLast>)]]
       var professorFirstNameNode = addWithParents(
-        [classNode, classNode2, prefixNode2],
+        [classNode, prefixNode2],
         ' ' + profFirst + ' ',
       );
       var professorLastNameNode = addWithParents(
-        [classNode, classNode2, prefixNode2, professorFirstNameNode],
+        [classNode, prefixNode2, professorFirstNameNode],
         ' ' + profLast,
         {
           prefix: prefix,
