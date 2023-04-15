@@ -219,7 +219,7 @@ nodeFetch
     }
 
     //Add node in format: <prefix>[<number>| <number>[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]]
-    //and: (<number>|<number> )[<prefix>][.<section>][ <professorLast>|(<professorFirst> <professorLast>)]
+    //and: (<number>|<number> )<prefix>[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]
     function addPrefixFirst(
       prefix: string,
       number: string,
@@ -247,11 +247,11 @@ nodeFetch
 
       //...[ <professorLast>|(<professorFirst> <professorLast>)]]
       const professorFirstNameNode = addWithParents(
-        [classNode, classNode2, prefixNode2],
+        [classNode, prefixNode2],
         ' ' + profFirst + ' ',
       );
       const professorLastNameNode = addWithParents(
-        [classNode, classNode2, prefixNode2, professorFirstNameNode],
+        [classNode, prefixNode2, professorFirstNameNode],
         ' ' + profLast,
         {
           prefix: prefix,
