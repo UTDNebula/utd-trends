@@ -123,7 +123,7 @@ export const SearchBar = (props: SearchProps) => {
               inputProps={params.inputProps}
               fullWidth={true}
               className="font-sans w-full h-12 bg-primary-light text-gray-600 placeholder-dark"
-              placeholder="Search section number, professor name, course number...."
+              placeholder="Search course, professor, or both...."
               startAdornment={
                 <InputAdornment position="start">
                   <Search className="fill-primary text-4xl" />
