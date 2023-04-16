@@ -316,8 +316,11 @@ export const Dashboard: NextPage = () => {
         4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
       ];
       const mean =
-        GPALookup.reduce((accumulator, currentValue, index) => accumulator + currentValue * partialGradesData[i].data[index], 0) /
-        total;
+        GPALookup.reduce(
+          (accumulator, currentValue, index) =>
+            accumulator + currentValue * partialGradesData[i].data[index],
+          0,
+        ) / total;
       newAverageDat.push({
         name: partialGradesData[i].name,
         data: [mean],
