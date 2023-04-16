@@ -16,6 +16,7 @@ type GraphProps = {
   yaxisFormatter?: (val: number) => string;
   series: any[];
   title: string;
+  subtitle?: string;
   labels?: string[];
 };
 export default GraphProps;

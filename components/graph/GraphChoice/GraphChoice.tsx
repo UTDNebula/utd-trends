@@ -24,6 +24,7 @@ export function GraphChoice(props: GraphProps) {
           yaxisFormatter={props.yaxisFormatter}
           series={props.series}
           title={props.title}
+          subtitle={props.subtitle}
         ></BarGraph>
       );
     }
@@ -34,6 +35,7 @@ export function GraphChoice(props: GraphProps) {
           yaxisFormatter={props.yaxisFormatter}
           series={props.series}
           title={props.title}
+          subtitle={props.subtitle}
         ></LineGraph>
       );
     }
@@ -44,6 +46,7 @@ export function GraphChoice(props: GraphProps) {
           yaxisFormatter={props.yaxisFormatter}
           series={props.series}
           title={props.title}
+          subtitle={props.subtitle}
         ></BoxGraph>
       );
     }
@@ -54,6 +57,7 @@ export function GraphChoice(props: GraphProps) {
           yaxisFormatter={props.yaxisFormatter}
           series={props.series}
           title={props.title}
+          subtitle={props.subtitle}
         ></VerticalBarGraph>
       );
     }
@@ -64,6 +68,7 @@ export function GraphChoice(props: GraphProps) {
           yaxisFormatter={props.yaxisFormatter}
           series={props.series}
           title={props.title}
+          subtitle={props.subtitle}
         ></HorizontalBarGraph>
       );
     }
@@ -73,6 +78,7 @@ export function GraphChoice(props: GraphProps) {
           xaxisLabels={props.xaxisLabels}
           series={props.series}
           title={props.title}
+          subtitle={props.subtitle}
         ></RadarChart>
       );
     }
@@ -81,6 +87,7 @@ export function GraphChoice(props: GraphProps) {
         <RadialBarChart
           series={props.series}
           title={props.title}
+          subtitle={props.subtitle}
         ></RadialBarChart>
       );
     }
@@ -91,6 +98,7 @@ export function GraphChoice(props: GraphProps) {
           yaxisFormatter={props.yaxisFormatter}
           series={props.series}
           title={props.title}
+          subtitle={props.subtitle}
         ></BarGraph>
       );
     }
