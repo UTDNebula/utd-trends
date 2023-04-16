@@ -320,7 +320,9 @@ export const Dashboard: NextPage = () => {
           (accumulator, currentValue, index) =>
             accumulator + currentValue * partialGradesData[i].data[index],
           0,
-        ) / total;
+        ) /
+        (total -
+          partialGradesData[i].data[partialGradesData[i].data.length - 1]);
       newAverageDat.push({
         name: partialGradesData[i].name,
         data: [mean],
