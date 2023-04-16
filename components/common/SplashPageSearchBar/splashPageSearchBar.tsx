@@ -32,6 +32,10 @@ export const SplashPageSearchBar = (props: SearchProps) => {
   const [inputValue, setInputValue] = React.useState('');
 
   useEffect(() => {
+    if (inputValue === '') {
+      setOptions([]);
+      return;
+    }
     const controller = new AbortController();
     fetch('/api/autocomplete?input=' + inputValue, {
       signal: controller.signal,
