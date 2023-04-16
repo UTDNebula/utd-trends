@@ -3,7 +3,7 @@ import { Search } from '@mui/icons-material';
 import { Autocomplete, InputBase, InputAdornment } from '@mui/material';
 import Popper from '@mui/material/Popper';
 import { Box, Paper } from '@mui/material';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
@@ -15,8 +15,7 @@ import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual
 type SearchProps = {
   // setSearch: the setter function from the parent component to set the search value
   selectSearchValue: Function;
-  value: SearchQuery[];
-  setValue: Function;
+  searchTerms: SearchQuery[];
   disabled?: boolean;
 };
 
@@ -27,45 +26,51 @@ type SearchProps = {
  * Styled for the ExpandableSearchGrid component
  */
 export const SearchBar = (props: SearchProps) => {
-  const [open, setOpen] = React.useState(false);
-  const [options, setOptions] = React.useState<readonly SearchQuery[]>([]);
+  const [open, setOpen] = useState(false);
+  const [options, setOptions] = useState<readonly SearchQuery[]>([]);
 
-  const [inputValue, setInputValue] = React.useState('');
+  const [value, setValue] = useState<SearchQuery | null>(null);
+  const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
-    const controller = new AbortController();
-    fetch('/api/autocomplete?input=' + inputValue, {
-      signal: controller.signal,
-      method: 'GET',
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setOptions(data.output);
-      })
-      .catch((error) => {
-        if (error instanceof DOMException) {
-          // ignore aborts
-        } else {
-          console.log(error);
+    if (open) {
+      let searchValue = inputValue;
+      if (searchValue === '') {
+        if (!props.searchTerms.length) {
+          setOptions([]);
+          return;
         }
-      });
-    return () => {
-      controller.abort();
-    };
-  }, [props.value, inputValue]);
-
-  useEffect(() => {
-    if (!open) {
-      setOptions([]);
+        searchValue = searchQueryLabel(
+          props.searchTerms[props.searchTerms.length - 1],
+        );
+      }
+      const controller = new AbortController();
+      fetch('/api/autocomplete?input=' + searchValue, {
+        signal: controller.signal,
+        method: 'GET',
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setOptions(data.output);
+        })
+        .catch((error) => {
+          if (error instanceof DOMException) {
+            // ignore aborts
+          } else {
+            console.log(error);
+          }
+        });
+      return () => {
+        controller.abort();
+      };
     }
-  }, [open]);
+  }, [open, inputValue]);
 
   return (
     <>
       <div className="text-primary w-full max-w-2xl h-fit flex flex-row items-start">
         <Autocomplete
           autoHighlight={true}
-          multiple={true}
           disabled={props.disabled}
           className="w-full h-12 bg-primary-light font-sans"
           open={open}
@@ -78,36 +83,21 @@ export const SearchBar = (props: SearchProps) => {
           filterSelectedOptions
           getOptionLabel={(option) => searchQueryLabel(option)}
           options={options}
-          filterOptions={(options) => options}
-          value={props.value}
-          // When a new option is selected, find the new selected option by getting the
-          // difference between the current and new value, then return that to the parent
+          filterOptions={(options) =>
+            options.filter((option) =>
+              props.searchTerms.every(
+                (searchTerm) => !searchQueryEqual(option, searchTerm),
+              ),
+            )
+          }
+          value={value}
+          // When a new option is selected return it to the parent
           // component using selectSearchValue prop
-          onChange={(
-            event: any,
-            newValue: SearchQuery[] | undefined,
-            reason,
-          ) => {
-            if (reason === 'removeOption') {
-              return;
+          onChange={(event: any, newValue: SearchQuery | null, reason) => {
+            if (reason === 'selectOption' && typeof newValue !== 'undefined') {
+              props.selectSearchValue(newValue);
+              setValue(null);
             }
-            let difference: SearchQuery[];
-            if (props.value !== undefined) {
-              if (newValue !== undefined) {
-                // @ts-ignore
-                difference = newValue.filter((x) => !props.value.includes(x));
-              } else {
-                difference = [];
-              }
-            } else {
-              if (newValue !== undefined) {
-                difference = newValue;
-              } else {
-                difference = [];
-              }
-            }
-            props.selectSearchValue(difference[0] ? difference[0] : null);
-            props.setValue(newValue);
           }}
           inputValue={inputValue}
           onInputChange={(event, newInputValue) => {
@@ -152,7 +142,6 @@ export const SearchBar = (props: SearchProps) => {
               </Paper>
             );
           }}
-          defaultValue={[]}
         />
         <div className="w-8 h-8" />
       </div>

@@ -22,7 +22,6 @@ export const ExpandableSearchGrid = ({
   onChange,
   studentTotals,
 }: ExpandableSearchGridProps) => {
-  const [value, setValue] = useState<SearchQuery[]>([]);
   const [searchTerms, setSearchTerms] = useState<SearchQuery[]>([]);
   const [searchDisabled, setSearchDisable] = useState<boolean>(false);
 
@@ -42,11 +41,6 @@ export const ExpandableSearchGrid = ({
     setSearchTerms(
       searchTerms
         .slice(0, searchTermIndex)
-        .concat(searchTerms.slice(searchTermIndex + 1)),
-    );
-    setValue(
-      value
-        ?.slice(0, searchTermIndex)
         .concat(searchTerms.slice(searchTermIndex + 1)),
     );
   }
@@ -84,8 +78,7 @@ export const ExpandableSearchGrid = ({
           <CardContent className="flex flex-col justify-center items-start p-3">
             <SearchBar
               selectSearchValue={addSearchTerm}
-              value={value}
-              setValue={setValue}
+              searchTerms={searchTerms}
               disabled={searchDisabled}
             />
           </CardContent>
