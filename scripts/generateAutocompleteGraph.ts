@@ -165,6 +165,9 @@ nodeFetch
       if (typeof preExisting === 'string') {
         if (characters.length <= 1) {
           //console.log('found: ', characters[0], 'end');
+          if (typeof data !== 'undefined') {
+            graph.setNodeAttribute(preExisting, 'd', data);
+          }
           return preExisting;
         }
         //console.log('found: ', characters[0]);
