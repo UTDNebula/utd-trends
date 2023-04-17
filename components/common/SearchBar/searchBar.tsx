@@ -4,6 +4,8 @@ import { Autocomplete, InputBase, InputAdornment } from '@mui/material';
 import Popper from '@mui/material/Popper';
 import { Box, Paper } from '@mui/material';
 import { useEffect } from 'react';
+import parse from 'autosuggest-highlight/parse';
+import match from 'autosuggest-highlight/match';
 // import { searchAutocomplete } from '../../autocomplete';
 
 /**
@@ -131,13 +133,34 @@ export const SearchBar = (props: SearchProps) => {
               }
             />
           )}
-          renderOption={(props, option, { selected }) => (
-            <li
-              {...props}
-            >
-              {searchQueryLabel(option)}
-            </li>
-          )}
+          renderOption={(props, option, { inputValue }) => {
+            const text = searchQueryLabel(option);
+            //add spaces between prefix and course number
+            const matches = match(
+              text,
+              inputValue.replace(
+                /([a-zA-Z]{2,4})([0-9][0-9V]?[0-9]{0,2})/,
+                '$1 $2',
+              ),
+            );
+            const parts = parse(text, matches);
+            console.log(parts);
+            return (
+              <li {...props}>
+                {parts.map((part, index) => (
+                  <span
+                    key={index}
+                    className={
+                      'whitespace-pre-wrap' +
+                      (part.highlight ? ' font-bold' : '')
+                    }
+                  >
+                    {part.text}
+                  </span>
+                ))}
+              </li>
+            );
+          }}
           isOptionEqualToValue={(option, value) => {
             if (option.prefix !== value.prefix) {
               return false;
