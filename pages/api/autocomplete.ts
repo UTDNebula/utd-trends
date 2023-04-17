@@ -82,7 +82,10 @@ function bfsRecursionToNextData(queue: PriorityQueue) {
   if (typeof data !== 'undefined') {
     graph.forEachOutNeighbor(queueItem?.data?.node, (neighbor) => {
       queue.enqueue({
-        priority: queueItem?.priority ?? 0 + 1,
+        priority:
+          (queueItem?.priority ?? 0) +
+          100 +
+          graph.getNodeAttribute(neighbor, 'c').length,
         data: {
           node: neighbor,
           characters: '',
@@ -94,7 +97,9 @@ function bfsRecursionToNextData(queue: PriorityQueue) {
   } else {
     graph.forEachOutNeighbor(queueItem?.data?.node, (neighbor) => {
       queue.enqueue({
-        priority: queueItem?.priority ?? 0,
+        priority:
+          (queueItem?.priority ?? 0) +
+          graph.getNodeAttribute(neighbor, 'c').length,
         data: {
           node: neighbor,
           characters: '',
@@ -138,7 +143,7 @@ function bfsRecursion(queue: PriorityQueue) {
   ) {
     //full match or end of characters to match but all matched
     //console.log('match: ', queueItem?.data?.characters, queueItem?.data?.characters?.length === 1);
-    if (queueItem?.data?.characters?.length <= nodeCharacters.length) {
+    if (queueItem?.data?.characters?.length === matches) {
       //last characters
       queueToNext = true;
       returnData = true;
@@ -147,7 +152,7 @@ function bfsRecursion(queue: PriorityQueue) {
     }
   } else if (
     matches > 0 &&
-    queueItem?.data?.characters?.length < nodeCharacters.length
+    queueItem?.data?.characters?.length <= nodeCharacters.length
   ) {
     //partial match
     queueToNext = true;
@@ -158,7 +163,9 @@ function bfsRecursion(queue: PriorityQueue) {
     graph.forEachOutNeighbor(queueItem?.data?.node, (neighbor) => {
       //console.log('queue: ', graph.getNodeAttribute(neighbor, 'c'));
       queue.enqueue({
-        priority: queueItem?.priority ?? 0,
+        priority:
+          (queueItem?.priority ?? 0) +
+          graph.getNodeAttribute(neighbor, 'c').length,
         data: {
           node: neighbor,
           characters: queueItem?.data?.characters?.slice(matches),
@@ -171,7 +178,9 @@ function bfsRecursion(queue: PriorityQueue) {
     graph.forEachOutNeighbor(queueItem?.data?.node, (neighbor) => {
       //console.log('toNext: ', graph.getNodeAttribute(neighbor, 'c'));
       queue.enqueue({
-        priority: queueItem?.priority ?? 0,
+        priority:
+          (queueItem?.priority ?? 0) +
+          graph.getNodeAttribute(neighbor, 'c').length,
         data: {
           node: neighbor,
           characters: '',
@@ -199,10 +208,10 @@ export function searchAutocomplete(query: string) {
       visited: false,
     };
   });
-  let queue = new PriorityQueue();
+  const queue = new PriorityQueue();
   graph.forEachOutNeighbor(root, (neighbor) => {
     queue.enqueue({
-      priority: 0,
+      priority: graph.getNodeAttribute(neighbor, 'c').length,
       data: {
         node: neighbor,
         characters: query,
