@@ -118,10 +118,9 @@ export const SplashPageSearchBar = (props: SearchProps) => {
             //add spaces between prefix and course number
             const matches = match(
               text,
-              inputValue.replace(
-                /([a-zA-Z]{2,4})([0-9][0-9V]?[0-9]{0,2})/,
-                '$1 $2',
-              ),
+              inputValue
+                .replace(/([a-zA-Z]{2,4})([0-9][0-9V]?[0-9]{0,2})/, '$1 $2')
+                .replace(/([0-9][0-9V]?[0-9]{0,2})([a-zA-Z]{2,4})/, '$1 $2'),
             );
             const parts = parse(text, matches);
             return (
