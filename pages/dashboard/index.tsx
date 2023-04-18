@@ -16,6 +16,7 @@ import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
+import { useMediaQuery } from '@mui/material';
 
 type SearchQuery = {
   prefix?: string;
@@ -95,6 +96,9 @@ export const Dashboard: NextPage = () => {
       }),
     );
   }
+  
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const darkModeElevation = prefersDarkMode ? 3 : 1;
 
   /* Grades data */
 
@@ -413,7 +417,7 @@ export const Dashboard: NextPage = () => {
               </Select>
             </div>
           </div>
-          <Card className="h-96 p-4 m-4">
+          <Card className="h-96 p-4 m-4" elevation={darkModeElevation}>
             <GraphChoice
               form="Bar"
               title="Grades"
@@ -437,7 +441,7 @@ export const Dashboard: NextPage = () => {
               series={gradesData}
             />
           </Card>
-          <Card className="h-96 p-4 m-4">
+          <Card className="h-96 p-4 m-4" elevation={darkModeElevation}>
             <GraphChoice
               form="BoxWhisker"
               title="GPA Box and Whisker"
@@ -446,7 +450,7 @@ export const Dashboard: NextPage = () => {
             />
           </Card>
           <div className="grid grid-cols-1 md:grid-cols-2">
-            <Card className="h-96 p-4 m-4">
+            <Card className="h-96 p-4 m-4" elevation={darkModeElevation}>
               <GraphChoice
                 form="Vertical"
                 title="GPA Averages"
@@ -455,7 +459,7 @@ export const Dashboard: NextPage = () => {
                 series={averageData}
               />
             </Card>
-            <Card className="h-96 p-4 m-4">
+            <Card className="h-96 p-4 m-4" elevation={darkModeElevation}>
               <GraphChoice
                 form="Vertical"
                 title="GPA Standard Deviations"
@@ -551,7 +555,7 @@ export const Dashboard: NextPage = () => {
                   text += ' for ' + professorInvolvingSearchTerms[index];
                 }
                 return (
-                  <Card className="h-fit m-4" key={index}>
+                  <Card className="h-fit m-4" key={index} elevation={darkModeElevation}>
                     <Typography className="text-2xl text-center m-4">
                       {text}
                     </Typography>
@@ -559,7 +563,7 @@ export const Dashboard: NextPage = () => {
                 );
               }
               return (
-                <Card className="h-fit m-4" key={index}>
+                <Card className="h-fit m-4" key={index} elevation={darkModeElevation}>
                   <ProfessorCard
                     position="relative"
                     element="Card"

@@ -34,6 +34,7 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
         alignItems: 'center',
         borderRadius: 0,
       }}
+      variant="outlined"
     >
       <div className="float-left flex align-middle place-items-center">
         <Box
