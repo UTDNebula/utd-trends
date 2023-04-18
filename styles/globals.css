@@ -14,7 +14,9 @@ body {
 }
 
 @layer base {
-  :root, ::before, ::after {
+  :root,
+  ::before,
+  ::after {
     --primary-light: 188 201 253;
     --primary-DEFAULT: 116 134 206;
     --primary-dark: 70 89 167;
@@ -28,9 +30,11 @@ body {
 
     --surface: 133 133 133;
   }
-  
+
   @media (prefers-color-scheme: dark) {
-    :root, ::before, ::after {
+    :root,
+    ::before,
+    ::after {
       --primary-light: 70 89 167;
       --primary-DEFAULT: 116 134 206;
       --primary-dark: 188 201 253;

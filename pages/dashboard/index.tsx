@@ -96,7 +96,7 @@ export const Dashboard: NextPage = () => {
       }),
     );
   }
-  
+
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const darkModeElevation = prefersDarkMode ? 3 : 1;
 
@@ -555,7 +555,11 @@ export const Dashboard: NextPage = () => {
                   text += ' for ' + professorInvolvingSearchTerms[index];
                 }
                 return (
-                  <Card className="h-fit m-4" key={index} elevation={darkModeElevation}>
+                  <Card
+                    className="h-fit m-4"
+                    key={index}
+                    elevation={darkModeElevation}
+                  >
                     <Typography className="text-2xl text-center m-4">
                       {text}
                     </Typography>
@@ -563,7 +567,11 @@ export const Dashboard: NextPage = () => {
                 );
               }
               return (
-                <Card className="h-fit m-4" key={index} elevation={darkModeElevation}>
+                <Card
+                  className="h-fit m-4"
+                  key={index}
+                  elevation={darkModeElevation}
+                >
                   <ProfessorCard
                     position="relative"
                     element="Card"
