@@ -24,6 +24,7 @@ export function RadialBarChart(props: GraphProps) {
       zoom: {
         enabled: false,
       },
+      background: 'transparent',
     },
     labels: compiledLabels,
     colors: ['#eb5757', '#2d9cdb', '#499F68'],

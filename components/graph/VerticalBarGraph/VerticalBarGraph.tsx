@@ -18,6 +18,7 @@ export function VerticalBarGraph(props: GraphProps) {
       zoom: {
         enabled: false,
       },
+      background: 'transparent',
     },
     plotOptions: {
       bar: {

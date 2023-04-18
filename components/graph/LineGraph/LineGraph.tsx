@@ -18,6 +18,7 @@ export function LineGraph(props: GraphProps) {
       zoom: {
         enabled: false,
       },
+      background: 'transparent',
     },
     plotOptions: {
       bar: {

@@ -45,6 +45,7 @@ export function BoxGraph(props: GraphProps) {
       zoom: {
         enabled: false,
       },
+      background: 'transparent',
     },
     plotOptions: {
       bar: {

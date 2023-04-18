@@ -18,6 +18,7 @@ export function RadarChart(props: GraphProps) {
       zoom: {
         enabled: false,
       },
+      background: 'transparent',
     },
     dataLabels: {
       enabled: false,
