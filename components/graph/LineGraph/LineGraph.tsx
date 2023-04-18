@@ -4,6 +4,7 @@ import { ApexOptions } from 'apexcharts';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import GraphProps from '../../../modules/GraphProps';
 import React from 'react';
+import { useMediaQuery } from '@mui/material';
 
 /**
  * Creates a pre-configured ApexCharts line graph component. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`.
@@ -54,6 +55,9 @@ export function LineGraph(props: GraphProps) {
         fontSize: '14px',
         fontFamily: undefined,
       },
+    },
+    theme: {
+      mode: useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light',
     },
   };
 

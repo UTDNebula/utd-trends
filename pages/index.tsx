@@ -62,7 +62,7 @@ const Home: NextPage = () => {
                     <LogoIcon />
                   </div>
                   <div className="text-center pb-2">
-                    <h2 className="text-headline4">Welcome to UTD Trends!</h2>
+                    <h2 className="text-headline4 text-light-always">Welcome to UTD Trends!</h2>
                   </div>
                 </Card>
               </div>

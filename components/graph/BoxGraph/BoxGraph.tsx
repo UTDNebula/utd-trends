@@ -3,6 +3,7 @@ import { ApexOptions } from 'apexcharts';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import GraphProps from '../../../modules/GraphProps';
 import React from 'react';
+import { useMediaQuery } from '@mui/material';
 
 /**
  * Creates a pre-configured ApexCharts box-and-whisker graph. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`.
@@ -86,6 +87,9 @@ export function BoxGraph(props: GraphProps) {
         fontSize: '14px',
         fontFamily: undefined,
       },
+    },
+    theme: {
+      mode: useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light',
     },
   };
 

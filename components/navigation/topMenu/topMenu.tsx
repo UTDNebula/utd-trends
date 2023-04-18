@@ -50,7 +50,7 @@ export function TopMenu() {
                 <div className="h-full float-left mr-2 w-7">
                   <LogoIcon />
                 </div>
-                <h1 className=" float-right text-xl">UTD Trends</h1>
+                <h1 className="float-right text-xl text-light-always">UTD Trends</h1>
               </div>
             </a>
           </Link>
@@ -69,7 +69,7 @@ export function TopMenu() {
               shareLink(url);
             }}
           >
-            <Share className="fill-white text-3xl mr-1" />
+            <Share className="fill-light-always text-3xl mr-1" />
           </IconButton>
         </div>
       </div>

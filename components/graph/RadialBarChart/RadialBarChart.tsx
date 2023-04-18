@@ -4,6 +4,7 @@ import { ApexOptions } from 'apexcharts';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import GraphProps from '../../../modules/GraphProps';
 import React from 'react';
+import { useMediaQuery } from '@mui/material';
 
 /**
  * Creates a pre-configured ApexCharts radial bar graph component. Takes in `series` and `title` `GraphProps`. The `data` fields in `series` need to each be arrays with just one entry.
@@ -56,6 +57,9 @@ export function RadialBarChart(props: GraphProps) {
           },
         },
       },
+    },
+    theme: {
+      mode: useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light',
     },
   };
 
