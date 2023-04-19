@@ -90,15 +90,13 @@ export const ExpandableSearchGrid = ({
         />
       ))}
       {searchTerms.length < 3 ? (
-        <Card className="bg-primary-light rounded-none">
-          <CardContent className="flex flex-col justify-center items-start p-3">
+        <Card className="bg-primary-light rounded-none flex flex-col justify-center items-start p-3">
             <SearchBar
               selectSearchValue={addSearchTerm}
               value={value}
               setValue={setValue}
               disabled={searchDisabled}
             />
-          </CardContent>
         </Card>
       ) : null}
     </div>
