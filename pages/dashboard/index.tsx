@@ -319,8 +319,8 @@ export const Dashboard: NextPage = () => {
             accumulator + currentValue * partialGradesData[i].data[index],
           0,
         ) /
-        (total -
-          partialGradesData[i].data[partialGradesData[i].data.length - 1])
+          (total -
+            partialGradesData[i].data[partialGradesData[i].data.length - 1]),
       );
     }
     setGradesData(newGradesData);

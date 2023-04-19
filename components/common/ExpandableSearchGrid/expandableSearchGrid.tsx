@@ -79,7 +79,10 @@ export const ExpandableSearchGrid = ({
       {searchTerms.map((option: SearchQuery, index: number) => (
         <SearchTermCard
           primaryText={searchQueryLabel(option)}
-          secondaryText={secondaryTextFormatter(studentTotals[index], averageData[index])}
+          secondaryText={secondaryTextFormatter(
+            studentTotals[index],
+            averageData[index],
+          )}
           key={index}
           index={index}
           legendColor={colors[index]}
@@ -106,7 +109,12 @@ function secondaryTextFormatter(total: number, gpa: number) {
   if (total === -1 || gpa === -1) {
     return 'Loading...';
   }
-  return total.toLocaleString('en-US') + ' grades | ' + Number(gpa).toFixed(2) + ' average GPA';
+  return (
+    total.toLocaleString('en-US') +
+    ' grades | ' +
+    Number(gpa).toFixed(2) +
+    ' average GPA'
+  );
 }
 
 function searchQueryLabel(query: SearchQuery): string {
