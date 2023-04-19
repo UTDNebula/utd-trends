@@ -27,7 +27,8 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
   return (
     <Card className="bg-primary-light p-2 flex flex-row justify-between items-center rounded-none">
       <div className="float-left flex align-middle place-items-center">
-        <Box className={"rounded-full w-5 h-5 float-left mr-2 ml-2"}
+        <Box
+          className={'rounded-full w-5 h-5 float-left mr-2 ml-2'}
           sx={{
             backgroundColor: props.legendColor,
           }}
