@@ -115,9 +115,7 @@ export const Dashboard: NextPage = () => {
 
   const [fullGradesData, setFullGradesData] = useState<fullGradesType[]>([]);
   const [gradesData, setGradesData] = useState<gradesType[]>([]);
-  const [GPAData, setGPAData] = useState<gradesType[]>([]);
-  const [averageData, setAverageData] = useState<gradesType[]>([]);
-  const [stdevData, setStdevData] = useState<gradesType[]>([]);
+  const [averageData, setAverageData] = useState([-1, -1, -1]);
   const [studentTotals, setStudentTotals] = useState([-1, -1, -1]);
 
   const [professorInvolvingSearchTerms, setProfessorInvolvingSearchTerms] =
@@ -294,10 +292,9 @@ export const Dashboard: NextPage = () => {
       };
     });
 
-    let newDat: gradesType[] = [];
+    let newGradesData: gradesType[] = [];
     let newStudentTotals = [-1, -1, -1];
-    let newAverageDat: gradesType[] = [];
-    let newStdevDat: gradesType[] = [];
+    let newAverageData: number[] = [];
     for (let i = 0; i < partialGradesData.length; i++) {
       const total: number = partialGradesData[i].data.reduce(
         (accumulator, currentValue) => accumulator + currentValue,
@@ -307,7 +304,7 @@ export const Dashboard: NextPage = () => {
       const normalized: number[] = partialGradesData[i].data.map(
         (value) => (value / total) * 100,
       );
-      newDat[i] = {
+      newGradesData[i] = {
         name: partialGradesData[i].name,
         data: normalized,
       };
@@ -315,23 +312,20 @@ export const Dashboard: NextPage = () => {
       const GPALookup = [
         4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
       ];
-      const mean =
+
+      newAverageData.push(
         GPALookup.reduce(
           (accumulator, currentValue, index) =>
             accumulator + currentValue * partialGradesData[i].data[index],
           0,
         ) /
         (total -
-          partialGradesData[i].data[partialGradesData[i].data.length - 1]);
-      newAverageDat.push({
-        name: partialGradesData[i].name,
-        data: [mean],
-      });
+          partialGradesData[i].data[partialGradesData[i].data.length - 1])
+      );
     }
-    setGradesData(newDat);
+    setGradesData(newGradesData);
     setStudentTotals(newStudentTotals);
-    setAverageData(newAverageDat);
-    setStdevData(newStdevDat);
+    setAverageData(newAverageData);
   }, [fullGradesData, startingSession, endingSession]);
 
   let gradesPage;
@@ -421,16 +415,6 @@ export const Dashboard: NextPage = () => {
               ]}
               yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
               series={gradesData}
-            />
-          </Card>
-          <Card className="h-96 p-4 m-4">
-            <GraphChoice
-              form="Vertical"
-              title="GPA Averages"
-              subtitle="Excluding dropped grades"
-              xaxisLabels={['Average']}
-              yaxisFormatter={(value) => Number(value).toFixed(2)}
-              series={averageData}
             />
           </Card>
         </div>
@@ -574,6 +558,7 @@ export const Dashboard: NextPage = () => {
         <ExpandableSearchGrid
           onChange={searchTermsChange}
           studentTotals={studentTotals}
+          averageData={averageData}
         />
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">

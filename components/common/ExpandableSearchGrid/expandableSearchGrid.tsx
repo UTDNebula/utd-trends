@@ -16,6 +16,7 @@ type SearchQuery = {
 type ExpandableSearchGridProps = {
   onChange: Function;
   studentTotals: number[];
+  averageData: number[];
 };
 
 /**
@@ -26,6 +27,7 @@ type ExpandableSearchGridProps = {
 export const ExpandableSearchGrid = ({
   onChange,
   studentTotals,
+  averageData,
 }: ExpandableSearchGridProps) => {
   const [value, setValue] = useState<SearchQuery[]>([]);
   const [searchTerms, setSearchTerms] = useState<SearchQuery[]>([]);
@@ -77,7 +79,7 @@ export const ExpandableSearchGrid = ({
       {searchTerms.map((option: SearchQuery, index: number) => (
         <SearchTermCard
           primaryText={searchQueryLabel(option)}
-          secondaryText={studentTotalFormatter(studentTotals[index])}
+          secondaryText={secondaryTextFormatter(studentTotals[index], averageData[index])}
           key={index}
           index={index}
           legendColor={colors[index]}
@@ -100,11 +102,11 @@ export const ExpandableSearchGrid = ({
   );
 };
 
-function studentTotalFormatter(total: number) {
-  if (total === -1) {
+function secondaryTextFormatter(total: number, gpa: number) {
+  if (total === -1 || gpa === -1) {
     return 'Loading...';
   }
-  return total.toLocaleString('en-US') + ' grades';
+  return total.toLocaleString('en-US') + ' grades | ' + Number(gpa).toFixed(2) + ' average GPA';
 }
 
 function searchQueryLabel(query: SearchQuery): string {
