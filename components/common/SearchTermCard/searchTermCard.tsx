@@ -12,6 +12,7 @@ type SearchTermCardProps = {
   index: number;
   onCloseButtonClicked: Function;
   legendColor: string;
+  loading: boolean;
 };
 
 /**
@@ -28,7 +29,7 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
     <Card className="bg-primary-light p-2 flex flex-row justify-between items-center rounded-none">
       <div className="float-left flex align-middle place-items-center">
         <Box
-          className={'rounded-full w-5 h-5 float-left mr-2 ml-2'}
+          className="rounded-full w-5 h-5 float-left mr-2 ml-2"
           sx={{
             backgroundColor: props.legendColor,
           }}
@@ -38,11 +39,13 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
             {props.primaryText}
           </Typography>
           <span className="block text-sm text-gray-500 inline">
-            {props.secondaryText}
+            {props.loading ? 'Loading...' : props.secondaryText}
           </span>
-          <Tooltip title="Avergae GPA excludes dropped grades" arrow>
-            <Help className="inline fill-primary text-base ml-0.5 mb-0.5" />
-          </Tooltip>
+          {props.loading ? null : (
+            <Tooltip title="Avergae GPA excludes dropped grades" arrow>
+              <Help className="inline fill-primary text-base ml-0.5 mb-0.5" />
+            </Tooltip>
+          )}
         </div>
       </div>
       <div className="float-right">

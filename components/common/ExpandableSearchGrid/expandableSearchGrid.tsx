@@ -87,6 +87,7 @@ export const ExpandableSearchGrid = ({
           index={index}
           legendColor={colors[index]}
           onCloseButtonClicked={deleteSearchTerm}
+          loading={studentTotals[index] === -1 || averageData[index] === -1}
         />
       ))}
       {searchTerms.length < 3 ? (
@@ -104,9 +105,6 @@ export const ExpandableSearchGrid = ({
 };
 
 function secondaryTextFormatter(total: number, gpa: number) {
-  if (total === -1 || gpa === -1) {
-    return 'Loading...';
-  }
   return (
     total.toLocaleString('en-US') +
     ' grades | ' +
