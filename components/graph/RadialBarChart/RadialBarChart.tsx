@@ -33,10 +33,6 @@ export function RadialBarChart(props: GraphProps) {
       text: props.title,
       align: 'left',
     },
-    subtitle: {
-      text: props.subtitle,
-      align: 'left',
-    },
     noData: {
       text: 'Please select a class to add',
       align: 'center',
