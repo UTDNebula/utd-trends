@@ -178,11 +178,8 @@ export const Dashboard: NextPage = () => {
     }
     return true;
   }
-  
-  function removeDuplicates(
-    array1: SearchQuery[],
-    array2: SearchQuery[],
-  ) {
+
+  function removeDuplicates(array1: SearchQuery[], array2: SearchQuery[]) {
     return array1.filter(
       (query1: SearchQuery) =>
         array2.findIndex((query2: SearchQuery) =>
