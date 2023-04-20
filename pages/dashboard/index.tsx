@@ -27,6 +27,7 @@ export const Dashboard: NextPage = () => {
 
   //Increment these to reset cache on next deployment
   const cacheIndexGrades = 0;
+  const cacheIndexRelated = 0;
   const cacheIndexProfessor = 0;
 
   function getCache(key: string, cacheIndex: number) {
@@ -107,6 +108,7 @@ export const Dashboard: NextPage = () => {
   };
 
   const [gradesState, setGradesState] = useState('loading');
+  const [relatedState, setRelatedState] = useState('loading');
 
   const [fullGradesData, setFullGradesData] = useState<fullGradesType[]>([]);
   const [gradesData, setGradesData] = useState<gradesType[]>([]);
@@ -114,6 +116,7 @@ export const Dashboard: NextPage = () => {
   const [averageData, setAverageData] = useState<gradesType[]>([]);
   const [stdevData, setStdevData] = useState<gradesType[]>([]);
   const [studentTotals, setStudentTotals] = useState([-1, -1, -1]);
+  const [relatedQueries, setRelatedQueries] = useState<SearchQuery[]>([]);
 
   const [professorInvolvingSearchTerms, setProfessorInvolvingSearchTerms] =
     useState<string[]>([]);
@@ -247,7 +250,61 @@ export const Dashboard: NextPage = () => {
         setGradesState('error');
         console.error('Nebula API', error);
       });
+
+    fetchData(
+      searchTerms.map(
+        (searchTerm: SearchQuery) =>
+          '/api/autocomplete?' +
+          Object.keys(searchTerm)
+            .map(
+              (key) =>
+                key +
+                '=' +
+                encodeURIComponent(
+                  String(searchTerm[key as keyof SearchQuery]),
+                ),
+            )
+            .join('&'),
+      ),
+      cacheIndexRelated,
+      7889400000, //3 months
+    )
+      .then((responses) => {
+        if (!responses.length) {
+          setRelatedQueries([]);
+        } else if (responses.length === 1) {
+          setRelatedQueries(responses[0].slice(0, 10));
+        } else {
+          responses.reverse();
+          const responseLengths = Array(responses.length).fill(0);
+          let offset = 0;
+          for (let i = 0; i < 10; i++) {
+            if (
+              responseLengths[(i + offset) % responses.length] >=
+              responses[(i + offset) % responses.length].length
+            ) {
+              offset++;
+            }
+            responseLengths[(i + offset) % responses.length]++;
+          }
+          setRelatedQueries(
+            responses
+              .map((response, index) =>
+                response.slice(0, responseLengths[index]),
+              )
+              .flat(),
+          );
+        }
+      })
+      .catch((error) => {
+        setRelatedState('error');
+        console.error('Related query', error);
+      });
   }, []);
+
+  useEffect(() => {
+    console.log(relatedQueries);
+  }, [relatedQueries]);
 
   useEffect(() => {
     const partialGradesData: gradesType[] = fullGradesData.map((datPoint) => {
