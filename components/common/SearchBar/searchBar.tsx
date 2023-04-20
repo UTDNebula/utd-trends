@@ -44,7 +44,10 @@ export const SearchBar = (props: SearchProps) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        setOptions(data.output);
+        if (data.message !== 'success') {
+          throw new Error(data.message);
+        }
+        setOptions(data.data);
       })
       .catch((error) => {
         if (error instanceof DOMException) {

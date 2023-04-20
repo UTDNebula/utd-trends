@@ -133,7 +133,7 @@ function bfsRecursion(queue: QueueItem[]) {
 type bfsReturn = SearchQuery | undefined;
 
 export function searchAutocomplete(query: string) {
-  query = query.trim().toUpperCase();
+  query = query.trimStart().toUpperCase();
   graph.updateEachNodeAttributes((node, attr) => {
     return {
       ...attr,
@@ -163,16 +163,110 @@ export function searchAutocomplete(query: string) {
   return results;
 }
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+type Data = {
+  message: string;
+  data?: SearchQuery[];
+};
+
+export default function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Data>,
+) {
   if ('input' in req.query && typeof req.query.input === 'string') {
     return new Promise<void>((resolve, reject) => {
       res.status(200).json({
-        success: true,
-        output: searchAutocomplete(req.query.input as string),
+        message: 'success',
+        data: searchAutocomplete(req.query.input as string),
+      });
+      resolve();
+    });
+  } else if (
+    ('prefix' in req.query && typeof req.query.prefix === 'string') ||
+    ('number' in req.query && typeof req.query.number === 'string') ||
+    ('professorName' in req.query &&
+      typeof req.query.professorName === 'string') ||
+    ('sectionNumber' in req.query &&
+      typeof req.query.sectionNumber === 'string')
+  ) {
+    const prefexDefined =
+      'prefix' in req.query && typeof req.query.prefix === 'string';
+    const numberDefined =
+      'number' in req.query && typeof req.query.number === 'string';
+    const professorNameDefined =
+      'professorName' in req.query &&
+      typeof req.query.professorName === 'string';
+    const sectionNumberDefined =
+      'sectionNumber' in req.query &&
+      typeof req.query.sectionNumber === 'string';
+    let results: SearchQuery[] = [];
+
+    let query: SearchQuery = {};
+    if (prefexDefined) {
+      query.prefix = req.query.prefix as string;
+    }
+    if (numberDefined) {
+      query.number = req.query.number as string;
+    }
+    if (professorNameDefined) {
+      query.professorName = req.query.professorName as string;
+    }
+    if (sectionNumberDefined) {
+      query.sectionNumber = req.query.sectionNumber as string;
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      results.push(...searchAutocomplete(searchTermURIString(query) + ' '));
+      if (prefexDefined && numberDefined && professorNameDefined) {
+        results.push(
+          ...searchAutocomplete(
+            (((req.query.prefix as string) + req.query.number) as string) + ' ',
+          ),
+        );
+        results.push(
+          ...searchAutocomplete((req.query.professorName as string) + ' '),
+        );
+      }
+      results = results.filter((result) => !searchQueryEqual(result, query));
+      res.status(200).json({
+        message: 'success',
+        data: results,
       });
       resolve();
     });
   } else {
     res.status(400).json({ message: 'Incorrect query parameters' });
   }
+}
+
+function searchQueryEqual(query1: SearchQuery, query2: SearchQuery) {
+  if (query1.prefix !== query2.prefix) {
+    return false;
+  }
+  if (query1.professorName !== query2.professorName) {
+    return false;
+  }
+  if (query1.number !== query2.number) {
+    return false;
+  }
+  if (query1.sectionNumber !== query2.sectionNumber) {
+    return false;
+  }
+  return true;
+}
+
+function searchTermURIString(query: SearchQuery): string {
+  let result = '';
+  if (query.prefix !== undefined) {
+    result += query.prefix;
+  }
+  if (query.number !== undefined) {
+    result += ' ' + query.number;
+  }
+  if (query.sectionNumber !== undefined) {
+    result += '.' + query.sectionNumber;
+  }
+  if (query.professorName !== undefined) {
+    result += ' ' + query.professorName;
+  }
+  return result.trim();
 }
