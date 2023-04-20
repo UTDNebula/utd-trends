@@ -224,7 +224,7 @@ export default function handler(
       } else if (prefexDefined && numberDefined) {
         results.push(...searchAutocomplete((req.query.prefix as string) + ' '));
       }
-      if (results.legnth < 10) {
+      if (results.length < 10) {
         results.push(...searchAutocomplete(searchTermURIString(query) + ' '));
       }
       results = results.filter((result) => !searchQueryEqual(result, query));
