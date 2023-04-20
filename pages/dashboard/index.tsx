@@ -141,6 +141,34 @@ export const Dashboard: NextPage = () => {
     return querys.map((query) => searchQueryLabel(query)).join(',');
   }
 
+  function searchQueryEqual(query1: SearchQuery, query2: SearchQuery) {
+    if (query1.prefix !== query2.prefix) {
+      return false;
+    }
+    if (query1.professorName !== query2.professorName) {
+      return false;
+    }
+    if (query1.number !== query2.number) {
+      return false;
+    }
+    if (query1.sectionNumber !== query2.sectionNumber) {
+      return false;
+    }
+    return true;
+  }
+  
+  function removeDuplicates(
+    array1: SearchQuery[],
+    array2: SearchQuery[],
+  ) {
+    return array1.filter(
+      (query1: SearchQuery) =>
+        array2.findIndex((query2: SearchQuery) =>
+          searchQueryEqual(query1, query2),
+        ) < 0,
+    );
+  }
+
   const searchTermsChange = useCallback((searchTerms: SearchQuery[]) => {
     if (searchTerms.length > 0) {
       router.replace(
@@ -275,6 +303,19 @@ export const Dashboard: NextPage = () => {
         } else if (responses.length === 1) {
           setRelatedQueries(responses[0].slice(0, 10));
         } else {
+          //Remove original searchTerms
+          for (let i = 0; i < responses.length; i++) {
+            responses[i] = removeDuplicates(responses[i], searchTerms);
+          }
+
+          //Remove duplicates
+          responses[0] = removeDuplicates(responses[0], responses[1]);
+          if (responses.length >= 3) {
+            responses[0] = removeDuplicates(responses[0], responses[2]);
+            responses[1] = removeDuplicates(responses[1], responses[2]);
+          }
+
+          //Combine to get 10 total, roughly evenly distributed
           responses.reverse();
           const responseLengths = Array(responses.length).fill(0);
           let offset = 0;
