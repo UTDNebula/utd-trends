@@ -209,16 +209,17 @@ export default function handler(
     }
 
     return new Promise<void>((resolve, reject) => {
-      results.push(...searchAutocomplete(searchTermURIString(query) + ' '));
       if (prefexDefined && numberDefined && professorNameDefined) {
         results.push(
           ...searchAutocomplete(
-            (((req.query.prefix as string) + req.query.number) as string) + ' ',
+            (req.query.prefix as string) + (req.query.number as string) + ' ',
           ),
         );
-        results.push(
-          ...searchAutocomplete((req.query.professorName as string) + ' '),
-        );
+      } else if (prefexDefined && numberDefined) {
+        results.push(...searchAutocomplete((req.query.prefix as string) + ' '));
+      }
+      if (results.legnth < 10) {
+        results.push(...searchAutocomplete(searchTermURIString(query) + ' '));
       }
       results = results.filter((result) => !searchQueryEqual(result, query));
       res.status(200).json({
