@@ -311,7 +311,8 @@ export const Dashboard: NextPage = () => {
                   String(searchTerm[key as keyof SearchQuery]),
                 ),
             )
-            .join('&'),
+            .join('&') +
+          '&limit=10',
       ),
       cacheIndexRelated,
       7889400000, //3 months
