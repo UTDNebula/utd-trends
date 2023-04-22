@@ -200,11 +200,11 @@ nodeFetch['default']('https://catfact.ninja/fact', { method: 'GET' })
       });
       //...[ <professorLast>|(<professorFirst> <professorLast>)]]
       var professorFirstNameNode = addWithParents(
-        [classNode, prefixNode2],
+        [classNode, prefixNode2, classNode2],
         ' ' + profFirst + ' ',
       );
       var professorLastNameNode = addWithParents(
-        [classNode, prefixNode2, professorFirstNameNode],
+        [classNode, prefixNode2, classNode2, professorFirstNameNode],
         ' ' + profLast,
         {
           prefix: prefix,
@@ -215,7 +215,7 @@ nodeFetch['default']('https://catfact.ninja/fact', { method: 'GET' })
       if (sectionNumber === 'HON') {
         //...[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]]
         var sectionNode = addWithParents(
-          [classNode, prefixNode2],
+          [classNode, prefixNode2, classNode2],
           '.' + sectionNumber,
           {
             prefix: prefix,

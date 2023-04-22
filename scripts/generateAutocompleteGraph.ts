@@ -250,11 +250,11 @@ nodeFetch
 
       //...[ <professorLast>|(<professorFirst> <professorLast>)]]
       const professorFirstNameNode = addWithParents(
-        [classNode, prefixNode2],
+        [classNode, prefixNode2, classNode2],
         ' ' + profFirst + ' ',
       );
       const professorLastNameNode = addWithParents(
-        [classNode, prefixNode2, professorFirstNameNode],
+        [classNode, prefixNode2, classNode2, professorFirstNameNode],
         ' ' + profLast,
         {
           prefix: prefix,
@@ -266,7 +266,7 @@ nodeFetch
       if (sectionNumber === 'HON') {
         //...[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]]
         const sectionNode = addWithParents(
-          [classNode, prefixNode2],
+          [classNode, prefixNode2, classNode2],
           '.' + sectionNumber,
           {
             prefix: prefix,
