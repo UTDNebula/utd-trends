@@ -15,6 +15,7 @@ import Carousel from '../../components/common/Carousel/carousel';
 import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
+import { RelatedClasses } from '../../components/common/RelatedClasses/relatedClasses';
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 import SearchQuery from '../../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
@@ -296,10 +297,11 @@ export const Dashboard: NextPage = () => {
       7889400000, //3 months
     )
       .then((responses) => {
+        let result: SearchQuery[] = [];
         if (!responses.length) {
-          setRelatedQueries([]);
+          result = [];
         } else if (responses.length === 1) {
-          setRelatedQueries(responses[0].slice(0, 10));
+          result = responses[0].slice(0, 10);
         } else {
           //Remove original searchTerms
           for (let i = 0; i < responses.length; i++) {
@@ -326,13 +328,15 @@ export const Dashboard: NextPage = () => {
             }
             responseLengths[(i + offset) % responses.length]++;
           }
-          setRelatedQueries(
-            responses
-              .map((response, index) =>
-                response.slice(0, responseLengths[index]),
-              )
-              .flat(),
-          );
+          result = responses
+            .map((response, index) => response.slice(0, responseLengths[index]))
+            .flat();
+        }
+        setRelatedQueries(result);
+        if (result.length) {
+          setRelatedState('success');
+        } else {
+          setRelatedState('none');
         }
       })
       .catch((error) => {
@@ -340,10 +344,6 @@ export const Dashboard: NextPage = () => {
         console.error('Related query', error);
       });
   }, []);
-
-  useEffect(() => {
-    console.log(relatedQueries);
-  }, [relatedQueries]);
 
   useEffect(() => {
     const partialGradesData: gradesType[] = fullGradesData.map((datPoint) => {
@@ -446,7 +446,7 @@ export const Dashboard: NextPage = () => {
   } else {
     gradesPage = (
       <>
-        <div className="h-full m-4">
+        <div className="h-full m-4 flex-auto">
           <div className="flex justify-center gap-2">
             <div>
               <InputLabel id="startingSessionLabel">From</InputLabel>
@@ -544,6 +544,23 @@ export const Dashboard: NextPage = () => {
     );
   }
 
+  let relatedComponent;
+
+  if (relatedState === 'error') {
+    relatedComponent = null;
+  } else if (relatedState === 'none') {
+    relatedComponent = null;
+  } else {
+    relatedComponent = (
+      <Card className="m-8 flex-initial">
+        <RelatedClasses
+          displayData={relatedQueries}
+          addNew={(data) => console.log(data)}
+        />
+      </Card>
+    );
+  }
+
   /* Professor Data */
 
   type profType = {
@@ -614,7 +631,7 @@ export const Dashboard: NextPage = () => {
   } else {
     professorRatingsPage = (
       <>
-        <div className="h-full m-4">
+        <div className="h-full m-4 flex-auto">
           {profData.length > 0 ? (
             profData.map((data: profType, index: number) => {
               if (!data.found) {
@@ -684,8 +701,14 @@ export const Dashboard: NextPage = () => {
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">
             <Carousel>
-              {gradesPage}
-              {professorRatingsPage}
+              <div className="flex flex-wrap-reverse items-end">
+                {relatedComponent}
+                {gradesPage}
+              </div>
+              <div className="flex flex-wrap-reverse items-end">
+                {relatedComponent}
+                {professorRatingsPage}
+              </div>
             </Carousel>
           </div>
         </div>
