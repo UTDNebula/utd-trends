@@ -126,7 +126,7 @@ function bfsRecursion(queue: QueueItem[]) {
 
 type bfsReturn = SearchQuery | undefined;
 
-export function searchAutocomplete(query: string) {
+function searchAutocomplete(query: string, limit: number) {
   query = query.trimStart().toUpperCase();
   graph.updateEachNodeAttributes((node, attr) => {
     return {
@@ -143,7 +143,7 @@ export function searchAutocomplete(query: string) {
     });
   });
   let results: SearchQuery[] = [];
-  while (queue.length && results.length < 20) {
+  while (queue.length && results.length < limit) {
     let response: bfsReturn;
     if (queue[0].toNext) {
       response = bfsRecursionToNextData(queue);
@@ -170,17 +170,19 @@ export default function handler(
     return new Promise<void>((resolve, reject) => {
       res.status(200).json({
         message: 'success',
-        data: searchAutocomplete(req.query.input as string),
+        data: searchAutocomplete(req.query.input as string, 20),
       });
       resolve();
     });
   } else if (
-    ('prefix' in req.query && typeof req.query.prefix === 'string') ||
-    ('number' in req.query && typeof req.query.number === 'string') ||
-    ('professorName' in req.query &&
-      typeof req.query.professorName === 'string') ||
-    ('sectionNumber' in req.query &&
-      typeof req.query.sectionNumber === 'string')
+    (('prefix' in req.query && typeof req.query.prefix === 'string') ||
+      ('number' in req.query && typeof req.query.number === 'string') ||
+      ('professorName' in req.query &&
+        typeof req.query.professorName === 'string') ||
+      ('sectionNumber' in req.query &&
+        typeof req.query.sectionNumber === 'string')) &&
+    'limit' in req.query &&
+    typeof req.query.limit === 'string'
   ) {
     const prefexDefined =
       'prefix' in req.query && typeof req.query.prefix === 'string';
@@ -209,24 +211,42 @@ export default function handler(
     }
 
     return new Promise<void>((resolve, reject) => {
-      if (prefexDefined && numberDefined && sectionNumberDefined && professorNameDefined) {
+      if (
+        prefexDefined &&
+        numberDefined &&
+        sectionNumberDefined &&
+        professorNameDefined
+      ) {
         results.push(
           ...searchAutocomplete(
-            query.prefix + query.number + '.' + query.sectionNumber + ' ',
+            (req.query.prefix as string) +
+              (req.query.number as string) +
+              '.' +
+              (req.query.sectionNumber as string) +
+              ' ',
+            Number(req.query.limit),
           ),
         );
       } else if (prefexDefined && numberDefined && professorNameDefined) {
         results.push(
           ...searchAutocomplete(
-            query.prefix + query.number + ' ',
+            (req.query.prefix as string) + (req.query.number as string) + ' ',
+            Number(req.query.limit),
           ),
         );
       }
-      if (results.length < 10) {
-        results.push(...searchAutocomplete(searchTermURIString(query) + ' '));
+      if (results.length < Number(req.query.limit)) {
+        results.push(
+          ...searchAutocomplete(
+            searchTermURIString(query) + ' ',
+            Number(req.query.limit),
+          ),
+        );
         results = results.filter(
           (query1: SearchQuery, index, self) =>
-            self.findIndex((query2: SearchQuery) => searchQueryEqual(query1, query2)) === index,
+            self.findIndex((query2: SearchQuery) =>
+              searchQueryEqual(query1, query2),
+            ) === index,
         );
       }
       results = results.filter((result) => !searchQueryEqual(result, query));
