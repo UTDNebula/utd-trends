@@ -215,17 +215,25 @@ export default function handler(
     }
 
     return new Promise<void>((resolve, reject) => {
-      if (prefexDefined && numberDefined && professorNameDefined) {
+      if (prefexDefined && numberDefined && sectionNumberDefined && professorNameDefined) {
         results.push(
           ...searchAutocomplete(
-            (req.query.prefix as string) + (req.query.number as string) + ' ',
+            query.prefix + query.number + '.' + query.sectionNumber + ' ',
           ),
         );
-      } else if (prefexDefined && numberDefined) {
-        results.push(...searchAutocomplete((req.query.prefix as string) + ' '));
+      } else if (prefexDefined && numberDefined && professorNameDefined) {
+        results.push(
+          ...searchAutocomplete(
+            query.prefix + query.number + ' ',
+          ),
+        );
       }
       if (results.length < 10) {
         results.push(...searchAutocomplete(searchTermURIString(query) + ' '));
+        results = results.filter(
+          (query1: SearchQuery, index, self) =>
+            self.findIndex((query2: SearchQuery) => searchQueryEqual(query1, query2)) === index,
+        );
       }
       results = results.filter((result) => !searchQueryEqual(result, query));
       res.status(200).json({
