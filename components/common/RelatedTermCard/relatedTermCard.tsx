@@ -29,8 +29,7 @@ export const RelatedTermCard = (props: RelatedTermCardProps) => {
       variant="outlined"
     >
       <div className="float-left flex align-middle place-items-center">
-        <Typography className="leading-tight text-lg text-gray-600">
-          {/* dark:text-gray-200*/}
+        <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
           {props.primaryText}
         </Typography>
       </div>
