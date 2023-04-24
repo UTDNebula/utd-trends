@@ -11,6 +11,7 @@ import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel
 type ExpandableSearchGridProps = {
   onChange: Function;
   studentTotals: number[];
+  relatedQuery: SearchQuery;
 };
 
 /**
@@ -21,6 +22,7 @@ type ExpandableSearchGridProps = {
 export const ExpandableSearchGrid = ({
   onChange,
   studentTotals,
+  relatedQuery,
 }: ExpandableSearchGridProps) => {
   const [value, setValue] = useState<SearchQuery[]>([]);
   const [searchTerms, setSearchTerms] = useState<SearchQuery[]>([]);
@@ -36,6 +38,8 @@ export const ExpandableSearchGrid = ({
       setSearchTerms([...searchTerms, newSearchTerm]);
     }
   }
+  
+  useEffect(() => addSearchTerm(relatedQuery), [relatedQuery]);
 
   function deleteSearchTerm(searchTermIndex: number) {
     //console.log('deleteSearchTerm called on ' + searchTermIndex);
