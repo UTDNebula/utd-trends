@@ -35,13 +35,23 @@ export const RelatedTermCard = (props: RelatedTermCardProps) => {
         </Typography>
       </div>
       <div className="float-right">
-      <Tooltip title={props.disabled ? "Remove a search term to add this query" : "Add query to search"}>
-        <span>
-          <IconButton aria-label="add query" onClick={handleAddClick} disabled={props.disabled}>
-            <AddCircle />
-          </IconButton>
-        </span>
-      </Tooltip>
+        <Tooltip
+          title={
+            props.disabled
+              ? 'Remove a search term to add this query'
+              : 'Add query to search'
+          }
+        >
+          <span>
+            <IconButton
+              aria-label="add query"
+              onClick={handleAddClick}
+              disabled={props.disabled}
+            >
+              <AddCircle />
+            </IconButton>
+          </span>
+        </Tooltip>
       </div>
     </Card>
   );

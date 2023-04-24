@@ -43,7 +43,7 @@ export const ExpandableSearchGrid = ({
       setSearchTerms([...searchTerms, newSearchTerm]);
     }
   }
-  
+
   useEffect(() => {
     if (searchTerms.length < 3 && typeof relatedQuery !== 'undefined') {
       addSearchTerm(relatedQuery);
