@@ -1,4 +1,4 @@
-import { IconButton, Snackbar } from '@mui/material';
+import { IconButton, Snackbar, Tooltip } from '@mui/material';
 import { LogoIcon } from '../../icons/LogoIcon/logoIcon';
 import { Share } from '@mui/icons-material';
 import React from 'react';
@@ -54,23 +54,25 @@ export function TopMenu() {
               </div>
             </a>
           </Link>
-          <IconButton
-            className="w-12"
-            size="large"
-            onClick={() => {
-              let url = window.location.href;
-              if (
-                router.query &&
-                Object.keys(router.query).length === 0 &&
-                Object.getPrototypeOf(router.query) === Object.prototype
-              ) {
-                url = 'https://trends.utdnebula.com/';
-              }
-              shareLink(url);
-            }}
-          >
-            <Share className="fill-white text-3xl mr-1" />
-          </IconButton>
+          <Tooltip title="Share link with search queries">
+            <IconButton
+              className="w-12"
+              size="large"
+              onClick={() => {
+                let url = window.location.href;
+                if (
+                  router.query &&
+                  Object.keys(router.query).length === 0 &&
+                  Object.getPrototypeOf(router.query) === Object.prototype
+                ) {
+                  url = 'https://trends.utdnebula.com/';
+                }
+                shareLink(url);
+              }}
+            >
+              <Share className="fill-white text-3xl mr-1" />
+            </IconButton>
+          </Tooltip>
         </div>
       </div>
       <Snackbar

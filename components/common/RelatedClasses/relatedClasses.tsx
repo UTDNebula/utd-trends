@@ -12,6 +12,7 @@ type SearchQuery = {
 type RelatedClassesProps = {
   displayData: SearchQuery[];
   addNew: Function;
+  disabled: boolean;
 };
 
 /**
@@ -22,6 +23,7 @@ type RelatedClassesProps = {
 export const RelatedClasses = ({
   displayData,
   addNew,
+  disabled,
 }: RelatedClassesProps) => {
   function addSearchTerm(index: number) {
     addNew(displayData[index]);
@@ -40,6 +42,7 @@ export const RelatedClasses = ({
           key={index}
           index={index}
           onAddButtonClicked={addSearchTerm}
+          disabled={disabled}
         />
       ))}
     </div>
