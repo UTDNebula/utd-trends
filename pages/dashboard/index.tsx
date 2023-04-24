@@ -576,7 +576,7 @@ export const Dashboard: NextPage = () => {
       <Card className="m-8 lg:w-64 flex-initial">
         <RelatedClasses
           displayData={relatedQueries}
-          addNew={(data) => setRelatedQuery(data)}
+          addNew={(query: SearchQuery) => setRelatedQuery(query)}
           disabled={relatedDisabled}
         />
       </Card>
