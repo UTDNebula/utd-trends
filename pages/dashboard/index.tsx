@@ -447,7 +447,7 @@ export const Dashboard: NextPage = () => {
   if (gradesState === 'loading') {
     gradesPage = (
       <>
-        <div className="h-full m-4">
+        <div className="h-full m-4 flex-auto">
           <LinearProgress className="mt-8 pt-2"></LinearProgress>
         </div>
       </>
@@ -455,7 +455,7 @@ export const Dashboard: NextPage = () => {
   } else if (gradesState === 'error') {
     gradesPage = (
       <>
-        <div className="h-full m-4">
+        <div className="h-full m-4 flex-auto">
           <h1 className="text-3xl text-center text-gray-600 font-semibold">
             An error occurred! Please reload the page, and if this problem
             persists, contact Nebula Labs.
@@ -565,6 +565,7 @@ export const Dashboard: NextPage = () => {
   }
 
   let relatedComponent;
+  const [relatedQuery, setRelatedQuery] = useState<SearchQuery | undefined>(undefined);
 
   if (relatedState === 'error') {
     relatedComponent = null;
@@ -575,7 +576,7 @@ export const Dashboard: NextPage = () => {
       <Card className="m-8 lg:w-64 flex-initial">
         <RelatedClasses
           displayData={relatedQueries}
-          addNew={(data) => console.log(data)}
+          addNew={(data) => setRelatedQuery(data)}
           disabled={relatedDisabled}
         />
       </Card>
@@ -633,7 +634,7 @@ export const Dashboard: NextPage = () => {
   if (professorRatingsState === 'loading') {
     professorRatingsPage = (
       <>
-        <div className="h-full m-4">
+        <div className="h-full m-4 flex-auto">
           <LinearProgress className="mt-8 pt-2"></LinearProgress>
         </div>
       </>
@@ -641,7 +642,7 @@ export const Dashboard: NextPage = () => {
   } else if (professorRatingsState === 'error') {
     professorRatingsPage = (
       <>
-        <div className="h-full m-4">
+        <div className="h-full m-4 flex-auto">
           <h1 className="text-3xl text-center text-gray-600 font-semibold">
             An error occurred! Please reload the page, and if this problem
             persists, contact Nebula Labs.
@@ -718,6 +719,7 @@ export const Dashboard: NextPage = () => {
         <ExpandableSearchGrid
           onChange={searchTermsChange}
           studentTotals={studentTotals}
+          relatedQuery={relatedQuery}
         />
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">
