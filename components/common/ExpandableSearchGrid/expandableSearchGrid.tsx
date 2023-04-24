@@ -11,7 +11,7 @@ import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel
 type ExpandableSearchGridProps = {
   onChange: Function;
   studentTotals: number[];
-  relatedQuery: SearchQuery;
+  relatedQuery: SearchQuery | undefined;
 };
 
 /**
@@ -39,7 +39,11 @@ export const ExpandableSearchGrid = ({
     }
   }
   
-  useEffect(() => addSearchTerm(relatedQuery), [relatedQuery]);
+  useEffect(() => {
+    if (searchTerms.length < 3 && typeof relatedQuery !== 'undefined') {
+      addSearchTerm(relatedQuery);
+    }
+  }, [relatedQuery]);
 
   function deleteSearchTerm(searchTermIndex: number) {
     //console.log('deleteSearchTerm called on ' + searchTermIndex);
