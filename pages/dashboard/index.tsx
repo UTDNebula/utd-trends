@@ -334,7 +334,7 @@ export const Dashboard: NextPage = () => {
             .flat();
         }
         setRelatedQueries(result);
-        setRelatedState(result.length ? 'success': 'none');
+        setRelatedState(result.length ? 'success' : 'none');
         setRelatedDisabled(responses.length >= 3 ? true : false);
       })
       .catch((error) => {
@@ -543,7 +543,9 @@ export const Dashboard: NextPage = () => {
   }
 
   let relatedComponent;
-  const [relatedQuery, setRelatedQuery] = useState<SearchQuery | undefined>(undefined);
+  const [relatedQuery, setRelatedQuery] = useState<SearchQuery | undefined>(
+    undefined,
+  );
 
   if (relatedState === 'error') {
     relatedComponent = null;

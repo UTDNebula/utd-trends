@@ -55,11 +55,11 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
         </Typography>
       </div>
       <div className="float-right">
-      <Tooltip title="Remove query">
-        <IconButton aria-label="remove query" onClick={handleCloseClick}>
-          <Close />
-        </IconButton>
-      </Tooltip>
+        <Tooltip title="Remove query">
+          <IconButton aria-label="remove query" onClick={handleCloseClick}>
+            <Close />
+          </IconButton>
+        </Tooltip>
       </div>
     </Card>
   );
