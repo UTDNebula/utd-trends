@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Card from '@mui/material/Card';
-import { Box, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography, Tooltip } from '@mui/material';
 import { Close } from '@mui/icons-material';
 
 /**
@@ -55,9 +55,11 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
         </Typography>
       </div>
       <div className="float-right">
+      <Tooltip title="Remove query">
         <IconButton aria-label="remove query" onClick={handleCloseClick}>
           <Close />
         </IconButton>
+      </Tooltip>
       </div>
     </Card>
   );

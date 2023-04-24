@@ -118,6 +118,7 @@ export const Dashboard: NextPage = () => {
   const [stdevData, setStdevData] = useState<gradesType[]>([]);
   const [studentTotals, setStudentTotals] = useState([-1, -1, -1]);
   const [relatedQueries, setRelatedQueries] = useState<SearchQuery[]>([]);
+  const [relatedDisabled, setRelatedDisabled] = useState<boolean>(false);
 
   const [professorInvolvingSearchTerms, setProfessorInvolvingSearchTerms] =
     useState<string[]>([]);
@@ -333,11 +334,8 @@ export const Dashboard: NextPage = () => {
             .flat();
         }
         setRelatedQueries(result);
-        if (result.length) {
-          setRelatedState('success');
-        } else {
-          setRelatedState('none');
-        }
+        setRelatedState(result.length ? 'success': 'none');
+        setRelatedDisabled(responses.length >= 3 ? true : false);
       })
       .catch((error) => {
         setRelatedState('error');
@@ -552,10 +550,11 @@ export const Dashboard: NextPage = () => {
     relatedComponent = null;
   } else {
     relatedComponent = (
-      <Card className="m-8 flex-initial">
+      <Card className="m-8 lg:w-64 flex-initial">
         <RelatedClasses
           displayData={relatedQueries}
           addNew={(data) => console.log(data)}
+          disabled={relatedDisabled}
         />
       </Card>
     );
@@ -701,11 +700,11 @@ export const Dashboard: NextPage = () => {
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">
             <Carousel>
-              <div className="flex flex-wrap-reverse items-end">
+              <div className="flex lg:items-start items-stretch lg:flex-row flex-col-reverse">
                 {relatedComponent}
                 {gradesPage}
               </div>
-              <div className="flex flex-wrap-reverse items-end">
+              <div className="flex lg:items-start items-stretch lg:flex-row flex-col-reverse">
                 {relatedComponent}
                 {professorRatingsPage}
               </div>

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Card from '@mui/material/Card';
-import { IconButton, Typography } from '@mui/material';
+import { IconButton, Typography, Tooltip } from '@mui/material';
 import { AddCircle } from '@mui/icons-material';
 
 /**
@@ -10,6 +10,7 @@ type RelatedTermCardProps = {
   primaryText: string;
   index: number;
   onAddButtonClicked: Function;
+  disabled: boolean;
 };
 
 /**
@@ -34,9 +35,13 @@ export const RelatedTermCard = (props: RelatedTermCardProps) => {
         </Typography>
       </div>
       <div className="float-right">
-        <IconButton aria-label="add query" onClick={handleAddClick}>
-          <AddCircle />
-        </IconButton>
+      <Tooltip title={props.disabled ? "Remove a search term to add this query" : "Add query to search"}>
+        <span>
+          <IconButton aria-label="add query" onClick={handleAddClick} disabled={props.disabled}>
+            <AddCircle />
+          </IconButton>
+        </span>
+      </Tooltip>
       </div>
     </Card>
   );
