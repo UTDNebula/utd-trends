@@ -1,8 +1,12 @@
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import GraphProps from '../../../modules/GraphProps';
 import React from 'react';
+import { Card, Modal, Fade } from '@mui/material';
+import { FullscreenOpenIcon } from '../../icons/FullscreenOpenIcon/fullscreenOpenIcon';
+import { FullscreenCloseIcon } from '../../icons/FullscreenCloseIcon/fullscreenCloseIcon';
 
 /**
  * Creates a pre-configured ApexCharts box-and-whisker graph. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`.
@@ -26,6 +30,7 @@ export function BoxGraph(props: GraphProps) {
       return sorted[base];
     }
   }
+
   const formattedSeries = props.series.map((value) => {
     return {
       x: value.name,
@@ -38,11 +43,32 @@ export function BoxGraph(props: GraphProps) {
       ],
     };
   });
+
+  const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
+
+  const icon =
+    '<div class="apexcharts-menu-icon">' +
+    (fullScreenOpen ? FullscreenCloseIcon : FullscreenOpenIcon) +
+    '</div>';
+
   const options: ApexOptions = {
     chart: {
       id: 'line-chart',
       zoom: {
         enabled: false,
+      },
+      toolbar: {
+        tools: {
+          customIcons: [
+            {
+              icon: icon,
+              index: 0,
+              title: 'Fullscreen',
+              class: 'custom-icon',
+              click: (chart, options, e) => setFullScreenOpen(!fullScreenOpen),
+            },
+          ],
+        },
       },
     },
     plotOptions: {
@@ -89,21 +115,34 @@ export function BoxGraph(props: GraphProps) {
     },
   };
 
+  const graph = (
+    <div className="h-full">
+      <Chart
+        options={options}
+        series={[
+          {
+            type: 'boxPlot',
+            data: formattedSeries,
+          },
+        ]}
+        type="boxPlot"
+        height={'100%'}
+      />
+    </div>
+  );
+
   return (
     <>
-      <div className="h-full">
-        <Chart
-          options={options}
-          series={[
-            {
-              type: 'boxPlot',
-              data: formattedSeries,
-            },
-          ]}
-          type="boxPlot"
-          height={'100%'}
-        />
-      </div>
+      {graph}
+      <Modal
+        open={fullScreenOpen}
+        onClose={() => setFullScreenOpen(false)}
+        className="flex justify-stretch align-stretch"
+      >
+        <Fade in={fullScreenOpen}>
+          <Card className="p-4 m-12 flex-auto">{graph}</Card>
+        </Fade>
+      </Modal>
     </>
   );
 }

@@ -4,6 +4,9 @@ import { ApexOptions } from 'apexcharts';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import GraphProps from '../../../modules/GraphProps';
 import React from 'react';
+import { Card, Modal, Fade } from '@mui/material';
+import { FullscreenOpenIcon } from '../../icons/FullscreenOpenIcon/fullscreenOpenIcon';
+import { FullscreenCloseIcon } from '../../icons/FullscreenCloseIcon/fullscreenCloseIcon';
 
 /**
  * Creates a pre-configured ApexCharts horizontal bar graph component. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`. This component also gets returned from a BarGraph component on a small screen.
@@ -18,11 +21,31 @@ export function HorizontalBarGraph(props: GraphProps) {
     return props.yaxisFormatter(Number(value));
   }
 
+  const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
+
+  const icon =
+    '<div class="apexcharts-menu-icon">' +
+    (fullScreenOpen ? FullscreenCloseIcon : FullscreenOpenIcon) +
+    '</div>';
+
   const options: ApexOptions = {
     chart: {
       id: 'line-chart',
       zoom: {
         enabled: false,
+      },
+      toolbar: {
+        tools: {
+          customIcons: [
+            {
+              icon: icon,
+              index: 0,
+              title: 'Fullscreen',
+              class: 'custom-icon',
+              click: (chart, options, e) => setFullScreenOpen(!fullScreenOpen),
+            },
+          ],
+        },
       },
     },
     plotOptions: {
@@ -62,16 +85,29 @@ export function HorizontalBarGraph(props: GraphProps) {
     },
   };
 
+  const graph = (
+    <div className="h-full">
+      <Chart
+        options={options}
+        series={props.series}
+        type="bar"
+        height={'100%'}
+      />
+    </div>
+  );
+
   return (
     <>
-      <div className="h-full">
-        <Chart
-          options={options}
-          series={props.series}
-          type="bar"
-          height={'100%'}
-        />
-      </div>
+      {graph}
+      <Modal
+        open={fullScreenOpen}
+        onClose={() => setFullScreenOpen(false)}
+        className="flex justify-stretch align-stretch"
+      >
+        <Fade in={fullScreenOpen}>
+          <Card className="p-4 m-12 flex-auto">{graph}</Card>
+        </Fade>
+      </Modal>
     </>
   );
 }
