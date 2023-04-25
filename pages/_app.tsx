@@ -42,17 +42,17 @@ function MyApp({ Component, pageProps }: AppProps) {
             <Fade in={gitInfoOpen}>
               <Card className="p-4 m-12 h-fit">
                 <a
-                  target="_blank"
-                  className="commit-link"
                   href={
                     'https://github.com/UTDNebula/utd-trends/commit/' +
                     process.env.NEXT_PUBLIC_VERCEL_COMMIT_SHA
                   }
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
-                  {process.env.NEXT_PUBLIC_VERCEL_COMMIT_SHA.substring(0, 7)}
+                  {process.env.NEXT_PUBLIC_VERCEL_COMMIT_SHA?.substring(0, 7)}
                 </a>
                 {process.env.NODE_ENV}
-                {process.env.NEXT_PUBLIC_VERCEL_ENV}
+                {process.env?.NEXT_PUBLIC_VERCEL_ENV}
               </Card>
             </Fade>
           </Modal>
