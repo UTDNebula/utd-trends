@@ -153,31 +153,6 @@ export const Dashboard: NextPage = () => {
     );
   }
 
-  function searchQueryEqual(query1: SearchQuery, query2: SearchQuery) {
-    if (query1.prefix !== query2.prefix) {
-      return false;
-    }
-    if (query1.professorName !== query2.professorName) {
-      return false;
-    }
-    if (query1.number !== query2.number) {
-      return false;
-    }
-    if (query1.sectionNumber !== query2.sectionNumber) {
-      return false;
-    }
-    return true;
-  }
-
-  function removeDuplicates(array1: SearchQuery[], array2: SearchQuery[]) {
-    return array1.filter(
-      (query1: SearchQuery) =>
-        array2.findIndex((query2: SearchQuery) =>
-          searchQueryEqual(query1, query2),
-        ) < 0,
-    );
-  }
-
   const searchTermsChange = useCallback((searchTerms: SearchQuery[]) => {
     if (searchTerms.length > 0) {
       router.replace(
