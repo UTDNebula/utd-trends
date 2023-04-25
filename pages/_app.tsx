@@ -9,13 +9,10 @@ import { useState } from 'react';
 function MyApp({ Component, pageProps }: AppProps) {
   const [gitInfoOpen, setGitInfoOpen] = useState<boolean>(false);
   const showGitInfo =
-    typeof process.env.NEXT_PUBLIC_VERCEL_COMMIT_SHA !== 'undefined' &&
-    typeof process.env.NODE_ENV !== 'undefined' &&
     typeof process.env.NEXT_PUBLIC_VERCEL_ENV !== 'undefined' &&
-    true;
+    process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview';
   console.log(
     process.env.NEXT_PUBLIC_VERCEL_COMMIT_SHA,
-    process.env.NODE_ENV,
     process.env.NEXT_PUBLIC_VERCEL_ENV,
   );
 
@@ -56,8 +53,6 @@ function MyApp({ Component, pageProps }: AppProps) {
                 >
                   {process.env.NEXT_PUBLIC_VERCEL_COMMIT_SHA?.substring(0, 7)}
                 </a>
-                {process.env.NODE_ENV}
-                {process.env?.NEXT_PUBLIC_VERCEL_ENV}
               </Card>
             </Fade>
           </Modal>
