@@ -5,13 +5,8 @@ import { CardContent } from '@mui/material';
 import { SearchBar } from '../SearchBar/searchBar';
 import React from 'react';
 import { useRouter } from 'next/router';
-
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
-};
+import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 
 type ExpandableSearchGridProps = {
   onChange: Function;
@@ -105,23 +100,6 @@ function studentTotalFormatter(total: number) {
     return 'Loading...';
   }
   return total.toLocaleString('en-US') + ' grades';
-}
-
-function searchQueryLabel(query: SearchQuery): string {
-  let result = '';
-  if (query.prefix !== undefined) {
-    result += query.prefix;
-  }
-  if (query.number !== undefined) {
-    result += ' ' + query.number;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += '.' + query.sectionNumber;
-  }
-  if (query.professorName !== undefined) {
-    result += ' ' + query.professorName;
-  }
-  return result.trim();
 }
 
 function parseURIEncodedSearchTerms(

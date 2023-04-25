@@ -2,7 +2,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
-import GraphProps from '../../../modules/GraphProps';
+import GraphProps from '../../../modules/GraphProps/GraphProps';
 import React from 'react';
 
 /**
