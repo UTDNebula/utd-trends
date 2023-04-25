@@ -13,6 +13,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     typeof process.env.NODE_ENV !== 'undefined' &&
     typeof process.env.NEXT_PUBLIC_VERCEL_ENV !== 'undefined' &&
     true;
+  console.log(
+    process.env.NEXT_PUBLIC_VERCEL_COMMIT_SHA,
+    process.env.NODE_ENV,
+    process.env.NEXT_PUBLIC_VERCEL_ENV,
+  );
 
   return (
     <>
