@@ -19,6 +19,7 @@ import { RelatedClasses } from '../../components/common/RelatedClasses/relatedCl
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 import SearchQuery from '../../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
+import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 
 // @ts-ignore
 export const Dashboard: NextPage = () => {
@@ -141,22 +142,6 @@ export const Dashboard: NextPage = () => {
 
   function searchTermsURIString(querys: SearchQuery[]): string {
     return querys.map((query) => searchQueryLabel(query)).join(',');
-  }
-
-  function searchQueryEqual(query1: SearchQuery, query2: SearchQuery) {
-    if (query1.prefix !== query2.prefix) {
-      return false;
-    }
-    if (query1.professorName !== query2.professorName) {
-      return false;
-    }
-    if (query1.number !== query2.number) {
-      return false;
-    }
-    if (query1.sectionNumber !== query2.sectionNumber) {
-      return false;
-    }
-    return true;
   }
 
   function removeDuplicates(array1: SearchQuery[], array2: SearchQuery[]) {

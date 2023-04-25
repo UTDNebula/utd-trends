@@ -2,6 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { DirectedGraph } from 'graphology';
 import autocompleteGraph from '../../data/autocomplete_graph.json';
 import SearchQuery from '../../modules/SearchQuery/SearchQuery';
+import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
+import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 
 type NodeAttributes = {
   c: string;
@@ -238,7 +240,7 @@ export default function handler(
       if (results.length < Number(req.query.limit)) {
         results.push(
           ...searchAutocomplete(
-            searchTermURIString(query) + ' ',
+            searchQueryLabel(query) + ' ',
             Number(req.query.limit),
           ),
         );
@@ -259,37 +261,4 @@ export default function handler(
   } else {
     res.status(400).json({ message: 'Incorrect query parameters' });
   }
-}
-
-function searchQueryEqual(query1: SearchQuery, query2: SearchQuery) {
-  if (query1.prefix !== query2.prefix) {
-    return false;
-  }
-  if (query1.professorName !== query2.professorName) {
-    return false;
-  }
-  if (query1.number !== query2.number) {
-    return false;
-  }
-  if (query1.sectionNumber !== query2.sectionNumber) {
-    return false;
-  }
-  return true;
-}
-
-function searchTermURIString(query: SearchQuery): string {
-  let result = '';
-  if (query.prefix !== undefined) {
-    result += query.prefix;
-  }
-  if (query.number !== undefined) {
-    result += ' ' + query.number;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += '.' + query.sectionNumber;
-  }
-  if (query.professorName !== undefined) {
-    result += ' ' + query.professorName;
-  }
-  return result.trim();
 }
