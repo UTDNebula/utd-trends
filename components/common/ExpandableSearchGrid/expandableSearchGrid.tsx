@@ -35,7 +35,7 @@ export const ExpandableSearchGrid = ({
     onChange(searchTerms);
   }, [onChange, searchTerms]);
 
-  function addSearchTerm(newSearchTerm: SearchQuery) {
+  function addSearchTerm(newSearchTerm: SearchQuery | null) {
     if (newSearchTerm != null) {
       //console.log('adding ' + newSearchTerm + ' to the search terms.');
       setSearchTerms([...searchTerms, newSearchTerm]);

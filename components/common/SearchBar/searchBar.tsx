@@ -16,7 +16,7 @@ import { useEffect } from 'react';
  */
 type SearchProps = {
   // setSearch: the setter function from the parent component to set the search value
-  selectSearchValue: (value: SearchQuery) => void;
+  selectSearchValue: (value: SearchQuery | null) => void;
   value: SearchQuery[];
   setValue: (value: SearchQuery[]) => void;
   disabled?: boolean;
@@ -92,27 +92,15 @@ export const SearchBar = (props: SearchProps) => {
           // When a new option is selected, find the new selected option by getting the
           // difference between the current and new value, then return that to the parent
           // component using selectSearchValue prop
-          onChange={(
-            event: any,
-            newValue: SearchQuery[] | undefined,
-            reason,
-          ) => {
+          onChange={(event: any, newValue: SearchQuery[], reason) => {
             if (reason === 'removeOption') {
               return;
             }
             let difference: SearchQuery[];
             if (props.value !== undefined) {
-              if (newValue !== undefined) {
-                difference = newValue.filter((x) => !props.value.includes(x));
-              } else {
-                difference = [];
-              }
+              difference = newValue.filter((x) => !props.value.includes(x));
             } else {
-              if (newValue !== undefined) {
-                difference = newValue;
-              } else {
-                difference = [];
-              }
+              difference = newValue;
             }
             props.selectSearchValue(difference[0] ? difference[0] : null);
             props.setValue(newValue);
