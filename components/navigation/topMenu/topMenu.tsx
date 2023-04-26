@@ -44,15 +44,13 @@ export function TopMenu() {
     <>
       <div className="bg-primary h-16 text-light relative py-2 px-4">
         <div className="h-full flex min-w-fit justify-between">
-          <Link href="/">
-            <a className="my-2 mx-2">
-              <div className="h-full flex align-middle place-items-center justify-center">
-                <div className="h-full float-left mr-2 w-7">
-                  <LogoIcon />
-                </div>
-                <h1 className=" float-right text-xl">UTD Trends</h1>
+          <Link href="/" className="m-2">
+            <div className="h-full flex align-middle place-items-center justify-center">
+              <div className="h-full float-left mr-2 w-7">
+                <LogoIcon />
               </div>
-            </a>
+              <h1 className=" float-right text-xl">UTD Trends</h1>
+            </div>
           </Link>
           <IconButton
             className="w-12"
