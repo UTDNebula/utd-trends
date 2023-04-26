@@ -57,7 +57,7 @@ export const Dashboard: NextPage = () => {
   function setCache(
     key: string,
     cacheIndex: number,
-    data: any,
+    data: object,
     expireTime: number,
   ) {
     localStorage.setItem(
@@ -70,30 +70,33 @@ export const Dashboard: NextPage = () => {
     );
   }
 
-  function fetchData(urls: string[], cacheIndex: number, expireTime: number) {
-    return Promise.all(
-      urls.map((url) => {
-        const cache = getCache(url, cacheIndexProfessor);
-        if (cache) {
-          return cache;
-        }
-        return fetch(url, {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.message !== 'success') {
-              throw new Error(data.message);
-            }
-            setCache(url, cacheIndex, data.data, expireTime);
-            return data.data;
-          });
-      }),
-    );
-  }
+  const fetchData = useCallback(
+    (urls: string[], cacheIndex: number, expireTime: number) => {
+      return Promise.all(
+        urls.map((url) => {
+          const cache = getCache(url, cacheIndexProfessor);
+          if (cache) {
+            return cache;
+          }
+          return fetch(url, {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+            },
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.message !== 'success') {
+                throw new Error(data.message);
+              }
+              setCache(url, cacheIndex, data.data, expireTime);
+              return data.data;
+            });
+        }),
+      );
+    },
+    [],
+  );
 
   /* Grades data */
 
@@ -138,9 +141,9 @@ export const Dashboard: NextPage = () => {
   const [startingSession, setStartingSession] = useState<number>(0);
   const [endingSession, setEndingSession] = useState<number>(9999);
 
-  function searchTermsURIString(querys: SearchQuery[]): string {
-    return querys.map((query) => searchTermURIString(query)).join(',');
-  }
+  const searchTermsURIString = useCallback((queries: SearchQuery[]): string => {
+    return queries.map((query) => searchTermURIString(query)).join(',');
+  }, []);
 
   function searchTermURIString(query: SearchQuery): string {
     let result = '';
@@ -159,116 +162,122 @@ export const Dashboard: NextPage = () => {
     return result.trim();
   }
 
-  const searchTermsChange = useCallback((searchTerms: SearchQuery[]) => {
-    if (searchTerms.length > 0) {
-      router.replace(
-        {
-          pathname: '/dashboard',
-          query: { searchTerms: searchTermsURIString(searchTerms) },
-        },
-        undefined,
-        { shallow: true },
+  const searchTermsChange = useCallback(
+    (searchTerms: SearchQuery[]) => {
+      if (searchTerms.length > 0) {
+        router.replace(
+          {
+            pathname: '/dashboard',
+            query: { searchTerms: searchTermsURIString(searchTerms) },
+          },
+          undefined,
+          { shallow: true },
+        );
+      } else {
+        router.replace('/dashboard', undefined, { shallow: true });
+      }
+      setProfessorInvolvingSearchTerms(
+        searchTerms
+          .filter(
+            (searchQuery) => typeof searchQuery.professorName !== 'undefined',
+          )
+          .map((searchQuery) => searchQuery.professorName)
+          .filter(
+            (professorName, index, self) =>
+              self.indexOf(professorName) == index,
+          ) as string[],
       );
-    } else {
-      router.replace('/dashboard', undefined, { shallow: true });
-    }
-    setProfessorInvolvingSearchTerms(
-      searchTerms
-        .filter(
-          (searchQuery) => typeof searchQuery.professorName !== 'undefined',
-        )
-        .map((searchQuery) => searchQuery.professorName)
-        .filter(
-          (professorName, index, self) => self.indexOf(professorName) == index,
-        ) as string[],
-    );
-    fetchData(
-      searchTerms.map(
-        (searchTerm: SearchQuery) =>
-          '/api/grades?' +
-          Object.keys(searchTerm)
-            .map(
-              (key) =>
-                key +
-                '=' +
-                encodeURIComponent(
-                  String(searchTerm[key as keyof SearchQuery]),
-                ),
-            )
-            .join('&'),
-      ),
-      cacheIndexGrades,
-      7889400000, //3 months
-    )
-      .then((responses) => {
-        //console.log('data from grid: ', responses);
+      fetchData(
+        searchTerms.map(
+          (searchTerm: SearchQuery) =>
+            '/api/grades?' +
+            Object.keys(searchTerm)
+              .map(
+                (key) =>
+                  key +
+                  '=' +
+                  encodeURIComponent(
+                    String(searchTerm[key as keyof SearchQuery]),
+                  ),
+              )
+              .join('&'),
+        ),
+        cacheIndexGrades,
+        7889400000, //3 months
+      )
+        .then((responses) => {
+          //console.log('data from grid: ', responses);
 
-        //Generate possible academic sessions
-        type individualacademicSessionResponse = {
-          _id: string;
-          grade_distribution: number[];
-        };
-        setPossibleAcademicSessions(
-          responses
-            .map((response) =>
-              response.map((data: individualacademicSessionResponse) => {
-                let name: string = data._id;
-                name = '20' + name;
-                name = name
-                  .replace('F', ' Fall')
-                  .replace('S', ' Spring')
-                  .replace('U', ' Summer');
-                let place: number = parseInt(name.split(' ')[0]);
-                if (name.split(' ')[1] == 'Spring') {
-                  place += 0.1;
-                } else if (name.split(' ')[1] == 'Summer') {
-                  place += 0.2;
-                } else {
-                  place += 0.3;
-                }
-                return { name: name, place: place };
-              }),
-            )
-            .flat()
-            .filter(
-              (value, index, self) =>
-                index ===
-                self.findIndex(
-                  (t) => t.place === value.place && t.name === value.name,
-                ),
-            )
-            .sort((a, b) => a.place - b.place),
-        );
+          //Generate possible academic sessions
+          type individualacademicSessionResponse = {
+            _id: string;
+            grade_distribution: number[];
+          };
+          setPossibleAcademicSessions(
+            responses
+              .map((response) =>
+                response.map((data: individualacademicSessionResponse) => {
+                  let name: string = data._id;
+                  name = '20' + name;
+                  name = name
+                    .replace('F', ' Fall')
+                    .replace('S', ' Spring')
+                    .replace('U', ' Summer');
+                  let place: number = parseInt(name.split(' ')[0]);
+                  if (name.split(' ')[1] == 'Spring') {
+                    place += 0.1;
+                  } else if (name.split(' ')[1] == 'Summer') {
+                    place += 0.2;
+                  } else {
+                    place += 0.3;
+                  }
+                  return { name: name, place: place };
+                }),
+              )
+              .flat()
+              .filter(
+                (value, index, self) =>
+                  index ===
+                  self.findIndex(
+                    (t) => t.place === value.place && t.name === value.name,
+                  ),
+              )
+              .sort((a, b) => a.place - b.place),
+          );
 
-        //Replace _id with number
-        setFullGradesData(
-          responses.map((response, index) => {
-            return {
-              name: searchTermURIString(searchTerms[index]),
-              data: response.map((data: individualacademicSessionResponse) => {
-                let session: number = parseInt('20' + data._id);
-                if (data._id.includes('S')) {
-                  session += 0.1;
-                } else if (data._id.includes('U')) {
-                  session += 0.2;
-                } else {
-                  session += 0.3;
-                }
-                return {
-                  session: session,
-                  grade_distribution: data.grade_distribution,
-                };
-              }),
-            };
-          }),
-        );
-        setGradesState('success');
-      })
-      .catch((error) => {
-        setGradesState('error');
-        console.error('Nebula API', error);
-      });
-  }, []);
+          //Replace _id with number
+          setFullGradesData(
+            responses.map((response, index) => {
+              return {
+                name: searchTermURIString(searchTerms[index]),
+                data: response.map(
+                  (data: individualacademicSessionResponse) => {
+                    let session: number = parseInt('20' + data._id);
+                    if (data._id.includes('S')) {
+                      session += 0.1;
+                    } else if (data._id.includes('U')) {
+                      session += 0.2;
+                    } else {
+                      session += 0.3;
+                    }
+                    return {
+                      session: session,
+                      grade_distribution: data.grade_distribution,
+                    };
+                  },
+                ),
+              };
+            }),
+          );
+          setGradesState('success');
+        })
+        .catch((error) => {
+          setGradesState('error');
+          console.error('Nebula API', error);
+        });
+    },
+    [fetchData, searchTermsURIString],
+  );
 
   useEffect(() => {
     const partialGradesData: gradesType[] = fullGradesData.map((datPoint) => {
@@ -513,7 +522,7 @@ export const Dashboard: NextPage = () => {
       setProfessorRatingsState('success');
       setProfData([]);
     }
-  }, [professorInvolvingSearchTerms]);
+  }, [fetchData, professorInvolvingSearchTerms]);
 
   let professorRatingsPage;
 

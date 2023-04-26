@@ -70,7 +70,7 @@ export const ExpandableSearchGrid = ({
     if (router.isReady) {
       setSearchTerms(parseURIEncodedSearchTerms(router.query.searchTerms));
     }
-  }, [router.isReady]);
+  }, [router.isReady, router.query.searchTerms]);
 
   return (
     <div className="w-full min-h-[72px] grid grid-flow-row auto-cols-fr md:grid-flow-col justify-center">

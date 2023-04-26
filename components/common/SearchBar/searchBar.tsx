@@ -92,7 +92,11 @@ export const SearchBar = (props: SearchProps) => {
           // When a new option is selected, find the new selected option by getting the
           // difference between the current and new value, then return that to the parent
           // component using selectSearchValue prop
-          onChange={(event: any, newValue: SearchQuery[], reason) => {
+          onChange={(
+            event: React.SyntheticEvent,
+            newValue: SearchQuery[],
+            reason,
+          ) => {
             if (reason === 'removeOption') {
               return;
             }

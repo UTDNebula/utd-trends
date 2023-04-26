@@ -81,7 +81,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
           // When a new option is selected, find the new selected option by getting the
           // difference between the current and new value, then return that to the parent
           // component using selectSearchValue prop
-          onChange={(event: any, newValue: SearchQuery[]) => {
+          onChange={(event: React.SyntheticEvent, newValue: SearchQuery[]) => {
             props.selectSearchValue(newValue[0]);
           }}
           inputValue={inputValue}
