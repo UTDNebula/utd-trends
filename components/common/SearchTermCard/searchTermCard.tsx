@@ -1,7 +1,9 @@
 import * as React from 'react';
 import Card from '@mui/material/Card';
-import { Box, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography, Tooltip } from '@mui/material';
 import { Close } from '@mui/icons-material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { useMediaQuery } from '@mui/material';
 
 /**
  * Props type used by the SearchTermCard component
@@ -11,6 +13,8 @@ type SearchTermCardProps = {
   secondaryText: string;
   index: number;
   onCloseButtonClicked: Function;
+  onToggleButtonClicked: Function;
+  visible: boolean;
   legendColor: string;
 };
 
@@ -20,33 +24,50 @@ type SearchTermCardProps = {
  *
  */
 export const SearchTermCard = (props: SearchTermCardProps) => {
+  function handleToggleClick() {
+    props.onToggleButtonClicked(props.index);
+  }
+
   function handleCloseClick() {
     props.onCloseButtonClicked(props.index);
   }
 
+  const finePointer = useMediaQuery('(pointer: fine)');
+
   return (
-    <Card
-      className="bg-primary-light"
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderRadius: 0,
-      }}
-    >
+    <Card className="bg-primary-light p-2 flex flex-row justify-between items-center rounded-none group">
       <div className="float-left flex align-middle place-items-center">
         <Box
+          className={
+            'rounded-full w-fit h-fit float-left mr-2 ml-2' +
+            (props.visible ? '' : ' brightness-90')
+          }
           sx={{
             backgroundColor: props.legendColor,
-            borderRadius: 100,
-            width: '20px',
-            height: '20px',
-            float: 'left',
-            marginRight: '8px',
-            marginLeft: '8px',
           }}
-        />
+        >
+          <Tooltip
+            title={props.visible ? 'Turn off visibility' : 'Turn on visibility'}
+          >
+            <IconButton
+              aria-label="toggle visibility"
+              onClick={handleToggleClick}
+            >
+              {props.visible ? (
+                <Visibility
+                  className={
+                    'fill-light' +
+                    (finePointer
+                      ? ' opacity-0 group-hover:opacity-100 transition-opacity'
+                      : '')
+                  }
+                />
+              ) : (
+                <VisibilityOff className="fill-light" />
+              )}
+            </IconButton>
+          </Tooltip>
+        </Box>
         <Typography className="leading-tight text-lg text-gray-600">
           {props.primaryText}
           <span className="block text-sm text-gray-500">

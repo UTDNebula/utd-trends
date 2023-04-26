@@ -120,6 +120,8 @@ export const Dashboard: NextPage = () => {
   const [stdevData, setStdevData] = useState<gradesType[]>([]);
   const [studentTotals, setStudentTotals] = useState([-1, -1, -1]);
 
+  const [included, setIncluded] = useState<boolean[]>([]);
+
   const [professorInvolvingSearchTerms, setProfessorInvolvingSearchTerms] =
     useState<string[]>([]);
 
@@ -434,7 +436,7 @@ export const Dashboard: NextPage = () => {
                 'W',
               ]}
               yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
-              series={gradesData}
+              series={gradesData.filter((dat, index) => included[index])}
             />
           </Card>
           <Card className="h-96 p-4 m-4">
@@ -442,7 +444,7 @@ export const Dashboard: NextPage = () => {
               form="BoxWhisker"
               title="GPA Box and Whisker"
               yaxisFormatter={(value) => Number(value).toFixed(2)}
-              series={GPAData}
+              series={GPAData.filter((dat, index) => included[index])}
             />
           </Card>
           <div className="grid grid-cols-1 md:grid-cols-2">
@@ -452,7 +454,7 @@ export const Dashboard: NextPage = () => {
                 title="GPA Averages"
                 xaxisLabels={['Average']}
                 yaxisFormatter={(value) => Number(value).toFixed(2)}
-                series={averageData}
+                series={averageData.filter((dat, index) => included[index])}
               />
             </Card>
             <Card className="h-96 p-4 m-4">
@@ -461,7 +463,7 @@ export const Dashboard: NextPage = () => {
                 title="GPA Standard Deviations"
                 xaxisLabels={['Standard Deviation']}
                 yaxisFormatter={(value) => Number(value).toFixed(2)}
-                series={stdevData}
+                series={stdevData.filter((dat, index) => included[index])}
               />
             </Card>
           </div>
@@ -543,6 +545,9 @@ export const Dashboard: NextPage = () => {
         <div className="h-full m-4">
           {profData.length > 0 ? (
             profData.map((data: profType, index: number) => {
+              if (!included[index]) {
+                return null;
+              }
               if (!data.found) {
                 let text = 'Data not found';
                 if (
@@ -605,6 +610,7 @@ export const Dashboard: NextPage = () => {
         <TopMenu />
         <ExpandableSearchGrid
           onChange={searchTermsChange}
+          setIncluded={setIncluded}
           studentTotals={studentTotals}
         />
         <div className="w-full h-5/6 justify-center">
