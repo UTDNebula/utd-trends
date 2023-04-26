@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { SearchTermCard } from '../SearchTermCard/searchTermCard';
-import Card from '@mui/material/Card';
 import { CardContent } from '@mui/material';
-import { SearchBar } from '../SearchBar/searchBar';
-import React from 'react';
+import Card from '@mui/material/Card';
 import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+
+import { SearchBar } from '../SearchBar/searchBar';
+import { SearchTermCard } from '../SearchTermCard/searchTermCard';
 
 type SearchQuery = {
   prefix?: string;
@@ -14,7 +14,7 @@ type SearchQuery = {
 };
 
 type ExpandableSearchGridProps = {
-  onChange: Function;
+  onChange: (searchTerms: SearchQuery[]) => void;
   studentTotals: number[];
 };
 
@@ -139,7 +139,7 @@ function parseURIEncodedSearchTerms(
 }
 
 function parseURIEncodedSearchTerm(encodedSearchTerm: string): SearchQuery {
-  let encodedSearchTermParts = encodedSearchTerm.split(' ');
+  const encodedSearchTermParts = encodedSearchTerm.split(' ');
   // Does it start with prefix
   if (/^([A-Z]{2,4})$/.test(encodedSearchTermParts[0])) {
     // If it is just the prefix, return that
@@ -164,7 +164,7 @@ function parseURIEncodedSearchTerm(encodedSearchTerm: string): SearchQuery {
     }
     // Is the second part a course number and section
     else if (/^([0-9A-Z]{4}\.[0-9A-Z]{3})$/.test(encodedSearchTermParts[1])) {
-      let courseNumberAndSection: string[] =
+      const courseNumberAndSection: string[] =
         encodedSearchTermParts[1].split('.');
       if (encodedSearchTermParts.length == 2) {
         return {

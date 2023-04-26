@@ -1,10 +1,10 @@
-import { IconButton, Snackbar } from '@mui/material';
-import { LogoIcon } from '../../icons/LogoIcon/logoIcon';
 import { Share } from '@mui/icons-material';
-import React from 'react';
+import { IconButton, Snackbar } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import React, { useState } from 'react';
+
+import { LogoIcon } from '../../icons/LogoIcon/logoIcon';
 
 /**
  * This is a component to hold UTD Trends branding and basic navigation

@@ -1,21 +1,21 @@
 import {
   Card,
-  LinearProgress,
-  Select,
-  MenuItem,
   InputLabel,
-  Box,
+  LinearProgress,
+  MenuItem,
+  Select,
   Typography,
 } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useState, useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+
 import Carousel from '../../components/common/Carousel/carousel';
-import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
-import TopMenu from '../../components/navigation/topMenu/topMenu';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
+import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
+import TopMenu from '../../components/navigation/topMenu/topMenu';
 
 type SearchQuery = {
   prefix?: string;
@@ -24,7 +24,6 @@ type SearchQuery = {
   sectionNumber?: string;
 };
 
-// @ts-ignore
 export const Dashboard: NextPage = () => {
   /* Helper functions */
 
@@ -294,8 +293,8 @@ export const Dashboard: NextPage = () => {
       };
     });
 
-    let newDat: gradesType[] = [];
-    let newStudentTotals = [-1, -1, -1];
+    const newDat: gradesType[] = [];
+    const newStudentTotals = [-1, -1, -1];
     for (let i = 0; i < partialGradesData.length; i++) {
       const total: number = partialGradesData[i].data.reduce(
         (accumulator, currentValue) => accumulator + currentValue,
@@ -313,9 +312,9 @@ export const Dashboard: NextPage = () => {
     setGradesData(newDat);
     setStudentTotals(newStudentTotals);
 
-    let newGPADat: gradesType[] = [];
-    let newAverageDat: gradesType[] = [];
-    let newStdevDat: gradesType[] = [];
+    const newGPADat: gradesType[] = [];
+    const newAverageDat: gradesType[] = [];
+    const newStdevDat: gradesType[] = [];
     for (let i = 0; i < partialGradesData.length; i++) {
       const GPALookup = [
         4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
@@ -561,8 +560,6 @@ export const Dashboard: NextPage = () => {
               return (
                 <Card className="h-fit m-4" key={index}>
                   <ProfessorCard
-                    position="relative"
-                    element="Card"
                     professorRating={data.data.averageRating}
                     averageDifficulty={data.data.averageDifficulty}
                     takingAgain={data.data.wouldTakeAgainPercentage}

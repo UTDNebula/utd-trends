@@ -1,8 +1,13 @@
-import * as React from 'react';
 import { Search } from '@mui/icons-material';
-import { Autocomplete, InputBase, InputAdornment } from '@mui/material';
+import {
+  Autocomplete,
+  Box,
+  InputAdornment,
+  InputBase,
+  Paper,
+} from '@mui/material';
 import Popper from '@mui/material/Popper';
-import { Box, Paper } from '@mui/material';
+import * as React from 'react';
 import { useEffect } from 'react';
 // import { searchAutocomplete } from '../../autocomplete';
 
@@ -11,9 +16,9 @@ import { useEffect } from 'react';
  */
 type SearchProps = {
   // setSearch: the setter function from the parent component to set the search value
-  selectSearchValue: Function;
+  selectSearchValue: (value: SearchQuery) => void;
   value: SearchQuery[];
-  setValue: Function;
+  setValue: (value: SearchQuery[]) => void;
   disabled?: boolean;
 };
 
@@ -98,7 +103,6 @@ export const SearchBar = (props: SearchProps) => {
             let difference: SearchQuery[];
             if (props.value !== undefined) {
               if (newValue !== undefined) {
-                // @ts-ignore
                 difference = newValue.filter((x) => !props.value.includes(x));
               } else {
                 difference = [];
@@ -131,7 +135,7 @@ export const SearchBar = (props: SearchProps) => {
               }
             />
           )}
-          renderOption={(props, option, { selected }) => (
+          renderOption={(props, option) => (
             <li
               {...props}
               className="bg-white/25 active:bg-white/50 focus:bg-white/50 hover:bg-white/50 my-4 mx-8 font-sans"

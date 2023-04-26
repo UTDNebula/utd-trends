@@ -1,6 +1,6 @@
-import * as React from 'react';
 import { Search } from '@mui/icons-material';
-import { Autocomplete, InputBase, InputAdornment } from '@mui/material';
+import { Autocomplete, InputAdornment, InputBase } from '@mui/material';
+import * as React from 'react';
 import { useEffect } from 'react';
 // import { searchAutocomplete } from '../../autocomplete';
 
@@ -8,7 +8,7 @@ import { useEffect } from 'react';
  * Props type used by the SearchBar component
  */
 type SearchProps = {
-  selectSearchValue: Function;
+  selectSearchValue: (chosenOption: SearchQuery) => void;
   disabled?: boolean;
 };
 
@@ -81,11 +81,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
           // When a new option is selected, find the new selected option by getting the
           // difference between the current and new value, then return that to the parent
           // component using selectSearchValue prop
-          onChange={(
-            event: any,
-            newValue: SearchQuery[] | undefined,
-            reason,
-          ) => {
+          onChange={(event: any, newValue: SearchQuery[] | undefined) => {
             let difference: SearchQuery[];
             if (newValue !== undefined) {
               difference = newValue;

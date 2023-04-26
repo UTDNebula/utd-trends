@@ -1,8 +1,9 @@
 import { useMediaQuery } from '@mui/material';
+import React from 'react';
+
+import GraphProps from '../../../modules/GraphProps';
 import { HorizontalBarGraph } from '../HorizontalBarGraph/HorizontalBarGraph';
 import { VerticalBarGraph } from '../VerticalBarGraph/VerticalBarGraph';
-import GraphProps from '../../../modules/GraphProps';
-import React from 'react';
 
 /**
  * The purpose of this component is to offer an automatically responsive bar chart feature. It simply returns a `VerticalBarGraph` or a `HorizontalBarGraph`
