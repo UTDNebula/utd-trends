@@ -4,6 +4,7 @@ import { Box, IconButton, Typography, Tooltip } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useMediaQuery } from '@mui/material';
+import { useState } from 'react';
 
 /**
  * Props type used by the SearchTermCard component
@@ -34,6 +35,9 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
 
   const finePointer = useMediaQuery('(pointer: fine)');
 
+  const [transition, setTransition] = useState('');
+  window.addEventListener('load', () => setTransition(' transition-opacity'));
+
   return (
     <Card className="bg-primary-light p-2 flex flex-row justify-between items-center rounded-none group">
       <div className="float-left flex align-middle place-items-center">
@@ -58,7 +62,7 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
                   className={
                     'fill-light' +
                     (finePointer
-                      ? ' opacity-0 group-hover:opacity-100 transition-opacity'
+                      ? ' opacity-0 group-hover:opacity-100' + transition
                       : '')
                   }
                 />
