@@ -2,9 +2,9 @@
   "name": "UTD-Trends",
   "private": true,
   "scripts": {
-    "predev": "node scripts/generateAutocompleteGraph.js",
+    "predev": "ts-node scripts/generateAutocompleteGraph.ts",
     "dev": "next dev",
-    "prebuild": "node scripts/generateAutocompleteGraph.js",
+    "prebuild": "ts-node scripts/generateAutocompleteGraph.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -37,6 +37,7 @@
     "react-dom": "^18.2.0",
     "style-loader": "^3.3.1",
     "tailwindcss": "^3.0.23",
+    "ts-node": "^10.9.1",
     "webpack": "^5.72.0"
   },
   "devDependencies": {
