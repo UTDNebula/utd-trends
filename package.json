@@ -11,6 +11,9 @@
     "prepare": "husky install",
     "preinstall": "npx npm-force-resolutions"
   },
+  "engines": {
+    "node": "^18"
+  },
   "resolutions": {},
   "dependencies": {
     "@babel/runtime": "^7.17.9",
