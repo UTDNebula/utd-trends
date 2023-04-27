@@ -27,12 +27,28 @@ export const ExpandableSearchGrid = ({
   onChange,
   studentTotals,
 }: ExpandableSearchGridProps) => {
+  const router = useRouter();
+
   const [value, setValue] = useState<SearchQuery[]>([]);
   const [searchTerms, setSearchTerms] = useState<SearchQuery[]>([]);
   const [searchDisabled, setSearchDisable] = useState<boolean>(false);
 
   useEffect(() => {
     onChange(searchTerms);
+    if (router.isReady) {
+      if (searchTerms.length > 0) {
+        router.replace(
+          {
+            pathname: '/dashboard',
+            query: { searchTerms: searchQueriesLabel(searchTerms) },
+          },
+          undefined,
+          { shallow: true },
+        );
+      } else {
+        router.replace('/dashboard', undefined, { shallow: true });
+      }
+    }
   }, [onChange, searchTerms]);
 
   function addSearchTerm(newSearchTerm: SearchQuery | null) {
@@ -63,8 +79,6 @@ export const ExpandableSearchGrid = ({
       setSearchDisable(false);
     }
   }, [searchTerms]);
-
-  const router = useRouter();
 
   useEffect(() => {
     if (router.isReady) {
@@ -105,6 +119,10 @@ function studentTotalFormatter(total: number) {
     return 'Loading...';
   }
   return total.toLocaleString('en-US') + ' grades';
+}
+
+function searchQueriesLabel(queries: SearchQuery[]): string {
+  return queries.map((query) => searchQueryLabel(query)).join(',');
 }
 
 function searchQueryLabel(query: SearchQuery): string {

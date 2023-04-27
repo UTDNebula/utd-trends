@@ -8,7 +8,6 @@ import {
 } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import Carousel from '../../components/common/Carousel/carousel';
@@ -26,8 +25,6 @@ type SearchQuery = {
 
 export const Dashboard: NextPage = () => {
   /* Helper functions */
-
-  const router = useRouter();
 
   //Increment these to reset cache on next deployment
   const cacheIndexGrades = 0;
@@ -141,10 +138,6 @@ export const Dashboard: NextPage = () => {
   const [startingSession, setStartingSession] = useState<number>(0);
   const [endingSession, setEndingSession] = useState<number>(9999);
 
-  const searchTermsURIString = useCallback((queries: SearchQuery[]): string => {
-    return queries.map((query) => searchTermURIString(query)).join(',');
-  }, []);
-
   function searchTermURIString(query: SearchQuery): string {
     let result = '';
     if (query.prefix !== undefined) {
@@ -164,18 +157,6 @@ export const Dashboard: NextPage = () => {
 
   const searchTermsChange = useCallback(
     (searchTerms: SearchQuery[]) => {
-      if (searchTerms.length > 0) {
-        router.replace(
-          {
-            pathname: '/dashboard',
-            query: { searchTerms: searchTermsURIString(searchTerms) },
-          },
-          undefined,
-          { shallow: true },
-        );
-      } else {
-        router.replace('/dashboard', undefined, { shallow: true });
-      }
       setProfessorInvolvingSearchTerms(
         searchTerms
           .filter(
@@ -276,7 +257,7 @@ export const Dashboard: NextPage = () => {
           console.error('Nebula API', error);
         });
     },
-    [fetchData, searchTermsURIString],
+    [fetchData],
   );
 
   useEffect(() => {
