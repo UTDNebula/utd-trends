@@ -90,7 +90,9 @@ const Home: NextPage = () => {
                             <span className="italic">CS 1337 Jason Smith</span>
                           </li>
                         </ul>
-                        <p>then we&apos;ll aggregate grades across every section</p>
+                        <p>
+                          then we&apos;ll aggregate grades across every section
+                        </p>
                       </Typography>
                     </Card>
                   }
