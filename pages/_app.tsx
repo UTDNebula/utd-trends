@@ -11,7 +11,6 @@ function MyApp({ Component, pageProps }: AppProps) {
   const showGitInfo =
     typeof process.env.NEXT_PUBLIC_VERCEL_ENV !== 'undefined' &&
     process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview';
-  console.log(process.env.NEXT_PUBLIC_SHA, process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA, process.env.NEXT_PUBLIC_VERCEL_ENV);
 
   return (
     <>
@@ -43,12 +42,12 @@ function MyApp({ Component, pageProps }: AppProps) {
                 <a
                   href={
                     'https://github.com/UTDNebula/utd-trends/commit/' +
-                    process.env.NEXT_PUBLIC_SHA
+                    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
                   }
                   rel="noopener noreferrer"
                   target="_blank"
                 >
-                  {process.env.NEXT_PUBLIC_SHA?.substring(0, 7)}
+                  {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.substring(0, 7)}
                 </a>
               </Card>
             </Fade>
