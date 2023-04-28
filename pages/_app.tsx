@@ -36,12 +36,7 @@ function MyApp({ Component, pageProps }: AppProps) {
               rel="noopener noreferrer"
               target="_blank"
             >
-              <IconButton
-                size="large"
-                onClick={() => {
-                  setGitInfoOpen(true);
-                }}
-              >
+              <IconButton size="large">
                 <GitHub className="fill-dark text-3xl" />
               </IconButton>
             </a>
