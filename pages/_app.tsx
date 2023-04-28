@@ -4,7 +4,6 @@ import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { IconButton, Card } from '@mui/material';
 import GitHub from '@mui/icons-material/GitHub';
-import { useState } from 'react';
 import { useMediaQuery } from '@mui/material';
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -22,7 +21,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       </Head>
       <Component {...pageProps} />
       <Analytics />
-      {showGitInfo || true ? (
+      {showGitInfo ? (
         <>
           <Card
             className="w-fit h-fit bg-light fixed bottom-2 right-2 rounded-full"
