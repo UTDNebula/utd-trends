@@ -6,6 +6,8 @@ import {
   InputLabel,
   Box,
   Typography,
+  FormControl,
+  FormHelperText,
 } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
@@ -353,46 +355,6 @@ export const Dashboard: NextPage = () => {
     gradesPage = (
       <>
         <div className="h-full m-4">
-          <div className="flex justify-center gap-2">
-            <div>
-              <InputLabel id="startingSessionLabel">From</InputLabel>
-              <Select
-                labelId="startingSessionLabel"
-                defaultValue={0}
-                onChange={(e) => setStartingSession(e.target.value as number)}
-              >
-                <MenuItem key="First available" value="0">
-                  First available
-                </MenuItem>
-                {possibleAcademicSessions.map(
-                  (session: academicSessionType) => (
-                    <MenuItem key={session.name} value={session.place}>
-                      {session.name}
-                    </MenuItem>
-                  ),
-                )}
-              </Select>
-            </div>
-            <div>
-              <InputLabel id="endingSessionLabel">To</InputLabel>
-              <Select
-                labelId="endingSessionLabel"
-                defaultValue={9999}
-                onChange={(e) => setEndingSession(e.target.value as number)}
-              >
-                <MenuItem key="Last available" value="9999">
-                  Last available
-                </MenuItem>
-                {possibleAcademicSessions.map(
-                  (session: academicSessionType) => (
-                    <MenuItem key={session.name} value={session.place}>
-                      {session.name}
-                    </MenuItem>
-                  ),
-                )}
-              </Select>
-            </div>
-          </div>
           <Card className="h-96 p-4 m-4">
             <GraphChoice
               form="Bar"
@@ -417,6 +379,57 @@ export const Dashboard: NextPage = () => {
               series={gradesData}
             />
           </Card>
+          <div className="flex justify-center gap-2">
+            <FormControl
+              error={startingSession > endingSession}
+              variant="standard"
+            >
+              <InputLabel id="startingSessionLabel">From</InputLabel>
+              <Select
+                labelId="startingSessionLabel"
+                defaultValue={0}
+                onChange={(e) => setStartingSession(e.target.value as number)}
+              >
+                <MenuItem key="First available" value="0">
+                  First available
+                </MenuItem>
+                {possibleAcademicSessions.map(
+                  (session: academicSessionType) => (
+                    <MenuItem key={session.name} value={session.place}>
+                      {session.name}
+                    </MenuItem>
+                  ),
+                )}
+              </Select>
+            </FormControl>
+            <FormControl
+              error={startingSession > endingSession}
+              variant="standard"
+            >
+              <InputLabel id="endingSessionLabel">To</InputLabel>
+              <Select
+                labelId="endingSessionLabel"
+                defaultValue={9999}
+                onChange={(e) => setEndingSession(e.target.value as number)}
+              >
+                {possibleAcademicSessions.map(
+                  (session: academicSessionType) => (
+                    <MenuItem key={session.name} value={session.place}>
+                      {session.name}
+                    </MenuItem>
+                  ),
+                )}
+                <MenuItem key="Last available" value="9999">
+                  Last available
+                </MenuItem>
+              </Select>
+            </FormControl>
+          </div>
+          {startingSession > endingSession ? (
+            <FormHelperText className="text-center" error={true}>
+              Starting academic session must be before ending academic session
+            </FormHelperText>
+          ) : null}
         </div>
       </>
     );
