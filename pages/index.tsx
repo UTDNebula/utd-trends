@@ -6,7 +6,7 @@ import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/sp
 import { WaveSVG } from '../components/icons/Wave/waveSVG';
 import { Wave2SVG } from '../components/icons/Wave2/wave2SVG';
 import { LogoIcon } from '../components/icons/LogoIcon/logoIcon';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 type SearchQuery = {
   prefix?: string;
@@ -21,12 +21,10 @@ const Home: NextPage = () => {
   const router = useRouter();
   function searchOptionChosen(chosenOption: SearchQuery) {
     //console.log('The option chosen was: ', chosenOption);
-    router.push(
-      {
-        pathname: '/dashboard',
-        query: { searchTerms: searchTermURIString(chosenOption) },
-      },
-    );
+    router.push({
+      pathname: '/dashboard',
+      query: { searchTerms: searchTermURIString(chosenOption) },
+    });
   }
 
   useEffect(() => {
