@@ -26,9 +26,12 @@ const Home: NextPage = () => {
         pathname: '/dashboard',
         query: { searchTerms: searchTermURIString(chosenOption) },
       },
-      '/dashboard',
     );
   }
+
+  useEffect(() => {
+    router.prefetch('/dashboard');
+  }, [router]);
 
   return (
     <>
