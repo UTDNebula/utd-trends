@@ -1,3 +1,3 @@
-``` ts
+```ts
 <SearchBar />
 ```

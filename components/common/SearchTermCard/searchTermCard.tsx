@@ -49,7 +49,9 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
         />
         <Typography className="leading-tight text-lg text-gray-600">
           {props.primaryText}
-          <span className="block text-sm text-gray-500">{props.secondaryText}</span>
+          <span className="block text-sm text-gray-500">
+            {props.secondaryText}
+          </span>
         </Typography>
       </div>
       <div className="float-right">

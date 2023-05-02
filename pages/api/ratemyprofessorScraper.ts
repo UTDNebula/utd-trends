@@ -1,62 +1,77 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 type RateMyProfessorInfo = {
-  legacyId: string;
-  averageRating: number;
-  numRatings: number;
-  wouldTakeAgainPercentage: number;
-  averageDifficulty: number;
-  department: string;
-  firstName: string;
-  lastName: string;
+  found: boolean;
+  data?: {
+    legacyId: string;
+    averageRating: number;
+    numRatings: number;
+    wouldTakeAgainPercentage: number;
+    averageDifficulty: number;
+    department: string;
+    firstName: string;
+    lastName: string;
+  };
 };
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  if ('professors' in req.query && typeof req.query.professors === 'string') {
-    var profNames: string[] = req.query.professors.split(',');
+type Data = {
+  message: string;
+  data?: RateMyProfessorInfo;
+};
 
-    var professorUrls: string[] = [];
-
-    for (let i = 0; i < profNames.length; i++) {
-      professorUrls.push(
-        `https://www.ratemyprofessors.com/search/teachers?query=${encodeURIComponent(
-          profNames[i],
-        )}&sid=U2Nob29sLTEyNzM=`,
-      );
-    }
-    return new Promise<void>((resolve, reject) => {
-      Promise.all(professorUrls.map((u) => fetch(u)))
-        .then((responses) => Promise.all(responses.map((res) => res.text())))
-        .then((texts) => {
-          const regex =
-            /"legacyId":(\w+),"avgRating":([\d.]+),"numRatings":(\d+),"wouldTakeAgainPercent":([\d.]+),"avgDifficulty":([\d.]+),"department":"([\w\s]+)","school":.+?,"firstName":"([\w-]+)","lastName":"([\w-]+)"/;
-          const result = texts.map((page) => {
-            var parsedData: RateMyProfessorInfo = {
-              averageRating: 0,
-              averageDifficulty: 0,
-              department: '',
-              firstName: '',
-              lastName: '',
-              legacyId: '',
-              numRatings: 0,
-              wouldTakeAgainPercentage: 0,
-            };
-            const regexArray = page.match(regex);
-            if (regexArray != null) {
-              parsedData.legacyId = regexArray[1];
-              parsedData.averageRating = Number(regexArray[2]);
-              parsedData.numRatings = Number(regexArray[3]);
-              parsedData.wouldTakeAgainPercentage = Number(regexArray[4]);
-              parsedData.averageDifficulty = Number(regexArray[5]);
-              parsedData.department = regexArray[6];
-              parsedData.firstName = regexArray[7];
-              parsedData.lastName = regexArray[8];
-            }
-            return parsedData;
-          });
-          res.status(200).json(result);
-          resolve();
-        });
-    });
+export default function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Data>,
+) {
+  if (!('professor' in req.query && typeof req.query.professor === 'string')) {
+    res.status(400).json({ message: 'Incorrect query present' });
   }
+  const url = new URL('https://www.ratemyprofessors.com/search/teachers');
+  url.searchParams.append('query', req.query.professor as string);
+  url.searchParams.append('sid', 'U2Nob29sLTEyNzM='); //UTD
+  return new Promise<void>((resolve, reject) => {
+    fetch(url.href, {
+      method: 'GET',
+    })
+      .then((response) => response.text())
+      .then((text) => {
+        const regex =
+          /"legacyId":(\w+),"avgRating":([\d.]+),"numRatings":(\d+),"wouldTakeAgainPercent":([\d.]+),"avgDifficulty":([\d.]+),"department":"([\w\s]+)","school":.+?,"firstName":"([\w-]+)","lastName":"([\w-]+)"/;
+        let parsedData: RateMyProfessorInfo = {
+          found: true,
+        };
+        const regexArray = text.match(regex);
+        if (regexArray != null) {
+          res.status(200).json({
+            message: 'success',
+            data: {
+              found: true,
+              data: {
+                legacyId: regexArray[1],
+                averageRating: Number(regexArray[2]),
+                numRatings: Number(regexArray[3]),
+                wouldTakeAgainPercentage: Number(regexArray[4]),
+                averageDifficulty: Number(regexArray[5]),
+                department: regexArray[6],
+                firstName: regexArray[7],
+                lastName: regexArray[8],
+              },
+            },
+          });
+          resolve();
+        } else {
+          res.status(200).json({
+            message: 'success',
+            data: {
+              found: false,
+            },
+          });
+          resolve();
+        }
+      })
+      .catch((error) => {
+        res.status(400).json({ message: error.message });
+        resolve();
+      });
+  });
 }
