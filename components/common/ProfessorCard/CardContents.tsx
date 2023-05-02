@@ -16,11 +16,7 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
     <>
       <Box className="flex flex-col md:flex-row w-full h-1/6">
         <Box className="basis-1/2 flex flex-row items-center justify-center border-b-2 md:border-b-0 md:border-r-2 border-neutral-400 bg-inherit p-2">
-          <Link href={`https://www.ratemyprofessors.com/search/teachers?query=${encodeURIComponent(props.name,)}&sid=U2Nob29sLTEyNzM=`}>
-            <a target="_blank">
-              <Typography className="text-2xl text-center">{props.name}</Typography>
-            </a>
-          </Link>
+          <Typography className="text-2xl text-center">{props.name}</Typography>
         </Box>
         <Box className="basis-1/2 flex flex-row items-center justify-center border-b-2 md:border-b-0 border-neutral-400 bg-inherit p-2">
           <Typography className="text-2xl text-center">
@@ -68,9 +64,17 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
         </Box>
       </Box>
       <Box className="flex flex-row justify-center md:justify-start w-full h-1/6">
-        <Typography className="text-2xl text-neutral-600 text-center md:text-left font-semibold ml-8 my-4">
-          Based on {props.numRatings} ratings
-        </Typography>
+        <Link
+          href={`https://www.ratemyprofessors.com/search/teachers?query=${encodeURIComponent(
+            props.name,
+          )}&sid=U2Nob29sLTEyNzM=`}
+        >
+          <a target="_blank">
+            <Typography className="text-2xl text-center md:text-left font-semibold ml-8 my-4 underline text-blue-600 hover:text-blue-800 visited:text-purple-600">
+              Based on {props.numRatings} ratings
+            </Typography>
+          </a>
+        </Link>
       </Box>
       {/*<Box*/}
       {/*  className=".profcard-container"*/}

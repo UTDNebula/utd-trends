@@ -33,13 +33,6 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
-@layer base{
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
-} 
-
 * {
   box-sizing: border-box;
 }
