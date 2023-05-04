@@ -71,8 +71,11 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
             props.name,
           )}&sid=U2Nob29sLTEyNzM=`}
         >
-          <a target="_blank">
-            <Typography className="text-2xl text-center md:text-left font-semibold ml-8 my-4 underline text-blue-600 hover:text-blue-800 visited:text-purple-600">
+          <a
+            target="_blank"
+            className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+          >
+            <Typography className="text-2xl text-center md:text-left font-semibold ml-8 my-4">
               Based on {props.numRatings} ratings
             </Typography>
           </a>
