@@ -67,9 +67,9 @@ export const CardContents: FC<CardContentProps> = (props: CardContentProps) => {
       </Box>
       <Box className="flex flex-row justify-center md:justify-start w-full h-1/6">
         <Link
-          href={`https://www.ratemyprofessors.com/search/teachers?query=${encodeURIComponent(
+          href={`https://www.ratemyprofessors.com/search/professors/1273?q=${encodeURIComponent(
             props.name,
-          )}&sid=U2Nob29sLTEyNzM=`}
+          )}`}
         >
           <a
             target="_blank"
