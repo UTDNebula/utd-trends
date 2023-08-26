@@ -16,13 +16,8 @@ import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
-
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
-};
+import SearchQuery from '../../modules/SearchQuery/SearchQuery';
+import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
 
 // @ts-ignore
 export const Dashboard: NextPage = () => {
@@ -140,24 +135,7 @@ export const Dashboard: NextPage = () => {
   const [endingSession, setEndingSession] = useState<number>(9999);
 
   function searchTermsURIString(querys: SearchQuery[]): string {
-    return querys.map((query) => searchTermURIString(query)).join(',');
-  }
-
-  function searchTermURIString(query: SearchQuery): string {
-    let result = '';
-    if (query.prefix !== undefined) {
-      result += query.prefix;
-    }
-    if (query.number !== undefined) {
-      result += ' ' + query.number;
-    }
-    if (query.sectionNumber !== undefined) {
-      result += '.' + query.sectionNumber;
-    }
-    if (query.professorName !== undefined) {
-      result += ' ' + query.professorName;
-    }
-    return result.trim();
+    return querys.map((query) => searchQueryLabel(query)).join(',');
   }
 
   const searchTermsChange = useCallback((searchTerms: SearchQuery[]) => {
@@ -245,7 +223,7 @@ export const Dashboard: NextPage = () => {
         setFullGradesData(
           responses.map((response, index) => {
             return {
-              name: searchTermURIString(searchTerms[index]),
+              name: searchQueryLabel(searchTerms[index]),
               data: response.map((data: individualacademicSessionResponse) => {
                 let session: number = parseInt('20' + data._id);
                 if (data._id.includes('S')) {
