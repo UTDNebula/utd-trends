@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "lintFix": "next lint --fix",
     "prepare": "husky install",
     "preinstall": "npx npm-force-resolutions"
   },

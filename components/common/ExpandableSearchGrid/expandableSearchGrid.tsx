@@ -117,6 +117,10 @@ function studentTotalFormatter(total: number) {
   return total.toLocaleString('en-US') + ' grades';
 }
 
+function searchQueriesLabel(queries: SearchQuery[]): string {
+  return queries.map((query) => searchQueryLabel(query)).join(',');
+}
+
 function parseURIEncodedSearchTerms(
   encodedSearchTerms: string | string[] | undefined,
 ): SearchQuery[] {

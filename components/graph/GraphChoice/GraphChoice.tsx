@@ -1,6 +1,6 @@
 import React from 'react';
 
-import GraphProps from '../../../modules/GraphProps';
+import GraphProps from '../../../modules/GraphProps/GraphProps';
 import { BarGraph } from '../BarGraph/BarGraph';
 import { BoxGraph } from '../BoxGraph/BoxGraph';
 import { HorizontalBarGraph } from '../HorizontalBarGraph/HorizontalBarGraph';

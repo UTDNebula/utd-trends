@@ -2,7 +2,7 @@ import { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React from 'react';
 
-import GraphProps from '../../../modules/GraphProps';
+import GraphProps from '../../../modules/GraphProps/GraphProps';
 import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });

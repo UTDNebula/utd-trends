@@ -1,7 +1,7 @@
 import { useMediaQuery } from '@mui/material';
 import React from 'react';
 
-import GraphProps from '../../../modules/GraphProps';
+import GraphProps from '../../../modules/GraphProps/GraphProps';
 import { HorizontalBarGraph } from '../HorizontalBarGraph/HorizontalBarGraph';
 import { VerticalBarGraph } from '../VerticalBarGraph/VerticalBarGraph';
 
