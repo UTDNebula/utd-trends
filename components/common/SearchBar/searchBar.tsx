@@ -9,6 +9,10 @@ import {
 import Popper from '@mui/material/Popper';
 import * as React from 'react';
 import { useEffect } from 'react';
+
+import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
+import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 // import { searchAutocomplete } from '../../autocomplete';
 
 /**
@@ -20,13 +24,6 @@ type SearchProps = {
   value: SearchQuery[];
   setValue: (value: SearchQuery[]) => void;
   disabled?: boolean;
-};
-
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
 };
 
 /**
@@ -137,21 +134,9 @@ export const SearchBar = (props: SearchProps) => {
               </Box>
             </li>
           )}
-          isOptionEqualToValue={(option, value) => {
-            if (option.prefix !== value.prefix) {
-              return false;
-            }
-            if (option.professorName !== value.professorName) {
-              return false;
-            }
-            if (option.number !== value.number) {
-              return false;
-            }
-            if (option.sectionNumber !== value.sectionNumber) {
-              return false;
-            }
-            return true;
-          }}
+          isOptionEqualToValue={(option, value) =>
+            searchQueryEqual(option, value)
+          }
           PopperComponent={(props) => {
             return (
               <Popper {...props} className="rounded-none" placement="bottom" />
@@ -175,20 +160,3 @@ export const SearchBar = (props: SearchProps) => {
 SearchBar.defaultProps = {
   disabled: true,
 };
-
-function searchQueryLabel(query: SearchQuery): string {
-  let result = '';
-  if (query.prefix !== undefined) {
-    result += query.prefix;
-  }
-  if (query.number !== undefined) {
-    result += ' ' + query.number;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += '.' + query.sectionNumber;
-  }
-  if (query.professorName !== undefined) {
-    result += ' ' + query.professorName;
-  }
-  return result.trim();
-}

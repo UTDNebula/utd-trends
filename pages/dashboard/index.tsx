@@ -15,13 +15,8 @@ import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGr
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
-
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
-};
+import SearchQuery from '../../modules/SearchQuery/SearchQuery';
+import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
 
 export const Dashboard: NextPage = () => {
   /* Helper functions */
@@ -138,23 +133,6 @@ export const Dashboard: NextPage = () => {
   const [startingSession, setStartingSession] = useState<number>(0);
   const [endingSession, setEndingSession] = useState<number>(9999);
 
-  function searchTermURIString(query: SearchQuery): string {
-    let result = '';
-    if (query.prefix !== undefined) {
-      result += query.prefix;
-    }
-    if (query.number !== undefined) {
-      result += ' ' + query.number;
-    }
-    if (query.sectionNumber !== undefined) {
-      result += '.' + query.sectionNumber;
-    }
-    if (query.professorName !== undefined) {
-      result += ' ' + query.professorName;
-    }
-    return result.trim();
-  }
-
   const searchTermsChange = useCallback(
     (searchTerms: SearchQuery[]) => {
       setProfessorInvolvingSearchTerms(
@@ -230,7 +208,7 @@ export const Dashboard: NextPage = () => {
           setFullGradesData(
             responses.map((response, index) => {
               return {
-                name: searchTermURIString(searchTerms[index]),
+                name: searchQueryLabel(searchTerms[index]),
                 data: response.map(
                   (data: individualacademicSessionResponse) => {
                     let session: number = parseInt('20' + data._id);

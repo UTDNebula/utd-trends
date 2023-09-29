@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import React from 'react';
 
 import GraphProps from '../../../modules/GraphProps';
+import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
@@ -25,7 +26,7 @@ export function RadarChart(props: GraphProps) {
     xaxis: {
       categories: props.xaxisLabels,
     },
-    colors: ['#eb5757', '#2d9cdb', '#499F68'],
+    colors: searchQueryColors,
     stroke: {
       width: 2,
     },

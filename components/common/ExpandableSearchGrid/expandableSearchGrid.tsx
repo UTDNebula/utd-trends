@@ -3,15 +3,11 @@ import Card from '@mui/material/Card';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
+import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
+import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import { SearchBar } from '../SearchBar/searchBar';
 import { SearchTermCard } from '../SearchTermCard/searchTermCard';
-
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
-};
 
 type ExpandableSearchGridProps = {
   onChange: (searchTerms: SearchQuery[]) => void;
@@ -94,7 +90,7 @@ export const ExpandableSearchGrid = ({
           secondaryText={studentTotalFormatter(studentTotals[index])}
           key={index}
           index={index}
-          legendColor={colors[index]}
+          legendColor={searchQueryColors[index]}
           onCloseButtonClicked={deleteSearchTerm}
         />
       ))}
@@ -119,27 +115,6 @@ function studentTotalFormatter(total: number) {
     return 'Loading...';
   }
   return total.toLocaleString('en-US') + ' grades';
-}
-
-function searchQueriesLabel(queries: SearchQuery[]): string {
-  return queries.map((query) => searchQueryLabel(query)).join(',');
-}
-
-function searchQueryLabel(query: SearchQuery): string {
-  let result = '';
-  if (query.prefix !== undefined) {
-    result += query.prefix;
-  }
-  if (query.number !== undefined) {
-    result += ' ' + query.number;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += '.' + query.sectionNumber;
-  }
-  if (query.professorName !== undefined) {
-    result += ' ' + query.professorName;
-  }
-  return result.trim();
 }
 
 function parseURIEncodedSearchTerms(
@@ -212,5 +187,3 @@ function parseURIEncodedSearchTerm(encodedSearchTerm: string): SearchQuery {
     return { professorName: encodedSearchTerm.trim() };
   }
 }
-
-const colors = ['#eb5757', '#2d9cdb', '#499F68'];

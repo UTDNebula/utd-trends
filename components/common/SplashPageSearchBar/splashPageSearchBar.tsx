@@ -2,6 +2,9 @@ import { Search } from '@mui/icons-material';
 import { Autocomplete, InputAdornment, InputBase } from '@mui/material';
 import * as React from 'react';
 import { useEffect } from 'react';
+
+import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 // import { searchAutocomplete } from '../../autocomplete';
 
 /**
@@ -10,13 +13,6 @@ import { useEffect } from 'react';
 type SearchProps = {
   selectSearchValue: (chosenOption: SearchQuery) => void;
   disabled?: boolean;
-};
-
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
 };
 
 /**
@@ -111,20 +107,3 @@ export const SplashPageSearchBar = (props: SearchProps) => {
 SplashPageSearchBar.defaultProps = {
   disabled: true,
 };
-
-function searchQueryLabel(query: SearchQuery): string {
-  let result = '';
-  if (query.prefix !== undefined) {
-    result += query.prefix;
-  }
-  if (query.number !== undefined) {
-    result += ' ' + query.number;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += '.' + query.sectionNumber;
-  }
-  if (query.professorName !== undefined) {
-    result += ' ' + query.professorName;
-  }
-  return result.trim();
-}

@@ -8,13 +8,9 @@ import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/sp
 import { LogoIcon } from '../components/icons/LogoIcon/logoIcon';
 import { WaveSVG } from '../components/icons/Wave/waveSVG';
 import { Wave2SVG } from '../components/icons/Wave2/wave2SVG';
+import SearchQuery from '../modules/SearchQuery/SearchQuery';
+import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
 
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
-};
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
@@ -25,7 +21,7 @@ const Home: NextPage = () => {
     router.push(
       {
         pathname: '/dashboard',
-        query: { searchTerms: searchTermURIString(chosenOption) },
+        query: { searchTerms: searchQueryLabel(chosenOption) },
       },
       '/dashboard',
     );
@@ -74,22 +70,5 @@ const Home: NextPage = () => {
     </>
   );
 };
-
-function searchTermURIString(query: SearchQuery): string {
-  let result = '';
-  if (query.prefix !== undefined) {
-    result += query.prefix;
-  }
-  if (query.number !== undefined) {
-    result += ' ' + query.number;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += '.' + query.sectionNumber;
-  }
-  if (query.professorName !== undefined) {
-    result += ' ' + query.professorName;
-  }
-  return result.trim();
-}
 
 export default Home;
