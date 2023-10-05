@@ -6,7 +6,7 @@ import { BarGraph } from '../BarGraph/BarGraph';
 import { LineGraph } from '../LineGraph/LineGraph';
 import { RadarChart } from '../RadarChart/RadarChart';
 import { RadialBarChart } from '../RadialBarChart/RadialBarChart';
-import GraphProps from '../../../modules/GraphProps';
+import GraphProps from '../../../modules/GraphProps/GraphProps';
 import { VerticalBarGraph } from '../VerticalBarGraph/VerticalBarGraph';
 import { HorizontalBarGraph } from '../HorizontalBarGraph/HorizontalBarGraph';
 import { BoxGraph } from '../BoxGraph/BoxGraph';

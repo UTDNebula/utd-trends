@@ -5,13 +5,9 @@ import { CardContent } from '@mui/material';
 import { SearchBar } from '../SearchBar/searchBar';
 import React from 'react';
 import { useRouter } from 'next/router';
-
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
-};
+import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
+import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
 
 type ExpandableSearchGridProps = {
   onChange: Function;
@@ -103,7 +99,7 @@ export const ExpandableSearchGrid = ({
           secondaryText={studentTotalFormatter(studentTotals[index])}
           key={index}
           index={index}
-          legendColor={colors[index]}
+          legendColor={searchQueryColors[index]}
           onCloseButtonClicked={deleteSearchTerm}
           onToggleButtonClicked={toggleSearchTerm}
           visible={searchTermsInclude[index]}
@@ -130,23 +126,6 @@ function studentTotalFormatter(total: number) {
     return 'Loading...';
   }
   return total.toLocaleString('en-US') + ' grades';
-}
-
-function searchQueryLabel(query: SearchQuery): string {
-  let result = '';
-  if (query.prefix !== undefined) {
-    result += query.prefix;
-  }
-  if (query.number !== undefined) {
-    result += ' ' + query.number;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += '.' + query.sectionNumber;
-  }
-  if (query.professorName !== undefined) {
-    result += ' ' + query.professorName;
-  }
-  return result.trim();
 }
 
 function URIEncodedSearchTermsLength(
@@ -231,5 +210,3 @@ function parseURIEncodedSearchTerm(encodedSearchTerm: string): SearchQuery {
     return { professorName: encodedSearchTerm.trim() };
   }
 }
-
-const colors = ['#eb5757', '#2d9cdb', '#499F68'];
