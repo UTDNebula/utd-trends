@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { Card, Tooltip, Typography, Popper } from '@mui/material';
+import { Card, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
