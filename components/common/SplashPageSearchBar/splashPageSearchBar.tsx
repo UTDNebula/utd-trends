@@ -4,6 +4,8 @@ import { Autocomplete, InputBase, InputAdornment } from '@mui/material';
 import { useEffect } from 'react';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
+import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 // import { searchAutocomplete } from '../../autocomplete';
 
 /**
@@ -12,13 +14,6 @@ import match from 'autosuggest-highlight/match';
 type SearchProps = {
   selectSearchValue: Function;
   disabled?: boolean;
-};
-
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
 };
 
 /**
@@ -149,20 +144,3 @@ export const SplashPageSearchBar = (props: SearchProps) => {
 SplashPageSearchBar.defaultProps = {
   disabled: true,
 };
-
-function searchQueryLabel(query: SearchQuery): string {
-  let result = '';
-  if (query.prefix !== undefined) {
-    result += query.prefix;
-  }
-  if (query.number !== undefined) {
-    result += ' ' + query.number;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += '.' + query.sectionNumber;
-  }
-  if (query.professorName !== undefined) {
-    result += ' ' + query.professorName;
-  }
-  return result.trim();
-}

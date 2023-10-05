@@ -1,13 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { DirectedGraph } from 'graphology';
 import autocompleteGraph from '../../data/autocomplete_graph.json';
-
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
-};
+import SearchQuery from '../../modules/SearchQuery/SearchQuery';
 
 type NodeAttributes = {
   c: string;
