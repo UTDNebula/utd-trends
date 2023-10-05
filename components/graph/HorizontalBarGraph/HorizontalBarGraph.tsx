@@ -4,6 +4,7 @@ import { ApexOptions } from 'apexcharts';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import GraphProps from '../../../modules/GraphProps/GraphProps';
 import React from 'react';
+import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
 
 /**
  * Creates a pre-configured ApexCharts horizontal bar graph component. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`. This component also gets returned from a BarGraph component on a small screen.
@@ -39,7 +40,7 @@ export function HorizontalBarGraph(props: GraphProps) {
         formatter: xaxisFormatter,
       },
     },
-    colors: ['#eb5757', '#2d9cdb', '#499F68'],
+    colors: searchQueryColors,
     stroke: {
       width: 2,
       curve: 'smooth',

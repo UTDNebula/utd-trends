@@ -7,6 +7,7 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
+import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
 
 type ExpandableSearchGridProps = {
   onChange: Function;
@@ -83,7 +84,7 @@ export const ExpandableSearchGrid = ({
           secondaryText={studentTotalFormatter(studentTotals[index])}
           key={index}
           index={index}
-          legendColor={colors[index]}
+          legendColor={searchQueryColors[index]}
           onCloseButtonClicked={deleteSearchTerm}
         />
       ))}
@@ -180,5 +181,3 @@ function parseURIEncodedSearchTerm(encodedSearchTerm: string): SearchQuery {
     return { professorName: encodedSearchTerm.trim() };
   }
 }
-
-const colors = ['#eb5757', '#2d9cdb', '#499F68'];
