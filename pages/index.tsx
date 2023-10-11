@@ -2,13 +2,12 @@ import Card from '@mui/material/Card';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
+import { LogoIcon } from '../components/icons/LogoIcon/logoIcon';
 import { WaveSVG } from '../components/icons/Wave/waveSVG';
 import { Wave2SVG } from '../components/icons/Wave2/wave2SVG';
-import { LogoIcon } from '../components/icons/LogoIcon/logoIcon';
-import { useState, useEffect } from 'react';
 import SearchQuery from '../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
 
