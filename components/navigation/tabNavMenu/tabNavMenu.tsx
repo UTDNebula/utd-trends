@@ -1,4 +1,3 @@
-import { SyntheticEvent } from 'react';
 import { Divider, Tab, Tabs } from '@mui/material';
 import React from 'react';
 
@@ -9,7 +8,7 @@ type TabNavMenuProps = {
   value: number;
   // Turning animation of the carousel is handled by the parent, and this method is
   // responsible for playing the animation and setting the value to the correct new value
-  turner: Function;
+  turner: (displacement: number) => void;
 };
 
 /**

@@ -1,10 +1,10 @@
-import { IconButton, Snackbar } from '@mui/material';
-import { LogoIcon } from '../../icons/LogoIcon/logoIcon';
 import { Share } from '@mui/icons-material';
-import React from 'react';
+import { IconButton, Snackbar } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import React, { useState } from 'react';
+
+import { LogoIcon } from '../../icons/LogoIcon/logoIcon';
 
 /**
  * This is a component to hold UTD Trends branding and basic navigation
@@ -44,17 +44,15 @@ export function TopMenu() {
     <>
       <div className="bg-primary h-16 text-light relative py-2 px-4">
         <div className="h-full flex min-w-fit justify-between">
-          <Link href="/">
-            <a className="my-2 mx-2">
-              <div className="h-full flex align-middle place-items-center justify-center">
-                <div className="h-full float-left mr-2 w-7">
-                  <LogoIcon />
-                </div>
-                <h1 className="float-right text-xl text-light-always">
-                  UTD Trends
-                </h1>
+          <Link href="/" className="m-2">
+            <div className="h-full flex align-middle place-items-center justify-center">
+              <div className="h-full float-left mr-2 w-7">
+                <LogoIcon />
               </div>
-            </a>
+              <h1 className="float-right text-xl text-light-always">
+                UTD Trends
+              </h1>
+            </div>
           </Link>
           <IconButton
             className="w-12"
