@@ -29,7 +29,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             className="w-fit h-fit bg-light fixed bottom-2 right-2 rounded-full"
             elevation={darkModeElevation}
           >
-            <Tooltip title="Open GitHub commit in a new tab">
+            <Tooltip title="Open GitHub commit for this instance">
               <a
                 href={
                   'https://github.com/UTDNebula/utd-trends/commit/' +
