@@ -2,7 +2,7 @@ import Card from '@mui/material/Card';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
 import { LogoIcon } from '../components/icons/LogoIcon/logoIcon';
@@ -26,6 +26,10 @@ const Home: NextPage = () => {
       '/dashboard',
     );
   }
+
+  useEffect(() => {
+    router.prefetch('/dashboard');
+  }, [router]);
 
   return (
     <>
