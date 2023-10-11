@@ -1,12 +1,18 @@
-import * as React from 'react';
 import { Search } from '@mui/icons-material';
-import { Autocomplete, InputBase, InputAdornment } from '@mui/material';
+import {
+  Autocomplete,
+  Box,
+  InputAdornment,
+  InputBase,
+  Paper,
+} from '@mui/material';
 import Popper from '@mui/material/Popper';
-import { Box, Paper } from '@mui/material';
+import * as React from 'react';
 import { useEffect } from 'react';
+
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
-import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
+import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 // import { searchAutocomplete } from '../../autocomplete';
 
 /**
@@ -14,9 +20,9 @@ import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual
  */
 type SearchProps = {
   // setSearch: the setter function from the parent component to set the search value
-  selectSearchValue: Function;
+  selectSearchValue: (value: SearchQuery | null) => void;
   value: SearchQuery[];
-  setValue: Function;
+  setValue: (value: SearchQuery[]) => void;
   disabled?: boolean;
 };
 
@@ -84,8 +90,8 @@ export const SearchBar = (props: SearchProps) => {
           // difference between the current and new value, then return that to the parent
           // component using selectSearchValue prop
           onChange={(
-            event: any,
-            newValue: SearchQuery[] | undefined,
+            event: React.SyntheticEvent,
+            newValue: SearchQuery[],
             reason,
           ) => {
             if (reason === 'removeOption') {
@@ -93,18 +99,9 @@ export const SearchBar = (props: SearchProps) => {
             }
             let difference: SearchQuery[];
             if (props.value !== undefined) {
-              if (newValue !== undefined) {
-                // @ts-ignore
-                difference = newValue.filter((x) => !props.value.includes(x));
-              } else {
-                difference = [];
-              }
+              difference = newValue.filter((x) => !props.value.includes(x));
             } else {
-              if (newValue !== undefined) {
-                difference = newValue;
-              } else {
-                difference = [];
-              }
+              difference = newValue;
             }
             props.selectSearchValue(difference[0] ? difference[0] : null);
             props.setValue(newValue);
@@ -127,7 +124,7 @@ export const SearchBar = (props: SearchProps) => {
               }
             />
           )}
-          renderOption={(props, option, { selected }) => (
+          renderOption={(props, option) => (
             <li
               {...props}
               className="bg-white/25 active:bg-white/50 focus:bg-white/50 hover:bg-white/50 my-4 mx-8 font-sans"

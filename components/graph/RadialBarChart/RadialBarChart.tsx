@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts';
-const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
-import GraphProps from '../../../modules/GraphProps/GraphProps';
+import dynamic from 'next/dynamic';
 import React from 'react';
+
+import GraphProps from '../../../modules/GraphProps/GraphProps';
 import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
+
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 /**
  * Creates a pre-configured ApexCharts radial bar graph component. Takes in `series` and `title` `GraphProps`. The `data` fields in `series` need to each be arrays with just one entry.

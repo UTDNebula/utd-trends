@@ -29,7 +29,7 @@ export default function handler(
   const url = new URL('https://www.ratemyprofessors.com/search/teachers');
   url.searchParams.append('query', req.query.professor as string);
   url.searchParams.append('sid', 'U2Nob29sLTEyNzM='); //UTD
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<void>((resolve) => {
     fetch(url.href, {
       method: 'GET',
     })
@@ -37,9 +37,6 @@ export default function handler(
       .then((text) => {
         const regex =
           /"legacyId":(\w+),"avgRating":([\d.]+),"numRatings":(\d+),"wouldTakeAgainPercent":([\d.]+),"avgDifficulty":([\d.]+),"department":"([\w\s]+)","school":.+?,"firstName":"([\w-]+)","lastName":"([\w-]+)"/;
-        let parsedData: RateMyProfessorInfo = {
-          found: true,
-        };
         const regexArray = text.match(regex);
         if (regexArray != null) {
           res.status(200).json({
