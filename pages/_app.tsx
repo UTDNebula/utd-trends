@@ -1,10 +1,11 @@
-import { Analytics } from '@vercel/analytics/react';
 import '../styles/globals.css';
+
+import GitHub from '@mui/icons-material/GitHub';
+import { Card, IconButton, Tooltip, useMediaQuery } from '@mui/material';
+import { Analytics } from '@vercel/analytics/react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import { IconButton, Card, Tooltip } from '@mui/material';
-import GitHub from '@mui/icons-material/GitHub';
-import { useMediaQuery } from '@mui/material';
+import React from 'react';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const showGitInfo =
