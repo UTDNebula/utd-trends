@@ -1,5 +1,6 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { DirectedGraph } from 'graphology';
+import { NextApiRequest, NextApiResponse } from 'next';
+
 import autocompleteGraph from '../../data/autocomplete_graph.json';
 import SearchQuery from '../../modules/SearchQuery/SearchQuery';
 
@@ -12,7 +13,7 @@ type NodeAttributes = {
 const graph: DirectedGraph<NodeAttributes> = new DirectedGraph({
   allowSelfLoops: false,
 });
-graph.import(autocompleteGraph as Object);
+graph.import(autocompleteGraph as object);
 const root = '0';
 graph.updateEachNodeAttributes((node, attr) => {
   return {
@@ -134,7 +135,7 @@ export function searchAutocomplete(query: string) {
       visited: false,
     };
   });
-  let queue: QueueItem[] = [];
+  const queue: QueueItem[] = [];
   graph.forEachOutNeighbor(root, (neighbor) => {
     queue.push({
       node: neighbor,
@@ -142,7 +143,7 @@ export function searchAutocomplete(query: string) {
       toNext: query.length === 0, //bfsToNext if blank search string
     });
   });
-  let results: SearchQuery[] = [];
+  const results: SearchQuery[] = [];
   while (queue.length && results.length < 20) {
     let response: bfsReturn;
     if (queue[0].toNext) {
@@ -159,7 +160,7 @@ export function searchAutocomplete(query: string) {
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if ('input' in req.query && typeof req.query.input === 'string') {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve) => {
       res.status(200).json({
         success: true,
         output: searchAutocomplete(req.query.input as string),

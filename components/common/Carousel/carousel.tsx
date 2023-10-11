@@ -1,6 +1,7 @@
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
-import React, { FC, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import React, { useState } from 'react';
+
 import { TabNavMenu } from '../../navigation/tabNavMenu/tabNavMenu';
 
 interface CarouselProps {
@@ -36,7 +37,7 @@ const variants = {
  * @param props the props passed from the parent component
  * @returns
  */
-export const Carousel: FC<CarouselProps> = (props: CarouselProps) => {
+export const Carousel = (props: CarouselProps) => {
   //The card currently being displayed
   const [currentCard, setCard] = useState(0);
   //The Direction that the card is moving in
