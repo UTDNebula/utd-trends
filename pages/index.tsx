@@ -1,22 +1,18 @@
+import { Tooltip, Typography } from '@mui/material';
+import Card from '@mui/material/Card';
+import { styled } from '@mui/material/styles';
+import { tooltipClasses, TooltipProps } from '@mui/material/Tooltip';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { Card, Tooltip, Typography } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
+import React, { useEffect, useState } from 'react';
+
 import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
+import { LogoIcon } from '../components/icons/LogoIcon/logoIcon';
 import { WaveSVG } from '../components/icons/Wave/waveSVG';
 import { Wave2SVG } from '../components/icons/Wave2/wave2SVG';
-import { LogoIcon } from '../components/icons/LogoIcon/logoIcon';
-import { useState } from 'react';
-import { useMediaQuery } from '@mui/material';
-
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
-};
+import SearchQuery from '../modules/SearchQuery/SearchQuery';
+import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
 
 const TransparentTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -37,14 +33,15 @@ const Home: NextPage = () => {
     router.push(
       {
         pathname: '/dashboard',
-        query: { searchTerms: searchTermURIString(chosenOption) },
+        query: { searchTerms: searchQueryLabel(chosenOption) },
       },
       '/dashboard',
     );
   }
 
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const darkModeElevation = prefersDarkMode ? 3 : 1;
+  useEffect(() => {
+    router.prefetch('/dashboard');
+  }, [router]);
 
   return (
     <>
@@ -73,7 +70,7 @@ const Home: NextPage = () => {
                 />
                 <TransparentTooltip
                   title={
-                    <Card className="px-3 py-2" elevation={darkModeElevation}>
+                    <Card className="px-3 py-2" elevation={1}>
                       <Typography variant="body2">
                         You can search for:
                         <ul className="list-disc list-inside my-1">
@@ -124,22 +121,5 @@ const Home: NextPage = () => {
     </>
   );
 };
-
-function searchTermURIString(query: SearchQuery): string {
-  let result = '';
-  if (query.prefix !== undefined) {
-    result += query.prefix;
-  }
-  if (query.number !== undefined) {
-    result += ' ' + query.number;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += '.' + query.sectionNumber;
-  }
-  if (query.professorName !== undefined) {
-    result += ' ' + query.professorName;
-  }
-  return result.trim();
-}
 
 export default Home;

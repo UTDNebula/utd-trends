@@ -1,9 +1,11 @@
-import { useState } from 'react';
-import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts';
-const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
-import GraphProps from '../../../modules/GraphProps';
+import dynamic from 'next/dynamic';
 import React from 'react';
+
+import GraphProps from '../../../modules/GraphProps/GraphProps';
+import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
+
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 /**
  * Creates a pre-configured ApexCharts line graph component. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`.
@@ -34,7 +36,7 @@ export function LineGraph(props: GraphProps) {
         formatter: props.yaxisFormatter,
       },
     },
-    colors: ['#eb5757', '#2d9cdb', '#499F68'],
+    colors: searchQueryColors,
     stroke: {
       width: 2,
       curve: 'smooth',

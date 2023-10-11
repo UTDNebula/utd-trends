@@ -1,22 +1,18 @@
-import * as React from 'react';
 import { Search } from '@mui/icons-material';
-import { Autocomplete, InputBase, InputAdornment } from '@mui/material';
+import { Autocomplete, InputAdornment, InputBase } from '@mui/material';
+import * as React from 'react';
 import { useEffect } from 'react';
+
+import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 // import { searchAutocomplete } from '../../autocomplete';
 
 /**
  * Props type used by the SearchBar component
  */
 type SearchProps = {
-  selectSearchValue: Function;
+  selectSearchValue: (chosenOption: SearchQuery) => void;
   disabled?: boolean;
-};
-
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
 };
 
 /**
@@ -81,18 +77,8 @@ export const SplashPageSearchBar = (props: SearchProps) => {
           // When a new option is selected, find the new selected option by getting the
           // difference between the current and new value, then return that to the parent
           // component using selectSearchValue prop
-          onChange={(
-            event: any,
-            newValue: SearchQuery[] | undefined,
-            reason,
-          ) => {
-            let difference: SearchQuery[];
-            if (newValue !== undefined) {
-              difference = newValue;
-            } else {
-              difference = [];
-            }
-            props.selectSearchValue(difference[0] ? difference[0] : null);
+          onChange={(event: React.SyntheticEvent, newValue: SearchQuery[]) => {
+            props.selectSearchValue(newValue[0]);
           }}
           inputValue={inputValue}
           onInputChange={(event, newInputValue) => {
@@ -121,20 +107,3 @@ export const SplashPageSearchBar = (props: SearchProps) => {
 SplashPageSearchBar.defaultProps = {
   disabled: true,
 };
-
-function searchQueryLabel(query: SearchQuery): string {
-  let result = '';
-  if (query.prefix !== undefined) {
-    result += query.prefix;
-  }
-  if (query.number !== undefined) {
-    result += ' ' + query.number;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += '.' + query.sectionNumber;
-  }
-  if (query.professorName !== undefined) {
-    result += ' ' + query.professorName;
-  }
-  return result.trim();
-}
