@@ -26,9 +26,8 @@ export default function handler(
   if (!('professor' in req.query && typeof req.query.professor === 'string')) {
     res.status(400).json({ message: 'Incorrect query present' });
   }
-  const url = new URL('https://www.ratemyprofessors.com/search/teachers');
-  url.searchParams.append('query', req.query.professor as string);
-  url.searchParams.append('sid', 'U2Nob29sLTEyNzM='); //UTD
+  const url = new URL('https://www.ratemyprofessors.com/search/professors/1273?'); // UTD
+  url.searchParams.append('q', req.query.professor as string);
   return new Promise<void>((resolve) => {
     fetch(url.href, {
       method: 'GET',
