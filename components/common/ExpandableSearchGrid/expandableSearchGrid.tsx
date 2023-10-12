@@ -13,6 +13,7 @@ type ExpandableSearchGridProps = {
   onChange: (searchTerms: SearchQuery[]) => void;
   setIncluded: (included: boolean[]) => void;
   studentTotals: number[];
+  averageData: number[];
 };
 
 /**
@@ -24,6 +25,7 @@ export const ExpandableSearchGrid = ({
   onChange,
   setIncluded,
   studentTotals,
+  averageData,
 }: ExpandableSearchGridProps) => {
   const router = useRouter();
 
@@ -110,36 +112,40 @@ export const ExpandableSearchGrid = ({
       {searchTerms.map((option: SearchQuery, index: number) => (
         <SearchTermCard
           primaryText={searchQueryLabel(option)}
-          secondaryText={studentTotalFormatter(studentTotals[index])}
+          secondaryText={secondaryTextFormatter(
+            studentTotals[index],
+            averageData[index],
+          )}
           key={index}
           index={index}
           legendColor={searchQueryColors[index]}
           onCloseButtonClicked={deleteSearchTerm}
           onToggleButtonClicked={toggleSearchTerm}
           visible={searchTermsInclude[index]}
+          loading={studentTotals[index] === -1 || averageData[index] === -1}
         />
       ))}
       {searchTerms.length < 3 ? (
-        <Card className="bg-primary-light rounded-none" variant="outlined">
-          <CardContent className="flex flex-col justify-center items-start p-3">
-            <SearchBar
-              selectSearchValue={addSearchTerm}
-              value={value}
-              setValue={setValue}
-              disabled={searchDisabled}
-            />
-          </CardContent>
+        <Card className="bg-primary-light rounded-none flex flex-col justify-center items-start p-3">
+          <SearchBar
+            selectSearchValue={addSearchTerm}
+            value={value}
+            setValue={setValue}
+            disabled={searchDisabled}
+          />
         </Card>
       ) : null}
     </div>
   );
 };
 
-function studentTotalFormatter(total: number) {
-  if (total === -1) {
-    return 'Loading...';
-  }
-  return total.toLocaleString('en-US') + ' grades';
+function secondaryTextFormatter(total: number, gpa: number) {
+  return (
+    total.toLocaleString('en-US') +
+    ' grades | ' +
+    Number(gpa).toFixed(2) +
+    ' average GPA'
+  );
 }
 
 function searchQueriesLabel(queries: SearchQuery[]): string {

@@ -1,4 +1,4 @@
-import { Close, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Close, Help, Visibility, VisibilityOff } from '@mui/icons-material';
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import React, { useState } from 'react';
@@ -14,6 +14,7 @@ type SearchTermCardProps = {
   onToggleButtonClicked: (index: number) => void;
   visible: boolean;
   legendColor: string;
+  loading: boolean;
 };
 
 /**
@@ -59,10 +60,15 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
         </Box>
         <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
           {props.primaryText}
-          <span className="block text-sm text-gray-500 dark:text-gray-300">
-            {props.secondaryText}
+          <span className="block text-sm text-gray-500 dark:text-gray-300 inline">
+            {props.loading ? 'Loading...' : props.secondaryText}
           </span>
-        </Typography>
+          {props.loading ? null : (
+            <Tooltip title="Avergae GPA excludes dropped grades" arrow>
+              <Help className="inline fill-primary text-base ml-0.5 mb-0.5" />
+            </Tooltip>
+          )}
+        </div>
       </div>
       <div className="float-right">
         <IconButton aria-label="play/pause" onClick={handleCloseClick}>
