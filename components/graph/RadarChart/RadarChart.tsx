@@ -1,13 +1,14 @@
-import { useState } from 'react';
-import dynamic from 'next/dynamic';
+import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
 import { ApexOptions } from 'apexcharts';
-const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
+import dynamic from 'next/dynamic';
+import React, { useState } from 'react';
+
 import GraphProps from '../../../modules/GraphProps/GraphProps';
-import React from 'react';
-import { Card, Modal, Fade } from '@mui/material';
-import { FullscreenOpenIcon } from '../../icons/FullscreenOpenIcon/fullscreenOpenIcon';
-import { FullscreenCloseIcon } from '../../icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
+import { FullscreenCloseIcon } from '../../icons/FullscreenCloseIcon/fullscreenCloseIcon';
+import { FullscreenOpenIcon } from '../../icons/FullscreenOpenIcon/fullscreenOpenIcon';
+
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 /**
  * Creates a pre-configured ApexCharts radar graph component. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`.
@@ -41,6 +42,7 @@ export function RadarChart(props: GraphProps) {
           ],
         },
       },
+      background: 'transparent',
     },
     dataLabels: {
       enabled: false,
@@ -67,6 +69,9 @@ export function RadarChart(props: GraphProps) {
         fontSize: '14px',
         fontFamily: undefined,
       },
+    },
+    theme: {
+      mode: useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light',
     },
   };
 
