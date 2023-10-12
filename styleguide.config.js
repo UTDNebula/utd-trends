@@ -1,7 +1,4 @@
 const path = require('path');
-const { version } = require('./package');
-{
-}
 const webpack = require('webpack');
 const dotenv = require('dotenv').config({ path: __dirname + '/.env' });
 module.exports = {

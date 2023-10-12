@@ -1,9 +1,20 @@
-import * as React from 'react';
 import { Search } from '@mui/icons-material';
-import { Autocomplete, InputBase, InputAdornment } from '@mui/material';
+import {
+  Autocomplete,
+  Box,
+  InputAdornment,
+  InputBase,
+  Paper,
+} from '@mui/material';
 import Popper from '@mui/material/Popper';
-import { Box, Paper } from '@mui/material';
+import match from 'autosuggest-highlight/match';
+import parse from 'autosuggest-highlight/parse';
+import * as React from 'react';
 import { useEffect } from 'react';
+
+import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
+import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 // import { searchAutocomplete } from '../../autocomplete';
 
 /**
@@ -11,17 +22,10 @@ import { useEffect } from 'react';
  */
 type SearchProps = {
   // setSearch: the setter function from the parent component to set the search value
-  selectSearchValue: Function;
+  selectSearchValue: (value: SearchQuery | null) => void;
   value: SearchQuery[];
-  setValue: Function;
+  setValue: (value: SearchQuery[]) => void;
   disabled?: boolean;
-};
-
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
 };
 
 /**
@@ -88,8 +92,8 @@ export const SearchBar = (props: SearchProps) => {
           // difference between the current and new value, then return that to the parent
           // component using selectSearchValue prop
           onChange={(
-            event: any,
-            newValue: SearchQuery[] | undefined,
+            event: React.SyntheticEvent,
+            newValue: SearchQuery[],
             reason,
           ) => {
             if (reason === 'removeOption') {
@@ -97,18 +101,9 @@ export const SearchBar = (props: SearchProps) => {
             }
             let difference: SearchQuery[];
             if (props.value !== undefined) {
-              if (newValue !== undefined) {
-                // @ts-ignore
-                difference = newValue.filter((x) => !props.value.includes(x));
-              } else {
-                difference = [];
-              }
+              difference = newValue.filter((x) => !props.value.includes(x));
             } else {
-              if (newValue !== undefined) {
-                difference = newValue;
-              } else {
-                difference = [];
-              }
+              difference = newValue;
             }
             props.selectSearchValue(difference[0] ? difference[0] : null);
             props.setValue(newValue);
@@ -122,7 +117,7 @@ export const SearchBar = (props: SearchProps) => {
               ref={params.InputProps.ref}
               inputProps={params.inputProps}
               fullWidth={true}
-              className="font-sans w-full h-12 bg-primary-light text-gray-600 placeholder-dark"
+              className="font-sans w-full h-12 bg-primary-light text-gray-600 dark:text-gray-200 placeholder-dark"
               placeholder="Search section number, professor name, course number...."
               startAdornment={
                 <InputAdornment position="start">
@@ -131,16 +126,34 @@ export const SearchBar = (props: SearchProps) => {
               }
             />
           )}
-          renderOption={(props, option, { selected }) => (
-            <li
-              {...props}
-              className="bg-white/25 active:bg-white/50 focus:bg-white/50 hover:bg-white/50 my-4 mx-8 font-sans"
-            >
-              <Box className="cursor-pointer text-lg text-gray-600 pl-5 py-5">
-                {searchQueryLabel(option)}
-              </Box>
-            </li>
-          )}
+          renderOption={(props, option, { inputValue }) => {
+            const text = searchQueryLabel(option);
+            //add spaces between prefix and course number
+            const matches = match(
+              text,
+              inputValue.replace(
+                /([a-zA-Z]{2,4})([0-9][0-9V]?[0-9]{0,2})/,
+                '$1 $2',
+              ),
+            );
+            const parts = parse(text, matches);
+            console.log(parts);
+            return (
+              <li {...props}>
+                {parts.map((part, index) => (
+                  <span
+                    key={index}
+                    className={
+                      'whitespace-pre-wrap' +
+                      (part.highlight ? ' font-bold' : '')
+                    }
+                  >
+                    {part.text}
+                  </span>
+                ))}
+              </li>
+            );
+          }}
           isOptionEqualToValue={(option, value) => {
             if (option.prefix !== value.prefix) {
               return false;
@@ -179,20 +192,3 @@ export const SearchBar = (props: SearchProps) => {
 SearchBar.defaultProps = {
   disabled: true,
 };
-
-function searchQueryLabel(query: SearchQuery): string {
-  let result = '';
-  if (query.prefix !== undefined) {
-    result += query.prefix;
-  }
-  if (query.number !== undefined) {
-    result += ' ' + query.number;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += '.' + query.sectionNumber;
-  }
-  if (query.professorName !== undefined) {
-    result += ' ' + query.professorName;
-  }
-  return result.trim();
-}
