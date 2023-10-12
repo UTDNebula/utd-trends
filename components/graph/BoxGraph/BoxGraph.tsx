@@ -67,7 +67,7 @@ export function BoxGraph(props: GraphProps) {
               index: 0,
               title: 'Fullscreen',
               class: 'custom-icon',
-              click: (chart, options, e) => setFullScreenOpen(!fullScreenOpen),
+              click: () => setFullScreenOpen(!fullScreenOpen),
             },
           ],
         },

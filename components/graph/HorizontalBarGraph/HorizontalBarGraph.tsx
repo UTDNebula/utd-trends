@@ -44,12 +44,15 @@ export function HorizontalBarGraph(props: GraphProps) {
               index: 0,
               title: 'Fullscreen',
               class: 'custom-icon',
-              click: (chart, options, e) => setFullScreenOpen(!fullScreenOpen),
+              click: () => setFullScreenOpen(!fullScreenOpen),
             },
           ],
         },
       },
       background: 'transparent',
+      animations: {
+        enabled: !fullScreenOpen,
+      },
     },
     plotOptions: {
       bar: {
