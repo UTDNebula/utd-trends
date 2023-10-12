@@ -1,3 +1,4 @@
+import { useMediaQuery } from '@mui/material';
 import { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React from 'react';
@@ -19,6 +20,7 @@ export function RadarChart(props: GraphProps) {
       zoom: {
         enabled: false,
       },
+      background: 'transparent',
     },
     dataLabels: {
       enabled: false,
@@ -45,6 +47,9 @@ export function RadarChart(props: GraphProps) {
         fontSize: '14px',
         fontFamily: undefined,
       },
+    },
+    theme: {
+      mode: useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light',
     },
   };
 
