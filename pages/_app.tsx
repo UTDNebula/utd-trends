@@ -2,7 +2,6 @@ import '../styles/globals.css';
 
 import GitHub from '@mui/icons-material/GitHub';
 import { Card, IconButton, Tooltip, useMediaQuery } from '@mui/material';
-import { useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Analytics } from '@vercel/analytics/react';
 import type { AppProps } from 'next/app';
