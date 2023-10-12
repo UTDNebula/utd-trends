@@ -9,15 +9,15 @@ import Head from 'next/head';
 import React from 'react';
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+
   const showGitInfo =
     typeof process.env.NEXT_PUBLIC_VERCEL_ENV !== 'undefined' &&
     process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' &&
     typeof process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA !== 'undefined' &&
     process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA !== '';
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const darkModeElevation = prefersDarkMode ? 3 : 1;
 
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const muiTheme = createTheme({
     palette: {
       mode: prefersDarkMode ? 'dark' : 'light',
