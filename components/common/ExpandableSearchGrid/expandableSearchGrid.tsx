@@ -12,6 +12,7 @@ import { SearchTermCard } from '../SearchTermCard/searchTermCard';
 type ExpandableSearchGridProps = {
   onChange: (searchTerms: SearchQuery[]) => void;
   studentTotals: number[];
+  relatedQuery: SearchQuery | undefined;
   averageData: number[];
 };
 
@@ -23,6 +24,7 @@ type ExpandableSearchGridProps = {
 export const ExpandableSearchGrid = ({
   onChange,
   studentTotals,
+  relatedQuery,
   averageData,
 }: ExpandableSearchGridProps) => {
   const router = useRouter();
@@ -55,6 +57,12 @@ export const ExpandableSearchGrid = ({
       setSearchTerms([...searchTerms, newSearchTerm]);
     }
   }
+
+  useEffect(() => {
+    if (searchTerms.length < 3 && typeof relatedQuery !== 'undefined') {
+      addSearchTerm(relatedQuery);
+    }
+  }, [relatedQuery]);
 
   function deleteSearchTerm(searchTermIndex: number) {
     //console.log('deleteSearchTerm called on ' + searchTermIndex);
