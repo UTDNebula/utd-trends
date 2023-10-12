@@ -48,9 +48,11 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
         </div>
       </div>
       <div className="float-right">
-        <IconButton aria-label="play/pause" onClick={handleCloseClick}>
-          <Close />
-        </IconButton>
+        <Tooltip title="Remove query">
+          <IconButton aria-label="remove query" onClick={handleCloseClick}>
+            <Close />
+          </IconButton>
+        </Tooltip>
       </div>
     </Card>
   );

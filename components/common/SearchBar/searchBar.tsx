@@ -1,11 +1,5 @@
 import { Search } from '@mui/icons-material';
-import {
-  Autocomplete,
-  Box,
-  InputAdornment,
-  InputBase,
-  Paper,
-} from '@mui/material';
+import { Autocomplete, InputAdornment, InputBase, Paper } from '@mui/material';
 import Popper from '@mui/material/Popper';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
@@ -13,7 +7,6 @@ import * as React from 'react';
 import { useEffect } from 'react';
 
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
-import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 // import { searchAutocomplete } from '../../autocomplete';
 
@@ -48,7 +41,10 @@ export const SearchBar = (props: SearchProps) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        setOptions(data.output);
+        if (data.message !== 'success') {
+          throw new Error(data.message);
+        }
+        setOptions(data.data);
       })
       .catch((error) => {
         if (error instanceof DOMException) {
