@@ -1,22 +1,20 @@
-import * as React from 'react';
 import { Search } from '@mui/icons-material';
-import { Autocomplete, InputBase, InputAdornment } from '@mui/material';
+import { Autocomplete, InputAdornment, InputBase } from '@mui/material';
+import match from 'autosuggest-highlight/match';
+import parse from 'autosuggest-highlight/parse';
+import * as React from 'react';
 import { useEffect } from 'react';
+
+import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 // import { searchAutocomplete } from '../../autocomplete';
 
 /**
  * Props type used by the SearchBar component
  */
 type SearchProps = {
-  selectSearchValue: Function;
+  selectSearchValue: (chosenOption: SearchQuery) => void;
   disabled?: boolean;
-};
-
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
 };
 
 /**
@@ -39,7 +37,10 @@ export const SplashPageSearchBar = (props: SearchProps) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        setOptions(data.output);
+        if (data.message !== 'success') {
+          throw new Error(data.message);
+        }
+        setOptions(data.data);
       })
       .catch((error) => {
         if (error instanceof DOMException) {
@@ -80,18 +81,8 @@ export const SplashPageSearchBar = (props: SearchProps) => {
           // When a new option is selected, find the new selected option by getting the
           // difference between the current and new value, then return that to the parent
           // component using selectSearchValue prop
-          onChange={(
-            event: any,
-            newValue: SearchQuery[] | undefined,
-            reason,
-          ) => {
-            let difference: SearchQuery[];
-            if (newValue !== undefined) {
-              difference = newValue;
-            } else {
-              difference = [];
-            }
-            props.selectSearchValue(difference[0] ? difference[0] : null);
+          onChange={(event: React.SyntheticEvent, newValue: SearchQuery[]) => {
+            props.selectSearchValue(newValue[0]);
           }}
           inputValue={inputValue}
           onInputChange={(event, newInputValue) => {
@@ -101,7 +92,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
             <InputBase
               ref={params.InputProps.ref}
               inputProps={params.inputProps}
-              className="rounded-md border-primary-dark border-2 w-full h-12 px-2 bg-white text-primary-dark placeholder-primary-dark font-bold"
+              className="rounded-md border-primary-dark border-2 w-full h-12 px-2 bg-light text-primary-dark placeholder-primary-dark font-bold"
               placeholder="Search section number, professor name, course number...."
               startAdornment={
                 <InputAdornment position="start">
@@ -110,6 +101,32 @@ export const SplashPageSearchBar = (props: SearchProps) => {
               }
             />
           )}
+          renderOption={(props, option, { inputValue }) => {
+            const text = searchQueryLabel(option);
+            //add spaces between prefix and course number
+            const matches = match(
+              text,
+              inputValue
+                .replace(/([a-zA-Z]{2,4})([0-9][0-9V]?[0-9]{0,2})/, '$1 $2')
+                .replace(/([0-9][0-9V]?[0-9]{0,2})([a-zA-Z]{2,4})/, '$1 $2'),
+            );
+            const parts = parse(text, matches);
+            return (
+              <li {...props}>
+                {parts.map((part, index) => (
+                  <span
+                    key={index}
+                    className={
+                      'whitespace-pre-wrap' +
+                      (part.highlight ? ' font-bold' : '')
+                    }
+                  >
+                    {part.text}
+                  </span>
+                ))}
+              </li>
+            );
+          }}
           defaultValue={[]}
         />
       </div>
@@ -120,20 +137,3 @@ export const SplashPageSearchBar = (props: SearchProps) => {
 SplashPageSearchBar.defaultProps = {
   disabled: true,
 };
-
-function searchQueryLabel(query: SearchQuery): string {
-  let result = '';
-  if (query.prefix !== undefined) {
-    result += query.prefix;
-  }
-  if (query.number !== undefined) {
-    result += ' ' + query.number;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += '.' + query.sectionNumber;
-  }
-  if (query.professorName !== undefined) {
-    result += ' ' + query.professorName;
-  }
-  return result.trim();
-}

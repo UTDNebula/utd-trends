@@ -1,13 +1,10 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { DirectedGraph } from 'graphology';
-import autocompleteGraph from '../../data/autocomplete_graph.json';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
-};
+import autocompleteGraph from '../../data/autocomplete_graph.json';
+import SearchQuery from '../../modules/SearchQuery/SearchQuery';
+import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
+import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
 
 type NodeAttributes = {
   c: string;
@@ -18,7 +15,7 @@ type NodeAttributes = {
 const graph: DirectedGraph<NodeAttributes> = new DirectedGraph({
   allowSelfLoops: false,
 });
-graph.import(autocompleteGraph as Object);
+graph.import(autocompleteGraph as object);
 const root = '0';
 graph.updateEachNodeAttributes((node, attr) => {
   return {
@@ -200,8 +197,8 @@ function bfsRecursion(queue: PriorityQueue) {
 
 type bfsReturn = SearchQuery | undefined;
 
-export function searchAutocomplete(query: string) {
-  query = query.trim().toUpperCase();
+function searchAutocomplete(query: string, limit: number) {
+  query = query.trimStart().toUpperCase();
   graph.updateEachNodeAttributes((node, attr) => {
     return {
       ...attr,
@@ -219,8 +216,8 @@ export function searchAutocomplete(query: string) {
       },
     });
   });
-  let results: SearchQuery[] = [];
-  while (!queue.isEmpty() && results.length < 20) {
+  const results: SearchQuery[] = [];
+  while (!queue.isEmpty() && results.length < limit) {
     let response: bfsReturn;
     if (queue.front()?.data?.toNext) {
       response = bfsRecursionToNextData(queue);
@@ -252,12 +249,102 @@ export function searchAutocomplete(query: string) {
   );
 }
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+type Data = {
+  message: string;
+  data?: SearchQuery[];
+};
+
+export default function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Data>,
+) {
   if ('input' in req.query && typeof req.query.input === 'string') {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve) => {
       res.status(200).json({
-        success: true,
-        output: searchAutocomplete(req.query.input as string),
+        message: 'success',
+        data: searchAutocomplete(req.query.input as string, 20),
+      });
+      resolve();
+    });
+  } else if (
+    (('prefix' in req.query && typeof req.query.prefix === 'string') ||
+      ('number' in req.query && typeof req.query.number === 'string') ||
+      ('professorName' in req.query &&
+        typeof req.query.professorName === 'string') ||
+      ('sectionNumber' in req.query &&
+        typeof req.query.sectionNumber === 'string')) &&
+    'limit' in req.query &&
+    typeof req.query.limit === 'string'
+  ) {
+    const prefexDefined =
+      'prefix' in req.query && typeof req.query.prefix === 'string';
+    const numberDefined =
+      'number' in req.query && typeof req.query.number === 'string';
+    const professorNameDefined =
+      'professorName' in req.query &&
+      typeof req.query.professorName === 'string';
+    const sectionNumberDefined =
+      'sectionNumber' in req.query &&
+      typeof req.query.sectionNumber === 'string';
+    let results: SearchQuery[] = [];
+
+    const query: SearchQuery = {};
+    if (prefexDefined) {
+      query.prefix = req.query.prefix as string;
+    }
+    if (numberDefined) {
+      query.number = req.query.number as string;
+    }
+    if (professorNameDefined) {
+      query.professorName = req.query.professorName as string;
+    }
+    if (sectionNumberDefined) {
+      query.sectionNumber = req.query.sectionNumber as string;
+    }
+
+    return new Promise<void>((resolve) => {
+      if (
+        prefexDefined &&
+        numberDefined &&
+        sectionNumberDefined &&
+        professorNameDefined
+      ) {
+        results.push(
+          ...searchAutocomplete(
+            (req.query.prefix as string) +
+              (req.query.number as string) +
+              '.' +
+              (req.query.sectionNumber as string) +
+              ' ',
+            Number(req.query.limit),
+          ),
+        );
+      } else if (prefexDefined && numberDefined && professorNameDefined) {
+        results.push(
+          ...searchAutocomplete(
+            (req.query.prefix as string) + (req.query.number as string) + ' ',
+            Number(req.query.limit),
+          ),
+        );
+      }
+      if (results.length < Number(req.query.limit)) {
+        results.push(
+          ...searchAutocomplete(
+            searchQueryLabel(query) + ' ',
+            Number(req.query.limit),
+          ),
+        );
+        results = results.filter(
+          (query1: SearchQuery, index, self) =>
+            self.findIndex((query2: SearchQuery) =>
+              searchQueryEqual(query1, query2),
+            ) === index,
+        );
+      }
+      results = results.filter((result) => !searchQueryEqual(result, query));
+      res.status(200).json({
+        message: 'success',
+        data: results,
       });
       resolve();
     });
