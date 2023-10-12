@@ -58,14 +58,16 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
             </IconButton>
           </Tooltip>
         </Box>
-        <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
-          {props.primaryText}
+        <div>
+          <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
+            {props.primaryText}
+          </Typography>
           <span className="block text-sm text-gray-500 dark:text-gray-300 inline">
             {props.loading ? 'Loading...' : props.secondaryText}
           </span>
           {props.loading ? null : (
             <Tooltip title="Avergae GPA excludes dropped grades" arrow>
-              <Help className="inline fill-primary text-base ml-0.5 mb-0.5" />
+              <Help className="inline fill-gray-500 dark:fill-gray-300 text-base ml-0.5 mb-0.5" />
             </Tooltip>
           )}
         </div>
