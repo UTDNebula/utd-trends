@@ -1,5 +1,6 @@
 import {
   Card,
+  Grid,
   InputLabel,
   LinearProgress,
   MenuItem,
@@ -397,7 +398,7 @@ export const Dashboard: NextPage = () => {
   if (gradesState === 'loading') {
     gradesPage = (
       <>
-        <div className="h-full m-4 flex-auto">
+        <div className="h-full m-4">
           <LinearProgress className="mt-8 pt-2"></LinearProgress>
         </div>
       </>
@@ -405,7 +406,7 @@ export const Dashboard: NextPage = () => {
   } else if (gradesState === 'error') {
     gradesPage = (
       <>
-        <div className="h-full m-4 flex-auto">
+        <div className="h-full m-4">
           <h1 className="text-3xl text-center text-gray-600 font-semibold">
             An error occurred! Please reload the page, and if this problem
             persists, contact Nebula Labs.
@@ -416,7 +417,7 @@ export const Dashboard: NextPage = () => {
   } else {
     gradesPage = (
       <>
-        <div className="h-full m-4 flex-auto">
+        <div className="h-full m-4">
           <div className="flex justify-center gap-2">
             <div>
               <InputLabel id="startingSessionLabel">From</InputLabel>
@@ -525,7 +526,7 @@ export const Dashboard: NextPage = () => {
     relatedComponent = null;
   } else {
     relatedComponent = (
-      <Card className="m-8 lg:w-64 flex-initial">
+      <Card className="m-4" elevation={darkModeElevation}>
         <RelatedClasses
           displayData={relatedQueries}
           addNew={(query: SearchQuery) => setRelatedQuery(query)}
@@ -586,7 +587,7 @@ export const Dashboard: NextPage = () => {
   if (professorRatingsState === 'loading') {
     professorRatingsPage = (
       <>
-        <div className="h-full m-4 flex-auto">
+        <div className="h-full m-4">
           <LinearProgress className="mt-8 pt-2"></LinearProgress>
         </div>
       </>
@@ -594,7 +595,7 @@ export const Dashboard: NextPage = () => {
   } else if (professorRatingsState === 'error') {
     professorRatingsPage = (
       <>
-        <div className="h-full m-4 flex-auto">
+        <div className="h-full m-4">
           <h1 className="text-3xl text-center text-gray-600 font-semibold">
             An error occurred! Please reload the page, and if this problem
             persists, contact Nebula Labs.
@@ -605,7 +606,7 @@ export const Dashboard: NextPage = () => {
   } else {
     professorRatingsPage = (
       <>
-        <div className="h-full m-4 flex-auto">
+        <div className="h-full m-4">
           {profData.length > 0 ? (
             profData.map((data: profType, index: number) => {
               if (!data.found) {
@@ -682,14 +683,33 @@ export const Dashboard: NextPage = () => {
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">
             <Carousel>
-              <div className="flex lg:items-start items-stretch lg:flex-row flex-col-reverse">
-                {relatedComponent}
-                {gradesPage}
-              </div>
-              <div className="flex lg:items-start items-stretch lg:flex-row flex-col-reverse">
-                {relatedComponent}
-                {professorRatingsPage}
-              </div>
+              <Grid
+                container
+                component="main"
+                wrap="wrap-reverse"
+                className="grow"
+                spacing={2}
+              >
+                <Grid item xs={12} sm={6} md={4}>
+                  {relatedComponent}
+                </Grid>
+                <Grid item xs={false} sm={6} md={8} className="w-full">
+                  {gradesPage}
+                </Grid>
+              </Grid>
+              <Grid
+                container
+                component="main"
+                wrap="wrap-reverse"
+                className="grow"
+              >
+                <Grid item xs={12} sm={6} md={4}>
+                  {relatedComponent}
+                </Grid>
+                <Grid item xs={false} sm={6} md={8} className="w-full">
+                  {professorRatingsPage}
+                </Grid>
+              </Grid>
             </Carousel>
           </div>
         </div>

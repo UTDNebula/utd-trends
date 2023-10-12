@@ -1,6 +1,5 @@
 import { Close } from '@mui/icons-material';
 import { Box, Card, IconButton, Tooltip, Typography } from '@mui/material';
-import Card from '@mui/material/Card';
 import React from 'react';
 
 /**

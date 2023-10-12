@@ -32,7 +32,7 @@ export const RelatedClasses = ({
 
   return (
     <div className="grid grid-flow-column auto-cols-fr justify-center">
-      <div className="bg-white p-4 rounded-none">
+      <div className="p-4 rounded-none">
         <Typography className="leading-tight text-lg text-dark">
           Related Queries
         </Typography>
