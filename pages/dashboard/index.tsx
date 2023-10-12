@@ -693,7 +693,13 @@ export const Dashboard: NextPage = () => {
                 <Grid item xs={12} sm={6} md={4}>
                   {relatedComponent}
                 </Grid>
-                <Grid item xs={false} sm={6} md={8} className="w-full">
+                <Grid
+                  item
+                  xs={false}
+                  sm={relatedComponent === null ? 12 : 6}
+                  md={relatedComponent === null ? 12 : 8}
+                  className="w-full"
+                >
                   {gradesPage}
                 </Grid>
               </Grid>
@@ -706,7 +712,13 @@ export const Dashboard: NextPage = () => {
                 <Grid item xs={12} sm={6} md={4}>
                   {relatedComponent}
                 </Grid>
-                <Grid item xs={false} sm={6} md={8} className="w-full">
+                <Grid
+                  item
+                  xs={false}
+                  sm={relatedComponent === null ? 12 : 6}
+                  md={relatedComponent === null ? 12 : 8}
+                  className="w-full"
+                >
                   {professorRatingsPage}
                 </Grid>
               </Grid>
