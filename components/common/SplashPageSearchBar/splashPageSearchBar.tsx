@@ -12,7 +12,7 @@ import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel
  * Props type used by the SearchBar component
  */
 type SearchProps = {
-  selectSearchValue: (chosenOption: SearchQuery) => void;
+  selectSearchValue: (chosenOption: SearchQuery | null) => void;
   disabled?: boolean;
 };
 
@@ -113,7 +113,6 @@ export const SplashPageSearchBar = (props: SearchProps) => {
               </li>
             );
           }}
-          defaultValue={[]}
         />
       </div>
     </>

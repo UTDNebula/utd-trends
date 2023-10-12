@@ -16,15 +16,17 @@ import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
  */
 const Home: NextPage = () => {
   const router = useRouter();
-  function searchOptionChosen(chosenOption: SearchQuery) {
+  function searchOptionChosen(chosenOption: SearchQuery | null) {
     //console.log('The option chosen was: ', chosenOption);
-    router.push(
-      {
-        pathname: '/dashboard',
-        query: { searchTerms: searchQueryLabel(chosenOption) },
-      },
-      '/dashboard',
-    );
+    if (chosenOption !== null) {
+      router.push(
+        {
+          pathname: '/dashboard',
+          query: { searchTerms: searchQueryLabel(chosenOption) },
+        },
+        '/dashboard',
+      );
+    }
   }
 
   useEffect(() => {
