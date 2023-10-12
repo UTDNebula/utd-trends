@@ -1,7 +1,6 @@
 import { Close, Help, Visibility, VisibilityOff } from '@mui/icons-material';
-import { Box, IconButton, Tooltip, Typography } from '@mui/material';
-import Card from '@mui/material/Card';
-import React, { useState } from 'react';
+import { Box, Card, IconButton, Tooltip, Typography } from '@mui/material';
+import React from 'react';
 
 /**
  * Props type used by the SearchTermCard component
@@ -73,9 +72,11 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
         </div>
       </div>
       <div className="float-right">
-        <IconButton aria-label="play/pause" onClick={handleCloseClick}>
-          <Close />
-        </IconButton>
+        <Tooltip title="Remove query">
+          <IconButton aria-label="remove query" onClick={handleCloseClick}>
+            <Close />
+          </IconButton>
+        </Tooltip>
       </div>
     </Card>
   );
