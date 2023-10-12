@@ -1,4 +1,3 @@
-import { SyntheticEvent } from 'react';
 import { Divider, Tab, Tabs } from '@mui/material';
 import React from 'react';
 
@@ -9,7 +8,7 @@ type TabNavMenuProps = {
   value: number;
   // Turning animation of the carousel is handled by the parent, and this method is
   // responsible for playing the animation and setting the value to the correct new value
-  turner: Function;
+  turner: (displacement: number) => void;
 };
 
 /**
@@ -22,13 +21,12 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
     <Tabs
       value={props.value}
       onChange={(event, newValue) => props.turner(newValue - props.value)}
-      aria-label="basic tabs example"
-      centered
-      className="w-full grid grid-flow-row justify-center shadow"
+      aria-label="Tab switcher"
+      className="w-full grid grid-flow-row justify-center shadow dark:shadow-lg"
     >
       <Tab
         label="Grades"
-        className="text-lg text-gray-600 normal-case"
+        className="text-lg text-gray-600 dark:text-gray-200 normal-case"
         value={0}
       />
       <Tab
@@ -40,7 +38,7 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
       />
       <Tab
         label="Professor Ratings"
-        className="text-lg text-gray-600 normal-case"
+        className="text-lg text-gray-600 dark:text-gray-200 normal-case"
         value={1}
       />
     </Tabs>

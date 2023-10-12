@@ -1,10 +1,13 @@
-import * as React from 'react';
+import { Close, Visibility, VisibilityOff } from '@mui/icons-material';
+import {
+  Box,
+  IconButton,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+} from '@mui/material';
 import Card from '@mui/material/Card';
-import { Box, IconButton, Typography, Tooltip } from '@mui/material';
-import { Close } from '@mui/icons-material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { useMediaQuery } from '@mui/material';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 /**
  * Props type used by the SearchTermCard component
@@ -13,8 +16,8 @@ type SearchTermCardProps = {
   primaryText: string;
   secondaryText: string;
   index: number;
-  onCloseButtonClicked: Function;
-  onToggleButtonClicked: Function;
+  onCloseButtonClicked: (index: number) => void;
+  onToggleButtonClicked: (index: number) => void;
   visible: boolean;
   legendColor: string;
 };
@@ -72,9 +75,9 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
             </IconButton>
           </Tooltip>
         </Box>
-        <Typography className="leading-tight text-lg text-gray-600">
+        <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
           {props.primaryText}
-          <span className="block text-sm text-gray-500">
+          <span className="block text-sm text-gray-500 dark:text-gray-300">
             {props.secondaryText}
           </span>
         </Typography>
