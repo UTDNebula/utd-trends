@@ -6,6 +6,7 @@ import parse from 'autosuggest-highlight/parse';
 import React, { useEffect, useState } from 'react';
 
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 // import { searchAutocomplete } from '../../autocomplete';
 
