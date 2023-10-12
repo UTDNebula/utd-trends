@@ -1,11 +1,5 @@
 import { Close, Visibility, VisibilityOff } from '@mui/icons-material';
-import {
-  Box,
-  IconButton,
-  Tooltip,
-  Typography,
-  useMediaQuery,
-} from '@mui/material';
+import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import React, { useState } from 'react';
 
@@ -36,11 +30,6 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
     props.onCloseButtonClicked(props.index);
   }
 
-  const finePointer = useMediaQuery('(pointer: fine)');
-
-  const [transition, setTransition] = useState('');
-  window.addEventListener('load', () => setTransition(' transition-opacity'));
-
   return (
     <Card className="bg-primary-light p-2 flex flex-row justify-between items-center rounded-none group">
       <div className="float-left flex align-middle place-items-center">
@@ -61,14 +50,7 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
               onClick={handleToggleClick}
             >
               {props.visible ? (
-                <Visibility
-                  className={
-                    'fill-light' +
-                    (finePointer
-                      ? ' opacity-0 group-hover:opacity-100' + transition
-                      : '')
-                  }
-                />
+                <Visibility className="fill-light" />
               ) : (
                 <VisibilityOff className="fill-light" />
               )}
