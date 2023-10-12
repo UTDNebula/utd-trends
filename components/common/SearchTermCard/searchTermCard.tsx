@@ -1,7 +1,7 @@
-import * as React from 'react';
-import Card from '@mui/material/Card';
-import { Box, IconButton, Typography, Tooltip } from '@mui/material';
 import { Close, Help } from '@mui/icons-material';
+import { Box, IconButton, Tooltip, Typography } from '@mui/material';
+import Card from '@mui/material/Card';
+import * as React from 'react';
 
 /**
  * Props type used by the SearchTermCard component
@@ -10,7 +10,7 @@ type SearchTermCardProps = {
   primaryText: string;
   secondaryText: string;
   index: number;
-  onCloseButtonClicked: Function;
+  onCloseButtonClicked: (index: number) => void;
   legendColor: string;
   loading: boolean;
 };
@@ -35,10 +35,10 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
           }}
         />
         <div>
-          <Typography className="leading-tight text-lg text-gray-600">
+          <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
             {props.primaryText}
           </Typography>
-          <span className="block text-sm text-gray-500 inline">
+          <span className="block text-sm text-gray-500 dark:text-gray-300 inline">
             {props.loading ? 'Loading...' : props.secondaryText}
           </span>
           {props.loading ? null : (

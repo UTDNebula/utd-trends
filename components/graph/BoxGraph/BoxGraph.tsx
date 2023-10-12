@@ -1,8 +1,12 @@
-import dynamic from 'next/dynamic';
+import { useMediaQuery } from '@mui/material';
 import { ApexOptions } from 'apexcharts';
-const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
-import GraphProps from '../../../modules/GraphProps';
+import dynamic from 'next/dynamic';
 import React from 'react';
+
+import GraphProps from '../../../modules/GraphProps/GraphProps';
+import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
+
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 /**
  * Creates a pre-configured ApexCharts box-and-whisker graph. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`.
@@ -44,6 +48,7 @@ export function BoxGraph(props: GraphProps) {
       zoom: {
         enabled: false,
       },
+      background: 'transparent',
     },
     plotOptions: {
       bar: {
@@ -51,8 +56,8 @@ export function BoxGraph(props: GraphProps) {
       },
       boxPlot: {
         colors: {
-          upper: '#eb5757',
-          lower: '#2d9cdb',
+          upper: searchQueryColors[0],
+          lower: searchQueryColors[1],
         },
       },
     },
@@ -86,6 +91,9 @@ export function BoxGraph(props: GraphProps) {
         fontSize: '14px',
         fontFamily: undefined,
       },
+    },
+    theme: {
+      mode: useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light',
     },
   };
 
