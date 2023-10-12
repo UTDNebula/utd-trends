@@ -1,7 +1,7 @@
-import * as React from 'react';
-import Card from '@mui/material/Card';
-import { IconButton, Typography, Tooltip } from '@mui/material';
 import { AddCircle } from '@mui/icons-material';
+import { IconButton, Tooltip, Typography } from '@mui/material';
+import Card from '@mui/material/Card';
+import * as React from 'react';
 
 /**
  * Props type used by the SearchTermCard component
@@ -9,7 +9,7 @@ import { AddCircle } from '@mui/icons-material';
 type RelatedTermCardProps = {
   primaryText: string;
   index: number;
-  onAddButtonClicked: Function;
+  onAddButtonClicked: (index: number) => void;
   disabled: boolean;
 };
 

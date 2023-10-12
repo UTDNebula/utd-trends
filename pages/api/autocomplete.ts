@@ -1,9 +1,10 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { DirectedGraph } from 'graphology';
+import { NextApiRequest, NextApiResponse } from 'next';
+
 import autocompleteGraph from '../../data/autocomplete_graph.json';
 import SearchQuery from '../../modules/SearchQuery/SearchQuery';
-import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
+import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
 
 type NodeAttributes = {
   c: string;
@@ -14,7 +15,7 @@ type NodeAttributes = {
 const graph: DirectedGraph<NodeAttributes> = new DirectedGraph({
   allowSelfLoops: false,
 });
-graph.import(autocompleteGraph as Object);
+graph.import(autocompleteGraph as object);
 const root = '0';
 graph.updateEachNodeAttributes((node, attr) => {
   return {
@@ -136,7 +137,7 @@ function searchAutocomplete(query: string, limit: number) {
       visited: false,
     };
   });
-  let queue: QueueItem[] = [];
+  const queue: QueueItem[] = [];
   graph.forEachOutNeighbor(root, (neighbor) => {
     queue.push({
       node: neighbor,
@@ -144,7 +145,7 @@ function searchAutocomplete(query: string, limit: number) {
       toNext: query.length === 0, //bfsToNext if blank search string
     });
   });
-  let results: SearchQuery[] = [];
+  const results: SearchQuery[] = [];
   while (queue.length && results.length < limit) {
     let response: bfsReturn;
     if (queue[0].toNext) {
@@ -169,7 +170,7 @@ export default function handler(
   res: NextApiResponse<Data>,
 ) {
   if ('input' in req.query && typeof req.query.input === 'string') {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve) => {
       res.status(200).json({
         message: 'success',
         data: searchAutocomplete(req.query.input as string, 20),
@@ -198,7 +199,7 @@ export default function handler(
       typeof req.query.sectionNumber === 'string';
     let results: SearchQuery[] = [];
 
-    let query: SearchQuery = {};
+    const query: SearchQuery = {};
     if (prefexDefined) {
       query.prefix = req.query.prefix as string;
     }
@@ -212,7 +213,7 @@ export default function handler(
       query.sectionNumber = req.query.sectionNumber as string;
     }
 
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve) => {
       if (
         prefexDefined &&
         numberDefined &&

@@ -1,6 +1,7 @@
-import { RelatedTermCard } from '../RelatedTermCard/relatedTermCard';
-import { Card, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import React from 'react';
+
+import { RelatedTermCard } from '../RelatedTermCard/relatedTermCard';
 
 type SearchQuery = {
   prefix?: string;
@@ -11,7 +12,7 @@ type SearchQuery = {
 
 type RelatedClassesProps = {
   displayData: SearchQuery[];
-  addNew: Function;
+  addNew: (query: SearchQuery) => void;
   disabled: boolean;
 };
 

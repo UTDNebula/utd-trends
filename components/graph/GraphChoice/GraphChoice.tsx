@@ -1,16 +1,13 @@
-import { useState } from 'react';
-import dynamic from 'next/dynamic';
-import { ApexOptions } from 'apexcharts';
-const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
+import React from 'react';
+
+import GraphProps from '../../../modules/GraphProps/GraphProps';
 import { BarGraph } from '../BarGraph/BarGraph';
+import { BoxGraph } from '../BoxGraph/BoxGraph';
+import { HorizontalBarGraph } from '../HorizontalBarGraph/HorizontalBarGraph';
 import { LineGraph } from '../LineGraph/LineGraph';
 import { RadarChart } from '../RadarChart/RadarChart';
 import { RadialBarChart } from '../RadialBarChart/RadialBarChart';
-import GraphProps from '../../../modules/GraphProps/GraphProps';
 import { VerticalBarGraph } from '../VerticalBarGraph/VerticalBarGraph';
-import { HorizontalBarGraph } from '../HorizontalBarGraph/HorizontalBarGraph';
-import { BoxGraph } from '../BoxGraph/BoxGraph';
-import React from 'react';
 
 /**
  * This is a special graph component that creates the appropriate graph with it's corresponding props when given a graph type.
