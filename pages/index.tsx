@@ -5,7 +5,7 @@ import { tooltipClasses, TooltipProps } from '@mui/material/Tooltip';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
 import { LogoIcon } from '../components/icons/LogoIcon/logoIcon';
@@ -16,7 +16,7 @@ import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
 
 const TransparentTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
+))(() => ({
   [`& .${tooltipClasses.tooltip}`]: {
     backgroundColor: 'transparent',
     maxWidth: 'none',
