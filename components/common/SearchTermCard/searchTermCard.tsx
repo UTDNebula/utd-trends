@@ -34,6 +34,7 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
         alignItems: 'center',
         borderRadius: 0,
       }}
+      variant="outlined"
     >
       <div className="float-left flex align-middle place-items-center">
         <Box
@@ -47,9 +48,9 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
             marginLeft: '8px',
           }}
         />
-        <Typography className="leading-tight text-lg text-gray-600">
+        <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
           {props.primaryText}
-          <span className="block text-sm text-gray-500">
+          <span className="block text-sm text-gray-500 dark:text-gray-300">
             {props.secondaryText}
           </span>
         </Typography>
