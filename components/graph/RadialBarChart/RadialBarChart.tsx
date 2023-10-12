@@ -1,3 +1,4 @@
+import { useMediaQuery } from '@mui/material';
 import { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React from 'react';
@@ -25,6 +26,7 @@ export function RadialBarChart(props: GraphProps) {
       zoom: {
         enabled: false,
       },
+      background: 'transparent',
     },
     labels: compiledLabels,
     colors: searchQueryColors,
@@ -58,6 +60,9 @@ export function RadialBarChart(props: GraphProps) {
           },
         },
       },
+    },
+    theme: {
+      mode: useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light',
     },
   };
 

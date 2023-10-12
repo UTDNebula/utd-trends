@@ -117,7 +117,7 @@ export const SearchBar = (props: SearchProps) => {
               ref={params.InputProps.ref}
               inputProps={params.inputProps}
               fullWidth={true}
-              className="font-sans w-full h-12 bg-primary-light text-gray-600 placeholder-dark"
+              className="font-sans w-full h-12 bg-primary-light text-gray-600 dark:text-gray-200 placeholder-dark"
               placeholder="Search section number, professor name, course number...."
               startAdornment={
                 <InputAdornment position="start">

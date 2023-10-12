@@ -25,7 +25,7 @@ export const ProfessorCard = (props: ProfessorCardProps) => {
       </Box>
       <Box className="flex flex-col md:flex-row w-full h-4/6">
         <Box className="flex flex-col justify-between items-center border-b-2 md:border-b-0 md:border-r-2 border-neutral-400 bg-primary-light w-full">
-          <Typography className="text-3xl text-neutral-600 text-center font-semibold mt-4 lg:mb-8">
+          <Typography className="text-3xl text-neutral-600 dark:text-neutral-200 text-center font-semibold mt-4 lg:mb-8">
             Average Difficulty
           </Typography>
           <Box
@@ -38,7 +38,7 @@ export const ProfessorCard = (props: ProfessorCardProps) => {
           </Box>
         </Box>
         <Box className="flex flex-col justify-between items-center border-b-2 md:border-b-0 md:border-r-2 border-neutral-400 bg-primary-light w-full">
-          <Typography className="text-3xl text-neutral-600 text-center font-semibold mt-4 lg:mb-8">
+          <Typography className="text-3xl text-neutral-600 dark:text-neutral-200 text-center font-semibold mt-4 lg:mb-8">
             Average Rating
           </Typography>
           <Box
@@ -49,7 +49,7 @@ export const ProfessorCard = (props: ProfessorCardProps) => {
           </Box>
         </Box>
         <Box className="flex flex-col justify-between items-center border-b-2 md:border-b-0 border-neutral-400 bg-primary-light w-full">
-          <Typography className="text-3xl text-neutral-600 text-center font-semibold mt-4 lg:mb-8">
+          <Typography className="text-3xl text-neutral-600 dark:text-neutral-200 text-center font-semibold mt-4 lg:mb-8">
             Would Take Again
           </Typography>
           <Box
@@ -65,7 +65,7 @@ export const ProfessorCard = (props: ProfessorCardProps) => {
         </Box>
       </Box>
       <Box className="flex flex-row justify-center md:justify-start w-full h-1/6">
-        <Typography className="text-2xl text-neutral-600 text-center md:text-left font-semibold ml-8 my-4">
+        <Typography className="text-2xl text-neutral-600 dark:text-neutral-200 text-center md:text-left font-semibold ml-8 my-4">
           Based on {props.numRatings} ratings
         </Typography>
       </Box>
