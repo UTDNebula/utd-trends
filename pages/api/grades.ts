@@ -35,7 +35,7 @@ export default function handler(
   ) {
     res.status(400).json({ message: 'Incorrect query present' });
   }
-  const headers: HeadersInit = {
+  const headers = {
     'x-api-key': process.env.REACT_APP_NEBULA_API_KEY as string,
     Accept: 'application/json',
   };
@@ -62,7 +62,7 @@ export default function handler(
   ) {
     url.searchParams.append('section_number', req.query.sectionNumber);
   }
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<void>((resolve) => {
     fetch(url.href, {
       method: 'GET',
       headers: headers,
