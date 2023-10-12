@@ -16,7 +16,7 @@ import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
 
 const TransparentTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
+))(() => ({
   [`& .${tooltipClasses.tooltip}`]: {
     backgroundColor: 'transparent',
     maxWidth: 'none',

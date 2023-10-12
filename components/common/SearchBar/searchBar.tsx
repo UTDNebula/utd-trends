@@ -6,7 +6,6 @@ import parse from 'autosuggest-highlight/parse';
 import React, { useEffect, useState } from 'react';
 
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
-import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 // import { searchAutocomplete } from '../../autocomplete';
 
@@ -52,6 +51,9 @@ export const SearchBar = (props: SearchProps) => {
       })
         .then((response) => response.json())
         .then((data) => {
+          if (data.message !== 'success') {
+            throw new Error(data.message);
+          }
           setOptions(data.output);
         })
         .catch((error) => {

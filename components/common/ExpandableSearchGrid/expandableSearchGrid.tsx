@@ -12,6 +12,8 @@ import { SearchTermCard } from '../SearchTermCard/searchTermCard';
 type ExpandableSearchGridProps = {
   onChange: (searchTerms: SearchQuery[]) => void;
   studentTotals: number[];
+  relatedQuery: SearchQuery | undefined;
+  averageData: number[];
 };
 
 /**
@@ -22,6 +24,8 @@ type ExpandableSearchGridProps = {
 export const ExpandableSearchGrid = ({
   onChange,
   studentTotals,
+  relatedQuery,
+  averageData,
 }: ExpandableSearchGridProps) => {
   const router = useRouter();
 
@@ -53,6 +57,12 @@ export const ExpandableSearchGrid = ({
     }
   }
 
+  useEffect(() => {
+    if (searchTerms.length < 3 && typeof relatedQuery !== 'undefined') {
+      addSearchTerm(relatedQuery);
+    }
+  }, [relatedQuery]);
+
   function deleteSearchTerm(searchTermIndex: number) {
     //console.log('deleteSearchTerm called on ' + searchTermIndex);
     setSearchTerms(
@@ -81,11 +91,15 @@ export const ExpandableSearchGrid = ({
       {searchTerms.map((option: SearchQuery, index: number) => (
         <SearchTermCard
           primaryText={searchQueryLabel(option)}
-          secondaryText={studentTotalFormatter(studentTotals[index])}
+          secondaryText={secondaryTextFormatter(
+            studentTotals[index],
+            averageData[index],
+          )}
           key={index}
           index={index}
           legendColor={searchQueryColors[index]}
           onCloseButtonClicked={deleteSearchTerm}
+          loading={studentTotals[index] === -1 || averageData[index] === -1}
         />
       ))}
       {searchTerms.length < 3 ? (
@@ -103,11 +117,13 @@ export const ExpandableSearchGrid = ({
   );
 };
 
-function studentTotalFormatter(total: number) {
-  if (total === -1) {
-    return 'Loading...';
-  }
-  return total.toLocaleString('en-US') + ' grades';
+function secondaryTextFormatter(total: number, gpa: number) {
+  return (
+    total.toLocaleString('en-US') +
+    ' grades | ' +
+    Number(gpa).toFixed(2) +
+    ' average GPA'
+  );
 }
 
 function searchQueriesLabel(queries: SearchQuery[]): string {
