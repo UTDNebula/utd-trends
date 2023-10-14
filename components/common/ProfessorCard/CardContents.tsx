@@ -1,6 +1,6 @@
-import React, { FC } from 'react';
-import Link from 'next/link';
 import { Box, Typography } from '@mui/material';
+import Link from 'next/link';
+import React, { FC } from 'react';
 
 interface CardContentProps {
   name: string;

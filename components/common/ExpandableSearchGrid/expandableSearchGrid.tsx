@@ -1,21 +1,19 @@
-import { useEffect, useState } from 'react';
-import { SearchTermCard } from '../SearchTermCard/searchTermCard';
-import Card from '@mui/material/Card';
 import { CardContent } from '@mui/material';
-import { SearchBar } from '../SearchBar/searchBar';
-import React from 'react';
+import Card from '@mui/material/Card';
 import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
-};
+import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
+import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
+import { SearchBar } from '../SearchBar/searchBar';
+import { SearchTermCard } from '../SearchTermCard/searchTermCard';
 
 type ExpandableSearchGridProps = {
-  onChange: Function;
+  onChange: (searchTerms: SearchQuery[]) => void;
   studentTotals: number[];
+  relatedQuery: SearchQuery | undefined;
+  averageData: number[];
 };
 
 /**
@@ -26,21 +24,45 @@ type ExpandableSearchGridProps = {
 export const ExpandableSearchGrid = ({
   onChange,
   studentTotals,
+  relatedQuery,
+  averageData,
 }: ExpandableSearchGridProps) => {
+  const router = useRouter();
+
   const [value, setValue] = useState<SearchQuery[]>([]);
   const [searchTerms, setSearchTerms] = useState<SearchQuery[]>([]);
   const [searchDisabled, setSearchDisable] = useState<boolean>(false);
 
   useEffect(() => {
     onChange(searchTerms);
+    if (router.isReady) {
+      if (searchTerms.length > 0) {
+        router.replace(
+          {
+            pathname: '/dashboard',
+            query: { searchTerms: searchQueriesLabel(searchTerms) },
+          },
+          undefined,
+          { shallow: true },
+        );
+      } else {
+        router.replace('/dashboard', undefined, { shallow: true });
+      }
+    }
   }, [onChange, searchTerms]);
 
-  function addSearchTerm(newSearchTerm: SearchQuery) {
+  function addSearchTerm(newSearchTerm: SearchQuery | null) {
     if (newSearchTerm != null) {
       //console.log('adding ' + newSearchTerm + ' to the search terms.');
       setSearchTerms([...searchTerms, newSearchTerm]);
     }
   }
+
+  useEffect(() => {
+    if (searchTerms.length < 3 && typeof relatedQuery !== 'undefined') {
+      addSearchTerm(relatedQuery);
+    }
+  }, [relatedQuery]);
 
   function deleteSearchTerm(searchTermIndex: number) {
     //console.log('deleteSearchTerm called on ' + searchTermIndex);
@@ -64,64 +86,53 @@ export const ExpandableSearchGrid = ({
     }
   }, [searchTerms]);
 
-  const router = useRouter();
-
   useEffect(() => {
     if (router.isReady) {
       setSearchTerms(parseURIEncodedSearchTerms(router.query.searchTerms));
     }
-  }, [router.isReady]);
+  }, [router.isReady, router.query.searchTerms]);
 
   return (
     <div className="w-full min-h-[72px] grid grid-flow-row auto-cols-fr md:grid-flow-col justify-center">
       {searchTerms.map((option: SearchQuery, index: number) => (
         <SearchTermCard
           primaryText={searchQueryLabel(option)}
-          secondaryText={studentTotalFormatter(studentTotals[index])}
+          secondaryText={secondaryTextFormatter(
+            studentTotals[index],
+            averageData[index],
+          )}
           key={index}
           index={index}
-          legendColor={colors[index]}
+          legendColor={searchQueryColors[index]}
           onCloseButtonClicked={deleteSearchTerm}
+          loading={studentTotals[index] === -1 || averageData[index] === -1}
         />
       ))}
       {searchTerms.length < 3 ? (
-        <Card className="bg-primary-light rounded-none">
-          <CardContent className="flex flex-col justify-center items-start p-3">
-            <SearchBar
-              selectSearchValue={addSearchTerm}
-              value={value}
-              setValue={setValue}
-              disabled={searchDisabled}
-            />
-          </CardContent>
+        <Card className="bg-primary-light rounded-none flex flex-col justify-center items-start p-3">
+          <SearchBar
+            selectSearchValue={addSearchTerm}
+            value={value}
+            setValue={setValue}
+            disabled={searchDisabled}
+          />
         </Card>
       ) : null}
     </div>
   );
 };
 
-function studentTotalFormatter(total: number) {
-  if (total === -1) {
-    return 'Loading...';
-  }
-  return total.toLocaleString('en-US') + ' grades';
+function secondaryTextFormatter(total: number, gpa: number) {
+  return (
+    total.toLocaleString('en-US') +
+    ' grades | ' +
+    Number(gpa).toFixed(2) +
+    ' average GPA'
+  );
 }
 
-function searchQueryLabel(query: SearchQuery): string {
-  let result = '';
-  if (query.prefix !== undefined) {
-    result += query.prefix;
-  }
-  if (query.number !== undefined) {
-    result += ' ' + query.number;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += '.' + query.sectionNumber;
-  }
-  if (query.professorName !== undefined) {
-    result += ' ' + query.professorName;
-  }
-  return result.trim();
+function searchQueriesLabel(queries: SearchQuery[]): string {
+  return queries.map((query) => searchQueryLabel(query)).join(',');
 }
 
 function parseURIEncodedSearchTerms(
@@ -139,7 +150,7 @@ function parseURIEncodedSearchTerms(
 }
 
 function parseURIEncodedSearchTerm(encodedSearchTerm: string): SearchQuery {
-  let encodedSearchTermParts = encodedSearchTerm.split(' ');
+  const encodedSearchTermParts = encodedSearchTerm.split(' ');
   // Does it start with prefix
   if (/^([A-Z]{2,4})$/.test(encodedSearchTermParts[0])) {
     // If it is just the prefix, return that
@@ -164,7 +175,7 @@ function parseURIEncodedSearchTerm(encodedSearchTerm: string): SearchQuery {
     }
     // Is the second part a course number and section
     else if (/^([0-9A-Z]{4}\.[0-9A-Z]{3})$/.test(encodedSearchTermParts[1])) {
-      let courseNumberAndSection: string[] =
+      const courseNumberAndSection: string[] =
         encodedSearchTermParts[1].split('.');
       if (encodedSearchTermParts.length == 2) {
         return {
@@ -194,5 +205,3 @@ function parseURIEncodedSearchTerm(encodedSearchTerm: string): SearchQuery {
     return { professorName: encodedSearchTerm.trim() };
   }
 }
-
-const colors = ['#eb5757', '#2d9cdb', '#499F68'];

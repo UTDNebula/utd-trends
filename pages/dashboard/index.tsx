@@ -1,37 +1,33 @@
 import {
   Card,
-  LinearProgress,
-  Select,
-  MenuItem,
+  Grid,
   InputLabel,
-  Box,
+  LinearProgress,
+  MenuItem,
+  Select,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useState, useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+
 import Carousel from '../../components/common/Carousel/carousel';
-import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
-import TopMenu from '../../components/navigation/topMenu/topMenu';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
+import { RelatedClasses } from '../../components/common/RelatedClasses/relatedClasses';
+import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
+import TopMenu from '../../components/navigation/topMenu/topMenu';
+import SearchQuery from '../../modules/SearchQuery/SearchQuery';
+import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
+import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
 
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
-};
-
-// @ts-ignore
 export const Dashboard: NextPage = () => {
   /* Helper functions */
 
-  const router = useRouter();
-
   //Increment these to reset cache on next deployment
   const cacheIndexGrades = 0;
+  const cacheIndexRelated = 0;
   const cacheIndexProfessor = 0;
 
   function getCache(key: string, cacheIndex: number) {
@@ -58,7 +54,7 @@ export const Dashboard: NextPage = () => {
   function setCache(
     key: string,
     cacheIndex: number,
-    data: any,
+    data: object,
     expireTime: number,
   ) {
     localStorage.setItem(
@@ -71,30 +67,36 @@ export const Dashboard: NextPage = () => {
     );
   }
 
-  function fetchData(urls: string[], cacheIndex: number, expireTime: number) {
-    return Promise.all(
-      urls.map((url) => {
-        const cache = getCache(url, cacheIndexProfessor);
-        if (cache) {
-          return cache;
-        }
-        return fetch(url, {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.message !== 'success') {
-              throw new Error(data.message);
-            }
-            setCache(url, cacheIndex, data.data, expireTime);
-            return data.data;
-          });
-      }),
-    );
-  }
+  const fetchData = useCallback(
+    (urls: string[], cacheIndex: number, expireTime: number) => {
+      return Promise.all(
+        urls.map((url) => {
+          const cache = getCache(url, cacheIndexProfessor);
+          if (cache) {
+            return cache;
+          }
+          return fetch(url, {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+            },
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.message !== 'success') {
+                throw new Error(data.message);
+              }
+              setCache(url, cacheIndex, data.data, expireTime);
+              return data.data;
+            });
+        }),
+      );
+    },
+    [],
+  );
+
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const darkModeElevation = prefersDarkMode ? 3 : 1;
 
   /* Grades data */
 
@@ -112,13 +114,14 @@ export const Dashboard: NextPage = () => {
   };
 
   const [gradesState, setGradesState] = useState('loading');
+  const [relatedState, setRelatedState] = useState('loading');
 
   const [fullGradesData, setFullGradesData] = useState<fullGradesType[]>([]);
   const [gradesData, setGradesData] = useState<gradesType[]>([]);
-  const [GPAData, setGPAData] = useState<gradesType[]>([]);
-  const [averageData, setAverageData] = useState<gradesType[]>([]);
-  const [stdevData, setStdevData] = useState<gradesType[]>([]);
+  const [averageData, setAverageData] = useState([-1, -1, -1]);
   const [studentTotals, setStudentTotals] = useState([-1, -1, -1]);
+  const [relatedQueries, setRelatedQueries] = useState<SearchQuery[]>([]);
+  const [relatedDisabled, setRelatedDisabled] = useState<boolean>(false);
 
   const [professorInvolvingSearchTerms, setProfessorInvolvingSearchTerms] =
     useState<string[]>([]);
@@ -139,40 +142,16 @@ export const Dashboard: NextPage = () => {
   const [startingSession, setStartingSession] = useState<number>(0);
   const [endingSession, setEndingSession] = useState<number>(9999);
 
-  function searchTermsURIString(querys: SearchQuery[]): string {
-    return querys.map((query) => searchTermURIString(query)).join(',');
-  }
-
-  function searchTermURIString(query: SearchQuery): string {
-    let result = '';
-    if (query.prefix !== undefined) {
-      result += query.prefix;
-    }
-    if (query.number !== undefined) {
-      result += ' ' + query.number;
-    }
-    if (query.sectionNumber !== undefined) {
-      result += '.' + query.sectionNumber;
-    }
-    if (query.professorName !== undefined) {
-      result += ' ' + query.professorName;
-    }
-    return result.trim();
+  function removeDuplicates(array1: SearchQuery[], array2: SearchQuery[]) {
+    return array1.filter(
+      (query1: SearchQuery) =>
+        array2.findIndex((query2: SearchQuery) =>
+          searchQueryEqual(query1, query2),
+        ) < 0,
+    );
   }
 
   const searchTermsChange = useCallback((searchTerms: SearchQuery[]) => {
-    if (searchTerms.length > 0) {
-      router.replace(
-        {
-          pathname: '/dashboard',
-          query: { searchTerms: searchTermsURIString(searchTerms) },
-        },
-        undefined,
-        { shallow: true },
-      );
-    } else {
-      router.replace('/dashboard', undefined, { shallow: true });
-    }
     setProfessorInvolvingSearchTerms(
       searchTerms
         .filter(
@@ -245,7 +224,7 @@ export const Dashboard: NextPage = () => {
         setFullGradesData(
           responses.map((response, index) => {
             return {
-              name: searchTermURIString(searchTerms[index]),
+              name: searchQueryLabel(searchTerms[index]),
               data: response.map((data: individualacademicSessionResponse) => {
                 let session: number = parseInt('20' + data._id);
                 if (data._id.includes('S')) {
@@ -268,6 +247,70 @@ export const Dashboard: NextPage = () => {
       .catch((error) => {
         setGradesState('error');
         console.error('Nebula API', error);
+      });
+
+    fetchData(
+      searchTerms.map(
+        (searchTerm: SearchQuery) =>
+          '/api/autocomplete?' +
+          Object.keys(searchTerm)
+            .map(
+              (key) =>
+                key +
+                '=' +
+                encodeURIComponent(
+                  String(searchTerm[key as keyof SearchQuery]),
+                ),
+            )
+            .join('&') +
+          '&limit=10',
+      ),
+      cacheIndexRelated,
+      7889400000, //3 months
+    )
+      .then((responses) => {
+        let result: SearchQuery[] = [];
+        if (!responses.length) {
+          result = [];
+        } else if (responses.length === 1) {
+          result = responses[0].slice(0, 10);
+        } else {
+          //Remove original searchTerms
+          for (let i = 0; i < responses.length; i++) {
+            responses[i] = removeDuplicates(responses[i], searchTerms);
+          }
+
+          //Remove duplicates
+          responses[0] = removeDuplicates(responses[0], responses[1]);
+          if (responses.length >= 3) {
+            responses[0] = removeDuplicates(responses[0], responses[2]);
+            responses[1] = removeDuplicates(responses[1], responses[2]);
+          }
+
+          //Combine to get 10 total, roughly evenly distributed
+          responses.reverse();
+          const responseLengths = Array(responses.length).fill(0);
+          let offset = 0;
+          for (let i = 0; i < 10; i++) {
+            if (
+              responseLengths[(i + offset) % responses.length] >=
+              responses[(i + offset) % responses.length].length
+            ) {
+              offset++;
+            }
+            responseLengths[(i + offset) % responses.length]++;
+          }
+          result = responses
+            .map((response, index) => response.slice(0, responseLengths[index]))
+            .flat();
+        }
+        setRelatedQueries(result);
+        setRelatedState(result.length ? 'success' : 'none');
+        setRelatedDisabled(responses.length >= 3 ? true : false);
+      })
+      .catch((error) => {
+        setRelatedState('error');
+        console.error('Related query', error);
       });
   }, []);
 
@@ -294,8 +337,9 @@ export const Dashboard: NextPage = () => {
       };
     });
 
-    let newDat: gradesType[] = [];
-    let newStudentTotals = [-1, -1, -1];
+    const newGradesData: gradesType[] = [];
+    const newStudentTotals = [-1, -1, -1];
+    const newAverageData: number[] = [];
     for (let i = 0; i < partialGradesData.length; i++) {
       const total: number = partialGradesData[i].data.reduce(
         (accumulator, currentValue) => accumulator + currentValue,
@@ -305,47 +349,28 @@ export const Dashboard: NextPage = () => {
       const normalized: number[] = partialGradesData[i].data.map(
         (value) => (value / total) * 100,
       );
-      newDat[i] = {
+      newGradesData[i] = {
         name: partialGradesData[i].name,
         data: normalized,
       };
-    }
-    setGradesData(newDat);
-    setStudentTotals(newStudentTotals);
 
-    let newGPADat: gradesType[] = [];
-    let newAverageDat: gradesType[] = [];
-    let newStdevDat: gradesType[] = [];
-    for (let i = 0; i < partialGradesData.length; i++) {
       const GPALookup = [
         4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
       ];
-      let GPAGrades: number[] = [];
-      for (let j = 0; j < partialGradesData[i].data.length - 1; j++) {
-        GPAGrades = GPAGrades.concat(
-          Array(partialGradesData[i].data[j]).fill(GPALookup[j]),
-        );
-      }
-      newGPADat.push({ name: partialGradesData[i].name, data: GPAGrades });
-      const mean =
-        GPAGrades.reduce((partialSum, a) => partialSum + a, 0) /
-        GPAGrades.length;
-      newAverageDat.push({
-        name: partialGradesData[i].name,
-        data: [mean],
-      });
-      const stdev = Math.sqrt(
-        GPAGrades.reduce((partialSum, a) => partialSum + (a - mean) ** 2, 0) /
-          GPAGrades.length,
+
+      newAverageData.push(
+        GPALookup.reduce(
+          (accumulator, currentValue, index) =>
+            accumulator + currentValue * partialGradesData[i].data[index],
+          0,
+        ) /
+          (total -
+            partialGradesData[i].data[partialGradesData[i].data.length - 1]),
       );
-      newStdevDat.push({
-        name: partialGradesData[i].name,
-        data: [stdev],
-      });
     }
-    setGPAData(newGPADat);
-    setAverageData(newAverageDat);
-    setStdevData(newStdevDat);
+    setGradesData(newGradesData);
+    setStudentTotals(newStudentTotals);
+    setAverageData(newAverageData);
   }, [fullGradesData, startingSession, endingSession]);
 
   let gradesPage;
@@ -413,7 +438,7 @@ export const Dashboard: NextPage = () => {
               </Select>
             </div>
           </div>
-          <Card className="h-96 p-4 m-4">
+          <Card className="h-96 p-4 m-4" elevation={darkModeElevation}>
             <GraphChoice
               form="Bar"
               title="Grades"
@@ -437,36 +462,29 @@ export const Dashboard: NextPage = () => {
               series={gradesData}
             />
           </Card>
-          <Card className="h-96 p-4 m-4">
-            <GraphChoice
-              form="BoxWhisker"
-              title="GPA Box and Whisker"
-              yaxisFormatter={(value) => Number(value).toFixed(2)}
-              series={GPAData}
-            />
-          </Card>
-          <div className="grid grid-cols-1 md:grid-cols-2">
-            <Card className="h-96 p-4 m-4">
-              <GraphChoice
-                form="Vertical"
-                title="GPA Averages"
-                xaxisLabels={['Average']}
-                yaxisFormatter={(value) => Number(value).toFixed(2)}
-                series={averageData}
-              />
-            </Card>
-            <Card className="h-96 p-4 m-4">
-              <GraphChoice
-                form="Vertical"
-                title="GPA Standard Deviations"
-                xaxisLabels={['Standard Deviation']}
-                yaxisFormatter={(value) => Number(value).toFixed(2)}
-                series={stdevData}
-              />
-            </Card>
-          </div>
         </div>
       </>
+    );
+  }
+
+  let relatedComponent;
+  const [relatedQuery, setRelatedQuery] = useState<SearchQuery | undefined>(
+    undefined,
+  );
+
+  if (relatedState === 'error') {
+    relatedComponent = null;
+  } else if (relatedState === 'none') {
+    relatedComponent = null;
+  } else {
+    relatedComponent = (
+      <Card className="m-4" elevation={darkModeElevation}>
+        <RelatedClasses
+          displayData={relatedQueries}
+          addNew={(query: SearchQuery) => setRelatedQuery(query)}
+          disabled={relatedDisabled}
+        />
+      </Card>
     );
   }
 
@@ -514,7 +532,7 @@ export const Dashboard: NextPage = () => {
       setProfessorRatingsState('success');
       setProfData([]);
     }
-  }, [professorInvolvingSearchTerms]);
+  }, [fetchData, professorInvolvingSearchTerms]);
 
   let professorRatingsPage;
 
@@ -551,7 +569,11 @@ export const Dashboard: NextPage = () => {
                   text += ' for ' + professorInvolvingSearchTerms[index];
                 }
                 return (
-                  <Card className="h-fit m-4" key={index}>
+                  <Card
+                    className="h-fit m-4"
+                    key={index}
+                    elevation={darkModeElevation}
+                  >
                     <Typography className="text-2xl text-center m-4">
                       {text}
                     </Typography>
@@ -559,10 +581,12 @@ export const Dashboard: NextPage = () => {
                 );
               }
               return (
-                <Card className="h-fit m-4" key={index}>
+                <Card
+                  className="h-fit m-4"
+                  key={index}
+                  elevation={darkModeElevation}
+                >
                   <ProfessorCard
-                    position="relative"
-                    element="Card"
                     professorRating={data.data.averageRating}
                     averageDifficulty={data.data.averageDifficulty}
                     takingAgain={data.data.wouldTakeAgainPercentage}
@@ -606,12 +630,51 @@ export const Dashboard: NextPage = () => {
         <ExpandableSearchGrid
           onChange={searchTermsChange}
           studentTotals={studentTotals}
+          relatedQuery={relatedQuery}
+          averageData={averageData}
         />
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">
             <Carousel>
-              {gradesPage}
-              {professorRatingsPage}
+              <Grid
+                container
+                component="main"
+                wrap="wrap-reverse"
+                className="grow"
+                spacing={2}
+              >
+                <Grid item xs={12} sm={6} md={4}>
+                  {relatedComponent}
+                </Grid>
+                <Grid
+                  item
+                  xs={false}
+                  sm={relatedComponent === null ? 12 : 6}
+                  md={relatedComponent === null ? 12 : 8}
+                  className="w-full"
+                >
+                  {gradesPage}
+                </Grid>
+              </Grid>
+              <Grid
+                container
+                component="main"
+                wrap="wrap-reverse"
+                className="grow"
+              >
+                <Grid item xs={12} sm={6} md={4}>
+                  {relatedComponent}
+                </Grid>
+                <Grid
+                  item
+                  xs={false}
+                  sm={relatedComponent === null ? 12 : 6}
+                  md={relatedComponent === null ? 12 : 8}
+                  className="w-full"
+                >
+                  {professorRatingsPage}
+                </Grid>
+              </Grid>
             </Carousel>
           </div>
         </div>
