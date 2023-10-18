@@ -2,8 +2,7 @@ import { Search } from '@mui/icons-material';
 import { Autocomplete, InputAdornment, InputBase } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
-import * as React from 'react';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
@@ -107,8 +106,16 @@ export const SplashPageSearchBar = (props: SearchProps) => {
             const matches = match(
               text,
               inputValue
-                .replace(/([a-zA-Z]{2,4})([0-9][0-9V]?[0-9]{0,2})/, '$1 $2')
-                .replace(/([0-9][0-9V]?[0-9]{0,2})([a-zA-Z]{2,4})/, '$1 $2'),
+                .replace(
+                  //CS1200 -> CS 1200
+                  /([a-zA-Z]{2,4})([0-9][0-9V]?[0-9]{0,2})/,
+                  '$1 $2',
+                )
+                .replace(
+                  //1200CS -> 1200 CS
+                  /([0-9][0-9V][0-9]{2})([a-zA-Z]{1,4})/,
+                  '$1 $2',
+                ),
             );
             const parts = parse(text, matches);
             return (
