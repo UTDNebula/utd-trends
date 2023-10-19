@@ -4,8 +4,10 @@
   "scripts": {
     "predev": "ts-node scripts/generateAutocompleteGraph.ts",
     "dev": "next dev",
+    "devNoDAG": "next dev",
     "prebuild": "ts-node scripts/generateAutocompleteGraph.ts",
     "build": "next build",
+    "buildNoDAG": "next build",
     "start": "next start",
     "prettier": "prettier --write .",
     "lint": "next lint",
