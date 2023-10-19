@@ -163,17 +163,14 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       );
       if (typeof preExisting === 'string') {
         if (characters.length <= 1) {
-          //console.log('found: ', characters[0], 'end');
           if (typeof data !== 'undefined') {
             graph.setNodeAttribute(preExisting, 'd', data);
           }
           return preExisting;
         }
-        //console.log('found: ', characters[0]);
         return addSearchQueryCharacter(preExisting, characters.slice(1), data);
       }
       if (characters.length <= 1) {
-        //console.log('new: ', characters[0], 'end');
         let newData: NodeAttributes = {
           c: characters[0],
           visited: false,
@@ -185,7 +182,6 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
         graph.addEdge(node, newNode);
         return newNode;
       }
-      //console.log('new: ', characters[0]);
       const newNode = graph.addNode(numNodes++, {
         c: characters[0],
         visited: false,
@@ -341,7 +337,6 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
     }
 
     for (let prefixItr = 0; prefixItr < prefixList.length; prefixItr++) {
-      //console.log(myPrefixes[prefixItr].value);
       for (
         let classItr = 0;
         classItr < prefixList[prefixItr].classes.length;
@@ -352,7 +347,6 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
           sectionItr < prefixList[prefixItr].classes[classItr].sections.length;
           sectionItr++
         ) {
-          //console.log(myPrefixes[prefixItr].classes[classItr].number);
           for (
             let professorItr = 0;
             professorItr <
@@ -360,7 +354,6 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
               .professors.length;
             professorItr++
           ) {
-            //console.log(myPrefixes[prefixItr].classes[classItr].professors[professorItr].firstName + myPrefixes[prefixItr].classes[classItr].professors[professorItr].lastName);
             addPrefixFirst(
               prefixList[prefixItr].value,
               prefixList[prefixItr].classes[classItr].number,
@@ -391,16 +384,9 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       if (graph.getNodeAttribute(parent, 'visited')) {
         return;
       }
-      //console.log(parent, graph.getNodeAttribute(parent, 'c'));
       if (graph.outDegree(parent) > 1 || graph.hasNodeAttribute(parent, 'd')) {
-        /*if (graph.hasNodeAttribute(parent, 'd')) {
-          console.log('  has data, children:', graph.outDegree(parent));
-        } else {
-          console.log('  has children:', graph.outDegree(parent));
-        }*/
         graph.setNodeAttribute(parent, 'visited', true);
         graph.forEachOutNeighbor(parent, (child: string) => {
-          //console.log('    child', graph.getNodeAttribute(parent, 'c'), graph.getNodeAttribute(child, 'c'))
           checkForSingleChild(child);
         });
         return;
@@ -412,12 +398,10 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
           //will only return once
           if (graph.inDegree(singleChild) > 1) {
             //skip, should already be called on
-            //console.log('  child has parents', attributes.c);
             graph.setNodeAttribute(parent, 'visited', true);
             checkForSingleChild(singleChild); //move on
           } else {
             //one child, no data, child has one parent: merge
-            //console.log('  single');
             graph.updateNodeAttribute(
               parent,
               'c',
