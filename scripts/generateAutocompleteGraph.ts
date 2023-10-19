@@ -190,6 +190,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       return addSearchQueryCharacter(newNode, characters.slice(1), data);
     }
 
+    // add a string to the graph with multiple parents pointing to its first character
     function addWithParents(
       nodes: string[],
       characters: string,
