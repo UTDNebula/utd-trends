@@ -17,5 +17,6 @@ type GraphProps = {
   series: any[];
   title: string;
   labels?: string[];
+  includedColors?: boolean[];
 };
 export default GraphProps;

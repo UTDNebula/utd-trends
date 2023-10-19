@@ -125,6 +125,8 @@ export const Dashboard: NextPage = () => {
   const [relatedQueries, setRelatedQueries] = useState<SearchQuery[]>([]);
   const [relatedDisabled, setRelatedDisabled] = useState<boolean>(false);
 
+  const [included, setIncluded] = useState<boolean[]>([]);
+
   const [professorInvolvingSearchTerms, setProfessorInvolvingSearchTerms] =
     useState<string[]>([]);
 
@@ -421,7 +423,8 @@ export const Dashboard: NextPage = () => {
                 'W',
               ]}
               yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
-              series={gradesData}
+              series={gradesData.filter((dat, index) => included[index])}
+              includedColors={included}
             />
           </Card>
           <div className="flex justify-center gap-2">
@@ -574,6 +577,9 @@ export const Dashboard: NextPage = () => {
         <div className="h-full m-4">
           {profData.length > 0 ? (
             profData.map((data: profType, index: number) => {
+              if (!included[index]) {
+                return null;
+              }
               if (!data.found) {
                 let text = 'Data not found';
                 if (
@@ -642,6 +648,7 @@ export const Dashboard: NextPage = () => {
         <TopMenu />
         <ExpandableSearchGrid
           onChange={searchTermsChange}
+          setIncluded={setIncluded}
           studentTotals={studentTotals}
           relatedQuery={relatedQuery}
           averageData={averageData}

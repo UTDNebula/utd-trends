@@ -68,7 +68,9 @@ export function HorizontalBarGraph(props: GraphProps) {
         formatter: xaxisFormatter,
       },
     },
-    colors: searchQueryColors,
+    colors: searchQueryColors.filter(
+      (searchQuery, i) => props.includedColors?.[i] ?? 1,
+    ),
     stroke: {
       width: 2,
       curve: 'smooth',

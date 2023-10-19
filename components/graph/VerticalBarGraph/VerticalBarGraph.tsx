@@ -63,7 +63,9 @@ export function VerticalBarGraph(props: GraphProps) {
         formatter: props.yaxisFormatter,
       },
     },
-    colors: searchQueryColors,
+    colors: searchQueryColors.filter(
+      (searchQuery, i) => props.includedColors?.[i] ?? 1,
+    ),
     stroke: {
       width: 2,
       curve: 'smooth',

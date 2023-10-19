@@ -1,4 +1,4 @@
-import { Close, Help } from '@mui/icons-material';
+import { Close, Help, Visibility, VisibilityOff } from '@mui/icons-material';
 import { Box, Card, IconButton, Tooltip, Typography } from '@mui/material';
 import React from 'react';
 
@@ -10,6 +10,8 @@ type SearchTermCardProps = {
   secondaryText: string;
   index: number;
   onCloseButtonClicked: (index: number) => void;
+  onToggleButtonClicked: (index: number) => void;
+  visible: boolean;
   legendColor: string;
   loading: boolean;
 };
@@ -20,19 +22,41 @@ type SearchTermCardProps = {
  *
  */
 export const SearchTermCard = (props: SearchTermCardProps) => {
+  function handleToggleClick() {
+    props.onToggleButtonClicked(props.index);
+  }
+
   function handleCloseClick() {
     props.onCloseButtonClicked(props.index);
   }
 
   return (
-    <Card className="bg-primary-light p-2 flex flex-row justify-between items-center rounded-none">
+    <Card className="bg-primary-light p-2 flex flex-row justify-between items-center rounded-none group">
       <div className="float-left flex align-middle place-items-center">
         <Box
-          className="rounded-full w-5 h-5 float-left mr-2 ml-2"
+          className={
+            'rounded-full w-fit h-fit float-left mr-2 ml-2' +
+            (props.visible ? '' : ' brightness-90')
+          }
           sx={{
             backgroundColor: props.legendColor,
           }}
-        />
+        >
+          <Tooltip
+            title={props.visible ? 'Turn off visibility' : 'Turn on visibility'}
+          >
+            <IconButton
+              aria-label="toggle visibility"
+              onClick={handleToggleClick}
+            >
+              {props.visible ? (
+                <Visibility className="fill-light" />
+              ) : (
+                <VisibilityOff className="fill-light" />
+              )}
+            </IconButton>
+          </Tooltip>
+        </Box>
         <div>
           <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
             {props.primaryText}
@@ -42,7 +66,7 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
           </span>
           {props.loading ? null : (
             <Tooltip title="Avergae GPA excludes dropped grades" arrow>
-              <Help className="inline fill-primary text-base ml-0.5 mb-0.5" />
+              <Help className="inline fill-gray-500 dark:fill-gray-300 text-base ml-0.5 mb-0.5" />
             </Tooltip>
           )}
         </div>
