@@ -70,7 +70,6 @@ class PriorityQueue {
 
 function bfsRecursionToNextData(queue: PriorityQueue) {
   const queueItem = queue.dequeue();
-  //console.log(graph.getNodeAttribute(queueItem?.data?.node, 'c'));
   if (graph.getNodeAttribute(queueItem?.data?.node, 'visited')) {
     return;
   }
@@ -139,7 +138,6 @@ function bfsRecursion(queue: PriorityQueue) {
     queueItem?.data?.characters?.length === matches
   ) {
     //full match or end of characters to match but all matched
-    //console.log('match: ', queueItem?.data?.characters, queueItem?.data?.characters?.length === 1);
     if (queueItem?.data?.characters?.length === matches) {
       //last characters
       queueToNext = true;
@@ -158,7 +156,6 @@ function bfsRecursion(queue: PriorityQueue) {
 
   if (queueRecursion) {
     graph.forEachOutNeighbor(queueItem?.data?.node, (neighbor) => {
-      //console.log('queue: ', graph.getNodeAttribute(neighbor, 'c'));
       queue.enqueue({
         priority:
           (queueItem?.priority ?? 0) +
@@ -173,7 +170,6 @@ function bfsRecursion(queue: PriorityQueue) {
   }
   if (queueToNext) {
     graph.forEachOutNeighbor(queueItem?.data?.node, (neighbor) => {
-      //console.log('toNext: ', graph.getNodeAttribute(neighbor, 'c'));
       queue.enqueue({
         priority:
           (queueItem?.priority ?? 0) +
