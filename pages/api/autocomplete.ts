@@ -71,16 +71,20 @@ class PriorityQueue {
 // bfs search from node in DAG, only until next result can be returned
 function bfsRecursionToNextData(queue: PriorityQueue) {
   const queueItem = queue.dequeue();
-  if (graph.getNodeAttribute(queueItem?.data?.node, 'visited')) {
+  //satisfy typescript possibly undefined error
+  if (typeof queueItem === 'undefined') {
     return;
   }
-  graph.setNodeAttribute(queueItem?.data?.node, 'visited', true);
-  const data = graph.getNodeAttribute(queueItem?.data?.node, 'd');
+  if (graph.getNodeAttribute(queueItem.data.node, 'visited')) {
+    return;
+  }
+  graph.setNodeAttribute(queueItem.data.node, 'visited', true);
+  const data = graph.getNodeAttribute(queueItem.data.node, 'd');
   if (typeof data !== 'undefined') {
-    graph.forEachOutNeighbor(queueItem?.data?.node, (neighbor) => {
+    graph.forEachOutNeighbor(queueItem.data.node, (neighbor) => {
       queue.enqueue({
         priority:
-          (queueItem?.priority ?? 0) +
+          queueItem.priority +
           100 +
           graph.getNodeAttribute(neighbor, 'c').length,
         data: {
@@ -92,11 +96,10 @@ function bfsRecursionToNextData(queue: PriorityQueue) {
     });
     return data;
   } else {
-    graph.forEachOutNeighbor(queueItem?.data?.node, (neighbor) => {
+    graph.forEachOutNeighbor(queueItem.data.node, (neighbor) => {
       queue.enqueue({
         priority:
-          (queueItem?.priority ?? 0) +
-          graph.getNodeAttribute(neighbor, 'c').length,
+          queueItem.priority + graph.getNodeAttribute(neighbor, 'c').length,
         data: {
           node: neighbor,
           characters: '',
@@ -111,8 +114,8 @@ function bfsRecursionToNextData(queue: PriorityQueue) {
 // bfs search from node in DAG, adding children to priorirty queue if parant matches search string
 function bfsRecursion(queue: PriorityQueue) {
   const queueItem = queue.dequeue();
-  if (typeof queueItem?.data === 'undefined') {
-    //satisfy typescript possibly undefined error
+  //satisfy typescript possibly undefined error
+  if (typeof queueItem === 'undefined') {
     return;
   }
 
@@ -122,13 +125,13 @@ function bfsRecursion(queue: PriorityQueue) {
   let returnData = false;
 
   //# of characters matched
-  const nodeCharacters = graph.getNodeAttribute(queueItem?.data?.node, 'c');
+  const nodeCharacters = graph.getNodeAttribute(queueItem.data.node, 'c');
   let matches = 0;
   while (
     matches < nodeCharacters.length &&
-    matches < queueItem?.data?.characters?.length
+    matches < queueItem.data.characters.length
   ) {
-    if (queueItem?.data?.characters?.[matches] === nodeCharacters[matches]) {
+    if (queueItem.data.characters[matches] === nodeCharacters[matches]) {
       matches++;
     } else {
       return;
@@ -137,10 +140,10 @@ function bfsRecursion(queue: PriorityQueue) {
 
   if (
     nodeCharacters.length === matches ||
-    queueItem?.data?.characters?.length === matches
+    queueItem.data.characters.length === matches
   ) {
     //full match or end of characters to match but all matched
-    if (queueItem?.data?.characters?.length === matches) {
+    if (queueItem.data.characters.length === matches) {
       //last characters
       queueToNext = true;
       returnData = true;
@@ -149,7 +152,7 @@ function bfsRecursion(queue: PriorityQueue) {
     }
   } else if (
     matches > 0 &&
-    queueItem?.data?.characters?.length <= nodeCharacters.length
+    queueItem.data.characters.length <= nodeCharacters.length
   ) {
     //partial match
     queueToNext = true;
@@ -157,25 +160,23 @@ function bfsRecursion(queue: PriorityQueue) {
   }
 
   if (queueRecursion) {
-    graph.forEachOutNeighbor(queueItem?.data?.node, (neighbor) => {
+    graph.forEachOutNeighbor(queueItem.data.node, (neighbor) => {
       queue.enqueue({
         priority:
-          (queueItem?.priority ?? 0) +
-          graph.getNodeAttribute(neighbor, 'c').length,
+          queueItem.priority + graph.getNodeAttribute(neighbor, 'c').length,
         data: {
           node: neighbor,
-          characters: queueItem?.data?.characters?.slice(matches),
+          characters: queueItem.data.characters.slice(matches),
           toNext: false,
         },
       });
     });
   }
   if (queueToNext) {
-    graph.forEachOutNeighbor(queueItem?.data?.node, (neighbor) => {
+    graph.forEachOutNeighbor(queueItem.data.node, (neighbor) => {
       queue.enqueue({
         priority:
-          (queueItem?.priority ?? 0) +
-          graph.getNodeAttribute(neighbor, 'c').length,
+          queueItem.priority + graph.getNodeAttribute(neighbor, 'c').length,
         data: {
           node: neighbor,
           characters: '',
@@ -185,7 +186,7 @@ function bfsRecursion(queue: PriorityQueue) {
     });
   }
   if (returnData) {
-    const data = graph.getNodeAttribute(queueItem?.data?.node, 'd');
+    const data = graph.getNodeAttribute(queueItem.data.node, 'd');
     if (typeof data !== 'undefined') {
       //has data
       return data;
