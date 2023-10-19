@@ -45,11 +45,6 @@ body {
       --dark-DEFAULT: 249 249 250;
     }
   }
-
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
 }
 
 * {

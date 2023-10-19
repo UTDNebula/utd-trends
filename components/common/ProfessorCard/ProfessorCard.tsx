@@ -1,4 +1,5 @@
 import { Box, Typography } from '@mui/material';
+import Link from 'next/link';
 import React from 'react';
 
 type ProfessorCardProps = {
@@ -65,9 +66,17 @@ export const ProfessorCard = (props: ProfessorCardProps) => {
         </Box>
       </Box>
       <Box className="flex flex-row justify-center md:justify-start w-full h-1/6">
-        <Typography className="text-2xl text-neutral-600 dark:text-neutral-200 text-center md:text-left font-semibold ml-8 my-4">
-          Based on {props.numRatings} ratings
-        </Typography>
+        <Link
+          href={`https://www.ratemyprofessors.com/search/professors/1273?q=${encodeURIComponent(
+            props.name,
+          )}`}
+          target="_blank"
+          className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+        >
+          <Typography className="text-2xl text-center md:text-left font-semibold ml-8 my-4">
+            Based on {props.numRatings} ratings
+          </Typography>
+        </Link>
       </Box>
     </>
   );
