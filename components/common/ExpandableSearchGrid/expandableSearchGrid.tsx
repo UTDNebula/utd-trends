@@ -83,11 +83,6 @@ export const ExpandableSearchGrid = ({
         .slice(0, searchTermIndex)
         .concat(searchTermsInclude.slice(searchTermIndex + 1)),
     );
-    setValue(
-      value
-        ?.slice(0, searchTermIndex)
-        .concat(searchTerms.slice(searchTermIndex + 1)),
-    );
   }
 
   function toggleSearchTerm(searchTermIndex: number) {
