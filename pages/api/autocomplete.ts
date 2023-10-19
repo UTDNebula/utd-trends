@@ -68,6 +68,7 @@ class PriorityQueue {
   }
 }
 
+// bfs search from node in DAG, only until next result can be returned
 function bfsRecursionToNextData(queue: PriorityQueue) {
   const queueItem = queue.dequeue();
   if (graph.getNodeAttribute(queueItem?.data?.node, 'visited')) {
@@ -107,6 +108,7 @@ function bfsRecursionToNextData(queue: PriorityQueue) {
   return;
 }
 
+// bfs search from node in DAG, adding children to priorirty queue if parant matches search string
 function bfsRecursion(queue: PriorityQueue) {
   const queueItem = queue.dequeue();
   if (typeof queueItem?.data === 'undefined') {
@@ -193,6 +195,7 @@ function bfsRecursion(queue: PriorityQueue) {
 
 type bfsReturn = SearchQuery | undefined;
 
+// search autocomplete program using a DAG (more specifically a radix tree) to search for matches until limit is reached
 function searchAutocomplete(query: string, limit: number) {
   query = query.trimStart().toUpperCase();
   graph.updateEachNodeAttributes((node, attr) => {
