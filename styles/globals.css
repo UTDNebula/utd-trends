@@ -45,13 +45,12 @@ body {
       --dark-DEFAULT: 249 249 250;
     }
   }
-
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
 }
 
 * {
   box-sizing: border-box;
+}
+
+.apexcharts-toolbar {
+  z-index: 0 !important;
 }

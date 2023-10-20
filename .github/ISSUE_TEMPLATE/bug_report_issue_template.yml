@@ -2,8 +2,6 @@ name: Bug Report
 description: File a bug report
 title: '[Bug]: '
 labels: ['Type: Bug Report', 'Status: Awaiting Triage']
-assignees:
-  - WillieCubed
 body:
   - type: markdown
     attributes:

@@ -21,6 +21,7 @@ export function GraphChoice(props: GraphProps) {
           yaxisFormatter={props.yaxisFormatter}
           series={props.series}
           title={props.title}
+          includedColors={props.includedColors}
         ></BarGraph>
       );
     }
@@ -51,6 +52,7 @@ export function GraphChoice(props: GraphProps) {
           yaxisFormatter={props.yaxisFormatter}
           series={props.series}
           title={props.title}
+          includedColors={props.includedColors}
         ></VerticalBarGraph>
       );
     }
@@ -61,6 +63,7 @@ export function GraphChoice(props: GraphProps) {
           yaxisFormatter={props.yaxisFormatter}
           series={props.series}
           title={props.title}
+          includedColors={props.includedColors}
         ></HorizontalBarGraph>
       );
     }
