@@ -55,7 +55,7 @@ export const SearchBar = (props: SearchProps) => {
           if (data.message !== 'success') {
             throw new Error(data.message);
           }
-          setOptions(data.output);
+          setOptions(data.data);
         })
         .catch((error) => {
           if (error instanceof DOMException) {
