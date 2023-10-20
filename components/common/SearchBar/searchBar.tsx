@@ -136,7 +136,6 @@ export const SearchBar = (props: SearchProps) => {
               ),
             );
             const parts = parse(text, matches);
-            console.log(parts);
             return (
               <li {...props}>
                 {parts.map((part, index) => (
