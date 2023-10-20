@@ -267,14 +267,12 @@ export default function handler(
       resolve();
     });
   } else if (
-    (('prefix' in req.query && typeof req.query.prefix === 'string') ||
-      ('number' in req.query && typeof req.query.number === 'string') ||
-      ('professorName' in req.query &&
-        typeof req.query.professorName === 'string') ||
-      ('sectionNumber' in req.query &&
-        typeof req.query.sectionNumber === 'string')) &&
-    'limit' in req.query &&
-    typeof req.query.limit === 'string'
+    ('prefix' in req.query && typeof req.query.prefix === 'string') ||
+    ('number' in req.query && typeof req.query.number === 'string') ||
+    ('professorName' in req.query &&
+      typeof req.query.professorName === 'string') ||
+    ('sectionNumber' in req.query &&
+      typeof req.query.sectionNumber === 'string')
   ) {
     const prefexDefined =
       'prefix' in req.query && typeof req.query.prefix === 'string';
@@ -302,6 +300,11 @@ export default function handler(
       query.sectionNumber = req.query.sectionNumber as string;
     }
 
+    let limit = 20;
+    if ('limit' in req.query && typeof req.query.limit === 'string') {
+      limit = Number(req.query.limit);
+    }
+
     return new Promise<void>((resolve) => {
       if (
         prefexDefined &&
@@ -316,23 +319,20 @@ export default function handler(
               '.' +
               (req.query.sectionNumber as string) +
               ' ',
-            Number(req.query.limit),
+            limit,
           ),
         );
       } else if (prefexDefined && numberDefined && professorNameDefined) {
         results.push(
           ...searchAutocomplete(
             (req.query.prefix as string) + (req.query.number as string) + ' ',
-            Number(req.query.limit),
+            limit,
           ),
         );
       }
-      if (results.length < Number(req.query.limit)) {
+      if (results.length < limit) {
         results.push(
-          ...searchAutocomplete(
-            searchQueryLabel(query) + ' ',
-            Number(req.query.limit),
-          ),
+          ...searchAutocomplete(searchQueryLabel(query) + ' ', limit),
         );
         results = results.filter(
           (query1: SearchQuery, index, self) =>
