@@ -3,10 +3,10 @@ import { Autocomplete, InputAdornment, InputBase, Paper } from '@mui/material';
 import Popper from '@mui/material/Popper';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
-import * as React from 'react';
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 // import { searchAutocomplete } from '../../autocomplete';
 
@@ -16,8 +16,7 @@ import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel
 type SearchProps = {
   // setSearch: the setter function from the parent component to set the search value
   selectSearchValue: (value: SearchQuery | null) => void;
-  value: SearchQuery[];
-  setValue: (value: SearchQuery[]) => void;
+  searchTerms: SearchQuery[];
   disabled?: boolean;
 };
 
@@ -28,48 +27,54 @@ type SearchProps = {
  * Styled for the ExpandableSearchGrid component
  */
 export const SearchBar = (props: SearchProps) => {
-  const [open, setOpen] = React.useState(false);
-  const [options, setOptions] = React.useState<readonly SearchQuery[]>([]);
+  const [open, setOpen] = useState(false);
+  const [options, setOptions] = useState<readonly SearchQuery[]>([]);
 
-  const [inputValue, setInputValue] = React.useState('');
+  const [value, setValue] = useState<SearchQuery | null>(null);
+  const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
-    const controller = new AbortController();
-    fetch('/api/autocomplete?input=' + inputValue, {
-      signal: controller.signal,
-      method: 'GET',
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.message !== 'success') {
-          throw new Error(data.message);
+    if (open) {
+      let searchValue = inputValue;
+      if (searchValue === '') {
+        if (!props.searchTerms.length) {
+          setOptions([]);
+          return;
         }
-        setOptions(data.data);
+        searchValue = searchQueryLabel(
+          props.searchTerms[props.searchTerms.length - 1],
+        );
+      }
+      const controller = new AbortController();
+      fetch('/api/autocomplete?input=' + searchValue, {
+        signal: controller.signal,
+        method: 'GET',
       })
-      .catch((error) => {
-        if (error instanceof DOMException) {
-          // ignore aborts
-        } else {
-          console.log(error);
-        }
-      });
-    return () => {
-      controller.abort();
-    };
-  }, [props.value, inputValue]);
-
-  useEffect(() => {
-    if (!open) {
-      setOptions([]);
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message !== 'success') {
+            throw new Error(data.message);
+          }
+          setOptions(data.data);
+        })
+        .catch((error) => {
+          if (error instanceof DOMException) {
+            // ignore aborts
+          } else {
+            console.log(error);
+          }
+        });
+      return () => {
+        controller.abort();
+      };
     }
-  }, [open]);
+  }, [open, inputValue]);
 
   return (
     <>
       <div className="text-primary w-full max-w-2xl h-fit flex flex-row items-start">
         <Autocomplete
           autoHighlight={true}
-          multiple={true}
           disabled={props.disabled}
           className="w-full h-12 bg-primary-light font-sans"
           open={open}
@@ -82,27 +87,25 @@ export const SearchBar = (props: SearchProps) => {
           filterSelectedOptions
           getOptionLabel={(option) => searchQueryLabel(option)}
           options={options}
-          filterOptions={(options) => options}
-          value={props.value}
-          // When a new option is selected, find the new selected option by getting the
-          // difference between the current and new value, then return that to the parent
+          filterOptions={(options) =>
+            options.filter((option) =>
+              props.searchTerms.every(
+                (searchTerm) => !searchQueryEqual(option, searchTerm),
+              ),
+            )
+          }
+          value={value}
+          // When a new option is selected return it to the parent
           // component using selectSearchValue prop
           onChange={(
             event: React.SyntheticEvent,
-            newValue: SearchQuery[],
+            newValue: SearchQuery | null,
             reason,
           ) => {
-            if (reason === 'removeOption') {
-              return;
+            if (reason === 'selectOption' && typeof newValue !== 'undefined') {
+              props.selectSearchValue(newValue);
+              setValue(null);
             }
-            let difference: SearchQuery[];
-            if (props.value !== undefined) {
-              difference = newValue.filter((x) => !props.value.includes(x));
-            } else {
-              difference = newValue;
-            }
-            props.selectSearchValue(difference[0] ? difference[0] : null);
-            props.setValue(newValue);
           }}
           inputValue={inputValue}
           onInputChange={(event, newInputValue) => {
@@ -114,7 +117,7 @@ export const SearchBar = (props: SearchProps) => {
               inputProps={params.inputProps}
               fullWidth={true}
               className="font-sans w-full h-12 bg-primary-light text-gray-600 dark:text-gray-200 placeholder-dark"
-              placeholder="Search section number, professor name, course number...."
+              placeholder="Search course, professor, or both...."
               startAdornment={
                 <InputAdornment position="start">
                   <Search className="fill-primary text-4xl" />
@@ -133,7 +136,6 @@ export const SearchBar = (props: SearchProps) => {
               ),
             );
             const parts = parse(text, matches);
-            console.log(parts);
             return (
               <li {...props}>
                 {parts.map((part, index) => (
@@ -177,7 +179,6 @@ export const SearchBar = (props: SearchProps) => {
               </Paper>
             );
           }}
-          defaultValue={[]}
         />
         <div className="w-8 h-8" />
       </div>

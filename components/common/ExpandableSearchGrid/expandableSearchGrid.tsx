@@ -31,7 +31,6 @@ export const ExpandableSearchGrid = ({
 }: ExpandableSearchGridProps) => {
   const router = useRouter();
 
-  const [value, setValue] = useState<SearchQuery[]>([]);
   const [searchTerms, setSearchTerms] = useState<SearchQuery[]>([]);
   const [searchTermsInclude, setSearchTermsInclude] = useState<boolean[]>([]);
   const [searchDisabled, setSearchDisable] = useState<boolean>(false);
@@ -84,11 +83,6 @@ export const ExpandableSearchGrid = ({
         .slice(0, searchTermIndex)
         .concat(searchTermsInclude.slice(searchTermIndex + 1)),
     );
-    setValue(
-      value
-        ?.slice(0, searchTermIndex)
-        .concat(searchTerms.slice(searchTermIndex + 1)),
-    );
   }
 
   function toggleSearchTerm(searchTermIndex: number) {
@@ -134,13 +128,14 @@ export const ExpandableSearchGrid = ({
         />
       ))}
       {searchTerms.length < 3 ? (
-        <Card className="bg-primary-light rounded-none flex flex-col justify-center items-start p-3">
-          <SearchBar
-            selectSearchValue={addSearchTerm}
-            value={value}
-            setValue={setValue}
-            disabled={searchDisabled}
-          />
+        <Card className="bg-primary-light rounded-none" variant="outlined">
+          <CardContent className="flex flex-col justify-center items-start p-3">
+            <SearchBar
+              selectSearchValue={addSearchTerm}
+              searchTerms={searchTerms}
+              disabled={searchDisabled}
+            />
+          </CardContent>
         </Card>
       ) : null}
     </div>
