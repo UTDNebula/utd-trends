@@ -55,3 +55,7 @@ body {
 * {
   box-sizing: border-box;
 }
+
+.apexcharts-toolbar {
+  z-index: 0 !important;
+}

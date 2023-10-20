@@ -11,6 +11,7 @@ import { SearchTermCard } from '../SearchTermCard/searchTermCard';
 
 type ExpandableSearchGridProps = {
   onChange: (searchTerms: SearchQuery[]) => void;
+  setIncluded: (included: boolean[]) => void;
   studentTotals: number[];
   relatedQuery: SearchQuery | undefined;
   averageData: number[];
@@ -23,6 +24,7 @@ type ExpandableSearchGridProps = {
  */
 export const ExpandableSearchGrid = ({
   onChange,
+  setIncluded,
   studentTotals,
   relatedQuery,
   averageData,
@@ -30,6 +32,7 @@ export const ExpandableSearchGrid = ({
   const router = useRouter();
 
   const [searchTerms, setSearchTerms] = useState<SearchQuery[]>([]);
+  const [searchTermsInclude, setSearchTermsInclude] = useState<boolean[]>([]);
   const [searchDisabled, setSearchDisable] = useState<boolean>(false);
 
   useEffect(() => {
@@ -50,10 +53,15 @@ export const ExpandableSearchGrid = ({
     }
   }, [onChange, searchTerms]);
 
+  useEffect(() => {
+    setIncluded(searchTermsInclude);
+  }, [setIncluded, searchTermsInclude]);
+
   function addSearchTerm(newSearchTerm: SearchQuery | null) {
     if (newSearchTerm != null) {
       //console.log('adding ' + newSearchTerm + ' to the search terms.');
       setSearchTerms([...searchTerms, newSearchTerm]);
+      setSearchTermsInclude([...searchTermsInclude, true]);
     }
   }
 
@@ -70,6 +78,18 @@ export const ExpandableSearchGrid = ({
         .slice(0, searchTermIndex)
         .concat(searchTerms.slice(searchTermIndex + 1)),
     );
+    setSearchTermsInclude(
+      searchTermsInclude
+        .slice(0, searchTermIndex)
+        .concat(searchTermsInclude.slice(searchTermIndex + 1)),
+    );
+  }
+
+  function toggleSearchTerm(searchTermIndex: number) {
+    const newSearchTermsInclude = [...searchTermsInclude];
+    newSearchTermsInclude[searchTermIndex] =
+      !newSearchTermsInclude[searchTermIndex];
+    setSearchTermsInclude(newSearchTermsInclude);
   }
 
   useEffect(() => {
@@ -83,6 +103,9 @@ export const ExpandableSearchGrid = ({
   useEffect(() => {
     if (router.isReady) {
       setSearchTerms(parseURIEncodedSearchTerms(router.query.searchTerms));
+      setSearchTermsInclude(
+        Array(URIEncodedSearchTermsLength(router.query.searchTerms)).fill(true),
+      );
     }
   }, [router.isReady, router.query.searchTerms]);
 
@@ -99,6 +122,8 @@ export const ExpandableSearchGrid = ({
           index={index}
           legendColor={searchQueryColors[index]}
           onCloseButtonClicked={deleteSearchTerm}
+          onToggleButtonClicked={toggleSearchTerm}
+          visible={searchTermsInclude[index]}
           loading={studentTotals[index] === -1 || averageData[index] === -1}
         />
       ))}
@@ -130,10 +155,22 @@ function searchQueriesLabel(queries: SearchQuery[]): string {
   return queries.map((query) => searchQueryLabel(query)).join(',');
 }
 
+function URIEncodedSearchTermsLength(
+  encodedSearchTerms: string | string[] | undefined,
+): number {
+  if (typeof encodedSearchTerms === 'undefined') {
+    return 0;
+  } else if (typeof encodedSearchTerms === 'string') {
+    return encodedSearchTerms.split(',').length;
+  } else {
+    return encodedSearchTerms.length;
+  }
+}
+
 function parseURIEncodedSearchTerms(
   encodedSearchTerms: string | string[] | undefined,
 ): SearchQuery[] {
-  if (encodedSearchTerms === undefined) {
+  if (typeof encodedSearchTerms === 'undefined') {
     return [];
   } else if (typeof encodedSearchTerms === 'string') {
     return encodedSearchTerms

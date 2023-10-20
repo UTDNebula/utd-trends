@@ -22,6 +22,7 @@ export function BarGraph(props: GraphProps) {
         yaxisFormatter={props.yaxisFormatter}
         series={props.series}
         title={props.title}
+        includedColors={props.includedColors}
       />
     );
   }
@@ -31,6 +32,7 @@ export function BarGraph(props: GraphProps) {
       yaxisFormatter={props.yaxisFormatter}
       series={props.series}
       title={props.title}
+      includedColors={props.includedColors}
     />
   );
 }
