@@ -65,7 +65,7 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
             {props.loading ? 'Loading...' : props.secondaryText}
           </span>
           {props.loading ? null : (
-            <Tooltip title="Avergae GPA excludes dropped grades" arrow>
+            <Tooltip title="Average GPA excludes dropped grades" arrow>
               <Help className="inline fill-gray-500 dark:fill-gray-300 text-base ml-0.5 mb-0.5" />
             </Tooltip>
           )}
