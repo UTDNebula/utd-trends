@@ -1,24 +1,23 @@
 module.exports = {
-  important:true,
+  important: true,
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     screens: {
-
-      'short':{'raw': '(max-height: 200px)'},
-      'xs': '400px',
-      'sm': '640px',
+      short: { raw: '(max-height: 200px)' },
+      xs: '400px',
+      sm: '640px',
       // => @media (min-width: 640px) { ... }
 
-      'md': '768px',
+      md: '768px',
       // => @media (min-width: 768px) { ... }
 
-      'lg': '1024px',
+      lg: '1024px',
       // => @media (min-width: 1024px) { ... }
 
-      'xl': '1280px',
+      xl: '1280px',
       // => @media (min-width: 1280px) { ... }
 
       '2xl': '1536px',
@@ -27,25 +26,20 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          light: '#BCC9FD',
-          DEFAULT: '#7486CE',
-          dark: '#4659A7',
-          darker: '#314287'
+          light: 'rgb(var(--primary-light) / <alpha-value>)',
+          DEFAULT: 'rgb(var(--primary-DEFAULT) / <alpha-value>)',
+          dark: 'rgb(var(--primary-dark) / <alpha-value>)',
+          darker: 'rgb(var(--primary-darker) / <alpha-value>)',
         },
-        secondary: {
-          light: '#FFE2C5',
-          DEFAULT: '#FFCF9D',
-          dark: '#FBBB78',
-          darker: '#ffaf5c'
+        light: {
+          DEFAULT: 'rgb(var(--light-DEFAULT) / <alpha-value>)',
+          always: 'rgb(var(--light-always) / <alpha-value>)',
         },
-        navigation: {
-          DEFAULT: '#878FD6',
-          dark: '#5159A3',
-          line: '#C8D1F3',
+        dark: {
+          DEFAULT: 'rgb(var(--dark-DEFAULT) / <alpha-value>)',
+          always: 'rgb(var(--dark-always) / <alpha-value>)',
         },
-        light: '#F9F9FA',
-        dark: '#1F201F',
-        surface: '#858585'
+        surface: 'rgb(var(--surface) / <alpha-value>)',
       },
       fontSize: {
         headline1: [

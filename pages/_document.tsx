@@ -1,4 +1,5 @@
-import { Html, Head, Main, NextScript } from 'next/document';
+import { Head, Html, Main, NextScript } from 'next/document';
+import React from 'react';
 
 function Document() {
   return (
@@ -6,14 +7,14 @@ function Document() {
       <Head prefix="og: http://ogp.me/ns#">
         <meta
           name="description"
-          content="UTD Trends a data visualization tool built to help students view historical course and section data."
+          content="A data visualization tool built to help students view historical course and section data."
         />
         <meta name="theme-color" content="#7486ce" />
 
         <meta property="og:title" content="UTD Trends" />
         <meta
           property="og:description"
-          content="UTD Trends a data visualization tool built to help students view historical course and section data."
+          content="A data visualization tool built to help students view historical course and section data."
         />
         <meta property="og:type" content="website" />
         <meta

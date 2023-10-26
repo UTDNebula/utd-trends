@@ -1,7 +1,6 @@
-import * as React from 'react';
-import Card from '@mui/material/Card';
-import { Box, IconButton, Typography } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { Close, Help, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Box, Card, IconButton, Tooltip, Typography } from '@mui/material';
+import React from 'react';
 
 /**
  * Props type used by the SearchTermCard component
@@ -10,8 +9,11 @@ type SearchTermCardProps = {
   primaryText: string;
   secondaryText: string;
   index: number;
-  onCloseButtonClicked: Function;
+  onCloseButtonClicked: (index: number) => void;
+  onToggleButtonClicked: (index: number) => void;
+  visible: boolean;
   legendColor: string;
+  loading: boolean;
 };
 
 /**
@@ -20,43 +22,61 @@ type SearchTermCardProps = {
  *
  */
 export const SearchTermCard = (props: SearchTermCardProps) => {
+  function handleToggleClick() {
+    props.onToggleButtonClicked(props.index);
+  }
+
   function handleCloseClick() {
     props.onCloseButtonClicked(props.index);
   }
 
   return (
-    <Card
-      className="bg-primary-light"
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderRadius: 0,
-      }}
-    >
+    <Card className="bg-primary-light p-2 flex flex-row justify-between items-center rounded-none group">
       <div className="float-left flex align-middle place-items-center">
         <Box
+          className={
+            'rounded-full w-fit h-fit float-left mr-2 ml-2' +
+            (props.visible ? '' : ' brightness-90')
+          }
           sx={{
             backgroundColor: props.legendColor,
-            borderRadius: 100,
-            width: '20px',
-            height: '20px',
-            float: 'left',
-            marginRight: '8px',
-            marginLeft: '8px',
           }}
-        />
-        <Typography className="text-lg text-gray-600">
-          {props.primaryText}
-          <br />
-          <span className="text-base text-gray-600">{props.secondaryText}</span>
-        </Typography>
+        >
+          <Tooltip
+            title={props.visible ? 'Turn off visibility' : 'Turn on visibility'}
+          >
+            <IconButton
+              aria-label="toggle visibility"
+              onClick={handleToggleClick}
+            >
+              {props.visible ? (
+                <Visibility className="fill-light" />
+              ) : (
+                <VisibilityOff className="fill-light" />
+              )}
+            </IconButton>
+          </Tooltip>
+        </Box>
+        <div>
+          <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
+            {props.primaryText}
+          </Typography>
+          <span className="block text-sm text-gray-500 dark:text-gray-300 inline">
+            {props.loading ? 'Loading...' : props.secondaryText}
+          </span>
+          {props.loading ? null : (
+            <Tooltip title="Avergae GPA excludes dropped grades" arrow>
+              <Help className="inline fill-gray-500 dark:fill-gray-300 text-base ml-0.5 mb-0.5" />
+            </Tooltip>
+          )}
+        </div>
       </div>
       <div className="float-right">
-        <IconButton aria-label="play/pause" onClick={handleCloseClick}>
-          <Close />
-        </IconButton>
+        <Tooltip title="Remove query">
+          <IconButton aria-label="remove query" onClick={handleCloseClick}>
+            <Close />
+          </IconButton>
+        </Tooltip>
       </div>
     </Card>
   );

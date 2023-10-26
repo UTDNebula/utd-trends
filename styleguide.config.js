@@ -1,106 +1,99 @@
 const path = require('path');
-const { version } = require('./package');{}
-const webpack = require('webpack')
-const dotenv = require('dotenv').config({ path: __dirname + '/.env' })
+const webpack = require('webpack');
+const dotenv = require('dotenv').config({ path: __dirname + '/.env' });
 module.exports = {
   pagePerSection: true,
-  title: "UTD Trends Style Guide",
-  template:{
+  title: 'UTD Trends Style Guide',
+  template: {
     links: [
       {
         rel: 'stylesheet',
-        href:'./styles/globals.css'
-      }
-    ]
+        href: './styles/globals.css',
+      },
+    ],
   },
-  sections:[
+  sections: [
     {
       name: 'Introduction',
-      content: 'styleguidistDocs/introduction.md'
+      content: 'styleguidistDocs/introduction.md',
     },
     {
-      name:'Style Guide',
-      content:'styleguidistDocs/styling.md',
+      name: 'Style Guide',
+      content: 'styleguidistDocs/styling.md',
     },
     {
       name: 'Common Components',
-      content:'styleguidistDocs/common.md',
-      components: [
-        './components/common/**/*.tsx',
-      ],
+      content: 'styleguidistDocs/common.md',
+      components: ['./components/common/**/*.tsx'],
     },
     {
       name: 'Navigation Components',
-      components: [
-        './components/navigation/**/*.tsx',
-      ],
+      components: ['./components/navigation/**/*.tsx'],
     },
     {
-      name:'Graph Components',
+      name: 'Graph Components',
       content: './components/graph/GraphProps.md',
-      components: [
-        './components/graph/**/*.tsx',
-      ]
+      components: ['./components/graph/**/*.tsx'],
     },
     {
       name: 'Icon Components',
-      components: [
-        './components/icons/**/*.tsx',
-      ],
-    }
+      components: ['./components/icons/**/*.tsx'],
+    },
   ],
-  
-  propsParser: require("react-docgen-typescript").parse,
-  require:[
+
+  propsParser: require('react-docgen-typescript').parse,
+  require: [
     path.resolve(__dirname, 'styleguide/setup.js'),
-    path.join(__dirname, './styles/globals.css')
+    path.join(__dirname, './styles/globals.css'),
   ],
-  webpackConfig:{
-    plugins:[
+  webpackConfig: {
+    plugins: [
       new webpack.DefinePlugin({
-          'process.env': JSON.stringify(dotenv.parsed)
-      }),      
+        'process.env': JSON.stringify(dotenv.parsed),
+      }),
     ],
     module: {
       rules: [
         {
           test: /\.tsx?$/,
           exclude: /node_modules/,
-          loader: 'babel-loader'
+          loader: 'babel-loader',
         },
         // Other loaders that are needed for your components
         {
           test: /\.css$/,
-          use: ['style-loader', 'css-loader',
-          {
-            loader: "postcss-loader",
-            options: {
-              postcssOptions: {
-                plugins: [
-                  [
-                    "postcss-preset-env",
-                    {
-                      // Options
-                    },
+          use: [
+            'style-loader',
+            'css-loader',
+            {
+              loader: 'postcss-loader',
+              options: {
+                postcssOptions: {
+                  plugins: [
+                    [
+                      'postcss-preset-env',
+                      {
+                        // Options
+                      },
+                    ],
                   ],
-                ],
+                },
               },
             },
-          },]
+          ],
         },
         {
           test: /\.md$/,
           use: [
             {
-              loader: "html-loader",
+              loader: 'html-loader',
             },
             {
-              loader: "markdown-loader",
-              
+              loader: 'markdown-loader',
             },
           ],
         },
-      ]
+      ],
     },
-  }
+  },
 };

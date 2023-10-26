@@ -1,11 +1,10 @@
 /*
 RUN ON CHANGE:
-"tsc scripts/generateAutocompleteGraph.ts"
+"tsc scripts/generateAutocompleteGraph.ts --resolveJsonModule"
 run to compile to .js file that can be run at predev and prebuild
 */
-const fs = require('fs');
+import * as fs from 'fs';
 import { DirectedGraph } from 'graphology';
-const nodeFetch = require('node-fetch');
 import * as aggregatedData from '../data/autocomplete-min.json';
 
 type SearchQuery = {
@@ -16,9 +15,9 @@ type SearchQuery = {
 };
 
 type NodeAttributes = {
-  character: string;
-  data?: SearchQuery;
-  visited: boolean;
+  c: string;
+  d?: SearchQuery;
+  visited?: boolean;
 };
 
 type Prefix = {
@@ -134,8 +133,7 @@ aggregatedData.data.forEach((prefix) => {
   });
 });
 
-nodeFetch
-  .default('https://catfact.ninja/fact', { method: 'GET' })
+fetch('https://catfact.ninja/fact', { method: 'GET' })
   // @ts-ignore
   .then((response) => response.json())
   // @ts-ignore
@@ -147,7 +145,7 @@ nodeFetch
     });
     let numNodes = 0; //allows a unique name for each node
     const root = graph.addNode(numNodes++, {
-      character: '',
+      c: '',
       visited: false,
     });
 
@@ -160,94 +158,140 @@ nodeFetch
       characters = characters.toUpperCase();
       let preExisting = graph.findOutNeighbor(
         node,
-        (neighbor, attributes) => attributes.character === characters[0],
+        (neighbor: string, attributes: NodeAttributes) =>
+          attributes?.c === characters[0],
       );
       if (typeof preExisting === 'string') {
         if (characters.length <= 1) {
-          //console.log('found: ', characters[0], 'end');
+          if (typeof data !== 'undefined') {
+            graph.setNodeAttribute(preExisting, 'd', data);
+          }
           return preExisting;
         }
-        //console.log('found: ', characters[0]);
         return addSearchQueryCharacter(preExisting, characters.slice(1), data);
       }
       if (characters.length <= 1) {
-        //console.log('new: ', characters[0], 'end');
         let newData: NodeAttributes = {
-          character: characters[0],
+          c: characters[0],
           visited: false,
         };
         if (typeof data !== 'undefined') {
-          newData.data = data;
+          newData.d = data;
         }
         const newNode = graph.addNode(numNodes++, newData);
         graph.addEdge(node, newNode);
         return newNode;
       }
-      //console.log('new: ', characters[0]);
       const newNode = graph.addNode(numNodes++, {
-        character: characters[0],
+        c: characters[0],
         visited: false,
       });
       graph.addEdge(node, newNode);
       return addSearchQueryCharacter(newNode, characters.slice(1), data);
     }
 
-    //Add node in format: (<prefix> <number> or <prefix><number>) (<professorLast> or <professorFirst> <professorLast>)
+    // add a string to the graph with multiple parents pointing to its first character
+    function addWithParents(
+      nodes: string[],
+      characters: string,
+      data?: SearchQuery,
+    ) {
+      const nodeFirstChar = addSearchQueryCharacter(
+        nodes.pop() as string,
+        characters[0],
+        characters.length > 1 ? undefined : data,
+      );
+      while (nodes.length) {
+        const nextParent = nodes.pop();
+        if (!graph.hasEdge(nextParent, nodeFirstChar)) {
+          graph.addEdge(nextParent, nodeFirstChar);
+        }
+      }
+      if (characters.length > 1) {
+        return addSearchQueryCharacter(
+          nodeFirstChar,
+          characters.slice(1),
+          data,
+        );
+      }
+      return nodeFirstChar;
+    }
+
+    //Add node in format: <prefix>[<number>| <number>[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]]
+    //and: (<number>|<number> )<prefix>[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]
     function addPrefixFirst(
       prefix: string,
       number: string,
+      sectionNumber: string,
       profFirst: string,
       profLast: string,
     ) {
+      //<prefix>[<number>| <number>
       const prefixNode = addSearchQueryCharacter(root, prefix, {
         prefix: prefix,
       });
       const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
-      const classNodeFirstChar = addSearchQueryCharacter(
-        prefixSpaceNode,
-        number.toString()[0],
-      );
-      if (!graph.hasEdge(prefixNode, classNodeFirstChar)) {
-        graph.addEdge(prefixNode, classNodeFirstChar);
-      }
-      const classNode = addSearchQueryCharacter(
-        classNodeFirstChar,
-        number.toString().slice(1),
-        {
-          prefix: prefix,
-          number: number,
-        },
-      );
-      const classSpaceNode = addSearchQueryCharacter(classNode, ' ');
+      const classNode = addWithParents([prefixNode, prefixSpaceNode], number, {
+        prefix: prefix,
+        number: number,
+      });
 
-      const professorFirstNameNode = addSearchQueryCharacter(
-        classSpaceNode,
-        profFirst + ' ',
+      //(<number>|<number> )<prefix>
+      const classNode2 = addSearchQueryCharacter(root, number);
+      const classSpaceNode = addSearchQueryCharacter(classNode2, ' ');
+      const prefixNode2 = addWithParents([classNode2, classSpaceNode], prefix, {
+        prefix: prefix,
+        number: number,
+      });
+
+      //...[ <professorLast>|(<professorFirst> <professorLast>)]]
+      const professorFirstNameNode = addWithParents(
+        [classNode, prefixNode2, classNode2],
+        ' ' + profFirst + ' ',
       );
-      const professorLastNameFirstCharNode = addSearchQueryCharacter(
-        classSpaceNode,
-        profLast[0],
-      );
-      if (
-        !graph.hasEdge(professorFirstNameNode, professorLastNameFirstCharNode)
-      ) {
-        graph.addEdge(professorFirstNameNode, professorLastNameFirstCharNode);
-      }
-      const professorLastNameNode = addSearchQueryCharacter(
-        professorLastNameFirstCharNode,
-        profLast.slice(1),
+      const professorLastNameNode = addWithParents(
+        [classNode, prefixNode2, classNode2, professorFirstNameNode],
+        ' ' + profLast,
         {
           prefix: prefix,
           number: number,
           professorName: profFirst + ' ' + profLast,
         },
       );
+
+      if (sectionNumber === 'HON') {
+        //...[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]]
+        const sectionNode = addWithParents(
+          [classNode, prefixNode2, classNode2],
+          '.' + sectionNumber,
+          {
+            prefix: prefix,
+            number: number,
+            sectionNumber: sectionNumber,
+          },
+        );
+        const professorFirstNameNode2 = addSearchQueryCharacter(
+          sectionNode,
+          ' ' + profFirst + ' ',
+        );
+        const professorLastNameNode2 = addWithParents(
+          [sectionNode, professorFirstNameNode2],
+          ' ' + profLast,
+          {
+            prefix: prefix,
+            number: number,
+            sectionNumber: sectionNumber,
+            professorName: profFirst + ' ' + profLast,
+          },
+        );
+      }
     }
 
-    //Add nodes in format: (<professorLast> or <professorFirst> <professorLast>) (<prefix> <number> or <prefix><number>)
+    //Add nodes in format: (<professorLast>|<professorFirst> <professorLast>) ((<prefix> <number>|<prefix><number>)|(<number><prefix> |<number><prefix>))
     function addProfFirst(
       prefix: string,
       number: string,
+      sectionNumber: string,
       profFirst: string,
       profLast: string,
     ) {
@@ -255,18 +299,9 @@ nodeFetch
         root,
         profFirst + ' ',
       );
-      const professorLastNameFirstCharNode = addSearchQueryCharacter(
-        root,
-        profLast[0],
-      );
-      if (
-        !graph.hasEdge(professorFirstNameNode, professorLastNameFirstCharNode)
-      ) {
-        graph.addEdge(professorFirstNameNode, professorLastNameFirstCharNode);
-      }
-      const professorLastNameNode = addSearchQueryCharacter(
-        professorLastNameFirstCharNode,
-        profLast.slice(1),
+      const professorLastNameNode = addWithParents(
+        [root, professorFirstNameNode],
+        profLast,
         {
           professorName: profFirst + ' ' + profLast,
         },
@@ -278,54 +313,131 @@ nodeFetch
 
       const prefixNode = addSearchQueryCharacter(professorSpaceNode, prefix);
       const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
-      const classNodeFirstChar = addSearchQueryCharacter(
-        prefixSpaceNode,
-        number.toString()[0],
-      );
-      if (!graph.hasEdge(prefixNode, classNodeFirstChar)) {
-        graph.addEdge(prefixNode, classNodeFirstChar);
-      }
-      const classNode = addSearchQueryCharacter(
-        classNodeFirstChar,
-        number.toString().slice(1),
-        {
+      const classNode = addWithParents([prefixNode, prefixSpaceNode], number, {
+        prefix: prefix,
+        number: number,
+        professorName: profFirst + ' ' + profLast,
+      });
+
+      const classNode2 = addSearchQueryCharacter(professorSpaceNode, number);
+      const classSpaceNode = addSearchQueryCharacter(classNode2, ' ');
+      const prefixNode2 = addWithParents([classNode2, classSpaceNode], prefix, {
+        prefix: prefix,
+        number: number,
+        professorName: profFirst + ' ' + profLast,
+      });
+
+      if (sectionNumber === 'HON') {
+        addWithParents([classNode, classNode2], '.' + sectionNumber, {
           prefix: prefix,
           number: number,
+          sectionNumber: sectionNumber,
           professorName: profFirst + ' ' + profLast,
-        },
-      );
+        });
+      }
     }
 
-    for (let i = 0; i < prefixList.length; i++) {
-      //console.log(myPrefixes[i].value);
-      for (let j = 0; j < prefixList[i].classes.length; j++) {
-        //console.log(myPrefixes[i].classes[j].number);
-        for (let k = 0; k < prefixList[i].classes[j].professors.length; k++) {
-          //console.log(myPrefixes[i].classes[j].professors[k].firstName + myPrefixes[i].classes[j].professors[k].lastName);
-          addPrefixFirst(
-            prefixList[i].value,
-            prefixList[i].classes[j].number,
-            prefixList[i].classes[j].professors[k].firstName,
-            prefixList[i].classes[j].professors[k].lastName,
-          );
-          addProfFirst(
-            prefixList[i].value,
-            prefixList[i].classes[j].number,
-            prefixList[i].classes[j].professors[k].firstName,
-            prefixList[i].classes[j].professors[k].lastName,
-          );
+    for (let prefixItr = 0; prefixItr < prefixList.length; prefixItr++) {
+      for (
+        let classItr = 0;
+        classItr < prefixList[prefixItr].classes.length;
+        classItr++
+      ) {
+        for (
+          let sectionItr = 0;
+          sectionItr < prefixList[prefixItr].classes[classItr].sections.length;
+          sectionItr++
+        ) {
+          for (
+            let professorItr = 0;
+            professorItr <
+            prefixList[prefixItr].classes[classItr].sections[sectionItr]
+              .professors.length;
+            professorItr++
+          ) {
+            addPrefixFirst(
+              prefixList[prefixItr].value,
+              prefixList[prefixItr].classes[classItr].number,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                .section_number,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                .professors[professorItr].firstName,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                .professors[professorItr].lastName,
+            );
+            addProfFirst(
+              prefixList[prefixItr].value,
+              prefixList[prefixItr].classes[classItr].number,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                .section_number,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                .professors[professorItr].firstName,
+              prefixList[prefixItr].classes[classItr].sections[sectionItr]
+                .professors[professorItr].lastName,
+            );
+          }
         }
       }
     }
+
+    //Radix tree: reduces graph size by compressing chains of nodes each with only one child to a single node with a character value of several characters.
+    function checkForSingleChild(parent: string) {
+      if (graph.getNodeAttribute(parent, 'visited')) {
+        return;
+      }
+      if (graph.outDegree(parent) > 1 || graph.hasNodeAttribute(parent, 'd')) {
+        graph.setNodeAttribute(parent, 'visited', true);
+        graph.forEachOutNeighbor(parent, (child: string) => {
+          checkForSingleChild(child);
+        });
+        return;
+      }
+      //one child, no data
+      graph.forEachOutNeighbor(
+        parent,
+        (singleChild: string, attributes: NodeAttributes) => {
+          //will only return once
+          if (graph.inDegree(singleChild) > 1) {
+            //skip, should already be called on
+            graph.setNodeAttribute(parent, 'visited', true);
+            checkForSingleChild(singleChild); //move on
+          } else {
+            //one child, no data, child has one parent: merge
+            graph.updateNodeAttribute(
+              parent,
+              'c',
+              (n: string | undefined) => n + attributes.c,
+            );
+            graph.forEachOutNeighbor(singleChild, (grandchild: string) => {
+              graph.dropEdge(singleChild, grandchild);
+              if (!graph.hasEdge(parent, grandchild) && parent !== grandchild) {
+                graph.addEdge(parent, grandchild);
+              }
+            });
+            graph.dropNode(singleChild);
+            if (typeof attributes.d !== 'undefined') {
+              graph.setNodeAttribute(parent, 'd', attributes.d);
+              graph.setNodeAttribute(parent, 'visited', true);
+              graph.forEachOutNeighbor(parent, (child: string) =>
+                checkForSingleChild(child),
+              );
+            } else {
+              checkForSingleChild(parent);
+            }
+          }
+        },
+      );
+    }
+    checkForSingleChild(root);
+
+    graph.forEachNode((node: string) =>
+      graph.removeNodeAttribute(node, 'visited'),
+    );
 
     fs.writeFileSync(
       'data/autocomplete_graph.json',
       JSON.stringify(graph.export()),
     );
 
-    console.log(
-      `Generated a ${
-        process.env.VERCEL_ENV === 'production' ? 'crawlable' : 'non-crawlable'
-      } public/robots.txt`,
-    );
+    console.log('Autocomplete graph generation done.');
   });

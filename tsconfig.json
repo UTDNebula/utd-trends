@@ -20,9 +20,13 @@
         "./node_modules/react-styleguidist/lib/client/rsg-components/*"
       ]
     }
-
   },
-  "include": ["src","next-env.d.ts", "**/*.ts", "**/*.tsx","/**/**/*/.tsx"],
+  "include": ["src", "next-env.d.ts", "**/*.ts", "**/*.tsx", "/**/**/*/.tsx"],
   "exclude": ["node_modules"],
-  
+  "ts-node": {
+    "transpileOnly": true,
+    "moduleTypes": {
+      "scripts/generateAutocompleteGraph.ts": "cjs"
+    }
+  }
 }

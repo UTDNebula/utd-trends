@@ -1,9 +1,13 @@
-import * as React from 'react';
-import { SearchIcon } from '../../icons/SearchIcon/searchIcon';
-import Autocomplete from '@mui/material/Autocomplete';
+import { Search } from '@mui/icons-material';
+import { Autocomplete, InputAdornment, InputBase, Paper } from '@mui/material';
 import Popper from '@mui/material/Popper';
-import { Box, Paper } from '@mui/material';
-import { useEffect } from 'react';
+import match from 'autosuggest-highlight/match';
+import parse from 'autosuggest-highlight/parse';
+import React, { useEffect, useState } from 'react';
+
+import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
+import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 // import { searchAutocomplete } from '../../autocomplete';
 
 /**
@@ -11,17 +15,9 @@ import { useEffect } from 'react';
  */
 type SearchProps = {
   // setSearch: the setter function from the parent component to set the search value
-  selectSearchValue: Function;
-  value: SearchQuery[];
-  setValue: Function;
+  selectSearchValue: (value: SearchQuery | null) => void;
+  searchTerms: SearchQuery[];
   disabled?: boolean;
-};
-
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
 };
 
 /**
@@ -31,40 +27,56 @@ type SearchQuery = {
  * Styled for the ExpandableSearchGrid component
  */
 export const SearchBar = (props: SearchProps) => {
-  const [open, setOpen] = React.useState(false);
-  const [options, setOptions] = React.useState<readonly SearchQuery[]>([]);
+  const [open, setOpen] = useState(false);
+  const [options, setOptions] = useState<readonly SearchQuery[]>([]);
 
-  const [inputValue, setInputValue] = React.useState('');
+  const [value, setValue] = useState<SearchQuery | null>(null);
+  const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
-    fetch('/api/autocomplete?input=' + inputValue, { method: 'GET' })
-      .then((response) => response.json())
-      .then((data) => {
-        setOptions(data.output.concat(props.value));
+    if (open) {
+      let searchValue = inputValue;
+      if (searchValue === '') {
+        if (!props.searchTerms.length) {
+          setOptions([]);
+          return;
+        }
+        searchValue = searchQueryLabel(
+          props.searchTerms[props.searchTerms.length - 1],
+        );
+      }
+      const controller = new AbortController();
+      fetch('/api/autocomplete?input=' + searchValue, {
+        signal: controller.signal,
+        method: 'GET',
       })
-      .catch((error) => {
-        console.log(error);
-      });
-    // setOptions(searchAutocomplete(inputValue).concat(props.value));
-  }, [props.value, inputValue]);
-
-  useEffect(() => {
-    if (!open) {
-      setOptions([]);
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message !== 'success') {
+            throw new Error(data.message);
+          }
+          setOptions(data.data);
+        })
+        .catch((error) => {
+          if (error instanceof DOMException) {
+            // ignore aborts
+          } else {
+            console.log(error);
+          }
+        });
+      return () => {
+        controller.abort();
+      };
     }
-  }, [open]);
+  }, [open, inputValue]);
 
   return (
     <>
-      <div className="text-primary w-11/12 h-fit flex flex-row items-center">
-        <div className="translate-x-12 w-8 h-8 text-primary">
-          <SearchIcon />
-        </div>
+      <div className="text-primary w-full max-w-2xl h-fit flex flex-row items-start">
         <Autocomplete
           autoHighlight={true}
-          multiple={true}
           disabled={props.disabled}
-          className="w-full h-12 bg-primary-light outline-0 active:outline-0 focus:outline-0 font-sans"
+          className="w-full h-12 bg-primary-light font-sans"
           open={open}
           onOpen={() => {
             setOpen(true);
@@ -72,72 +84,80 @@ export const SearchBar = (props: SearchProps) => {
           onClose={() => {
             setOpen(false);
           }}
-          filterSelectedOptions
           getOptionLabel={(option) => searchQueryLabel(option)}
           options={options}
-          filterOptions={(options) => options}
-          value={props.value}
-          // When a new option is selected, find the new selected option by getting the
-          // difference between the current and new value, then return that to the parent
+          filterOptions={(options) =>
+            options.filter((option) =>
+              props.searchTerms.every(
+                (searchTerm) => !searchQueryEqual(option, searchTerm),
+              ),
+            )
+          }
+          value={value}
+          // When a new option is selected return it to the parent
           // component using selectSearchValue prop
           onChange={(
-            event: any,
-            newValue: SearchQuery[] | undefined,
+            event: React.SyntheticEvent,
+            newValue: SearchQuery | null,
             reason,
           ) => {
-            if (reason === 'removeOption') {
-              return;
+            if (reason === 'selectOption' && typeof newValue !== 'undefined') {
+              props.selectSearchValue(newValue);
+              setValue(null);
             }
-            let difference: SearchQuery[];
-            if (props.value !== undefined) {
-              if (newValue !== undefined) {
-                // @ts-ignore
-                difference = newValue.filter((x) => !props.value.includes(x));
-              } else {
-                difference = [];
-              }
-            } else {
-              if (newValue !== undefined) {
-                difference = newValue;
-              } else {
-                difference = [];
-              }
-            }
-            props.selectSearchValue(difference[0] ? difference[0] : null);
-            props.setValue(newValue);
           }}
           inputValue={inputValue}
           onInputChange={(event, newInputValue) => {
             setInputValue(newInputValue);
           }}
           renderInput={(params) => (
-            <div
+            <InputBase
               ref={params.InputProps.ref}
-              className="outline-0 active:outline-0 focus:outline-0 font-sans"
-            >
-              <input
-                {...params.inputProps}
-                type="search"
-                id="mainSearch"
-                className="outline-0 active:outline-0 focus:outline-0 w-full h-12 pl-16 bg-primary-light text-gray-600 placeholder-dark"
-                placeholder="Search section number, professor name, course number...."
-              />
-            </div>
+              inputProps={params.inputProps}
+              fullWidth={true}
+              className="font-sans w-full h-12 bg-primary-light text-gray-600 dark:text-gray-200 placeholder-dark"
+              placeholder="Search course, professor, or both...."
+              startAdornment={
+                <InputAdornment position="start">
+                  <Search className="fill-primary text-4xl" />
+                </InputAdornment>
+              }
+            />
           )}
-          renderOption={(props, option, { selected }) => (
-            <li
-              {...props}
-              className="bg-white/25 active:bg-white/50 focus:bg-white/50 hover:bg-white/50 my-4 mx-8 font-sans"
-            >
-              <Box className="text-lg text-gray-600 pl-5 py-5">
-                {searchQueryLabel(option)}
-                <br />
-                <span className="text-base text-gray-600">
-                  {option.sectionNumber}
-                </span>
-              </Box>
-            </li>
-          )}
+          renderOption={(props, option, { inputValue }) => {
+            const text = searchQueryLabel(option);
+            //add spaces between prefix and course number
+            const matches = match(
+              text,
+              inputValue
+                .replace(
+                  //CS1200 -> CS 1200
+                  /([a-zA-Z]{2,4})([0-9][0-9V]?[0-9]{0,2})/,
+                  '$1 $2',
+                )
+                .replace(
+                  //1200CS -> 1200 CS
+                  /([0-9][0-9V][0-9]{2})([a-zA-Z]{1,4})/,
+                  '$1 $2',
+                ),
+            );
+            const parts = parse(text, matches);
+            return (
+              <li {...props}>
+                {parts.map((part, index) => (
+                  <span
+                    key={index}
+                    className={
+                      'whitespace-pre-wrap' +
+                      (part.highlight ? ' font-bold' : '')
+                    }
+                  >
+                    {part.text}
+                  </span>
+                ))}
+              </li>
+            );
+          }}
           isOptionEqualToValue={(option, value) => {
             if (option.prefix !== value.prefix) {
               return false;
@@ -165,7 +185,6 @@ export const SearchBar = (props: SearchProps) => {
               </Paper>
             );
           }}
-          defaultValue={[]}
         />
         <div className="w-8 h-8" />
       </div>
@@ -176,20 +195,3 @@ export const SearchBar = (props: SearchProps) => {
 SearchBar.defaultProps = {
   disabled: true,
 };
-
-function searchQueryLabel(query: SearchQuery): string {
-  let result = '';
-  if (query.prefix !== undefined) {
-    result += query.prefix;
-  }
-  if (query.number !== undefined) {
-    result += ' ' + query.number;
-  }
-  if (query.professorName !== undefined) {
-    result += ' ' + query.professorName;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += ' ' + query.sectionNumber;
-  }
-  return result.trim();
-}
