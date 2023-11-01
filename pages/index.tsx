@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
 import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
-import { LogoIcon } from '../components/icons/LogoIcon/logoIcon';
+import LogoIcon from '../components/icons/LogoIcon/logoIcon';
 import { WaveSVG } from '../components/icons/Wave/waveSVG';
 import { Wave2SVG } from '../components/icons/Wave2/wave2SVG';
 import SearchQuery from '../modules/SearchQuery/SearchQuery';
