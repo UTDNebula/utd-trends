@@ -29,16 +29,19 @@ type SearchProps = {
 export const SearchBar = (props: SearchProps) => {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<readonly SearchQuery[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const [value, setValue] = useState<SearchQuery | null>(null);
   const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
     if (open) {
+      setLoading(true);
       let searchValue = inputValue;
       if (searchValue === '') {
         if (!props.searchTerms.length) {
           setOptions([]);
+          setLoading(false);
           return;
         }
         searchValue = searchQueryLabel(
@@ -56,6 +59,7 @@ export const SearchBar = (props: SearchProps) => {
             throw new Error(data.message);
           }
           setOptions(data.data);
+          setLoading(false);
         })
         .catch((error) => {
           if (error instanceof DOMException) {
@@ -74,6 +78,7 @@ export const SearchBar = (props: SearchProps) => {
     <>
       <div className="text-primary w-full max-w-2xl h-fit flex flex-row items-start">
         <Autocomplete
+          loading={loading}
           autoHighlight={true}
           disabled={props.disabled}
           className="w-full h-12 bg-primary-light font-sans"

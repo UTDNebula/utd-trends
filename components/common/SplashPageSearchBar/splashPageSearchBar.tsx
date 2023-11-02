@@ -24,12 +24,15 @@ type SearchProps = {
  */
 export const SplashPageSearchBar = (props: SearchProps) => {
   const [options, setOptions] = useState<readonly SearchQuery[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
+    setLoading(true);
     if (inputValue === '') {
       setOptions([]);
+      setLoading(false);
       return;
     }
     const controller = new AbortController();
@@ -43,6 +46,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
           throw new Error(data.message);
         }
         setOptions(data.data);
+        setLoading(false);
       })
       .catch((error) => {
         if (error instanceof DOMException) {
@@ -60,6 +64,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
     <>
       <div className="text-primary m-auto w-11/12 -translate-y-1/4">
         <Autocomplete
+          loading={loading}
           autoHighlight={true}
           disabled={props.disabled}
           className="w-full h-12"
