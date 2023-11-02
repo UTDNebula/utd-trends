@@ -31,7 +31,10 @@ function MyApp({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <title>UTD Trends</title>
-        <link rel="icon" href="/Project_Nebula_Logo.svg" />
+        <link
+          rel="icon"
+          href={prefersDarkMode ? '/logoIconLight.svg' : '/logoIconDark.svg'}
+        />
       </Head>
       <ThemeProvider theme={muiTheme}>
         <Component {...pageProps} />
