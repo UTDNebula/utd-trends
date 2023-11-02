@@ -112,7 +112,7 @@ const Home: NextPage = () => {
                     <LogoIcon />
                   </div>
                   <div className="text-center pb-2">
-                    <h2 className="text-headline4 text-light-always">
+                    <h2 className="text-headline4 text-light-always font-kallisto">
                       Welcome to UTD Trends!
                     </h2>
                   </div>

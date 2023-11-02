@@ -76,7 +76,7 @@ export const SearchBar = (props: SearchProps) => {
         <Autocomplete
           autoHighlight={true}
           disabled={props.disabled}
-          className="w-full h-12 bg-primary-light font-sans"
+          className="w-full h-12 bg-primary-light"
           open={open}
           onOpen={() => {
             setOpen(true);
@@ -115,7 +115,7 @@ export const SearchBar = (props: SearchProps) => {
               ref={params.InputProps.ref}
               inputProps={params.inputProps}
               fullWidth={true}
-              className="font-sans w-full h-12 bg-primary-light text-gray-600 dark:text-gray-200 placeholder-dark"
+              className="w-full h-12 bg-primary-light text-gray-600 dark:text-gray-200 placeholder-dark"
               placeholder="Search course, professor, or both...."
               startAdornment={
                 <InputAdornment position="start">

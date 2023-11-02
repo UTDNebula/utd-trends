@@ -103,6 +103,9 @@ export function BoxGraph(props: GraphProps) {
     title: {
       text: props.title,
       align: 'left',
+      style: {
+        fontFamily: 'inherit',
+      },
     },
     noData: {
       text: 'Please select a class to add',
@@ -111,9 +114,8 @@ export function BoxGraph(props: GraphProps) {
       offsetX: 0,
       offsetY: 0,
       style: {
-        color: undefined,
         fontSize: '14px',
-        fontFamily: undefined,
+        fontFamily: 'inherit',
       },
     },
     theme: {
