@@ -31,9 +31,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <title>UTD Trends</title>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         <link
           rel="icon"
           href={prefersDarkMode ? '/logoIconLight.svg' : '/logoIconDark.svg'}
+          type="image/svg+xml"
         />
       </Head>
       <ThemeProvider theme={muiTheme}>
