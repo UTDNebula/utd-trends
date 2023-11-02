@@ -19,12 +19,12 @@ function Document() {
         <meta property="og:type" content="website" />
         <meta
           property="og:image"
-          content="https://trends.utdnebula.com/logoIconDark.png"
+          content="https://trends.utdnebula.com/logoIcon.png"
         />
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:alt" content="Nebula Labs Icon." />
-        <meta property="og:image:width" content="1567" />
-        <meta property="og:image:height" content="1193" />
+        <meta property="og:image:width" content="512" />
+        <meta property="og:image:height" content="512" />
 
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:domain" content="trends.utdnebula.com" />
