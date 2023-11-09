@@ -39,6 +39,9 @@ export function TopMenu() {
   function alertLink(url: string) {
     alert(url);
   }
+  function searchOptionChosen(chosenOption: SearchQuery | null) {
+    console.log('The option chosen was: ', chosenOption);
+  }
 
   return (
     <>
