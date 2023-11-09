@@ -45,7 +45,7 @@ export function TopMenu() {
         <div className="h-full flex min-w-fit justify-between">
           <Link href="/" className="m-1">
             <div className="h-full flex align-middle place-items-center justify-center">
-              <div className="h-full float-left mr-2">
+              <div className="h-full float-left mr-2 w-14">
                 <Image
                   src="/icon-white.svg"
                   alt="Nebula Labs logo"
