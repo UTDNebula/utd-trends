@@ -4,11 +4,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
-import { SplashPageSearchBar } from '../../common/SplashPageSearchBar/splashPageSearchBar';
-import { LogoIcon } from '../../icons/LogoIcon/logoIcon';
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-
+import { SplashPageSearchBar } from '../../common/SplashPageSearchBar/splashPageSearchBar';
+import { LogoIcon } from '../../icons/LogoIcon/logoIcon';
 
 /**
  * This is a component to hold UTD Trends branding and basic navigation
