@@ -60,7 +60,7 @@ export function TopMenu() {
               </h1>
             </div>
           </Link>
-          <div className="w-1/2 h-1/4 align-middle m-auto pb-12">
+          <div className="w-1/2 h-1/4 align-middle mt-10 pb-12">
             <SplashPageSearchBar
               selectSearchValue={searchOptionChosen}
               disabled={false}
