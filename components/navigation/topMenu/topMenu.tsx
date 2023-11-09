@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
 import { LogoIcon } from '../../icons/LogoIcon/logoIcon';
-import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
+import { SplashPageSearchBar } from '../../common/SplashPageSearchBar/splashPageSearchBar';
 
 /**
  * This is a component to hold UTD Trends branding and basic navigation
