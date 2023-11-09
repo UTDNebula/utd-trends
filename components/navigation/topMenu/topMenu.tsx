@@ -54,6 +54,12 @@ export function TopMenu() {
               </h1>
             </div>
           </Link>
+          <div className="w-24 h-1/4 m-auto pb-12">
+            <SplashPageSearchBar
+              selectSearchValue={searchOptionChosen}
+              disabled={false}
+            />
+          </div>
           <Tooltip title="Share link with search queries">
             <IconButton
               className="w-12"
