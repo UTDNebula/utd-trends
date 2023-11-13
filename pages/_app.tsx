@@ -78,7 +78,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' &&
     typeof process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA !== 'undefined' &&
     process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA !== '';
-  const darkModeElevation = prefersDarkMode ? 3 : 1;
+  const cardElevation = prefersDarkMode ? 3 : 1;
 
   const muiTheme = createTheme({
     palette: {
@@ -101,7 +101,10 @@ function MyApp({ Component, pageProps }: AppProps) {
       <ThemeProvider theme={muiTheme}>
         <div
           className={
-            inter.variable + ' ' + kallisto.variable + ' h-full text-dark'
+            inter.variable +
+            ' ' +
+            kallisto.variable +
+            ' h-full text-haiti dark:text-white'
           }
         >
           <Component {...pageProps} />
@@ -112,7 +115,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <>
           <Card
             className="w-fit h-fit bg-light fixed bottom-2 right-2 rounded-full"
-            elevation={darkModeElevation}
+            elevation={cardElevation}
           >
             <Tooltip title="Open GitHub commit for this instance">
               <a

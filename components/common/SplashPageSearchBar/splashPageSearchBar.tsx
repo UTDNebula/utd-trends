@@ -75,7 +75,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
         <InputBase
           ref={params.InputProps.ref}
           inputProps={params.inputProps}
-          className="rounded-md border-surface border-2 w-full px-3 py-2 bg-light text-primary-dark placeholder-primary-dark text-sm"
+          className="rounded-md border-gray-300 dark:border-gray-700 border-2 w-full px-3 py-2 bg-white dark:bg-haiti placeholder-gray-700 dark:placeholder-gray-300 text-sm"
           placeholder="Search course, professor, or both..."
         />
       )}
