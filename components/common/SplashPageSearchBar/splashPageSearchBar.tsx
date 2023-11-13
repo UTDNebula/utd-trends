@@ -1,4 +1,3 @@
-import { Search } from '@mui/icons-material';
 import { Autocomplete, InputAdornment, InputBase } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
@@ -13,7 +12,6 @@ import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel
  */
 type SearchProps = {
   selectSearchValue: (chosenOption: SearchQuery | null) => void;
-  disabled?: boolean;
 };
 
 /**
@@ -58,10 +56,9 @@ export const SplashPageSearchBar = (props: SearchProps) => {
 
   return (
     <>
-      <div className="text-primary m-auto w-11/12 -translate-y-1/4">
+      <div className="text-primary m-auto">
         <Autocomplete
           autoHighlight={true}
-          disabled={props.disabled}
           className="w-full h-12"
           getOptionLabel={(option) => searchQueryLabel(option)}
           options={options}
@@ -80,13 +77,8 @@ export const SplashPageSearchBar = (props: SearchProps) => {
             <InputBase
               ref={params.InputProps.ref}
               inputProps={params.inputProps}
-              className="rounded-md border-primary-dark border-2 w-full h-12 px-2 bg-light text-primary-dark placeholder-primary-dark font-bold"
+              className="rounded-md border-surface border-2 w-full px-3 py-2 bg-light text-primary-dark placeholder-primary-dark text-sm"
               placeholder="Search course, professor, or both...."
-              startAdornment={
-                <InputAdornment position="start">
-                  <Search className="fill-primary text-4xl" />
-                </InputAdornment>
-              }
             />
           )}
           renderOption={(props, option, { inputValue }) => {
