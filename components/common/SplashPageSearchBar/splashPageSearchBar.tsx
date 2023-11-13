@@ -1,4 +1,4 @@
-import { Autocomplete, InputAdornment, InputBase } from '@mui/material';
+import { Autocomplete, InputBase } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import React, { useEffect, useState } from 'react';
@@ -12,6 +12,7 @@ import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel
  */
 type SearchProps = {
   selectSearchValue: (chosenOption: SearchQuery | null) => void;
+  className: string;
 };
 
 /**
@@ -55,69 +56,63 @@ export const SplashPageSearchBar = (props: SearchProps) => {
   }, [inputValue]);
 
   return (
-    <>
-      <div className="text-primary m-auto">
-        <Autocomplete
-          autoHighlight={true}
-          className="w-full h-12"
-          getOptionLabel={(option) => searchQueryLabel(option)}
-          options={options}
-          filterOptions={(options) => options}
-          // When a new option is selected return it to the parent
-          // component using selectSearchValue prop
-          onChange={(
-            event: React.SyntheticEvent,
-            newValue: SearchQuery | null,
-          ) => props.selectSearchValue(newValue)}
-          inputValue={inputValue}
-          onInputChange={(event, newInputValue) => {
-            setInputValue(newInputValue);
-          }}
-          renderInput={(params) => (
-            <InputBase
-              ref={params.InputProps.ref}
-              inputProps={params.inputProps}
-              className="rounded-md border-surface border-2 w-full px-3 py-2 bg-light text-primary-dark placeholder-primary-dark text-sm"
-              placeholder="Search course, professor, or both...."
-            />
-          )}
-          renderOption={(props, option, { inputValue }) => {
-            const text = searchQueryLabel(option);
-            //add spaces between prefix and course number
-            const matches = match(
-              text,
-              inputValue
-                .replace(
-                  //CS1200 -> CS 1200
-                  /([a-zA-Z]{2,4})([0-9][0-9V]?[0-9]{0,2})/,
-                  '$1 $2',
-                )
-                .replace(
-                  //1200CS -> 1200 CS
-                  /([0-9][0-9V][0-9]{2})([a-zA-Z]{1,4})/,
-                  '$1 $2',
-                ),
-            );
-            const parts = parse(text, matches);
-            return (
-              <li {...props}>
-                {parts.map((part, index) => (
-                  <span
-                    key={index}
-                    className={
-                      'whitespace-pre-wrap' +
-                      (part.highlight ? ' font-bold' : '')
-                    }
-                  >
-                    {part.text}
-                  </span>
-                ))}
-              </li>
-            );
-          }}
+    <Autocomplete
+      autoHighlight={true}
+      className={props.className}
+      getOptionLabel={(option) => searchQueryLabel(option)}
+      options={options}
+      filterOptions={(options) => options}
+      // When a new option is selected return it to the parent
+      // component using selectSearchValue prop
+      onChange={(event: React.SyntheticEvent, newValue: SearchQuery | null) =>
+        props.selectSearchValue(newValue)
+      }
+      inputValue={inputValue}
+      onInputChange={(event, newInputValue) => {
+        setInputValue(newInputValue);
+      }}
+      renderInput={(params) => (
+        <InputBase
+          ref={params.InputProps.ref}
+          inputProps={params.inputProps}
+          className="rounded-md border-surface border-2 w-full px-3 py-2 bg-light text-primary-dark placeholder-primary-dark text-sm"
+          placeholder="Search course, professor, or both..."
         />
-      </div>
-    </>
+      )}
+      renderOption={(props, option, { inputValue }) => {
+        const text = searchQueryLabel(option);
+        //add spaces between prefix and course number
+        const matches = match(
+          text,
+          inputValue
+            .replace(
+              //CS1200 -> CS 1200
+              /([a-zA-Z]{2,4})([0-9][0-9V]?[0-9]{0,2})/,
+              '$1 $2',
+            )
+            .replace(
+              //1200CS -> 1200 CS
+              /([0-9][0-9V][0-9]{2})([a-zA-Z]{1,4})/,
+              '$1 $2',
+            ),
+        );
+        const parts = parse(text, matches);
+        return (
+          <li {...props}>
+            {parts.map((part, index) => (
+              <span
+                key={index}
+                className={
+                  'whitespace-pre-wrap' + (part.highlight ? ' font-bold' : '')
+                }
+              >
+                {part.text}
+              </span>
+            ))}
+          </li>
+        );
+      }}
+    />
   );
 };
 

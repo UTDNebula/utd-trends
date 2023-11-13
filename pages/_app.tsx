@@ -99,9 +99,13 @@ function MyApp({ Component, pageProps }: AppProps) {
         <link rel="icon" href="/Project_Nebula_Logo.svg" />
       </Head>
       <ThemeProvider theme={muiTheme}>
-        <main className={inter.variable + ' ' + kallisto.variable}>
+        <div
+          className={
+            inter.variable + ' ' + kallisto.variable + ' h-full text-dark'
+          }
+        >
           <Component {...pageProps} />
-        </main>
+        </div>
       </ThemeProvider>
       <Analytics />
       {showGitInfo ? (

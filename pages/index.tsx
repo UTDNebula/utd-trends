@@ -1,5 +1,4 @@
-import { Tooltip, Typography } from '@mui/material';
-import Card from '@mui/material/Card';
+import { Card, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { tooltipClasses, TooltipProps } from '@mui/material/Tooltip';
 import type { NextPage } from 'next';
@@ -8,7 +7,6 @@ import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
 import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
-import { LogoIcon } from '../components/icons/LogoIcon/logoIcon';
 import SearchQuery from '../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
 
@@ -53,20 +51,48 @@ const Home: NextPage = () => {
         />
         <meta property="og:url" content="https://trends.utdnebula.com" />
       </Head>
-      <div className="bg-[url('/background.png')] bg-cover h-full w-full flex justify-center items-center">
-        <div>
-          <h2 className="text-sm font-semibold mb-3">
-            POWERED BY NEBULA LABS
-          </h2>
+      <div className="bg-[linear-gradient(rgba(211,211,211,0.5),rgba(211,211,211,0.5)),url('/background.png')] dark:bg-[linear-gradient(rgba(45,45,45,0.5),rgba(45,45,45,0.5)),url('/background.png')] bg-cover h-full w-full flex justify-center items-center p-8">
+        <div className="max-w-xl">
+          <h2 className="text-sm font-semibold mb-3">POWERED BY NEBULA LABS</h2>
           <h1 className="text-6xl font-extrabold font-kallisto mb-6">
             UTD TRENDS
           </h1>
-          <p className="mb-10">
-            Explore and compare past grades, syllabi, professor ratings and reviews to find the perfect class. 
+          <p className="mb-10 leading-7">
+            Explore and compare past grades, syllabi, professor ratings and
+            reviews to find the perfect class.
           </p>
           <SplashPageSearchBar
             selectSearchValue={searchOptionChosen}
+            className="mb-3"
           />
+          <TransparentTooltip
+            title={
+              <Card className="px-3 py-2" elevation={1}>
+                <p className="text-sm">
+                  You can search for:
+                  <ul className="list-disc list-inside my-1">
+                    <li>
+                      A whole course: <span className="italic">CS 1337</span>
+                    </li>
+                    <li>
+                      A professor&apos;s name:{' '}
+                      <span className="italic">Jason Smith</span>
+                    </li>
+                    <li>
+                      A course and professor:{' '}
+                      <span className="italic">CS 1337 Jason Smith</span>
+                    </li>
+                  </ul>
+                  then we&apos;ll aggregate grades across every section
+                </p>
+              </Card>
+            }
+          >
+            <p className="text-sm text-center">
+              What can you enter?{' '}
+              <span className="underline">Pretty much anything.</span>
+            </p>
+          </TransparentTooltip>
         </div>
       </div>
     </>
