@@ -58,7 +58,7 @@ const Home: NextPage = () => {
           <h2 className="text-sm font-semibold mb-3">
             POWERED BY NEBULA LABS
           </h2>
-          <h1 className="text-6xl font-extrabold mb-6">
+          <h1 className="text-6xl font-extrabold font-kallisto mb-6">
             UTD TRENDS
           </h1>
           <p className="mb-10">
