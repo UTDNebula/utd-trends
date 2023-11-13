@@ -75,6 +75,7 @@ export const SearchBar = (props: SearchProps) => {
       <div className="text-primary w-full max-w-2xl h-fit flex flex-row items-start">
         <Autocomplete
           autoHighlight={true}
+          clearOnBlur={false}
           disabled={props.disabled}
           className="w-full h-12 bg-primary-light font-sans"
           open={open}
