@@ -22,7 +22,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     palette: {
       mode: prefersDarkMode ? 'dark' : 'light',
       primary: {
-        main: '#7486ce',
+        main: '#573dff',
       },
     },
   });
