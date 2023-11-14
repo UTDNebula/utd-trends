@@ -4,21 +4,20 @@
   "scripts": {
     "predev": "ts-node scripts/generateAutocompleteGraph.ts",
     "dev": "next dev",
-    "devNoDAG": "next dev",
+    "dev:nodag": "next dev",
     "prebuild": "ts-node scripts/generateAutocompleteGraph.ts",
     "build": "next build",
-    "buildNoDAG": "next build",
+    "build:nodag": "next build",
     "start": "next start",
-    "prettier": "prettier --write .",
-    "lint": "next lint",
-    "lintFix": "next lint --fix",
-    "prepare": "husky install",
-    "preinstall": "npx npm-force-resolutions"
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "next lint --fix",
+    "lint:check": "next lint",
+    "prepare": "husky install"
   },
   "engines": {
     "node": "^18"
   },
-  "resolutions": {},
   "dependencies": {
     "@babel/runtime": "^7.17.9",
     "@emotion/react": "^11.8.1",
@@ -54,8 +53,6 @@
     "@babel/preset-env": "^7.21.4",
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.21.4",
-    "@commitlint/cli": "^17.6.1",
-    "@commitlint/config-conventional": "^17.6.1",
     "@types/autosuggest-highlight": "^3.2.0",
     "@types/node": "^18.16.1",
     "@types/react": "^18.2.0",
@@ -73,7 +70,7 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "husky": "^8.0.3",
-    "lint-staged": "^13.2.2",
+    "lint-staged": "^15.1.0",
     "prettier": "^2.5.1",
     "react-styleguidist": "^13.1.1",
     "typescript": "^5.0.4"
@@ -90,9 +87,9 @@
     ]
   },
   "lint-staged": {
-    "*.{tsx,ts,js}": [
-      "next lint --cache --fix .",
-      "prettier --write {pages,components,modules}/**/*.{tsx,ts,js}"
+    "*": [
+      "eslint --cache --fix",
+      "prettier --write"
     ]
   },
   "config": {
@@ -105,21 +102,6 @@
     }
   },
   "browserslist": "> 0.25%, not dead",
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ],
-    "rules": {
-      "subject-case": [
-        2,
-        "always",
-        [
-          "sentence-case",
-          "start-case"
-        ]
-      ]
-    }
-  },
   "eslintConfig": {
     "root": true,
     "extends": [
