@@ -1,7 +1,7 @@
 /*
-RUN ON CHANGE:
-"tsc scripts/generateAutocompleteGraph.ts --resolveJsonModule"
-run to compile to .js file that can be run at predev and prebuild
+Build the autocomplete radix tree
+Run on `npm run dev` and `npm run build`
+Documentation: https://nebula-labs.atlassian.net/wiki/spaces/TRENDS/pages/67993601/Autocomplete+Documentation
 */
 import * as fs from 'fs';
 import { DirectedGraph } from 'graphology';
