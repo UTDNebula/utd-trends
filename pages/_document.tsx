@@ -3,13 +3,13 @@ import React from 'react';
 
 function Document() {
   return (
-    <Html>
+    <Html lang="en">
       <Head prefix="og: http://ogp.me/ns#">
         <meta
           name="description"
           content="A data visualization tool built to help students view historical course and section data."
         />
-        <meta name="theme-color" content="#7486ce" />
+        <meta name="theme-color" content="#573DFF" />
 
         <meta property="og:title" content="UTD Trends" />
         <meta
@@ -19,7 +19,7 @@ function Document() {
         <meta property="og:type" content="website" />
         <meta
           property="og:image"
-          content="https://trends.utdnebula.com/Project_Nebula_Logo.png"
+          content="https://trends.utdnebula.com/logoIcon.png"
         />
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:alt" content="Nebula Labs Icon." />
