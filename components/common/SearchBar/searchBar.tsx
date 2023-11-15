@@ -80,6 +80,7 @@ export const SearchBar = (props: SearchProps) => {
         <Autocomplete
           loading={loading}
           autoHighlight={true}
+          clearOnBlur={false}
           disabled={props.disabled}
           className="w-full h-12 bg-primary-light"
           open={open}

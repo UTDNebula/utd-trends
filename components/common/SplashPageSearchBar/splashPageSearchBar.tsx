@@ -66,6 +66,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
         <Autocomplete
           loading={loading}
           autoHighlight={true}
+          clearOnBlur={false}
           disabled={props.disabled}
           className="w-full h-12"
           getOptionLabel={(option) => searchQueryLabel(option)}
