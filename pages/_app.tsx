@@ -5,8 +5,70 @@ import { Card, IconButton, Tooltip, useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Analytics } from '@vercel/analytics/react';
 import type { AppProps } from 'next/app';
+import { Inter } from 'next/font/google';
+import localFont from 'next/font/local';
 import Head from 'next/head';
 import React from 'react';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+});
+const kallisto = localFont({
+  src: [
+    {
+      path: '../fonts/Kallisto/Kallisto Thin.otf',
+      weight: '100',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Thin Italic.otf',
+      weight: '100',
+      style: 'italic',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Light.otf',
+      weight: '300',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Light Italic.otf',
+      weight: '300',
+      style: 'italic',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Medium.otf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Medium Italic.otf',
+      weight: '500',
+      style: 'italic',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Bold.otf',
+      weight: '700',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Bold Italic.otf',
+      weight: '700',
+      style: 'italic',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Heavy.otf',
+      weight: '900',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Heavy Italic.otf',
+      weight: '900',
+      style: 'italic',
+    },
+  ],
+  variable: '--font-kallisto',
+});
 
 function MyApp({ Component, pageProps }: AppProps) {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -24,6 +86,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       primary: {
         main: '#7486ce',
       },
+    },
+    typography: {
+      fontFamily: 'inherit',
     },
   });
 
@@ -52,7 +117,9 @@ function MyApp({ Component, pageProps }: AppProps) {
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
       <ThemeProvider theme={muiTheme}>
-        <Component {...pageProps} />
+        <main className={inter.variable + ' ' + kallisto.variable}>
+          <Component {...pageProps} />
+        </main>
       </ThemeProvider>
       <Analytics />
       {showGitInfo ? (
