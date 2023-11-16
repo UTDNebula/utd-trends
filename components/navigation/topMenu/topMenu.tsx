@@ -89,6 +89,7 @@ export function TopMenu() {
                 )}
               </Select>
             </FormControl>
+          </div>
           <Tooltip title="Share link with search queries">
             <IconButton
               className="w-12"
