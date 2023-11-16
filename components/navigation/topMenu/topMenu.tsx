@@ -1,5 +1,5 @@
 import { Share } from '@mui/icons-material';
-import { IconButton, Snackbar, Tooltip } from '@mui/material';
+import { FormControl, IconButton, InputLabel, MenuItem, Select, Snackbar, Tooltip } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
@@ -15,8 +15,8 @@ import { LogoIcon } from '../../icons/LogoIcon/logoIcon';
  */
 export function TopMenu() {
   const router = useRouter();
-  const [openCopied, setOpenCopied] = useState<boolean>(false);
   const sortOptions = ["Professor Name", "Course Number"];
+  const [openCopied, setOpenCopied] = useState<boolean>(false);
 
   function shareLink(url: string) {
     if (navigator.share) {
@@ -67,6 +67,28 @@ export function TopMenu() {
               disabled={false}
             />
           </div>
+          <div className="flex justify-center gap-2">
+            <FormControl
+              variant="standard"
+            >
+              <InputLabel id="sortLabel">Sort By</InputLabel>
+              <Select
+                labelId="sortLabel"
+                defaultValue={0}
+                onChange={}
+              >
+                <MenuItem key="Sort By" value="0">
+                  Sort By
+                </MenuItem>
+                {sortOptions.map(
+                  (s: String) => (
+                    <MenuItem key={s} value="0">
+                      {s}
+                    </MenuItem>
+                  ),
+                )}
+              </Select>
+            </FormControl>
           <Tooltip title="Share link with search queries">
             <IconButton
               className="w-12"
