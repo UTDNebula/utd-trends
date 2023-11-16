@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
-import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
+//import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import { SplashPageSearchBar } from '../../common/SplashPageSearchBar/splashPageSearchBar';
 import { LogoIcon } from '../../icons/LogoIcon/logoIcon';
 
@@ -81,7 +81,7 @@ export function TopMenu() {
                   Sort By
                 </MenuItem>
                 {sortOptions.map(
-                  (s: String) => (
+                  (s: string) => (
                     <MenuItem key={s} value="0">
                       {s}
                     </MenuItem>
