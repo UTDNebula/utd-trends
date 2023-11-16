@@ -16,6 +16,7 @@ import { LogoIcon } from '../../icons/LogoIcon/logoIcon';
 export function TopMenu() {
   const router = useRouter();
   const [openCopied, setOpenCopied] = useState<boolean>(false);
+  const sortOptions = ["Professor Name", "Course Number"];
 
   function shareLink(url: string) {
     if (navigator.share) {
