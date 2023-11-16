@@ -61,7 +61,7 @@ export function TopMenu() {
               </h1>
             </div>
           </Link>
-          <div className="w-1/2 h-1/4 align-middle mt-10 pb-12">
+          <div className="w-1/2 h-1/4 align-middle mt-4 pb-12">
             <SplashPageSearchBar
               selectSearchValue={searchOptionChosen}
               disabled={false}
@@ -82,7 +82,7 @@ export function TopMenu() {
                 </MenuItem>
                 {sortOptions.map(
                   (s: string) => (
-                    <MenuItem key={s} value="0">
+                    <MenuItem key={s} value={sortOptions.indexOf(s) + 1}>
                       {s}
                     </MenuItem>
                   ),
