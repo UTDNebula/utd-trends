@@ -23,6 +23,18 @@ export function VerticalBarGraph(props: GraphProps) {
     (fullScreenOpen ? FullscreenCloseIcon : FullscreenOpenIcon) +
     '</div>';
 
+  let series = props.series;
+  let noDataText = 'Please select a class to add';
+  if (
+    series.length !== 0 &&
+    series.every((grade_distribution) =>
+      grade_distribution.data.every((letter: number) => isNaN(letter)),
+    )
+  ) {
+    series = [];
+    noDataText = 'Grade data unavailable for selected courses';
+  }
+
   const options: ApexOptions = {
     chart: {
       id: 'line-chart',
@@ -75,7 +87,7 @@ export function VerticalBarGraph(props: GraphProps) {
       align: 'left',
     },
     noData: {
-      text: 'Please select a class to add',
+      text: noDataText,
       align: 'center',
       verticalAlign: 'middle',
       offsetX: 0,
@@ -93,12 +105,7 @@ export function VerticalBarGraph(props: GraphProps) {
 
   const graph = (
     <div className="h-full">
-      <Chart
-        options={options}
-        series={props.series}
-        type="bar"
-        height={'100%'}
-      />
+      <Chart options={options} series={series} type="bar" height={'100%'} />
     </div>
   );
 

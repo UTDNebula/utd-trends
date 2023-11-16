@@ -18,7 +18,7 @@ import Carousel from '../../components/common/Carousel/carousel';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 import { RelatedClasses } from '../../components/common/RelatedClasses/relatedClasses';
-import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
+import { BarGraph } from '../../components/graph/BarGraph/BarGraph';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import SearchQuery from '../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
@@ -413,8 +413,7 @@ export const Dashboard: NextPage = () => {
       <>
         <div className="h-full m-4">
           <Card className="h-96 p-4 m-4">
-            <GraphChoice
-              form="Bar"
+            <BarGraph
               title="Grades"
               xaxisLabels={[
                 'A+',
