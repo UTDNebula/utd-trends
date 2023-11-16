@@ -4,11 +4,11 @@ import { styled } from '@mui/material/styles';
 import { tooltipClasses, TooltipProps } from '@mui/material/Tooltip';
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
 import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
-import { LogoIcon } from '../components/icons/LogoIcon/logoIcon';
 import { WaveSVG } from '../components/icons/Wave/waveSVG';
 import { Wave2SVG } from '../components/icons/Wave2/wave2SVG';
 import SearchQuery from '../modules/SearchQuery/SearchQuery';
@@ -109,10 +109,16 @@ const Home: NextPage = () => {
               <div className="w-11/12 h-3/4 m-auto -translate-y-1/2 relative">
                 <Card className="bg-primary rounded-xl drop-shadow-lg text-light p-8 relative h-full">
                   <div className="m-auto  w-1/5">
-                    <LogoIcon />
+                    <Image
+                      src="/icon-white.svg"
+                      alt="Nebula Labs logo"
+                      width={100}
+                      height={100}
+                      priority
+                    />
                   </div>
                   <div className="text-center pb-2">
-                    <h2 className="text-headline4 text-light-always">
+                    <h2 className="text-headline4 text-light-always font-kallisto">
                       Welcome to UTD Trends!
                     </h2>
                   </div>

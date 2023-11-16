@@ -29,16 +29,19 @@ type SearchProps = {
 export const SearchBar = (props: SearchProps) => {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<readonly SearchQuery[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const [value, setValue] = useState<SearchQuery | null>(null);
   const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
     if (open) {
+      setLoading(true);
       let searchValue = inputValue;
       if (searchValue === '') {
         if (!props.searchTerms.length) {
           setOptions([]);
+          setLoading(false);
           return;
         }
         searchValue = searchQueryLabel(
@@ -56,6 +59,7 @@ export const SearchBar = (props: SearchProps) => {
             throw new Error(data.message);
           }
           setOptions(data.data);
+          setLoading(false);
         })
         .catch((error) => {
           if (error instanceof DOMException) {
@@ -74,9 +78,11 @@ export const SearchBar = (props: SearchProps) => {
     <>
       <div className="text-primary w-full max-w-2xl h-fit flex flex-row items-start">
         <Autocomplete
+          loading={loading}
           autoHighlight={true}
+          clearOnBlur={false}
           disabled={props.disabled}
-          className="w-full h-12 bg-primary-light font-sans"
+          className="w-full h-12 bg-primary-light"
           open={open}
           onOpen={() => {
             setOpen(true);
@@ -115,7 +121,7 @@ export const SearchBar = (props: SearchProps) => {
               ref={params.InputProps.ref}
               inputProps={params.inputProps}
               fullWidth={true}
-              className="font-sans w-full h-12 bg-primary-light text-gray-600 dark:text-gray-200 placeholder-dark"
+              className="w-full h-12 bg-primary-light text-gray-600 dark:text-gray-200 placeholder-dark"
               placeholder="Search course, professor, or both...."
               startAdornment={
                 <InputAdornment position="start">

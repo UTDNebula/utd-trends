@@ -135,9 +135,10 @@ module.exports = {
       gridTemplateColumns: {
         onboardingHonors: '40px minmax(0, 1fr)',
       },
-    },
-    fontFamily: {
-      sans: ['Roboto', 'ui-sans-serif', 'system-ui'],
+      fontFamily: {
+        kallisto: ['var(--font-kallisto)', 'Roboto', 'sans-serif'],
+        inter: ['var(--font-inter)', 'Roboto', 'sans-serif'],
+      },
     },
   },
   plugins: [],
