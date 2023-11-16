@@ -75,7 +75,7 @@ export function TopMenu() {
               <Select
                 labelId="sortLabel"
                 defaultValue={0}
-                onChange={}
+                //onChange=
               >
                 <MenuItem key="Sort By" value="0">
                   Sort By
