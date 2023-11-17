@@ -53,7 +53,6 @@ const Home: NextPage = () => {
   const cardElevation = prefersDarkMode ? 3 : 1;
 
   const [searchBy, setSearchBy] = useState('any');
-
   const [ABTest, setABTest] = useState(true);
 
   return (
@@ -94,8 +93,13 @@ const Home: NextPage = () => {
           </p>
           {ABTest && (
             <div className="flex gap-2 mb-3">
-              <FormControl>
-                <InputLabel id="search-by-label">Search by</InputLabel>
+              <FormControl
+                size="small"
+                className="rounded-md border-gray-300 dark:border-gray-700 border-2 w-32 bg-white dark:bg-haiti text-sm"
+              >
+                <InputLabel id="search-by-label" className="pt-2">
+                  Search by
+                </InputLabel>
                 <Select
                   labelId="search-by-label"
                   value={searchBy}
@@ -103,7 +107,12 @@ const Home: NextPage = () => {
                   onChange={(event) =>
                     setSearchBy(event.target.value as string)
                   }
-                  className="w-32 rounded-md bg-white dark:bg-haiti text-sm"
+                  className="pt-2"
+                  sx={{
+                    '.MuiOutlinedInput-notchedOutline': {
+                      borderWidth: '2px',
+                    },
+                  }}
                 >
                   <MenuItem value="any">Any</MenuItem>
                   <MenuItem value="professor">Professor</MenuItem>
