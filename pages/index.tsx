@@ -57,7 +57,14 @@ const Home: NextPage = () => {
       <div className="bg-[linear-gradient(rgba(211,211,211,0.5),rgba(211,211,211,0.5)),url('/background.png')] dark:bg-[linear-gradient(rgba(45,45,45,0.5),rgba(45,45,45,0.5)),url('/background.png')] bg-cover h-full w-full flex justify-center items-center p-8">
         <div className="max-w-xl">
           <h2 className="text-sm font-semibold mb-3 text-cornflower-600 dark:text-cornflower-400 tracking-wider">
-            POWERED BY NEBULA LABS
+            POWERED BY{' '}
+            <a
+              href="https://www.utdnebula.com/"
+              target="_blank"
+              className="underline decoration-transparent hover:decoration-inherit transition"
+            >
+              NEBULA LABS
+            </a>
           </h2>
           <h1 className="text-6xl font-extrabold font-kallisto mb-6">
             UTD TRENDS
