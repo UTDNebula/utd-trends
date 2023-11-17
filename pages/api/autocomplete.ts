@@ -195,8 +195,7 @@ function bfsRecursion(queue: PriorityQueue) {
 }
 
 //Check that search matches searchBy type
-type SearchBy = 'any' | 'professor' | 'course';
-function validateSearch(searchQuery: SearchQuery, searchBy: SearchBy) {
+function validateSearch(searchQuery: SearchQuery, searchBy: string) {
   if (searchBy === 'any') {
     return true;
   }
@@ -217,11 +216,7 @@ function validateSearch(searchQuery: SearchQuery, searchBy: SearchBy) {
 type bfsReturn = SearchQuery | undefined;
 
 // search autocomplete program using a DAG (more specifically a radix tree) to search for matches until limit is reached
-function searchAutocomplete(
-  query: string,
-  limit: number,
-  searchBy: SearchBy = 'any',
-) {
+function searchAutocomplete(query: string, limit: number, searchBy = 'any') {
   query = query.trimStart().toUpperCase();
   graph.updateEachNodeAttributes((node, attr) => {
     return {
@@ -283,14 +278,18 @@ export default function handler(
   res: NextApiResponse<Data>,
 ) {
   if ('input' in req.query && typeof req.query.input === 'string') {
+    let searchBy = 'any';
+    if (
+      'searchBy' in req.query &&
+      typeof req.query.searchBy === 'string' &&
+      (req.query.searchBy === 'professor' || req.query.searchBy === 'course')
+    ) {
+      searchBy = req.query.searchBy;
+    }
     return new Promise<void>((resolve) => {
       res.status(200).json({
         message: 'success',
-        data: searchAutocomplete(
-          req.query.input as string,
-          20,
-          req.query.searchBy ?? 'any',
-        ),
+        data: searchAutocomplete(req.query.input as string, 20, searchBy),
       });
       resolve();
     });

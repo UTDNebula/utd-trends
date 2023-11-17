@@ -13,7 +13,7 @@ import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel
 type SearchProps = {
   selectSearchValue: (chosenOption: SearchQuery | null) => void;
   className: string;
-  searchBy?: 'any' | 'professor' | 'course';
+  searchBy?: string;
 };
 
 /**
