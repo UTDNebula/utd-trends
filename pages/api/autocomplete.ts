@@ -194,10 +194,34 @@ function bfsRecursion(queue: PriorityQueue) {
   }
 }
 
+//Check that search matches searchBy type
+type SearchBy = 'any' | 'professor' | 'course';
+function validateSearch(searchQuery: SearchQuery, searchBy: SearchBy) {
+  if (searchBy === 'any') {
+    return true;
+  }
+  if (
+    searchBy === 'professor' &&
+    !('prefix' in searchQuery) &&
+    !('number' in searchQuery) &&
+    !('sectionNumber' in searchQuery)
+  ) {
+    return true;
+  }
+  if (searchBy === 'course' && !('professorName' in searchQuery)) {
+    return true;
+  }
+  return false;
+}
+
 type bfsReturn = SearchQuery | undefined;
 
 // search autocomplete program using a DAG (more specifically a radix tree) to search for matches until limit is reached
-function searchAutocomplete(query: string, limit: number) {
+function searchAutocomplete(
+  query: string,
+  limit: number,
+  searchBy: SearchBy = 'any',
+) {
   query = query.trimStart().toUpperCase();
   graph.updateEachNodeAttributes((node, attr) => {
     return {
@@ -224,7 +248,7 @@ function searchAutocomplete(query: string, limit: number) {
     } else {
       response = bfsRecursion(queue);
     }
-    if (typeof response !== 'undefined') {
+    if (typeof response !== 'undefined' && validateSearch(response, searchBy)) {
       results.push(response);
     }
   }
@@ -262,7 +286,11 @@ export default function handler(
     return new Promise<void>((resolve) => {
       res.status(200).json({
         message: 'success',
-        data: searchAutocomplete(req.query.input as string, 20),
+        data: searchAutocomplete(
+          req.query.input as string,
+          20,
+          req.query.searchBy ?? 'any',
+        ),
       });
       resolve();
     });

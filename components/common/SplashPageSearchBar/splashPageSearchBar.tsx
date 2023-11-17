@@ -13,6 +13,7 @@ import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel
 type SearchProps = {
   selectSearchValue: (chosenOption: SearchQuery | null) => void;
   className: string;
+  searchBy?: 'any' | 'professor' | 'course';
 };
 
 /**
@@ -32,10 +33,16 @@ export const SplashPageSearchBar = (props: SearchProps) => {
       return;
     }
     const controller = new AbortController();
-    fetch('/api/autocomplete?input=' + inputValue, {
-      signal: controller.signal,
-      method: 'GET',
-    })
+    fetch(
+      '/api/autocomplete?input=' +
+        inputValue +
+        '&searchBy=' +
+        (props.searchBy ?? 'any'),
+      {
+        signal: controller.signal,
+        method: 'GET',
+      },
+    )
       .then((response) => response.json())
       .then((data) => {
         if (data.message !== 'success') {
@@ -53,7 +60,7 @@ export const SplashPageSearchBar = (props: SearchProps) => {
     return () => {
       controller.abort();
     };
-  }, [inputValue]);
+  }, [inputValue, props.searchBy]);
 
   return (
     <Autocomplete
@@ -76,7 +83,17 @@ export const SplashPageSearchBar = (props: SearchProps) => {
           ref={params.InputProps.ref}
           inputProps={params.inputProps}
           className="rounded-md border-gray-300 dark:border-gray-700 border-2 w-full px-3 py-2 bg-white dark:bg-haiti placeholder-gray-700 dark:placeholder-gray-300 text-sm"
-          placeholder="Search course, professor, or both..."
+          placeholder={
+            'ex.' +
+            ((props.searchBy ?? 'any') === 'any' ||
+            (props.searchBy ?? 'any') === 'course'
+              ? ' CS 1200'
+              : '') +
+            ((props.searchBy ?? 'any') === 'any' ||
+            (props.searchBy ?? 'any') === 'professor'
+              ? ' John Cole'
+              : '')
+          }
         />
       )}
       renderOption={(props, option, { inputValue }) => {

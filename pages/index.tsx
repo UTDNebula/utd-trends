@@ -1,10 +1,18 @@
-import { Card, Tooltip, useMediaQuery } from '@mui/material';
+import {
+  Card,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Tooltip,
+  useMediaQuery,
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { tooltipClasses, TooltipProps } from '@mui/material/Tooltip';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
 import SearchQuery from '../modules/SearchQuery/SearchQuery';
@@ -44,6 +52,10 @@ const Home: NextPage = () => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const cardElevation = prefersDarkMode ? 3 : 1;
 
+  const [searchBy, setSearchBy] = useState('any');
+
+  const [ABTest, setABTest] = useState(true);
+
   return (
     <>
       <Head>
@@ -54,6 +66,12 @@ const Home: NextPage = () => {
         />
         <meta property="og:url" content="https://trends.utdnebula.com" />
       </Head>
+      <button
+        onClick={() => setABTest((old) => !old)}
+        className="absolute top-0 left-0"
+      >
+        Toggle A/B Test
+      </button>
       <div className="bg-[linear-gradient(rgba(211,211,211,0.5),rgba(211,211,211,0.5)),url('/background.png')] dark:bg-[linear-gradient(rgba(45,45,45,0.5),rgba(45,45,45,0.5)),url('/background.png')] bg-cover h-full w-full flex justify-center items-center p-8">
         <div className="max-w-xl">
           <h2 className="text-sm font-semibold mb-3 text-cornflower-600 dark:text-cornflower-400 tracking-wider">
@@ -62,6 +80,7 @@ const Home: NextPage = () => {
               href="https://www.utdnebula.com/"
               target="_blank"
               className="underline decoration-transparent hover:decoration-inherit transition"
+              rel="noreferrer"
             >
               NEBULA LABS
             </a>
@@ -73,10 +92,37 @@ const Home: NextPage = () => {
             Explore and compare past grades, syllabi, professor ratings and
             reviews to find the perfect class.
           </p>
-          <SplashPageSearchBar
-            selectSearchValue={searchOptionChosen}
-            className="mb-3"
-          />
+          {ABTest && (
+            <div className="flex gap-2 mb-3">
+              <FormControl>
+                <InputLabel id="search-by-label">Search by</InputLabel>
+                <Select
+                  labelId="search-by-label"
+                  value={searchBy}
+                  label="Search by"
+                  onChange={(event) =>
+                    setSearchBy(event.target.value as string)
+                  }
+                  className="w-32 rounded-md bg-white dark:bg-haiti text-sm"
+                >
+                  <MenuItem value="any">Any</MenuItem>
+                  <MenuItem value="professor">Professor</MenuItem>
+                  <MenuItem value="course">Course</MenuItem>
+                </Select>
+              </FormControl>
+              <SplashPageSearchBar
+                selectSearchValue={searchOptionChosen}
+                className="grow"
+                searchBy={searchBy}
+              />
+            </div>
+          )}
+          {!ABTest && (
+            <SplashPageSearchBar
+              selectSearchValue={searchOptionChosen}
+              className="mb-3"
+            />
+          )}
           <TransparentTooltip
             title={
               <Card className="px-3 py-2" elevation={cardElevation}>
