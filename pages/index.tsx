@@ -71,7 +71,7 @@ const Home: NextPage = () => {
       >
         Toggle A/B Test
       </button>
-      <div className="bg-[linear-gradient(rgba(211,211,211,0.5),rgba(211,211,211,0.5)),url('/background.png')] dark:bg-[linear-gradient(rgba(45,45,45,0.5),rgba(45,45,45,0.5)),url('/background.png')] bg-cover h-full w-full flex justify-center items-center p-8">
+      <div className="bg-[linear-gradient(rgba(255,255,255,0.6),rgba(255,255,255,0.6)),url('/background.png')] dark:bg-[linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('/background.png')] bg-cover h-full w-full flex justify-center items-center p-8">
         <div className="max-w-xl">
           <h2 className="text-sm font-semibold mb-3 text-cornflower-600 dark:text-cornflower-400 tracking-wider">
             POWERED BY{' '}
@@ -132,35 +132,6 @@ const Home: NextPage = () => {
               className="mb-3"
             />
           )}
-          <TransparentTooltip
-            title={
-              <Card className="px-3 py-2" elevation={cardElevation}>
-                <p className="text-sm">
-                  You can search for:
-                  <ul className="list-disc list-inside my-1">
-                    <li>
-                      A whole course: <span className="italic">CS 1337</span>
-                    </li>
-                    <li>
-                      A professor&apos;s name:{' '}
-                      <span className="italic">Jason Smith</span>
-                    </li>
-                    <li>
-                      A course and professor:{' '}
-                      <span className="italic">CS 1337 Jason Smith</span>
-                    </li>
-                  </ul>
-                  then we&apos;ll aggregate grades across every section
-                </p>
-              </Card>
-            }
-            enterTouchDelay={0}
-          >
-            <p className="text-sm text-center text-gray-700 dark:text-gray-300">
-              What can you enter?{' '}
-              <span className="underline">Pretty much anything.</span>
-            </p>
-          </TransparentTooltip>
         </div>
       </div>
     </>
