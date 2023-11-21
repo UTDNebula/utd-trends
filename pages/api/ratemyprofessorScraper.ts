@@ -38,7 +38,9 @@ export default function handler(
   ); //UTD
   url.searchParams.append(
     'q',
-    ((req.query.profFirst as string) + ' ' + req.query.profLast) as string,
+    ((req.query.profFirst as string).split(' ')[0] +
+      ' ' +
+      req.query.profLast) as string,
   );
   return new Promise<void>((resolve) => {
     fetch(url.href, {

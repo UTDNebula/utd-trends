@@ -254,9 +254,9 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
             ) {
               const professorData = sectionData.professors[professorItr];
               if (
-                'first_name' in professorData && //handle empty professor: {} (temporary)
+                'first_name' in professorData && //handle empty professor: {}
                 'last_name' in professorData &&
-                professorData.first_name !== '' && //handle blank name (temporary)
+                professorData.first_name !== '' && //handle blank name
                 professorData.last_name !== ''
               ) {
                 addPrefixFirst(
