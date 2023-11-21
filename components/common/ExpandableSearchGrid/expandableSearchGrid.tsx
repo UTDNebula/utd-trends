@@ -200,8 +200,10 @@ function parseURIEncodedSearchTerm(encodedSearchTerm: string): SearchQuery {
         return {
           prefix: encodedSearchTermParts[0],
           number: encodedSearchTermParts[1],
-          professorName:
-            encodedSearchTermParts[2] + ' ' + encodedSearchTermParts[3],
+          profFirst: encodedSearchTermParts
+            .slice(2, encodedSearchTermParts.length - 1)
+            .join(' '),
+          profLast: encodedSearchTermParts[encodedSearchTermParts.length - 1],
         };
       }
     }
@@ -220,8 +222,10 @@ function parseURIEncodedSearchTerm(encodedSearchTerm: string): SearchQuery {
           prefix: encodedSearchTermParts[0],
           number: courseNumberAndSection[0],
           sectionNumber: courseNumberAndSection[1],
-          professorName:
-            encodedSearchTermParts[2] + ' ' + encodedSearchTermParts[3],
+          profFirst: encodedSearchTermParts
+            .slice(2, encodedSearchTermParts.length - 1)
+            .join(' '),
+          profLast: encodedSearchTermParts[encodedSearchTermParts.length - 1],
         };
       }
     }
@@ -229,11 +233,18 @@ function parseURIEncodedSearchTerm(encodedSearchTerm: string): SearchQuery {
     else {
       return {
         prefix: encodedSearchTermParts[0],
-        professorName:
-          encodedSearchTermParts[1] + ' ' + encodedSearchTermParts[2],
+        profFirst: encodedSearchTermParts
+          .slice(1, encodedSearchTermParts.length - 1)
+          .join(' '),
+        profLast: encodedSearchTermParts[encodedSearchTermParts.length - 1],
       };
     }
   } else {
-    return { professorName: encodedSearchTerm.trim() };
+    return {
+      profFirst: encodedSearchTermParts
+        .slice(0, encodedSearchTermParts.length - 1)
+        .join(' '),
+      profLast: encodedSearchTermParts[encodedSearchTermParts.length - 1],
+    };
   }
 }
