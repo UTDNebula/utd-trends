@@ -5,6 +5,7 @@ import {
   Alert,
   Button,
   Card,
+  Collapse,
   IconButton,
   Rating,
   Snackbar,
@@ -202,8 +203,8 @@ function MyApp({ Component, pageProps }: AppProps) {
                       setFeedbackRating(newValue);
                     }}
                   />
-                  {feedbackRating !== null && (
-                    <>
+                  <Collapse in={feedbackRating !== null} className="w-full">
+                    <div className="w-full flex flex-col items-center gap-2">
                       <p className="text-base self-start">
                         Do you have anything else you&apos;d like to add?
                       </p>
@@ -229,8 +230,8 @@ function MyApp({ Component, pageProps }: AppProps) {
                         </a>{' '}
                         for more detailed issue reporting.
                       </p>
-                    </>
-                  )}
+                    </div>
+                  </Collapse>
                   <div className="self-end flex gap-2">
                     <Button
                       size="small"
