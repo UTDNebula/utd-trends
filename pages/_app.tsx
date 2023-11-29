@@ -114,17 +114,21 @@ function MyApp({ Component, pageProps }: AppProps) {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   useEffect(() => {
     let previousFeedback = localStorage.getItem('feedback');
+    let ask = previousFeedback === null;
     if (previousFeedback !== null) {
       previousFeedback = JSON.parse(previousFeedback);
       ///if (previousFeedback.value !== 'closed' && previousFeedback.value !== 'submitted') {
       // eslint-disable-next-line no-constant-condition
       if (true) {
         ///change before prod!!
-        const timer = setTimeout(() => {
-          setFeedbackOpen(true);
-        }, 1000 * 1); //1 second///change before prod!!
-        return () => clearTimeout(timer);
+        ask = true;
       }
+    }
+    if (ask) {
+      const timer = setTimeout(() => {
+        setFeedbackOpen(true);
+      }, 1000 * 1); //1 second///change before prod!!
+      return () => clearTimeout(timer);
     }
   }, []);
   const [feedbackSuccessOpen, setFeedbackSuccessOpen] = useState(false);
