@@ -97,7 +97,7 @@ const Home: NextPage = () => {
                   }
                 >
                   <Typography
-                    className="text-gray-600"
+                    className="text-gray-600 dark:text-gray-400"
                     align="center"
                     variant="subtitle2"
                   >
