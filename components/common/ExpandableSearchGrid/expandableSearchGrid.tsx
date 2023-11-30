@@ -118,6 +118,7 @@ export const ExpandableSearchGrid = ({
             studentTotals[index],
             averageData[index],
           )}
+          includeTooltip={studentTotals[index] !== 0}
           key={index}
           index={index}
           legendColor={searchQueryColors[index]}
@@ -143,6 +144,9 @@ export const ExpandableSearchGrid = ({
 };
 
 function secondaryTextFormatter(total: number, gpa: number) {
+  if (total == 0) {
+    return 'No grade data available';
+  }
   return (
     total.toLocaleString('en-US') +
     ' grades | ' +
