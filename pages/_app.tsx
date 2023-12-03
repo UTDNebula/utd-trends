@@ -5,8 +5,70 @@ import { Card, IconButton, Tooltip, useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Analytics } from '@vercel/analytics/react';
 import type { AppProps } from 'next/app';
+import { Inter } from 'next/font/google';
+import localFont from 'next/font/local';
 import Head from 'next/head';
 import React from 'react';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+});
+const kallisto = localFont({
+  src: [
+    {
+      path: '../fonts/Kallisto/Kallisto Thin.otf',
+      weight: '100',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Thin Italic.otf',
+      weight: '100',
+      style: 'italic',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Light.otf',
+      weight: '300',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Light Italic.otf',
+      weight: '300',
+      style: 'italic',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Medium.otf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Medium Italic.otf',
+      weight: '500',
+      style: 'italic',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Bold.otf',
+      weight: '700',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Bold Italic.otf',
+      weight: '700',
+      style: 'italic',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Heavy.otf',
+      weight: '900',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/Kallisto/Kallisto Heavy Italic.otf',
+      weight: '900',
+      style: 'italic',
+    },
+  ],
+  variable: '--font-kallisto',
+});
 
 function MyApp({ Component, pageProps }: AppProps) {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -16,14 +78,17 @@ function MyApp({ Component, pageProps }: AppProps) {
     process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' &&
     typeof process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA !== 'undefined' &&
     process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA !== '';
-  const darkModeElevation = prefersDarkMode ? 3 : 1;
+  const cardElevation = prefersDarkMode ? 3 : 1;
 
   const muiTheme = createTheme({
     palette: {
       mode: prefersDarkMode ? 'dark' : 'light',
       primary: {
-        main: '#7486ce',
+        main: '#573dff',
       },
+    },
+    typography: {
+      fontFamily: 'inherit',
     },
   });
 
@@ -34,14 +99,23 @@ function MyApp({ Component, pageProps }: AppProps) {
         <link rel="icon" href="/Project_Nebula_Logo.svg" />
       </Head>
       <ThemeProvider theme={muiTheme}>
-        <Component {...pageProps} />
+        <div
+          className={
+            inter.variable +
+            ' ' +
+            kallisto.variable +
+            ' h-full text-haiti dark:text-white'
+          }
+        >
+          <Component {...pageProps} />
+        </div>
       </ThemeProvider>
       <Analytics />
       {showGitInfo ? (
         <>
           <Card
             className="w-fit h-fit bg-light fixed bottom-2 right-2 rounded-full"
-            elevation={darkModeElevation}
+            elevation={cardElevation}
           >
             <Tooltip title="Open GitHub commit for this instance">
               <a
