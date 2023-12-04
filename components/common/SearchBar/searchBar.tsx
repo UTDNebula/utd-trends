@@ -164,21 +164,7 @@ export const SearchBar = (props: SearchProps) => {
               </li>
             );
           }}
-          isOptionEqualToValue={(option, value) => {
-            if (option.prefix !== value.prefix) {
-              return false;
-            }
-            if (option.professorName !== value.professorName) {
-              return false;
-            }
-            if (option.number !== value.number) {
-              return false;
-            }
-            if (option.sectionNumber !== value.sectionNumber) {
-              return false;
-            }
-            return true;
-          }}
+          isOptionEqualToValue={searchQueryEqual}
           PopperComponent={(props) => {
             return (
               <Popper {...props} className="rounded-none" placement="bottom" />

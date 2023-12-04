@@ -20,7 +20,7 @@ import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 import { RelatedClasses } from '../../components/common/RelatedClasses/relatedClasses';
 import { BarGraph } from '../../components/graph/BarGraph/BarGraph';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
-import SearchQuery from '../../modules/SearchQuery/SearchQuery';
+import SearchQuery, { Professor } from '../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
 
@@ -128,7 +128,7 @@ export const Dashboard: NextPage = () => {
   const [included, setIncluded] = useState<boolean[]>([]);
 
   const [professorInvolvingSearchTerms, setProfessorInvolvingSearchTerms] =
-    useState<string[]>([]);
+    useState<Professor[]>([]);
 
   type academicSessionType = {
     name: string;
@@ -160,12 +160,22 @@ export const Dashboard: NextPage = () => {
     setProfessorInvolvingSearchTerms(
       searchTerms
         .filter(
-          (searchQuery) => typeof searchQuery.professorName !== 'undefined',
+          (searchQuery) =>
+            typeof searchQuery.profFirst !== 'undefined' &&
+            typeof searchQuery.profLast !== 'undefined',
         )
-        .map((searchQuery) => searchQuery.professorName)
+        .map((searchQuery) => ({
+          profFirst: searchQuery.profFirst,
+          profLast: searchQuery.profLast,
+        }))
         .filter(
-          (professorName, index, self) => self.indexOf(professorName) == index,
-        ) as string[],
+          (professor, index, self) =>
+            self.findIndex(
+              (element) =>
+                professor.profFirst == element.profFirst &&
+                professor.profLast == element.profLast,
+            ) == index,
+        ) as Professor[],
     );
 
     //Grade data request
@@ -538,9 +548,11 @@ export const Dashboard: NextPage = () => {
       setProfessorRatingsState('loading');
       fetchData(
         professorInvolvingSearchTerms.map(
-          (professorName) =>
-            '/api/ratemyprofessorScraper?professor=' +
-            encodeURIComponent(professorName),
+          (professor) =>
+            '/api/ratemyprofessorScraper?profFirst=' +
+            encodeURIComponent(professor.profFirst) +
+            '&profLast=' +
+            encodeURIComponent(professor.profLast),
         ),
         cacheIndexProfessor,
         2629800000, //1 month
@@ -594,7 +606,11 @@ export const Dashboard: NextPage = () => {
                 if (
                   typeof professorInvolvingSearchTerms[index] !== 'undefined'
                 ) {
-                  text += ' for ' + professorInvolvingSearchTerms[index];
+                  text +=
+                    ' for ' +
+                    professorInvolvingSearchTerms[index].profFirst +
+                    ' ' +
+                    professorInvolvingSearchTerms[index].profLast;
                 }
                 return (
                   <Card

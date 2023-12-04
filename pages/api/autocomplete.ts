@@ -230,22 +230,7 @@ function searchAutocomplete(query: string, limit: number) {
   }
   return results.filter(
     (option, index, self) =>
-      index ===
-      self.findIndex((t) => {
-        if (t.prefix !== option.prefix) {
-          return false;
-        }
-        if (t.professorName !== option.professorName) {
-          return false;
-        }
-        if (t.number !== option.number) {
-          return false;
-        }
-        if (t.sectionNumber !== option.sectionNumber) {
-          return false;
-        }
-        return true;
-      }),
+      index === self.findIndex((t) => searchQueryEqual(t, option)),
   );
 }
 
@@ -269,8 +254,10 @@ export default function handler(
   } else if (
     ('prefix' in req.query && typeof req.query.prefix === 'string') ||
     ('number' in req.query && typeof req.query.number === 'string') ||
-    ('professorName' in req.query &&
-      typeof req.query.professorName === 'string') ||
+    ('profFirst' in req.query &&
+      typeof req.query.profFirst === 'string' &&
+      'profLast' in req.query &&
+      typeof req.query.profLast === 'string') ||
     ('sectionNumber' in req.query &&
       typeof req.query.sectionNumber === 'string')
   ) {
@@ -279,8 +266,10 @@ export default function handler(
     const numberDefined =
       'number' in req.query && typeof req.query.number === 'string';
     const professorNameDefined =
-      'professorName' in req.query &&
-      typeof req.query.professorName === 'string';
+      'profFirst' in req.query &&
+      typeof req.query.profFirst === 'string' &&
+      'profLast' in req.query &&
+      typeof req.query.profLast === 'string';
     const sectionNumberDefined =
       'sectionNumber' in req.query &&
       typeof req.query.sectionNumber === 'string';
@@ -294,7 +283,8 @@ export default function handler(
       query.number = req.query.number as string;
     }
     if (professorNameDefined) {
-      query.professorName = req.query.professorName as string;
+      query.profFirst = req.query.profFirst as string;
+      query.profLast = req.query.profLast as string;
     }
     if (sectionNumberDefined) {
       query.sectionNumber = req.query.sectionNumber as string;
