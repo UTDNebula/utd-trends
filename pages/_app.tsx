@@ -132,29 +132,68 @@ function MyApp({ Component, pageProps }: AppProps) {
       return () => clearTimeout(timer);
     }
   }, []);
+  const cacheIndexFeedback = 0; //Increment this to request feedback from all users on next deployment
+
   const [feedbackSuccessOpen, setFeedbackSuccessOpen] = useState(false);
-  const handleFeedbackSuccessClose = (
+  function handleFeedbackSuccessClose(
     event?: React.SyntheticEvent | Event,
     reason?: string,
-  ) => {
+  ) {
     if (reason === 'clickaway') {
       return;
     }
     setFeedbackSuccessOpen(false);
-  };
+  }
+
   const [feedbackErrorOpen, setFeedbackErrorOpen] = useState(false);
-  const handlefeedbackErrorClose = (
+  function handlefeedbackErrorClose(
     event?: React.SyntheticEvent | Event,
     reason?: string,
-  ) => {
+  ) {
     if (reason === 'clickaway') {
       return;
     }
     setFeedbackErrorOpen(false);
-  };
+  }
+
   const [feedbackRating, setFeedbackRating] = useState<number | null>(null);
   const [feedbackExtra, setFeedbackExtra] = useState('');
-  const cacheIndexFeedback = 0; //Increment this to request feedback from all users on next deployment
+  function sendFeedback() {
+    return new Promise<void>((resolve, reject) => {
+      fetch('/api/postFeedback', {
+        method: 'POST',
+        body: JSON.stringify({
+          rating: feedbackRating,
+          extra: feedbackExtra,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message !== 'success') {
+            throw new Error(data.message);
+          }
+          localStorage.setItem(
+            'feedback',
+            JSON.stringify({
+              value: 'submitted',
+              cacheIndex: cacheIndexFeedback,
+            }),
+          );
+          resolve();
+        })
+        .catch((error) => {
+          localStorage.setItem(
+            'feedback',
+            JSON.stringify({
+              value: 'error',
+              cacheIndex: cacheIndexFeedback,
+            }),
+          );
+          console.error('Feedback', error);
+          reject();
+        });
+    });
+  }
 
   return (
     <>
@@ -256,32 +295,12 @@ function MyApp({ Component, pageProps }: AppProps) {
                       disabled={feedbackRating === null}
                       onClick={() => {
                         setFeedbackOpen(false);
-                        fetch('https://catfact.ninja/fact', { method: 'GET' })
-                          .then((response) => response.json())
-                          .then((data) => {
-                            /*if (data.message !== 'success') {
-                            throw new Error(data.message);
-                          }*/
+                        sendFeedback()
+                          .then(() => {
                             setFeedbackSuccessOpen(true);
-                            console.log(data, feedbackRating, feedbackExtra);
-                            localStorage.setItem(
-                              'feedback',
-                              JSON.stringify({
-                                value: 'submitted',
-                                cacheIndex: cacheIndexFeedback,
-                              }),
-                            );
                           })
-                          .catch((error) => {
+                          .catch(() => {
                             setFeedbackErrorOpen(true);
-                            localStorage.setItem(
-                              'feedback',
-                              JSON.stringify({
-                                value: 'error',
-                                cacheIndex: cacheIndexFeedback,
-                              }),
-                            );
-                            console.error('Feedback', error);
                           });
                       }}
                     >

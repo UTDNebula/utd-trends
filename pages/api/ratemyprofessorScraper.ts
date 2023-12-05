@@ -25,6 +25,7 @@ export default function handler(
 ) {
   if (!('professor' in req.query && typeof req.query.professor === 'string')) {
     res.status(400).json({ message: 'Incorrect query present' });
+    return;
   }
   const url = new URL(
     'https://www.ratemyprofessors.com/search/professors/1273?',

@@ -32,6 +32,7 @@
     "css-loader": "^6.7.1",
     "dotenv": "^16.0.0",
     "framer-motion": "^10.12.4",
+    "google-auth-library": "^9.4.1",
     "graphology": "^0.25.1",
     "html-loader": "^4.2.0",
     "markdown-loader": "^8.0.0",
