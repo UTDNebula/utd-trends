@@ -1,12 +1,4 @@
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Tooltip,
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { tooltipClasses, TooltipProps } from '@mui/material/Tooltip';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
