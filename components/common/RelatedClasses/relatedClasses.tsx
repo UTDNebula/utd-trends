@@ -1,14 +1,9 @@
 import { Typography } from '@mui/material';
 import React from 'react';
 
+import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import { RelatedTermCard } from '../RelatedTermCard/relatedTermCard';
-
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
-};
 
 type RelatedClassesProps = {
   displayData: SearchQuery[];
@@ -49,20 +44,3 @@ export const RelatedClasses = ({
     </div>
   );
 };
-
-function searchQueryLabel(query: SearchQuery): string {
-  let result = '';
-  if (query.prefix !== undefined) {
-    result += query.prefix;
-  }
-  if (query.number !== undefined) {
-    result += ' ' + query.number;
-  }
-  if (query.sectionNumber !== undefined) {
-    result += '.' + query.sectionNumber;
-  }
-  if (query.professorName !== undefined) {
-    result += ' ' + query.professorName;
-  }
-  return result.trim();
-}

@@ -9,7 +9,7 @@ function Document() {
           name="description"
           content="A data visualization tool built to help students view historical course and section data."
         />
-        <meta name="theme-color" content="#573DFF" />
+        <meta name="theme-color" content="#573dff" />
 
         <meta property="og:title" content="UTD Trends" />
         <meta

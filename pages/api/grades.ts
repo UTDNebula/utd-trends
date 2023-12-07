@@ -26,8 +26,10 @@ export default function handler(
     !('prefix' in req.query && typeof req.query.prefix === 'string') &&
     !('number' in req.query && typeof req.query.number === 'string') &&
     !(
-      'professorName' in req.query &&
-      typeof req.query.professorName === 'string'
+      'profFirst' in req.query &&
+      typeof req.query.profFirst === 'string' &&
+      'profLast' in req.query &&
+      typeof req.query.profLast === 'string'
     ) &&
     !(
       'sectionNumber' in req.query &&
@@ -49,14 +51,13 @@ export default function handler(
     url.searchParams.append('number', req.query.number);
   }
   if (
-    'professorName' in req.query &&
-    typeof req.query.professorName === 'string'
+    'profFirst' in req.query &&
+    typeof req.query.profFirst === 'string' &&
+    'profLast' in req.query &&
+    typeof req.query.profLast === 'string'
   ) {
-    url.searchParams.append(
-      'first_name',
-      req.query.professorName.split(' ')[0],
-    );
-    url.searchParams.append('last_name', req.query.professorName.split(' ')[1]);
+    url.searchParams.append('first_name', req.query.profFirst);
+    url.searchParams.append('last_name', req.query.profLast);
   }
   if (
     'sectionNumber' in req.query &&

@@ -4,7 +4,10 @@ function searchQueryEqual(query1: SearchQuery, query2: SearchQuery): boolean {
   if (query1.prefix !== query2.prefix) {
     return false;
   }
-  if (query1.professorName !== query2.professorName) {
+  if (
+    query1.profFirst !== query2.profFirst ||
+    query1.profLast !== query2.profLast
+  ) {
     return false;
   }
   if (query1.number !== query2.number) {

@@ -23,14 +23,26 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>,
 ) {
-  if (!('professor' in req.query && typeof req.query.professor === 'string')) {
+  if (
+    !(
+      'profFirst' in req.query &&
+      typeof req.query.profFirst === 'string' &&
+      'profLast' in req.query &&
+      typeof req.query.profLast === 'string'
+    )
+  ) {
     res.status(400).json({ message: 'Incorrect query present' });
     return;
   }
   const url = new URL(
     'https://www.ratemyprofessors.com/search/professors/1273?',
   ); //UTD
-  url.searchParams.append('q', req.query.professor as string);
+  url.searchParams.append(
+    'q',
+    ((req.query.profFirst as string).split(' ')[0] +
+      ' ' +
+      req.query.profLast) as string,
+  );
   return new Promise<void>((resolve) => {
     fetch(url.href, {
       method: 'GET',

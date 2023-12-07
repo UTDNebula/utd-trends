@@ -18,9 +18,9 @@ import Carousel from '../../components/common/Carousel/carousel';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 import { RelatedClasses } from '../../components/common/RelatedClasses/relatedClasses';
-import { GraphChoice } from '../../components/graph/GraphChoice/GraphChoice';
+import { BarGraph } from '../../components/graph/BarGraph/BarGraph';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
-import SearchQuery from '../../modules/SearchQuery/SearchQuery';
+import SearchQuery, { Professor } from '../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
 
@@ -128,7 +128,7 @@ export const Dashboard: NextPage = () => {
   const [included, setIncluded] = useState<boolean[]>([]);
 
   const [professorInvolvingSearchTerms, setProfessorInvolvingSearchTerms] =
-    useState<string[]>([]);
+    useState<Professor[]>([]);
 
   type academicSessionType = {
     name: string;
@@ -156,16 +156,29 @@ export const Dashboard: NextPage = () => {
   }
 
   const searchTermsChange = useCallback((searchTerms: SearchQuery[]) => {
+    //define professors
     setProfessorInvolvingSearchTerms(
       searchTerms
         .filter(
-          (searchQuery) => typeof searchQuery.professorName !== 'undefined',
+          (searchQuery) =>
+            typeof searchQuery.profFirst !== 'undefined' &&
+            typeof searchQuery.profLast !== 'undefined',
         )
-        .map((searchQuery) => searchQuery.professorName)
+        .map((searchQuery) => ({
+          profFirst: searchQuery.profFirst,
+          profLast: searchQuery.profLast,
+        }))
         .filter(
-          (professorName, index, self) => self.indexOf(professorName) == index,
-        ) as string[],
+          (professor, index, self) =>
+            self.findIndex(
+              (element) =>
+                professor.profFirst == element.profFirst &&
+                professor.profLast == element.profLast,
+            ) == index,
+        ) as Professor[],
     );
+
+    //Grade data request
     fetchData(
       searchTerms.map(
         (searchTerm: SearchQuery) =>
@@ -195,23 +208,25 @@ export const Dashboard: NextPage = () => {
         setPossibleAcademicSessions(
           responses
             .map((response) =>
-              response.map((data: individualacademicSessionResponse) => {
-                let name: string = data._id;
-                name = '20' + name;
-                name = name
-                  .replace('F', ' Fall')
-                  .replace('S', ' Spring')
-                  .replace('U', ' Summer');
-                let place: number = parseInt(name.split(' ')[0]);
-                if (name.split(' ')[1] == 'Spring') {
-                  place += 0.1;
-                } else if (name.split(' ')[1] == 'Summer') {
-                  place += 0.2;
-                } else {
-                  place += 0.3;
-                }
-                return { name: name, place: place };
-              }),
+              response == null
+                ? []
+                : response.map((data: individualacademicSessionResponse) => {
+                    let name: string = data._id;
+                    name = '20' + name;
+                    name = name
+                      .replace('F', ' Fall')
+                      .replace('S', ' Spring')
+                      .replace('U', ' Summer');
+                    let place: number = parseInt(name.split(' ')[0]);
+                    if (name.split(' ')[1] == 'Spring') {
+                      place += 0.1;
+                    } else if (name.split(' ')[1] == 'Summer') {
+                      place += 0.2;
+                    } else {
+                      place += 0.3;
+                    }
+                    return { name: name, place: place };
+                  }),
             )
             .flat()
             .filter(
@@ -229,20 +244,23 @@ export const Dashboard: NextPage = () => {
           responses.map((response, index) => {
             return {
               name: searchQueryLabel(searchTerms[index]),
-              data: response.map((data: individualacademicSessionResponse) => {
-                let session: number = parseInt('20' + data._id);
-                if (data._id.includes('S')) {
-                  session += 0.1;
-                } else if (data._id.includes('U')) {
-                  session += 0.2;
-                } else {
-                  session += 0.3;
-                }
-                return {
-                  session: session,
-                  grade_distribution: data.grade_distribution,
-                };
-              }),
+              data:
+                response == null
+                  ? []
+                  : response.map((data: individualacademicSessionResponse) => {
+                      let session: number = parseInt('20' + data._id);
+                      if (data._id.includes('S')) {
+                        session += 0.1;
+                      } else if (data._id.includes('U')) {
+                        session += 0.2;
+                      } else {
+                        session += 0.3;
+                      }
+                      return {
+                        session: session,
+                        grade_distribution: data.grade_distribution,
+                      };
+                    }),
             };
           }),
         );
@@ -253,6 +271,7 @@ export const Dashboard: NextPage = () => {
         console.error('Nebula API', error);
       });
 
+    //Related search query list request
     fetchData(
       searchTerms.map(
         (searchTerm: SearchQuery) =>
@@ -319,6 +338,7 @@ export const Dashboard: NextPage = () => {
   }, []);
 
   useEffect(() => {
+    //Filter out to matching academic session range
     const partialGradesData: gradesType[] = fullGradesData.map((datPoint) => {
       const combined = datPoint.data.reduce(
         (accumulator, academicSession) => {
@@ -403,8 +423,7 @@ export const Dashboard: NextPage = () => {
       <>
         <div className="h-full m-4">
           <Card className="h-96 p-4 m-4">
-            <GraphChoice
-              form="Bar"
+            <BarGraph
               title="Grades"
               xaxisLabels={[
                 'A+',
@@ -529,9 +548,11 @@ export const Dashboard: NextPage = () => {
       setProfessorRatingsState('loading');
       fetchData(
         professorInvolvingSearchTerms.map(
-          (professorName) =>
-            '/api/ratemyprofessorScraper?professor=' +
-            encodeURIComponent(professorName),
+          (professor) =>
+            '/api/ratemyprofessorScraper?profFirst=' +
+            encodeURIComponent(professor.profFirst) +
+            '&profLast=' +
+            encodeURIComponent(professor.profLast),
         ),
         cacheIndexProfessor,
         2629800000, //1 month
@@ -585,7 +606,11 @@ export const Dashboard: NextPage = () => {
                 if (
                   typeof professorInvolvingSearchTerms[index] !== 'undefined'
                 ) {
-                  text += ' for ' + professorInvolvingSearchTerms[index];
+                  text +=
+                    ' for ' +
+                    professorInvolvingSearchTerms[index].profFirst +
+                    ' ' +
+                    professorInvolvingSearchTerms[index].profLast;
                 }
                 return (
                   <Card
