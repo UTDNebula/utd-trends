@@ -165,6 +165,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         body: JSON.stringify({
           rating: feedbackRating,
           extra: feedbackExtra,
+          env: process.env.NEXT_PUBLIC_VERCEL_ENV,
         }),
       })
         .then((response) => response.json())

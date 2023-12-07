@@ -32,6 +32,10 @@ export default function handler(
   if ('extra' in body && typeof body.extra === 'string') {
     extra = body.extra;
   }
+  let env = 'unknown';
+  if ('env' in body && typeof body.env === 'string') {
+    env = body.env;
+  }
   return new Promise<void>((resolve) => {
     const client = auth.fromJSON(
       JSON.parse(process.env.REACT_APP_GOOGLE_CREDENTIALS as string),
@@ -46,7 +50,7 @@ export default function handler(
         data: {
           range: 'Data!A1:E1',
           majorDimension: 'ROWS',
-          values: [[Date.now(), body.rating, extra]],
+          values: [[Date.now(), env, body.rating, extra]],
         },
       })
       .then((data) => {
