@@ -1,18 +1,12 @@
 /*
-RUN ON CHANGE:
-"tsc scripts/generateAutocompleteGraph.ts --resolveJsonModule"
-run to compile to .js file that can be run at predev and prebuild
+Build the autocomplete radix tree
+Run on `npm run dev` and `npm run build`
+Documentation: https://nebula-labs.atlassian.net/wiki/spaces/TRENDS/pages/67993601/Autocomplete+Documentation
 */
 import * as fs from 'fs';
 import { DirectedGraph } from 'graphology';
-import * as aggregatedData from '../data/autocomplete-min.json';
-
-type SearchQuery = {
-  prefix?: string;
-  number?: string;
-  professorName?: string;
-  sectionNumber?: string;
-};
+import * as aggregatedData from '../data/autocomplete_data.json';
+import SearchQuery from '../modules/SearchQuery/SearchQuery';
 
 type NodeAttributes = {
   c: string;
@@ -20,123 +14,8 @@ type NodeAttributes = {
   visited?: boolean;
 };
 
-type Prefix = {
-  classes: Class[];
-  professors: Professor[];
-  value: string;
-};
-
-type Class = {
-  prefix: Prefix;
-  number: string;
-  professors: Professor[];
-  sections: Section[];
-};
-
-type Professor = {
-  classes: Class[];
-  firstName: string;
-  lastName: string;
-};
-
-type Section = {
-  class: Class;
-  professors: Professor[];
-  section_number: string;
-};
-
-const prefixList: Prefix[] = [];
-const classList: Class[] = [];
-const professorList: Professor[] = [];
-const sectionList: Section[] = [];
-
-aggregatedData.data.forEach((prefix) => {
-  let newPrefix: Prefix = {
-    classes: [],
-    professors: [],
-    value: prefix.sp,
-  };
-  prefixList.push(newPrefix);
-  prefix.cns.forEach((course) => {
-    let newCourse: Class = {
-      prefix: newPrefix,
-      number: course.cn,
-      professors: [],
-      sections: [],
-    };
-    if (course.cn == undefined) {
-      console.log(course);
-    }
-    newPrefix.classes.push(newCourse);
-    classList.push(newCourse);
-    course.ass.forEach((session) => {
-      session.s.forEach((section) => {
-        let newSection: Section = {
-          class: newCourse,
-          professors: [],
-          section_number: section.sn,
-        };
-        newCourse.sections.push(newSection);
-        sectionList.push(newSection);
-        section.p.forEach((professor) => {
-          // @ts-ignore
-          if (professor.fn != undefined && professor.ln != undefined) {
-            let profExists = false;
-            let preExistingProf: Professor;
-            professorList.forEach((existingProfessor) => {
-              if (
-                !profExists &&
-                // @ts-ignore
-                existingProfessor.firstName == professor.fn &&
-                // @ts-ignore
-                existingProfessor.lastName == professor.ln
-              ) {
-                profExists = true;
-                preExistingProf = existingProfessor;
-              }
-            });
-            if (profExists) {
-              // @ts-ignore
-              if (!preExistingProf.classes.includes(newCourse)) {
-                // @ts-ignore
-                preExistingProf.classes.push(newCourse);
-              }
-              // @ts-ignore
-              newSection.professors.push(preExistingProf);
-              // @ts-ignore
-              if (!newCourse.professors.includes(preExistingProf)) {
-                // @ts-ignore
-                newCourse.professors.push(preExistingProf);
-              }
-              // @ts-ignore
-              if (!newPrefix.professors.includes(preExistingProf)) {
-                // @ts-ignore
-                newPrefix.professors.push(preExistingProf);
-              }
-            } else {
-              let newProf: Professor = {
-                classes: [newCourse],
-                // @ts-ignore
-                firstName: professor.fn,
-                // @ts-ignore
-                lastName: professor.ln,
-              };
-              professorList.push(newProf);
-              newSection.professors.push(newProf);
-              newCourse.professors.push(newProf);
-              newPrefix.professors.push(newProf);
-            }
-          }
-        });
-      });
-    });
-  });
-});
-
 fetch('https://catfact.ninja/fact', { method: 'GET' })
-  // @ts-ignore
   .then((response) => response.json())
-  // @ts-ignore
   .then((data) => {
     console.log(data);
 
@@ -255,7 +134,8 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
         {
           prefix: prefix,
           number: number,
-          professorName: profFirst + ' ' + profLast,
+          profFirst: profFirst,
+          profLast: profLast,
         },
       );
 
@@ -281,7 +161,8 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
             prefix: prefix,
             number: number,
             sectionNumber: sectionNumber,
-            professorName: profFirst + ' ' + profLast,
+            profFirst: profFirst,
+            profLast: profLast,
           },
         );
       }
@@ -303,7 +184,8 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
         [root, professorFirstNameNode],
         profLast,
         {
-          professorName: profFirst + ' ' + profLast,
+          profFirst: profFirst,
+          profLast: profLast,
         },
       );
       const professorSpaceNode = addSearchQueryCharacter(
@@ -316,7 +198,8 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       const classNode = addWithParents([prefixNode, prefixSpaceNode], number, {
         prefix: prefix,
         number: number,
-        professorName: profFirst + ' ' + profLast,
+        profFirst: profFirst,
+        profLast: profLast,
       });
 
       const classNode2 = addSearchQueryCharacter(professorSpaceNode, number);
@@ -324,7 +207,8 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       const prefixNode2 = addWithParents([classNode2, classSpaceNode], prefix, {
         prefix: prefix,
         number: number,
-        professorName: profFirst + ' ' + profLast,
+        profFirst: profFirst,
+        profLast: profLast,
       });
 
       if (sectionNumber === 'HON') {
@@ -332,49 +216,65 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
           prefix: prefix,
           number: number,
           sectionNumber: sectionNumber,
-          professorName: profFirst + ' ' + profLast,
+          profFirst: profFirst,
+          profLast: profLast,
         });
       }
     }
 
-    for (let prefixItr = 0; prefixItr < prefixList.length; prefixItr++) {
+    for (
+      let prefixItr = 0;
+      prefixItr < aggregatedData.data.length;
+      prefixItr++
+    ) {
+      const prefixData = aggregatedData.data[prefixItr];
       for (
-        let classItr = 0;
-        classItr < prefixList[prefixItr].classes.length;
-        classItr++
+        let courseNumberItr = 0;
+        courseNumberItr < prefixData.course_numbers.length;
+        courseNumberItr++
       ) {
+        const courseNumberData = prefixData.course_numbers[courseNumberItr];
         for (
-          let sectionItr = 0;
-          sectionItr < prefixList[prefixItr].classes[classItr].sections.length;
-          sectionItr++
+          let academicSessionItr = 0;
+          academicSessionItr < courseNumberData.academic_sessions.length;
+          academicSessionItr++
         ) {
+          const academicSessionData =
+            courseNumberData.academic_sessions[academicSessionItr];
           for (
-            let professorItr = 0;
-            professorItr <
-            prefixList[prefixItr].classes[classItr].sections[sectionItr]
-              .professors.length;
-            professorItr++
+            let sectionItr = 0;
+            sectionItr < academicSessionData.sections.length;
+            sectionItr++
           ) {
-            addPrefixFirst(
-              prefixList[prefixItr].value,
-              prefixList[prefixItr].classes[classItr].number,
-              prefixList[prefixItr].classes[classItr].sections[sectionItr]
-                .section_number,
-              prefixList[prefixItr].classes[classItr].sections[sectionItr]
-                .professors[professorItr].firstName,
-              prefixList[prefixItr].classes[classItr].sections[sectionItr]
-                .professors[professorItr].lastName,
-            );
-            addProfFirst(
-              prefixList[prefixItr].value,
-              prefixList[prefixItr].classes[classItr].number,
-              prefixList[prefixItr].classes[classItr].sections[sectionItr]
-                .section_number,
-              prefixList[prefixItr].classes[classItr].sections[sectionItr]
-                .professors[professorItr].firstName,
-              prefixList[prefixItr].classes[classItr].sections[sectionItr]
-                .professors[professorItr].lastName,
-            );
+            const sectionData = academicSessionData.sections[sectionItr];
+            for (
+              let professorItr = 0;
+              professorItr < sectionData.professors.length;
+              professorItr++
+            ) {
+              const professorData = sectionData.professors[professorItr];
+              if (
+                'first_name' in professorData && //handle empty professor: {}
+                'last_name' in professorData &&
+                professorData.first_name !== '' && //handle blank name
+                professorData.last_name !== ''
+              ) {
+                addPrefixFirst(
+                  prefixData.subject_prefix,
+                  courseNumberData.course_number,
+                  sectionData.section_number,
+                  professorData.first_name,
+                  professorData.last_name,
+                );
+                addProfFirst(
+                  prefixData.subject_prefix,
+                  courseNumberData.course_number,
+                  sectionData.section_number,
+                  professorData.first_name,
+                  professorData.last_name,
+                );
+              }
+            }
           }
         }
       }

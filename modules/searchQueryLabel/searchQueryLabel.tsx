@@ -11,8 +11,11 @@ function searchQueryLabel(query: SearchQuery): string {
   if (typeof query.sectionNumber !== 'undefined') {
     result += '.' + query.sectionNumber;
   }
-  if (typeof query.professorName !== 'undefined') {
-    result += ' ' + query.professorName;
+  if (
+    typeof query.profFirst !== 'undefined' &&
+    typeof query.profLast !== 'undefined'
+  ) {
+    result += ' ' + query.profFirst + ' ' + query.profLast;
   }
   return result.trim();
 }

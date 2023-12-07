@@ -11,6 +11,7 @@ import { styled } from '@mui/material/styles';
 import { tooltipClasses, TooltipProps } from '@mui/material/Tooltip';
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 

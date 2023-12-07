@@ -3,7 +3,7 @@ import React from 'react';
 
 function Document() {
   return (
-    <Html>
+    <Html lang="en">
       <Head prefix="og: http://ogp.me/ns#">
         <meta
           name="description"
@@ -19,7 +19,7 @@ function Document() {
         <meta property="og:type" content="website" />
         <meta
           property="og:image"
-          content="https://trends.utdnebula.com/Project_Nebula_Logo.png"
+          content="https://trends.utdnebula.com/logoIcon.png"
         />
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:alt" content="Nebula Labs Icon." />
