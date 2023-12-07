@@ -1,32 +1,20 @@
 import {
-  Card,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
   Tooltip,
-  useMediaQuery,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { tooltipClasses, TooltipProps } from '@mui/material/Tooltip';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
 import SearchQuery from '../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
-
-const TransparentTooltip = styled(({ className, ...props }: TooltipProps) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(() => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: 'transparent',
-    maxWidth: 'none',
-  },
-}));
 
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
@@ -49,9 +37,6 @@ const Home: NextPage = () => {
   useEffect(() => {
     router.prefetch('/dashboard');
   }, [router]);
-
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const cardElevation = prefersDarkMode ? 3 : 1;
 
   const [searchBy, setSearchBy] = useState('any');
   const [ABTest, setABTest] = useState(true);
