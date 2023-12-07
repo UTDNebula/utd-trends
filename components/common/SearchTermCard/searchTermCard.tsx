@@ -8,6 +8,7 @@ import React from 'react';
 type SearchTermCardProps = {
   primaryText: string;
   secondaryText: string;
+  includeTooltip: boolean;
   index: number;
   onCloseButtonClicked: (index: number) => void;
   onToggleButtonClicked: (index: number) => void;
@@ -64,7 +65,7 @@ export const SearchTermCard = (props: SearchTermCardProps) => {
           <span className="block text-sm text-gray-500 dark:text-gray-300 inline">
             {props.loading ? 'Loading...' : props.secondaryText}
           </span>
-          {props.loading ? null : (
+          {!props.loading && props.includeTooltip && (
             <Tooltip title="Avergae GPA excludes dropped grades" arrow>
               <Help className="inline fill-gray-500 dark:fill-gray-300 text-base ml-0.5 mb-0.5" />
             </Tooltip>
