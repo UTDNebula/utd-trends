@@ -3,6 +3,9 @@ import { Card, IconButton, Tooltip, useMediaQuery } from '@mui/material';
 import React from 'react';
 
 export default function GitHubButton() {
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const cardElevation = prefersDarkMode ? 3 : 1;
+
   const showGitInfo =
     typeof process.env.NEXT_PUBLIC_VERCEL_ENV !== 'undefined' &&
     process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' &&
@@ -12,9 +15,6 @@ export default function GitHubButton() {
   if (!showGitInfo) {
     return null;
   }
-
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const cardElevation = prefersDarkMode ? 3 : 1;
 
   return (
     <Card
