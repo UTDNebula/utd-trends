@@ -32,6 +32,7 @@ export default function handler(
     )
   ) {
     res.status(400).json({ message: 'Incorrect query present' });
+    return;
   }
   const url = new URL(
     'https://www.ratemyprofessors.com/search/professors/1273?',

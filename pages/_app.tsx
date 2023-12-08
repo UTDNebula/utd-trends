@@ -1,7 +1,6 @@
 import '../styles/globals.css';
 
-import GitHub from '@mui/icons-material/GitHub';
-import { Card, IconButton, Tooltip, useMediaQuery } from '@mui/material';
+import { useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Analytics } from '@vercel/analytics/react';
 import type { AppProps } from 'next/app';
@@ -9,6 +8,9 @@ import { Inter } from 'next/font/google';
 import localFont from 'next/font/local';
 import Head from 'next/head';
 import React from 'react';
+
+import FeedbackPopup from '../components/common/FeedbackPopup/feedbackPopup';
+import GitHubButton from '../components/common/GitHubButton/gitHubButton';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -73,18 +75,19 @@ const kallisto = localFont({
 function MyApp({ Component, pageProps }: AppProps) {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
-  const showGitInfo =
-    typeof process.env.NEXT_PUBLIC_VERCEL_ENV !== 'undefined' &&
-    process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' &&
-    typeof process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA !== 'undefined' &&
-    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA !== '';
-  const cardElevation = prefersDarkMode ? 3 : 1;
-
   const muiTheme = createTheme({
     palette: {
       mode: prefersDarkMode ? 'dark' : 'light',
+      //copied from tailwind.config.js
       primary: {
         main: '#573dff',
+      },
+      secondary: {
+        main: '#573dff',
+        light: '#c2c8ff',
+      },
+      error: {
+        main: '#ff5743',
       },
     },
     typography: {
@@ -126,32 +129,11 @@ function MyApp({ Component, pageProps }: AppProps) {
           }
         >
           <Component {...pageProps} />
+          <FeedbackPopup />
+          <GitHubButton />
         </div>
       </ThemeProvider>
       <Analytics />
-      {showGitInfo ? (
-        <>
-          <Card
-            className="w-fit h-fit bg-light fixed bottom-2 right-2 rounded-full"
-            elevation={cardElevation}
-          >
-            <Tooltip title="Open GitHub commit for this instance">
-              <a
-                href={
-                  'https://github.com/UTDNebula/utd-trends/commit/' +
-                  process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
-                }
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <IconButton size="large">
-                  <GitHub className="fill-dark text-3xl" />
-                </IconButton>
-              </a>
-            </Tooltip>
-          </Card>
-        </>
-      ) : null}
     </>
   );
 }
