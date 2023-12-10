@@ -122,7 +122,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             inter.variable +
             ' ' +
             kallisto.variable +
-            ' h-full text-haiti dark:text-white'
+            ' h-full text-haiti dark:text-white bg-[linear-gradient(rgba(255,255,255,0.6),rgba(255,255,255,0.6)),url("/background.png")] dark:bg-[linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url("/background.png")] bg-cover'
           }
         >
           <Component {...pageProps} />
