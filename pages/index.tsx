@@ -49,7 +49,7 @@ const Home: NextPage = () => {
       >
         Toggle A/B Test
       </button>
-      <div className="bg-[linear-gradient(rgba(255,255,255,0.6),rgba(255,255,255,0.6)),url('/background.png')] dark:bg-[linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('/background.png')] bg-cover h-full w-full flex justify-center items-center p-8">
+      <div className="h-full w-full flex justify-center items-center p-8">
         <div className="max-w-xl">
           <h2 className="text-sm font-semibold mb-3 text-cornflower-600 dark:text-cornflower-400 tracking-wider">
             POWERED BY{' '}
