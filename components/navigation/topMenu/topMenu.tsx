@@ -1,5 +1,13 @@
 import { Share } from '@mui/icons-material';
-import { FormControl, IconButton, InputLabel, MenuItem, Select, Snackbar, Tooltip } from '@mui/material';
+import {
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  Snackbar,
+  Tooltip,
+} from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
@@ -15,7 +23,7 @@ import { LogoIcon } from '../../icons/LogoIcon/logoIcon';
  */
 export function TopMenu() {
   const router = useRouter();
-  const sortOptions = ["Professor Name", "Course Number"];
+  const sortOptions = ['Professor Name', 'Course Number'];
   const [openCopied, setOpenCopied] = useState<boolean>(false);
 
   function shareLink(url: string) {
@@ -68,9 +76,7 @@ export function TopMenu() {
             />
           </div>
           <div className="flex justify-center gap-2">
-            <FormControl
-              variant="standard"
-            >
+            <FormControl variant="standard">
               <InputLabel id="sortLabel">Sort By</InputLabel>
               <Select
                 labelId="sortLabel"
@@ -80,13 +86,11 @@ export function TopMenu() {
                 <MenuItem key="Sort By" value="0">
                   Sort By
                 </MenuItem>
-                {sortOptions.map(
-                  (s: string) => (
-                    <MenuItem key={s} value={sortOptions.indexOf(s) + 1}>
-                      {s}
-                    </MenuItem>
-                  ),
-                )}
+                {sortOptions.map((s: string) => (
+                  <MenuItem key={s} value={sortOptions.indexOf(s) + 1}>
+                    {s}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </div>
