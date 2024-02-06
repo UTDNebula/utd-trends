@@ -60,6 +60,10 @@ export const SplashPageSearchBar = (props: SearchProps) => {
     };
   }, [inputValue]);
 
+  useEffect(() => {
+    fetch('/api/autocomplete');
+  }, []);
+
   return (
     <>
       <div className="text-primary m-auto w-11/12 -translate-y-1/4">
