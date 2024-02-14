@@ -194,10 +194,29 @@ function bfsRecursion(queue: PriorityQueue) {
   }
 }
 
+//Check that search matches searchBy type
+function validateSearch(searchQuery: SearchQuery, searchBy: string) {
+  if (searchBy === 'any') {
+    return true;
+  }
+  if (
+    searchBy === 'professor' &&
+    !('prefix' in searchQuery) &&
+    !('number' in searchQuery) &&
+    !('sectionNumber' in searchQuery)
+  ) {
+    return true;
+  }
+  if (searchBy === 'course' && !('professorName' in searchQuery)) {
+    return true;
+  }
+  return false;
+}
+
 type bfsReturn = SearchQuery | undefined;
 
 // search autocomplete program using a DAG (more specifically a radix tree) to search for matches until limit is reached
-function searchAutocomplete(query: string, limit: number) {
+function searchAutocomplete(query: string, limit: number, searchBy = 'any') {
   query = query.trimStart().toUpperCase();
   graph.updateEachNodeAttributes((node, attr) => {
     return {
@@ -224,28 +243,13 @@ function searchAutocomplete(query: string, limit: number) {
     } else {
       response = bfsRecursion(queue);
     }
-    if (typeof response !== 'undefined') {
+    if (typeof response !== 'undefined' && validateSearch(response, searchBy)) {
       results.push(response);
     }
   }
   return results.filter(
     (option, index, self) =>
-      index ===
-      self.findIndex((t) => {
-        if (t.prefix !== option.prefix) {
-          return false;
-        }
-        if (t.professorName !== option.professorName) {
-          return false;
-        }
-        if (t.number !== option.number) {
-          return false;
-        }
-        if (t.sectionNumber !== option.sectionNumber) {
-          return false;
-        }
-        return true;
-      }),
+      index === self.findIndex((t) => searchQueryEqual(t, option)),
   );
 }
 
@@ -259,18 +263,28 @@ export default function handler(
   res: NextApiResponse<Data>,
 ) {
   if ('input' in req.query && typeof req.query.input === 'string') {
+    let searchBy = 'any';
+    if (
+      'searchBy' in req.query &&
+      typeof req.query.searchBy === 'string' &&
+      (req.query.searchBy === 'professor' || req.query.searchBy === 'course')
+    ) {
+      searchBy = req.query.searchBy;
+    }
     return new Promise<void>((resolve) => {
       res.status(200).json({
         message: 'success',
-        data: searchAutocomplete(req.query.input as string, 20),
+        data: searchAutocomplete(req.query.input as string, 20, searchBy),
       });
       resolve();
     });
   } else if (
     ('prefix' in req.query && typeof req.query.prefix === 'string') ||
     ('number' in req.query && typeof req.query.number === 'string') ||
-    ('professorName' in req.query &&
-      typeof req.query.professorName === 'string') ||
+    ('profFirst' in req.query &&
+      typeof req.query.profFirst === 'string' &&
+      'profLast' in req.query &&
+      typeof req.query.profLast === 'string') ||
     ('sectionNumber' in req.query &&
       typeof req.query.sectionNumber === 'string')
   ) {
@@ -279,8 +293,10 @@ export default function handler(
     const numberDefined =
       'number' in req.query && typeof req.query.number === 'string';
     const professorNameDefined =
-      'professorName' in req.query &&
-      typeof req.query.professorName === 'string';
+      'profFirst' in req.query &&
+      typeof req.query.profFirst === 'string' &&
+      'profLast' in req.query &&
+      typeof req.query.profLast === 'string';
     const sectionNumberDefined =
       'sectionNumber' in req.query &&
       typeof req.query.sectionNumber === 'string';
@@ -294,7 +310,8 @@ export default function handler(
       query.number = req.query.number as string;
     }
     if (professorNameDefined) {
-      query.professorName = req.query.professorName as string;
+      query.profFirst = req.query.profFirst as string;
+      query.profLast = req.query.profLast as string;
     }
     if (sectionNumberDefined) {
       query.sectionNumber = req.query.sectionNumber as string;

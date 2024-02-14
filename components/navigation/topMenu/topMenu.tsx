@@ -8,10 +8,10 @@ import {
   Snackbar,
   Tooltip,
 } from '@mui/material';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
-
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 //import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import { SplashPageSearchBar } from '../../common/SplashPageSearchBar/splashPageSearchBar';
@@ -59,10 +59,16 @@ export function TopMenu() {
     <>
       <div className="bg-primary h-16 text-light relative py-2 px-4">
         <div className="h-full flex min-w-fit justify-between">
-          <Link href="/" className="m-2">
+          <Link href="/" className="m-1">
             <div className="h-full flex align-middle place-items-center justify-center">
-              <div className="h-full float-left mr-2 w-7">
-                <LogoIcon />
+              <div className="h-full float-left mr-2 w-14">
+                <Image
+                  src="/icon-white.svg"
+                  alt="Nebula Labs logo"
+                  width={100}
+                  height={76}
+                  className="h-full w-full"
+                />
               </div>
               <h1 className="float-right text-xl text-light-always">
                 UTD Trends

@@ -16,23 +16,7 @@ import { VerticalBarGraph } from '../VerticalBarGraph/VerticalBarGraph';
 export function BarGraph(props: GraphProps) {
   const smallScreen = useMediaQuery('(min-width:600px)');
   if (smallScreen) {
-    return (
-      <VerticalBarGraph
-        xaxisLabels={props.xaxisLabels}
-        yaxisFormatter={props.yaxisFormatter}
-        series={props.series}
-        title={props.title}
-        includedColors={props.includedColors}
-      />
-    );
+    return <VerticalBarGraph {...props} />;
   }
-  return (
-    <HorizontalBarGraph
-      xaxisLabels={props.xaxisLabels}
-      yaxisFormatter={props.yaxisFormatter}
-      series={props.series}
-      title={props.title}
-      includedColors={props.includedColors}
-    />
-  );
+  return <HorizontalBarGraph {...props} />;
 }

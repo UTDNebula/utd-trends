@@ -25,21 +25,34 @@ module.exports = {
     },
     extend: {
       colors: {
-        primary: {
-          light: 'rgb(var(--primary-light) / <alpha-value>)',
-          DEFAULT: 'rgb(var(--primary-DEFAULT) / <alpha-value>)',
-          dark: 'rgb(var(--primary-dark) / <alpha-value>)',
-          darker: 'rgb(var(--primary-darker) / <alpha-value>)',
+        haiti: '#090b2c', // brand black
+        persimmon: {
+          50: '#ffe5de',
+          100: '#ffcabd',
+          200: '#ffb09d',
+          300: '#ff947e',
+          400: '#ff7760',
+          500: '#ff5743', // brand accent, danger
+          600: '#d14a39',
+          700: '#a43d2e',
+          800: '#793025',
+          900: '#51231b',
         },
-        light: {
-          DEFAULT: 'rgb(var(--light-DEFAULT) / <alpha-value>)',
-          always: 'rgb(var(--light-always) / <alpha-value>)',
+        royal: '#573dff', // brand secondary (dark)
+        cornflower: {
+          50: '#eae4ff',
+          100: '#d3caff', // ~periwinkle
+          200: '#bcb0fe',
+          300: '#a297fd',
+          400: '#857efc',
+          500: '#6266fa', // brand primary
+          600: '#5455cc',
+          700: '#45449f', // ~royal
+          800: '#363475',
+          900: '#28254d',
         },
-        dark: {
-          DEFAULT: 'rgb(var(--dark-DEFAULT) / <alpha-value>)',
-          always: 'rgb(var(--dark-always) / <alpha-value>)',
-        },
-        surface: 'rgb(var(--surface) / <alpha-value>)',
+        periwinkle: '#c2c8ff', // brand secondary (light)
+        shade: '#101828', // drop shadow color from shipfaster ui
       },
       fontSize: {
         headline1: [
@@ -135,9 +148,10 @@ module.exports = {
       gridTemplateColumns: {
         onboardingHonors: '40px minmax(0, 1fr)',
       },
-    },
-    fontFamily: {
-      sans: ['Roboto', 'ui-sans-serif', 'system-ui'],
+      fontFamily: {
+        kallisto: ['var(--font-kallisto)', 'Roboto', 'sans-serif'],
+        inter: ['var(--font-inter)', 'Roboto', 'sans-serif'],
+      },
     },
   },
   plugins: [],

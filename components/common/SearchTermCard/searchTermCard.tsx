@@ -8,6 +8,7 @@ import React from 'react';
 type SearchTermCardProps = {
   primaryText: string;
   secondaryText: string;
+  includeTooltip: boolean;
   index: number;
   onCloseButtonClicked: (index: number) => void;
   onToggleButtonClicked: (index: number) => void;
