@@ -1,9 +1,21 @@
 import { Share } from '@mui/icons-material';
-import { IconButton, Snackbar, Tooltip } from '@mui/material';
+import {
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  Snackbar,
+  Tooltip,
+} from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
+//import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
+import { SplashPageSearchBar } from '../../common/SplashPageSearchBar/splashPageSearchBar';
+import { LogoIcon } from '../../icons/LogoIcon/logoIcon';
 
 /**
  * This is a component to hold UTD Trends branding and basic navigation
@@ -11,6 +23,7 @@ import React, { useState } from 'react';
  */
 export function TopMenu() {
   const router = useRouter();
+  const sortOptions = ['Professor Name', 'Course Number'];
   const [openCopied, setOpenCopied] = useState<boolean>(false);
 
   function shareLink(url: string) {
@@ -38,6 +51,9 @@ export function TopMenu() {
   function alertLink(url: string) {
     alert(url);
   }
+  function searchOptionChosen(chosenOption: SearchQuery | null) {
+    console.log('The option chosen was: ', chosenOption);
+  }
 
   return (
     <>
@@ -59,6 +75,31 @@ export function TopMenu() {
               </h1>
             </div>
           </Link>
+          <div className="w-1/2 h-1/4 align-middle mt-4 pb-12">
+            <SplashPageSearchBar
+              selectSearchValue={searchOptionChosen}
+              disabled={false}
+            />
+          </div>
+          <div className="flex justify-center gap-2">
+            <FormControl variant="standard">
+              <InputLabel id="sortLabel">Sort By</InputLabel>
+              <Select
+                labelId="sortLabel"
+                defaultValue={0}
+                //onChange=
+              >
+                <MenuItem key="Sort By" value="0">
+                  Sort By
+                </MenuItem>
+                {sortOptions.map((s: string) => (
+                  <MenuItem key={s} value={sortOptions.indexOf(s) + 1}>
+                    {s}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
           <Tooltip title="Share link with search queries">
             <IconButton
               className="w-12"
