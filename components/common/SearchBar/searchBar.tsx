@@ -74,6 +74,10 @@ export const SearchBar = (props: SearchProps) => {
     }
   }, [open, inputValue]);
 
+  useEffect(() => {
+    fetch('/api/autocomplete');
+  }, []);
+
   return (
     <>
       <div className="text-primary w-full max-w-2xl h-fit flex flex-row items-start">
