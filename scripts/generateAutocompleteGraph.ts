@@ -23,6 +23,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       allowSelfLoops: false,
     });
     let numNodes = 0; //allows a unique name for each node
+    let numEdges = 0;
     const root = graph.addNode(numNodes++, {
       c: '',
       visited: false,
@@ -58,14 +59,14 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
           newData.d = data;
         }
         const newNode = graph.addNode(numNodes++, newData);
-        graph.addEdge(node, newNode);
+        graph.addEdgeWithKey(numEdges++, node, newNode);
         return newNode;
       }
       const newNode = graph.addNode(numNodes++, {
         c: characters[0],
         visited: false,
       });
-      graph.addEdge(node, newNode);
+      graph.addEdgeWithKey(numEdges++, node, newNode);
       return addSearchQueryCharacter(newNode, characters.slice(1), data);
     }
 
@@ -83,7 +84,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       while (nodes.length) {
         const nextParent = nodes.pop();
         if (!graph.hasEdge(nextParent, nodeFirstChar)) {
-          graph.addEdge(nextParent, nodeFirstChar);
+          graph.addEdgeWithKey(numEdges++, nextParent, nodeFirstChar);
         }
       }
       if (characters.length > 1) {
@@ -311,7 +312,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
             graph.forEachOutNeighbor(singleChild, (grandchild: string) => {
               graph.dropEdge(singleChild, grandchild);
               if (!graph.hasEdge(parent, grandchild) && parent !== grandchild) {
-                graph.addEdge(parent, grandchild);
+                graph.addEdgeWithKey(numEdges++, parent, grandchild);
               }
             });
             graph.dropNode(singleChild);
