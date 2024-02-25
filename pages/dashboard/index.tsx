@@ -19,6 +19,7 @@ import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGr
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 import { RelatedClasses } from '../../components/common/RelatedClasses/relatedClasses';
 import { BarGraph } from '../../components/graph/BarGraph/BarGraph';
+import { ClassCard } from '../../components/common/ClassCard/ClassCard';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import SearchQuery, { Professor } from '../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
@@ -423,7 +424,7 @@ export const Dashboard: NextPage = () => {
       <>
         <div className="h-full m-4">
           <Card className="h-96 p-4 m-4">
-            <BarGraph
+            {/*<BarGraph
               title="Grades"
               xaxisLabels={[
                 'A+',
@@ -444,7 +445,31 @@ export const Dashboard: NextPage = () => {
               yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
               series={gradesData.filter((dat, index) => included[index])}
               includedColors={included}
-            />
+          />*/}
+            <ClassCard
+              graphProps={{
+                title: 'Grades',
+                xaxisLabels: [
+                  'A+',
+                  'A',
+                  'A-',
+                  'B+',
+                  'B',
+                  'B-',
+                  'C+',
+                  'C',
+                  'C-',
+                  'D+',
+                  'D',
+                  'D-',
+                  'F',
+                  'W',
+                ],
+                yaxisFormatter: (value) => Number(value).toFixed(0) + '%',
+                series: gradesData.filter((dat, index) => included[index]),
+                includedColors: included,
+              }}
+            ></ClassCard>
           </Card>
           <div className="flex justify-center gap-2">
             <FormControl
