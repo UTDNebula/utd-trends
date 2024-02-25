@@ -1,8 +1,9 @@
 import { Card } from '@mui/material';
 import React from 'react';
 
+import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import { BarGraph } from '../../graph/BarGraph/BarGraph';
-import SearchQuery from '../../modules/SearchQuery/SearchQuery';
 
 type ClassCardProps = {
   searchQuery: SearchQuery;
@@ -12,7 +13,7 @@ type ClassCardProps = {
 export const ClassCard = (props: ClassCardProps) => {
   return (
     <Card className="p-4 m-4">
-      <div>hi</div>
+      <div>{searchQueryLabel(props.searchQuery)}</div>
       <div className="h-80">
         <BarGraph {...props.graphProps} />
       </div>
