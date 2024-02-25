@@ -1,6 +1,7 @@
 import { Card } from '@mui/material';
 import React from 'react';
 
+import GraphProps from '../../../modules/GraphProps/GraphProps';
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import { BarGraph } from '../../graph/BarGraph/BarGraph';
