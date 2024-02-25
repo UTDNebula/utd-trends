@@ -15,11 +15,11 @@ import Head from 'next/head';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import Carousel from '../../components/common/Carousel/carousel';
+import { ClassCard } from '../../components/common/ClassCard/ClassCard';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 import { RelatedClasses } from '../../components/common/RelatedClasses/relatedClasses';
 import { BarGraph } from '../../components/graph/BarGraph/BarGraph';
-import { ClassCard } from '../../components/common/ClassCard/ClassCard';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import SearchQuery, { Professor } from '../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
@@ -423,10 +423,16 @@ export const Dashboard: NextPage = () => {
     gradesPage = (
       <>
         <div className="h-full m-4">
-          <Card className="h-96 p-4 m-4">
-            {/*<BarGraph
-              title="Grades"
-              xaxisLabels={[
+          <ClassCard
+            searchQuery={{
+              prefix: 'CS',
+              number: '1200',
+              profFirst: 'John',
+              profLast: 'Cole',
+            }}
+            graphProps={{
+              title: 'Grades',
+              xaxisLabels: [
                 'A+',
                 'A',
                 'A-',
@@ -441,36 +447,12 @@ export const Dashboard: NextPage = () => {
                 'D-',
                 'F',
                 'W',
-              ]}
-              yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
-              series={gradesData.filter((dat, index) => included[index])}
-              includedColors={included}
-          />*/}
-            <ClassCard
-              graphProps={{
-                title: 'Grades',
-                xaxisLabels: [
-                  'A+',
-                  'A',
-                  'A-',
-                  'B+',
-                  'B',
-                  'B-',
-                  'C+',
-                  'C',
-                  'C-',
-                  'D+',
-                  'D',
-                  'D-',
-                  'F',
-                  'W',
-                ],
-                yaxisFormatter: (value) => Number(value).toFixed(0) + '%',
-                series: gradesData.filter((dat, index) => included[index]),
-                includedColors: included,
-              }}
-            ></ClassCard>
-          </Card>
+              ],
+              yaxisFormatter: (value) => Number(value).toFixed(0) + '%',
+              series: gradesData.filter((dat, index) => included[index]),
+              includedColors: included,
+            }}
+          ></ClassCard>
           <div className="flex justify-center gap-2">
             <FormControl
               error={startingSession > endingSession}
