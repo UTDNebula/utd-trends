@@ -367,11 +367,10 @@ export const Dashboard: NextPage = () => {
       console.log(parseURIEncodedSearchTerms(router.query.searchTerms));
       searchTermsChange(parseURIEncodedSearchTerms(router.query.searchTerms));
       setIncluded(
-          Array(URIEncodedSearchTermsLength(router.query.searchTerms)).fill(true),
+        Array(URIEncodedSearchTermsLength(router.query.searchTerms)).fill(true),
       );
     }
   }, [router.isReady, router.query.searchTerms]);
-
   useEffect(() => {
     //Filter out to matching academic session range
     const partialGradesData: gradesType[] = fullGradesData.map((datPoint) => {
