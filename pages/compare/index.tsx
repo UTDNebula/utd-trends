@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { BarGraph } from '../../components/graph/BarGraph/BarGraph';
@@ -20,7 +21,7 @@ import SearchQuery, { Professor } from '../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
 
-export const Compare: NextPage = () => {
+export const Dashboard: NextPage = () => {
   /* Helper functions */
 
   //Increment these to reset cache on next deployment
@@ -94,6 +95,7 @@ export const Compare: NextPage = () => {
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const darkModeElevation = prefersDarkMode ? 3 : 1;
+  const router = useRouter();
 
   /* Grades data */
 
@@ -116,6 +118,7 @@ export const Compare: NextPage = () => {
   const [gradesData, setGradesData] = useState<gradesType[]>([]);
   const [averageData, setAverageData] = useState([-1, -1, -1]);
   const [studentTotals, setStudentTotals] = useState([-1, -1, -1]);
+  const [searchTerms, setSearchTerms] = useState<SearchQuery[]>([]);
 
   const [included, setIncluded] = useState<boolean[]>([]);
 
@@ -147,8 +150,103 @@ export const Compare: NextPage = () => {
     );
   }
 
-  const searchTermsChange = useCallback((searchTerms: SearchQuery[]) => {
+  function URIEncodedSearchTermsLength(
+    encodedSearchTerms: string | string[] | undefined,
+  ): number {
+    if (typeof encodedSearchTerms === 'undefined') {
+      return 0;
+    } else if (typeof encodedSearchTerms === 'string') {
+      return encodedSearchTerms.split(',').length;
+    } else {
+      return encodedSearchTerms.length;
+    }
+  }
+
+  function parseURIEncodedSearchTerms(
+    encodedSearchTerms: string | string[] | undefined,
+  ): SearchQuery[] {
+    if (typeof encodedSearchTerms === 'undefined') {
+      return [];
+    } else if (typeof encodedSearchTerms === 'string') {
+      return encodedSearchTerms
+        .split(',')
+        .map((term) => parseURIEncodedSearchTerm(term));
+    } else {
+      return encodedSearchTerms.map((term) => parseURIEncodedSearchTerm(term));
+    }
+  }
+
+  function parseURIEncodedSearchTerm(encodedSearchTerm: string): SearchQuery {
+    const encodedSearchTermParts = encodedSearchTerm.split(' ');
+    // Does it start with prefix
+    if (/^([A-Z]{2,4})$/.test(encodedSearchTermParts[0])) {
+      // If it is just the prefix, return that
+      if (encodedSearchTermParts.length == 1) {
+        return { prefix: encodedSearchTermParts[0] };
+      }
+      // Is the second part a course number only
+      if (/^([0-9A-Z]{4})$/.test(encodedSearchTermParts[1])) {
+        if (encodedSearchTermParts.length == 2) {
+          return {
+            prefix: encodedSearchTermParts[0],
+            number: encodedSearchTermParts[1],
+          };
+        } else {
+          return {
+            prefix: encodedSearchTermParts[0],
+            number: encodedSearchTermParts[1],
+            profFirst: encodedSearchTermParts
+              .slice(2, encodedSearchTermParts.length - 1)
+              .join(' '),
+            profLast: encodedSearchTermParts[encodedSearchTermParts.length - 1],
+          };
+        }
+      }
+      // Is the second part a course number and section
+      else if (/^([0-9A-Z]{4}\.[0-9A-Z]{3})$/.test(encodedSearchTermParts[1])) {
+        const courseNumberAndSection: string[] =
+          encodedSearchTermParts[1].split('.');
+        if (encodedSearchTermParts.length == 2) {
+          return {
+            prefix: encodedSearchTermParts[0],
+            number: courseNumberAndSection[0],
+            sectionNumber: courseNumberAndSection[1],
+          };
+        } else {
+          return {
+            prefix: encodedSearchTermParts[0],
+            number: courseNumberAndSection[0],
+            sectionNumber: courseNumberAndSection[1],
+            profFirst: encodedSearchTermParts
+              .slice(2, encodedSearchTermParts.length - 1)
+              .join(' '),
+            profLast: encodedSearchTermParts[encodedSearchTermParts.length - 1],
+          };
+        }
+      }
+      // the second part is the start of the name
+      else {
+        return {
+          prefix: encodedSearchTermParts[0],
+          profFirst: encodedSearchTermParts
+            .slice(1, encodedSearchTermParts.length - 1)
+            .join(' '),
+          profLast: encodedSearchTermParts[encodedSearchTermParts.length - 1],
+        };
+      }
+    } else {
+      return {
+        profFirst: encodedSearchTermParts
+          .slice(0, encodedSearchTermParts.length - 1)
+          .join(' '),
+        profLast: encodedSearchTermParts[encodedSearchTermParts.length - 1],
+      };
+    }
+  }
+
+  function searchTermsChange(searchTerms: SearchQuery[]) {
     //define professors
+    console.log(searchTerms);
     setProfessorInvolvingSearchTerms(
       searchTerms
         .filter(
@@ -262,7 +360,17 @@ export const Compare: NextPage = () => {
         setGradesState('error');
         console.error('Nebula API', error);
       });
-  }, []);
+  }
+
+  useEffect(() => {
+    if (router.isReady) {
+      console.log(router.query.searchTerms);
+      console.log(parseURIEncodedSearchTerms(router.query.searchTerms));
+      setSearchTerms(parseURIEncodedSearchTerms(router.query.searchTerms));
+      console.log(searchTerms);
+      searchTermsChange(searchTerms);
+    }
+  }, [router.isReady, router.query.searchTerms]);
 
   useEffect(() => {
     //Filter out to matching academic session range
@@ -465,4 +573,4 @@ export const Compare: NextPage = () => {
   );
 };
 
-export default Compare;
+export default Dashboard;
