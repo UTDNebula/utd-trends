@@ -118,7 +118,6 @@ export const Dashboard: NextPage = () => {
   const [gradesData, setGradesData] = useState<gradesType[]>([]);
   const [averageData, setAverageData] = useState([-1, -1, -1]);
   const [studentTotals, setStudentTotals] = useState([-1, -1, -1]);
-  const [searchTerms, setSearchTerms] = useState<SearchQuery[]>([]);
 
   const [included, setIncluded] = useState<boolean[]>([]);
 
@@ -366,9 +365,7 @@ export const Dashboard: NextPage = () => {
     if (router.isReady) {
       console.log(router.query.searchTerms);
       console.log(parseURIEncodedSearchTerms(router.query.searchTerms));
-      setSearchTerms(parseURIEncodedSearchTerms(router.query.searchTerms));
-      console.log(searchTerms);
-      searchTermsChange(searchTerms);
+      searchTermsChange(parseURIEncodedSearchTerms(router.query.searchTerms));
     }
   }, [router.isReady, router.query.searchTerms]);
 
