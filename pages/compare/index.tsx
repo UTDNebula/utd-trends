@@ -366,6 +366,9 @@ export const Dashboard: NextPage = () => {
       console.log(router.query.searchTerms);
       console.log(parseURIEncodedSearchTerms(router.query.searchTerms));
       searchTermsChange(parseURIEncodedSearchTerms(router.query.searchTerms));
+      setIncluded(
+          Array(URIEncodedSearchTermsLength(router.query.searchTerms)).fill(true),
+      );
     }
   }, [router.isReady, router.query.searchTerms]);
 
