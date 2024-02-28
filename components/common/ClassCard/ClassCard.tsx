@@ -162,20 +162,20 @@ export const ClassCard = (props: ClassCardProps) => {
             GPA: <b>{gpa}</b>
           </p>
         </div>
-        <Box className="bg-gray-800 p-4 ml-5 mr-1">
+        <Box className="bg-gray-200 dark:bg-gray-800 p-4">
           <div className="text-left inline-block m-0 w-1/3 pl-5">
-            <h1>Overall</h1>
-            <h1 className="text-2xl">4.5</h1>
+            <p>Overall</p>
+            <p className="text-2xl">4.5</p>
           </div>
 
           <div className="text-Sleft inline-block m-0  w-1/3 pl-5">
-            <h1>Grading</h1>
-            <h1 className="text-2xl">4.5</h1>
+            <p>Grading</p>
+            <p className="text-2xl">4.5</p>
           </div>
 
           <div className="text-left inline-block m-0  w-1/3 pl-5">
-            <h1>Most frequent grade</h1>
-            <h1 className="text-2xl">4.5</h1>
+            <p>Most frequent grade</p>
+            <p className="text-2xl">4.5</p>
           </div>
         </Box>
       </div>
