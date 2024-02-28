@@ -143,6 +143,7 @@ export const ClassCard = (props: ClassCardProps) => {
             yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
             series={[
               {
+                name: label,
                 data: series,
               },
             ]}
