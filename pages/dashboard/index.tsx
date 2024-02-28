@@ -399,6 +399,7 @@ export const Dashboard: NextPage = () => {
   }, [fullGradesData, startingSession, endingSession]);
 
   let gradesPage;
+  const [semesters, setSemesters] = useState<string[]>([]);
 
   if (gradesState === 'loading') {
     gradesPage = (
@@ -430,29 +431,12 @@ export const Dashboard: NextPage = () => {
               profFirst: 'John',
               profLast: 'Cole',
             }}
-            graphProps={{
-              title: 'Grades',
-              xaxisLabels: [
-                'A+',
-                'A',
-                'A-',
-                'B+',
-                'B',
-                'B-',
-                'C+',
-                'C',
-                'C-',
-                'D+',
-                'D',
-                'D-',
-                'F',
-                'W',
-              ],
-              yaxisFormatter: (value) => Number(value).toFixed(0) + '%',
-              series: gradesData.filter((dat, index) => included[index]),
-              includedColors: included,
-            }}
+            setSemesters={setSemesters}
+            semesters={undefined}
           ></ClassCard>
+          <Card className="p-4 m-4 flex flex-col gap-2">
+            <p>Semesters: {semesters}</p>
+          </Card>
           <div className="flex justify-center gap-2">
             <FormControl
               error={startingSession > endingSession}
