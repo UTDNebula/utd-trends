@@ -108,72 +108,77 @@ export const ClassCard = (props: ClassCardProps) => {
   }
 
   return (
-    <Card className="p-4 m-4 flex flex-col gap-2">
-      <div className="flex gap-2 items-start">
+    <Card className="m-4">
+      <button
+        className="w-full pt-4 px-4 pb-2 flex gap-2 items-start"
+        onClick={() => setOpen((old) => !old)}
+      >
         <div className="flex gap-2 flex-wrap">
           <p>{label}</p>
           <div>Add compare button here</div>
         </div>
-        <IconButton className="ml-auto" onClick={() => setOpen((old) => !old)}>
+        <IconButton className="ml-auto">
           <ExpandMoreIcon
             className={'transition-transform' + (open ? ' rotate-180' : '')}
           />
         </IconButton>
-      </div>
-      <Collapse in={open} className="w-full">
-        <div className="h-80 w-full">
-          <BarGraph
-            title="Grades"
-            xaxisLabels={[
-              'A+',
-              'A',
-              'A-',
-              'B+',
-              'B',
-              'B-',
-              'C+',
-              'C',
-              'C-',
-              'D+',
-              'D',
-              'D-',
-              'F',
-              'W',
-            ]}
-            yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
-            series={[
-              {
-                name: label,
-                data: series,
-              },
-            ]}
-          />
+      </button>
+      <div className="mx-4 mb-4">
+        <Collapse in={open} className="w-full">
+          <div className="h-80 w-full">
+            <BarGraph
+              title="Grades"
+              xaxisLabels={[
+                'A+',
+                'A',
+                'A-',
+                'B+',
+                'B',
+                'B-',
+                'C+',
+                'C',
+                'C-',
+                'D+',
+                'D',
+                'D-',
+                'F',
+                'W',
+              ]}
+              yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
+              series={[
+                {
+                  name: label,
+                  data: series,
+                },
+              ]}
+            />
+          </div>
+        </Collapse>
+        <div className="bg-gray-200 dark:bg-gray-800 rounded p-4 flex flex-wrap justify-around ">
+          <p>
+            Grades: <b>{total}</b>
+          </p>
+          <p>
+            GPA: <b>{gpa}</b>
+          </p>
         </div>
-      </Collapse>
-      <div className="bg-gray-200 dark:bg-gray-800 rounded p-4 flex flex-wrap justify-around ">
-        <p>
-          Grades: <b>{total}</b>
-        </p>
-        <p>
-          GPA: <b>{gpa}</b>
-        </p>
-      </div>
-      <Box className="bg-gray-800 p-4 ml-5 mr-1">
-        <div className="text-left inline-block m-0 w-1/3 pl-5">
-          <h1>Overall</h1>
-          <h1 className="text-2xl">4.5</h1>
-        </div>
+        <Box className="bg-gray-800 p-4 ml-5 mr-1">
+          <div className="text-left inline-block m-0 w-1/3 pl-5">
+            <h1>Overall</h1>
+            <h1 className="text-2xl">4.5</h1>
+          </div>
 
-        <div className="text-Sleft inline-block m-0  w-1/3 pl-5">
-          <h1>Grading</h1>
-          <h1 className="text-2xl">4.5</h1>
-        </div>
+          <div className="text-Sleft inline-block m-0  w-1/3 pl-5">
+            <h1>Grading</h1>
+            <h1 className="text-2xl">4.5</h1>
+          </div>
 
-        <div className="text-left inline-block m-0  w-1/3 pl-5">
-          <h1>Most frequent grade</h1>
-          <h1 className="text-2xl">4.5</h1>
-        </div>
-      </Box>
+          <div className="text-left inline-block m-0  w-1/3 pl-5">
+            <h1>Most frequent grade</h1>
+            <h1 className="text-2xl">4.5</h1>
+          </div>
+        </Box>
+      </div>
     </Card>
   );
 };
