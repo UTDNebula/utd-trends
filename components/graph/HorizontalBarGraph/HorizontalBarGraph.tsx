@@ -77,6 +77,9 @@ export function HorizontalBarGraph(props: GraphProps) {
     dataLabels: {
       enabled: false,
     },
+    legend: {
+      show: series.length !== 1,
+    },
     xaxis: {
       categories: props.xaxisLabels,
       labels: {

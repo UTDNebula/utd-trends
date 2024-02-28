@@ -68,10 +68,10 @@ export function VerticalBarGraph(props: GraphProps) {
       },
     },
     dataLabels: {
-      enabled: series.length !== 1,
+      enabled: false,
     },
     legend: {
-      show: false,
+      show: series.length !== 1,
     },
     xaxis: {
       categories: props.xaxisLabels,
