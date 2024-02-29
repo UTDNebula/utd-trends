@@ -42,7 +42,7 @@ export const ProfessorCard = (props: ProfessorCardProps) => {
       {/* Number of ratings */}
       <Box className="flex flex-col items-center justify-center mb-2">
         <Link
-          href={`https://www.ratemyprofessors.com/search/professors/?q=${encodeURIComponent(
+          href={`https://www.ratemyprofessors.com/search/professors/1273?q=${encodeURIComponent(
             props.name,
           )}`}
           target="_blank"
