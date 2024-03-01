@@ -136,11 +136,12 @@ export const ClassCard = (props: ClassCardProps) => {
           <p className="text-xl">{label}</p>
           <div>Add compare button here</div>
         </div>
-        <IconButton className="ml-auto self-start">
-          <ExpandMoreIcon
-            className={'transition-transform' + (open ? ' rotate-180' : '')}
-          />
-        </IconButton>
+        <ExpandMoreIcon
+          className={
+            'ml-auto self-start mr-2 transition-transform' +
+            (open ? ' rotate-180' : '')
+          }
+        />
       </button>
       <div className="mx-4 mb-4">
         {gradesState === 'error' && (

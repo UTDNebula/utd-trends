@@ -434,6 +434,16 @@ export const Dashboard: NextPage = () => {
             setSemesters={setSemesters}
             semesters={undefined}
           ></ClassCard>
+          <ClassCard
+            searchQuery={{
+              prefix: 'CS',
+              number: '1200',
+              profFirst: 'Ivor',
+              profLast: 'Page',
+            }}
+            setSemesters={setSemesters}
+            semesters={undefined}
+          ></ClassCard>
           <Card className="p-4 m-4 flex flex-col gap-2">
             <p>Semesters: {semesters}</p>
           </Card>
