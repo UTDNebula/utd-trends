@@ -1,5 +1,13 @@
+import AddIcon from '@mui/icons-material/Add';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Card, Collapse, IconButton, Skeleton } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  Collapse,
+  IconButton,
+  Skeleton,
+} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
 import fetchWithCache, {
@@ -129,7 +137,6 @@ export const ClassCard = (props: ClassCardProps) => {
       >
         <div className="flex gap-2 flex-wrap self-center">
           <p className="text-xl">{label}</p>
-          <div>Add compare button here</div>
         </div>
         <IconButton className="ml-auto self-start">
           <ExpandMoreIcon
@@ -137,6 +144,22 @@ export const ClassCard = (props: ClassCardProps) => {
           />
         </IconButton>
       </button>
+
+      <div className="grid grid-cols-3 justify-between md:grid-rows-1 md:grid-cols-3 gap-2 ">
+        <div className="col-start-1 grid content-center">
+          <h1 className="pl-4">professor name</h1>
+        </div>
+        <div className="col-start-3 pr-4 grid justify-end ">
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<AddIcon />}
+            className="text-white border-gray-800"
+          >
+            Select for compare
+          </Button>
+        </div>
+      </div>
       <div className="mx-4 mb-4">
         <Collapse
           in={open}
@@ -174,6 +197,13 @@ export const ClassCard = (props: ClassCardProps) => {
               />
             </div>
           )}
+
+          <h1>Course Sections</h1>
+          <div className="h-1/2">
+            <Box>
+              <h1>Course Sections boxes</h1>
+            </Box>
+          </div>
         </Collapse>
         <div className="mb-2 bg-gray-200 dark:bg-gray-800 rounded p-4 flex flex-wrap justify-around">
           <p>
