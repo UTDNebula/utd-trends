@@ -154,72 +154,74 @@ export const ClassCard = (props: ClassCardProps) => {
             Failed to load course evaluations
           </Alert>
         )}
-        <Collapse
-          in={open}
-          className={'w-full transition-all' + (open ? ' mb-2' : '')}
-        >
-          {gradesState !== 'done' ? (
-            <Skeleton
-              variant="rounded"
-              className="h-80 w-full"
-              animation={gradesState !== 'error' ? 'pulse' : false}
-            />
-          ) : (
-            <div className="h-80 w-full">
-              <BarGraph
-                title="Grades"
-                xaxisLabels={[
-                  'A+',
-                  'A',
-                  'A-',
-                  'B+',
-                  'B',
-                  'B-',
-                  'C+',
-                  'C',
-                  'C-',
-                  'D+',
-                  'D',
-                  'D-',
-                  'F',
-                  'W',
-                ]}
-                yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
-                series={[
-                  {
-                    name: label,
-                    data: series,
-                  },
-                ]}
-              />
-            </div>
-          )}
-        </Collapse>
-        <div className="mb-2 bg-gray-200 dark:bg-gray-800 rounded p-4 flex flex-wrap justify-around">
-          <p>
-            Grades:{' '}
+        <div className="mb-2 bg-gray-200 dark:bg-gray-800 rounded p-4">
+          <Collapse
+            in={open}
+            className={'w-full transition-all' + (open ? ' mb-2' : '')}
+          >
             {gradesState !== 'done' ? (
               <Skeleton
-                variant="text"
-                className="inline-block w-[5ch]"
+                variant="rounded"
+                className="h-80 w-full"
                 animation={gradesState !== 'error' ? 'pulse' : false}
               />
             ) : (
-              <b>{total}</b>
+              <div className="h-80 w-full">
+                <BarGraph
+                  title="Grade Distribution"
+                  xaxisLabels={[
+                    'A+',
+                    'A',
+                    'A-',
+                    'B+',
+                    'B',
+                    'B-',
+                    'C+',
+                    'C',
+                    'C-',
+                    'D+',
+                    'D',
+                    'D-',
+                    'F',
+                    'W',
+                  ]}
+                  yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
+                  series={[
+                    {
+                      name: label,
+                      data: series,
+                    },
+                  ]}
+                />
+              </div>
             )}
-          </p>
-          <p>
-            GPA:{' '}
-            {gradesState !== 'done' ? (
-              <Skeleton
-                variant="text"
-                className="inline-block w-[4ch]"
-                animation={gradesState !== 'error' ? 'pulse' : false}
-              />
-            ) : (
-              <b>{gpa}</b>
-            )}
-          </p>
+          </Collapse>
+          <div className="flex flex-wrap justify-around">
+            <p>
+              Grades:{' '}
+              {gradesState !== 'done' ? (
+                <Skeleton
+                  variant="text"
+                  className="inline-block w-[5ch]"
+                  animation={gradesState !== 'error' ? 'pulse' : false}
+                />
+              ) : (
+                <b>{total}</b>
+              )}
+            </p>
+            <p>
+              GPA:{' '}
+              {gradesState !== 'done' ? (
+                <Skeleton
+                  variant="text"
+                  className="inline-block w-[4ch]"
+                  animation={gradesState !== 'error' ? 'pulse' : false}
+                />
+              ) : (
+                <b>{gpa}</b>
+              )}
+            </p>
+          </div>
         </div>
         <div className="bg-gray-200 dark:bg-gray-800 rounded p-4 grid grid-rows-3 md:grid-rows-1 md:grid-cols-3 gap-2">
           <div className="flex gap-2 items-center md:block">
