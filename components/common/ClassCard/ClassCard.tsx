@@ -1,5 +1,7 @@
+import AddIcon from '@mui/icons-material/Add';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Button, Card, Collapse, IconButton, Skeleton } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
 import React, { useEffect, useState } from 'react';
 
 import fetchWithCache, {
@@ -129,7 +131,16 @@ export const ClassCard = (props: ClassCardProps) => {
       >
         <div className="flex gap-2 flex-wrap self-center">
           <p className="text-xl">{label}</p>
-          <Button variant="outlined">Outlined</Button>
+          <Button
+            variant="contained"
+            style={{
+              backgroundColor: 'rgb(38, 38, 35)',
+              color: 'white',
+            }}
+          >
+            <AddIcon />
+            Select for Compare
+          </Button>
         </div>
         <IconButton className="ml-auto self-start">
           <ExpandMoreIcon
