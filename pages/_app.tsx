@@ -2,6 +2,7 @@ import '../styles/globals.css';
 
 import GitHub from '@mui/icons-material/GitHub';
 import { Card, IconButton, Tooltip, useMediaQuery } from '@mui/material';
+import { grey } from '@mui/material/colors';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Analytics } from '@vercel/analytics/react';
 import type { AppProps } from 'next/app';
@@ -86,9 +87,16 @@ function MyApp({ Component, pageProps }: AppProps) {
       primary: {
         main: '#573dff',
       },
+      grey: {
+        main: grey[300],
+        dark: grey[400],
+      },
     },
     typography: {
       fontFamily: 'inherit',
+      button: {
+        textTransform: 'none',
+      },
     },
   });
 

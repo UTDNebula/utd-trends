@@ -2,6 +2,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Button, Card, Collapse, IconButton, Skeleton } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
+import { info } from 'console';
 import React, { useEffect, useState } from 'react';
 
 import fetchWithCache, {
@@ -34,7 +35,7 @@ export const ClassCard = (props: ClassCardProps) => {
     data: GradeData[];
   }
   [];
-  const [loadingGrades, setLoadingGrades] = useState(true);
+  const [gradesState, setGradesState] = useState('loading');
   //fetch grade data
   useEffect(() => {
     fetchWithCache(
@@ -57,22 +58,27 @@ export const ClassCard = (props: ClassCardProps) => {
           Accept: 'application/json',
         },
       },
-    ).then((data: GradeResponse) => {
-      if (data.message !== 'success') {
-        throw new Error(data.message);
-        return;
-      }
-      if (typeof props.setSemesters !== 'undefined') {
-        //add new values to semester list
-        props.setSemesters((old: string[]) =>
-          old
-            .concat(data.data.map((semester) => semester._id))
-            .filter((item, index, array) => array.indexOf(item) == index),
-        );
-      }
-      setGradeData(data.data);
-      setLoadingGrades(false);
-    });
+    )
+      .then((data: GradeResponse) => {
+        if (data.message !== 'success') {
+          throw new Error(data.message);
+          return;
+        }
+        if (typeof props.setSemesters !== 'undefined') {
+          //add new values to semester list
+          props.setSemesters((old: string[]) =>
+            old
+              .concat(data.data.map((semester) => semester._id))
+              .filter((item, index, array) => array.indexOf(item) == index),
+          );
+        }
+        setGradeData(data.data);
+        setGradesState('done');
+      })
+      .catch((error) => {
+        setGradesState('error');
+        console.error('Grade Data', error);
+      });
   }, []);
 
   //parse grade data
@@ -111,12 +117,12 @@ export const ClassCard = (props: ClassCardProps) => {
 
   //evaluation storage
   const [evalData, setEvalData] = useState<number[]>([]);
-  const [loadingEvals, setLoadingEvals] = useState(true);
+  const [evalsState, setEvalsState] = useState('loading');
   //fetch evaluation data
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setEvalData([1, 2, 3]);
-      setLoadingEvals(false);
+      setEvalsState('done');
     }, 2000);
     return () => clearTimeout(timeoutId);
   }, []);
@@ -131,84 +137,106 @@ export const ClassCard = (props: ClassCardProps) => {
       >
         <div className="flex gap-2 flex-wrap self-center">
           <p className="text-xl">{label}</p>
-          <Button
-            variant="contained"
-            style={{
-              backgroundColor: 'rgb(38, 38, 35)',
-              color: 'white',
-            }}
-          >
-            <AddIcon />
+          <Button variant="outlined" color="grey" startIcon={<AddIcon />}>
             Select for Compare
           </Button>
         </div>
-        <IconButton className="ml-auto self-start">
-          <ExpandMoreIcon
-            className={'transition-transform' + (open ? ' rotate-180' : '')}
-          />
-        </IconButton>
+        <ExpandMoreIcon
+          className={
+            'ml-auto self-start mr-2 transition-transform' +
+            (open ? ' rotate-180' : '')
+          }
+        />
       </button>
       <div className="mx-4 mb-4">
-        <Collapse
-          in={open}
-          className={'w-full transition-all' + (open ? ' mb-2' : '')}
-        >
-          {loadingGrades ? (
-            <Skeleton variant="rounded" className="h-80 w-full" />
-          ) : (
-            <div className="h-80 w-full">
-              <BarGraph
-                title="Grades"
-                xaxisLabels={[
-                  'A+',
-                  'A',
-                  'A-',
-                  'B+',
-                  'B',
-                  'B-',
-                  'C+',
-                  'C',
-                  'C-',
-                  'D+',
-                  'D',
-                  'D-',
-                  'F',
-                  'W',
-                ]}
-                yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
-                series={[
-                  {
-                    name: label,
-                    data: series,
-                  },
-                ]}
+        {gradesState === 'error' && (
+          <Alert severity="error" className="mb-2">
+            Failed to load grades
+          </Alert>
+        )}
+        {evalsState === 'error' && (
+          <Alert severity="error" className="mb-2">
+            Failed to load course evaluations
+          </Alert>
+        )}
+        <div className="mb-2 bg-gray-200 dark:bg-gray-800 rounded p-4">
+          <Collapse
+            in={open}
+            className={'w-full transition-all' + (open ? ' mb-2' : '')}
+          >
+            {gradesState !== 'done' ? (
+              <Skeleton
+                variant="rounded"
+                className="h-80 w-full"
+                animation={gradesState !== 'error' ? 'pulse' : false}
               />
-            </div>
-          )}
-        </Collapse>
-        <div className="mb-2 bg-gray-200 dark:bg-gray-800 rounded p-4 flex flex-wrap justify-around">
-          <p>
-            Grades:{' '}
-            {loadingGrades ? (
-              <Skeleton variant="text" className="inline-block w-[5ch]" />
             ) : (
-              <b>{total}</b>
+              <div className="h-80 w-full">
+                <BarGraph
+                  title="Grade Distribution"
+                  xaxisLabels={[
+                    'A+',
+                    'A',
+                    'A-',
+                    'B+',
+                    'B',
+                    'B-',
+                    'C+',
+                    'C',
+                    'C-',
+                    'D+',
+                    'D',
+                    'D-',
+                    'F',
+                    'W',
+                  ]}
+                  yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
+                  series={[
+                    {
+                      name: label,
+                      data: series,
+                    },
+                  ]}
+                />
+              </div>
             )}
-          </p>
-          <p>
-            GPA:{' '}
-            {loadingGrades ? (
-              <Skeleton variant="text" className="inline-block w-[4ch]" />
-            ) : (
-              <b>{gpa}</b>
-            )}
-          </p>
+          </Collapse>
+          <div className="flex flex-wrap justify-around">
+            <p>
+              Grades:{' '}
+              {gradesState !== 'done' ? (
+                <Skeleton
+                  variant="text"
+                  className="inline-block w-[5ch]"
+                  animation={gradesState !== 'error' ? 'pulse' : false}
+                />
+              ) : (
+                <b>{total}</b>
+              )}
+            </p>
+            <p>
+              GPA:{' '}
+              {gradesState !== 'done' ? (
+                <Skeleton
+                  variant="text"
+                  className="inline-block w-[4ch]"
+                  animation={gradesState !== 'error' ? 'pulse' : false}
+                />
+              ) : (
+                <b>{gpa}</b>
+              )}
+            </p>
+          </div>
         </div>
         <div className="bg-gray-200 dark:bg-gray-800 rounded p-4 grid grid-rows-3 md:grid-rows-1 md:grid-cols-3 gap-2">
           <div className="flex gap-2 items-center md:block">
             <p>Overall</p>
-            {loadingEvals ? (
-              <Skeleton variant="text" className="text-2xl w-[3ch]" />
+            {evalsState !== 'done' ? (
+              <Skeleton
+                variant="text"
+                className="text-2xl w-[3ch]"
+                animation={evalsState !== 'error' ? 'pulse' : false}
+              />
             ) : (
               <p className="text-2xl">{evalData[0]}</p>
             )}
@@ -216,8 +244,12 @@ export const ClassCard = (props: ClassCardProps) => {
 
           <div className="flex gap-2 items-center md:block">
             <p>Grading</p>
-            {loadingEvals ? (
-              <Skeleton variant="text" className="text-2xl w-[3ch]" />
+            {evalsState !== 'done' ? (
+              <Skeleton
+                variant="text"
+                className="text-2xl w-[3ch]"
+                animation={evalsState !== 'error' ? 'pulse' : false}
+              />
             ) : (
               <p className="text-2xl">{evalData[1]}</p>
             )}
@@ -225,8 +257,12 @@ export const ClassCard = (props: ClassCardProps) => {
 
           <div className="flex gap-2 items-center md:block">
             <p>Most frequent grade</p>
-            {loadingEvals ? (
-              <Skeleton variant="text" className="text-2xl w-[3ch]" />
+            {evalsState !== 'done' ? (
+              <Skeleton
+                variant="text"
+                className="text-2xl w-[3ch]"
+                animation={evalsState !== 'error' ? 'pulse' : false}
+              />
             ) : (
               <p className="text-2xl">{evalData[2]}</p>
             )}
