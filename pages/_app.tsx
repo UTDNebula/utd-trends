@@ -87,7 +87,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       primary: {
         main: '#573dff',
       },
-      grey: {
+      info: {
         main: grey[300],
         dark: grey[400],
       },

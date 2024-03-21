@@ -1,8 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Button, Card, Collapse, IconButton, Skeleton } from '@mui/material';
-import { createTheme } from '@mui/material/styles';
-import { info } from 'console';
+import { Alert, Button, Card, Collapse, Skeleton } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
 import fetchWithCache, {
@@ -137,7 +135,7 @@ export const ClassCard = (props: ClassCardProps) => {
       >
         <div className="flex gap-2 flex-wrap self-center">
           <p className="text-xl">{label}</p>
-          <Button variant="outlined" color="grey" startIcon={<AddIcon />}>
+          <Button variant="outlined" color="info" startIcon={<AddIcon />}>
             Select for Compare
           </Button>
         </div>
