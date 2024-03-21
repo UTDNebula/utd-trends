@@ -15,6 +15,7 @@ import Head from 'next/head';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import Carousel from '../../components/common/Carousel/carousel';
+import { ClassCard } from '../../components/common/ClassCard/ClassCard';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 import { RelatedClasses } from '../../components/common/RelatedClasses/relatedClasses';
@@ -398,6 +399,7 @@ export const Dashboard: NextPage = () => {
   }, [fullGradesData, startingSession, endingSession]);
 
   let gradesPage;
+  const [semesters, setSemesters] = useState<string[]>([]);
 
   if (gradesState === 'loading') {
     gradesPage = (
@@ -422,29 +424,28 @@ export const Dashboard: NextPage = () => {
     gradesPage = (
       <>
         <div className="h-full m-4">
-          <Card className="h-96 p-4 m-4">
-            <BarGraph
-              title="Grades"
-              xaxisLabels={[
-                'A+',
-                'A',
-                'A-',
-                'B+',
-                'B',
-                'B-',
-                'C+',
-                'C',
-                'C-',
-                'D+',
-                'D',
-                'D-',
-                'F',
-                'W',
-              ]}
-              yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
-              series={gradesData.filter((dat, index) => included[index])}
-              includedColors={included}
-            />
+          <ClassCard
+            searchQuery={{
+              prefix: 'CS',
+              number: '1200',
+              profFirst: 'John',
+              profLast: 'Cole',
+            }}
+            setSemesters={setSemesters}
+            semesters={undefined}
+          ></ClassCard>
+          <ClassCard
+            searchQuery={{
+              prefix: 'CS',
+              number: '1200',
+              profFirst: 'Ivor',
+              profLast: 'Page',
+            }}
+            setSemesters={setSemesters}
+            semesters={undefined}
+          ></ClassCard>
+          <Card className="p-4 m-4 flex flex-col gap-2">
+            <p>Semesters: {semesters}</p>
           </Card>
           <div className="flex justify-center gap-2">
             <FormControl
