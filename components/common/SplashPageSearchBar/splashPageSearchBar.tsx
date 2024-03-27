@@ -98,8 +98,10 @@ export const SplashPageSearchBar = (props: SearchProps) => {
         event.stopPropagation();
         addValue(options[0]);
       }
-    } else if (event.key === 'Enter') {
-      console.log('HELOOO');
+    } else if (event.key === 'Enter' && inputValue === '') {
+      event.preventDefault();
+      event.stopPropagation();
+      props.selectSearchValue(value);
     }
   }
 
@@ -120,8 +122,6 @@ export const SplashPageSearchBar = (props: SearchProps) => {
       options={options}
       filterOptions={(options) => options}
       value={value}
-      // When a new option is selected return it to the parent
-      // component using selectSearchValue prop
       onChange={(
         event: React.SyntheticEvent,
         newValue: (string | SearchQuery)[],
@@ -130,7 +130,6 @@ export const SplashPageSearchBar = (props: SearchProps) => {
           return;
         }
         setValue(newValue as SearchQuery[]);
-        props.selectSearchValue(newValue as SearchQuery[]);
         setOptions((old) =>
           old.filter(
             (item) => !searchQueryEqual(newValue[0] as SearchQuery, item),
