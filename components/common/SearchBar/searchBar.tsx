@@ -2,7 +2,7 @@ import { Autocomplete, TextField } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import { useRouter } from 'next/router';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
@@ -29,20 +29,33 @@ type SearchProps = {
  * Styled for the splash page
  */
 const SearchBar = (props: SearchProps) => {
+  //what you can choose from
   const [options, setOptions] = useState<SearchQuery[]>([]);
+  //initial loading prop for first load
   const [loading, setLoading] = useState(false);
 
-  const [inputValue, setInputValue] = useState('');
+  //text in search
+  const [inputValue, _setInputValue] = useState('');
+  //quick input updates for fetch (state is slow)
+  const quickInputValue = useRef('');
+  function setInputValue(newValue: string) {
+    quickInputValue.current = newValue;
+    _setInputValue(newValue);
+  }
+  //chosen values
   const [value, setValue] = useState<SearchQuery[]>([]);
+
+  //set value from query
   const router = useRouter();
   useEffect(() => {
     if (props.manageQuery) {
-      if (router.isReady) {
+      if (router.isReady && typeof router.query.searchTerms !== 'undefined') {
         setValue(router.query.searchTerms.split(',').map((el) => decodeSearchQueryLabel(el)));
       }
     }
   }, [router.isReady]);
-  
+
+  //update url with what's in value
   function updateQueries(newValue: SearchQuery[]) {
     if (props.manageQuery && typeof props.path === 'string' && router.isReady) {
       if (newValue.length > 0) {
@@ -60,6 +73,7 @@ const SearchBar = (props: SearchProps) => {
     }
   }
 
+  //fetch new options, add tags if valid
   function loadNewOptions(newInputValue: string) {
     setLoading(true);
     if (newInputValue.trim() === '') {
@@ -67,16 +81,15 @@ const SearchBar = (props: SearchProps) => {
       setLoading(false);
       return;
     }
+    //to allow selecting only one course
     const courseSelected =
       value.findIndex((el) => 'prefix' in el && 'number' in el) !== -1;
-    const controller = new AbortController();
     fetch(
       '/api/autocomplete?input=' +
         encodeURIComponent(newInputValue) +
         '&searchBy=' +
         (courseSelected ? 'professor' : 'both'),
       {
-        signal: controller.signal,
         method: 'GET',
       },
     )
@@ -85,20 +98,31 @@ const SearchBar = (props: SearchProps) => {
         if (data.message !== 'success') {
           throw new Error(data.message);
         }
+        //remove currently chosen values
         const filtered = data.data.filter(
           (item: SearchQuery) =>
             value.findIndex((el) => searchQueryEqual(el, item)) === -1,
         );
+        //add to chosen values if only one option and space
         if (
           filtered.length === 1 &&
-          newInputValue.charAt(newInputValue.length - 1) === ' '
+          (
+            //last char is a space
+            newInputValue.charAt(newInputValue.length - 1) === ' ' ||
+            //next char is a space
+            quickInputValue.current.slice(newInputValue.length)[0] === ' '
+          )
         ) {
           addValue(filtered[0]);
-          setOptions([]);
-        } else {
+          const rest = quickInputValue.current.slice(newInputValue.length).trimStart();
+          setInputValue(rest);
+          loadNewOptions(rest.trimEnd());
+          setLoading(false);
+        } else if (quickInputValue.current === newInputValue) {
+          //still valid options
           setOptions(filtered);
+          setLoading(false);
         }
-        setLoading(false);
       })
       .catch((error) => {
         if (error instanceof DOMException) {
@@ -109,21 +133,31 @@ const SearchBar = (props: SearchProps) => {
       });
   }
 
-  function addValue(newValue: SearchQuery) {
-    setValue((old) => {
-      const response = [...old, newValue];
-      if (typeof props.changeValue !== 'undefined') {
-        props.changeValue(response);
-      }
-      updateQueries(response);
-      return response;
-    });
-    setOptions((old) =>
-      old.filter((item) => !searchQueryEqual(newValue, item)),
-    );
-    setInputValue('');
+  //update parent and queries
+  function onValueChange(newValue: SearchQuery[]) {
+    if (typeof props.changeValue !== 'undefined') {
+      props.changeValue(newValue);
+    }
+    updateQueries(newValue);
   }
 
+  //add value
+  function addValue(newValue: SearchQuery) {
+    setValue((old) => {
+      const oldAndNew = [...old, newValue];
+      onValueChange(oldAndNew);
+      return oldAndNew;
+    });
+  }
+
+  //change all values
+  function updateValue(newValue: SearchQuery[]) {
+    setValue(newValue);
+    onValueChange(newValue);
+  }
+
+  //for handling spaces, when options are already loaded
+  //also returns results on enter
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === ' ') {
       if (
@@ -134,6 +168,10 @@ const SearchBar = (props: SearchProps) => {
         event.preventDefault();
         event.stopPropagation();
         addValue(options[0]);
+        setOptions((old) =>
+          old.filter((item) => !searchQueryEqual(options[0], item)),
+        );
+        setInputValue('');
       }
     } else if (event.key === 'Enter' && inputValue === '') {
       event.preventDefault();
@@ -149,6 +187,7 @@ const SearchBar = (props: SearchProps) => {
       multiple
       freeSolo
       loading={loading}
+      //highligh first option to add with enter
       autoHighlight={true}
       clearOnBlur={false}
       className={props.className}
@@ -159,25 +198,26 @@ const SearchBar = (props: SearchProps) => {
         return searchQueryLabel(option);
       }}
       options={options}
+      //don't filter options, done in fetch
       filterOptions={(options) => options}
       value={value}
       onChange={(
         event: React.SyntheticEvent,
         newValue: (string | SearchQuery)[],
       ) => {
+        //should never happen
         if (!newValue.every((el) => typeof el !== 'string')) {
           return;
         }
-        setValue(newValue as SearchQuery[]);
-        setOptions((old) =>
-          old.filter(
-            (item) => !searchQueryEqual(newValue[0] as SearchQuery, item),
-          ),
-        );
-        if (typeof props.changeValue !== 'undefined') {
-          props.changeValue(newValue as SearchQuery[]);
+        //remove from options
+        if (newValue.length > value.length) {
+          setOptions((old) =>
+            old.filter(
+              (item) => !searchQueryEqual(newValue[newValue.length - 1] as SearchQuery, item),
+            ),
+          );
         }
-        updateQueries(newValue as SearchQuery[]);
+        updateValue(newValue as SearchQuery[]);
       }}
       inputValue={inputValue}
       onInputChange={(event, newInputValue) => {
@@ -190,12 +230,7 @@ const SearchBar = (props: SearchProps) => {
           <TextField
             {...params}
             variant="outlined"
-            className={
-              '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti ' +
-              (typeof props.input_className !== 'undefined'
-                ? props.input_className
-                : '')
-            }
+            className={props.input_className}
             placeholder="ex. CS 1200"
           />
         );

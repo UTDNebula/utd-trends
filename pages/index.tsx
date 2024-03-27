@@ -59,6 +59,7 @@ const Home: NextPage = () => {
           <SearchBar
             selectSearchValue={searchOptionChosen}
             className="mb-3"
+            input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />
         </div>
       </div>
