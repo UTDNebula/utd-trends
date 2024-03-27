@@ -3,8 +3,9 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
-import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
+import SearchBar from '../components/common/SearchBar/searchBar';
 import SearchQuery from '../modules/SearchQuery/SearchQuery';
+import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
 
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
@@ -13,15 +14,12 @@ const Home: NextPage = () => {
   const router = useRouter();
   function searchOptionChosen(chosenOption: SearchQuery[]) {
     console.log('The option chosen was: ', chosenOption);
-    /*if (chosenOption !== null) {
-      router.push(
-        {
-          pathname: '/dashboard',
-          query: { searchTerms: searchQueryLabel(chosenOption) },
-        },
-        '/dashboard',
-      );
-    }*/
+    router.push(
+      {
+        pathname: '/dashboard',
+        query: { searchTerms: chosenOption.map((el) => searchQueryLabel(el)).join(',') },
+      }
+    );
   }
 
   useEffect(() => {
@@ -58,7 +56,7 @@ const Home: NextPage = () => {
             Explore and compare past grades, syllabi, professor ratings and
             reviews to find the perfect class.
           </p>
-          <SplashPageSearchBar
+          <SearchBar
             selectSearchValue={searchOptionChosen}
             className="mb-3"
           />
