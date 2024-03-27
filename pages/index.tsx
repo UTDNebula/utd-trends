@@ -11,7 +11,7 @@ import SearchQuery from '../modules/SearchQuery/SearchQuery';
  */
 const Home: NextPage = () => {
   const router = useRouter();
-  function searchOptionChosen(chosenOption: SearchQuery | null) {
+  function searchOptionChosen(chosenOption: SearchQuery[]) {
     console.log('The option chosen was: ', chosenOption);
     /*if (chosenOption !== null) {
       router.push(
