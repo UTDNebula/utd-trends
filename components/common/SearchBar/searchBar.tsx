@@ -2,12 +2,12 @@ import { Autocomplete, TextField } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import { useRouter } from 'next/router';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
+import decodeSearchQueryLabel from '../../../modules/decodeSearchQueryLabel/decodeSearchQueryLabel';
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import decodeSearchQueryLabel from '../../../modules/decodeSearchQueryLabel/decodeSearchQueryLabel';
 // import { searchAutocomplete } from '../../autocomplete';
 
 /**
@@ -50,11 +50,11 @@ const SearchBar = (props: SearchProps) => {
   useEffect(() => {
     if (props.manageQuery) {
       if (router.isReady && typeof router.query.searchTerms !== 'undefined') {
-        setValue(
-          router.query.searchTerms
-            .split(',')
-            .map((el) => decodeSearchQueryLabel(el)),
-        );
+        let array = router.query.searchTerms;
+        if (!Array.isArray(array)) {
+          array = array.split(',');
+        }
+        setValue(array.map((el) => decodeSearchQueryLabel(el)));
       }
     }
   }, [router.isReady]);

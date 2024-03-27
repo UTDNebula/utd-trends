@@ -57,7 +57,7 @@ const Home: NextPage = () => {
             reviews to find the perfect class.
           </p>
           <SearchBar
-            selectSearchValue={searchOptionChosen}
+            selectValue={searchOptionChosen}
             className="mb-3"
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />

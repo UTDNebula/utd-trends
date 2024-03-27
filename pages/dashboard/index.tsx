@@ -14,10 +14,10 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import SearchBar from '../../components/common/SearchBar/searchBar';
 import Carousel from '../../components/common/Carousel/carousel';
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 import { RelatedClasses } from '../../components/common/RelatedClasses/relatedClasses';
+import SearchBar from '../../components/common/SearchBar/searchBar';
 import { BarGraph } from '../../components/graph/BarGraph/BarGraph';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import SearchQuery, { Professor } from '../../modules/SearchQuery/SearchQuery';
@@ -675,6 +675,7 @@ export const Dashboard: NextPage = () => {
           manageQuery={true}
           path={'/dashboard'}
           changeValue={(val: SearchQuery[]) => console.log(val)}
+          input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         />
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">
