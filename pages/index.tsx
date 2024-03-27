@@ -1,12 +1,10 @@
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
 import SearchQuery from '../modules/SearchQuery/SearchQuery';
-import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
 
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
