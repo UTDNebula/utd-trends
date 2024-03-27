@@ -207,7 +207,12 @@ function validateSearch(searchQuery: SearchQuery, searchBy: string) {
   ) {
     return true;
   }
-  if ((searchBy === 'course' || searchBy === 'both') && !('profFirst' in searchQuery) && !('profLast' in searchQuery) && Object.keys(searchQuery).length !== 1) {
+  if (
+    (searchBy === 'course' || searchBy === 'both') &&
+    !('profFirst' in searchQuery) &&
+    !('profLast' in searchQuery) &&
+    Object.keys(searchQuery).length !== 1
+  ) {
     return true;
   }
   return false;
@@ -267,7 +272,9 @@ export default function handler(
     if (
       'searchBy' in req.query &&
       typeof req.query.searchBy === 'string' &&
-      (req.query.searchBy === 'professor' || req.query.searchBy === 'course' || req.query.searchBy === 'both')
+      (req.query.searchBy === 'professor' ||
+        req.query.searchBy === 'course' ||
+        req.query.searchBy === 'both')
     ) {
       searchBy = req.query.searchBy;
     }

@@ -37,7 +37,8 @@ export const SplashPageSearchBar = (props: SearchProps) => {
       setLoading(false);
       return;
     }
-    const courseSelected = value.findIndex((el) => 'prefix' in el && 'number' in el) !== -1;
+    const courseSelected =
+      value.findIndex((el) => 'prefix' in el && 'number' in el) !== -1;
     const controller = new AbortController();
     fetch(
       '/api/autocomplete?input=' +
@@ -54,8 +55,14 @@ export const SplashPageSearchBar = (props: SearchProps) => {
         if (data.message !== 'success') {
           throw new Error(data.message);
         }
-        const filtered = data.data.filter((item: SearchQuery) => value.findIndex((el) => searchQueryEqual(el, item)) === -1);
-        if (filtered.length === 1 && newInputValue.charAt(newInputValue.length - 1) === ' ') {
+        const filtered = data.data.filter(
+          (item: SearchQuery) =>
+            value.findIndex((el) => searchQueryEqual(el, item)) === -1,
+        );
+        if (
+          filtered.length === 1 &&
+          newInputValue.charAt(newInputValue.length - 1) === ' '
+        ) {
           addValue(filtered[0]);
           setOptions([]);
         } else {
@@ -74,13 +81,19 @@ export const SplashPageSearchBar = (props: SearchProps) => {
 
   function addValue(newValue: SearchQuery) {
     setValue((old) => [...old, newValue]);
-    setOptions((old) => old.filter(item => !searchQueryEqual(newValue, item)));
+    setOptions((old) =>
+      old.filter((item) => !searchQueryEqual(newValue, item)),
+    );
     setInputValue('');
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === ' ') {
-      if (event.target !== null && (event.target as HTMLInputElement).value.length > 0 && options.length === 1) {
+      if (
+        event.target !== null &&
+        (event.target as HTMLInputElement).value.length > 0 &&
+        options.length === 1
+      ) {
         event.preventDefault();
         event.stopPropagation();
         addValue(options[0]);
@@ -109,13 +122,20 @@ export const SplashPageSearchBar = (props: SearchProps) => {
       value={value}
       // When a new option is selected return it to the parent
       // component using selectSearchValue prop
-      onChange={(event: React.SyntheticEvent, newValue: (string | SearchQuery)[]) => {
+      onChange={(
+        event: React.SyntheticEvent,
+        newValue: (string | SearchQuery)[],
+      ) => {
         if (!newValue.every((el) => typeof el !== 'string')) {
           return;
         }
         setValue(newValue as SearchQuery[]);
         props.selectSearchValue(newValue as SearchQuery[]);
-        setOptions((old) => old.filter(item => !searchQueryEqual(newValue[0] as SearchQuery, item)));
+        setOptions((old) =>
+          old.filter(
+            (item) => !searchQueryEqual(newValue[0] as SearchQuery, item),
+          ),
+        );
       }}
       inputValue={inputValue}
       onInputChange={(event, newInputValue) => {
@@ -128,7 +148,12 @@ export const SplashPageSearchBar = (props: SearchProps) => {
           <TextField
             {...params}
             variant="outlined"
-            className={'[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti ' + (typeof props.input_className !== 'undefined' ? props.input_className : '')}
+            className={
+              '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti ' +
+              (typeof props.input_className !== 'undefined'
+                ? props.input_className
+                : '')
+            }
             placeholder="ex. CS 1200"
           />
         );
