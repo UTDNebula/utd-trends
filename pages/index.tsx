@@ -14,12 +14,12 @@ const Home: NextPage = () => {
   const router = useRouter();
   function searchOptionChosen(chosenOption: SearchQuery[]) {
     console.log('The option chosen was: ', chosenOption);
-    router.push(
-      {
-        pathname: '/dashboard',
-        query: { searchTerms: chosenOption.map((el) => searchQueryLabel(el)).join(',') },
-      }
-    );
+    router.push({
+      pathname: '/dashboard',
+      query: {
+        searchTerms: chosenOption.map((el) => searchQueryLabel(el)).join(','),
+      },
+    });
   }
 
   useEffect(() => {

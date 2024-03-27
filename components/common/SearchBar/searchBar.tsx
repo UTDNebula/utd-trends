@@ -50,7 +50,11 @@ const SearchBar = (props: SearchProps) => {
   useEffect(() => {
     if (props.manageQuery) {
       if (router.isReady && typeof router.query.searchTerms !== 'undefined') {
-        setValue(router.query.searchTerms.split(',').map((el) => decodeSearchQueryLabel(el)));
+        setValue(
+          router.query.searchTerms
+            .split(',')
+            .map((el) => decodeSearchQueryLabel(el)),
+        );
       }
     }
   }, [router.isReady]);
@@ -62,7 +66,9 @@ const SearchBar = (props: SearchProps) => {
         router.replace(
           {
             pathname: props.path,
-            query: { searchTerms: newValue.map((el) => searchQueryLabel(el)).join(',') },
+            query: {
+              searchTerms: newValue.map((el) => searchQueryLabel(el)).join(','),
+            },
           },
           undefined,
           { shallow: true },
@@ -106,15 +112,15 @@ const SearchBar = (props: SearchProps) => {
         //add to chosen values if only one option and space
         if (
           filtered.length === 1 &&
-          (
-            //last char is a space
-            newInputValue.charAt(newInputValue.length - 1) === ' ' ||
+          //last char is a space
+          (newInputValue.charAt(newInputValue.length - 1) === ' ' ||
             //next char is a space
-            quickInputValue.current.slice(newInputValue.length)[0] === ' '
-          )
+            quickInputValue.current.slice(newInputValue.length)[0] === ' ')
         ) {
           addValue(filtered[0]);
-          const rest = quickInputValue.current.slice(newInputValue.length).trimStart();
+          const rest = quickInputValue.current
+            .slice(newInputValue.length)
+            .trimStart();
           setInputValue(rest);
           loadNewOptions(rest.trimEnd());
           setLoading(false);
@@ -213,7 +219,11 @@ const SearchBar = (props: SearchProps) => {
         if (newValue.length > value.length) {
           setOptions((old) =>
             old.filter(
-              (item) => !searchQueryEqual(newValue[newValue.length - 1] as SearchQuery, item),
+              (item) =>
+                !searchQueryEqual(
+                  newValue[newValue.length - 1] as SearchQuery,
+                  item,
+                ),
             ),
           );
         }
