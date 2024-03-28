@@ -77,12 +77,8 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       characters: string,
       data?: SearchQuery,
     ) {
-      if (!nodes.length) {
-        return;
-      }
-
       const nodeFirstChar = addSearchQueryCharacter(
-        nodes.shift(),
+        nodes.shift() as string,
         characters[0],
         characters.length > 1 ? undefined : data,
       );
