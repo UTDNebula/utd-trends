@@ -35,7 +35,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       data?: SearchQuery,
     ): string {
       characters = characters.toUpperCase();
-      let preExisting = graph.findOutNeighbor(
+      const preExisting = graph.findOutNeighbor(
         node,
         (neighbor: string, attributes: NodeAttributes) =>
           attributes?.c === characters[0],
@@ -75,6 +75,27 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       characters: string,
       data?: SearchQuery,
     ) {
+      let firstNode = nodes[0];
+      let removeIndex = nodes.indexOf(root);
+      if (removeIndex !== -1) {
+        firstNode = root;
+      } else {
+        //look for prexisitng
+        for (let i = 0; i < nodes.length; i++) {
+          const preExisting = graph.findOutNeighbor(
+            nodes[i],
+            (neighbor: string, attributes: NodeAttributes) =>
+              attributes?.c === characters[0],
+          );
+          if (typeof preExisting === 'string') {
+            firstNode = preExisting;
+            removeIndex = i;
+            break;
+          }
+        }
+      }
+      nodes.splice(removeIndex, 1);
+
       const nodeFirstChar = addSearchQueryCharacter(
         nodes.pop() as string,
         characters[0],
