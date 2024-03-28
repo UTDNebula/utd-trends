@@ -81,6 +81,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       if (removeIndex !== -1) {
         firstNode = root;
       } else {
+        ///removeIndex = 0;
         //look for prexisitng
         for (let i = 0; i < nodes.length; i++) {
           const preExisting = graph.findOutNeighbor(
@@ -98,7 +99,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       nodes.splice(removeIndex, 1);
 
       const nodeFirstChar = addSearchQueryCharacter(
-        nodes.pop() as string,
+        firstNode,
         characters[0],
         characters.length > 1 ? undefined : data,
       );
@@ -162,9 +163,10 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       );
 
       if (sectionNumber === 'HON') {
-        //<prefix>(<number>| <number>).<section>( <professorLast>|(<professorFirst> <professorLast>))
-        const sectionNode = addSearchQueryCharacter(
-          classNode,
+        //<prefix>(<number>| <number>).<section>( <professorLast>|( <professorFirst> <professorLast>))
+        //<number>.<section>( <professorLast>|( <professorFirst> <professorLast>))
+        const sectionNode = addWithParents(
+          [classNode, classNode2],
           '.' + sectionNumber,
           {
             prefix: prefix,
@@ -172,7 +174,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
             sectionNumber: sectionNumber,
           },
         );
-        //<number>.<section> <prefix>( <professorLast>|(<professorFirst> <professorLast>))
+        //<number>.<section> <prefix>( <professorLast>|( <professorFirst> <professorLast>))
         const sectionAndPrefixNode = addSearchQueryCharacter(
           classNode2,
           '.' + sectionNumber + ' ' + prefix,
