@@ -21,6 +21,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
 
     const graph: DirectedGraph<NodeAttributes> = new DirectedGraph({
       allowSelfLoops: false,
+      type: 'directed',
     });
     let numNodes = 0; //allows a unique name for each node
     const root = graph.addNode(numNodes++, {
@@ -147,7 +148,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       //...[ <professorLast>|(<professorFirst> <professorLast>)]]
       const professorFirstNameNode = addWithParents(
         [classNode, prefixNode2, classNode2],
-        ' ' + profFirst + ' ',
+        ' ' + profFirst,
       );
       const professorLastNameNode = addWithParents(
         [classNode, prefixNode2, classNode2, professorFirstNameNode],
@@ -161,7 +162,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       );
 
       if (sectionNumber === 'HON') {
-        //<prefix>[<number>| <number>][.<section>][ <professorLast>|(<professorFirst> <professorLast>)]]
+        //<prefix>(<number>| <number>).<section>( <professorLast>|(<professorFirst> <professorLast>))
         const sectionNode = addSearchQueryCharacter(
           classNode,
           '.' + sectionNumber,
@@ -171,7 +172,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
             sectionNumber: sectionNumber,
           },
         );
-        //(<number>|<number> )[.<section>] <prefix>[ <professorLast>|(<professorFirst> <professorLast>)]]
+        //<number>.<section> <prefix>( <professorLast>|(<professorFirst> <professorLast>))
         const sectionAndPrefixNode = addSearchQueryCharacter(
           classNode2,
           '.' + sectionNumber + ' ' + prefix,
@@ -184,7 +185,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
         //same prof
         const professorFirstNameNode2 = addWithParents(
           [sectionNode, sectionAndPrefixNode],
-          ' ' + profFirst + ' ',
+          ' ' + profFirst,
         );
         const professorLastNameNode2 = addWithParents(
           [sectionNode, sectionAndPrefixNode, professorFirstNameNode2],
@@ -200,7 +201,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       }
     }
 
-    //Add nodes in format: (<professorLast>|<professorFirst> <professorLast>) ((<prefix> <number>|<prefix><number>)|(<number><prefix> |<number><prefix>))
+    //Add nodes in format: (<professorLast>|<professorFirst> <professorLast>) ((<prefix> <number>|<prefix><number>)|(<number> <prefix>|<number><prefix>))
     function addProfFirst(
       prefix: string,
       number: string,
