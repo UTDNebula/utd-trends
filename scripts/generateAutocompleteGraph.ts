@@ -194,18 +194,11 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       profFirst: string,
       profLast: string,
     ) {
-      const profFirstNode = addSearchQueryCharacter(
-        root,
-        profFirst + ' ',
-      );
-      const profLastNode = addWithParents(
-        [profFirstNode, root],
-        profLast,
-        {
-          profFirst: profFirst,
-          profLast: profLast,
-        },
-      );
+      const profFirstNode = addSearchQueryCharacter(root, profFirst + ' ');
+      const profLastNode = addWithParents([profFirstNode, root], profLast, {
+        profFirst: profFirst,
+        profLast: profLast,
+      });
 
       const prefixNode = addSearchQueryCharacter(profLastNode, ' ' + prefix);
       const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
