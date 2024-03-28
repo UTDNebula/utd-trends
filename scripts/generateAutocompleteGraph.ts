@@ -49,15 +49,15 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
         }
         return addSearchQueryCharacter(preExisting, characters.slice(1), data);
       }
-      if (characters.length <= 1) {
-        let newData: NodeAttributes = {
+      if (characters.length == 1) {
+        let attributes: NodeAttributes = {
           c: characters[0],
           visited: false,
         };
         if (typeof data !== 'undefined') {
-          newData.d = data;
+          attributes.d = data;
         }
-        const newNode = graph.addNode(numNodes++, newData);
+        const newNode = graph.addNode(numNodes++, attributes);
         graph.addEdge(node, newNode);
         return newNode;
       }
@@ -244,13 +244,24 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       });
 
       if (sectionNumber === 'HON') {
-        addWithParents([classNode, classNode2], '.' + sectionNumber, {
+        addSearchQueryCharacter(classNode, '.' + sectionNumber, {
           prefix: prefix,
           number: number,
           sectionNumber: sectionNumber,
           profFirst: profFirst,
           profLast: profLast,
         });
+        addSearchQueryCharacter(
+          classNode2,
+          '.' + sectionNumber + ' ' + prefix,
+          {
+            prefix: prefix,
+            number: number,
+            sectionNumber: sectionNumber,
+            profFirst: profFirst,
+            profLast: profLast,
+          },
+        );
       }
     }
 
