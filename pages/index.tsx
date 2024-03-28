@@ -53,8 +53,8 @@ const Home: NextPage = () => {
             UTD TRENDS
           </h1>
           <p className="mb-10 text-gray-700 dark:text-gray-300 leading-7">
-            Explore and compare past grades, syllabi, professor ratings and
-            reviews to find the perfect class.
+            Explore and compare past grades, professor ratings, and reviews to
+            find the perfect class.
           </p>
           <SearchBar
             selectValue={searchOptionChosen}
