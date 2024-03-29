@@ -110,7 +110,9 @@ const SearchBar = (props: SearchProps) => {
             value.findIndex((el) => searchQueryEqual(el, item)) === -1,
         );
         //add to chosen values if only one option and space
-        const noSections = filtered.filter((el) => !('sectionNumber' in el));
+        const noSections = filtered.filter(
+          (el: SearchQuery) => !('sectionNumber' in el),
+        );
         if (
           (filtered.length === 1 || noSections.length === 1) &&
           //last char is a space
@@ -167,7 +169,9 @@ const SearchBar = (props: SearchProps) => {
   //also returns results on enter
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === ' ') {
-      const noSections = options.filter((el) => !('sectionNumber' in el));
+      const noSections = options.filter(
+        (el: SearchQuery) => !('sectionNumber' in el),
+      );
       if (
         event.target !== null &&
         (event.target as HTMLInputElement).value.length > 0 &&
