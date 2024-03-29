@@ -165,28 +165,9 @@ const SearchBar = (props: SearchProps) => {
     onValueChange(newValue);
   }
 
-  //for handling spaces, when options are already loaded
-  //also returns results on enter
+  //returns results on enter
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    alert('"'+event.key+'"'+event.keyCode+'"'+event.which+'"');
-    if (event.key === ' ') {
-      const noSections = options.filter(
-        (el: SearchQuery) => !('sectionNumber' in el),
-      );
-      if (
-        event.target !== null &&
-        (event.target as HTMLInputElement).value.length > 0 &&
-        (options.length === 1 ||
-          //all but one is a section
-          noSections.length === 1)
-      ) {
-        event.preventDefault();
-        event.stopPropagation();
-        addValue(options.length === 1 ? options[0] : noSections[0]);
-        setOptions([]);
-        setInputValue('');
-      }
-    } else if (event.key === 'Enter' && inputValue === '') {
+    if (event.key === 'Enter' && inputValue === '') {
       event.preventDefault();
       event.stopPropagation();
       if (typeof props.selectValue !== 'undefined') {
@@ -251,6 +232,27 @@ const SearchBar = (props: SearchProps) => {
             placeholder="ex. CS 1200"
           />
         );
+      }}
+      //for handling spaces, when options are already loaded
+      onInput={(event) => {
+        const value = (event.target as HTMLInputElement).value;
+        if (value[value.length - 1] === ' ') {
+          const noSections = options.filter(
+            (el: SearchQuery) => !('sectionNumber' in el),
+          );
+          if (
+            value.length > 0 &&
+            (options.length === 1 ||
+              //all but one is a section
+              noSections.length === 1)
+          ) {
+            event.preventDefault();
+            event.stopPropagation();
+            addValue(options.length === 1 ? options[0] : noSections[0]);
+            setOptions([]);
+            (event.target as HTMLInputElement).value = '';
+          }
+        }
       }}
       renderOption={(props, option, { inputValue }) => {
         const text = searchQueryLabel(option);
