@@ -110,14 +110,15 @@ const SearchBar = (props: SearchProps) => {
             value.findIndex((el) => searchQueryEqual(el, item)) === -1,
         );
         //add to chosen values if only one option and space
+        const noSections = filtered.filter((el) => !('sectionNumber' in el));
         if (
-          filtered.length === 1 &&
+          (filtered.length === 1 || noSections.length === 1) &&
           //last char is a space
           (newInputValue.charAt(newInputValue.length - 1) === ' ' ||
             //next char is a space
             quickInputValue.current.slice(newInputValue.length)[0] === ' ')
         ) {
-          addValue(filtered[0]);
+          addValue(filtered.length === 1 ? filtered[0] : noSections[0]);
           const rest = quickInputValue.current
             .slice(newInputValue.length)
             .trimStart();
@@ -166,17 +167,18 @@ const SearchBar = (props: SearchProps) => {
   //also returns results on enter
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === ' ') {
+      const noSections = options.filter((el) => !('sectionNumber' in el));
       if (
         event.target !== null &&
         (event.target as HTMLInputElement).value.length > 0 &&
-        options.length === 1
+        (options.length === 1 ||
+          //all but one is a section
+          noSections.length === 1)
       ) {
         event.preventDefault();
         event.stopPropagation();
-        addValue(options[0]);
-        setOptions((old) =>
-          old.filter((item) => !searchQueryEqual(options[0], item)),
-        );
+        addValue(options.length === 1 ? options[0] : noSections[0]);
+        setOptions([]);
         setInputValue('');
       }
     } else if (event.key === 'Enter' && inputValue === '') {
