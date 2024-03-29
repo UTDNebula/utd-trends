@@ -168,7 +168,7 @@ const SearchBar = (props: SearchProps) => {
   //for handling spaces, when options are already loaded
   //also returns results on enter
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    alert('"'+event.key'"');
+    alert('"'+event.key+'"');
     if (event.key === ' ') {
       const noSections = options.filter(
         (el: SearchQuery) => !('sectionNumber' in el),
