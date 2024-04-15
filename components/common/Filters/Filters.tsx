@@ -1,17 +1,10 @@
 import { MenuItem, Select } from '@mui/material';
-import react from 'react';
-
-/* Props type used by the SearchBar component
- */
-type FilterProps = {};
+import React from 'react';
 
 /**
- * This component returns a custom search bar component that makes use of the Material UI autocomplete component
- * Sends a new search value to the parent component when the user selects it from the options list
- *
- * Styled for the ExpandableSearchGrid component
+ * This component returns a set of filters with which to sort results.
  */
-const Filters = (props: FilterProps) => {
+const Filters = () => {
   return (
     <div>
       <Select label="Age">

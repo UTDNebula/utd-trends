@@ -62,11 +62,7 @@ const Home: NextPage = () => {
             className="mb-3"
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />
-          <Filters
-            selectValue={searchOptionChosen}
-            className="mb-3"
-            input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
-          />
+          <Filters />
         </div>
       </div>
     </>
