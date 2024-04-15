@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
+import Filters from '../components/common/Filters/filters';
 import SearchBar from '../components/common/SearchBar/searchBar';
 import SearchQuery from '../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
@@ -57,6 +58,11 @@ const Home: NextPage = () => {
             find the perfect class.
           </p>
           <SearchBar
+            selectValue={searchOptionChosen}
+            className="mb-3"
+            input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+          />
+          <Filters
             selectValue={searchOptionChosen}
             className="mb-3"
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
