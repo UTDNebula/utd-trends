@@ -12,9 +12,11 @@ import {
 } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import Carousel from '../../components/common/Carousel/carousel';
+import Filters from '../../components/common/Filters/filters';
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 import { RelatedClasses } from '../../components/common/RelatedClasses/relatedClasses';
 import SearchBar from '../../components/common/SearchBar/searchBar';
@@ -654,6 +656,13 @@ export const Dashboard: NextPage = () => {
     );
   }
 
+  const router = useRouter();
+  useEffect(() => {
+    if (router.isReady) {
+      console.log(router.query);
+    }
+  }, [router.isReady, router.query]);
+
   /* Final page */
 
   return (
@@ -672,11 +681,11 @@ export const Dashboard: NextPage = () => {
       <div className=" w-full bg-light h-full">
         <TopMenu />
         <SearchBar
-          manageQuery={true}
+          manageQuery
           path={'/dashboard'}
-          changeValue={(val: SearchQuery[]) => console.log(val)}
           input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         />
+        <Filters manageQuery />
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">
             <Carousel>

@@ -13,14 +13,14 @@ import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel
 /**
  * Props type used by the SearchBar component
  */
-type SearchProps = {
+interface SearchProps {
   manageQuery?: boolean;
   path?: string;
   selectValue?: (value: SearchQuery[]) => void;
   changeValue?: (value: SearchQuery[]) => void;
   className?: string;
   input_className?: string;
-};
+}
 
 /**
  * This component returns a custom search bar component that makes use of the Material UI autocomplete component
@@ -62,20 +62,22 @@ const SearchBar = (props: SearchProps) => {
   //update url with what's in value
   function updateQueries(newValue: SearchQuery[]) {
     if (props.manageQuery && typeof props.path === 'string' && router.isReady) {
+      const newQuery = router.query;
       if (newValue.length > 0) {
-        router.replace(
-          {
-            pathname: props.path,
-            query: {
-              searchTerms: newValue.map((el) => searchQueryLabel(el)).join(','),
-            },
-          },
-          undefined,
-          { shallow: true },
-        );
+        newQuery.searchTerms = newValue
+          .map((el) => searchQueryLabel(el))
+          .join(',');
       } else {
-        router.replace(props.path, undefined, { shallow: true });
+        delete newQuery.searchTerms;
       }
+      router.replace(
+        {
+          pathname: props.path,
+          query: newQuery,
+        },
+        undefined,
+        { shallow: true },
+      );
     }
   }
 

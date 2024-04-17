@@ -1,9 +1,11 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import Filters from '../components/common/Filters/filters';
+import Filters, {
+  type FiltersType,
+} from '../components/common/Filters/filters';
 import SearchBar from '../components/common/SearchBar/searchBar';
 import SearchQuery from '../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
@@ -12,12 +14,15 @@ import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
 const Home: NextPage = () => {
+  const [filters, setFilters] = useState<FiltersType>({});
+
   const router = useRouter();
   function searchOptionChosen(chosenOption: SearchQuery[]) {
     console.log('The option chosen was: ', chosenOption);
     router.push({
       pathname: '/dashboard',
       query: {
+        ...filters,
         searchTerms: chosenOption.map((el) => searchQueryLabel(el)).join(','),
       },
     });
@@ -62,7 +67,7 @@ const Home: NextPage = () => {
             className="mb-3"
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />
-          <Filters />
+          <Filters changeValue={(value) => setFilters(value)} />
         </div>
       </div>
     </>
