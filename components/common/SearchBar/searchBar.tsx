@@ -87,14 +87,10 @@ const SearchBar = (props: SearchProps) => {
       setLoading(false);
       return;
     }
-    //to allow selecting only one course
-    const courseSelected =
-      value.findIndex((el) => 'prefix' in el && 'number' in el) !== -1;
     fetch(
       '/api/autocomplete?input=' +
         encodeURIComponent(newInputValue) +
-        '&searchBy=' +
-        (courseSelected ? 'professor' : 'both'),
+        '&searchBy=both',
       {
         method: 'GET',
       },
