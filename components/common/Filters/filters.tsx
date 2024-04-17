@@ -7,7 +7,7 @@ import React from 'react';
 const Filters = () => {
   return (
     <div className="flex gap-2">
-      <FormControl fullWidth>
+      <FormControl fullWidth size="small">
         <InputLabel id="demo-simple-select-label">Age</InputLabel>
         <Select label="Age" labelId="demo-simple-select-label">
           <MenuItem value={10}>Ten</MenuItem>
@@ -15,7 +15,7 @@ const Filters = () => {
           <MenuItem value={30}>Thirty</MenuItem>
         </Select>
       </FormControl>
-      <FormControl fullWidth>
+      <FormControl fullWidth size="small">
         <InputLabel id="demo-simple-select-label">Age</InputLabel>
         <Select label="Age" labelId="demo-simple-select-label">
           <MenuItem value={10}>Ten</MenuItem>
@@ -23,7 +23,7 @@ const Filters = () => {
           <MenuItem value={30}>Thirty</MenuItem>
         </Select>
       </FormControl>
-      <FormControl fullWidth>
+      <FormControl fullWidth size="small">
         <InputLabel id="demo-simple-select-label">Age</InputLabel>
         <Select label="Age" labelId="demo-simple-select-label">
           <MenuItem value={10}>Ten</MenuItem>
