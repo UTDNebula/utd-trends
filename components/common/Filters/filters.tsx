@@ -35,6 +35,15 @@ const Filters = () => {
       >
         <InputLabel id="minRating">Minimum Rating</InputLabel>
         <Select label="Minimum Rating" labelId="minRating">
+          {minRatings.map((Ratings) => {
+            const key = Ratings === '' ? 'None' : Ratings;
+            const text = Ratings === '' ? <em>None</em> : Ratings;
+            return (
+              <MenuItem key={key} value={Ratings}>
+                {text}
+              </MenuItem>
+            );
+          })}
           <MenuItem value={10}>Ten</MenuItem>
           <MenuItem value={20}>Twenty</MenuItem>
           <MenuItem value={30}>Thirty</MenuItem>
@@ -47,6 +56,15 @@ const Filters = () => {
       >
         <InputLabel id="maxDiff">Maximum Difficulty</InputLabel>
         <Select label="Maximum Difficulty" labelId="maxDiff">
+          {maxDiffs.map((Difficulty) => {
+            const key = Difficulty === '' ? 'None' : Difficulty;
+            const text = Difficulty === '' ? <em>None</em> : Difficulty;
+            return (
+              <MenuItem key={key} value={Difficulty}>
+                {text}
+              </MenuItem>
+            );
+          })}
           <MenuItem value={10}>Ten</MenuItem>
           <MenuItem value={20}>Twenty</MenuItem>
           <MenuItem value={30}>Thirty</MenuItem>
