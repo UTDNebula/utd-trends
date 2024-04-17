@@ -4,7 +4,9 @@ import React from 'react';
 /**
  * This component returns a set of filters with which to sort results.
  */
-
+const minGPAs = ['', 3.5, 3.0, 2.5, 2.0, 1.5, 1.0, 0.5];
+const minRatings = ['', 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5];
+const maxDiffs = ['', 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5];
 const Filters = () => {
   return (
     <div className="flex gap-2">
@@ -15,9 +17,15 @@ const Filters = () => {
       >
         <InputLabel id="minGPA">Minimum GPA</InputLabel>
         <Select label="Minimum GPA" labelId="minGPA">
-          <MenuItem value={10}>Ten</MenuItem>
-          <MenuItem value={20}>Twenty</MenuItem>
-          <MenuItem value={30}>Thirty</MenuItem>
+          {minGPAs.map((GPA) => {
+            const key = GPA === '' ? 'None' : GPA;
+            const text = GPA === '' ? <em>None</em> : GPA;
+            return (
+              <MenuItem key={key} value={GPA}>
+                {text}
+              </MenuItem>
+            );
+          })}
         </Select>
       </FormControl>
       <FormControl
