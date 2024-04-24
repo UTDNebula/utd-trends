@@ -1,6 +1,16 @@
 import AddIcon from '@mui/icons-material/Add';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Alert, Button, Card, Collapse, Skeleton } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  Collapse,
+  Skeleton,
+  Typography,
+} from '@mui/material';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
 import fetchWithCache, {
@@ -128,24 +138,11 @@ export const ClassCard = (props: ClassCardProps) => {
   const label = searchQueryLabel(props.searchQuery);
 
   return (
-    <Card className="m-4">
-      <button
-        className="w-full pt-4 px-4 pb-2 flex gap-2"
-        onClick={() => setOpen((old) => !old)}
-      >
-        <div className="flex gap-2 flex-wrap self-center">
-          <p className="text-xl">{label}</p>
-          <Button variant="outlined" color="info" startIcon={<AddIcon />}>
-            Select for Compare
-          </Button>
-        </div>
-        <ExpandMoreIcon
-          className={
-            'ml-auto self-start mr-2 transition-transform' +
-            (open ? ' rotate-180' : '')
-          }
-        />
-      </button>
+    <Card className="m-4 w-3/4 max-h-full">
+      <div className="flex gap-2 flex-wrap justify-start p-4">
+        <p className="text-xl">{label}</p>
+      </div>
+
       <div className="mx-4 mb-4">
         {gradesState === 'error' && (
           <Alert severity="error" className="mb-2">
@@ -158,47 +155,43 @@ export const ClassCard = (props: ClassCardProps) => {
           </Alert>
         )}
         <div className="mb-2 bg-gray-200 dark:bg-gray-800 rounded p-4">
-          <Collapse
-            in={open}
-            className={'w-full transition-all' + (open ? ' mb-2' : '')}
-          >
-            {gradesState !== 'done' ? (
-              <Skeleton
-                variant="rounded"
-                className="h-80 w-full"
-                animation={gradesState !== 'error' ? 'pulse' : false}
+          {gradesState !== 'done' ? (
+            <Skeleton
+              variant="rounded"
+              className="h-80 w-full"
+              animation={gradesState !== 'error' ? 'pulse' : false}
+            />
+          ) : (
+            <div className="h-80 w-full">
+              <BarGraph
+                title="Grade Distribution"
+                xaxisLabels={[
+                  'A+',
+                  'A',
+                  'A-',
+                  'B+',
+                  'B',
+                  'B-',
+                  'C+',
+                  'C',
+                  'C-',
+                  'D+',
+                  'D',
+                  'D-',
+                  'F',
+                  'W',
+                ]}
+                yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
+                series={[
+                  {
+                    name: label,
+                    data: series,
+                  },
+                ]}
               />
-            ) : (
-              <div className="h-80 w-full">
-                <BarGraph
-                  title="Grade Distribution"
-                  xaxisLabels={[
-                    'A+',
-                    'A',
-                    'A-',
-                    'B+',
-                    'B',
-                    'B-',
-                    'C+',
-                    'C',
-                    'C-',
-                    'D+',
-                    'D',
-                    'D-',
-                    'F',
-                    'W',
-                  ]}
-                  yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
-                  series={[
-                    {
-                      name: label,
-                      data: series,
-                    },
-                  ]}
-                />
-              </div>
-            )}
-          </Collapse>
+            </div>
+          )}
+
           <div className="flex flex-wrap justify-around">
             <p>
               Grades:{' '}
@@ -226,45 +219,28 @@ export const ClassCard = (props: ClassCardProps) => {
             </p>
           </div>
         </div>
-        <div className="bg-gray-200 dark:bg-gray-800 rounded p-4 grid grid-rows-3 md:grid-rows-1 md:grid-cols-3 gap-2">
-          <div className="flex gap-2 items-center md:block">
-            <p>Overall</p>
-            {evalsState !== 'done' ? (
-              <Skeleton
-                variant="text"
-                className="text-2xl w-[3ch]"
-                animation={evalsState !== 'error' ? 'pulse' : false}
-              />
-            ) : (
-              <p className="text-2xl">{evalData[0]}</p>
-            )}
-          </div>
-
-          <div className="flex gap-2 items-center md:block">
-            <p>Grading</p>
-            {evalsState !== 'done' ? (
-              <Skeleton
-                variant="text"
-                className="text-2xl w-[3ch]"
-                animation={evalsState !== 'error' ? 'pulse' : false}
-              />
-            ) : (
-              <p className="text-2xl">{evalData[1]}</p>
-            )}
-          </div>
-
-          <div className="flex gap-2 items-center md:block">
-            <p>Most frequent grade</p>
-            {evalsState !== 'done' ? (
-              <Skeleton
-                variant="text"
-                className="text-2xl w-[3ch]"
-                animation={evalsState !== 'error' ? 'pulse' : false}
-              />
-            ) : (
-              <p className="text-2xl">{evalData[2]}</p>
-            )}
-          </div>
+        <div className="inline-flex">
+          <Box className="bg-gray-200 dark:bg-gray-800 rounded px-2">
+            <p># of rmp ratings </p>
+            <p className="flex justify-center">1000</p>
+          </Box>
+          <Box className="mx-3 bg-gray-200 dark:bg-gray-800 rounded px-2">
+            <p>would take again</p>
+            <p className="flex justify-center">6%</p>
+          </Box>
+        </div>
+        <div className="py-2">
+          <Button variant="outlined" color="info" startIcon={<AddIcon />}>
+            Select for Compare
+          </Button>
+          <Button
+            variant="outlined"
+            color="info"
+            startIcon={<BookmarkBorderIcon />}
+            className="mx-3"
+          >
+            Bookmark
+          </Button>
         </div>
       </div>
     </Card>

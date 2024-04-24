@@ -25,7 +25,7 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
       className="w-full grid grid-flow-row justify-center shadow dark:shadow-lg"
     >
       <Tab
-        label="Grades"
+        label="Compare"
         className="text-lg text-gray-600 dark:text-gray-200 normal-case"
         value={0}
       />
@@ -37,7 +37,7 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
         className="w-px min-w-[1px]"
       />
       <Tab
-        label="Professor Ratings"
+        label="Prof & class intro"
         className="text-lg text-gray-600 dark:text-gray-200 normal-case"
         value={1}
       />
