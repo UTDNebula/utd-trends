@@ -14,13 +14,14 @@ export default function FeedbackPopup() {
 
   //Open after 60 seconds if not already asked/close (based on localStorage)
   useEffect(() => {
-    let previousFeedback = localStorage.getItem('feedback');
+    const previousFeedback = localStorage.getItem('feedback');
     let ask = previousFeedback === null;
     if (previousFeedback !== null) {
-      previousFeedback = JSON.parse(previousFeedback);
+      const parsedFeedback = JSON.parse(previousFeedback);
       if (
-        previousFeedback.value !== 'closed' &&
-        previousFeedback.value !== 'submitted'
+        parsedFeedback !== null &&
+        parsedFeedback.value !== 'closed' &&
+        parsedFeedback.value !== 'submitted'
       ) {
         ask = true;
       }
