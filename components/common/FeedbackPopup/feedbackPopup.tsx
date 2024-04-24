@@ -12,23 +12,23 @@ import React, { useEffect, useState } from 'react';
 export default function FeedbackPopup() {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
-  //Open after x seconds if not already asked/close (based on loalStorage)
+  //Open after 60 seconds if not already asked/close (based on localStorage)
   useEffect(() => {
     let previousFeedback = localStorage.getItem('feedback');
     let ask = previousFeedback === null;
     if (previousFeedback !== null) {
       previousFeedback = JSON.parse(previousFeedback);
-      ///if (previousFeedback.value !== 'closed' && previousFeedback.value !== 'submitted') {
-      // eslint-disable-next-line no-constant-condition
-      if (true) {
-        ///change before prod!!
+      if (
+        previousFeedback.value !== 'closed' &&
+        previousFeedback.value !== 'submitted'
+      ) {
         ask = true;
       }
     }
     if (ask) {
       const timer = setTimeout(() => {
         setFeedbackOpen(true);
-      }, 1000 * 1); //1 second///change before prod!!
+      }, 1000 * 60); //60 seconds
       return () => clearTimeout(timer);
     }
   }, []);
