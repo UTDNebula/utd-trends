@@ -21,6 +21,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
 
     const graph: DirectedGraph<NodeAttributes> = new DirectedGraph({
       allowSelfLoops: false,
+      type: 'directed',
     });
     let numNodes = 0; //allows a unique name for each node
     const root = graph.addNode(numNodes++, {
@@ -35,7 +36,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       data?: SearchQuery,
     ): string {
       characters = characters.toUpperCase();
-      let preExisting = graph.findOutNeighbor(
+      const preExisting = graph.findOutNeighbor(
         node,
         (neighbor: string, attributes: NodeAttributes) =>
           attributes?.c === characters[0],
@@ -49,15 +50,15 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
         }
         return addSearchQueryCharacter(preExisting, characters.slice(1), data);
       }
-      if (characters.length <= 1) {
-        let newData: NodeAttributes = {
+      if (characters.length == 1) {
+        let attributes: NodeAttributes = {
           c: characters[0],
           visited: false,
         };
         if (typeof data !== 'undefined') {
-          newData.d = data;
+          attributes.d = data;
         }
-        const newNode = graph.addNode(numNodes++, newData);
+        const newNode = graph.addNode(numNodes++, attributes);
         graph.addEdge(node, newNode);
         return newNode;
       }
@@ -71,12 +72,13 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
 
     // add a string to the graph with multiple parents pointing to its first character
     function addWithParents(
+      //main parent must be first!!! Otherwise can lead to accessing unmatched data like typing GEOS 2305 CE and getting ce2305 because it looped back
       nodes: string[],
       characters: string,
       data?: SearchQuery,
     ) {
       const nodeFirstChar = addSearchQueryCharacter(
-        nodes.pop() as string,
+        nodes.shift() as string,
         characters[0],
         characters.length > 1 ? undefined : data,
       );
@@ -105,7 +107,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       profFirst: string,
       profLast: string,
     ) {
-      //<prefix>[<number>| <number>
+      //<prefix>[<number>| <number>]
       const prefixNode = addSearchQueryCharacter(root, prefix, {
         prefix: prefix,
       });
@@ -124,12 +126,12 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       });
 
       //...[ <professorLast>|(<professorFirst> <professorLast>)]]
-      const professorFirstNameNode = addWithParents(
+      const profFirstNode = addWithParents(
         [classNode, prefixNode2, classNode2],
-        ' ' + profFirst + ' ',
+        ' ' + profFirst,
       );
-      const professorLastNameNode = addWithParents(
-        [classNode, prefixNode2, classNode2, professorFirstNameNode],
+      const profLastNode = addWithParents(
+        [profFirstNode, classNode, prefixNode2, classNode2],
         ' ' + profLast,
         {
           prefix: prefix,
@@ -140,9 +142,10 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       );
 
       if (sectionNumber === 'HON') {
-        //...[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]]
+        //<prefix>(<number>| <number>).<section>( <professorLast>|( <professorFirst> <professorLast>))
+        //<number>.<section>( <professorLast>|( <professorFirst> <professorLast>))
         const sectionNode = addWithParents(
-          [classNode, prefixNode2, classNode2],
+          [classNode, classNode2],
           '.' + sectionNumber,
           {
             prefix: prefix,
@@ -150,12 +153,23 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
             sectionNumber: sectionNumber,
           },
         );
-        const professorFirstNameNode2 = addSearchQueryCharacter(
-          sectionNode,
-          ' ' + profFirst + ' ',
+        //<number>.<section> <prefix>( <professorLast>|( <professorFirst> <professorLast>))
+        const sectionAndPrefixNode = addSearchQueryCharacter(
+          classNode2,
+          '.' + sectionNumber + ' ' + prefix,
+          {
+            prefix: prefix,
+            number: number,
+            sectionNumber: sectionNumber,
+          },
         );
-        const professorLastNameNode2 = addWithParents(
-          [sectionNode, professorFirstNameNode2],
+        //same prof
+        const profFirstNode2 = addWithParents(
+          [sectionNode, sectionAndPrefixNode],
+          ' ' + profFirst,
+        );
+        const profLastNode2 = addWithParents(
+          [sectionNode, sectionAndPrefixNode, profFirstNode2],
           ' ' + profLast,
           {
             prefix: prefix,
@@ -168,7 +182,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       }
     }
 
-    //Add nodes in format: (<professorLast>|<professorFirst> <professorLast>) ((<prefix> <number>|<prefix><number>)|(<number><prefix> |<number><prefix>))
+    //Add nodes in format: (<professorLast>|<professorFirst> <professorLast>) ((<prefix> <number>|<prefix><number>)|(<number> <prefix>|<number><prefix>))
     function addProfFirst(
       prefix: string,
       number: string,
@@ -176,24 +190,13 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       profFirst: string,
       profLast: string,
     ) {
-      const professorFirstNameNode = addSearchQueryCharacter(
-        root,
-        profFirst + ' ',
-      );
-      const professorLastNameNode = addWithParents(
-        [root, professorFirstNameNode],
-        profLast,
-        {
-          profFirst: profFirst,
-          profLast: profLast,
-        },
-      );
-      const professorSpaceNode = addSearchQueryCharacter(
-        professorLastNameNode,
-        ' ',
-      );
+      const profFirstNode = addSearchQueryCharacter(root, profFirst + ' ');
+      const profLastNode = addWithParents([profFirstNode, root], profLast, {
+        profFirst: profFirst,
+        profLast: profLast,
+      });
 
-      const prefixNode = addSearchQueryCharacter(professorSpaceNode, prefix);
+      const prefixNode = addSearchQueryCharacter(profLastNode, ' ' + prefix);
       const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
       const classNode = addWithParents([prefixNode, prefixSpaceNode], number, {
         prefix: prefix,
@@ -202,7 +205,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
         profLast: profLast,
       });
 
-      const classNode2 = addSearchQueryCharacter(professorSpaceNode, number);
+      const classNode2 = addSearchQueryCharacter(profLastNode, ' ' + number);
       const classSpaceNode = addSearchQueryCharacter(classNode2, ' ');
       const prefixNode2 = addWithParents([classNode2, classSpaceNode], prefix, {
         prefix: prefix,
@@ -212,13 +215,24 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       });
 
       if (sectionNumber === 'HON') {
-        addWithParents([classNode, classNode2], '.' + sectionNumber, {
+        addSearchQueryCharacter(classNode, '.' + sectionNumber, {
           prefix: prefix,
           number: number,
           sectionNumber: sectionNumber,
           profFirst: profFirst,
           profLast: profLast,
         });
+        addSearchQueryCharacter(
+          classNode2,
+          '.' + sectionNumber + ' ' + prefix,
+          {
+            prefix: prefix,
+            number: number,
+            sectionNumber: sectionNumber,
+            profFirst: profFirst,
+            profLast: profLast,
+          },
+        );
       }
     }
 
