@@ -5,6 +5,7 @@ Documentation: https://nebula-labs.atlassian.net/wiki/spaces/TRENDS/pages/679936
 */
 import * as fs from 'fs';
 import { DirectedGraph } from 'graphology';
+
 import * as aggregatedData from '../data/autocomplete_data.json';
 import SearchQuery from '../modules/SearchQuery/SearchQuery';
 
@@ -35,7 +36,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       data?: SearchQuery,
     ): string {
       characters = characters.toUpperCase();
-      let preExisting = graph.findOutNeighbor(
+      const preExisting = graph.findOutNeighbor(
         node,
         (neighbor: string, attributes: NodeAttributes) =>
           attributes?.c === characters[0],
@@ -50,7 +51,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
         return addSearchQueryCharacter(preExisting, characters.slice(1), data);
       }
       if (characters.length <= 1) {
-        let newData: NodeAttributes = {
+        const newData: NodeAttributes = {
           c: characters[0],
           visited: false,
         };

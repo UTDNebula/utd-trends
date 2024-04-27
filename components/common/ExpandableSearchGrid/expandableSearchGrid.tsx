@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
+import { ResultRow } from '../ResultRow/resultRow';
 import { SearchBar } from '../SearchBar/searchBar';
 import { SearchTermCard } from '../SearchTermCard/searchTermCard';
 
@@ -112,20 +113,17 @@ export const ExpandableSearchGrid = ({
   return (
     <div className="w-full min-h-[72px] grid grid-flow-row auto-cols-fr md:grid-flow-col justify-center">
       {searchTerms.map((option: SearchQuery, index: number) => (
-        <SearchTermCard
-          primaryText={searchQueryLabel(option)}
-          secondaryText={secondaryTextFormatter(
-            studentTotals[index],
-            averageData[index],
-          )}
+        <ResultRow
+          courseCode={'Cs1200'}
+          courseName={'ComSCi'}
+          gpa={3.9}
+          rmpRating={5.0}
+          rmpDifficulty={2.0}
           includeTooltip={studentTotals[index] !== 0}
           key={index}
           index={index}
-          legendColor={searchQueryColors[index]}
-          onCloseButtonClicked={deleteSearchTerm}
-          onToggleButtonClicked={toggleSearchTerm}
-          visible={searchTermsInclude[index]}
-          loading={studentTotals[index] === -1 || averageData[index] === -1}
+          onAddToCompare={deleteSearchTerm}
+          onToggleClick={toggleSearchTerm}
         />
       ))}
       {searchTerms.length < 3 ? (

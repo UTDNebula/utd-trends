@@ -17,7 +17,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Carousel from '../../components/common/Carousel/carousel';
 import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
-import { RelatedClasses } from '../../components/common/RelatedClasses/relatedClasses';
+import { SearchResultsTable } from '../../components/common/SearchResultsTable/searchResultsTable';
 import { BarGraph } from '../../components/graph/BarGraph/BarGraph';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import SearchQuery, { Professor } from '../../modules/SearchQuery/SearchQuery';
@@ -146,6 +146,25 @@ export const Dashboard: NextPage = () => {
   const [startingSession, setStartingSession] = useState<number>(0);
   const [endingSession, setEndingSession] = useState<number>(9999);
 
+  /* Professor Data */
+
+  type profType = {
+    found: boolean;
+    data: {
+      averageRating: number;
+      averageDifficulty: number;
+      department: string;
+      firstName: string;
+      lastName: string;
+      legacyId: string;
+      numRatings: number;
+      wouldTakeAgainPercentage: number;
+    };
+  };
+
+  const [professorRatingsState, setProfessorRatingsState] = useState('loading');
+  const [profData, setProfData] = useState<profType[]>([]);
+
   function removeDuplicates(array1: SearchQuery[], array2: SearchQuery[]) {
     return array1.filter(
       (query1: SearchQuery) =>
@@ -155,42 +174,17 @@ export const Dashboard: NextPage = () => {
     );
   }
 
-  const searchTermsChange = useCallback((searchTerms: SearchQuery[]) => {
-    //define professors
-    setProfessorInvolvingSearchTerms(
-      searchTerms
-        .filter(
-          (searchQuery) =>
-            typeof searchQuery.profFirst !== 'undefined' &&
-            typeof searchQuery.profLast !== 'undefined',
-        )
-        .map((searchQuery) => ({
-          profFirst: searchQuery.profFirst,
-          profLast: searchQuery.profLast,
-        }))
-        .filter(
-          (professor, index, self) =>
-            self.findIndex(
-              (element) =>
-                professor.profFirst == element.profFirst &&
-                professor.profLast == element.profLast,
-            ) == index,
-        ) as Professor[],
-    );
-
-    //Grade data request
+  function gradesDataFetch(courses: SearchQuery[]) {
     fetchData(
-      searchTerms.map(
-        (searchTerm: SearchQuery) =>
+      courses.map(
+        (course: SearchQuery) =>
           '/api/grades?' +
-          Object.keys(searchTerm)
+          Object.keys(course)
             .map(
               (key) =>
                 key +
                 '=' +
-                encodeURIComponent(
-                  String(searchTerm[key as keyof SearchQuery]),
-                ),
+                encodeURIComponent(String(course[key as keyof SearchQuery])),
             )
             .join('&'),
       ),
@@ -243,7 +237,7 @@ export const Dashboard: NextPage = () => {
         setFullGradesData(
           responses.map((response, index) => {
             return {
-              name: searchQueryLabel(searchTerms[index]),
+              name: searchQueryLabel(courses[index]),
               data:
                 response == null
                   ? []
@@ -265,76 +259,159 @@ export const Dashboard: NextPage = () => {
           }),
         );
         setGradesState('success');
+        console.log('fullGradesData');
+        console.log(fullGradesData);
       })
       .catch((error) => {
         setGradesState('error');
         console.error('Nebula API', error);
       });
+  }
 
-    //Related search query list request
+  function professorsDataFetch(courses: SearchQuery[]) {
+    //TODO: caching; especially if searching for 1 professor's courses, don't need to call rmp scraper 7 times
     fetchData(
-      searchTerms.map(
-        (searchTerm: SearchQuery) =>
-          '/api/autocomplete?' +
-          Object.keys(searchTerm)
-            .map(
-              (key) =>
-                key +
-                '=' +
-                encodeURIComponent(
-                  String(searchTerm[key as keyof SearchQuery]),
-                ),
-            )
-            .join('&') +
-          '&limit=10',
+      courses.map(
+        (course: SearchQuery) =>
+          '/api/ratemyprofessorScraper?profFirst=' +
+          encodeURIComponent(String(course.profFirst)) +
+          '&profLast=' +
+          encodeURIComponent(String(course.profLast)),
       ),
-      cacheIndexRelated,
-      7889400000, //3 months
+      cacheIndexProfessor,
+      2629800000, //1 month
     )
       .then((responses) => {
-        let result: SearchQuery[] = [];
-        if (!responses.length) {
-          result = [];
-        } else if (responses.length === 1) {
-          result = responses[0].slice(0, 10);
-        } else {
-          //Remove original searchTerms
-          for (let i = 0; i < responses.length; i++) {
-            responses[i] = removeDuplicates(responses[i], searchTerms);
-          }
-
-          //Remove duplicates
-          responses[0] = removeDuplicates(responses[0], responses[1]);
-          if (responses.length >= 3) {
-            responses[0] = removeDuplicates(responses[0], responses[2]);
-            responses[1] = removeDuplicates(responses[1], responses[2]);
-          }
-
-          //Combine to get 10 total, roughly evenly distributed
-          responses.reverse();
-          const responseLengths = Array(responses.length).fill(0);
-          let offset = 0;
-          for (let i = 0; i < 10; i++) {
-            if (
-              responseLengths[(i + offset) % responses.length] >=
-              responses[(i + offset) % responses.length].length
-            ) {
-              offset++;
-            }
-            responseLengths[(i + offset) % responses.length]++;
-          }
-          result = responses
-            .map((response, index) => response.slice(0, responseLengths[index]))
-            .flat();
-        }
-        setRelatedQueries(result);
-        setRelatedState(result.length ? 'success' : 'none');
-        setRelatedDisabled(responses.length >= 3 ? true : false);
+        setProfData(responses);
+        setProfessorRatingsState('success');
       })
       .catch((error) => {
-        setRelatedState('error');
-        console.error('Related query', error);
+        setProfessorRatingsState('error');
+        console.error('Professor Scraper', error);
       });
+  }
+
+  // only gets triggered when a new search is made
+  const searchTermsChange = useCallback((searchTerms: SearchQuery[]) => {
+    //define professors
+    setProfessorInvolvingSearchTerms(
+      // for RMP scraping
+      searchTerms
+        .filter(
+          (searchQuery) =>
+            typeof searchQuery.profFirst !== 'undefined' &&
+            typeof searchQuery.profLast !== 'undefined',
+        )
+        .map((searchQuery) => ({
+          profFirst: searchQuery.profFirst,
+          profLast: searchQuery.profLast,
+        }))
+        .filter(
+          (professor, index, self) =>
+            self.findIndex(
+              (element) =>
+                professor.profFirst == element.profFirst &&
+                professor.profLast == element.profLast,
+            ) == index,
+        ) as Professor[],
+    );
+
+    if (searchTerms[0] !== undefined) {
+      console.log(searchTerms[0]);
+      console.log('Here is where I will print all the professors for a course');
+      // get an array of the api autocomplete
+      const controller = new AbortController();
+      fetch('/api/autocomplete?input=' + searchQueryLabel(searchTerms[0]), {
+        signal: controller.signal,
+        method: 'GET',
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message !== 'success') {
+            throw new Error(data.message);
+          }
+          console.log('YOLO-');
+          console.log(data.data);
+          return data.data;
+        })
+        .then((courses: SearchQuery[]) => {
+          gradesDataFetch(courses);
+          professorsDataFetch(courses);
+        })
+        .catch((error) => {
+          if (error instanceof DOMException) {
+            // ignore aborts
+          } else {
+            console.log(error);
+          }
+        });
+      controller.abort;
+    }
+
+    // Related search query list request
+    //   fetchData(
+    //     searchTerms.map(
+    //       (searchTerm: SearchQuery) =>
+    //         '/api/autocomplete?' +
+    //         Object.keys(searchTerm)
+    //           .map(
+    //             (key) =>
+    //               key +
+    //               '=' +
+    //               encodeURIComponent(
+    //                 String(searchTerm[key as keyof SearchQuery]),
+    //               ),
+    //           )
+    //           .join('&') +
+    //         '&limit=10',
+    //     ),
+    //     cacheIndexRelated,
+    //     7889400000, //3 months
+    //   )
+    //     .then((responses) => {
+    //       let result: SearchQuery[] = [];
+    //       if (!responses.length) {
+    //         result = [];
+    //       } else if (responses.length === 1) {
+    //         result = responses[0].slice(0, 10);
+    //       } else {
+    //         //Remove original searchTerms
+    //         for (let i = 0; i < responses.length; i++) {
+    //           responses[i] = removeDuplicates(responses[i], searchTerms);
+    //         }
+
+    //         //Remove duplicates
+    //         responses[0] = removeDuplicates(responses[0], responses[1]);
+    //         if (responses.length >= 3) {
+    //           responses[0] = removeDuplicates(responses[0], responses[2]);
+    //           responses[1] = removeDuplicates(responses[1], responses[2]);
+    //         }
+
+    //         //Combine to get 10 total, roughly evenly distributed
+    //         responses.reverse();
+    //         const responseLengths = Array(responses.length).fill(0);
+    //         let offset = 0;
+    //         for (let i = 0; i < 10; i++) {
+    //           if (
+    //             responseLengths[(i + offset) % responses.length] >=
+    //             responses[(i + offset) % responses.length].length
+    //           ) {
+    //             offset++;
+    //           }
+    //           responseLengths[(i + offset) % responses.length]++;
+    //         }
+    //         result = responses
+    //           .map((response, index) => response.slice(0, responseLengths[index]))
+    //           .flat();
+    //       }
+    //       setRelatedQueries(result);
+    //       setRelatedState(result.length ? 'success' : 'none');
+    //       setRelatedDisabled(responses.length >= 3 ? true : false);
+    //     })
+    //     .catch((error) => {
+    //       setRelatedState('error');
+    //       console.error('Related query', error);
+    //     });
   }, []);
 
   useEffect(() => {
@@ -514,34 +591,16 @@ export const Dashboard: NextPage = () => {
   } else {
     relatedComponent = (
       <Card className="m-4" elevation={darkModeElevation}>
-        <RelatedClasses
-          displayData={relatedQueries}
-          addNew={(query: SearchQuery) => setRelatedQuery(query)}
-          disabled={relatedDisabled}
+        <SearchResultsTable
+          courseResults={fullGradesData}
+          distributionData={gradesData}
+          averageData={averageData}
+          studentTotals={studentTotals}
+          professorData={profData}
         />
       </Card>
     );
   }
-
-  /* Professor Data */
-
-  type profType = {
-    found: boolean;
-    data: {
-      averageRating: number;
-      averageDifficulty: number;
-      department: string;
-      firstName: string;
-      lastName: string;
-      legacyId: string;
-      numRatings: number;
-      wouldTakeAgainPercentage: number;
-    };
-  };
-
-  const [professorRatingsState, setProfessorRatingsState] = useState('loading');
-
-  const [profData, setProfData] = useState<profType[]>([]);
 
   useEffect(() => {
     if (professorInvolvingSearchTerms.length > 0) {
