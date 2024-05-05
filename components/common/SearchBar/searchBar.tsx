@@ -145,8 +145,8 @@ const SearchBar = (props: SearchProps) => {
     if (typeof props.changeValue !== 'undefined') {
       props.changeValue(newValue);
     }
-    console.log("onValueChange")
-    console.log(newValue)
+    console.log('onValueChange');
+    console.log(newValue);
     updateQueries(newValue);
   }
 
@@ -173,8 +173,8 @@ const SearchBar = (props: SearchProps) => {
       if (typeof props.selectValue !== 'undefined') {
         props.selectValue(value);
       }
-      console.log("handleKeyDown")
-      console.log(value)
+      console.log('handleKeyDown');
+      console.log(value);
     }
   }
 
