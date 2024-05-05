@@ -1,9 +1,10 @@
 import { Share } from '@mui/icons-material';
 import { IconButton, Snackbar, Tooltip } from '@mui/material';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+
+import SearchBar from '../../common/SearchBar/searchBar';
 
 /**
  * This is a component to hold UTD Trends branding and basic navigation
@@ -11,7 +12,7 @@ import React, { useState } from 'react';
  */
 export function TopMenu() {
   const router = useRouter();
-  const [openCopied, setOpenCopied] = useState<boolean>(false);
+  const [openCopied, setOpenCopied] = useState(false);
 
   function shareLink(url: string) {
     if (navigator.share) {
@@ -41,44 +42,38 @@ export function TopMenu() {
 
   return (
     <>
-      <div className="bg-primary h-16 text-light relative py-2 px-4">
-        <div className="h-full flex min-w-fit justify-between">
-          <Link href="/" className="m-1">
-            <div className="h-full flex align-middle place-items-center justify-center">
-              <div className="h-full float-left mr-2 w-14">
-                <Image
-                  src="/icon-white.svg"
-                  alt="Nebula Labs logo"
-                  width={100}
-                  height={76}
-                  className="h-full w-full"
-                />
-              </div>
-              <h1 className="float-right text-xl text-light-always">
-                UTD Trends
-              </h1>
-            </div>
-          </Link>
-          <Tooltip title="Share link with search queries">
-            <IconButton
-              className="w-12"
-              size="large"
-              onClick={() => {
-                let url = window.location.href;
-                if (
-                  router.query &&
-                  Object.keys(router.query).length === 0 &&
-                  Object.getPrototypeOf(router.query) === Object.prototype
-                ) {
-                  url = 'https://trends.utdnebula.com/';
-                }
-                shareLink(url);
-              }}
-            >
-              <Share className="fill-light-always text-3xl mr-1" />
-            </IconButton>
-          </Tooltip>
-        </div>
+      <div className="flex items-center gap-4 md:gap-8 lg:gap-16 py-1 md:py-2 px-4 md:px-8 lg:px-16 bg-[linear-gradient(rgba(255,255,255,0.6),rgba(255,255,255,0.6)),url('/background.png')] dark:bg-[linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('/background.png')] bg-cover">
+        <Link
+          href="/"
+          className="lext-lg md:text-xl font-kallisto font-medium md:font-bold"
+        >
+          UTD TRENDS
+        </Link>
+        <SearchBar
+          manageQuery
+          path={'/dashboard'}
+          input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+          className="shrink basis-96 mr-auto"
+        />
+        <Tooltip title="Share link to search">
+          <IconButton
+            className="aspect-square"
+            size="medium"
+            onClick={() => {
+              let url = window.location.href;
+              if (
+                router.query &&
+                Object.keys(router.query).length === 0 &&
+                Object.getPrototypeOf(router.query) === Object.prototype
+              ) {
+                url = 'https://trends.utdnebula.com/';
+              }
+              shareLink(url);
+            }}
+          >
+            <Share className="text-3xl mr-1" />
+          </IconButton>
+        </Tooltip>
       </div>
       <Snackbar
         open={openCopied}
