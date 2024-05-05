@@ -1,3 +1,5 @@
+### Splash Page Search Example
+
 ```ts
-<SearchBar />
+<SplashPageSearchBar />
 ```

@@ -222,12 +222,12 @@ export const SearchResultsTable = ({
   professorData,
   distributionData,
 }: SearchResultsTableProps) => {
-  console.log('in searchResultsTable');
-  console.log(courseResults);
-  console.log(averageData);
-  console.log(studentTotals);
-  console.log(professorData);
-  console.log(distributionData);
+  // console.log('in searchResultsTable');
+  // console.log(courseResults);
+  // console.log(averageData);
+  // console.log(studentTotals);
+  // console.log(professorData);
+  // console.log(distributionData);
 
   //Convert NaN's to -1 -- if a course has no GPA, treat it as -1 (for sorting)
   averageData.map((gpa) => (Number.isNaN(gpa) ? -1 : gpa));

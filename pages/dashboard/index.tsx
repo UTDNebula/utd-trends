@@ -12,12 +12,15 @@ import {
 } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import Carousel from '../../components/common/Carousel/carousel';
-import { ExpandableSearchGrid } from '../../components/common/ExpandableSearchGrid/expandableSearchGrid';
+import Filters from '../../components/common/Filters/filters';
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 import { SearchResultsTable } from '../../components/common/SearchResultsTable/searchResultsTable';
+import { RelatedClasses } from '../../components/common/RelatedClasses/relatedClasses';
+import SearchBar from '../../components/common/SearchBar/searchBar';
 import { BarGraph } from '../../components/graph/BarGraph/BarGraph';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import SearchQuery, { Professor } from '../../modules/SearchQuery/SearchQuery';
@@ -317,7 +320,7 @@ export const Dashboard: NextPage = () => {
     );
 
     if (searchTerms[0] !== undefined) {
-      console.log(searchTerms[0]);
+      console.log(searchTerms);
       console.log('Here is where I will print all the professors for a course');
       // get an array of the api autocomplete
       const controller = new AbortController();
@@ -713,6 +716,13 @@ export const Dashboard: NextPage = () => {
     );
   }
 
+  const router = useRouter();
+  useEffect(() => {
+    if (router.isReady) {
+      console.log(router.query);
+    }
+  }, [router.isReady, router.query]);
+
   /* Final page */
 
   return (
@@ -730,13 +740,13 @@ export const Dashboard: NextPage = () => {
       </Head>
       <div className=" w-full bg-light h-full">
         <TopMenu />
-        <ExpandableSearchGrid
-          onChange={searchTermsChange}
-          setIncluded={setIncluded}
-          studentTotals={studentTotals}
-          relatedQuery={relatedQuery}
-          averageData={averageData}
+        <SearchBar
+          manageQuery
+          path={'/dashboard'}
+          selectValue={searchTermsChange}
+          input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         />
+        <Filters manageQuery />
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">
             <Carousel>

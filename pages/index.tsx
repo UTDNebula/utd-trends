@@ -1,10 +1,12 @@
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
-import { SplashPageSearchBar } from '../components/common/SplashPageSearchBar/splashPageSearchBar';
+import Filters, {
+  type FiltersType,
+} from '../components/common/Filters/filters';
+import SearchBar from '../components/common/SearchBar/searchBar';
 import SearchQuery from '../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
 
@@ -12,26 +14,23 @@ import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
 const Home: NextPage = () => {
+  const [filters, setFilters] = useState<FiltersType>({});
+
   const router = useRouter();
-  function searchOptionChosen(chosenOption: SearchQuery | null) {
-    //console.log('The option chosen was: ', chosenOption);
-    if (chosenOption !== null) {
-      router.push(
-        {
-          pathname: '/dashboard',
-          query: { searchTerms: searchQueryLabel(chosenOption) },
-        },
-        '/dashboard',
-      );
-    }
+  function searchOptionChosen(chosenOption: SearchQuery[]) {
+    console.log('The option chosen was: ', chosenOption);
+    router.push({
+      pathname: '/dashboard',
+      query: {
+        ...filters,
+        searchTerms: chosenOption.map((el) => searchQueryLabel(el)).join(','),
+      },
+    });
   }
 
   useEffect(() => {
     router.prefetch('/dashboard');
   }, [router]);
-
-  const [searchBy, setSearchBy] = useState('any');
-  const [ABTest, setABTest] = useState(true);
 
   return (
     <>
@@ -43,12 +42,6 @@ const Home: NextPage = () => {
         />
         <meta property="og:url" content="https://trends.utdnebula.com" />
       </Head>
-      <button
-        onClick={() => setABTest((old) => !old)}
-        className="absolute top-0 left-0"
-      >
-        Toggle A/B Test
-      </button>
       <div className="bg-[linear-gradient(rgba(255,255,255,0.6),rgba(255,255,255,0.6)),url('/background.png')] dark:bg-[linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('/background.png')] bg-cover h-full w-full flex justify-center items-center p-8">
         <div className="max-w-xl">
           <h2 className="text-sm font-semibold mb-3 text-cornflower-600 dark:text-cornflower-400 tracking-wider">
@@ -66,50 +59,15 @@ const Home: NextPage = () => {
             UTD TRENDS
           </h1>
           <p className="mb-10 text-gray-700 dark:text-gray-300 leading-7">
-            Explore and compare past grades, syllabi, professor ratings and
-            reviews to find the perfect class.
+            Explore and compare past grades, professor ratings, and reviews to
+            find the perfect class.
           </p>
-          {ABTest && (
-            <div className="flex gap-2 mb-3">
-              <FormControl
-                size="small"
-                className="rounded-md border-gray-300 dark:border-gray-700 border-2 w-32 bg-white dark:bg-haiti text-sm"
-              >
-                <InputLabel id="search-by-label" className="pt-2">
-                  Search by
-                </InputLabel>
-                <Select
-                  labelId="search-by-label"
-                  value={searchBy}
-                  label="Search by"
-                  onChange={(event) =>
-                    setSearchBy(event.target.value as string)
-                  }
-                  className="pt-2"
-                  sx={{
-                    '.MuiOutlinedInput-notchedOutline': {
-                      borderWidth: '2px',
-                    },
-                  }}
-                >
-                  <MenuItem value="any">Any</MenuItem>
-                  <MenuItem value="professor">Professor</MenuItem>
-                  <MenuItem value="course">Course</MenuItem>
-                </Select>
-              </FormControl>
-              <SplashPageSearchBar
-                selectSearchValue={searchOptionChosen}
-                className="grow"
-                searchBy={searchBy}
-              />
-            </div>
-          )}
-          {!ABTest && (
-            <SplashPageSearchBar
-              selectSearchValue={searchOptionChosen}
-              className="mb-3"
-            />
-          )}
+          <SearchBar
+            selectValue={searchOptionChosen}
+            className="mb-3"
+            input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+          />
+          <Filters changeValue={(value) => setFilters(value)} />
         </div>
       </div>
     </>
