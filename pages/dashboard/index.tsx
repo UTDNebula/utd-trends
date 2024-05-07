@@ -19,13 +19,13 @@ import Carousel from '../../components/common/Carousel/carousel';
 import Filters from '../../components/common/Filters/filters';
 import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 import { RelatedClasses } from '../../components/common/RelatedClasses/relatedClasses';
-import SearchBar from '../../components/common/SearchBar/searchBar';
 import { BarGraph } from '../../components/graph/BarGraph/BarGraph';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import fetchWithCache, {
   cacheIndexGrades,
   expireTime,
 } from '../../modules/fetchWithCache';
+import decodeSearchQueryLabel from '../../modules/decodeSearchQueryLabel/decodeSearchQueryLabel';
 import SearchQuery, { Professor } from '../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
@@ -615,7 +615,11 @@ export const Dashboard: NextPage = () => {
   const router = useRouter();
   useEffect(() => {
     if (router.isReady) {
-      console.log(router.query);
+      let array = router.query.searchTerms ?? [];
+      if (!Array.isArray(array)) {
+        array = array.split(',');
+      }
+      console.log(array.map((el) => decodeSearchQueryLabel(el)));
     }
   }, [router.isReady, router.query]);
 
@@ -636,11 +640,6 @@ export const Dashboard: NextPage = () => {
       </Head>
       <div className=" w-full bg-light h-full">
         <TopMenu />
-        <SearchBar
-          manageQuery
-          path={'/dashboard'}
-          input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
-        />
         <Filters manageQuery />
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">

@@ -1,5 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
@@ -9,6 +10,7 @@ import Filters, {
 import SearchBar from '../components/common/SearchBar/searchBar';
 import SearchQuery from '../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
+import Background from '../public/background.png';
 
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
@@ -42,7 +44,13 @@ const Home: NextPage = () => {
         />
         <meta property="og:url" content="https://trends.utdnebula.com" />
       </Head>
-      <div className="bg-[linear-gradient(rgba(255,255,255,0.6),rgba(255,255,255,0.6)),url('/background.png')] dark:bg-[linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('/background.png')] bg-cover h-full w-full flex justify-center items-center p-8">
+      <div className="relative bg-lighten dark:bg-darken h-full w-full flex justify-center items-center p-8">
+        <Image
+          src={Background}
+          alt="gradient background"
+          fill
+          className="object-cover -z-20"
+        />
         <div className="max-w-xl">
           <h2 className="text-sm font-semibold mb-3 text-cornflower-600 dark:text-cornflower-400 tracking-wider">
             POWERED BY{' '}

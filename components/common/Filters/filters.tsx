@@ -93,9 +93,9 @@ const Filters = (props: FiltersProps) => {
         size="small"
         className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
       >
-        <InputLabel id="minGPA">Minimum GPA</InputLabel>
+        <InputLabel id="minGPA">Min GPA</InputLabel>
         <Select
-          label="Minimum GPA"
+          label="Min GPA"
           labelId="minGPA"
           value={minGPA}
           onChange={(event: SelectChangeEvent) => {
@@ -116,9 +116,9 @@ const Filters = (props: FiltersProps) => {
         size="small"
         className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
       >
-        <InputLabel id="minRating">Minimum Rating</InputLabel>
+        <InputLabel id="minRating">Min Rating</InputLabel>
         <Select
-          label="Minimum Rating"
+          label="Min Rating"
           labelId="minRating"
           value={minRating}
           onChange={(event: SelectChangeEvent) => {
@@ -139,9 +139,9 @@ const Filters = (props: FiltersProps) => {
         size="small"
         className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
       >
-        <InputLabel id="maxDiff">Maximum Difficulty</InputLabel>
+        <InputLabel id="maxDiff">Max Difficulty</InputLabel>
         <Select
-          label="Maximum Difficulty"
+          label="Max Difficulty"
           labelId="maxDiff"
           value={maxDiff}
           onChange={(event: SelectChangeEvent) => {
