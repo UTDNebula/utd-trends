@@ -262,7 +262,7 @@ export const Dashboard: NextPage = () => {
           }),
         );
         setGradesState('success');
-        console.log('fullGradesData');
+        console.log('fullGradesData:');
         console.log(fullGradesData);
       })
       .catch((error) => {
@@ -287,6 +287,8 @@ export const Dashboard: NextPage = () => {
       .then((responses) => {
         setProfData(responses);
         setProfessorRatingsState('success');
+        console.log('profData:');
+        console.log(profData);
       })
       .catch((error) => {
         setProfessorRatingsState('error');
@@ -535,10 +537,10 @@ export const Dashboard: NextPage = () => {
     setAverageData(newAverageData);
   }, [fullGradesData, startingSession, endingSession]);
 
-  let gradesPage;
+  let gradesComponent;
 
   if (gradesState === 'loading') {
-    gradesPage = (
+    gradesComponent = (
       <>
         <div className="h-full m-4">
           <LinearProgress className="mt-8 pt-2"></LinearProgress>
@@ -546,7 +548,7 @@ export const Dashboard: NextPage = () => {
       </>
     );
   } else if (gradesState === 'error') {
-    gradesPage = (
+    gradesComponent = (
       <>
         <div className="h-full m-4">
           <h1 className="text-3xl text-center text-gray-600 font-semibold">
@@ -557,7 +559,7 @@ export const Dashboard: NextPage = () => {
       </>
     );
   } else {
-    gradesPage = (
+    gradesComponent = (
       <>
         <div className="h-full m-4">
           <Card className="h-96 p-4 m-4">
@@ -640,18 +642,18 @@ export const Dashboard: NextPage = () => {
     );
   }
 
-  let relatedComponent;
+  let searchResultsComponent;
   const [relatedQuery, setRelatedQuery] = useState<SearchQuery | undefined>(
     undefined,
   );
 
   if (relatedState === 'error') {
-    relatedComponent = null;
+    searchResultsComponent = null;
   } else if (relatedState === 'none') {
-    relatedComponent = null;
+    searchResultsComponent = null;
   } else {
-    relatedComponent = (
-      <Card className="m-4" elevation={darkModeElevation}>
+    searchResultsComponent = (
+      <div className="h-full m-4">
         <SearchResultsTable
           courseResults={fullGradesData}
           distributionData={gradesData}
@@ -659,7 +661,7 @@ export const Dashboard: NextPage = () => {
           studentTotals={studentTotals}
           professorData={profData}
         />
-      </Card>
+      </div>
     );
   }
 
@@ -807,47 +809,26 @@ export const Dashboard: NextPage = () => {
         <Filters manageQuery />
         <div className="w-full h-5/6 justify-center">
           <div className="w-full h-5/6 relative min-h-full">
-            <Carousel>
-              <Grid
-                container
-                component="main"
-                wrap="wrap-reverse"
-                className="grow"
-                spacing={2}
-              >
-                <Grid item xs={12} sm={6} md={4}>
-                  {relatedComponent}
-                </Grid>
-                <Grid
-                  item
-                  xs={false}
-                  sm={relatedComponent === null ? 12 : 6}
-                  md={relatedComponent === null ? 12 : 8}
-                  className="w-full"
-                >
-                  {gradesPage}
-                </Grid>
+            <Grid
+              container
+              component="main"
+              wrap="wrap-reverse"
+              className="grow"
+              spacing={2}
+            >
+              <Grid item xs={12} sm={6} md={6}>
+                {searchResultsComponent}
               </Grid>
               <Grid
-                container
-                component="main"
-                wrap="wrap-reverse"
-                className="grow"
+                item
+                xs={false}
+                sm={searchResultsComponent === null ? 12 : 6}
+                md={searchResultsComponent === null ? 12 : 6}
+                className="w-full"
               >
-                <Grid item xs={12} sm={6} md={4}>
-                  {relatedComponent}
-                </Grid>
-                <Grid
-                  item
-                  xs={false}
-                  sm={relatedComponent === null ? 12 : 6}
-                  md={relatedComponent === null ? 12 : 8}
-                  className="w-full"
-                >
-                  {professorRatingsPage}
-                </Grid>
+                {gradesComponent}
               </Grid>
-            </Carousel>
+            </Grid>
           </div>
         </div>
       </div>
