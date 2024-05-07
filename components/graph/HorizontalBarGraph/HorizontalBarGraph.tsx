@@ -4,7 +4,9 @@ import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 
 import GraphProps from '../../../modules/GraphProps/GraphProps';
-import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
+import searchQueryColors, {
+  rainbowColors,
+} from '../../../modules/searchQueryColors/searchQueryColors';
 import { FullscreenCloseIcon } from '../../icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '../../icons/FullscreenOpenIcon/fullscreenOpenIcon';
 
@@ -68,11 +70,15 @@ export function HorizontalBarGraph(props: GraphProps) {
     },
     plotOptions: {
       bar: {
+        distributed: series.length === 1,
         horizontal: true,
       },
     },
     dataLabels: {
       enabled: false,
+    },
+    legend: {
+      show: series.length !== 1,
     },
     xaxis: {
       categories: props.xaxisLabels,
@@ -80,9 +86,12 @@ export function HorizontalBarGraph(props: GraphProps) {
         formatter: xaxisFormatter,
       },
     },
-    colors: searchQueryColors.filter(
-      (searchQuery, i) => props.includedColors?.[i] ?? 1,
-    ),
+    colors:
+      series.length === 1
+        ? rainbowColors
+        : searchQueryColors.filter(
+            (searchQuery, i) => props.includedColors?.[i] ?? 1,
+          ),
     stroke: {
       width: 2,
       curve: 'smooth',
