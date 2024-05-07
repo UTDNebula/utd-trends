@@ -294,8 +294,74 @@ export const Dashboard: NextPage = () => {
       });
   }
 
+  function autocompleteForSearchResultsFetch(
+    searchTerms: SearchQuery[],
+    controller: AbortController,
+  ): Promise<SearchQuery[]>[] {
+    return searchTerms.map((searchTerm) => {
+      return fetch('/api/autocomplete?input=' + searchQueryLabel(searchTerm), {
+        // use the search terms to fetch all the result course-professor combinations
+        signal: controller.signal,
+        method: 'GET',
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message !== 'success') {
+            throw new Error(data.message);
+          }
+          return data.data as SearchQuery[];
+        });
+    });
+  }
+
+  function fetchSearchResults(
+    searchTerms: SearchQuery[],
+    filterTerms: SearchQuery[],
+  ) {
+    // store the search results' data in fullGradesdata and profData
+    const controller = new AbortController();
+    Promise.all(autocompleteForSearchResultsFetch(searchTerms, controller))
+      .then((allSearchTermResults: SearchQuery[][]) => {
+        const results: SearchQuery[] = [];
+        allSearchTermResults.map((searchTermResults) =>
+          searchTermResults.map((searchTermResult) => {
+            if (filterTerms.length > 0) {
+              filterTerms.map((filterTerm) => {
+                if (
+                  filterTerm.profFirst === searchTermResult.profFirst &&
+                  filterTerm.profLast === searchTermResult.profLast
+                ) {
+                  results.push(searchTermResult);
+                } else if (
+                  filterTerm.prefix === searchTermResult.prefix &&
+                  filterTerm.number === searchTermResult.number
+                ) {
+                  results.push(searchTermResult);
+                }
+              });
+            } else {
+              results.push(searchTermResult);
+            }
+          }),
+        );
+        return results;
+      })
+      .then((courses: SearchQuery[]) => {
+        gradesDataFetch(courses); // get each course-prof's grade data
+        professorsDataFetch(courses); // get each professor's rmp data
+      })
+      .catch((error) => {
+        if (error instanceof DOMException) {
+          // ignore aborts
+        } else {
+          console.log(error);
+        }
+      });
+    controller.abort;
+  }
+
   // only gets triggered when a new search is made
-  const searchTermsChange = useCallback((searchTerms: SearchQuery[]) => {
+  const searchTermsChange = useCallback(async (searchTerms: SearchQuery[]) => {
     //define professors
     setProfessorInvolvingSearchTerms(
       // for RMP scraping
@@ -319,36 +385,28 @@ export const Dashboard: NextPage = () => {
         ) as Professor[],
     );
 
+    const courseSearchTerms: SearchQuery[] = [];
+    const professorSearchTerms: SearchQuery[] = [];
+
+    // split the search terms into professors and courses
+    searchTerms.map((searchTerm) => {
+      if (searchTerm.profLast !== undefined) {
+        professorSearchTerms.push(searchTerm);
+      }
+      if (searchTerm.prefix !== undefined) {
+        courseSearchTerms.push(searchTerm);
+      }
+    });
+
+    if (courseSearchTerms.length > 0) {
+      fetchSearchResults(courseSearchTerms, professorSearchTerms);
+    } else if (professorSearchTerms.length > 0) {
+      fetchSearchResults(professorSearchTerms, courseSearchTerms);
+    }
+
     if (searchTerms[0] !== undefined) {
       console.log(searchTerms);
       console.log('Here is where I will print all the professors for a course');
-      // get an array of the api autocomplete
-      const controller = new AbortController();
-      fetch('/api/autocomplete?input=' + searchQueryLabel(searchTerms[0]), {
-        signal: controller.signal,
-        method: 'GET',
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.message !== 'success') {
-            throw new Error(data.message);
-          }
-          console.log('YOLO-');
-          console.log(data.data);
-          return data.data;
-        })
-        .then((courses: SearchQuery[]) => {
-          gradesDataFetch(courses);
-          professorsDataFetch(courses);
-        })
-        .catch((error) => {
-          if (error instanceof DOMException) {
-            // ignore aborts
-          } else {
-            console.log(error);
-          }
-        });
-      controller.abort;
     }
 
     // Related search query list request
