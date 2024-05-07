@@ -21,11 +21,11 @@ import ProfessorCard from '../../components/common/ProfessorCard/ProfessorCard';
 import { RelatedClasses } from '../../components/common/RelatedClasses/relatedClasses';
 import { BarGraph } from '../../components/graph/BarGraph/BarGraph';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
+import decodeSearchQueryLabel from '../../modules/decodeSearchQueryLabel/decodeSearchQueryLabel';
 import fetchWithCache, {
   cacheIndexGrades,
   expireTime,
 } from '../../modules/fetchWithCache';
-import decodeSearchQueryLabel from '../../modules/decodeSearchQueryLabel/decodeSearchQueryLabel';
 import SearchQuery, { Professor } from '../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
@@ -279,7 +279,7 @@ export const Dashboard: NextPage = () => {
         }
         setRelatedQueries(result);
         setRelatedState(result.length ? 'success' : 'none');
-        setRelatedDisabled(responses.length >= 3 ? true : false);
+        setRelatedDisabled(responses.length >= 3);
       })
       .catch((error) => {
         setRelatedState('error');
