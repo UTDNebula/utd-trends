@@ -22,83 +22,15 @@ import { RelatedClasses } from '../../components/common/RelatedClasses/relatedCl
 import { BarGraph } from '../../components/graph/BarGraph/BarGraph';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import decodeSearchQueryLabel from '../../modules/decodeSearchQueryLabel/decodeSearchQueryLabel';
+import fetchWithCache, {
+  cacheIndexGrades,
+  expireTime,
+} from '../../modules/fetchWithCache';
 import SearchQuery, { Professor } from '../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
 
 export const Dashboard: NextPage = () => {
-  /* Helper functions */
-
-  //Increment these to reset cache on next deployment
-  const cacheIndexGrades = 0;
-  const cacheIndexRelated = 0;
-  const cacheIndexProfessor = 0;
-
-  function getCache(key: string, cacheIndex: number) {
-    if (process.env.NODE_ENV !== 'development') {
-      const getItem = localStorage.getItem(key);
-      if (getItem !== null) {
-        const parsedItem = JSON.parse(getItem);
-        if (
-          !('cacheIndex' in parsedItem) ||
-          cacheIndex !== parsedItem.cacheIndex ||
-          !('expiry' in parsedItem) ||
-          !('value' in parsedItem) ||
-          new Date().getTime() > parsedItem.expiry
-        ) {
-          localStorage.removeItem(key);
-        } else {
-          return parsedItem.value;
-        }
-      }
-    }
-    return false;
-  }
-
-  function setCache(
-    key: string,
-    cacheIndex: number,
-    data: object,
-    expireTime: number,
-  ) {
-    localStorage.setItem(
-      key,
-      JSON.stringify({
-        value: data,
-        expiry: new Date().getTime() + expireTime,
-        cacheIndex: cacheIndex,
-      }),
-    );
-  }
-
-  const fetchData = useCallback(
-    (urls: string[], cacheIndex: number, expireTime: number) => {
-      return Promise.all(
-        urls.map((url) => {
-          const cache = getCache(url, cacheIndexProfessor);
-          if (cache) {
-            return cache;
-          }
-          return fetch(url, {
-            method: 'GET',
-            headers: {
-              Accept: 'application/json',
-            },
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.message !== 'success') {
-                throw new Error(data.message);
-              }
-              setCache(url, cacheIndex, data.data, expireTime);
-              return data.data;
-            });
-        }),
-      );
-    },
-    [],
-  );
-
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const darkModeElevation = prefersDarkMode ? 3 : 1;
 
@@ -181,25 +113,33 @@ export const Dashboard: NextPage = () => {
     );
 
     //Grade data request
-    fetchData(
-      searchTerms.map(
-        (searchTerm: SearchQuery) =>
+    Promise.all(
+      searchTerms.map((searchTerm: SearchQuery) =>
+        fetchWithCache(
           '/api/grades?' +
-          Object.keys(searchTerm)
-            .map(
-              (key) =>
-                key +
-                '=' +
-                encodeURIComponent(
-                  String(searchTerm[key as keyof SearchQuery]),
-                ),
-            )
-            .join('&'),
+            Object.keys(searchTerm)
+              .map(
+                (key) =>
+                  key +
+                  '=' +
+                  encodeURIComponent(
+                    String(searchTerm[key as keyof SearchQuery]),
+                  ),
+              )
+              .join('&'),
+          cacheIndexGrades,
+          expireTime,
+          {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        ),
       ),
-      cacheIndexGrades,
-      7889400000, //3 months
     )
       .then((responses) => {
+        responses = responses.map((data) => data.data);
         //console.log('data from grid: ', responses);
 
         //Generate possible academic sessions
@@ -274,26 +214,34 @@ export const Dashboard: NextPage = () => {
       });
 
     //Related search query list request
-    fetchData(
-      searchTerms.map(
-        (searchTerm: SearchQuery) =>
+    Promise.all(
+      searchTerms.map((searchTerm: SearchQuery) =>
+        fetchWithCache(
           '/api/autocomplete?' +
-          Object.keys(searchTerm)
-            .map(
-              (key) =>
-                key +
-                '=' +
-                encodeURIComponent(
-                  String(searchTerm[key as keyof SearchQuery]),
-                ),
-            )
-            .join('&') +
-          '&limit=10',
+            Object.keys(searchTerm)
+              .map(
+                (key) =>
+                  key +
+                  '=' +
+                  encodeURIComponent(
+                    String(searchTerm[key as keyof SearchQuery]),
+                  ),
+              )
+              .join('&') +
+            '&limit=10',
+          cacheIndexGrades,
+          expireTime,
+          {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        ),
       ),
-      cacheIndexRelated,
-      7889400000, //3 months
     )
       .then((responses) => {
+        responses = responses.map((data) => data.data);
         let result: SearchQuery[] = [];
         if (!responses.length) {
           result = [];
@@ -331,7 +279,7 @@ export const Dashboard: NextPage = () => {
         }
         setRelatedQueries(result);
         setRelatedState(result.length ? 'success' : 'none');
-        setRelatedDisabled(responses.length >= 3 ? true : false);
+        setRelatedDisabled(responses.length >= 3);
       })
       .catch((error) => {
         setRelatedState('error');
@@ -548,18 +496,26 @@ export const Dashboard: NextPage = () => {
   useEffect(() => {
     if (professorInvolvingSearchTerms.length > 0) {
       setProfessorRatingsState('loading');
-      fetchData(
-        professorInvolvingSearchTerms.map(
-          (professor) =>
+      Promise.all(
+        professorInvolvingSearchTerms.map((professor) =>
+          fetchWithCache(
             '/api/ratemyprofessorScraper?profFirst=' +
-            encodeURIComponent(professor.profFirst) +
-            '&profLast=' +
-            encodeURIComponent(professor.profLast),
+              encodeURIComponent(professor.profFirst) +
+              '&profLast=' +
+              encodeURIComponent(professor.profLast),
+            cacheIndexGrades,
+            expireTime,
+            {
+              method: 'GET',
+              headers: {
+                Accept: 'application/json',
+              },
+            },
+          ),
         ),
-        cacheIndexProfessor,
-        2629800000, //1 month
       )
         .then((responses) => {
+          responses = responses.map((data) => data.data);
           setProfData(responses);
           setProfessorRatingsState('success');
         })
@@ -571,7 +527,7 @@ export const Dashboard: NextPage = () => {
       setProfessorRatingsState('success');
       setProfData([]);
     }
-  }, [fetchData, professorInvolvingSearchTerms]);
+  }, [professorInvolvingSearchTerms]);
 
   let professorRatingsPage;
 
