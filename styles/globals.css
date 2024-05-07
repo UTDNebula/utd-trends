@@ -19,3 +19,12 @@ body,
 .apexcharts-toolbar {
   z-index: 0 !important;
 }
+
+@layer utilities {
+  .bg-lighten {
+    background-color: rgba(255, 255, 255, 0.6);
+  }
+  .bg-darken {
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+}

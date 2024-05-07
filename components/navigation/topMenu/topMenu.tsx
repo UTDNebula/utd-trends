@@ -1,9 +1,11 @@
 import { Share } from '@mui/icons-material';
 import { IconButton, Snackbar, Tooltip } from '@mui/material';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
+import Background from '../../../public/background.png';
 import SearchBar from '../../common/SearchBar/searchBar';
 
 /**
@@ -42,7 +44,13 @@ export function TopMenu() {
 
   return (
     <>
-      <div className="flex items-center gap-4 md:gap-8 lg:gap-16 py-1 md:py-2 px-4 md:px-8 lg:px-16 bg-[linear-gradient(rgba(255,255,255,0.6),rgba(255,255,255,0.6)),url('/background.png')] dark:bg-[linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('/background.png')] bg-cover">
+      <div className="relative overflow-hidden flex items-center gap-4 md:gap-8 lg:gap-16 py-1 md:py-2 px-4 md:px-8 lg:px-16 bg-lighten dark:bg-darken">
+        <Image
+          src={Background}
+          alt="gradient background"
+          fill
+          className="object-cover -z-20"
+        />
         <Link
           href="/"
           className="lext-lg md:text-xl font-kallisto font-medium md:font-bold"
