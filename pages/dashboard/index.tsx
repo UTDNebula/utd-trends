@@ -563,80 +563,12 @@ export const Dashboard: NextPage = () => {
       <>
         <div className="h-full m-4">
           <Card className="h-96 p-4 m-4">
-            <BarGraph
-              title="Grades"
-              xaxisLabels={[
-                'A+',
-                'A',
-                'A-',
-                'B+',
-                'B',
-                'B-',
-                'C+',
-                'C',
-                'C-',
-                'D+',
-                'D',
-                'D-',
-                'F',
-                'W',
-              ]}
-              yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
-              series={gradesData.filter((dat, index) => included[index])}
-              includedColors={included}
-            />
+            <Carousel>
+              <p>page 1</p>
+              <p>page 2</p>
+              <p>page 3</p>
+            </Carousel>
           </Card>
-          <div className="flex justify-center gap-2">
-            <FormControl
-              error={startingSession > endingSession}
-              variant="standard"
-            >
-              <InputLabel id="startingSessionLabel">From</InputLabel>
-              <Select
-                labelId="startingSessionLabel"
-                defaultValue={0}
-                onChange={(e) => setStartingSession(e.target.value as number)}
-              >
-                <MenuItem key="First available" value="0">
-                  First available
-                </MenuItem>
-                {possibleAcademicSessions.map(
-                  (session: academicSessionType) => (
-                    <MenuItem key={session.name} value={session.place}>
-                      {session.name}
-                    </MenuItem>
-                  ),
-                )}
-              </Select>
-            </FormControl>
-            <FormControl
-              error={startingSession > endingSession}
-              variant="standard"
-            >
-              <InputLabel id="endingSessionLabel">To</InputLabel>
-              <Select
-                labelId="endingSessionLabel"
-                defaultValue={9999}
-                onChange={(e) => setEndingSession(e.target.value as number)}
-              >
-                {possibleAcademicSessions.map(
-                  (session: academicSessionType) => (
-                    <MenuItem key={session.name} value={session.place}>
-                      {session.name}
-                    </MenuItem>
-                  ),
-                )}
-                <MenuItem key="Last available" value="9999">
-                  Last available
-                </MenuItem>
-              </Select>
-            </FormControl>
-          </div>
-          {startingSession > endingSession ? (
-            <FormHelperText className="text-center" error={true}>
-              Starting academic session must be before ending academic session
-            </FormHelperText>
-          ) : null}
         </div>
       </>
     );
@@ -816,14 +748,14 @@ export const Dashboard: NextPage = () => {
               className="grow"
               spacing={2}
             >
-              <Grid item xs={12} sm={6} md={6}>
+              <Grid item xs={12} sm={7} md={7}>
                 {searchResultsComponent}
               </Grid>
               <Grid
                 item
                 xs={false}
-                sm={searchResultsComponent === null ? 12 : 6}
-                md={searchResultsComponent === null ? 12 : 6}
+                sm={searchResultsComponent === null ? 12 : 5}
+                md={searchResultsComponent === null ? 12 : 5}
                 className="w-full"
               >
                 {gradesComponent}

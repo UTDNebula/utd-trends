@@ -9,6 +9,7 @@ type TabNavMenuProps = {
   // Turning animation of the carousel is handled by the parent, and this method is
   // responsible for playing the animation and setting the value to the correct new value
   turner: (displacement: number) => void;
+  options: string[];
 };
 
 /**
@@ -25,22 +26,42 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
       className="w-full grid grid-flow-row justify-center shadow dark:shadow-lg"
     >
       <Tab
-        label="Grades"
+        label={props.options[0]}
         className="text-lg text-gray-600 dark:text-gray-200 normal-case"
         value={0}
       />
-      <Tab
-        label=""
-        icon={<Divider orientation="vertical" />}
-        disabled
-        value={-1}
-        className="w-px min-w-[1px]"
-      />
-      <Tab
-        label="Professor Ratings"
-        className="text-lg text-gray-600 dark:text-gray-200 normal-case"
-        value={1}
-      />
+      {props.options.length > 1
+        ? props.options.slice(1).map((option, index) =>
+            // eslint-disable-next-line react/jsx-key
+            [
+              <Tab
+                label=""
+                icon={<Divider orientation="vertical" />}
+                disabled
+                value={-1}
+                className="w-px min-w-[1px]"
+              />,
+              // eslint-disable-next-line react/jsx-key
+              <Tab
+                label={option}
+                className="text-lg text-gray-600 dark:text-gray-200 normal-case"
+                value={index + 1}
+              />,
+            ],
+          )
+        : null}
+      {/*<Tab*/}
+      {/*  label=""*/}
+      {/*  icon={<Divider orientation="vertical" />}*/}
+      {/*  disabled*/}
+      {/*  value={-1}*/}
+      {/*  className="w-px min-w-[1px]"*/}
+      {/*/>*/}
+      {/*<Tab*/}
+      {/*  label="Professor Ratings"*/}
+      {/*  className="text-lg text-gray-600 dark:text-gray-200 normal-case"*/}
+      {/*  value={1}*/}
+      {/*/>*/}
     </Tabs>
   );
 };

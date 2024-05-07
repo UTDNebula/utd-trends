@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { TabNavMenu } from '../../navigation/tabNavMenu/tabNavMenu';
 
 interface CarouselProps {
-  children: ReactJSXElement[];
+  children: ReactJSXElement[] | ReactJSXElement;
 }
 
 /**
@@ -50,13 +50,18 @@ export const Carousel = (props: CarouselProps) => {
    */
   const turn = (displacement: number) => {
     //set direction
+    // console.log("displacement=",displacement);
     setDir(displacement);
     setCard(currentCard + displacement);
   };
 
   return (
     <>
-      <TabNavMenu value={currentCard} turner={turn} />
+      <TabNavMenu
+        value={currentCard}
+        options={['Compare', 'Professor Overview', 'Class Overview']}
+        turner={turn}
+      />
       <div
         className="relative p-2 pt-0 lg:p-10"
         style={{
@@ -80,7 +85,9 @@ export const Carousel = (props: CarouselProps) => {
               }}
             >
               <div className="w-full h-full lg:h-full rounded-md mb-10">
-                {props.children[currentCard]}
+                {Array.isArray(props.children)
+                  ? props.children[currentCard]
+                  : props.children}
               </div>
             </motion.div>
           </div>
