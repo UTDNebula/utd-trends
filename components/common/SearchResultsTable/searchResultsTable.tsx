@@ -22,7 +22,7 @@ import SearchQuery, {
 } from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
+import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
 import type {
   GenericFetchedData,
   GradesType,
@@ -95,7 +95,7 @@ function colorMidpoint(good: number, bad: number, value: number) {
 type RowProps = {
   course: SearchQuery;
   grades: GenericFetchedData<GradesType>;
-  rmp: GenericFetchedData<RateMyProfessorData>;
+  rmp: GenericFetchedData<RMPInterface>;
   inCompare: boolean;
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
@@ -183,10 +183,10 @@ function Row({
               <Typography
                 className="text-base text-black rounded-full px-5 py-2 inline"
                 sx={{
-                  backgroundColor: colorMidpoint(5, 0, rmp.data.averageRating),
+                  backgroundColor: colorMidpoint(5, 0, rmp.data.avgRating ),
                 }}
               >
-                {rmp.data.averageRating.toFixed(1)}
+                {rmp.data.avgRating .toFixed(1)}
               </Typography>
             )) ||
             null}
@@ -210,11 +210,11 @@ function Row({
                   backgroundColor: colorMidpoint(
                     0,
                     5,
-                    rmp.data.averageDifficulty,
+                    rmp.data.avgDifficulty,
                   ),
                 }}
               >
-                {rmp.data.averageDifficulty.toFixed(1)}
+                {rmp.data.avgDifficulty.toFixed(1)}
               </Typography>
             )) ||
             null}
@@ -238,7 +238,7 @@ type SearchResultsTableProps = {
   resultsLoading: 'loading' | 'done';
   includedResults: SearchQuery[];
   grades: { [key: string]: GenericFetchedData<GradesType> };
-  rmp: { [key: string]: GenericFetchedData<RateMyProfessorData> };
+  rmp: { [key: string]: GenericFetchedData<RMPInterface> };
   compare: SearchQuery[];
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
@@ -327,14 +327,14 @@ const SearchResultsTable = ({
         }
         if (orderBy === 'rating') {
           if (order === 'asc') {
-            return aRmp.data.averageRating - bRmp.data.averageRating;
+            return aRmp.data.avgRating  - bRmp.data.avgRating ;
           }
-          return bRmp.data.averageRating - aRmp.data.averageRating;
+          return bRmp.data.avgRating  - aRmp.data.avgRating ;
         }
         if (order === 'asc') {
-          return aRmp.data.averageDifficulty - bRmp.data.averageDifficulty;
+          return aRmp.data.avgDifficulty - bRmp.data.avgDifficulty;
         }
-        return bRmp.data.averageDifficulty - aRmp.data.averageDifficulty;
+        return bRmp.data.avgDifficulty - aRmp.data.avgDifficulty;
       }
       return 0;
     });

@@ -2,7 +2,7 @@ import React from 'react';
 
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
+import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
 import type {
   GenericFetchedData,
   GradesType,
@@ -13,7 +13,7 @@ import CompareTable from '../CompareTable/compareTable';
 type CompareProps = {
   courses: SearchQuery[];
   grades: { [key: string]: GenericFetchedData<GradesType> };
-  rmp: { [key: string]: GenericFetchedData<RateMyProfessorData> };
+  rmp: { [key: string]: GenericFetchedData<RMPInterface> };
   removeFromCompare: { (arg0: SearchQuery): void };
 };
 

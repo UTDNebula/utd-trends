@@ -19,7 +19,7 @@ import SearchQuery, {
 } from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
+import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
 import type {
   GenericFetchedData,
   GradesType,
@@ -55,7 +55,7 @@ function colorMidpoint(good: number, bad: number, value: number) {
 type RowProps = {
   course: SearchQuery;
   grades: GenericFetchedData<GradesType>;
-  rmp: GenericFetchedData<RateMyProfessorData>;
+  rmp: GenericFetchedData<RMPInterface>;
   removeFromCompare: (arg0: SearchQuery) => void;
   color: string | undefined;
 };
@@ -108,10 +108,10 @@ function Row({ course, grades, rmp, removeFromCompare, color }: RowProps) {
             <Typography
               className="text-base text-black rounded-full px-5 py-2 inline"
               sx={{
-                backgroundColor: colorMidpoint(5, 0, rmp.data.averageRating),
+                backgroundColor: colorMidpoint(5, 0, rmp.data.avgRating ),
               }}
             >
-              {rmp.data.averageRating.toFixed(1)}
+              {rmp.data.avgRating .toFixed(1)}
             </Typography>
           )) ||
           null}
@@ -132,11 +132,11 @@ function Row({ course, grades, rmp, removeFromCompare, color }: RowProps) {
                 backgroundColor: colorMidpoint(
                   0,
                   5,
-                  rmp.data.averageDifficulty,
+                  rmp.data.avgDifficulty,
                 ),
               }}
             >
-              {rmp.data.averageDifficulty.toFixed(1)}
+              {rmp.data.avgDifficulty.toFixed(1)}
             </Typography>
           )) ||
           null}
@@ -157,11 +157,11 @@ function Row({ course, grades, rmp, removeFromCompare, color }: RowProps) {
                 backgroundColor: colorMidpoint(
                   100,
                   0,
-                  rmp.data.wouldTakeAgainPercentage,
+                  rmp.data.wouldTakeAgain,
                 ),
               }}
             >
-              {rmp.data.wouldTakeAgainPercentage.toFixed(0) + '%'}
+              {rmp.data.wouldTakeAgain.toFixed(0) + '%'}
             </Typography>
           )) ||
           null}
@@ -173,7 +173,7 @@ function Row({ course, grades, rmp, removeFromCompare, color }: RowProps) {
 type CompareTableProps = {
   includedResults: SearchQuery[];
   grades: { [key: string]: GenericFetchedData<GradesType> };
-  rmp: { [key: string]: GenericFetchedData<RateMyProfessorData> };
+  rmp: { [key: string]: GenericFetchedData<RMPInterface> };
   removeFromCompare: (arg0: SearchQuery) => void;
 };
 
@@ -242,26 +242,26 @@ const CompareTable = ({
         }
         if (orderBy === 'rating') {
           if (order === 'asc') {
-            return aRmp.data.averageRating - bRmp.data.averageRating;
+            return aRmp.data.avgRating  - bRmp.data.avgRating ;
           }
-          return bRmp.data.averageRating - aRmp.data.averageRating;
+          return bRmp.data.avgRating  - aRmp.data.avgRating ;
         }
         if (orderBy === 'difficulty') {
           if (order === 'asc') {
-            return aRmp.data.averageDifficulty - bRmp.data.averageDifficulty;
+            return aRmp.data.avgDifficulty - bRmp.data.avgDifficulty;
           }
-          return bRmp.data.averageDifficulty - aRmp.data.averageDifficulty;
+          return bRmp.data.avgDifficulty - aRmp.data.avgDifficulty;
         }
         if (orderBy === 'would_take_again') {
           if (order === 'asc') {
             return (
-              aRmp.data.wouldTakeAgainPercentage -
-              bRmp.data.wouldTakeAgainPercentage
+              aRmp.data.wouldTakeAgain -
+              bRmp.data.wouldTakeAgain
             );
           }
           return (
-            bRmp.data.wouldTakeAgainPercentage -
-            aRmp.data.wouldTakeAgainPercentage
+            bRmp.data.wouldTakeAgain -
+            aRmp.data.wouldTakeAgain
           );
         }
       }
