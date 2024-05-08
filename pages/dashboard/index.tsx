@@ -29,6 +29,7 @@ import fetchWithCache, {
 import SearchQuery, { Professor } from '../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
+import { RMPInterface } from '../api/ratemyprofessorScraper';
 
 export const Dashboard: NextPage = () => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -475,23 +476,9 @@ export const Dashboard: NextPage = () => {
 
   /* Professor Data */
 
-  type profType = {
-    found: boolean;
-    data: {
-      averageRating: number;
-      averageDifficulty: number;
-      department: string;
-      firstName: string;
-      lastName: string;
-      legacyId: string;
-      numRatings: number;
-      wouldTakeAgainPercentage: number;
-    };
-  };
-
   const [professorRatingsState, setProfessorRatingsState] = useState('loading');
 
-  const [profData, setProfData] = useState<profType[]>([]);
+  const [profData, setProfData] = useState<RMPInterface[]>([]);
 
   useEffect(() => {
     if (professorInvolvingSearchTerms.length > 0) {
@@ -555,11 +542,11 @@ export const Dashboard: NextPage = () => {
       <>
         <div className="h-full m-4">
           {profData.length > 0 ? (
-            profData.map((data: profType, index: number) => {
+            profData.map((data: RMPInterface, index: number) => {
               if (!included[index]) {
                 return null;
               }
-              if (!data.found) {
+              /*if (!data.found) {
                 let text = 'Data not found';
                 if (
                   typeof professorInvolvingSearchTerms[index] !== 'undefined'
@@ -581,7 +568,7 @@ export const Dashboard: NextPage = () => {
                     </Typography>
                   </Card>
                 );
-              }
+              }*/
               return (
                 <Card
                   className="h-fit m-4"
@@ -589,12 +576,12 @@ export const Dashboard: NextPage = () => {
                   elevation={darkModeElevation}
                 >
                   <ProfessorCard
-                    professorRating={data.data.averageRating}
-                    averageDifficulty={data.data.averageDifficulty}
-                    takingAgain={data.data.wouldTakeAgainPercentage}
-                    numRatings={data.data.numRatings}
-                    name={data.data.firstName + ' ' + data.data.lastName}
-                    department={data.data.department}
+                    professorRating={data.avgRating}
+                    averageDifficulty={data.avgDifficulty}
+                    takingAgain={data.wouldTakeAgainPercent}
+                    numRatings={data.numRatings}
+                    name={data.firstName + ' ' + data.lastName}
+                    department={data.department}
                     key={index}
                   />
                 </Card>
