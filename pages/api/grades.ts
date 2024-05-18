@@ -19,7 +19,8 @@ export default function handler(
       typeof process.env.REACT_APP_NEBULA_API_KEY === 'string'
     )
   ) {
-    res.status(400).json({ message: 'API key is undefined' });
+    res.status(500).json({ message: 'API key is undefined' });
+    return;
   }
   if (
     !('prefix' in req.query && typeof req.query.prefix === 'string') &&
@@ -36,6 +37,7 @@ export default function handler(
     )
   ) {
     res.status(400).json({ message: 'Incorrect query present' });
+    return;
   }
   const headers = {
     'x-api-key': process.env.REACT_APP_NEBULA_API_KEY as string,

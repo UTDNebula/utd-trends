@@ -112,11 +112,14 @@ const SearchBar = (props: SearchProps) => {
           (el: SearchQuery) => !('sectionNumber' in el),
         );
         if (
+          // if the returned options minus already selected values or those options minus sections is 1, then this
+          // means a space following should autocomplete the previous stuff to a chip
           (filtered.length === 1 || noSections.length === 1) &&
-          //last char is a space
-          (newInputValue.charAt(newInputValue.length - 1) === ' ' ||
-            //next char is a space
-            quickInputValue.current.slice(newInputValue.length)[0] === ' ')
+          // if the next character the user typed was a space, then the chip should be autocompleted
+          // this looks at quickInputValue because it is always the most recent state of the field's string input,
+          // so requests that return later will still see that a space was typed after the text to be autocompleted,
+          // so it should autocomplete then when this is realized
+          quickInputValue.current.charAt(newInputValue.length) === ' '
         ) {
           addValue(filtered.length === 1 ? filtered[0] : noSections[0]);
           const rest = quickInputValue.current
@@ -238,7 +241,12 @@ const SearchBar = (props: SearchProps) => {
       //for handling spaces, when options are already loaded
       onInput={(event) => {
         const value = (event.target as HTMLInputElement).value;
-        if (value[value.length - 1] === ' ') {
+        // if the last character in the new string is a space, check for autocomplete
+        if (
+          value[value.length - 1] === ' ' &&
+          // but if the user is deleting text, don't try to autocomplete
+          (event.nativeEvent as InputEvent).inputType === 'insertText'
+        ) {
           const noSections = options.filter(
             (el: SearchQuery) => !('sectionNumber' in el),
           );
