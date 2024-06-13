@@ -17,6 +17,7 @@ interface FiltersProps {
   manageQuery?: boolean;
   path?: string;
   changeValue?: (value: FiltersType) => void;
+  className?: string;
 }
 
 /**
@@ -88,7 +89,7 @@ const Filters = (props: FiltersProps) => {
   }
 
   return (
-    <div className="flex gap-2">
+    <div className={'flex gap-2 ' + props.className ?? ''}>
       <FormControl
         size="small"
         className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"

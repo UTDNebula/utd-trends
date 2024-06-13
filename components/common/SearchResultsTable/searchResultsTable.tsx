@@ -1,144 +1,121 @@
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Typography } from '@mui/material';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import Collapse from '@mui/material/Collapse';
-import IconButton from '@mui/material/IconButton';
-import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import React from 'react';
+import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
+import {
+  Box,
+  Card,
+  Collapse,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 
+import SearchQuery, {
+  convertToProfOnly,
+} from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
+import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
 import { BarGraph } from '../../graph/BarGraph/BarGraph';
 
-type fullGradesType = {
-  name: string;
-  data: {
-    session: number;
-    grade_distribution: number[];
-  }[];
-};
+function colorMidpoint(bad: number, good: number, value: number) {
+  const min = good < bad ? good : bad;
+  const max = good > bad ? good : bad;
 
-type profType = {
-  found: boolean;
-  data: {
-    averageRating: number;
-    averageDifficulty: number;
-    department: string;
-    firstName: string;
-    lastName: string;
-    legacyId: string;
-    numRatings: number;
-    wouldTakeAgainPercentage: number;
-  };
-};
+  // Ensure value is within bounds
+  if (value < min) value = min;
+  if (value > max) value = max;
 
-type gradesType = {
-  name: string;
-  data: number[];
-};
+  // Normalize the value between 0 and 1
+  let ratio = (value - min) / (max - min);
+  if (good > bad) {
+    ratio = 1 - ratio;
+  }
 
-function createCourse(
-  courseData: fullGradesType,
-  averageData: number,
-  studentTotals: number,
-  professorData: profType,
-  distributionData: gradesType,
-) {
-  const x: gradesType = { name: 'x', data: [] };
-  return {
-    name: courseData.name,
-    gpa:
-      averageData === undefined || Number.isNaN(averageData) ? -1 : averageData,
-    num_students: studentTotals,
-    rmp_rating:
-      professorData !== undefined && professorData.found
-        ? professorData.data.averageRating
-        : -1,
-    difficulty:
-      professorData !== undefined && professorData.found
-        ? professorData.data.averageDifficulty
-        : -1,
-    would_take_again:
-      professorData !== undefined && professorData.found
-        ? professorData.data.wouldTakeAgainPercentage
-        : -1,
-    num_rmp_ratings:
-      professorData !== undefined && professorData.found
-        ? professorData.data.numRatings
-        : -1,
-    grade_distribution:
-      distributionData !== undefined
-        ? distributionData
-        : { name: '', data: [] },
-    history: [
-      // expanded info
-      {
-        date: '2020-01-05',
-        customerId: '11091700',
-        amount: 3,
-      },
-      {
-        date: '2020-01-02',
-        customerId: 'Anonymous',
-        amount: 1,
-      },
-    ],
-  };
+  const startColor = { r: 0xff, g: 0x57, b: 0x57 };
+  const endColor = { r: 0x79, g: 0xff, b: 0x57 };
+
+  const r = Math.round(startColor.r + ratio * (endColor.r - startColor.r));
+  const g = Math.round(startColor.g + ratio * (endColor.g - startColor.g));
+  const b = Math.round(startColor.b + ratio * (endColor.b - startColor.b));
+
+  return `#${r.toString(16).padStart(2, '0')}${g
+    .toString(16)
+    .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
-function Row(props: { row: ReturnType<typeof createCourse> }) {
-  const { row } = props;
-  const [open, setOpen] = React.useState(false);
+type GradesType = {
+  session: number;
+  grade_distribution: number[];
+}[];
+
+type RowProps = {
+  course: SearchQuery;
+  grades: GradesType;
+  rmp: RateMyProfessorData;
+};
+
+function Row({ course, grades, rmp }: RowProps) {
+  const [open, setOpen] = useState(false);
 
   return (
-    <React.Fragment>
+    <>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell>
           <IconButton
             aria-label="expand row"
             size="small"
             onClick={() => setOpen(!open)}
+            className={'transition-transform' + (open ? ' rotate-90' : '')}
           >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            <KeyboardArrowIcon />
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row">
           <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
-            {row.name}
-          </Typography>
-          <Typography className="block text-sm text-gray-500 dark:text-gray-300 inline">
-            course name
+            {searchQueryLabel(course)}
           </Typography>
         </TableCell>
         <TableCell align="right">
           <Box className="rounded-3xl px-5 py-2 bg-primary-dark">
-            <Typography className="text-base">
-              {row.gpa === -1 ? 'X' : row.gpa.toFixed(2)}
-            </Typography>
+            <Typography className="text-base">5.0</Typography>
           </Box>
         </TableCell>
         <TableCell align="right">
-          <Box className="rounded-3xl px-5 py-2 bg-primary-dark">
-            <Typography className="text-base">
-              {row.rmp_rating === -1 ? 'X' : row.rmp_rating.toFixed(1)}
-            </Typography>
-          </Box>
+          {typeof rmp !== 'undefined' && (
+            <Box
+              className="rounded-3xl px-5 py-2"
+              sx={{ backgroundColor: colorMidpoint(5, 0, rmp.averageRating) }}
+            >
+              <Typography className="text-base">
+                {typeof rmp === 'undefined'
+                  ? 'X'
+                  : rmp.averageRating.toFixed(1)}
+              </Typography>
+            </Box>
+          )}
         </TableCell>
         <TableCell align="right">
-          <Box className="rounded-3xl px-5 py-2 bg-primary-dark">
-            <Typography className="text-base">
-              {row.difficulty === -1 ? 'X' : row.difficulty.toFixed(1)}
-            </Typography>
-          </Box>
+          {typeof rmp !== 'undefined' && (
+            <Box
+              className="rounded-3xl px-5 py-2 bg-primary-dark"
+              sx={{
+                backgroundColor: colorMidpoint(0, 5, rmp.averageDifficulty),
+              }}
+            >
+              <Typography className="text-base">
+                {rmp.averageDifficulty.toFixed(1)}
+              </Typography>
+            </Box>
+          )}
         </TableCell>
       </TableRow>
-      <TableRow>
+      {/*<TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
@@ -197,17 +174,15 @@ function Row(props: { row: ReturnType<typeof createCourse> }) {
             </Box>
           </Collapse>
         </TableCell>
-      </TableRow>
-    </React.Fragment>
+      </TableRow>*/}
+    </>
   );
 }
 
 type SearchResultsTableProps = {
-  courseResults: fullGradesType[]; //TODO: create a courseType that encompasses grades, rmp, etc
-  averageData: number[];
-  studentTotals: number[];
-  professorData: profType[];
-  distributionData: gradesType[];
+  includedResults: SearchQuery[];
+  grades: { [key: string]: GradesType };
+  rmp: { [key: string]: RateMyProfessorData };
 };
 
 /**
@@ -216,59 +191,39 @@ type SearchResultsTableProps = {
  * SearchTermCard components, and are displayed from left to right in this grid.
  */
 export const SearchResultsTable = ({
-  courseResults,
-  averageData,
-  studentTotals,
-  professorData,
-  distributionData,
+  includedResults,
+  grades,
+  rmp,
 }: SearchResultsTableProps) => {
-  console.log('in searchResultsTable');
-  console.log(courseResults);
-  console.log(averageData);
-  console.log(studentTotals);
-  console.log(professorData);
-  console.log(distributionData);
-
-  //Convert NaN's to -1 -- if a course has no GPA, treat it as -1 (for sorting)
-  averageData.map((gpa) => (Number.isNaN(gpa) ? -1 : gpa));
-  console.log(averageData);
-
   return (
     //TODO: sticky header
-    <div className="grid grid-flow-column auto-cols-fr justify-center">
-      <div className="p-4 rounded-none">
-        <Typography className="leading-tight text-3xl font-bold text-dark">
-          Search Results
-        </Typography>
-      </div>
+    <>
+      <Typography className="leading-tight text-3xl font-bold p-4">
+        Search Results
+      </Typography>
       <TableContainer component={Paper}>
         <Table stickyHeader aria-label="collapsible table">
           <TableHead>
             <TableRow>
               <TableCell />
               <TableCell>Name</TableCell>
-              <TableCell align="right">GPA</TableCell>
-              <TableCell align="right">Rating</TableCell>
-              <TableCell align="right">Difficulty</TableCell>
+              <TableCell align="center">GPA</TableCell>
+              <TableCell align="center">Rating</TableCell>
+              <TableCell align="center">Difficulty</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {courseResults
-              .map((courseResult, index) =>
-                createCourse(
-                  courseResult,
-                  averageData[index],
-                  studentTotals[index],
-                  professorData[index],
-                  distributionData[index],
-                ),
-              )
-              .map((row) => (
-                <Row key={row.name} row={row} />
-              ))}
+            {includedResults.map((result) => (
+              <Row
+                key={searchQueryLabel(result)}
+                course={result}
+                grades={grades[searchQueryLabel(result)]}
+                rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
+              />
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </>
   );
 };

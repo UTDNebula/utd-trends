@@ -1,17 +1,19 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
+export type RateMyProfessorData = {
+  legacyId: string;
+  averageRating: number;
+  numRatings: number;
+  wouldTakeAgainPercentage: number;
+  averageDifficulty: number;
+  department: string;
+  firstName: string;
+  lastName: string;
+};
+
 type RateMyProfessorInfo = {
   found: boolean;
-  data?: {
-    legacyId: string;
-    averageRating: number;
-    numRatings: number;
-    wouldTakeAgainPercentage: number;
-    averageDifficulty: number;
-    department: string;
-    firstName: string;
-    lastName: string;
-  };
+  data?: RateMyProfessorData;
 };
 
 type Data = {
