@@ -1,7 +1,6 @@
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Box,
-  Card,
   Collapse,
   IconButton,
   Paper,
@@ -13,19 +12,19 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import SearchQuery, {
   convertToProfOnly,
 } from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
+import { GradesType } from '../../../pages/dashboard/index';
 import { BarGraph } from '../../graph/BarGraph/BarGraph';
 
-function colorMidpoint(bad: number, good: number, value: number) {
-  const min = good < bad ? good : bad;
-  const max = good > bad ? good : bad;
+function colorMidpoint(good: number, bad: number, value: number) {
+  const min = bad < good ? bad : good;
+  const max = bad > good ? bad : good;
 
   // Ensure value is within bounds
   if (value < min) value = min;
@@ -33,7 +32,7 @@ function colorMidpoint(bad: number, good: number, value: number) {
 
   // Normalize the value between 0 and 1
   let ratio = (value - min) / (max - min);
-  if (good > bad) {
+  if (bad > good) {
     ratio = 1 - ratio;
   }
 
@@ -48,11 +47,6 @@ function colorMidpoint(bad: number, good: number, value: number) {
     .toString(16)
     .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
-
-type GradesType = {
-  session: number;
-  grade_distribution: number[];
-}[];
 
 type RowProps = {
   course: SearchQuery;
@@ -82,99 +76,112 @@ function Row({ course, grades, rmp }: RowProps) {
           </Typography>
         </TableCell>
         <TableCell align="right">
-          <Box className="rounded-3xl px-5 py-2 bg-primary-dark">
-            <Typography className="text-base">5.0</Typography>
-          </Box>
-        </TableCell>
-        <TableCell align="right">
-          {typeof rmp !== 'undefined' && (
-            <Box
-              className="rounded-3xl px-5 py-2"
-              sx={{ backgroundColor: colorMidpoint(5, 0, rmp.averageRating) }}
+          {typeof grades !== 'undefined' && grades.gpa !== -1 ? (
+            <Typography
+              className="text-base text-black rounded-3xl px-5 py-2 inline"
+              sx={{ backgroundColor: colorMidpoint(4, 0, grades.gpa) }}
             >
-              <Typography className="text-base">
-                {typeof rmp === 'undefined'
-                  ? 'X'
-                  : rmp.averageRating.toFixed(1)}
-              </Typography>
-            </Box>
+              {grades.gpa.toFixed(2)}
+            </Typography>
+          ) : (
+            <Typography className="text-base px-5 py-2 inline">X</Typography>
           )}
         </TableCell>
         <TableCell align="right">
-          {typeof rmp !== 'undefined' && (
-            <Box
-              className="rounded-3xl px-5 py-2 bg-primary-dark"
+          {typeof rmp !== 'undefined' ? (
+            <Typography
+              className="text-base text-black rounded-3xl px-5 py-2 inline"
+              sx={{ backgroundColor: colorMidpoint(5, 0, rmp.averageRating) }}
+            >
+              {rmp.averageRating.toFixed(1)}
+            </Typography>
+          ) : (
+            <Typography className="text-base px-5 py-2 inline">X</Typography>
+          )}
+        </TableCell>
+        <TableCell align="right">
+          {typeof rmp !== 'undefined' ? (
+            <Typography
+              className="text-base text-black rounded-3xl px-5 py-2 inline"
               sx={{
                 backgroundColor: colorMidpoint(0, 5, rmp.averageDifficulty),
               }}
             >
-              <Typography className="text-base">
-                {rmp.averageDifficulty.toFixed(1)}
-              </Typography>
-            </Box>
+              {rmp.averageDifficulty.toFixed(1)}
+            </Typography>
+          ) : (
+            <Typography className="text-base px-5 py-2 inline">X</Typography>
           )}
         </TableCell>
       </TableRow>
-      {/*<TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+      <TableRow>
+        <TableCell className="p-0" colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                History
-              </Typography>
-              <div className="h-full m-4">
-                <Card className="h-96 p-4 m-4">
-                  <BarGraph
-                    title="Grades"
-                    xaxisLabels={[
-                      'A+',
-                      'A',
-                      'A-',
-                      'B+',
-                      'B',
-                      'B-',
-                      'C+',
-                      'C',
-                      'C-',
-                      'D+',
-                      'D',
-                      'D-',
-                      'F',
-                      'W',
-                    ]}
-                    yaxisFormatter={(value) => Number(value).toFixed(0) + '%'}
-                    series={[row.grade_distribution]}
-                  />
-                </Card>
-                <div className="flex flex-wrap justify-around">
-                  <p>
-                    Grades: <b>{row.num_students}</b>
-                  </p>
-                  <p>
-                    GPA: <b>{row.gpa === -1 ? 'X' : row.gpa.toFixed(3)}</b>
-                  </p>
-                </div>
-                <div className="inline-flex">
-                  <Box className="bg-gray-200 dark:bg-gray-800 rounded px-2">
-                    <p># of RMP ratings </p>
-                    <p className="flex justify-center">
-                      {row.num_rmp_ratings === -1 ? 'X' : row.num_rmp_ratings}
+            <div className="p-4">
+              {typeof grades !== 'undefined' && (
+                <>
+                  <div className="h-64">
+                    <BarGraph
+                      title="Grades"
+                      xaxisLabels={[
+                        'A+',
+                        'A',
+                        'A-',
+                        'B+',
+                        'B',
+                        'B-',
+                        'C+',
+                        'C',
+                        'C-',
+                        'D+',
+                        'D',
+                        'D-',
+                        'F',
+                        'W',
+                      ]}
+                      series={[
+                        {
+                          name: searchQueryLabel(course),
+                          data: grades.grade_distribution,
+                        },
+                      ]}
+                    />
+                  </div>
+                  <div className="flex flex-wrap justify-around">
+                    <p>
+                      Grades: <b>{grades.total}</b>
                     </p>
-                  </Box>
-                  <Box className="mx-3 bg-gray-200 dark:bg-gray-800 rounded px-2">
-                    <p>would take again</p>
-                    <p className="flex justify-center">
-                      {row.would_take_again === -1
-                        ? 'X'
-                        : row.would_take_again.toFixed(0) + '%'}
+                    <p>
+                      GPA:{' '}
+                      <b>{grades.gpa === -1 ? 'X' : grades.gpa.toFixed(3)}</b>
                     </p>
-                  </Box>
-                </div>
-              </div>
-            </Box>
+                  </div>
+                </>
+              )}
+              {typeof rmp !== 'undefined' && (
+                <>
+                  <div className="inline-flex">
+                    <Box className="bg-gray-200 dark:bg-gray-800 rounded px-2">
+                      <p># of RMP ratings </p>
+                      <p className="flex justify-center">
+                        {rmp.numRatings === -1 ? 'X' : rmp.numRatings}
+                      </p>
+                    </Box>
+                    <Box className="mx-3 bg-gray-200 dark:bg-gray-800 rounded px-2">
+                      <p>would take again</p>
+                      <p className="flex justify-center">
+                        {rmp.wouldTakeAgainPercentage === -1
+                          ? 'X'
+                          : rmp.wouldTakeAgainPercentage.toFixed(0) + '%'}
+                      </p>
+                    </Box>
+                  </div>
+                </>
+              )}
+            </div>
           </Collapse>
         </TableCell>
-      </TableRow>*/}
+      </TableRow>
     </>
   );
 }
@@ -185,12 +192,7 @@ type SearchResultsTableProps = {
   rmp: { [key: string]: RateMyProfessorData };
 };
 
-/**
- * This component returns a bar that will allow users to add and remove search terms (up to 3 max)
- * using the SearchBar component. The currently selected search terms are represented by
- * SearchTermCard components, and are displayed from left to right in this grid.
- */
-export const SearchResultsTable = ({
+const SearchResultsTable = ({
   includedResults,
   grades,
   rmp,
@@ -227,3 +229,5 @@ export const SearchResultsTable = ({
     </>
   );
 };
+
+export default SearchResultsTable;

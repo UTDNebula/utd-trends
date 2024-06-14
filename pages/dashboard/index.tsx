@@ -1,13 +1,4 @@
-import {
-  Card,
-  FormControl,
-  FormHelperText,
-  Grid,
-  InputLabel,
-  LinearProgress,
-  MenuItem,
-  Select,
-} from '@mui/material';
+import { Card, Grid, LinearProgress } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -15,8 +6,7 @@ import React, { useEffect, useState } from 'react';
 
 import Carousel from '../../components/common/Carousel/carousel';
 import Filters from '../../components/common/Filters/filters';
-import { SearchResultsTable } from '../../components/common/SearchResultsTable/searchResultsTable';
-import { BarGraph } from '../../components/graph/BarGraph/BarGraph';
+import SearchResultsTable from '../../components/common/SearchResultsTable/searchResultsTable';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import decodeSearchQueryLabel from '../../modules/decodeSearchQueryLabel/decodeSearchQueryLabel';
 import fetchWithCache, {
@@ -26,7 +16,6 @@ import fetchWithCache, {
 } from '../../modules/fetchWithCache';
 import SearchQuery, {
   convertToProfOnly,
-  Professor,
 } from '../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
@@ -44,7 +33,7 @@ function autocompleteForSearchResultsFetch(
 ): Promise<SearchQuery[]>[] {
   return searchTerms.map((searchTerm) => {
     return fetchWithCache(
-      '/api/autocomplete?input=' + searchQueryLabel(searchTerm),
+      '/api/autocomplete?limit=50&input=' + searchQueryLabel(searchTerm),
       cacheIndexGrades,
       expireTime,
       {
@@ -96,10 +85,55 @@ function fetchSearchResults(
   });
 }
 
-type GradesType = {
-  session: number;
+type GradesData = {
+  _id: string;
   grade_distribution: number[];
 }[];
+
+function calculateGrades(grades: GradesData, academicSessions?: string[]) {
+  let grade_distribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  for (const session of grades) {
+    if (
+      typeof academicSessions === 'undefined' ||
+      academicSessions.includes(session._id)
+    ) {
+      grade_distribution = grade_distribution.map(
+        (item, i) => item + session.grade_distribution[i],
+      );
+    }
+  }
+
+  const total: number = grade_distribution.reduce(
+    (accumulator, currentValue) => accumulator + currentValue,
+    0,
+  );
+
+  const GPALookup = [
+    4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
+  ];
+  let gpa = -1;
+  if (total !== 0) {
+    gpa =
+      GPALookup.reduce(
+        (accumulator, currentValue, index) =>
+          accumulator + currentValue * grade_distribution[index],
+        0,
+      ) /
+      (total - grade_distribution[grade_distribution.length - 1]);
+  }
+
+  return {
+    gpa: gpa,
+    total: total,
+    grade_distribution: grade_distribution,
+  };
+}
+export type GradesType = {
+  gpa: number;
+  total: number;
+  grade_distribution: number[];
+  grades: GradesData;
+};
 function fetchGradesData(course: SearchQuery, controller: AbortController) {
   return new Promise<GradesType>((resolve) => {
     fetchWithCache(
@@ -125,31 +159,20 @@ function fetchGradesData(course: SearchQuery, controller: AbortController) {
       response = response.data;
 
       if (response == null) {
-        resolve([]);
+        resolve({
+          gpa: -1,
+          total: 0,
+          grade_distribution: [],
+          grades: [],
+        });
         return;
       }
 
-      //Replace _id with number
-      type individualacademicSessionResponse = {
-        _id: string;
-        grade_distribution: number[];
-      };
-      resolve(
-        response.map((data: individualacademicSessionResponse) => {
-          let session: number = parseInt('20' + data._id);
-          if (data._id.includes('S')) {
-            session += 0.1;
-          } else if (data._id.includes('U')) {
-            session += 0.2;
-          } else {
-            session += 0.3;
-          }
-          return {
-            session: session,
-            grade_distribution: data.grade_distribution,
-          };
-        }),
-      );
+      resolve({
+        ...calculateGrades(response),
+        grades: response,
+      });
+      return;
     });
   });
 }
@@ -204,6 +227,12 @@ export const Dashboard: NextPage = () => {
       });
       setCourses(courseSearchTerms);
       setProfessors(professorSearchTerms);
+      setState('loading');
+      setResults([]);
+      setAcademicSessions([]);
+      _setChosenSessions([]);
+      setGrades({});
+      setRmp({});
     }
   }, [router.isReady, router.query.searchTerms]);
 
@@ -235,6 +264,61 @@ export const Dashboard: NextPage = () => {
     }
   }, [courses, professors]);
 
+  const [academicSessions, setAcademicSessions] = useState<string[]>([]);
+  const [chosenSessions, _setChosenSessions] = useState<string[]>([]);
+
+  function setChosenSessions(func: (arg0: string[]) => string[]) {
+    _setChosenSessions((old) => {
+      const newVal = func(old);
+      setGrades((grades) => {
+        Object.keys(grades).forEach((key) => {
+          grades[key] = {
+            ...grades[key],
+            ...calculateGrades(grades[key].grades, newVal),
+          };
+        });
+        return grades;
+      });
+      return newVal;
+    });
+  }
+
+  function addAcademicSessions(sessions: string[]) {
+    setAcademicSessions((oldSessions) => {
+      oldSessions = oldSessions.concat(sessions);
+      oldSessions = oldSessions.filter(
+        (value, index, array) => array.indexOf(value) === index,
+      );
+      oldSessions.sort((a, b) => {
+        let aNum = parseInt(a);
+        if (a.includes('S')) {
+          aNum += 0.1;
+        } else if (a.includes('U')) {
+          aNum += 0.2;
+        } else {
+          aNum += 0.3;
+        }
+        let bNum = parseInt(b);
+        if (b.includes('S')) {
+          bNum += 0.1;
+        } else if (b.includes('U')) {
+          bNum += 0.2;
+        } else {
+          bNum += 0.3;
+        }
+        return aNum - bNum;
+      });
+      return oldSessions;
+    });
+    setChosenSessions((oldSessions) => {
+      oldSessions = oldSessions.concat(sessions);
+      oldSessions = oldSessions.filter(
+        (value, index, array) => array.indexOf(value) === index,
+      );
+      return oldSessions;
+    });
+  }
+
   const [grades, setGrades] = useState<{ [key: string]: GradesType }>({});
   const [rmp, setRmp] = useState<{ [key: string]: RateMyProfessorData }>({});
 
@@ -249,6 +333,7 @@ export const Dashboard: NextPage = () => {
           setGrades((old) => {
             return { ...old, [searchQueryLabel(result)]: res };
           });
+          addAcademicSessions(res.grades.map((session) => session._id));
         })
         .catch((error) => {
           console.error('Grades data', error);
@@ -358,12 +443,7 @@ export const Dashboard: NextPage = () => {
     );
   } else {
     contentComponent = (
-      <Grid
-        container
-        component="main"
-        wrap="wrap-reverse"
-        spacing={2}
-      >
+      <Grid container component="main" wrap="wrap-reverse" spacing={2}>
         <Grid item xs={12} sm={7} md={7}>
           <SearchResultsTable
             includedResults={includedResults}
@@ -402,13 +482,18 @@ export const Dashboard: NextPage = () => {
       <div className="w-full bg-light h-full">
         <TopMenu />
         <main className="p-4">
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={7} md={7}>
-            <Filters manageQuery />
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={7} md={7}>
+              <Filters
+                manageQuery
+                academicSessions={academicSessions}
+                chosenSessions={chosenSessions}
+                setChosenSessions={setChosenSessions}
+              />
+            </Grid>
+            <Grid item xs={false} sm={5} md={5}></Grid>
           </Grid>
-          <Grid item xs={false} sm={5} md={5}></Grid>
-        </Grid>
-        {contentComponent}
+          {contentComponent}
         </main>
       </div>
     </>
