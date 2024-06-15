@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { TabNavMenu } from '../../navigation/tabNavMenu/tabNavMenu';
 
 interface CarouselProps {
+  names: string[] | string;
   children: ReactJSXElement[] | ReactJSXElement;
 }
 
@@ -37,7 +38,7 @@ const variants = {
  * @param props the props passed from the parent component
  * @returns
  */
-export const Carousel = (props: CarouselProps) => {
+export const Carousel = ({ names, children }: CarouselProps) => {
   //The card currently being displayed
   const [currentCard, setCard] = useState(0);
   //The Direction that the card is moving in
@@ -59,7 +60,7 @@ export const Carousel = (props: CarouselProps) => {
     <>
       <TabNavMenu
         value={currentCard}
-        options={['Compare', 'Professor Overview', 'Class Overview']}
+        options={Array.isArray(names) ? names : [names]}
         turner={turn}
       />
       <div
@@ -85,9 +86,7 @@ export const Carousel = (props: CarouselProps) => {
               }}
             >
               <div className="w-full h-full lg:h-full rounded-md mb-10">
-                {Array.isArray(props.children)
-                  ? props.children[currentCard]
-                  : props.children}
+                {Array.isArray(children) ? children[currentCard] : children}
               </div>
             </motion.div>
           </div>

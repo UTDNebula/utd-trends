@@ -1,6 +1,7 @@
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Box,
+  Checkbox,
   Collapse,
   IconButton,
   Paper,
@@ -17,9 +18,10 @@ import React, { useState } from 'react';
 import SearchQuery, {
   convertToProfOnly,
 } from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
-import { GradesType } from '../../../pages/dashboard/index';
+import type { GradesType } from '../../../pages/dashboard/index';
 import { BarGraph } from '../../graph/BarGraph/BarGraph';
 
 function colorMidpoint(good: number, bad: number, value: number) {
@@ -52,9 +54,19 @@ type RowProps = {
   course: SearchQuery;
   grades: GradesType;
   rmp: RateMyProfessorData;
+  inCompare: boolean;
+  addToCompare: (arg0: SearchQuery) => void;
+  removeFromCompare: (arg0: SearchQuery) => void;
 };
 
-function Row({ course, grades, rmp }: RowProps) {
+function Row({
+  course,
+  grades,
+  rmp,
+  inCompare,
+  addToCompare,
+  removeFromCompare,
+}: RowProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -69,6 +81,18 @@ function Row({ course, grades, rmp }: RowProps) {
           >
             <KeyboardArrowIcon />
           </IconButton>
+        </TableCell>
+        <TableCell>
+          <Checkbox
+            checked={inCompare}
+            onClick={() => {
+              if (inCompare) {
+                removeFromCompare(course);
+              } else {
+                addToCompare(course);
+              }
+            }}
+          />
         </TableCell>
         <TableCell component="th" scope="row">
           <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
@@ -190,12 +214,18 @@ type SearchResultsTableProps = {
   includedResults: SearchQuery[];
   grades: { [key: string]: GradesType };
   rmp: { [key: string]: RateMyProfessorData };
+  compare: SearchQuery[];
+  addToCompare: (arg0: SearchQuery) => void;
+  removeFromCompare: (arg0: SearchQuery) => void;
 };
 
 const SearchResultsTable = ({
   includedResults,
   grades,
   rmp,
+  compare,
+  addToCompare,
+  removeFromCompare,
 }: SearchResultsTableProps) => {
   return (
     //TODO: sticky header
@@ -208,6 +238,7 @@ const SearchResultsTable = ({
           <TableHead>
             <TableRow>
               <TableCell />
+              <TableCell>Compare</TableCell>
               <TableCell>Name</TableCell>
               <TableCell align="center">GPA</TableCell>
               <TableCell align="center">Rating</TableCell>
@@ -221,6 +252,12 @@ const SearchResultsTable = ({
                 course={result}
                 grades={grades[searchQueryLabel(result)]}
                 rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
+                inCompare={
+                  compare.findIndex((obj) => searchQueryEqual(obj, result)) !==
+                  -1
+                }
+                addToCompare={addToCompare}
+                removeFromCompare={removeFromCompare}
               />
             ))}
           </TableBody>

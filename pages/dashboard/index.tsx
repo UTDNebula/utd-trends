@@ -5,7 +5,10 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import Carousel from '../../components/common/Carousel/carousel';
+import Compare from '../../components/common/Compare/compare';
+import CourseOverview from '../../components/common/CourseOverview/courseOverview';
 import Filters from '../../components/common/Filters/filters';
+import ProfessorOverview from '../../components/common/ProfessorOverview/professorOverview';
 import SearchResultsTable from '../../components/common/SearchResultsTable/searchResultsTable';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import decodeSearchQueryLabel from '../../modules/decodeSearchQueryLabel/decodeSearchQueryLabel';
@@ -279,6 +282,15 @@ export const Dashboard: NextPage = () => {
         });
         return grades;
       });
+      setCompareGrades((grades) => {
+        Object.keys(grades).forEach((key) => {
+          grades[key] = {
+            ...grades[key],
+            ...calculateGrades(grades[key].grades, newVal),
+          };
+        });
+        return grades;
+      });
       return newVal;
     });
   }
@@ -358,22 +370,6 @@ export const Dashboard: NextPage = () => {
         });
     }
 
-    //TODO: Filters
-    /*const router = useRouter();
-    useEffect(() => {
-      if (router.isReady) {
-        let array = router.query.searchTerms ?? [];
-        if (!Array.isArray(array)) {
-          array = array.split(',');
-        }
-        const searchTerms = array.map((el) => decodeSearchQueryLabel(el));
-        
-        if (searchTerms.length === 1) {
-          //sent to autocomplete to finish
-          
-        }
-      }
-    }, [router.isReady, router.query]);*/
     return () => {
       controller.abort();
     };
@@ -424,6 +420,54 @@ export const Dashboard: NextPage = () => {
     rmp,
   ]);
 
+  const [compare, setCompare] = useState<SearchQuery[]>([]);
+  const [compareGrades, setCompareGrades] = useState<{
+    [key: string]: GradesType;
+  }>({});
+  const [compareRmp, setCompareRmp] = useState<{
+    [key: string]: RateMyProfessorData;
+  }>({});
+
+  function addToCompare(searchQuery: SearchQuery) {
+    console.log(
+      compare,
+      searchQuery,
+      compare.findIndex((obj) => searchQueryEqual(obj, searchQuery)),
+    );
+    if (compare.findIndex((obj) => searchQueryEqual(obj, searchQuery)) === -1) {
+      setCompare((old) => old.concat([searchQuery]));
+      setCompareGrades((old) => {
+        return {
+          ...old,
+          [searchQueryLabel(searchQuery)]:
+            grades[searchQueryLabel(searchQuery)],
+        };
+      });
+      setCompareRmp((old) => {
+        return {
+          ...old,
+          [searchQueryLabel(searchQuery)]: rmp[searchQueryLabel(searchQuery)],
+        };
+      });
+    }
+  }
+
+  function removeFromCompare(searchQuery: SearchQuery) {
+    if (compare.findIndex((obj) => searchQueryEqual(obj, searchQuery)) !== -1) {
+      setCompare((old) =>
+        old.filter((el) => !searchQueryEqual(el, searchQuery)),
+      );
+      setCompareGrades((old) => {
+        delete old[searchQueryLabel(searchQuery)];
+        return old;
+      });
+      setCompareRmp((old) => {
+        delete old[searchQueryLabel(searchQuery)];
+        return old;
+      });
+    }
+  }
+
   let contentComponent;
 
   if (state === 'loading') {
@@ -442,6 +486,31 @@ export const Dashboard: NextPage = () => {
       </div>
     );
   } else {
+    const names = [];
+    const tabs = [];
+    if (professors.length === 1) {
+      names.push('Professor');
+      tabs.push(
+        <ProfessorOverview
+          professor={professors[0]}
+          grades={grades[searchQueryLabel(professors[0])]}
+          rmp={rmp[searchQueryLabel(professors[0])]}
+        />,
+      );
+    }
+    if (courses.length === 1) {
+      names.push('Class');
+      tabs.push(
+        <CourseOverview
+          course={courses[0]}
+          grades={grades[searchQueryLabel(courses[0])]}
+        />,
+      );
+    }
+    names.push('Compare');
+    tabs.push(
+      <Compare courses={compare} grades={compareGrades} rmp={compareRmp} />,
+    );
     contentComponent = (
       <Grid container component="main" wrap="wrap-reverse" spacing={2}>
         <Grid item xs={12} sm={7} md={7}>
@@ -449,15 +518,14 @@ export const Dashboard: NextPage = () => {
             includedResults={includedResults}
             grades={grades}
             rmp={rmp}
+            compare={compare}
+            addToCompare={addToCompare}
+            removeFromCompare={removeFromCompare}
           />
         </Grid>
         <Grid item xs={false} sm={5} md={5}>
           <Card className="h-96 px-4 py-2">
-            <Carousel>
-              <p>page 1</p>
-              <p>page 2</p>
-              <p>page 3</p>
-            </Carousel>
+            <Carousel names={names}>{tabs}</Carousel>
           </Card>
         </Grid>
       </Grid>
