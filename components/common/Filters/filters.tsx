@@ -110,7 +110,10 @@ const Filters = ({
 
   const [open, setOpen] = useState(false);
 
-  const showAcademicSessions = typeof academicSessions !== 'undefined' && typeof chosenSessions !== 'undefined' && typeof setChosenSessions !== 'undefined';
+  const showAcademicSessions =
+    typeof academicSessions !== 'undefined' &&
+    typeof chosenSessions !== 'undefined' &&
+    typeof setChosenSessions !== 'undefined';
 
   return (
     <div className={'flex flex-col gap-2 ' + className ?? ''}>
@@ -196,47 +199,49 @@ const Filters = ({
                 ? ' border-2 border-persimmon-500 border-solid'
                 : '')
             }
-            title={academicSessions.length !== chosenSessions.length ? 'Not showing all academic sessions' : 'Choose academic sessions'}
+            title={
+              academicSessions.length !== chosenSessions.length
+                ? 'Not showing all academic sessions'
+                : 'Choose academic sessions'
+            }
           >
             <KeyboardArrowIcon />
           </IconButton>
         )}
       </div>
       {showAcademicSessions && (
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <div className="flex flex-wrap gap-2">
-              {academicSessions.map((session, index) => (
-                <FormControlLabel
-                  key={session}
-                  control={
-                    <Checkbox
-                      checked={chosenSessions.includes(session)}
-                      onClick={() => {
-                        setChosenSessions((oldChosenSessions: string[]) => {
-                          if (oldChosenSessions.includes(session)) {
-                            return oldChosenSessions.filter(
-                              (el) => el !== session,
-                            );
-                          }
-                          const newSessions = oldChosenSessions.concat([
-                            session,
-                          ]);
-                          return newSessions;
-                        });
-                      }}
-                    />
-                  }
-                  label={
-                    '20' +
-                    session.slice(0, 2) +
-                    ' ' +
-                    { U: 'Summer', F: 'Fall', S: 'Spring' }[session.slice(2)]
-                  }
-                />
-              ))}
-            </div>
-          </Collapse>
-        )}
+        <Collapse in={open} timeout="auto" unmountOnExit>
+          <div className="flex flex-wrap gap-2">
+            {academicSessions.map((session, index) => (
+              <FormControlLabel
+                key={session}
+                control={
+                  <Checkbox
+                    checked={chosenSessions.includes(session)}
+                    onClick={() => {
+                      setChosenSessions((oldChosenSessions: string[]) => {
+                        if (oldChosenSessions.includes(session)) {
+                          return oldChosenSessions.filter(
+                            (el) => el !== session,
+                          );
+                        }
+                        const newSessions = oldChosenSessions.concat([session]);
+                        return newSessions;
+                      });
+                    }}
+                  />
+                }
+                label={
+                  '20' +
+                  session.slice(0, 2) +
+                  ' ' +
+                  { U: 'Summer', F: 'Fall', S: 'Spring' }[session.slice(2)]
+                }
+              />
+            ))}
+          </div>
+        </Collapse>
+      )}
     </div>
   );
 };

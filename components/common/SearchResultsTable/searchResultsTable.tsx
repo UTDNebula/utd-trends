@@ -1,9 +1,12 @@
+import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Box,
   Checkbox,
+  CircularProgress,
   Collapse,
   IconButton,
+  LinearProgress,
   Paper,
   Table,
   TableBody,
@@ -54,6 +57,8 @@ type RowProps = {
   course: SearchQuery;
   grades: GradesType;
   rmp: RateMyProfessorData;
+  gradesLoading: 'loading' | 'done' | 'error';
+  rmpLoading: 'loading' | 'done' | 'error';
   inCompare: boolean;
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
@@ -63,6 +68,8 @@ function Row({
   course,
   grades,
   rmp,
+  gradesLoading,
+  rmpLoading,
   inCompare,
   addToCompare,
   removeFromCompare,
@@ -100,31 +107,37 @@ function Row({
           </Typography>
         </TableCell>
         <TableCell align="right">
-          {typeof grades !== 'undefined' && grades.gpa !== -1 ? (
+          {gradesLoading === 'loading' && <CircularProgress />}
+          {gradesLoading === 'error' && <CloseIcon />}
+          {gradesLoading === 'done' && (
             <Typography
               className="text-base text-black rounded-3xl px-5 py-2 inline"
               sx={{ backgroundColor: colorMidpoint(4, 0, grades.gpa) }}
             >
               {grades.gpa.toFixed(2)}
             </Typography>
-          ) : (
-            <Typography className="text-base px-5 py-2 inline">X</Typography>
           )}
         </TableCell>
         <TableCell align="right">
-          {typeof rmp !== 'undefined' ? (
+          {rmpLoading === 'loading' && <CircularProgress />}
+          {(rmpLoading === 'error' || typeof rmpLoading === 'undefined') && (
+            <CloseIcon />
+          )}
+          {rmpLoading === 'done' && (
             <Typography
               className="text-base text-black rounded-3xl px-5 py-2 inline"
               sx={{ backgroundColor: colorMidpoint(5, 0, rmp.averageRating) }}
             >
               {rmp.averageRating.toFixed(1)}
             </Typography>
-          ) : (
-            <Typography className="text-base px-5 py-2 inline">X</Typography>
           )}
         </TableCell>
         <TableCell align="right">
-          {typeof rmp !== 'undefined' ? (
+          {rmpLoading === 'loading' && <CircularProgress />}
+          {(rmpLoading === 'error' || typeof rmpLoading === 'undefined') && (
+            <CloseIcon />
+          )}
+          {rmpLoading === 'done' && (
             <Typography
               className="text-base text-black rounded-3xl px-5 py-2 inline"
               sx={{
@@ -133,8 +146,6 @@ function Row({
             >
               {rmp.averageDifficulty.toFixed(1)}
             </Typography>
-          ) : (
-            <Typography className="text-base px-5 py-2 inline">X</Typography>
           )}
         </TableCell>
       </TableRow>
@@ -142,7 +153,8 @@ function Row({
         <TableCell className="p-0" colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <div className="p-4">
-              {typeof grades !== 'undefined' && (
+              {gradesLoading === 'loading' && <LinearProgress />}
+              {gradesLoading === 'done' && (
                 <>
                   <div className="h-64">
                     <BarGraph
@@ -163,6 +175,7 @@ function Row({
                         'F',
                         'W',
                       ]}
+                      yaxisFormatter={(value) => Number(value).toLocaleString()}
                       series={[
                         {
                           name: searchQueryLabel(course),
@@ -182,7 +195,8 @@ function Row({
                   </div>
                 </>
               )}
-              {typeof rmp !== 'undefined' && (
+              {rmpLoading === 'loading' && <LinearProgress />}
+              {rmpLoading === 'done' && (
                 <>
                   <div className="inline-flex">
                     <Box className="bg-gray-200 dark:bg-gray-800 rounded px-2">
@@ -214,6 +228,8 @@ type SearchResultsTableProps = {
   includedResults: SearchQuery[];
   grades: { [key: string]: GradesType };
   rmp: { [key: string]: RateMyProfessorData };
+  gradesLoading: { [key: string]: 'loading' | 'done' | 'error' };
+  rmpLoading: { [key: string]: 'loading' | 'done' | 'error' };
   compare: SearchQuery[];
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
@@ -223,6 +239,8 @@ const SearchResultsTable = ({
   includedResults,
   grades,
   rmp,
+  gradesLoading,
+  rmpLoading,
   compare,
   addToCompare,
   removeFromCompare,
@@ -252,6 +270,10 @@ const SearchResultsTable = ({
                 course={result}
                 grades={grades[searchQueryLabel(result)]}
                 rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
+                gradesLoading={gradesLoading[searchQueryLabel(result)]}
+                rmpLoading={
+                  rmpLoading[searchQueryLabel(convertToProfOnly(result))]
+                }
                 inCompare={
                   compare.findIndex((obj) => searchQueryEqual(obj, result)) !==
                   -1
