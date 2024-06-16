@@ -110,6 +110,8 @@ const Filters = ({
 
   const [open, setOpen] = useState(false);
 
+  const showAcademicSessions = typeof academicSessions !== 'undefined' && typeof chosenSessions !== 'undefined' && typeof setChosenSessions !== 'undefined';
+
   return (
     <div className={'flex flex-col gap-2 ' + className ?? ''}>
       <div className="flex gap-2">
@@ -182,26 +184,28 @@ const Filters = ({
             ))}
           </Select>
         </FormControl>
-        {typeof academicSessions !== 'undefined' && (
+        {showAcademicSessions && (
           <IconButton
             aria-label="expand academic session picker"
             size="small"
             onClick={() => setOpen(!open)}
             className={
               'w-10 transition-transform' +
-              (open ? ' rotate-90' : ' rotate-180')
+              (open ? ' rotate-90' : ' rotate-180') +
+              (academicSessions.length !== chosenSessions.length
+                ? ' border-2 border-persimmon-500 border-solid'
+                : '')
             }
+            title={academicSessions.length !== chosenSessions.length ? 'Not showing all academic sessions' : 'Choose academic sessions'}
           >
             <KeyboardArrowIcon />
           </IconButton>
         )}
       </div>
-      {typeof academicSessions !== 'undefined' &&
-        typeof chosenSessions !== 'undefined' &&
-        typeof setChosenSessions !== 'undefined' && (
+      {showAcademicSessions && (
           <Collapse in={open} timeout="auto" unmountOnExit>
             <div className="flex flex-wrap gap-2">
-              {academicSessions.map((session) => (
+              {academicSessions.map((session, index) => (
                 <FormControlLabel
                   key={session}
                   control={

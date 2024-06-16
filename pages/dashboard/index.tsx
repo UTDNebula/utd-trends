@@ -429,11 +429,6 @@ export const Dashboard: NextPage = () => {
   }>({});
 
   function addToCompare(searchQuery: SearchQuery) {
-    console.log(
-      compare,
-      searchQuery,
-      compare.findIndex((obj) => searchQueryEqual(obj, searchQuery)),
-    );
     if (compare.findIndex((obj) => searchQueryEqual(obj, searchQuery)) === -1) {
       setCompare((old) => old.concat([searchQuery]));
       setCompareGrades((old) => {
