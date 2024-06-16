@@ -28,6 +28,7 @@ import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScra
 import type { GradesType } from '../../../pages/dashboard/index';
 import { BarGraph } from '../../graph/BarGraph/BarGraph';
 
+//Find the color corresponding to a number in a range
 function colorMidpoint(good: number, bad: number, value: number) {
   const min = bad < good ? bad : good;
   const max = bad > good ? bad : good;
@@ -246,10 +247,13 @@ const SearchResultsTable = ({
   addToCompare,
   removeFromCompare,
 }: SearchResultsTableProps) => {
+  //Table sorting category
   const [orderBy, setOrderBy] = useState<
     'none' | 'gpa' | 'rating' | 'difficulty'
   >('none');
+  //Table sorting direction
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+  //Cycle through sorting
   function handleClick(col: 'gpa' | 'rating' | 'difficulty') {
     if (orderBy !== col) {
       setOrderBy(col);
@@ -263,6 +267,7 @@ const SearchResultsTable = ({
     }
   }
 
+  //Sort
   let sortedResults = includedResults;
   if (orderBy !== 'none') {
     sortedResults = [...includedResults].sort((a, b) => {
@@ -271,6 +276,7 @@ const SearchResultsTable = ({
         const bGrades = grades[searchQueryLabel(b)];
         const aGradesLoading = gradesLoading[searchQueryLabel(a)];
         const bGradesLoading = gradesLoading[searchQueryLabel(b)];
+        //drop loading/error rows to bottom
         if (aGradesLoading !== 'done' && bGradesLoading !== 'done') {
           return 0;
         }
@@ -290,6 +296,7 @@ const SearchResultsTable = ({
         const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
         const aRmpLoading = rmpLoading[searchQueryLabel(convertToProfOnly(a))];
         const bRmpLoading = rmpLoading[searchQueryLabel(convertToProfOnly(b))];
+        //drop loading/error rows to bottom
         if (aRmpLoading !== 'done' && bRmpLoading !== 'done') {
           return 0;
         }

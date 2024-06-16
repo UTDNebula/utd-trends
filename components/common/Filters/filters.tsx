@@ -66,6 +66,7 @@ const Filters = ({
     }
   }, [router.isReady]);
 
+  //Update URL, state, and parent
   function onChange(
     newValue: string,
     toSet: 'minGPA' | 'minRating' | 'maxDiff',
@@ -108,8 +109,10 @@ const Filters = ({
     }
   }
 
+  //For academic sessions
   const [open, setOpen] = useState(false);
 
+  //All of these must be defined to work
   const showAcademicSessions =
     typeof academicSessions !== 'undefined' &&
     typeof chosenSessions !== 'undefined' &&

@@ -1,12 +1,14 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+export type GradesData = {
+  _id: string;
+  grade_distribution: number[];
+}[];
+
 type Data = {
   message: string;
-  data?: {
-    _id: string;
-    grade_distribution: number[];
-  }[];
+  data?: GradesData;
 };
 
 export default function handler(
