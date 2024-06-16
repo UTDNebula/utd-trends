@@ -249,7 +249,7 @@ const SearchResultsTable = ({
   const [orderBy, setOrderBy] = useState<
     'none' | 'gpa' | 'rating' | 'difficulty'
   >('none');
-  const [order, setOrder] = useState<'none' | 'asc' | 'desc'>('asc');
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
   function handleClick(col: 'gpa' | 'rating' | 'difficulty') {
     if (orderBy !== col) {
       setOrderBy(col);
@@ -263,10 +263,9 @@ const SearchResultsTable = ({
     }
   }
 
-  console.log(orderBy, order);
   let sortedResults = includedResults;
   if (orderBy !== 'none') {
-    sortedResults = includedResults.toSorted((a, b) => {
+    sortedResults = [...includedResults].sort((a, b) => {
       if (orderBy === 'gpa') {
         const aGrades = grades[searchQueryLabel(a)];
         const bGrades = grades[searchQueryLabel(b)];
@@ -311,6 +310,7 @@ const SearchResultsTable = ({
         }
         return bRmp.averageDifficulty - aRmp.averageDifficulty;
       }
+      return 0;
     });
   }
 

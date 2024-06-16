@@ -345,7 +345,8 @@ export const Dashboard: NextPage = () => {
     const controller = new AbortController();
 
     //Get grade data
-    const blankGradesLoading = {};
+    const blankGradesLoading: { [key: string]: 'loading' | 'done' | 'error' } =
+      {};
     for (const result of results) {
       blankGradesLoading[searchQueryLabel(result)] = 'loading';
     }
@@ -377,7 +378,7 @@ export const Dashboard: NextPage = () => {
       .map((result) => convertToProfOnly(result))
       .filter((obj) => Object.keys(obj).length !== 0);
     professorsInResults = removeDuplicates(professorsInResults);
-    const blankRmpLoading = {};
+    const blankRmpLoading: { [key: string]: 'loading' | 'done' | 'error' } = {};
     for (const professor of professorsInResults) {
       blankRmpLoading[searchQueryLabel(professor)] = 'loading';
     }

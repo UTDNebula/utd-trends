@@ -265,7 +265,8 @@ const SearchBar = (props: SearchProps) => {
         }
       }}
       renderOption={(props, option, { inputValue }) => {
-        const text = searchQueryLabel(option);
+        const text =
+          typeof option === 'string' ? option : searchQueryLabel(option);
         //add spaces between prefix and course number
         const matches = match(
           text,
