@@ -14,6 +14,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
@@ -245,6 +246,74 @@ const SearchResultsTable = ({
   addToCompare,
   removeFromCompare,
 }: SearchResultsTableProps) => {
+  const [orderBy, setOrderBy] = useState<
+    'none' | 'gpa' | 'rating' | 'difficulty'
+  >('none');
+  const [order, setOrder] = useState<'none' | 'asc' | 'desc'>('asc');
+  function handleClick(col: 'gpa' | 'rating' | 'difficulty') {
+    if (orderBy !== col) {
+      setOrderBy(col);
+      setOrder('asc');
+    } else {
+      if (order === 'asc') {
+        setOrder('desc');
+      } else if (order === 'desc') {
+        setOrderBy('none');
+      }
+    }
+  }
+
+  console.log(orderBy, order);
+  let sortedResults = includedResults;
+  if (orderBy !== 'none') {
+    sortedResults = includedResults.toSorted((a, b) => {
+      if (orderBy === 'gpa') {
+        const aGrades = grades[searchQueryLabel(a)];
+        const bGrades = grades[searchQueryLabel(b)];
+        const aGradesLoading = gradesLoading[searchQueryLabel(a)];
+        const bGradesLoading = gradesLoading[searchQueryLabel(b)];
+        if (aGradesLoading !== 'done' && bGradesLoading !== 'done') {
+          return 0;
+        }
+        if (aGradesLoading !== 'done') {
+          return 9999;
+        }
+        if (bGradesLoading !== 'done') {
+          return -9999;
+        }
+        if (order === 'asc') {
+          return aGrades.gpa - bGrades.gpa;
+        }
+        return bGrades.gpa - aGrades.gpa;
+      }
+      if (orderBy === 'rating' || orderBy === 'difficulty') {
+        const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
+        const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
+        const aRmpLoading = rmpLoading[searchQueryLabel(convertToProfOnly(a))];
+        const bRmpLoading = rmpLoading[searchQueryLabel(convertToProfOnly(b))];
+        if (aRmpLoading !== 'done' && bRmpLoading !== 'done') {
+          return 0;
+        }
+        if (aRmpLoading !== 'done') {
+          return 9999;
+        }
+        if (bRmpLoading !== 'done') {
+          return -9999;
+        }
+        if (orderBy === 'rating') {
+          if (order === 'asc') {
+            return aRmp.averageRating - bRmp.averageRating;
+          }
+          return bRmp.averageRating - aRmp.averageRating;
+        }
+        if (order === 'asc') {
+          return aRmp.averageDifficulty - bRmp.averageDifficulty;
+        }
+        return bRmp.averageDifficulty - aRmp.averageDifficulty;
+      }
+    });
+  }
+
   return (
     //TODO: sticky header
     <>
@@ -258,13 +327,43 @@ const SearchResultsTable = ({
               <TableCell />
               <TableCell>Compare</TableCell>
               <TableCell>Name</TableCell>
-              <TableCell align="center">GPA</TableCell>
-              <TableCell align="center">Rating</TableCell>
-              <TableCell align="center">Difficulty</TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'gpa'}
+                  direction={orderBy === 'gpa' ? order : 'asc'}
+                  onClick={() => {
+                    handleClick('gpa');
+                  }}
+                >
+                  GPA
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'rating'}
+                  direction={orderBy === 'rating' ? order : 'asc'}
+                  onClick={() => {
+                    handleClick('rating');
+                  }}
+                >
+                  Rating
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'difficulty'}
+                  direction={orderBy === 'difficulty' ? order : 'asc'}
+                  onClick={() => {
+                    handleClick('difficulty');
+                  }}
+                >
+                  Difficulty
+                </TableSortLabel>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {includedResults.map((result) => (
+            {sortedResults.map((result) => (
               <Row
                 key={searchQueryLabel(result)}
                 course={result}
