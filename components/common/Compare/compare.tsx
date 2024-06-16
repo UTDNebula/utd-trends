@@ -15,12 +15,12 @@ type CompareProps = {
 const Compare = ({ courses }: CompareProps) => {
   console.log(courses);
   return (
-    <Typography className="leading-tight">
-      compare
+    <>
+      <p>compare</p>
       {courses.map((course) => (
-        <div key={searchQueryLabel(course)}>{searchQueryLabel(course)}</div>
+        <p key={searchQueryLabel(course)}>{searchQueryLabel(course)}</p>
       ))}
-    </Typography>
+    </>
   );
 };
 

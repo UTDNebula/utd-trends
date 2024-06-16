@@ -18,9 +18,10 @@ const ProfessorOverview = ({
   rmp,
 }: ProfessorOverviewProps) => {
   return (
-    <Typography className="leading-tight">
-      prof{searchQueryLabel(professor)}
-    </Typography>
+    <>
+      <p>prof</p>
+      <p>{searchQueryLabel(professor)}</p>
+    </>
   );
 };
 

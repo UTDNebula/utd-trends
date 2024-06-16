@@ -427,7 +427,8 @@ export const Dashboard: NextPage = () => {
           });
           //Set loading status to done
           setRmpLoading((old) => {
-            old[searchQueryLabel(professor)] = 'done';
+            old[searchQueryLabel(professor)] =
+              typeof res !== 'undefined' ? 'done' : 'error';
             return old;
           });
         })
@@ -626,8 +627,8 @@ export const Dashboard: NextPage = () => {
             removeFromCompare={removeFromCompare}
           />
         </Grid>
-        <Grid item xs={false} sm={5} md={5}>
-          <Card className="h-96 px-4 py-2">
+        <Grid item xs={false} sm={5} md={5} className="w-full">
+          <Card className="h-96">
             <Carousel names={names}>{tabs}</Carousel>
           </Card>
         </Grid>

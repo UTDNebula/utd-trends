@@ -12,9 +12,10 @@ type CourseOverviewProps = {
 
 const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
   return (
-    <Typography className="leading-tight">
-      course{searchQueryLabel(course)}
-    </Typography>
+    <>
+      <p>course</p>
+      <p>{searchQueryLabel(course)}</p>
+    </>
   );
 };
 

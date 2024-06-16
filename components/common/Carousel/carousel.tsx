@@ -63,35 +63,24 @@ export const Carousel = ({ names, children }: CarouselProps) => {
         options={Array.isArray(names) ? names : [names]}
         turner={turn}
       />
-      <div
-        className="relative p-2 pt-0 lg:p-10"
-        style={{
-          height: '90%',
-          overflowX: 'hidden',
-        }}
-      >
-        <AnimatePresence>
-          <div className="h-full">
-            <motion.div
-              className="h-full"
-              key={currentCard}
-              custom={direction}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{
-                x: { type: 'spring', stiffness: 300, damping: 30 },
-                opacity: { duration: 0.2 },
-              }}
-            >
-              <div className="w-full h-full lg:h-full rounded-md mb-10">
-                {Array.isArray(children) ? children[currentCard] : children}
-              </div>
-            </motion.div>
-          </div>
-        </AnimatePresence>
-      </div>
+      <AnimatePresence>
+        <div className="p-4 lg:p-6">
+          <motion.div
+            key={currentCard}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              x: { type: 'spring', stiffness: 300, damping: 30 },
+              opacity: { duration: 0.2 },
+            }}
+          >
+            {Array.isArray(children) ? children[currentCard] : children}
+          </motion.div>
+        </div>
+      </AnimatePresence>
     </>
   );
 };

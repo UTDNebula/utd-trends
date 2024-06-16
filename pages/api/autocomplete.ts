@@ -31,13 +31,17 @@ export default function handler(
     ) {
       searchBy = req.query.searchBy;
     }
+    let limit = 20;
+    if ('limit' in req.query && typeof req.query.limit === 'string') {
+      limit = Number(req.query.limit);
+    }
     return new Promise<void>((resolve) => {
       res.status(200).json({
         message: 'success',
         data: searchAutocomplete(
           graph,
           req.query.input as string,
-          20,
+          limit,
           searchBy,
         ),
       });
