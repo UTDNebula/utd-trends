@@ -35,6 +35,7 @@ function removeDuplicates(array: SearchQuery[]) {
 //Fetch course+prof combos matching a specific course/prof
 function autocompleteForSearchResultsFetch(
   searchTerms: SearchQuery[],
+  controller: AbortController,
 ): Promise<SearchQuery[]>[] {
   return searchTerms.map((searchTerm) => {
     return fetchWithCache(
@@ -43,6 +44,7 @@ function autocompleteForSearchResultsFetch(
       expireTime,
       {
         // use the search terms to fetch all the result course-professor combinations
+        signal: controller.signal,
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -63,32 +65,33 @@ function autocompleteForSearchResultsFetch(
 function fetchSearchResults(
   searchTerms: SearchQuery[],
   filterTerms: SearchQuery[],
+  controller: AbortController,
 ) {
   return new Promise<SearchQuery[]>((resolve) => {
-    Promise.all(autocompleteForSearchResultsFetch(searchTerms)).then(
-      (allSearchTermResults: SearchQuery[][]) => {
-        const results: SearchQuery[] = [];
-        allSearchTermResults.map((searchTermResults) =>
-          searchTermResults.map((searchTermResult) => {
-            if (filterTerms.length > 0) {
-              filterTerms.map((filterTerm) => {
-                if (
-                  (filterTerm.profFirst === searchTermResult.profFirst &&
-                    filterTerm.profLast === searchTermResult.profLast) ||
-                  (filterTerm.prefix === searchTermResult.prefix &&
-                    filterTerm.number === searchTermResult.number)
-                ) {
-                  results.push(searchTermResult);
-                }
-              });
-            } else {
-              results.push(searchTermResult);
-            }
-          }),
-        );
-        resolve(results);
-      },
-    );
+    Promise.all(
+      autocompleteForSearchResultsFetch(searchTerms, controller),
+    ).then((allSearchTermResults: SearchQuery[][]) => {
+      const results: SearchQuery[] = [];
+      allSearchTermResults.map((searchTermResults) =>
+        searchTermResults.map((searchTermResult) => {
+          if (filterTerms.length > 0) {
+            filterTerms.map((filterTerm) => {
+              if (
+                (filterTerm.profFirst === searchTermResult.profFirst &&
+                  filterTerm.profLast === searchTermResult.profLast) ||
+                (filterTerm.prefix === searchTermResult.prefix &&
+                  filterTerm.number === searchTermResult.number)
+              ) {
+                results.push(searchTermResult);
+              }
+            });
+          } else {
+            results.push(searchTermResult);
+          }
+        }),
+      );
+      resolve(results);
+    });
   });
 }
 
@@ -249,28 +252,36 @@ export const Dashboard: NextPage = () => {
       setGradesLoading({});
       setRmpLoading({});
 
+      //To cancel on rerender
+      const controller = new AbortController();
+
       //Get results from autocomplete
       if (courseSearchTerms.length > 0) {
-        fetchSearchResults(courseSearchTerms, professorSearchTerms)
+        fetchSearchResults(courseSearchTerms, professorSearchTerms, controller)
           .then((res) => {
             setResults(res);
             setState('done');
+            getData(res, controller);
           })
           .catch((error) => {
             setState('error');
             console.error('Search Results', error);
           });
       } else if (professorSearchTerms.length > 0) {
-        fetchSearchResults(professorSearchTerms, courseSearchTerms)
+        fetchSearchResults(professorSearchTerms, courseSearchTerms, controller)
           .then((res) => {
             setResults(res);
             setState('done');
+            getData(res, controller);
           })
           .catch((error) => {
             setState('error');
             console.error('Search Results', error);
           });
       }
+      return () => {
+        controller.abort();
+      };
     }
   }, [router.isReady, router.query.searchTerms]);
 
@@ -361,10 +372,7 @@ export const Dashboard: NextPage = () => {
   }>({});
 
   //On change to results, load new data
-  useEffect(() => {
-    //To cancel on rerender
-    const controller = new AbortController();
-
+  function getData(results: SearchQuery[], controller: AbortController) {
     //Grade data
     //Set loading states to loading
     const blankGradesLoading: { [key: string]: 'loading' | 'done' | 'error' } =
@@ -441,11 +449,7 @@ export const Dashboard: NextPage = () => {
           console.error('RMP data for ' + searchQueryLabel(professor), error);
         });
     }
-
-    return () => {
-      controller.abort();
-    };
-  }, [results]);
+  }
 
   //Filtered results
   const [includedResults, setIncludedResults] = useState<SearchQuery[]>([]);
