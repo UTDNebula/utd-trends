@@ -1,10 +1,10 @@
 import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
-  Box,
   Checkbox,
   CircularProgress,
   Collapse,
+  Grid,
   IconButton,
   LinearProgress,
   Paper,
@@ -154,10 +154,10 @@ function Row({
       <TableRow>
         <TableCell className="p-0" colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <div className="p-4">
+            <div className="p-2 md:p-4">
               {gradesLoading === 'loading' && <LinearProgress />}
               {gradesLoading === 'done' && (
-                <>
+                <div className="p-2">
                   <div className="h-64">
                     <BarGraph
                       title="Grades"
@@ -195,28 +195,30 @@ function Row({
                       <b>{grades.gpa === -1 ? 'X' : grades.gpa.toFixed(3)}</b>
                     </p>
                   </div>
-                </>
+                </div>
               )}
               {rmpLoading === 'loading' && <LinearProgress />}
               {rmpLoading === 'done' && (
-                <>
-                  <div className="inline-flex">
-                    <Box className="bg-gray-200 dark:bg-gray-800 rounded px-2">
-                      <p># of RMP ratings </p>
-                      <p className="flex justify-center">
-                        {rmp.numRatings === -1 ? 'X' : rmp.numRatings}
-                      </p>
-                    </Box>
-                    <Box className="mx-3 bg-gray-200 dark:bg-gray-800 rounded px-2">
-                      <p>would take again</p>
-                      <p className="flex justify-center">
-                        {rmp.wouldTakeAgainPercentage === -1
-                          ? 'X'
-                          : rmp.wouldTakeAgainPercentage.toFixed(0) + '%'}
-                      </p>
-                    </Box>
-                  </div>
-                </>
+                <Grid container spacing={2} className="p-4">
+                  <Grid item xs={6}>
+                    <p className="text-xl font-bold">{rmp.averageRating}</p>
+                    <p>Professor rating</p>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <p className="text-xl font-bold">{rmp.averageDifficulty}</p>
+                    <p>Difficulty</p>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <p className="text-xl font-bold">{rmp.numRatings}</p>
+                    <p>Ratings given</p>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <p className="text-xl font-bold">
+                      {rmp.wouldTakeAgainPercentage.toFixed(0) + '%'}
+                    </p>
+                    <p>Would take again</p>
+                  </Grid>
+                </Grid>
               )}
             </div>
           </Collapse>
