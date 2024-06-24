@@ -1,5 +1,5 @@
 //Increment these to reset cache on next deployment
-export const cacheIndexGrades = 0;
+export const cacheIndexNebula = 0;
 export const cacheIndexRmp = 0;
 
 export const expireTime = 604800; //1 week

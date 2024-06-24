@@ -13,7 +13,7 @@ import SearchResultsTable from '../../components/common/SearchResultsTable/searc
 import TopMenu from '../../components/navigation/topMenu/topMenu';
 import decodeSearchQueryLabel from '../../modules/decodeSearchQueryLabel/decodeSearchQueryLabel';
 import fetchWithCache, {
-  cacheIndexGrades,
+  cacheIndexNebula,
   cacheIndexRmp,
   expireTime,
 } from '../../modules/fetchWithCache';
@@ -40,7 +40,7 @@ function autocompleteForSearchResultsFetch(
   return searchTerms.map((searchTerm) => {
     return fetchWithCache(
       '/api/autocomplete?limit=50&input=' + searchQueryLabel(searchTerm),
-      cacheIndexGrades,
+      cacheIndexNebula,
       expireTime,
       {
         // use the search terms to fetch all the result course-professor combinations
@@ -153,7 +153,7 @@ function fetchGradesData(course: SearchQuery, controller: AbortController) {
               encodeURIComponent(String(course[key as keyof SearchQuery])),
           )
           .join('&'),
-      cacheIndexGrades,
+      cacheIndexNebula,
       expireTime,
       {
         signal: controller.signal,
@@ -215,7 +215,7 @@ export const Dashboard: NextPage = () => {
   const [professors, setProfessors] = useState<SearchQuery[]>([]);
 
   //State for loading list of results
-  const [state, setState] = useState('loading');
+  const [state, setState] = useState<'loading' | 'done' | 'error'>('loading');
   //List of course+prof combos, data on each still needs to be fetched
   const [results, setResults] = useState<SearchQuery[]>([]);
 
@@ -595,6 +595,8 @@ export const Dashboard: NextPage = () => {
           professor={professors[0]}
           grades={grades[searchQueryLabel(professors[0])]}
           rmp={rmp[searchQueryLabel(professors[0])]}
+          gradesLoading={gradesLoading[searchQueryLabel(professors[0])]}
+          rmpLoading={rmpLoading[searchQueryLabel(professors[0])]}
         />,
       );
     }
@@ -605,6 +607,7 @@ export const Dashboard: NextPage = () => {
           key="course"
           course={courses[0]}
           grades={grades[searchQueryLabel(courses[0])]}
+          gradesLoading={gradesLoading[searchQueryLabel(courses[0])]}
         />,
       );
     }
@@ -632,7 +635,7 @@ export const Dashboard: NextPage = () => {
           />
         </Grid>
         <Grid item xs={false} sm={5} md={5} className="w-full">
-          <Card className="h-96">
+          <Card>
             <Carousel names={names}>{tabs}</Carousel>
           </Card>
         </Grid>

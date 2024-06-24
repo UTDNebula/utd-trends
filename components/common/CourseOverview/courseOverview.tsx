@@ -7,9 +7,14 @@ import type { GradesType } from '../../../pages/dashboard/index';
 type CourseOverviewProps = {
   course: SearchQuery;
   grades: GradesType;
+  gradesLoading: 'loading' | 'done' | 'error';
 };
 
-const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
+const CourseOverview = ({
+  course,
+  grades,
+  gradesLoading,
+}: CourseOverviewProps) => {
   return (
     <>
       <p>course</p>

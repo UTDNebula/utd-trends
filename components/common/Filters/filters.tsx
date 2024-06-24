@@ -215,7 +215,7 @@ const Filters = ({
       {showAcademicSessions && (
         <Collapse in={open} timeout="auto" unmountOnExit>
           <div className="flex flex-wrap gap-2">
-            {academicSessions.map((session, index) => (
+            {academicSessions.map((session) => (
               <FormControlLabel
                 key={session}
                 control={

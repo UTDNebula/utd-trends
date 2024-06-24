@@ -4,9 +4,7 @@ import {
   Checkbox,
   CircularProgress,
   Collapse,
-  Grid,
   IconButton,
-  LinearProgress,
   Paper,
   Table,
   TableBody,
@@ -26,7 +24,8 @@ import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
 import type { GradesType } from '../../../pages/dashboard/index';
-import { BarGraph } from '../../graph/BarGraph/BarGraph';
+import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
+import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(good: number, bad: number, value: number) {
@@ -154,72 +153,13 @@ function Row({
       <TableRow>
         <TableCell className="p-0" colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <div className="p-2 md:p-4">
-              {gradesLoading === 'loading' && <LinearProgress />}
-              {gradesLoading === 'done' && (
-                <div className="p-2">
-                  <div className="h-64">
-                    <BarGraph
-                      title="Grades"
-                      xaxisLabels={[
-                        'A+',
-                        'A',
-                        'A-',
-                        'B+',
-                        'B',
-                        'B-',
-                        'C+',
-                        'C',
-                        'C-',
-                        'D+',
-                        'D',
-                        'D-',
-                        'F',
-                        'W',
-                      ]}
-                      yaxisFormatter={(value) => Number(value).toLocaleString()}
-                      series={[
-                        {
-                          name: searchQueryLabel(course),
-                          data: grades.grade_distribution,
-                        },
-                      ]}
-                    />
-                  </div>
-                  <div className="flex flex-wrap justify-around">
-                    <p>
-                      Grades: <b>{grades.total}</b>
-                    </p>
-                    <p>
-                      GPA:{' '}
-                      <b>{grades.gpa === -1 ? 'X' : grades.gpa.toFixed(3)}</b>
-                    </p>
-                  </div>
-                </div>
-              )}
-              {rmpLoading === 'loading' && <LinearProgress />}
-              {rmpLoading === 'done' && (
-                <Grid container spacing={2} className="p-4">
-                  <Grid item xs={6}>
-                    <p className="text-xl font-bold">{rmp.averageRating}</p>
-                    <p>Professor rating</p>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <p className="text-xl font-bold">{rmp.averageDifficulty}</p>
-                    <p>Difficulty</p>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <p className="text-xl font-bold">{rmp.numRatings}</p>
-                    <p>Ratings given</p>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <p className="text-xl font-bold">
-                      {rmp.wouldTakeAgainPercentage.toFixed(0) + '%'}
-                    </p>
-                    <p>Would take again</p>
-                  </Grid>
-                </Grid>
-              )}
+            <div className="p-2 md:p-4 flex flex-col gap-2">
+              <SingleGradesInfo
+                course={course}
+                grades={grades}
+                gradesLoading={gradesLoading}
+              />
+              <SingleProfInfo rmp={rmp} rmpLoading={rmpLoading} />
             </div>
           </Collapse>
         </TableCell>
