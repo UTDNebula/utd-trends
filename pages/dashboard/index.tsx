@@ -452,12 +452,12 @@ export const Dashboard: NextPage = () => {
   }
 
   //Filtered results
-  const [includedResults, setIncludedResults] = useState<SearchQuery[]>([]);
+  let includedResults: SearchQuery[] = [];
 
-  //On change to filters, results, or what to filter them by: filter list
-  useEffect(() => {
+  //Filter results based on gpa, rmp, and rmp difficulty
+  function filterResults() {
     if (router.isReady) {
-      setIncludedResults(
+      includedResults =
         results.filter((result) => {
           //Remove if over threshold
           const courseGrades = grades[searchQueryLabel(result)];
@@ -484,19 +484,18 @@ export const Dashboard: NextPage = () => {
             return false;
           }
           return true;
-        }),
-      );
+        });
     } else {
-      setIncludedResults(results);
+      includedResults = results;
     }
-  }, [
+  }
+  filterResults();
+
+  useEffect(filterResults, [
     router.isReady,
     router.query.minGPA,
     router.query.minRating,
     router.query.maxDiff,
-    results,
-    grades,
-    rmp,
   ]);
 
   //List of course+prof combos saved for comparison
