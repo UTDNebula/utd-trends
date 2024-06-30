@@ -100,6 +100,7 @@ function Row({
                 addToCompare(course);
               }
             }}
+            disabled={gradesLoading === 'loading' || rmpLoading === 'loading'}
           />
         </TableCell>
         <TableCell component="th" scope="row">

@@ -233,10 +233,10 @@ export const Dashboard: NextPage = () => {
 
       // split the search terms into professors and courses
       searchTerms.map((searchTerm) => {
-        if (searchTerm.profLast !== undefined) {
+        if (typeof searchTerm.profLast !== 'undefined') {
           professorSearchTerms.push(searchTerm);
         }
-        if (searchTerm.prefix !== undefined) {
+        if (typeof searchTerm.prefix !== 'undefined') {
           courseSearchTerms.push(searchTerm);
         }
       });
@@ -396,6 +396,7 @@ export const Dashboard: NextPage = () => {
             old[searchQueryLabel(result)] = res.gpa !== -1 ? 'done' : 'error';
             return old;
           });
+          //Add any more academic sessions to list
           addAcademicSessions(res.grades.map((session) => session._id));
         })
         .catch((error) => {
@@ -457,34 +458,33 @@ export const Dashboard: NextPage = () => {
   //Filter results based on gpa, rmp, and rmp difficulty
   function filterResults() {
     if (router.isReady) {
-      includedResults =
-        results.filter((result) => {
-          //Remove if over threshold
-          const courseGrades = grades[searchQueryLabel(result)];
-          if (
-            typeof router.query.minGPA === 'string' &&
-            typeof courseGrades !== 'undefined' &&
-            courseGrades.gpa < parseFloat(router.query.minGPA)
-          ) {
-            return false;
-          }
-          const courseRmp = rmp[searchQueryLabel(convertToProfOnly(result))];
-          if (
-            typeof router.query.minRating === 'string' &&
-            typeof courseRmp !== 'undefined' &&
-            courseRmp.averageRating < parseFloat(router.query.minRating)
-          ) {
-            return false;
-          }
-          if (
-            typeof router.query.maxDiff === 'string' &&
-            typeof courseRmp !== 'undefined' &&
-            courseRmp.averageDifficulty > parseFloat(router.query.maxDiff)
-          ) {
-            return false;
-          }
-          return true;
-        });
+      includedResults = results.filter((result) => {
+        //Remove if over threshold
+        const courseGrades = grades[searchQueryLabel(result)];
+        if (
+          typeof router.query.minGPA === 'string' &&
+          typeof courseGrades !== 'undefined' &&
+          courseGrades.gpa < parseFloat(router.query.minGPA)
+        ) {
+          return false;
+        }
+        const courseRmp = rmp[searchQueryLabel(convertToProfOnly(result))];
+        if (
+          typeof router.query.minRating === 'string' &&
+          typeof courseRmp !== 'undefined' &&
+          courseRmp.averageRating < parseFloat(router.query.minRating)
+        ) {
+          return false;
+        }
+        if (
+          typeof router.query.maxDiff === 'string' &&
+          typeof courseRmp !== 'undefined' &&
+          courseRmp.averageDifficulty > parseFloat(router.query.maxDiff)
+        ) {
+          return false;
+        }
+        return true;
+      });
     } else {
       includedResults = results;
     }
@@ -509,7 +509,16 @@ export const Dashboard: NextPage = () => {
     [key: string]: RateMyProfessorData;
   }>({});
 
+  //Loading states for each compare course and prof in compare
+  const [compareGradesLoading, setCompareGradesLoading] = useState<{
+    [key: string]: 'loading' | 'done' | 'error';
+  }>({});
+  const [compareRmpLoading, setCompareRmpLoading] = useState<{
+    [key: string]: 'loading' | 'done' | 'error';
+  }>({});
+
   //Add a course+prof combo to compare (happens from search results)
+  //copy over data basically
   function addToCompare(searchQuery: SearchQuery) {
     //If not already there
     if (compare.findIndex((obj) => searchQueryEqual(obj, searchQuery)) === -1) {
@@ -523,14 +532,30 @@ export const Dashboard: NextPage = () => {
             grades[searchQueryLabel(searchQuery)],
         };
       });
-      //Save prof data
-      setCompareRmp((old) => {
+      setCompareGradesLoading((old) => {
         return {
           ...old,
-          [searchQueryLabel(convertToProfOnly(searchQuery))]:
-            rmp[searchQueryLabel(convertToProfOnly(searchQuery))],
+          [searchQueryLabel(searchQuery)]:
+            gradesLoading[searchQueryLabel(searchQuery)],
         };
       });
+      //Save prof data
+      if (typeof searchQuery.profLast !== 'undefined') {
+        setCompareRmp((old) => {
+          return {
+            ...old,
+            [searchQueryLabel(convertToProfOnly(searchQuery))]:
+              rmp[searchQueryLabel(convertToProfOnly(searchQuery))],
+          };
+        });
+        setCompareRmpLoading((old) => {
+          return {
+            ...old,
+            [searchQueryLabel(convertToProfOnly(searchQuery))]:
+              rmpLoading[searchQueryLabel(convertToProfOnly(searchQuery))],
+          };
+        });
+      }
     }
   }
 
@@ -547,6 +572,10 @@ export const Dashboard: NextPage = () => {
         delete old[searchQueryLabel(searchQuery)];
         return old;
       });
+      setCompareGradesLoading((old) => {
+        delete old[searchQueryLabel(searchQuery)];
+        return old;
+      });
       //If no other courses in compare have the same professor
       if (
         !compare
@@ -555,6 +584,10 @@ export const Dashboard: NextPage = () => {
       ) {
         //Remove from saved rmp data
         setCompareRmp((old) => {
+          delete old[searchQueryLabel(convertToProfOnly(searchQuery))];
+          return old;
+        });
+        setCompareRmpLoading((old) => {
           delete old[searchQueryLabel(convertToProfOnly(searchQuery))];
           return old;
         });
@@ -583,7 +616,7 @@ export const Dashboard: NextPage = () => {
       </div>
     );
   } else {
-    //Add RHS tabs, only add overview tab is one course/prof
+    //Add RHS tabs, only add overview tab if one course/prof
     const names = [];
     const tabs = [];
     if (professors.length === 1) {
@@ -617,6 +650,8 @@ export const Dashboard: NextPage = () => {
         courses={compare}
         grades={compareGrades}
         rmp={compareRmp}
+        gradesLoading={compareGradesLoading}
+        rmpLoading={compareRmpLoading}
       />,
     );
     contentComponent = (

@@ -9,10 +9,18 @@ type CompareProps = {
   courses: SearchQuery[];
   grades: { [key: string]: GradesType };
   rmp: { [key: string]: RateMyProfessorData };
+  gradesLoading: { [key: string]: 'loading' | 'done' | 'error' };
+  rmpLoading: { [key: string]: 'loading' | 'done' | 'error' };
 };
 
-const Compare = ({ courses }: CompareProps) => {
-  console.log(courses);
+const Compare = ({
+  courses,
+  grades,
+  rmp,
+  gradesLoading,
+  rmpLoading,
+}: CompareProps) => {
+  console.log(courses, grades, rmp, gradesLoading, rmpLoading);
   return (
     <>
       <p>compare</p>
