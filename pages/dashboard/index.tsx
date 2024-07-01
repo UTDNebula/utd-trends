@@ -1,4 +1,4 @@
-import { Button, Card, Grid, LinearProgress, Typography } from '@mui/material';
+import { Button, Card, Grid, Typography } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -598,9 +598,7 @@ export const Dashboard: NextPage = () => {
   //Main content: loading, error, or normal
   let contentComponent;
 
-  if (state === 'loading') {
-    contentComponent = <LinearProgress className="mt-8 h-2"></LinearProgress>;
-  } else if (state === 'error') {
+  if (state === 'error') {
     contentComponent = (
       <div className="mt-8 flex flex-col items-center">
         <Typography
@@ -627,8 +625,10 @@ export const Dashboard: NextPage = () => {
           professor={professors[0]}
           grades={grades[searchQueryLabel(professors[0])]}
           rmp={rmp[searchQueryLabel(professors[0])]}
-          gradesLoading={gradesLoading[searchQueryLabel(professors[0])]}
-          rmpLoading={rmpLoading[searchQueryLabel(professors[0])]}
+          gradesLoading={
+            gradesLoading[searchQueryLabel(professors[0])] ?? 'loading'
+          }
+          rmpLoading={rmpLoading[searchQueryLabel(professors[0])] ?? 'loading'}
         />,
       );
     }
@@ -639,7 +639,9 @@ export const Dashboard: NextPage = () => {
           key="course"
           course={courses[0]}
           grades={grades[searchQueryLabel(courses[0])]}
-          gradesLoading={gradesLoading[searchQueryLabel(courses[0])]}
+          gradesLoading={
+            gradesLoading[searchQueryLabel(courses[0])] ?? 'loading'
+          }
         />,
       );
     }
@@ -658,6 +660,7 @@ export const Dashboard: NextPage = () => {
       <Grid container component="main" wrap="wrap-reverse" spacing={2}>
         <Grid item xs={12} sm={7} md={7}>
           <SearchResultsTable
+            resultsLoading={state}
             includedResults={includedResults}
             grades={grades}
             rmp={rmp}

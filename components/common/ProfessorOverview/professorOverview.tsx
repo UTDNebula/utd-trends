@@ -1,4 +1,4 @@
-import { LinearProgress } from '@mui/material';
+import { Skeleton } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
@@ -77,7 +77,9 @@ const ProfessorOverview = ({
         }
         setProfData(response.data as ProfessorInterface);
         setSrc(response.data.image_uri);
-        setProfDataLoading('done');
+        setProfDataLoading(
+          typeof response.data !== 'undefined' ? 'done' : 'error',
+        );
       })
       .catch((error) => {
         setProfDataLoading('error');
@@ -87,56 +89,66 @@ const ProfessorOverview = ({
 
   return (
     <div className="flex flex-col gap-2">
-      <Image
-        src={src}
-        alt="Headshot"
-        height={280}
-        width={280}
-        className="w-32 h-32 rounded-full self-center"
-        onLoadingComplete={(result) => {
-          if (result.naturalWidth === 0) {
-            // Broken image
-            setSrc(fallbackSrc);
-          }
-        }}
-        onError={() => {
-          setSrc(fallbackSrc);
-        }}
-      />
-      {profDataLoading === 'done' && typeof profData !== 'undefined' ? (
-        <div className="flex flex-col items-center">
-          <Link
-            href={profData.profile_uri}
-            target="_blank"
-            className="text-2xl font-bold underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-          >
-            {searchQueryLabel(professor)}
-          </Link>
-
-          <Link
-            href={'mailto:' + profData.email}
-            target="_blank"
-            className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-          >
-            {profData.email}
-          </Link>
-          <p>
-            Office:{' '}
-            <Link
-              href={profData.office.map_uri}
-              target="_blank"
-              className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-            >
-              <b>{profData.office.building + ' ' + profData.office.room}</b>
-            </Link>
-          </p>
-        </div>
+      {profDataLoading === 'loading' ? (
+        <Skeleton variant="circular" className="w-32 h-32 self-center" />
       ) : (
+        <Image
+          src={src}
+          alt="Headshot"
+          height={280}
+          width={280}
+          className="w-32 h-32 rounded-full self-center"
+          onLoadingComplete={(result) => {
+            if (result.naturalWidth === 0) {
+              // Broken image
+              setSrc(fallbackSrc);
+            }
+          }}
+          onError={() => {
+            setSrc(fallbackSrc);
+          }}
+        />
+      )}
+      <div className="flex flex-col items-center">
         <p className="text-2xl font-bold self-center">
           {searchQueryLabel(professor)}
         </p>
-      )}
-      {profDataLoading === 'loading' && <LinearProgress />}
+        {profDataLoading === 'loading' && (
+          <>
+            <Skeleton className="w-[25ch]" />
+            <Skeleton className="w-[20ch]" />
+            <Skeleton className="w-[10ch]" />
+          </>
+        )}
+        {profDataLoading === 'done' && typeof profData !== 'undefined' && (
+          <>
+            <Link
+              href={'mailto:' + profData.email}
+              target="_blank"
+              className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+            >
+              {profData.email}
+            </Link>
+            <p>
+              Office:{' '}
+              <Link
+                href={profData.office.map_uri}
+                target="_blank"
+                className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+              >
+                <b>{profData.office.building + ' ' + profData.office.room}</b>
+              </Link>
+            </p>
+            <Link
+              href={profData.profile_uri}
+              target="_blank"
+              className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+            >
+              Faculty Profile
+            </Link>
+          </>
+        )}
+      </div>
       <SingleGradesInfo
         course={professor}
         grades={grades}

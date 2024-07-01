@@ -1,4 +1,4 @@
-import { LinearProgress } from '@mui/material';
+import { Skeleton } from '@mui/material';
 import React from 'react';
 
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
@@ -13,50 +13,62 @@ type Props = {
 };
 
 function SingleGradesInfo({ course, grades, gradesLoading }: Props) {
+  if (gradesLoading === 'error') {
+    return null;
+  }
   return (
-    <>
-      {gradesLoading === 'loading' && <LinearProgress />}
-      {gradesLoading === 'done' && (
-        <div className="p-2">
-          <div className="h-64">
-            <BarGraph
-              title="Grades"
-              xaxisLabels={[
-                'A+',
-                'A',
-                'A-',
-                'B+',
-                'B',
-                'B-',
-                'C+',
-                'C',
-                'C-',
-                'D+',
-                'D',
-                'D-',
-                'F',
-                'W',
-              ]}
-              yaxisFormatter={(value) => Number(value).toLocaleString()}
-              series={[
-                {
-                  name: searchQueryLabel(course),
-                  data: grades.grade_distribution,
-                },
-              ]}
-            />
-          </div>
-          <div className="flex flex-wrap justify-around">
-            <p>
-              Grades: <b>{grades.total.toLocaleString()}</b>
-            </p>
-            <p>
-              GPA: <b>{grades.gpa === -1 ? 'X' : grades.gpa.toFixed(3)}</b>
-            </p>
-          </div>
+    <div className="p-2">
+      {gradesLoading === 'loading' ? (
+        <Skeleton variant="rounded" className="w-full h-60 m-2" />
+      ) : (
+        <div className="h-64">
+          <BarGraph
+            title="Grades"
+            xaxisLabels={[
+              'A+',
+              'A',
+              'A-',
+              'B+',
+              'B',
+              'B-',
+              'C+',
+              'C',
+              'C-',
+              'D+',
+              'D',
+              'D-',
+              'F',
+              'W',
+            ]}
+            yaxisFormatter={(value) => Number(value).toLocaleString()}
+            series={[
+              {
+                name: searchQueryLabel(course),
+                data: grades.grade_distribution,
+              },
+            ]}
+          />
         </div>
       )}
-    </>
+      <div className="flex flex-wrap justify-around">
+        <p>
+          Grades:{' '}
+          {gradesLoading === 'loading' ? (
+            <Skeleton className="inline-block w-[5ch]" />
+          ) : (
+            <b>{grades.total.toLocaleString()}</b>
+          )}
+        </p>
+        <p>
+          GPA:{' '}
+          {gradesLoading === 'loading' ? (
+            <Skeleton className="inline-block w-[5ch]" />
+          ) : (
+            <b>{grades.gpa === -1 ? 'None' : grades.gpa.toFixed(3)}</b>
+          )}
+        </p>
+      </div>
+    </div>
   );
 }
 
