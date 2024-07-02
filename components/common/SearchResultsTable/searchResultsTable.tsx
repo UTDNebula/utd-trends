@@ -382,7 +382,9 @@ const SearchResultsTable = ({
                     removeFromCompare={removeFromCompare}
                   />
                 ))
-              : Array(10).fill(<LoadingRow />)}
+              : Array(10)
+                  .fill(0)
+                  .map((_, index) => <LoadingRow key={index} />)}
           </TableBody>
         </Table>
       </TableContainer>
