@@ -199,7 +199,7 @@ function fetchRmpData(professor: SearchQuery, controller: AbortController) {
         },
       },
     ).then((response) => {
-      if (response.found === 'false') {
+      if (response.found !== 'true') {
         reject();
         return;
       }
@@ -395,8 +395,10 @@ export const Dashboard: NextPage = () => {
           });
           //Set loading status to done, unless total was 0 in calculateGrades
           setGradesLoading((old) => {
-            old[searchQueryLabel(result)] = res.gpa !== -1 ? 'done' : 'error';
-            return old;
+            return {
+              ...old,
+              [searchQueryLabel(result)]: res.gpa !== -1 ? 'done' : 'error',
+            };
           });
           //Add any more academic sessions to list
           addAcademicSessions(res.grades.map((session) => session._id));
@@ -404,8 +406,7 @@ export const Dashboard: NextPage = () => {
         .catch((error) => {
           //Set loading status to error
           setGradesLoading((old) => {
-            old[searchQueryLabel(result)] = 'error';
-            return old;
+            return { ...old, [searchQueryLabel(result)]: 'error' };
           });
           console.error('Grades data for ' + searchQueryLabel(result), error);
         });
@@ -438,16 +439,17 @@ export const Dashboard: NextPage = () => {
           });
           //Set loading status to done
           setRmpLoading((old) => {
-            old[searchQueryLabel(professor)] =
-              typeof res !== 'undefined' ? 'done' : 'error';
-            return old;
+            return {
+              ...old,
+              [searchQueryLabel(professor)]:
+                typeof res !== 'undefined' ? 'done' : 'error',
+            };
           });
         })
         .catch((error) => {
           //Set loading status to error
           setRmpLoading((old) => {
-            old[searchQueryLabel(professor)] = 'error';
-            return old;
+            return { ...old, [searchQueryLabel(professor)]: 'error' };
           });
           console.error('RMP data for ' + searchQueryLabel(professor), error);
         });
