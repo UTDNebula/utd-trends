@@ -456,47 +456,37 @@ export const Dashboard: NextPage = () => {
   let includedResults: SearchQuery[] = [];
 
   //Filter results based on gpa, rmp, and rmp difficulty
-  function filterResults() {
-    if (router.isReady) {
-      includedResults = results.filter((result) => {
-        //Remove if over threshold
-        const courseGrades = grades[searchQueryLabel(result)];
-        if (
-          typeof router.query.minGPA === 'string' &&
-          typeof courseGrades !== 'undefined' &&
-          courseGrades.gpa < parseFloat(router.query.minGPA)
-        ) {
-          return false;
-        }
-        const courseRmp = rmp[searchQueryLabel(convertToProfOnly(result))];
-        if (
-          typeof router.query.minRating === 'string' &&
-          typeof courseRmp !== 'undefined' &&
-          courseRmp.averageRating < parseFloat(router.query.minRating)
-        ) {
-          return false;
-        }
-        if (
-          typeof router.query.maxDiff === 'string' &&
-          typeof courseRmp !== 'undefined' &&
-          courseRmp.averageDifficulty > parseFloat(router.query.maxDiff)
-        ) {
-          return false;
-        }
-        return true;
-      });
-    } else {
-      includedResults = results;
-    }
+  if (router.isReady) {
+    includedResults = results.filter((result) => {
+      //Remove if over threshold
+      const courseGrades = grades[searchQueryLabel(result)];
+      if (
+        typeof router.query.minGPA === 'string' &&
+        typeof courseGrades !== 'undefined' &&
+        courseGrades.gpa < parseFloat(router.query.minGPA)
+      ) {
+        return false;
+      }
+      const courseRmp = rmp[searchQueryLabel(convertToProfOnly(result))];
+      if (
+        typeof router.query.minRating === 'string' &&
+        typeof courseRmp !== 'undefined' &&
+        courseRmp.averageRating < parseFloat(router.query.minRating)
+      ) {
+        return false;
+      }
+      if (
+        typeof router.query.maxDiff === 'string' &&
+        typeof courseRmp !== 'undefined' &&
+        courseRmp.averageDifficulty > parseFloat(router.query.maxDiff)
+      ) {
+        return false;
+      }
+      return true;
+    });
+  } else {
+    includedResults = results;
   }
-  filterResults();
-
-  useEffect(filterResults, [
-    router.isReady,
-    router.query.minGPA,
-    router.query.minRating,
-    router.query.maxDiff,
-  ]);
 
   //List of course+prof combos saved for comparison
   const [compare, setCompare] = useState<SearchQuery[]>([]);

@@ -234,7 +234,7 @@ const SearchBar = (props: SearchProps) => {
             {...params}
             variant="outlined"
             className={props.input_className}
-            placeholder="ex. CS 1200"
+            placeholder="ex. GOVT 2306"
           />
         );
       }}
