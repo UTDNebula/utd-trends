@@ -1,4 +1,4 @@
-import { Button, Card, Grid, Typography } from '@mui/material';
+import { Card, Grid } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -7,6 +7,8 @@ import React, { useEffect, useState } from 'react';
 import Carousel from '../../components/common/Carousel/carousel';
 import Compare from '../../components/common/Compare/compare';
 import CourseOverview from '../../components/common/CourseOverview/courseOverview';
+import DashboardEmpty from '../../components/common/DashboardEmpty/dashboardEmpty';
+import DashboardError from '../../components/common/DashboardError/dashboardError';
 import Filters from '../../components/common/Filters/filters';
 import ProfessorOverview from '../../components/common/ProfessorOverview/professorOverview';
 import SearchResultsTable from '../../components/common/SearchResultsTable/searchResultsTable';
@@ -588,21 +590,10 @@ export const Dashboard: NextPage = () => {
   //Main content: loading, error, or normal
   let contentComponent;
 
-  if (state === 'error') {
-    contentComponent = (
-      <div className="mt-8 flex flex-col items-center">
-        <Typography
-          variant="h2"
-          gutterBottom
-          className="text-gray-600 font-semibold"
-        >
-          Error fetching results.
-        </Typography>
-        <Button variant="outlined" onClick={() => router.reload()}>
-          Reload the page
-        </Button>
-      </div>
-    );
+  if (courses.length === 0 && professors.length === 0) {
+    contentComponent = <DashboardEmpty />;
+  } else if (state === 'error') {
+    contentComponent = <DashboardError />;
   } else {
     //Add RHS tabs, only add overview tab if one course/prof
     const names = [];
@@ -647,26 +638,39 @@ export const Dashboard: NextPage = () => {
       />,
     );
     contentComponent = (
-      <Grid container component="main" wrap="wrap-reverse" spacing={2}>
-        <Grid item xs={12} sm={7} md={7}>
-          <SearchResultsTable
-            resultsLoading={state}
-            includedResults={includedResults}
-            grades={grades}
-            rmp={rmp}
-            gradesLoading={gradesLoading}
-            rmpLoading={rmpLoading}
-            compare={compare}
-            addToCompare={addToCompare}
-            removeFromCompare={removeFromCompare}
-          />
+      <>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={7} md={7}>
+            <Filters
+              manageQuery
+              academicSessions={academicSessions}
+              chosenSessions={chosenSessions}
+              setChosenSessions={setChosenSessions}
+            />
+          </Grid>
+          <Grid item xs={false} sm={5} md={5}></Grid>
         </Grid>
-        <Grid item xs={false} sm={5} md={5} className="w-full">
-          <Card>
-            <Carousel names={names}>{tabs}</Carousel>
-          </Card>
+        <Grid container component="main" wrap="wrap-reverse" spacing={2}>
+          <Grid item xs={12} sm={7} md={7}>
+            <SearchResultsTable
+              resultsLoading={state}
+              includedResults={includedResults}
+              grades={grades}
+              rmp={rmp}
+              gradesLoading={gradesLoading}
+              rmpLoading={rmpLoading}
+              compare={compare}
+              addToCompare={addToCompare}
+              removeFromCompare={removeFromCompare}
+            />
+          </Grid>
+          <Grid item xs={false} sm={5} md={5} className="w-full">
+            <Card>
+              <Carousel names={names}>{tabs}</Carousel>
+            </Card>
+          </Grid>
         </Grid>
-      </Grid>
+      </>
     );
   }
 
@@ -687,31 +691,7 @@ export const Dashboard: NextPage = () => {
       </Head>
       <div className="w-full bg-light h-full">
         <TopMenu />
-        <main className="p-4">
-          {courses.length === 0 && professors.length === 0 ? (
-            <Typography
-              variant="h2"
-              className="mt-8 text-center text-gray-600 font-semibold"
-            >
-              Search for a course or professor above.
-            </Typography>
-          ) : (
-            <>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={7} md={7}>
-                  <Filters
-                    manageQuery
-                    academicSessions={academicSessions}
-                    chosenSessions={chosenSessions}
-                    setChosenSessions={setChosenSessions}
-                  />
-                </Grid>
-                <Grid item xs={false} sm={5} md={5}></Grid>
-              </Grid>
-              {contentComponent}
-            </>
-          )}
-        </main>
+        <main className="p-4">{contentComponent}</main>
       </div>
     </>
   );
