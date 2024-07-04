@@ -259,6 +259,23 @@ const SearchResultsTable = ({
     }
   }
 
+  if (resultsLoading !== 'loading' && includedResults.length === 0) {
+    return (
+      <div className="p-4">
+        <Typography
+          variant="h3"
+          gutterBottom
+          className="leading-tight text-3xl font-bold"
+        >
+          No results found
+        </Typography>
+        <Typography variant="body1">
+          There is no overlap between the selected courses and professors.
+        </Typography>
+      </div>
+    );
+  }
+
   //Sort
   let sortedResults = includedResults;
   if (orderBy !== 'none') {
