@@ -257,6 +257,15 @@ export const Dashboard: NextPage = () => {
       //To cancel on rerender
       const controller = new AbortController();
 
+      //Get course/prof info
+      if (courseSearchTerms.length === 1) {
+        fetchAndStoreGradesData(courseSearchTerms[0], controller);
+      }
+      if (professorSearchTerms.length === 1) {
+        fetchAndStoreGradesData(professorSearchTerms[0], controller);
+        fetchAndStoreRmpData(professorSearchTerms[0], controller);
+      }
+
       //Get results from autocomplete
       if (courseSearchTerms.length > 0) {
         fetchSearchResults(courseSearchTerms, professorSearchTerms, controller)
@@ -373,43 +382,86 @@ export const Dashboard: NextPage = () => {
     [key: string]: 'loading' | 'done' | 'error';
   }>({});
 
+  //Call fetchGradesData and store response
+  function fetchAndStoreGradesData(
+    course: SearchQuery,
+    controller: AbortController,
+  ) {
+    setGradesLoading((old) => {
+      return {
+        ...old,
+        [searchQueryLabel(course)]: 'loading',
+      };
+    });
+    fetchGradesData(course, controller)
+      .then((res) => {
+        //Add to storage
+        setGrades((old) => {
+          return { ...old, [searchQueryLabel(course)]: res };
+        });
+        //Set loading status to done, unless total was 0 in calculateGrades
+        setGradesLoading((old) => {
+          return {
+            ...old,
+            [searchQueryLabel(course)]: res.gpa !== -1 ? 'done' : 'error',
+          };
+        });
+        //Add any more academic sessions to list
+        addAcademicSessions(res.grades.map((session) => session._id));
+      })
+      .catch((error) => {
+        //Set loading status to error
+        setGradesLoading((old) => {
+          return { ...old, [searchQueryLabel(course)]: 'error' };
+        });
+        console.error('Grades data for ' + searchQueryLabel(course), error);
+      });
+  }
+
+  //Call fetchRmpData and store response
+  function fetchAndStoreRmpData(
+    professor: SearchQuery,
+    controller: AbortController,
+  ) {
+    setRmpLoading((old) => {
+      return {
+        ...old,
+        [searchQueryLabel(professor)]: 'loading',
+      };
+    });
+    fetchRmpData(professor, controller)
+      .then((res) => {
+        //Add to storage
+        setRmp((old) => {
+          return { ...old, [searchQueryLabel(professor)]: res };
+        });
+        //Set loading status to done
+        setRmpLoading((old) => {
+          return {
+            ...old,
+            [searchQueryLabel(professor)]:
+              typeof res !== 'undefined' ? 'done' : 'error',
+          };
+        });
+      })
+      .catch((error) => {
+        //Set loading status to error
+        setRmpLoading((old) => {
+          return { ...old, [searchQueryLabel(professor)]: 'error' };
+        });
+        console.error('RMP data for ' + searchQueryLabel(professor), error);
+      });
+  }
+
   //On change to results, load new data
   function getData(results: SearchQuery[], controller: AbortController) {
     //Grade data
-    //Set loading states to loading
-    const blankGradesLoading: { [key: string]: 'loading' | 'done' | 'error' } =
-      {};
-    for (const result of results) {
-      blankGradesLoading[searchQueryLabel(result)] = 'loading';
-    }
-    setGradesLoading(blankGradesLoading);
-    //Remove previous data
-    setGrades({});
     //Fetch each result
     for (const result of results) {
-      fetchGradesData(result, controller)
-        .then((res) => {
-          //Add to storage
-          setGrades((old) => {
-            return { ...old, [searchQueryLabel(result)]: res };
-          });
-          //Set loading status to done, unless total was 0 in calculateGrades
-          setGradesLoading((old) => {
-            return {
-              ...old,
-              [searchQueryLabel(result)]: res.gpa !== -1 ? 'done' : 'error',
-            };
-          });
-          //Add any more academic sessions to list
-          addAcademicSessions(res.grades.map((session) => session._id));
-        })
-        .catch((error) => {
-          //Set loading status to error
-          setGradesLoading((old) => {
-            return { ...old, [searchQueryLabel(result)]: 'error' };
-          });
-          console.error('Grades data for ' + searchQueryLabel(result), error);
-        });
+      //Not already loading
+      if (typeof gradesLoading[searchQueryLabel(result)] === 'undefined') {
+        fetchAndStoreGradesData(result, controller);
+      }
     }
 
     //RMP data
@@ -421,38 +473,19 @@ export const Dashboard: NextPage = () => {
       .filter((obj) => Object.keys(obj).length !== 0);
     //Remove duplicates so as not to fetch multiple times
     professorsInResults = removeDuplicates(professorsInResults);
-    //Set loading states to loading
-    const blankRmpLoading: { [key: string]: 'loading' | 'done' | 'error' } = {};
-    for (const professor of professorsInResults) {
-      blankRmpLoading[searchQueryLabel(professor)] = 'loading';
-    }
-    setRmpLoading(blankRmpLoading);
-    //Remove previous data
-    setRmp({});
     //Fetch each professor
+    //also fetch single profs from search
+    if (
+      professors.length === 1 &&
+      !professorsInResults.some((el) => searchQueryEqual(el, professors[0]))
+    ) {
+      professorsInResults.push(professors[0]);
+    }
     for (const professor of professorsInResults) {
-      fetchRmpData(professor, controller)
-        .then((res) => {
-          //Add to storage
-          setRmp((old) => {
-            return { ...old, [searchQueryLabel(professor)]: res };
-          });
-          //Set loading status to done
-          setRmpLoading((old) => {
-            return {
-              ...old,
-              [searchQueryLabel(professor)]:
-                typeof res !== 'undefined' ? 'done' : 'error',
-            };
-          });
-        })
-        .catch((error) => {
-          //Set loading status to error
-          setRmpLoading((old) => {
-            return { ...old, [searchQueryLabel(professor)]: 'error' };
-          });
-          console.error('RMP data for ' + searchQueryLabel(professor), error);
-        });
+      //Not already loading
+      if (typeof rmpLoading[searchQueryLabel(professor)] === 'undefined') {
+        fetchAndStoreRmpData(professor, controller);
+      }
     }
   }
 
