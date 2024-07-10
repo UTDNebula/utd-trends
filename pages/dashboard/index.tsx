@@ -199,7 +199,7 @@ function fetchRmpData(professor: SearchQuery, controller: AbortController) {
         },
       },
     ).then((response) => {
-      if (response.found !== 'true') {
+      if (!response.data.found) {
         reject();
         return;
       }
