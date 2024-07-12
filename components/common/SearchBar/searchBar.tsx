@@ -14,8 +14,7 @@ import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel
  * Props type used by the SearchBar component
  */
 interface SearchProps {
-  manageQuery?: boolean;
-  path?: string;
+  manageQuery?: 'onSelect' | 'onChange';
   selectValue?: (value: SearchQuery[]) => void;
   changeValue?: (value: SearchQuery[]) => void;
   className?: string;
@@ -28,7 +27,13 @@ interface SearchProps {
  *
  * Styled for the splash page
  */
-const SearchBar = (props: SearchProps) => {
+const SearchBar = ({
+  manageQuery,
+  selectValue,
+  changeValue,
+  className,
+  input_className,
+}: SearchProps) => {
   //what you can choose from
   const [options, setOptions] = useState<SearchQuery[]>([]);
   //initial loading prop for first load
@@ -48,20 +53,18 @@ const SearchBar = (props: SearchProps) => {
   //set value from query
   const router = useRouter();
   useEffect(() => {
-    if (props.manageQuery) {
-      if (router.isReady && typeof router.query.searchTerms !== 'undefined') {
-        let array = router.query.searchTerms;
-        if (!Array.isArray(array)) {
-          array = array.split(',');
-        }
-        setValue(array.map((el) => decodeSearchQueryLabel(el)));
+    if (router.isReady && typeof router.query.searchTerms !== 'undefined') {
+      let array = router.query.searchTerms;
+      if (!Array.isArray(array)) {
+        array = array.split(',');
       }
+      setValue(array.map((el) => decodeSearchQueryLabel(el)));
     }
   }, [router.isReady]);
 
   //update url with what's in value
   function updateQueries(newValue: SearchQuery[]) {
-    if (props.manageQuery && typeof props.path === 'string' && router.isReady) {
+    if (typeof manageQuery !== 'undefined' && router.isReady) {
       const newQuery = router.query;
       if (newValue.length > 0) {
         newQuery.searchTerms = newValue
@@ -72,7 +75,6 @@ const SearchBar = (props: SearchProps) => {
       }
       router.replace(
         {
-          pathname: props.path,
           query: newQuery,
         },
         undefined,
@@ -145,12 +147,12 @@ const SearchBar = (props: SearchProps) => {
 
   //update parent and queries
   function onValueChange(newValue: SearchQuery[]) {
-    if (typeof props.changeValue !== 'undefined') {
-      props.changeValue(newValue);
+    if (typeof changeValue !== 'undefined') {
+      changeValue(newValue);
     }
-    console.log('onValueChange');
-    console.log(newValue);
-    updateQueries(newValue);
+    if (manageQuery === 'onChange') {
+      updateQueries(newValue);
+    }
   }
 
   //add value
@@ -173,11 +175,12 @@ const SearchBar = (props: SearchProps) => {
     if (event.key === 'Enter' && inputValue === '') {
       event.preventDefault();
       event.stopPropagation();
-      if (typeof props.selectValue !== 'undefined') {
-        props.selectValue(value);
+      if (typeof selectValue !== 'undefined') {
+        selectValue(value);
       }
-      console.log('handleKeyDown');
-      console.log(value);
+      if (manageQuery === 'onSelect') {
+        updateQueries(value);
+      }
     }
   }
 
@@ -189,7 +192,7 @@ const SearchBar = (props: SearchProps) => {
       //highligh first option to add with enter
       autoHighlight={true}
       clearOnBlur={false}
-      className={props.className}
+      className={className}
       getOptionLabel={(option) => {
         if (typeof option === 'string') {
           return option;
@@ -233,7 +236,7 @@ const SearchBar = (props: SearchProps) => {
           <TextField
             {...params}
             variant="outlined"
-            className={props.input_className}
+            className={input_className}
             placeholder="ex. GOVT 2306"
           />
         );

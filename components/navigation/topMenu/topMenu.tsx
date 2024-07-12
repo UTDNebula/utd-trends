@@ -58,10 +58,9 @@ export function TopMenu() {
           UTD TRENDS
         </Link>
         <SearchBar
-          manageQuery
-          path={'/dashboard'}
-          input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+          manageQuery="onSelect"
           className="shrink basis-96 mr-auto"
+          input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         />
         <Tooltip title="Share link to search">
           <IconButton
