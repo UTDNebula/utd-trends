@@ -52,11 +52,11 @@ function autocompleteForSearchResultsFetch(
           Accept: 'application/json',
         },
       },
-    ).then((data) => {
-      if (data.message !== 'success') {
-        throw new Error(data.message);
+    ).then((response) => {
+      if (response.message !== 'success') {
+        throw new Error(response.message);
       }
-      return data.data as SearchQuery[];
+      return response.data as SearchQuery[];
     });
   });
 }
@@ -69,31 +69,29 @@ function fetchSearchResults(
   filterTerms: SearchQuery[],
   controller: AbortController,
 ) {
-  return new Promise<SearchQuery[]>((resolve) => {
-    Promise.all(
-      autocompleteForSearchResultsFetch(searchTerms, controller),
-    ).then((allSearchTermResults: SearchQuery[][]) => {
-      const results: SearchQuery[] = [];
-      allSearchTermResults.map((searchTermResults) =>
-        searchTermResults.map((searchTermResult) => {
-          if (filterTerms.length > 0) {
-            filterTerms.map((filterTerm) => {
-              if (
-                (filterTerm.profFirst === searchTermResult.profFirst &&
-                  filterTerm.profLast === searchTermResult.profLast) ||
-                (filterTerm.prefix === searchTermResult.prefix &&
-                  filterTerm.number === searchTermResult.number)
-              ) {
-                results.push(searchTermResult);
-              }
-            });
-          } else {
-            results.push(searchTermResult);
-          }
-        }),
-      );
-      resolve(results);
-    });
+  return Promise.all(
+    autocompleteForSearchResultsFetch(searchTerms, controller),
+  ).then((allSearchTermResults: SearchQuery[][]) => {
+    const results: SearchQuery[] = [];
+    allSearchTermResults.map((searchTermResults) =>
+      searchTermResults.map((searchTermResult) => {
+        if (filterTerms.length > 0) {
+          filterTerms.map((filterTerm) => {
+            if (
+              (filterTerm.profFirst === searchTermResult.profFirst &&
+                filterTerm.profLast === searchTermResult.profLast) ||
+              (filterTerm.prefix === searchTermResult.prefix &&
+                filterTerm.number === searchTermResult.number)
+            ) {
+              results.push(searchTermResult);
+            }
+          });
+        } else {
+          results.push(searchTermResult);
+        }
+      }),
+    );
+    return results;
   });
 }
 
@@ -144,68 +142,63 @@ export type GradesType = {
 };
 //Fetch grades by academic session from nebula api
 function fetchGradesData(course: SearchQuery, controller: AbortController) {
-  return new Promise<GradesType>((resolve, reject) => {
-    fetchWithCache(
-      '/api/grades?' +
-        Object.keys(course)
-          .map(
-            (key) =>
-              key +
-              '=' +
-              encodeURIComponent(String(course[key as keyof SearchQuery])),
-          )
-          .join('&'),
-      cacheIndexNebula,
-      expireTime,
-      {
-        signal: controller.signal,
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-        },
+  return fetchWithCache(
+    '/api/grades?' +
+      Object.keys(course)
+        .map(
+          (key) =>
+            key +
+            '=' +
+            encodeURIComponent(String(course[key as keyof SearchQuery])),
+        )
+        .join('&'),
+    cacheIndexNebula,
+    expireTime,
+    {
+      signal: controller.signal,
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
       },
-    ).then((response) => {
-      response = response.data;
-
-      if (response == null) {
-        reject();
-        return;
-      }
-
-      resolve({
-        ...calculateGrades(response),
-        grades: response,
-      });
+    },
+  ).then((response) => {
+    if (response.message !== 'success') {
+      throw new Error(response.message);
       return;
-    });
+    }
+    if (response.data == null) {
+      throw new Error('null data');
+      return;
+    }
+    return {
+      ...calculateGrades(response.data),
+      grades: response.data,
+    };
   });
 }
 
 //Fetch RMP data from RMP
 function fetchRmpData(professor: SearchQuery, controller: AbortController) {
-  return new Promise<RateMyProfessorData>((resolve, reject) => {
-    fetchWithCache(
-      '/api/ratemyprofessorScraper?profFirst=' +
-        encodeURIComponent(String(professor.profFirst)) +
-        '&profLast=' +
-        encodeURIComponent(String(professor.profLast)),
-      cacheIndexRmp,
-      expireTime,
-      {
-        signal: controller.signal,
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-        },
+  return fetchWithCache(
+    '/api/ratemyprofessorScraper?profFirst=' +
+      encodeURIComponent(String(professor.profFirst)) +
+      '&profLast=' +
+      encodeURIComponent(String(professor.profLast)),
+    cacheIndexRmp,
+    expireTime,
+    {
+      signal: controller.signal,
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
       },
-    ).then((response) => {
-      if (!response.data.found) {
-        reject();
-        return;
-      }
-      resolve(response.data.data);
+    },
+  ).then((response) => {
+    if (response.message !== 'success') {
+      throw new Error(response.message);
       return;
-    });
+    }
+    return response.data;
   });
 }
 
