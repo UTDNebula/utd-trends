@@ -141,7 +141,10 @@ export type GradesType = {
   grades: GradesData;
 };
 //Fetch grades by academic session from nebula api
-function fetchGradesData(course: SearchQuery, controller: AbortController): Promise<GradesType> {
+function fetchGradesData(
+  course: SearchQuery,
+  controller: AbortController,
+): Promise<GradesType> {
   return fetchWithCache(
     '/api/grades?' +
       Object.keys(course)
@@ -176,7 +179,10 @@ function fetchGradesData(course: SearchQuery, controller: AbortController): Prom
 }
 
 //Fetch RMP data from RMP
-function fetchRmpData(professor: SearchQuery, controller: AbortController): Promise<RateMyProfessorData> {
+function fetchRmpData(
+  professor: SearchQuery,
+  controller: AbortController,
+): Promise<RateMyProfessorData> {
   return fetchWithCache(
     '/api/ratemyprofessorScraper?profFirst=' +
       encodeURIComponent(String(professor.profFirst)) +
