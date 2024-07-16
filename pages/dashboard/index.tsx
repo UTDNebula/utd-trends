@@ -141,7 +141,7 @@ export type GradesType = {
   grades: GradesData;
 };
 //Fetch grades by academic session from nebula api
-function fetchGradesData(course: SearchQuery, controller: AbortController) {
+function fetchGradesData(course: SearchQuery, controller: AbortController): Promise<GradesType> {
   return fetchWithCache(
     '/api/grades?' +
       Object.keys(course)
@@ -164,11 +164,9 @@ function fetchGradesData(course: SearchQuery, controller: AbortController) {
   ).then((response) => {
     if (response.message !== 'success') {
       throw new Error(response.message);
-      return;
     }
     if (response.data == null) {
       throw new Error('null data');
-      return;
     }
     return {
       ...calculateGrades(response.data),
@@ -178,7 +176,7 @@ function fetchGradesData(course: SearchQuery, controller: AbortController) {
 }
 
 //Fetch RMP data from RMP
-function fetchRmpData(professor: SearchQuery, controller: AbortController) {
+function fetchRmpData(professor: SearchQuery, controller: AbortController): Promise<RateMyProfessorData> {
   return fetchWithCache(
     '/api/ratemyprofessorScraper?profFirst=' +
       encodeURIComponent(String(professor.profFirst)) +
@@ -196,7 +194,6 @@ function fetchRmpData(professor: SearchQuery, controller: AbortController) {
   ).then((response) => {
     if (response.message !== 'success') {
       throw new Error(response.message);
-      return;
     }
     return response.data;
   });
@@ -387,7 +384,7 @@ export const Dashboard: NextPage = () => {
       };
     });
     fetchGradesData(course, controller)
-      .then((res) => {
+      .then((res: GradesType) => {
         //Add to storage
         setGrades((old) => {
           return { ...old, [searchQueryLabel(course)]: res };
@@ -423,7 +420,7 @@ export const Dashboard: NextPage = () => {
       };
     });
     fetchRmpData(professor, controller)
-      .then((res) => {
+      .then((res: RateMyProfessorData) => {
         //Add to storage
         setRmp((old) => {
           return { ...old, [searchQueryLabel(professor)]: res };
