@@ -122,30 +122,40 @@ const ProfessorOverview = ({
         )}
         {profDataLoading === 'done' && typeof profData !== 'undefined' && (
           <>
-            <Link
-              href={'mailto:' + profData.email}
-              target="_blank"
-              className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-            >
-              {profData.email}
-            </Link>
-            <p>
-              Office:{' '}
+            {profData.email !== '' && (
               <Link
-                href={profData.office.map_uri}
+                href={'mailto:' + profData.email}
                 target="_blank"
                 className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
               >
-                <b>{profData.office.building + ' ' + profData.office.room}</b>
+                {profData.email}
               </Link>
-            </p>
-            <Link
-              href={profData.profile_uri}
-              target="_blank"
-              className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-            >
-              Faculty Profile
-            </Link>
+            )}
+            {profData.office.map_uri !== '' &&
+              profData.office.building !== '' &&
+              profData.office.room !== '' && (
+                <p>
+                  Office:{' '}
+                  <Link
+                    href={profData.office.map_uri}
+                    target="_blank"
+                    className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                  >
+                    <b>
+                      {profData.office.building + ' ' + profData.office.room}
+                    </b>
+                  </Link>
+                </p>
+              )}
+            {profData.profile_uri !== '' && (
+              <Link
+                href={profData.profile_uri}
+                target="_blank"
+                className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+              >
+                Faculty Profile
+              </Link>
+            )}
           </>
         )}
       </div>
