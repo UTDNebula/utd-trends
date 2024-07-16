@@ -1,4 +1,4 @@
-import { Autocomplete, TextField } from '@mui/material';
+import { Autocomplete, Button, TextField } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import { useRouter } from 'next/router';
@@ -15,8 +15,8 @@ import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel
  */
 interface SearchProps {
   manageQuery?: 'onSelect' | 'onChange';
-  selectValue?: (value: SearchQuery[]) => void;
-  changeValue?: (value: SearchQuery[]) => void;
+  onSelect?: (value: SearchQuery[]) => void;
+  onChange?: (value: SearchQuery[]) => void;
   className?: string;
   input_className?: string;
 }
@@ -29,8 +29,8 @@ interface SearchProps {
  */
 const SearchBar = ({
   manageQuery,
-  selectValue,
-  changeValue,
+  onSelect,
+  onChange,
   className,
   input_className,
 }: SearchProps) => {
@@ -65,6 +65,9 @@ const SearchBar = ({
   //update url with what's in value
   function updateQueries(newValue: SearchQuery[]) {
     if (typeof manageQuery !== 'undefined' && router.isReady) {
+      if (typeof onChange !== 'undefined') {
+        onChange(newValue);
+      }
       const newQuery = router.query;
       if (newValue.length > 0) {
         newQuery.searchTerms = newValue
@@ -146,9 +149,9 @@ const SearchBar = ({
   }
 
   //update parent and queries
-  function onValueChange(newValue: SearchQuery[]) {
-    if (typeof changeValue !== 'undefined') {
-      changeValue(newValue);
+  function onChange_internal(newValue: SearchQuery[]) {
+    if (typeof onChange !== 'undefined') {
+      onChange(newValue);
     }
     if (manageQuery === 'onChange') {
       updateQueries(newValue);
@@ -159,7 +162,7 @@ const SearchBar = ({
   function addValue(newValue: SearchQuery) {
     setValue((old) => {
       const oldAndNew = [...old, newValue];
-      onValueChange(oldAndNew);
+      onChange_internal(oldAndNew);
       return oldAndNew;
     });
   }
@@ -167,7 +170,17 @@ const SearchBar = ({
   //change all values
   function updateValue(newValue: SearchQuery[]) {
     setValue(newValue);
-    onValueChange(newValue);
+    onChange_internal(newValue);
+  }
+
+  //update parent and queries
+  function onSelect_internal(newValue: SearchQuery[]) {
+    if (typeof onSelect !== 'undefined') {
+      onSelect(newValue);
+    }
+    if (manageQuery === 'onSelect') {
+      updateQueries(newValue);
+    }
   }
 
   //returns results on enter
@@ -175,133 +188,139 @@ const SearchBar = ({
     if (event.key === 'Enter' && inputValue === '') {
       event.preventDefault();
       event.stopPropagation();
-      if (typeof selectValue !== 'undefined') {
-        selectValue(value);
-      }
-      if (manageQuery === 'onSelect') {
-        updateQueries(value);
-      }
+      onSelect_internal(value);
     }
   }
 
   return (
-    <Autocomplete
-      multiple
-      freeSolo
-      loading={loading}
-      //highligh first option to add with enter
-      autoHighlight={true}
-      clearOnBlur={false}
-      className={className}
-      getOptionLabel={(option) => {
-        if (typeof option === 'string') {
-          return option;
-        }
-        return searchQueryLabel(option);
-      }}
-      options={options}
-      //don't filter options, done in fetch
-      filterOptions={(options) => options}
-      value={value}
-      onChange={(
-        event: React.SyntheticEvent,
-        newValue: (string | SearchQuery)[],
-      ) => {
-        //should never happen
-        if (!newValue.every((el) => typeof el !== 'string')) {
-          return;
-        }
-        //remove from options
-        if (newValue.length > value.length) {
-          setOptions((old) =>
-            old.filter(
-              (item) =>
-                !searchQueryEqual(
-                  newValue[newValue.length - 1] as SearchQuery,
-                  item,
-                ),
-            ),
-          );
-        }
-        updateValue(newValue as SearchQuery[]);
-      }}
-      inputValue={inputValue}
-      onInputChange={(event, newInputValue) => {
-        setInputValue(newInputValue);
-        loadNewOptions(newInputValue);
-      }}
-      renderInput={(params) => {
-        params.inputProps.onKeyDown = handleKeyDown;
-        return (
-          <TextField
-            {...params}
-            variant="outlined"
-            className={input_className}
-            placeholder="ex. GOVT 2306"
-          />
-        );
-      }}
-      //for handling spaces, when options are already loaded
-      onInput={(event) => {
-        const value = (event.target as HTMLInputElement).value;
-        // if the last character in the new string is a space, check for autocomplete
-        if (
-          value[value.length - 1] === ' ' &&
-          // but if the user is deleting text, don't try to autocomplete
-          (event.nativeEvent as InputEvent).inputType === 'insertText'
-        ) {
-          const noSections = options.filter(
-            (el: SearchQuery) => !('sectionNumber' in el),
-          );
-          if (
-            value.length > 0 &&
-            (options.length === 1 ||
-              //all but one is a section
-              noSections.length === 1)
-          ) {
-            event.preventDefault();
-            event.stopPropagation();
-            addValue(options.length === 1 ? options[0] : noSections[0]);
-            setOptions([]);
-            (event.target as HTMLInputElement).value = '';
+    <div className={'flex items-center gap-2 ' + (className ?? '')}>
+      <Autocomplete
+        multiple
+        freeSolo
+        loading={loading}
+        //highligh first option to add with enter
+        autoHighlight={true}
+        clearOnBlur={false}
+        className="grow"
+        getOptionLabel={(option) => {
+          if (typeof option === 'string') {
+            return option;
           }
-        }
-      }}
-      renderOption={(props, option, { inputValue }) => {
-        const text =
-          typeof option === 'string' ? option : searchQueryLabel(option);
-        //add spaces between prefix and course number
-        const matches = match(
-          text,
-          inputValue
-            .replace(
-              //CS1200 -> CS 1200
-              /([a-zA-Z]{2,4})([0-9][0-9V]?[0-9]{0,2})/,
-              '$1 $2',
-            )
-            .replace(
-              //1200CS -> 1200 CS
-              /([0-9][0-9V][0-9]{2})([a-zA-Z]{1,4})/,
-              '$1 $2',
-            ),
-        );
-        const parts = parse(text, matches);
-        return (
-          <li {...props}>
-            {parts.map((part, index) => (
-              <span
-                key={index}
-                className={
-                  'whitespace-pre-wrap' + (part.highlight ? ' font-bold' : '')
-                }
-              >
-                {part.text}
-              </span>
-            ))}
-          </li>
-        );
-      }}
-    />
+          return searchQueryLabel(option);
+        }}
+        options={options}
+        //don't filter options, done in fetch
+        filterOptions={(options) => options}
+        value={value}
+        onChange={(
+          event: React.SyntheticEvent,
+          newValue: (string | SearchQuery)[],
+        ) => {
+          //should never happen
+          if (!newValue.every((el) => typeof el !== 'string')) {
+            return;
+          }
+          //remove from options
+          if (newValue.length > value.length) {
+            setOptions((old) =>
+              old.filter(
+                (item) =>
+                  !searchQueryEqual(
+                    newValue[newValue.length - 1] as SearchQuery,
+                    item,
+                  ),
+              ),
+            );
+          }
+          updateValue(newValue as SearchQuery[]);
+        }}
+        inputValue={inputValue}
+        onInputChange={(event, newInputValue) => {
+          setInputValue(newInputValue);
+          loadNewOptions(newInputValue);
+        }}
+        renderInput={(params) => {
+          params.inputProps.onKeyDown = handleKeyDown;
+          return (
+            <TextField
+              {...params}
+              variant="outlined"
+              className={input_className}
+              placeholder="ex. GOVT 2306"
+            />
+          );
+        }}
+        //for handling spaces, when options are already loaded
+        onInput={(event) => {
+          const value = (event.target as HTMLInputElement).value;
+          // if the last character in the new string is a space, check for autocomplete
+          if (
+            value[value.length - 1] === ' ' &&
+            // but if the user is deleting text, don't try to autocomplete
+            (event.nativeEvent as InputEvent).inputType === 'insertText'
+          ) {
+            const noSections = options.filter(
+              (el: SearchQuery) => !('sectionNumber' in el),
+            );
+            if (
+              value.length > 0 &&
+              (options.length === 1 ||
+                //all but one is a section
+                noSections.length === 1)
+            ) {
+              event.preventDefault();
+              event.stopPropagation();
+              addValue(options.length === 1 ? options[0] : noSections[0]);
+              setOptions([]);
+              (event.target as HTMLInputElement).value = '';
+            }
+          }
+        }}
+        renderOption={(props, option, { inputValue }) => {
+          const text =
+            typeof option === 'string' ? option : searchQueryLabel(option);
+          //add spaces between prefix and course number
+          const matches = match(
+            text,
+            inputValue
+              .replace(
+                //CS1200 -> CS 1200
+                /([a-zA-Z]{2,4})([0-9][0-9V]?[0-9]{0,2})/,
+                '$1 $2',
+              )
+              .replace(
+                //1200CS -> 1200 CS
+                /([0-9][0-9V][0-9]{2})([a-zA-Z]{1,4})/,
+                '$1 $2',
+              ),
+          );
+          const parts = parse(text, matches);
+          return (
+            <li {...props}>
+              {parts.map((part, index) => (
+                <span
+                  key={index}
+                  className={
+                    'whitespace-pre-wrap' + (part.highlight ? ' font-bold' : '')
+                  }
+                >
+                  {part.text}
+                </span>
+              ))}
+            </li>
+          );
+        }}
+      />
+      <Button
+        variant="contained"
+        disableElevation
+        size="large"
+        className="shrink-0 normal-case bg-royal hover:bg-royalDark"
+        onClick={() => onSelect_internal(value)}
+      >
+        Search
+      </Button>
+    </div>
   );
 };
 

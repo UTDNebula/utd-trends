@@ -39,6 +39,7 @@ module.exports = {
           900: '#51231b',
         },
         royal: '#573dff', // brand secondary (dark)
+        royalDark: '#3c2ab2',
         cornflower: {
           50: '#eae4ff',
           100: '#d3caff', // ~periwinkle

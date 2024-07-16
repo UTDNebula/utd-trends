@@ -1,5 +1,5 @@
 import { Share } from '@mui/icons-material';
-import { IconButton, Snackbar, Tooltip } from '@mui/material';
+import { IconButton, Snackbar, Tooltip, useMediaQuery } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -42,9 +42,23 @@ export function TopMenu() {
     alert(url);
   }
 
+  const matches = useMediaQuery('(min-width: 640px)');
+  const searchBar = (
+    <SearchBar
+      manageQuery="onSelect"
+      className={'shrink ' + (matches ? 'basis-[32rem]' : 'basis-full')}
+      input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+    />
+  );
+
   return (
     <>
-      <div className="relative overflow-hidden flex items-center gap-4 md:gap-8 lg:gap-16 py-1 md:py-2 px-4 md:px-8 lg:px-16 bg-lighten dark:bg-darken">
+      <div
+        className={
+          'relative overflow-hidden flex items-center gap-y-0 gap-x-4 md:gap-x-8 lg:gap-x-16 py-1 md:py-2 px-4 md:px-8 lg:px-16 bg-lighten dark:bg-darken' +
+          (matches ? '' : ' flex-wrap')
+        }
+      >
         <Image
           src={Background}
           alt="gradient background"
@@ -57,12 +71,8 @@ export function TopMenu() {
         >
           UTD TRENDS
         </Link>
-        <SearchBar
-          manageQuery="onSelect"
-          className="shrink basis-96 mr-auto"
-          input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
-        />
-        <Tooltip title="Share link to search">
+        {matches && searchBar}
+        <Tooltip title="Share link to search" className="ml-auto">
           <IconButton
             className="aspect-square"
             size="medium"
@@ -81,6 +91,7 @@ export function TopMenu() {
             <Share className="text-3xl mr-1" />
           </IconButton>
         </Tooltip>
+        {!matches && searchBar}
       </div>
       <Snackbar
         open={openCopied}
