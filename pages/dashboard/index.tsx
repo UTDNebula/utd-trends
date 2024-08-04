@@ -24,6 +24,7 @@ import SearchQuery, {
 } from '../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
+import type { CourseData } from '../../pages/api/course';
 import type { GradesData } from '../../pages/api/grades';
 import type { RateMyProfessorData } from '../../pages/api/ratemyprofessorScraper';
 
@@ -66,7 +67,7 @@ function autocompleteForSearchResultsFetch(
 //When both paramaters are defined this validates that a combo exists
 function fetchSearchResults(
   searchTerms: SearchQuery[],
-  filterTerms: SearchQuery[],
+  filterTerms: SearchQuery[], //filterTerms is blank if the searchTerms are ALL courses or ALL professors
   controller: AbortController,
 ) {
   return Promise.all(
@@ -173,7 +174,7 @@ function fetchGradesData(
     }
     return {
       ...calculateGrades(response.data),
-      grades: response.data,
+      grades: response.data, //type GradesData
     };
   });
 }
@@ -200,6 +201,41 @@ function fetchRmpData(
   ).then((response) => {
     if (response.message !== 'success') {
       throw new Error(response.message);
+    }
+    return response.data;
+  });
+}
+
+//Fetch course details (like the description) from nebula api
+function fetchCourseData(
+  course: SearchQuery,
+  controller: AbortController,
+): Promise<CourseData[]> {
+  return fetchWithCache(
+    '/api/course?' +
+      Object.keys(course)
+        .map(
+          (key) =>
+            key +
+            '=' +
+            encodeURIComponent(String(course[key as keyof SearchQuery])),
+        )
+        .join('&'),
+    cacheIndexNebula,
+    expireTime,
+    {
+      signal: controller.signal,
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+    },
+  ).then((response) => {
+    if (response.message !== 'success') {
+      throw new Error(response.message);
+    }
+    if (response.data == null) {
+      throw new Error('null data');
     }
     return response.data;
   });
@@ -449,6 +485,30 @@ export const Dashboard: NextPage = () => {
       });
   }
 
+  //Call fetchCourseData and store response
+  function fetchAndStoreCourseData(
+    course: SearchQuery,
+    controller: AbortController,
+  ) {
+    setCourseDataLoading('loading'); //Set Course Loading status
+    fetchCourseData(course, controller)
+      .then((res: CourseData[]) => {
+        res.sort((a, b) => b.catalog_year - a.catalog_year); // sort by year descending, so index 0 has the most recent year
+        console.log(
+          res[0]._id,
+          ': ',
+          res[0].catalog_year,
+          '-',
+          res[0].description,
+        );
+        setCourseDataLoading('done'); //Set loading status to done
+      })
+      .catch((error) => {
+        setCourseDataLoading('error'); //Set loading status to error
+        console.error('Course data for ' + searchQueryLabel(course), error);
+      });
+  }
+
   //On change to results, load new data
   function getData(results: SearchQuery[], controller: AbortController) {
     //Grade data
@@ -461,7 +521,7 @@ export const Dashboard: NextPage = () => {
     }
 
     //RMP data
-    //Get lsit of profs from results
+    //Get list of profs from results
     let professorsInResults = results
       //Remove course data from each
       .map((result) => convertToProfOnly(result))
@@ -520,6 +580,19 @@ export const Dashboard: NextPage = () => {
   } else {
     includedResults = results;
   }
+
+  //Course and Professor data for RHS tabs
+  //only used when there is 1 professor and/or 1 course searched for
+  const [courseData, setCourseData] = useState<CourseData>();
+  const [professorData, setProfessorData] = useState<string>();
+
+  //Loading states for Course and Professor data (for RHS tabs)
+  const [courseDataLoading, setCourseDataLoading] = useState<
+    'loading' | 'done' | 'error'
+  >('loading');
+  const [professorDataLoading, setProfessorDataLoading] = useState<
+    'loading' | 'done' | 'error'
+  >('loading');
 
   //List of course+prof combos saved for comparison
   const [compare, setCompare] = useState<SearchQuery[]>([]);
