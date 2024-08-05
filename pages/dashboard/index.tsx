@@ -292,6 +292,7 @@ export const Dashboard: NextPage = () => {
       //Get course/prof info
       if (courseSearchTerms.length === 1) {
         fetchAndStoreGradesData(courseSearchTerms[0], controller);
+        fetchAndStoreCourseData(courseSearchTerms[0], controller);
       }
       if (professorSearchTerms.length === 1) {
         fetchAndStoreGradesData(professorSearchTerms[0], controller);
@@ -494,13 +495,7 @@ export const Dashboard: NextPage = () => {
     fetchCourseData(course, controller)
       .then((res: CourseData[]) => {
         res.sort((a, b) => b.catalog_year - a.catalog_year); // sort by year descending, so index 0 has the most recent year
-        console.log(
-          res[0]._id,
-          ': ',
-          res[0].catalog_year,
-          '-',
-          res[0].description,
-        );
+        setCourseData(res[0]);
         setCourseDataLoading('done'); //Set loading status to done
       })
       .catch((error) => {
@@ -722,7 +717,8 @@ export const Dashboard: NextPage = () => {
       tabs.push(
         <CourseOverview
           key="course"
-          course={courses[0]}
+          course={courseData}
+          courseLoading={courseDataLoading ?? 'loading'}
           grades={grades[searchQueryLabel(courses[0])]}
           gradesLoading={
             gradesLoading[searchQueryLabel(courses[0])] ?? 'loading'
