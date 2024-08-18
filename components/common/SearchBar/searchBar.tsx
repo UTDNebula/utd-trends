@@ -27,6 +27,7 @@ interface SearchProps {
  *
  * Styled for the splash page
  */
+let wasEmpty = false; // tracks if the searchbar was empty before the new entry (to create a new browser navigation entry push())
 const SearchBar = ({
   manageQuery,
   onSelect,
@@ -60,7 +61,7 @@ const SearchBar = ({
       }
       setValue(array.map((el) => decodeSearchQueryLabel(el)));
     }
-  }, [router.isReady]);
+  }, [router.query]); // useEffect is called every time the query changes
 
   //update url with what's in value
   function updateQueries(newValue: SearchQuery[]) {
@@ -76,13 +77,26 @@ const SearchBar = ({
       } else {
         delete newQuery.searchTerms;
       }
-      router.replace(
-        {
-          query: newQuery,
-        },
-        undefined,
-        { shallow: true },
-      );
+      if (wasEmpty) {
+        // if the searchbar was cleared before this entry,
+        router.push(
+          {
+            query: router.query,
+          },
+          undefined,
+          { shallow: true },
+        );
+        router.pathname;
+        wasEmpty = false;
+      } //otherwise, just update the current navigation entry query
+      else
+        router.replace(
+          {
+            query: newQuery,
+          },
+          undefined,
+          { shallow: true },
+        );
     }
   }
 
@@ -153,7 +167,9 @@ const SearchBar = ({
     if (typeof onChange !== 'undefined') {
       onChange(newValue);
     }
-    if (manageQuery === 'onChange') {
+    if (newValue.length == 0) {
+      wasEmpty = true; // so that the next search creates a new navigation entry (push())
+    } else if (manageQuery === 'onChange') {
       updateQueries(newValue);
     }
   }

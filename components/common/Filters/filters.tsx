@@ -64,7 +64,7 @@ const Filters = ({
         }
       }
     }
-  }, [router.isReady]);
+  }, [router.query]); // useEffect is called on query update (so on back navigation, the filters selected are set based on the url)
 
   //Update URL, state, and parent
   function onChange(
