@@ -4,15 +4,19 @@ import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import { CourseData } from '../../../pages/api/course';
 import type { GradesType } from '../../../pages/dashboard/index';
+import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
 
 type CourseOverviewProps = {
-  course?: CourseData;
+  course: SearchQuery;
+  courseData?: CourseData;
   courseLoading: 'loading' | 'done' | 'error';
   grades: GradesType;
   gradesLoading: 'loading' | 'done' | 'error';
 };
 
-function parseDescription(course: CourseData): [string, string[], string] {
+function parseDescription(
+  course: CourseData,
+): [string, string[], string, string] {
   //extracts info from the course description and formats it
   const descriptionIntro =
     course.subject_prefix +
@@ -126,6 +130,38 @@ function parseDescription(course: CourseData): [string, string[], string] {
           formattedDescription.lastIndexOf(' ('),
         )
       : '';
+
+  let offeringFrequency = formattedDescription.charAt(
+    formattedDescription.length - 1,
+  );
+  switch (offeringFrequency) {
+    case 'S':
+      offeringFrequency = 'Each semester';
+      break;
+    case 'Y':
+      offeringFrequency = 'Each year';
+      break;
+    case 'T':
+      offeringFrequency = 'Every two years';
+      break;
+    case 'R':
+      offeringFrequency =
+        'Based on student interest and instructor availability';
+      break;
+    case 'P':
+      offeringFrequency = 'Spring';
+      break;
+    case 'F':
+      offeringFrequency = 'Fall';
+      break;
+    case 'U':
+      offeringFrequency = 'Summer';
+      break;
+    default:
+      '';
+      break;
+  }
+
   if (firstRequisite != 4 || lastRequisite != 4) {
     formattedDescription = formattedDescription.substring(
       0,
@@ -146,34 +182,47 @@ function parseDescription(course: CourseData): [string, string[], string] {
       formattedDescription.lastIndexOf('.') + 1,
     );
 
-  return [formattedDescription, requisites, sameAsText];
+  return [formattedDescription, requisites, sameAsText, offeringFrequency];
 }
 
 const CourseOverview = ({
   course,
+  courseData,
   courseLoading,
   grades,
   gradesLoading,
 }: CourseOverviewProps) => {
-  if (courseLoading === 'done' && course != null) {
-    const [formattedDescription, requisites, sameAsText] =
-      parseDescription(course);
+  if (courseLoading === 'done' && courseData != null) {
+    const [formattedDescription, requisites, sameAsText, offeringFrequency] =
+      parseDescription(courseData);
     return (
       <div className="flex flex-col gap-2">
         <div className="flex flex-col items-center">
-          <p className="text-2xl font-bold self-start">{course.title}</p>
-          <p className="text-lg font-semibold self-start">
-            {course.subject_prefix +
+          <p className="text-2xl font-bold self-center">{courseData.title}</p>
+          <p className="text-lg font-semibold self-center">
+            {courseData.subject_prefix +
               ' ' +
-              course.course_number +
+              courseData.course_number +
               ' ' +
               sameAsText}
           </p>
-          <p>{formattedDescription}</p>
+          <p className="font-semibold">{courseData.school}</p>
+          <p>
+            {formattedDescription +
+              ' ' +
+              courseData.credit_hours +
+              ' credit hours.'}
+          </p>
           <p>{requisites[0]}</p>
           <p>{requisites[1]}</p>
           <p>{requisites[2]}</p>
+          <p>{'Offering Frequency: ' + offeringFrequency}</p>
         </div>
+        <SingleGradesInfo
+          course={course}
+          grades={grades}
+          gradesLoading={gradesLoading}
+        />
       </div>
     );
   }
