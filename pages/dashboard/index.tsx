@@ -717,7 +717,8 @@ export const Dashboard: NextPage = () => {
       tabs.push(
         <CourseOverview
           key="course"
-          course={courseData}
+          course={courses[0]}
+          courseData={courseData}
           courseLoading={courseDataLoading ?? 'loading'}
           grades={grades[searchQueryLabel(courses[0])]}
           gradesLoading={
