@@ -92,9 +92,9 @@ function colorMidpoint(good: number, bad: number, value: number) {
 type RowProps = {
   course: SearchQuery;
   grades: GradesType;
-  rmp: RateMyProfessorData;
+  rmp: RateMyProfessorData | undefined;
   gradesLoading: 'loading' | 'done' | 'error';
-  rmpLoading: 'loading' | 'done' | 'error';
+  rmpLoading: 'loading' | 'done' | 'error' | undefined;
   inCompare: boolean;
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
@@ -207,7 +207,9 @@ function Row({
                 grades={grades}
                 gradesLoading={gradesLoading}
               />
-              <SingleProfInfo rmp={rmp} rmpLoading={rmpLoading} />
+              {typeof rmpLoading !== 'undefined' && (
+                <SingleProfInfo rmp={rmp} rmpLoading={rmpLoading} />
+              )}
             </div>
           </Collapse>
         </TableCell>

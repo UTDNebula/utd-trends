@@ -61,7 +61,7 @@ const SearchBar = ({
       }
       setValue(array.map((el) => decodeSearchQueryLabel(el)));
     }
-  }, [router.query]); // useEffect is called every time the query changes
+  }, [router.isReady, router.query.searchTerms]); // useEffect is called every time the query changes
 
   //update url with what's in value
   function updateQueries(newValue: SearchQuery[]) {
@@ -169,7 +169,8 @@ const SearchBar = ({
     }
     if (newValue.length == 0) {
       wasEmpty = true; // so that the next search creates a new navigation entry (push())
-    } else if (manageQuery === 'onChange') {
+    }
+    if (manageQuery === 'onChange') {
       updateQueries(newValue);
     }
   }

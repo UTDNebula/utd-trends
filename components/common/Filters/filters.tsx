@@ -64,7 +64,12 @@ const Filters = ({
         }
       }
     }
-  }, [router.query]); // useEffect is called on query update (so on back navigation, the filters selected are set based on the url)
+  }, [
+    router.isReady,
+    router.query.minGPA,
+    router.query.minRating,
+    router.query.maxDiff,
+  ]); // useEffect is called on query update (so on back navigation, the filters selected are set based on the url)
 
   //Update URL, state, and parent
   function onChange(
