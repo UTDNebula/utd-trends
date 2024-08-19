@@ -92,9 +92,9 @@ function colorMidpoint(good: number, bad: number, value: number) {
 type RowProps = {
   course: SearchQuery;
   grades: GradesType;
-  rmp: RateMyProfessorData | undefined;
+  rmp: RateMyProfessorData;
   gradesLoading: 'loading' | 'done' | 'error';
-  rmpLoading: 'loading' | 'done' | 'error' | undefined;
+  rmpLoading: 'loading' | 'done' | 'error';
   inCompare: boolean;
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;

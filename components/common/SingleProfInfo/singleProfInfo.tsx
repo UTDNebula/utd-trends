@@ -1,16 +1,15 @@
-import CloseIcon from '@mui/icons-material/Close';
 import { Grid, Skeleton } from '@mui/material';
 import React from 'react';
 
 import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
 
 type Props = {
-  rmp: RateMyProfessorData | undefined;
-  rmpLoading: 'loading' | 'done' | 'error' | undefined;
+  rmp: RateMyProfessorData;
+  rmpLoading: 'loading' | 'done' | 'error';
 };
 
 function SingleProfInfo({ rmp, rmpLoading }: Props) {
-  if (rmpLoading === 'error') {
+  if (rmpLoading === 'error' || typeof rmpLoading === 'undefined') {
     return null;
   }
   return (
@@ -18,9 +17,6 @@ function SingleProfInfo({ rmp, rmpLoading }: Props) {
       <Grid item xs={6}>
         <p className="text-xl font-bold">
           {rmpLoading === 'loading' && <Skeleton />}
-          {(rmpLoading === 'error' || typeof rmpLoading === 'undefined') && (
-            <CloseIcon />
-          )}
           {rmpLoading === 'done' && rmp.averageRating}
         </p>
         <p>Professor rating</p>
@@ -28,9 +24,6 @@ function SingleProfInfo({ rmp, rmpLoading }: Props) {
       <Grid item xs={6}>
         <p className="text-xl font-bold">
           {rmpLoading === 'loading' && <Skeleton />}
-          {(rmpLoading === 'error' || typeof rmpLoading === 'undefined') && (
-            <CloseIcon />
-          )}
           {rmpLoading === 'done' && rmp.averageDifficulty}
         </p>
         <p>Difficulty</p>
@@ -38,9 +31,6 @@ function SingleProfInfo({ rmp, rmpLoading }: Props) {
       <Grid item xs={6}>
         <p className="text-xl font-bold">
           {rmpLoading === 'loading' && <Skeleton />}
-          {(rmpLoading === 'error' || typeof rmpLoading === 'undefined') && (
-            <CloseIcon />
-          )}
           {rmpLoading === 'done' && rmp.numRatings.toLocaleString()}
         </p>
         <p>Ratings given</p>
@@ -48,9 +38,6 @@ function SingleProfInfo({ rmp, rmpLoading }: Props) {
       <Grid item xs={6}>
         <p className="text-xl font-bold">
           {rmpLoading === 'loading' && <Skeleton />}
-          {(rmpLoading === 'error' || typeof rmpLoading === 'undefined') && (
-            <CloseIcon />
-          )}
           {rmpLoading === 'done' &&
             rmp.wouldTakeAgainPercentage.toFixed(0) + '%'}
         </p>
