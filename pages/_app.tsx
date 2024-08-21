@@ -4,10 +4,12 @@ import GitHub from '@mui/icons-material/GitHub';
 import { Card, IconButton, Tooltip, useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
 import localFont from 'next/font/local';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React from 'react';
 
 const inter = Inter({
@@ -92,6 +94,8 @@ function MyApp({ Component, pageProps }: AppProps) {
     },
   });
 
+  const router = useRouter();
+
   return (
     <>
       <Head>
@@ -122,6 +126,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         </main>
       </ThemeProvider>
       <Analytics />
+      <SpeedInsights route={router.pathname} />
       {showGitInfo ? (
         <>
           <Card
