@@ -7,7 +7,7 @@
     "dev:nodag": "next dev",
     "prebuild": "ts-node scripts/generateAutocompleteGraph.ts",
     "build": "next build",
-    "build:nodag": "next build",
+    "build:nodag": "set NODE_OPTIONS=--max_old_space_size=4096 && next build",
     "start": "next start",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

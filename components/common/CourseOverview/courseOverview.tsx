@@ -1,5 +1,10 @@
-import React from 'react';
+import { Skeleton } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 
+import fetchWithCache, {
+  cacheIndexNebula,
+  expireTime,
+} from '../../../modules/fetchWithCache';
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import { CourseData } from '../../../pages/api/course';
@@ -8,15 +13,16 @@ import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
 
 type CourseOverviewProps = {
   course: SearchQuery;
-  courseData?: CourseData;
-  courseLoading: 'loading' | 'done' | 'error';
   grades: GradesType;
   gradesLoading: 'loading' | 'done' | 'error';
 };
 
-function parseDescription(
-  course: CourseData,
-): [string, string[], string, string] {
+function parseDescription(course: CourseData): {
+  formattedDescription: string;
+  requisites: string[];
+  sameAsText: string;
+  offeringFrequency: string;
+} {
   //extracts info from the course description and formats it
   const descriptionIntro =
     course.subject_prefix +
@@ -182,57 +188,134 @@ function parseDescription(
       formattedDescription.lastIndexOf('.') + 1,
     );
 
-  return [formattedDescription, requisites, sameAsText, offeringFrequency];
+  return { formattedDescription, requisites, sameAsText, offeringFrequency };
 }
 
 const CourseOverview = ({
   course,
-  courseData,
-  courseLoading,
   grades,
   gradesLoading,
 }: CourseOverviewProps) => {
-  if (courseLoading === 'done' && courseData != null) {
-    const [formattedDescription, requisites, sameAsText, offeringFrequency] =
-      parseDescription(courseData);
-    return (
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-col items-center">
-          <p className="text-2xl font-bold self-center">{courseData.title}</p>
-          <p className="text-lg font-semibold self-center">
-            {courseData.subject_prefix +
-              ' ' +
-              courseData.course_number +
-              ' ' +
-              sameAsText}
-          </p>
-          <p className="font-semibold">{courseData.school}</p>
-          <p>
-            {formattedDescription +
-              ' ' +
-              courseData.credit_hours +
-              ' credit hours.'}
-          </p>
-          <p>{requisites[0]}</p>
-          <p>{requisites[1]}</p>
-          <p>{requisites[2]}</p>
-          <p>{'Offering Frequency: ' + offeringFrequency}</p>
-        </div>
-        <SingleGradesInfo
-          course={course}
-          grades={grades}
-          gradesLoading={gradesLoading}
-        />
-      </div>
-    );
-  }
-  //@TODO: maybe remove the tab or prevent creation if loading
-  else
-    return (
+  const [courseData, setCourseData] = useState<CourseData | undefined>();
+  const [courseDataLoading, setCourseDataLoading] = useState<
+    'loading' | 'done' | 'error'
+  >('loading');
+
+  useEffect(() => {
+    setCourseDataLoading('loading');
+    fetchWithCache(
+      '/api/course?prefix=' +
+        encodeURIComponent(String(course.prefix)) +
+        '&number=' +
+        encodeURIComponent(String(course.number)),
+      cacheIndexNebula,
+      expireTime,
+      {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+        },
+      },
+    )
+      .then((response) => {
+        if (response.message !== 'success') {
+          throw new Error(response.message);
+        }
+        setCourseData(response.data[0] as CourseData);
+        setCourseDataLoading(
+          typeof response.data !== 'undefined' ? 'done' : 'error',
+        );
+      })
+      .catch((error) => {
+        setCourseDataLoading('error');
+        console.error('Course data', error);
+      });
+  }, [course]);
+
+  let courseComponent = null;
+  if (courseDataLoading === 'loading') {
+    courseComponent = (
       <>
-        <p>Course information is not available</p>
+        <p className="text-2xl font-bold self-center w-[min(25ch,100%)]">
+          <Skeleton />
+        </p>
+        <p className="text-lg font-semibold text-center">
+          {searchQueryLabel(course)}
+        </p>
+        <p className="font-semibold w-[80%]">
+          <Skeleton />
+        </p>
+        <Skeleton variant="rounded" className="w-full h-24" />
+        <p className="w-[30ch]">
+          <Skeleton />
+        </p>
+        <p className="w-[21ch]">
+          <Skeleton />
+        </p>
+        <p className="w-[24ch]">
+          <Skeleton />
+        </p>
+        <p className="w-[33ch]">
+          <Skeleton />
+        </p>
       </>
     );
+  } else if (
+    courseDataLoading === 'done' &&
+    typeof courseData !== 'undefined'
+  ) {
+    const { formattedDescription, requisites, sameAsText, offeringFrequency } =
+      parseDescription(courseData);
+    courseComponent = (
+      <>
+        <p className="text-2xl font-bold text-center">{courseData.title}</p>
+        <p className="text-lg font-semibold text-center">
+          {searchQueryLabel(course) + ' ' + sameAsText}
+        </p>
+        <p className="font-semibold">{courseData.school}</p>
+        <p>
+          {formattedDescription +
+            ' ' +
+            courseData.credit_hours +
+            ' credit hours.'}
+        </p>
+        {requisites.map((requisite, index) => {
+          if (requisite === '') {
+            return null;
+          }
+          const split = requisite.split(': ');
+          return (
+            <p key={index}>
+              <b>{split[0] + ': '}</b>
+              {split[1]}
+            </p>
+          );
+        })}
+        {offeringFrequency !== '' && (
+          <p>
+            <b>Offering Frequency: </b>
+            {offeringFrequency}
+          </p>
+        )}
+      </>
+    );
+  } else {
+    return (
+      <p className="text-lg font-semibold text-center">
+        Course information is not available
+      </p>
+    );
+  }
+  return (
+    <div className="flex flex-col gap-2">
+      {courseComponent}
+      <SingleGradesInfo
+        course={course}
+        grades={grades}
+        gradesLoading={gradesLoading}
+      />
+    </div>
+  );
 };
 
 export default CourseOverview;

@@ -24,7 +24,6 @@ import SearchQuery, {
 } from '../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
-import type { CourseData } from '../../pages/api/course';
 import type { GradesData } from '../../pages/api/grades';
 import type { RateMyProfessorData } from '../../pages/api/ratemyprofessorScraper';
 
@@ -206,41 +205,6 @@ function fetchRmpData(
   });
 }
 
-//Fetch course details (like the description) from nebula api
-function fetchCourseData(
-  course: SearchQuery,
-  controller: AbortController,
-): Promise<CourseData[]> {
-  return fetchWithCache(
-    '/api/course?' +
-      Object.keys(course)
-        .map(
-          (key) =>
-            key +
-            '=' +
-            encodeURIComponent(String(course[key as keyof SearchQuery])),
-        )
-        .join('&'),
-    cacheIndexNebula,
-    expireTime,
-    {
-      signal: controller.signal,
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
-    },
-  ).then((response) => {
-    if (response.message !== 'success') {
-      throw new Error(response.message);
-    }
-    if (response.data == null) {
-      throw new Error('null data');
-    }
-    return response.data;
-  });
-}
-
 export const Dashboard: NextPage = () => {
   const router = useRouter();
 
@@ -292,7 +256,6 @@ export const Dashboard: NextPage = () => {
       //Get course/prof info
       if (courseSearchTerms.length === 1) {
         fetchAndStoreGradesData(courseSearchTerms[0], controller);
-        fetchAndStoreCourseData(courseSearchTerms[0], controller);
       }
       if (professorSearchTerms.length === 1) {
         fetchAndStoreGradesData(professorSearchTerms[0], controller);
@@ -486,24 +449,6 @@ export const Dashboard: NextPage = () => {
       });
   }
 
-  //Call fetchCourseData and store response
-  function fetchAndStoreCourseData(
-    course: SearchQuery,
-    controller: AbortController,
-  ) {
-    setCourseDataLoading('loading'); //Set Course Loading status
-    fetchCourseData(course, controller)
-      .then((res: CourseData[]) => {
-        res.sort((a, b) => b.catalog_year - a.catalog_year); // sort by year descending, so index 0 has the most recent year
-        setCourseData(res[0]);
-        setCourseDataLoading('done'); //Set loading status to done
-      })
-      .catch((error) => {
-        setCourseDataLoading('error'); //Set loading status to error
-        console.error('Course data for ' + searchQueryLabel(course), error);
-      });
-  }
-
   //On change to results, load new data
   function getData(results: SearchQuery[], controller: AbortController) {
     //Grade data
@@ -575,19 +520,6 @@ export const Dashboard: NextPage = () => {
   } else {
     includedResults = results;
   }
-
-  //Course and Professor data for RHS tabs
-  //only used when there is 1 professor and/or 1 course searched for
-  const [courseData, setCourseData] = useState<CourseData>();
-  const [professorData, setProfessorData] = useState<string>();
-
-  //Loading states for Course and Professor data (for RHS tabs)
-  const [courseDataLoading, setCourseDataLoading] = useState<
-    'loading' | 'done' | 'error'
-  >('loading');
-  const [professorDataLoading, setProfessorDataLoading] = useState<
-    'loading' | 'done' | 'error'
-  >('loading');
 
   //List of course+prof combos saved for comparison
   const [compare, setCompare] = useState<SearchQuery[]>([]);
@@ -718,8 +650,6 @@ export const Dashboard: NextPage = () => {
         <CourseOverview
           key="course"
           course={courses[0]}
-          courseData={courseData}
-          courseLoading={courseDataLoading ?? 'loading'}
           grades={grades[searchQueryLabel(courses[0])]}
           gradesLoading={
             gradesLoading[searchQueryLabel(courses[0])] ?? 'loading'

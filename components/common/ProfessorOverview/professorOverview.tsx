@@ -57,6 +57,7 @@ const ProfessorOverview = ({
   const [src, setSrc] = useState(fallbackSrc);
 
   useEffect(() => {
+    setProfDataLoading('loading');
     fetchWithCache(
       '/api/professor?profFirst=' +
         encodeURIComponent(String(professor.profFirst)) +

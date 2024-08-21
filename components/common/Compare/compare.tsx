@@ -7,7 +7,7 @@ import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel
 import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
 import type { GradesType } from '../../../pages/dashboard/index';
 import { BarGraph } from '../../graph/BarGraph/BarGraph';
-import CompareTable from '../CompareTable/CompareTable';
+import CompareTable from '../CompareTable/compareTable';
 
 type CompareProps = {
   courses: SearchQuery[];
