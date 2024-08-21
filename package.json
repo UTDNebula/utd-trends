@@ -25,6 +25,7 @@
     "@mui/icons-material": "^5.4.4",
     "@mui/material": "^5.4.2",
     "@vercel/analytics": "^1.0.0",
+    "@vercel/speed-insights": "^1.0.12",
     "apexcharts": "^3.33.2",
     "autoprefixer": "^10.4.2",
     "autosuggest-highlight": "^3.3.4",
