@@ -221,11 +221,16 @@ const CourseOverview = ({
         if (response.message !== 'success') {
           throw new Error(response.message);
         }
-        setCourseData(response.data[0] as CourseData);
+        return response.data;
+      })
+      .then((response: CourseData[]) => {
+        response.sort((a, b) => b.catalog_year - a.catalog_year); // sort by year descending, so index 0 has the most recent year
+        setCourseData(response[0] as CourseData);
         setCourseDataLoading(
-          typeof response.data !== 'undefined' ? 'done' : 'error',
+          typeof response !== 'undefined' ? 'done' : 'error',
         );
       })
+
       .catch((error) => {
         setCourseDataLoading('error');
         console.error('Course data', error);
@@ -306,6 +311,7 @@ const CourseOverview = ({
       </p>
     );
   }
+  console.log(courseData?.catalog_year);
   return (
     <div className="flex flex-col gap-2">
       {courseComponent}
