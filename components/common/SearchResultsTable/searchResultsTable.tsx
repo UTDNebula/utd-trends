@@ -140,7 +140,11 @@ function Row({
         </TableCell>
         <TableCell component="th" scope="row">
           <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
-            {searchQueryLabel(course)}
+            {searchQueryLabel(course) +
+              (typeof course.profFirst === 'undefined' &&
+              typeof course.profLast === 'undefined'
+                ? ' (Overall)'
+                : '')}
           </Typography>
         </TableCell>
         <TableCell align="right">
