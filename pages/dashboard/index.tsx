@@ -736,6 +736,8 @@ export const Dashboard: NextPage = () => {
         rmp={compareRmp}
         gradesLoading={compareGradesLoading}
         rmpLoading={compareRmpLoading}
+        addToCompare={addToCompare}
+        removeFromCompare={removeFromCompare}
       />,
     );
     contentComponent = (
