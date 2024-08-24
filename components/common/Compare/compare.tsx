@@ -73,9 +73,9 @@ const Compare = ({
         resultsLoading={
           courses.every(
             (course) =>
-              gradesLoading[searchQueryLabel(course)] === 'done' &&
-              (rmpLoading[searchQueryLabel(convertToProfOnly(course))] ===
-                'done' ||
+              gradesLoading[searchQueryLabel(course)] !== 'loading' &&
+              (rmpLoading[searchQueryLabel(convertToProfOnly(course))] !==
+                'loading' ||
                 typeof rmpLoading[
                   searchQueryLabel(convertToProfOnly(course))
                 ] === 'undefined'),
