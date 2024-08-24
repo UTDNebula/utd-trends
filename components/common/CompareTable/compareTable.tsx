@@ -332,7 +332,10 @@ const CompareTable = ({
                 grades={grades[searchQueryLabel(result)]}
                 rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
                 removeFromCompare={removeFromCompare}
-                color={searchQueryColors[index % searchQueryColors.length]}
+                color={
+                  sortedResults.length > 1 &&
+                  searchQueryColors[index % searchQueryColors.length]
+                }
               />
             ))}
           </TableBody>

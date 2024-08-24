@@ -1,8 +1,6 @@
 import React from 'react';
 
-import SearchQuery, {
-  convertToProfOnly,
-} from '../../../modules/SearchQuery/SearchQuery';
+import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
 import type {
@@ -27,7 +25,10 @@ function convertNumbersToPercents(distribution: GradesType): number[] {
 }
 
 const Compare = ({ courses, grades, rmp, removeFromCompare }: CompareProps) => {
-  // console.log(courses, grades, rmp);
+  if (courses.length === 0) {
+    return <p>Click a checkbox to add something to compare.</p>;
+  }
+
   return (
     <>
       <div className="h-64">
