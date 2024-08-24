@@ -311,7 +311,6 @@ const CourseOverview = ({
       </p>
     );
   }
-  console.log(courseData?.catalog_year);
   return (
     <div className="flex flex-col gap-2">
       {courseComponent}

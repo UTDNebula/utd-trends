@@ -98,6 +98,7 @@ type RowProps = {
   inCompare: boolean;
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
+  color: string;
 };
 
 function Row({
@@ -109,22 +110,13 @@ function Row({
   inCompare,
   addToCompare,
   removeFromCompare,
+  color,
 }: RowProps) {
   const [open, setOpen] = useState(false);
   console.log(course);
   return (
     <>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-        <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-            className={'transition-transform' + (open ? ' rotate-90' : '')}
-          >
-            <KeyboardArrowIcon />
-          </IconButton>
-        </TableCell>
         <TableCell>
           <Checkbox
             checked={inCompare}
@@ -136,16 +128,13 @@ function Row({
               }
             }}
             disabled={gradesLoading === 'loading' || rmpLoading === 'loading'}
+            sx={{
+              color: color,
+              '&.Mui-checked': {
+                color: color,
+              },
+            }}
           />
-        </TableCell>
-        <TableCell component="th" scope="row">
-          <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
-            {searchQueryLabel(course) +
-              (typeof course.profFirst === 'undefined' &&
-              typeof course.profLast === 'undefined'
-                ? ' (Overall)'
-                : '')}
-          </Typography>
         </TableCell>
         <TableCell align="right">
           {gradesLoading === 'loading' && (
@@ -201,21 +190,29 @@ function Row({
             </Typography>
           )}
         </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell className="p-0" colSpan={6}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <div className="p-2 md:p-4 flex flex-col gap-2">
-              <SingleGradesInfo
-                course={course}
-                grades={grades}
-                gradesLoading={gradesLoading}
-              />
-              {typeof rmpLoading !== 'undefined' && (
-                <SingleProfInfo rmp={rmp} rmpLoading={rmpLoading} />
-              )}
-            </div>
-          </Collapse>
+        <TableCell align="right">
+          {rmpLoading === 'loading' && (
+            <Skeleton variant="rounded" className="rounded-full px-5 py-2">
+              <Typography className="text-base">5.0</Typography>
+            </Skeleton>
+          )}
+          {(rmpLoading === 'error' || typeof rmpLoading === 'undefined') && (
+            <CloseIcon />
+          )}
+          {rmpLoading === 'done' && (
+            <Typography
+              className="text-base text-black rounded-full px-5 py-2 inline"
+              sx={{
+                backgroundColor: colorMidpoint(
+                  100,
+                  0,
+                  rmp.wouldTakeAgainPercentage,
+                ),
+              }}
+            >
+              {rmp.wouldTakeAgainPercentage.toFixed(0) + '%'}
+            </Typography>
+          )}
         </TableCell>
       </TableRow>
     </>
@@ -232,6 +229,7 @@ type CompareTableProps = {
   compare: SearchQuery[];
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
+  colors: string[];
 };
 
 const CompareTable = ({
@@ -244,15 +242,18 @@ const CompareTable = ({
   compare,
   addToCompare,
   removeFromCompare,
+  colors,
 }: CompareTableProps) => {
   //Table sorting category
   const [orderBy, setOrderBy] = useState<
-    'none' | 'gpa' | 'rating' | 'difficulty'
+    'none' | 'gpa' | 'rating' | 'difficulty' | 'would_take_again'
   >('none');
   //Table sorting direction
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
   //Cycle through sorting
-  function handleClick(col: 'gpa' | 'rating' | 'difficulty') {
+  function handleClick(
+    col: 'gpa' | 'rating' | 'difficulty' | 'would_take_again',
+  ) {
     if (orderBy !== col) {
       setOrderBy(col);
       setOrder('asc');
@@ -344,9 +345,7 @@ const CompareTable = ({
         <Table stickyHeader aria-label="collapsible table">
           <TableHead>
             <TableRow>
-              <TableCell />
               <TableCell>Compare</TableCell>
-              <TableCell>Name</TableCell>
               <TableCell>
                 <TableSortLabel
                   active={orderBy === 'gpa'}
@@ -380,11 +379,22 @@ const CompareTable = ({
                   Difficulty
                 </TableSortLabel>
               </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'would_take_again'}
+                  direction={orderBy === 'would_take_again' ? order : 'asc'}
+                  onClick={() => {
+                    handleClick('would_take_again');
+                  }}
+                >
+                  Would Take Again
+                </TableSortLabel>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {resultsLoading === 'done'
-              ? sortedResults.map((result) => (
+              ? sortedResults.map((result, index) => (
                   <Row
                     key={searchQueryLabel(result)}
                     course={result}
@@ -401,6 +411,7 @@ const CompareTable = ({
                     }
                     addToCompare={addToCompare}
                     removeFromCompare={removeFromCompare}
+                    color={colors[index]}
                   />
                 ))
               : Array(10)

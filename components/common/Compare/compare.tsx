@@ -3,6 +3,9 @@ import React from 'react';
 import SearchQuery, {
   convertToProfOnly,
 } from '../../../modules/SearchQuery/SearchQuery';
+import searchQueryColors, {
+  rainbowColors,
+} from '../../../modules/searchQueryColors/searchQueryColors';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
 import type { GradesType } from '../../../pages/dashboard/index';
@@ -88,6 +91,11 @@ const Compare = ({
         compare={courses} //*
         addToCompare={addToCompare}
         removeFromCompare={removeFromCompare}
+        colors={
+          courses.length === 1
+            ? rainbowColors
+            : searchQueryColors.filter((searchQuery, i) => 1)
+        }
       />
     </>
   );
