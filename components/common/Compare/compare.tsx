@@ -3,22 +3,19 @@ import React from 'react';
 import SearchQuery, {
   convertToProfOnly,
 } from '../../../modules/SearchQuery/SearchQuery';
-import searchQueryColors, {
-  rainbowColors,
-} from '../../../modules/searchQueryColors/searchQueryColors';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
-import type { GradesType } from '../../../pages/dashboard/index';
+import type {
+  GenericFetchedData,
+  GradesType,
+} from '../../../pages/dashboard/index';
 import { BarGraph } from '../../graph/BarGraph/BarGraph';
 import CompareTable from '../CompareTable/compareTable';
 
 type CompareProps = {
   courses: SearchQuery[];
-  grades: { [key: string]: GradesType };
-  rmp: { [key: string]: RateMyProfessorData };
-  gradesLoading: { [key: string]: 'loading' | 'done' | 'error' };
-  rmpLoading: { [key: string]: 'loading' | 'done' | 'error' };
-  addToCompare: { (arg0: SearchQuery): void };
+  grades: { [key: string]: GenericFetchedData<GradesType> };
+  rmp: { [key: string]: GenericFetchedData<RateMyProfessorData> };
   removeFromCompare: { (arg0: SearchQuery): void };
 };
 
@@ -29,16 +26,8 @@ function convertNumbersToPercents(distribution: GradesType): number[] {
   );
 }
 
-const Compare = ({
-  courses,
-  grades,
-  rmp,
-  gradesLoading,
-  rmpLoading,
-  addToCompare,
-  removeFromCompare,
-}: CompareProps) => {
-  // console.log(courses, grades, rmp, gradesLoading, rmpLoading);
+const Compare = ({ courses, grades, rmp, removeFromCompare }: CompareProps) => {
+  // console.log(courses, grades, rmp);
   return (
     <>
       <div className="h-64">
@@ -61,41 +50,23 @@ const Compare = ({
             'W',
           ]}
           yaxisFormatter={(value) => Number(value).toLocaleString() + '%'}
-          series={courses.map((course, index) => ({
-            name: searchQueryLabel(course),
-            data: grades[searchQueryLabel(course)]
-              ? convertNumbersToPercents(grades[searchQueryLabel(course)])
-              : [],
-          }))}
+          series={courses.map((course) => {
+            const grade = grades[searchQueryLabel(course)];
+            return {
+              name: searchQueryLabel(course),
+              data:
+                grade.state === 'done'
+                  ? convertNumbersToPercents(grade.data)
+                  : [],
+            };
+          })}
         />
       </div>
       <CompareTable
-        resultsLoading={
-          courses.every(
-            (course) =>
-              gradesLoading[searchQueryLabel(course)] !== 'loading' &&
-              (rmpLoading[searchQueryLabel(convertToProfOnly(course))] !==
-                'loading' ||
-                typeof rmpLoading[
-                  searchQueryLabel(convertToProfOnly(course))
-                ] === 'undefined'),
-          )
-            ? 'done'
-            : 'loading'
-        } //*
         includedResults={courses}
         grades={grades}
         rmp={rmp}
-        gradesLoading={gradesLoading}
-        rmpLoading={rmpLoading}
-        compare={courses} //*
-        addToCompare={addToCompare}
         removeFromCompare={removeFromCompare}
-        colors={
-          courses.length === 1
-            ? rainbowColors
-            : searchQueryColors.filter((searchQuery, i) => 1)
-        }
       />
     </>
   );

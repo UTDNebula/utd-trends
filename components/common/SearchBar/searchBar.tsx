@@ -157,7 +157,7 @@ const SearchBar = ({
         if (error instanceof DOMException) {
           // ignore aborts
         } else {
-          console.log(error);
+          console.error('Autocomplete', error);
         }
       });
   }

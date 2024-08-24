@@ -23,7 +23,10 @@ import SearchQuery, {
 import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
-import type { GradesType } from '../../../pages/dashboard/index';
+import type {
+  GenericFetchedData,
+  GradesType,
+} from '../../../pages/dashboard/index';
 import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
 import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
 
@@ -44,17 +47,17 @@ function LoadingRow() {
         </Typography>
       </TableCell>
       <TableCell align="right">
-        <Skeleton variant="rounded" className="rounded-full px-5 py-2">
+        <Skeleton variant="rounded" className="rounded-full px-5 py-2 ml-auto">
           <Typography className="text-base">4.00</Typography>
         </Skeleton>
       </TableCell>
       <TableCell align="right">
-        <Skeleton variant="rounded" className="rounded-full px-5 py-2">
+        <Skeleton variant="rounded" className="rounded-full px-5 py-2 ml-auto">
           <Typography className="text-base">5.0</Typography>
         </Skeleton>
       </TableCell>
       <TableCell align="right">
-        <Skeleton variant="rounded" className="rounded-full px-5 py-2">
+        <Skeleton variant="rounded" className="rounded-full px-5 py-2 ml-auto">
           <Typography className="text-base">5.0</Typography>
         </Skeleton>
       </TableCell>
@@ -91,10 +94,8 @@ function colorMidpoint(good: number, bad: number, value: number) {
 
 type RowProps = {
   course: SearchQuery;
-  grades: GradesType;
-  rmp: RateMyProfessorData;
-  gradesLoading: 'loading' | 'done' | 'error';
-  rmpLoading: 'loading' | 'done' | 'error';
+  grades: GenericFetchedData<GradesType>;
+  rmp: GenericFetchedData<RateMyProfessorData>;
   inCompare: boolean;
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
@@ -104,8 +105,6 @@ function Row({
   course,
   grades,
   rmp,
-  gradesLoading,
-  rmpLoading,
   inCompare,
   addToCompare,
   removeFromCompare,
@@ -135,7 +134,10 @@ function Row({
                 addToCompare(course);
               }
             }}
-            disabled={gradesLoading === 'loading' || rmpLoading === 'loading'}
+            disabled={
+              (typeof grades !== 'undefined' && grades.state === 'loading') ||
+              (typeof rmp !== 'undefined' && rmp.state === 'loading')
+            }
           />
         </TableCell>
         <TableCell component="th" scope="row">
@@ -148,72 +150,86 @@ function Row({
           </Typography>
         </TableCell>
         <TableCell align="right">
-          {gradesLoading === 'loading' && (
-            <Skeleton variant="rounded" className="rounded-full px-5 py-2">
-              <Typography className="text-base">4.00</Typography>
-            </Skeleton>
-          )}
-          {gradesLoading === 'error' && <CloseIcon />}
-          {gradesLoading === 'done' && (
-            <Typography
-              className="text-base text-black rounded-full px-5 py-2 inline"
-              sx={{ backgroundColor: colorMidpoint(4, 0, grades.gpa) }}
-            >
-              {grades.gpa.toFixed(2)}
-            </Typography>
-          )}
+          {((typeof grades === 'undefined' || grades.state === 'error') && (
+            <CloseIcon />
+          )) ||
+            (grades.state === 'loading' && (
+              <Skeleton
+                variant="rounded"
+                className="rounded-full px-5 py-2 ml-auto"
+              >
+                <Typography className="text-base">4.00</Typography>
+              </Skeleton>
+            )) ||
+            (grades.state === 'done' && (
+              <Typography
+                className="text-base text-black rounded-full px-5 py-2 inline"
+                sx={{ backgroundColor: colorMidpoint(4, 0, grades.data.gpa) }}
+              >
+                {grades.data.gpa.toFixed(2)}
+              </Typography>
+            )) ||
+            null}
         </TableCell>
         <TableCell align="right">
-          {rmpLoading === 'loading' && (
-            <Skeleton variant="rounded" className="rounded-full px-5 py-2">
-              <Typography className="text-base">5.0</Typography>
-            </Skeleton>
-          )}
-          {(rmpLoading === 'error' || typeof rmpLoading === 'undefined') && (
+          {((typeof rmp === 'undefined' || rmp.state === 'error') && (
             <CloseIcon />
-          )}
-          {rmpLoading === 'done' && (
-            <Typography
-              className="text-base text-black rounded-full px-5 py-2 inline"
-              sx={{ backgroundColor: colorMidpoint(5, 0, rmp.averageRating) }}
-            >
-              {rmp.averageRating.toFixed(1)}
-            </Typography>
-          )}
+          )) ||
+            (rmp.state === 'loading' && (
+              <Skeleton
+                variant="rounded"
+                className="rounded-full px-5 py-2 ml-auto"
+              >
+                <Typography className="text-base">5.0</Typography>
+              </Skeleton>
+            )) ||
+            (rmp.state === 'done' && (
+              <Typography
+                className="text-base text-black rounded-full px-5 py-2 inline"
+                sx={{
+                  backgroundColor: colorMidpoint(5, 0, rmp.data.averageRating),
+                }}
+              >
+                {rmp.data.averageRating.toFixed(1)}
+              </Typography>
+            )) ||
+            null}
         </TableCell>
         <TableCell align="right">
-          {rmpLoading === 'loading' && (
-            <Skeleton variant="rounded" className="rounded-full px-5 py-2">
-              <Typography className="text-base">5.0</Typography>
-            </Skeleton>
-          )}
-          {(rmpLoading === 'error' || typeof rmpLoading === 'undefined') && (
+          {((typeof rmp === 'undefined' || rmp.state === 'error') && (
             <CloseIcon />
-          )}
-          {rmpLoading === 'done' && (
-            <Typography
-              className="text-base text-black rounded-full px-5 py-2 inline"
-              sx={{
-                backgroundColor: colorMidpoint(0, 5, rmp.averageDifficulty),
-              }}
-            >
-              {rmp.averageDifficulty.toFixed(1)}
-            </Typography>
-          )}
+          )) ||
+            (rmp.state === 'loading' && (
+              <Skeleton
+                variant="rounded"
+                className="rounded-full px-5 py-2 ml-auto"
+              >
+                <Typography className="text-base">5.0</Typography>
+              </Skeleton>
+            )) ||
+            (rmp.state === 'done' && (
+              <Typography
+                className="text-base text-black rounded-full px-5 py-2 inline"
+                sx={{
+                  backgroundColor: colorMidpoint(
+                    0,
+                    5,
+                    rmp.data.averageDifficulty,
+                  ),
+                }}
+              >
+                {rmp.data.averageDifficulty.toFixed(1)}
+              </Typography>
+            )) ||
+            null}
         </TableCell>
       </TableRow>
       <TableRow>
         <TableCell className="p-0" colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <div className="p-2 md:p-4 flex flex-col gap-2">
-              <SingleGradesInfo
-                course={course}
-                grades={grades}
-                gradesLoading={gradesLoading}
-              />
-              {typeof rmpLoading !== 'undefined' && (
-                <SingleProfInfo rmp={rmp} rmpLoading={rmpLoading} />
-              )}
+              <SingleGradesInfo course={course} grades={grades} />
+              <SingleProfInfo rmp={rmp} />
             </div>
           </Collapse>
         </TableCell>
@@ -225,10 +241,8 @@ function Row({
 type SearchResultsTableProps = {
   resultsLoading: 'loading' | 'done';
   includedResults: SearchQuery[];
-  grades: { [key: string]: GradesType };
-  rmp: { [key: string]: RateMyProfessorData };
-  gradesLoading: { [key: string]: 'loading' | 'done' | 'error' };
-  rmpLoading: { [key: string]: 'loading' | 'done' | 'error' };
+  grades: { [key: string]: GenericFetchedData<GradesType> };
+  rmp: { [key: string]: GenericFetchedData<RateMyProfessorData> };
   compare: SearchQuery[];
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
@@ -239,8 +253,6 @@ const SearchResultsTable = ({
   includedResults,
   grades,
   rmp,
-  gradesLoading,
-  rmpLoading,
   compare,
   addToCompare,
   removeFromCompare,
@@ -289,48 +301,44 @@ const SearchResultsTable = ({
       if (orderBy === 'gpa') {
         const aGrades = grades[searchQueryLabel(a)];
         const bGrades = grades[searchQueryLabel(b)];
-        const aGradesLoading = gradesLoading[searchQueryLabel(a)];
-        const bGradesLoading = gradesLoading[searchQueryLabel(b)];
         //drop loading/error rows to bottom
-        if (aGradesLoading !== 'done' && bGradesLoading !== 'done') {
+        if (aGrades.state !== 'done' && bGrades.state !== 'done') {
           return 0;
         }
-        if (aGradesLoading !== 'done') {
+        if (aGrades.state !== 'done') {
           return 9999;
         }
-        if (bGradesLoading !== 'done') {
+        if (bGrades.state !== 'done') {
           return -9999;
         }
         if (order === 'asc') {
-          return aGrades.gpa - bGrades.gpa;
+          return aGrades.data.gpa - bGrades.data.gpa;
         }
-        return bGrades.gpa - aGrades.gpa;
+        return bGrades.data.gpa - aGrades.data.gpa;
       }
       if (orderBy === 'rating' || orderBy === 'difficulty') {
         const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
         const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
-        const aRmpLoading = rmpLoading[searchQueryLabel(convertToProfOnly(a))];
-        const bRmpLoading = rmpLoading[searchQueryLabel(convertToProfOnly(b))];
         //drop loading/error rows to bottom
-        if (aRmpLoading !== 'done' && bRmpLoading !== 'done') {
+        if (aRmp.state !== 'done' && bRmp.state !== 'done') {
           return 0;
         }
-        if (aRmpLoading !== 'done') {
+        if (aRmp.state !== 'done') {
           return 9999;
         }
-        if (bRmpLoading !== 'done') {
+        if (bRmp.state !== 'done') {
           return -9999;
         }
         if (orderBy === 'rating') {
           if (order === 'asc') {
-            return aRmp.averageRating - bRmp.averageRating;
+            return aRmp.data.averageRating - bRmp.data.averageRating;
           }
-          return bRmp.averageRating - aRmp.averageRating;
+          return bRmp.data.averageRating - aRmp.data.averageRating;
         }
         if (order === 'asc') {
-          return aRmp.averageDifficulty - bRmp.averageDifficulty;
+          return aRmp.data.averageDifficulty - bRmp.data.averageDifficulty;
         }
-        return bRmp.averageDifficulty - aRmp.averageDifficulty;
+        return bRmp.data.averageDifficulty - aRmp.data.averageDifficulty;
       }
       return 0;
     });
@@ -392,10 +400,6 @@ const SearchResultsTable = ({
                     course={result}
                     grades={grades[searchQueryLabel(result)]}
                     rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
-                    gradesLoading={gradesLoading[searchQueryLabel(result)]}
-                    rmpLoading={
-                      rmpLoading[searchQueryLabel(convertToProfOnly(result))]
-                    }
                     inCompare={
                       compare.findIndex((obj) =>
                         searchQueryEqual(obj, result),

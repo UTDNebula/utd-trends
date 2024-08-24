@@ -10,7 +10,10 @@ import fetchWithCache, {
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
-import type { GradesType } from '../../../pages/dashboard/index';
+import type {
+  GenericFetchedData,
+  GradesType,
+} from '../../../pages/dashboard/index';
 import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
 import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
 
@@ -36,28 +39,23 @@ interface ProfessorInterface {
 
 type ProfessorOverviewProps = {
   professor: SearchQuery;
-  grades: GradesType;
-  rmp: RateMyProfessorData;
-  gradesLoading: 'loading' | 'done' | 'error';
-  rmpLoading: 'loading' | 'done' | 'error';
+  grades: GenericFetchedData<GradesType>;
+  rmp: GenericFetchedData<RateMyProfessorData>;
 };
 
 const ProfessorOverview = ({
   professor,
   grades,
   rmp,
-  gradesLoading,
-  rmpLoading,
 }: ProfessorOverviewProps) => {
-  const [profData, setProfData] = useState<ProfessorInterface | undefined>();
-  const [profDataLoading, setProfDataLoading] = useState<
-    'loading' | 'done' | 'error'
-  >('loading');
+  const [profData, setProfData] = useState<
+    GenericFetchedData<ProfessorInterface>
+  >({ state: 'loading' });
 
   const [src, setSrc] = useState(fallbackSrc);
 
   useEffect(() => {
-    setProfDataLoading('loading');
+    setProfData({ state: 'loading' });
     fetchWithCache(
       '/api/professor?profFirst=' +
         encodeURIComponent(String(professor.profFirst)) +
@@ -76,21 +74,21 @@ const ProfessorOverview = ({
         if (response.message !== 'success') {
           throw new Error(response.message);
         }
-        setProfData(response.data as ProfessorInterface);
+        setProfData({
+          state: typeof response.data !== 'undefined' ? 'done' : 'error',
+          data: response.data as ProfessorInterface,
+        });
         setSrc(response.data.image_uri);
-        setProfDataLoading(
-          typeof response.data !== 'undefined' ? 'done' : 'error',
-        );
       })
       .catch((error) => {
-        setProfDataLoading('error');
+        setProfData({ state: 'error' });
         console.error('Professor data', error);
       });
   }, [professor]);
 
   return (
     <div className="flex flex-col gap-2">
-      {profDataLoading === 'loading' ? (
+      {profData.state === 'loading' ? (
         <Skeleton variant="circular" className="w-32 h-32 self-center" />
       ) : (
         <Image
@@ -114,43 +112,45 @@ const ProfessorOverview = ({
         <p className="text-2xl font-bold self-center">
           {searchQueryLabel(professor)}
         </p>
-        {profDataLoading === 'loading' && (
+        {profData.state === 'loading' && (
           <>
             <Skeleton className="w-[25ch]" />
             <Skeleton className="w-[20ch]" />
             <Skeleton className="w-[10ch]" />
           </>
         )}
-        {profDataLoading === 'done' && typeof profData !== 'undefined' && (
+        {profData.state === 'done' && typeof profData.data !== 'undefined' && (
           <>
-            {profData.email !== '' && (
+            {profData.data.email !== '' && (
               <Link
-                href={'mailto:' + profData.email}
+                href={'mailto:' + profData.data.email}
                 target="_blank"
                 className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
               >
-                {profData.email}
+                {profData.data.email}
               </Link>
             )}
-            {profData.office.map_uri !== '' &&
-              profData.office.building !== '' &&
-              profData.office.room !== '' && (
+            {profData.data.office.map_uri !== '' &&
+              profData.data.office.building !== '' &&
+              profData.data.office.room !== '' && (
                 <p>
                   Office:{' '}
                   <Link
-                    href={profData.office.map_uri}
+                    href={profData.data.office.map_uri}
                     target="_blank"
                     className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
                   >
                     <b>
-                      {profData.office.building + ' ' + profData.office.room}
+                      {profData.data.office.building +
+                        ' ' +
+                        profData.data.office.room}
                     </b>
                   </Link>
                 </p>
               )}
-            {profData.profile_uri !== '' && (
+            {profData.data.profile_uri !== '' && (
               <Link
-                href={profData.profile_uri}
+                href={profData.data.profile_uri}
                 target="_blank"
                 className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
               >
@@ -160,12 +160,8 @@ const ProfessorOverview = ({
           </>
         )}
       </div>
-      <SingleGradesInfo
-        course={professor}
-        grades={grades}
-        gradesLoading={gradesLoading}
-      />
-      <SingleProfInfo rmp={rmp} rmpLoading={rmpLoading} />
+      <SingleGradesInfo course={professor} grades={grades} />
+      <SingleProfInfo rmp={rmp} />
     </div>
   );
 };

@@ -8,13 +8,15 @@ import fetchWithCache, {
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import { CourseData } from '../../../pages/api/course';
-import type { GradesType } from '../../../pages/dashboard/index';
+import type {
+  GenericFetchedData,
+  GradesType,
+} from '../../../pages/dashboard/index';
 import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
 
 type CourseOverviewProps = {
   course: SearchQuery;
-  grades: GradesType;
-  gradesLoading: 'loading' | 'done' | 'error';
+  grades: GenericFetchedData<GradesType>;
 };
 
 function parseDescription(course: CourseData): {
@@ -191,18 +193,13 @@ function parseDescription(course: CourseData): {
   return { formattedDescription, requisites, sameAsText, offeringFrequency };
 }
 
-const CourseOverview = ({
-  course,
-  grades,
-  gradesLoading,
-}: CourseOverviewProps) => {
-  const [courseData, setCourseData] = useState<CourseData | undefined>();
-  const [courseDataLoading, setCourseDataLoading] = useState<
-    'loading' | 'done' | 'error'
-  >('loading');
+const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
+  const [courseData, setCourseData] = useState<GenericFetchedData<CourseData>>({
+    state: 'loading',
+  });
 
   useEffect(() => {
-    setCourseDataLoading('loading');
+    setCourseData({ state: 'loading' });
     fetchWithCache(
       '/api/course?prefix=' +
         encodeURIComponent(String(course.prefix)) +
@@ -225,20 +222,20 @@ const CourseOverview = ({
       })
       .then((response: CourseData[]) => {
         response.sort((a, b) => b.catalog_year - a.catalog_year); // sort by year descending, so index 0 has the most recent year
-        setCourseData(response[0] as CourseData);
-        setCourseDataLoading(
-          typeof response !== 'undefined' ? 'done' : 'error',
-        );
+        setCourseData({
+          state: typeof response !== 'undefined' ? 'done' : 'error',
+          data: response[0] as CourseData,
+        });
       })
 
       .catch((error) => {
-        setCourseDataLoading('error');
+        setCourseData({ state: 'error' });
         console.error('Course data', error);
       });
   }, [course]);
 
   let courseComponent = null;
-  if (courseDataLoading === 'loading') {
+  if (courseData.state === 'loading') {
     courseComponent = (
       <>
         <p className="text-2xl font-bold self-center w-[min(25ch,100%)]">
@@ -266,22 +263,24 @@ const CourseOverview = ({
       </>
     );
   } else if (
-    courseDataLoading === 'done' &&
-    typeof courseData !== 'undefined'
+    courseData.state === 'done' &&
+    typeof courseData.data !== 'undefined'
   ) {
     const { formattedDescription, requisites, sameAsText, offeringFrequency } =
-      parseDescription(courseData);
+      parseDescription(courseData.data);
     courseComponent = (
       <>
-        <p className="text-2xl font-bold text-center">{courseData.title}</p>
+        <p className="text-2xl font-bold text-center">
+          {courseData.data.title}
+        </p>
         <p className="text-lg font-semibold text-center">
           {searchQueryLabel(course) + ' ' + sameAsText}
         </p>
-        <p className="font-semibold">{courseData.school}</p>
+        <p className="font-semibold">{courseData.data.school}</p>
         <p>
           {formattedDescription +
             ' ' +
-            courseData.credit_hours +
+            courseData.data.credit_hours +
             ' credit hours.'}
         </p>
         {requisites.map((requisite, index) => {
@@ -314,11 +313,7 @@ const CourseOverview = ({
   return (
     <div className="flex flex-col gap-2">
       {courseComponent}
-      <SingleGradesInfo
-        course={course}
-        grades={grades}
-        gradesLoading={gradesLoading}
-      />
+      <SingleGradesInfo course={course} grades={grades} />
     </div>
   );
 };

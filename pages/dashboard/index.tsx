@@ -27,6 +27,25 @@ import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
 import type { GradesData } from '../../pages/api/grades';
 import type { RateMyProfessorData } from '../../pages/api/ratemyprofessorScraper';
 
+//Limit cached number of grades and rmp data entries
+const MAX_ENTRIES = 1000;
+
+type GenericFetchedDataError<T> = {
+  state: 'error';
+  data?: T;
+};
+type GenericFetchedDataLoading = {
+  state: 'loading';
+};
+type GenericFetchedDataDone<T> = {
+  state: 'done';
+  data: T;
+};
+export type GenericFetchedData<T> =
+  | GenericFetchedDataError<T>
+  | GenericFetchedDataLoading
+  | GenericFetchedDataDone<T>;
+
 function removeDuplicates(array: SearchQuery[]) {
   return array.filter(
     (obj1, index, self) =>
@@ -212,10 +231,10 @@ export const Dashboard: NextPage = () => {
   const [courses, setCourses] = useState<SearchQuery[]>([]);
   const [professors, setProfessors] = useState<SearchQuery[]>([]);
 
-  //State for loading list of results
-  const [state, setState] = useState<'loading' | 'done' | 'error'>('loading');
   //List of course+prof combos, data on each still needs to be fetched
-  const [results, setResults] = useState<SearchQuery[]>([]);
+  const [results, setResults] = useState<GenericFetchedData<SearchQuery[]>>({
+    state: 'loading',
+  });
 
   //On search change, seperate into courses and profs, clear data, and fetch new results
   useEffect(() => {
@@ -242,47 +261,67 @@ export const Dashboard: NextPage = () => {
       setProfessors(professorSearchTerms);
 
       //Clear fetched data
-      setState('loading');
+      setResults({ state: 'loading' });
       setAcademicSessions([]);
-      _setChosenSessions([]);
-      setGrades({});
-      setRmp({});
-      setGradesLoading({});
-      setRmpLoading({});
+      setChosenSessions([]);
+      Object.values(compareGrades).forEach((compareGrade) => {
+        if (compareGrade.state === 'done') {
+          addAcademicSessions(
+            compareGrade.data.grades.map((session) => session._id),
+          );
+        }
+      });
 
       //To cancel on rerender
       const controller = new AbortController();
 
       //Get course/prof info
       if (courseSearchTerms.length === 1) {
-        fetchAndStoreGradesData(courseSearchTerms[0], controller);
+        if (
+          typeof grades[searchQueryLabel(courseSearchTerms[0])] === 'undefined'
+        ) {
+          fetchAndStoreGradesData(courseSearchTerms[0], controller);
+        }
       }
       if (professorSearchTerms.length === 1) {
-        fetchAndStoreGradesData(professorSearchTerms[0], controller);
-        fetchAndStoreRmpData(professorSearchTerms[0], controller);
+        if (
+          typeof grades[searchQueryLabel(professorSearchTerms[0])] ===
+          'undefined'
+        ) {
+          fetchAndStoreGradesData(professorSearchTerms[0], controller);
+        }
+        if (
+          typeof rmp[searchQueryLabel(professorSearchTerms[0])] === 'undefined'
+        ) {
+          fetchAndStoreRmpData(professorSearchTerms[0], controller);
+        }
       }
 
       //Get results from autocomplete
       if (courseSearchTerms.length > 0) {
         fetchSearchResults(courseSearchTerms, professorSearchTerms, controller)
           .then((res) => {
-            setResults(res);
-            setState('done');
+            setResults({
+              state: 'done',
+              data: res,
+            });
             getData(res, controller);
           })
           .catch((error) => {
-            setState('error');
+            setResults({ state: 'error', data: [] });
             console.error('Search Results', error);
           });
       } else if (professorSearchTerms.length > 0) {
         fetchSearchResults(professorSearchTerms, courseSearchTerms, controller)
           .then((res) => {
-            setResults(res);
-            setState('done');
+            setResults({
+              state: 'done',
+              data: res,
+            });
             getData(res, controller);
           })
           .catch((error) => {
-            setState('error');
+            setResults({ state: 'error', data: [] });
             console.error('Search Results', error);
           });
       }
@@ -295,27 +334,40 @@ export const Dashboard: NextPage = () => {
   //Compiled list of academic sessions grade data is available for
   const [academicSessions, setAcademicSessions] = useState<string[]>([]);
   //Selected sessions to perform calculations with, starts as all of them
-  const [chosenSessions, _setChosenSessions] = useState<string[]>([]);
+  const [chosenSessions, setChosenSessions] = useState<string[]>([]);
 
   //A wrapper on the setter function for chosenSessions that also recalculates GPA and such data for saved grade data based on the new set of chosen sessions
-  function setChosenSessions(func: (arg0: string[]) => string[]) {
-    _setChosenSessions((old) => {
+  function addChosenSessions(func: (arg0: string[]) => string[]) {
+    setChosenSessions((old) => {
       const newVal = func(old);
-      setGrades((grades) => {
-        Object.keys(grades).forEach((key) => {
-          grades[key] = {
-            ...grades[key],
-            ...calculateGrades(grades[key].grades, newVal),
-          };
+      if (results.state === 'done') {
+        setGrades((grades) => {
+          //Relavent keys
+          for (const result of [
+            ...(results.state === 'done' ? results.data : []),
+          ]
+            .concat(courses.length === 1 ? courses[0] : [])
+            .concat(professors.length === 1 ? professors[0] : [])) {
+            const entry = grades[searchQueryLabel(result)];
+            if (entry && entry.state === 'done') {
+              entry.data = {
+                ...entry.data,
+                ...calculateGrades(entry.data.grades, newVal),
+              };
+            }
+          }
+          return grades;
         });
-        return grades;
-      });
+      }
       setCompareGrades((grades) => {
         Object.keys(grades).forEach((key) => {
-          grades[key] = {
-            ...grades[key],
-            ...calculateGrades(grades[key].grades, newVal),
-          };
+          const entry = grades[key];
+          if (entry && entry.state === 'done') {
+            entry.data = {
+              ...entry.data,
+              ...calculateGrades(entry.data.grades, newVal),
+            };
+          }
         });
         return grades;
       });
@@ -354,7 +406,7 @@ export const Dashboard: NextPage = () => {
       return oldSessions;
     });
     //Have new sessions be automatically checked
-    setChosenSessions((oldSessions) => {
+    addChosenSessions((oldSessions) => {
       oldSessions = oldSessions.concat(sessions);
       //Remove duplicates
       oldSessions = oldSessions.filter(
@@ -366,50 +418,69 @@ export const Dashboard: NextPage = () => {
   }
 
   //Store grades by course+prof combo
-  const [grades, setGrades] = useState<{ [key: string]: GradesType }>({});
+  const [grades, setGrades] = useState<{
+    [key: string]: GenericFetchedData<GradesType>;
+  }>({});
+  function addToGrades(key: string, value: GenericFetchedData<GradesType>) {
+    setGrades((old) => {
+      if (typeof old[key] !== 'undefined') {
+        old[key] = value;
+        return old;
+      }
+      const newVal = { ...old };
+      if (Object.keys(newVal).length >= MAX_ENTRIES) {
+        // Remove the oldest entry
+        const oldestKey = Object.keys(newVal)[0];
+        delete newVal[oldestKey];
+      }
+      newVal[key] = value;
+      return newVal;
+    });
+  }
   //Store rmp scores by profs
-  const [rmp, setRmp] = useState<{ [key: string]: RateMyProfessorData }>({});
-
-  //Loading states for each result and prof in results
-  const [gradesLoading, setGradesLoading] = useState<{
-    [key: string]: 'loading' | 'done' | 'error';
+  const [rmp, setRmp] = useState<{
+    [key: string]: GenericFetchedData<RateMyProfessorData>;
   }>({});
-  const [rmpLoading, setRmpLoading] = useState<{
-    [key: string]: 'loading' | 'done' | 'error';
-  }>({});
+  function addToRmp(
+    key: string,
+    value: GenericFetchedData<RateMyProfessorData>,
+  ) {
+    setRmp((old) => {
+      if (typeof old[key] !== 'undefined') {
+        old[key] = value;
+        return old;
+      }
+      const newVal = { ...old };
+      if (Object.keys(newVal).length >= MAX_ENTRIES) {
+        // Remove the oldest entry
+        const oldestKey = Object.keys(newVal)[0];
+        delete newVal[oldestKey];
+      }
+      newVal[key] = value;
+      return newVal;
+    });
+  }
 
   //Call fetchGradesData and store response
   function fetchAndStoreGradesData(
     course: SearchQuery,
     controller: AbortController,
   ) {
-    setGradesLoading((old) => {
-      return {
-        ...old,
-        [searchQueryLabel(course)]: 'loading',
-      };
-    });
+    addToGrades(searchQueryLabel(course), { state: 'loading' });
     fetchGradesData(course, controller)
       .then((res: GradesType) => {
         //Add to storage
-        setGrades((old) => {
-          return { ...old, [searchQueryLabel(course)]: res };
-        });
         //Set loading status to done, unless total was 0 in calculateGrades
-        setGradesLoading((old) => {
-          return {
-            ...old,
-            [searchQueryLabel(course)]: res.gpa !== -1 ? 'done' : 'error',
-          };
+        addToGrades(searchQueryLabel(course), {
+          state: res.gpa !== -1 ? 'done' : 'error',
+          data: res,
         });
         //Add any more academic sessions to list
         addAcademicSessions(res.grades.map((session) => session._id));
       })
       .catch((error) => {
         //Set loading status to error
-        setGradesLoading((old) => {
-          return { ...old, [searchQueryLabel(course)]: 'error' };
-        });
+        addToGrades(searchQueryLabel(course), { state: 'error' });
         console.error('Grades data for ' + searchQueryLabel(course), error);
       });
   }
@@ -419,32 +490,19 @@ export const Dashboard: NextPage = () => {
     professor: SearchQuery,
     controller: AbortController,
   ) {
-    setRmpLoading((old) => {
-      return {
-        ...old,
-        [searchQueryLabel(professor)]: 'loading',
-      };
-    });
+    addToRmp(searchQueryLabel(professor), { state: 'loading' });
     fetchRmpData(professor, controller)
       .then((res: RateMyProfessorData) => {
         //Add to storage
-        setRmp((old) => {
-          return { ...old, [searchQueryLabel(professor)]: res };
-        });
         //Set loading status to done
-        setRmpLoading((old) => {
-          return {
-            ...old,
-            [searchQueryLabel(professor)]:
-              typeof res !== 'undefined' ? 'done' : 'error',
-          };
+        addToRmp(searchQueryLabel(professor), {
+          state: typeof res !== 'undefined' ? 'done' : 'error',
+          data: res,
         });
       })
       .catch((error) => {
         //Set loading status to error
-        setRmpLoading((old) => {
-          return { ...old, [searchQueryLabel(professor)]: 'error' };
-        });
+        addToRmp(searchQueryLabel(professor), { state: 'error' });
         console.error('RMP data for ' + searchQueryLabel(professor), error);
       });
   }
@@ -454,9 +512,26 @@ export const Dashboard: NextPage = () => {
     //Grade data
     //Fetch each result
     for (const result of results) {
+      const entry = grades[searchQueryLabel(result)];
       //Not already loading
-      if (typeof gradesLoading[searchQueryLabel(result)] === 'undefined') {
+      if (typeof entry === 'undefined') {
         fetchAndStoreGradesData(result, controller);
+      } else {
+        //Recalc gpa and such from past stored data for new page
+        setGrades((grades) => {
+          const entry = grades[searchQueryLabel(result)];
+          if (entry && entry.state === 'done') {
+            entry.data = {
+              ...entry.data,
+              ...calculateGrades(entry.data.grades),
+            };
+          }
+          return grades;
+        });
+        //Readd academic sessions
+        if (entry.state === 'done') {
+          addAcademicSessions(entry.data.grades.map((session) => session._id));
+        }
       }
     }
 
@@ -479,7 +554,7 @@ export const Dashboard: NextPage = () => {
     }
     for (const professor of professorsInResults) {
       //Not already loading
-      if (typeof rmpLoading[searchQueryLabel(professor)] === 'undefined') {
+      if (typeof rmp[searchQueryLabel(professor)] === 'undefined') {
         fetchAndStoreRmpData(professor, controller);
       }
     }
@@ -490,54 +565,51 @@ export const Dashboard: NextPage = () => {
 
   //Filter results based on gpa, rmp, and rmp difficulty
   if (router.isReady) {
-    includedResults = results.filter((result) => {
-      //Remove if over threshold
-      const courseGrades = grades[searchQueryLabel(result)];
-      if (
-        typeof router.query.minGPA === 'string' &&
-        typeof courseGrades !== 'undefined' &&
-        courseGrades.gpa < parseFloat(router.query.minGPA)
-      ) {
-        return false;
-      }
-      const courseRmp = rmp[searchQueryLabel(convertToProfOnly(result))];
-      if (
-        typeof router.query.minRating === 'string' &&
-        typeof courseRmp !== 'undefined' &&
-        courseRmp.averageRating < parseFloat(router.query.minRating)
-      ) {
-        return false;
-      }
-      if (
-        typeof router.query.maxDiff === 'string' &&
-        typeof courseRmp !== 'undefined' &&
-        courseRmp.averageDifficulty > parseFloat(router.query.maxDiff)
-      ) {
-        return false;
-      }
-      return true;
-    });
+    includedResults = (results.state === 'done' ? results.data : []).filter(
+      (result) => {
+        //Remove if over threshold
+        const courseGrades = grades[searchQueryLabel(result)];
+        if (
+          typeof router.query.minGPA === 'string' &&
+          typeof courseGrades !== 'undefined' &&
+          courseGrades.state === 'done' &&
+          courseGrades.data.gpa < parseFloat(router.query.minGPA)
+        ) {
+          return false;
+        }
+        const courseRmp = rmp[searchQueryLabel(convertToProfOnly(result))];
+        if (
+          typeof router.query.minRating === 'string' &&
+          typeof courseRmp !== 'undefined' &&
+          courseRmp.state === 'done' &&
+          courseRmp.data.averageRating < parseFloat(router.query.minRating)
+        ) {
+          return false;
+        }
+        if (
+          typeof router.query.maxDiff === 'string' &&
+          typeof courseRmp !== 'undefined' &&
+          courseRmp.state === 'done' &&
+          courseRmp.data.averageDifficulty > parseFloat(router.query.maxDiff)
+        ) {
+          return false;
+        }
+        return true;
+      },
+    );
   } else {
-    includedResults = results;
+    includedResults = results.state === 'done' ? results.data : [];
   }
 
   //List of course+prof combos saved for comparison
   const [compare, setCompare] = useState<SearchQuery[]>([]);
   //Their saved grade data
   const [compareGrades, setCompareGrades] = useState<{
-    [key: string]: GradesType;
+    [key: string]: GenericFetchedData<GradesType>;
   }>({});
   //Saved data for their professors
   const [compareRmp, setCompareRmp] = useState<{
-    [key: string]: RateMyProfessorData;
-  }>({});
-
-  //Loading states for each compare course and prof in compare
-  const [compareGradesLoading, setCompareGradesLoading] = useState<{
-    [key: string]: 'loading' | 'done' | 'error';
-  }>({});
-  const [compareRmpLoading, setCompareRmpLoading] = useState<{
-    [key: string]: 'loading' | 'done' | 'error';
+    [key: string]: GenericFetchedData<RateMyProfessorData>;
   }>({});
 
   //Add a course+prof combo to compare (happens from search results)
@@ -555,13 +627,6 @@ export const Dashboard: NextPage = () => {
             grades[searchQueryLabel(searchQuery)],
         };
       });
-      setCompareGradesLoading((old) => {
-        return {
-          ...old,
-          [searchQueryLabel(searchQuery)]:
-            gradesLoading[searchQueryLabel(searchQuery)],
-        };
-      });
       //Save prof data
       if (typeof searchQuery.profLast !== 'undefined') {
         setCompareRmp((old) => {
@@ -569,13 +634,6 @@ export const Dashboard: NextPage = () => {
             ...old,
             [searchQueryLabel(convertToProfOnly(searchQuery))]:
               rmp[searchQueryLabel(convertToProfOnly(searchQuery))],
-          };
-        });
-        setCompareRmpLoading((old) => {
-          return {
-            ...old,
-            [searchQueryLabel(convertToProfOnly(searchQuery))]:
-              rmpLoading[searchQueryLabel(convertToProfOnly(searchQuery))],
           };
         });
       }
@@ -595,10 +653,6 @@ export const Dashboard: NextPage = () => {
         delete old[searchQueryLabel(searchQuery)];
         return old;
       });
-      setCompareGradesLoading((old) => {
-        delete old[searchQueryLabel(searchQuery)];
-        return old;
-      });
       //If no other courses in compare have the same professor
       if (
         !compare
@@ -607,10 +661,6 @@ export const Dashboard: NextPage = () => {
       ) {
         //Remove from saved rmp data
         setCompareRmp((old) => {
-          delete old[searchQueryLabel(convertToProfOnly(searchQuery))];
-          return old;
-        });
-        setCompareRmpLoading((old) => {
           delete old[searchQueryLabel(convertToProfOnly(searchQuery))];
           return old;
         });
@@ -623,7 +673,7 @@ export const Dashboard: NextPage = () => {
 
   if (courses.length === 0 && professors.length === 0) {
     contentComponent = <DashboardEmpty />;
-  } else if (state === 'error') {
+  } else if (results.state === 'error') {
     contentComponent = <DashboardError />;
   } else {
     //Add RHS tabs, only add overview tab if one course/prof
@@ -637,10 +687,6 @@ export const Dashboard: NextPage = () => {
           professor={professors[0]}
           grades={grades[searchQueryLabel(professors[0])]}
           rmp={rmp[searchQueryLabel(professors[0])]}
-          gradesLoading={
-            gradesLoading[searchQueryLabel(professors[0])] ?? 'loading'
-          }
-          rmpLoading={rmpLoading[searchQueryLabel(professors[0])] ?? 'loading'}
         />,
       );
     }
@@ -651,9 +697,6 @@ export const Dashboard: NextPage = () => {
           key="course"
           course={courses[0]}
           grades={grades[searchQueryLabel(courses[0])]}
-          gradesLoading={
-            gradesLoading[searchQueryLabel(courses[0])] ?? 'loading'
-          }
         />,
       );
     }
@@ -664,9 +707,6 @@ export const Dashboard: NextPage = () => {
         courses={compare}
         grades={compareGrades}
         rmp={compareRmp}
-        gradesLoading={compareGradesLoading}
-        rmpLoading={compareRmpLoading}
-        addToCompare={addToCompare}
         removeFromCompare={removeFromCompare}
       />,
     );
@@ -678,7 +718,7 @@ export const Dashboard: NextPage = () => {
               manageQuery
               academicSessions={academicSessions}
               chosenSessions={chosenSessions}
-              setChosenSessions={setChosenSessions}
+              addChosenSessions={addChosenSessions}
             />
           </Grid>
           <Grid item xs={false} sm={5} md={5}></Grid>
@@ -686,12 +726,10 @@ export const Dashboard: NextPage = () => {
         <Grid container component="main" wrap="wrap-reverse" spacing={2}>
           <Grid item xs={12} sm={7} md={7}>
             <SearchResultsTable
-              resultsLoading={state}
+              resultsLoading={results.state}
               includedResults={includedResults}
               grades={grades}
               rmp={rmp}
-              gradesLoading={gradesLoading}
-              rmpLoading={rmpLoading}
               compare={compare}
               addToCompare={addToCompare}
               removeFromCompare={removeFromCompare}

@@ -29,7 +29,7 @@ interface FiltersProps {
   className?: string;
   academicSessions?: string[];
   chosenSessions?: string[];
-  setChosenSessions?: (arg0: (arg0: string[]) => string[]) => void;
+  addChosenSessions?: (arg0: (arg0: string[]) => string[]) => void;
 }
 
 /**
@@ -42,7 +42,7 @@ const Filters = ({
   className,
   academicSessions,
   chosenSessions,
-  setChosenSessions,
+  addChosenSessions,
 }: FiltersProps) => {
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
@@ -121,7 +121,7 @@ const Filters = ({
   const showAcademicSessions =
     typeof academicSessions !== 'undefined' &&
     typeof chosenSessions !== 'undefined' &&
-    typeof setChosenSessions !== 'undefined';
+    typeof addChosenSessions !== 'undefined';
 
   return (
     <div className={'flex flex-col gap-2 ' + className ?? ''}>
@@ -227,7 +227,7 @@ const Filters = ({
                   <Checkbox
                     checked={chosenSessions.includes(session)}
                     onClick={() => {
-                      setChosenSessions((oldChosenSessions: string[]) => {
+                      addChosenSessions((oldChosenSessions: string[]) => {
                         if (oldChosenSessions.includes(session)) {
                           return oldChosenSessions.filter(
                             (el) => el !== session,
