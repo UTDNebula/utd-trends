@@ -1,4 +1,12 @@
-const searchQueryColors = ['#eb5757', '#2d9cdb', '#499F68'];
+const searchQueryColors = [
+  '#eb5757',
+  '#2d9cdb',
+  '#499F68',
+  '#f2994a',
+  '#9b51e0',
+  '#f2c94c',
+  '#1f78b4',
+];
 export default searchQueryColors;
 
 export const rainbowColors = [
