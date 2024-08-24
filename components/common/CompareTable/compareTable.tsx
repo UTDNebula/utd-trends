@@ -1,9 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
-import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Checkbox,
-  Collapse,
-  IconButton,
   Paper,
   Skeleton,
   Table,
@@ -21,15 +18,12 @@ import SearchQuery, {
   convertToProfOnly,
 } from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
-import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
 import type {
   GenericFetchedData,
   GradesType,
 } from '../../../pages/dashboard/index';
-import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
-import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(good: number, bad: number, value: number) {
