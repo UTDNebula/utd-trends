@@ -333,9 +333,9 @@ const CompareTable = ({
                 rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
                 removeFromCompare={removeFromCompare}
                 color={
-                  sortedResults.length > 1 ?
-                  searchQueryColors[index % searchQueryColors.length] :
-                  undefined
+                  sortedResults.length > 1
+                    ? searchQueryColors[index % searchQueryColors.length]
+                    : undefined
                 }
               />
             ))}
