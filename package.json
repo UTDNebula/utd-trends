@@ -12,8 +12,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "next lint --fix",
-    "lint:check": "next lint",
-    "prepare": "husky install"
+    "lint:check": "next lint"
   },
   "engines": {
     "node": "^18"
@@ -69,8 +68,6 @@
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
-    "husky": "^8.0.3",
-    "lint-staged": "^15.1.0",
     "prettier": "^2.5.1",
     "react-styleguidist": "^13.1.1",
     "typescript": "^5.0.4"
@@ -84,12 +81,6 @@
     "plugins": [
       "@babel/plugin-transform-runtime",
       "babel-plugin-styled-components"
-    ]
-  },
-  "lint-staged": {
-    "*": [
-      "eslint --cache --fix",
-      "prettier --write ./**/*.{tsx,ts,js}"
     ]
   },
   "browserslist": "> 0.25%, not dead",
