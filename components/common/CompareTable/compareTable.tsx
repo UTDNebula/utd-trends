@@ -57,7 +57,7 @@ type RowProps = {
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RateMyProfessorData>;
   removeFromCompare: (arg0: SearchQuery) => void;
-  color: string;
+  color: string | undefined;
 };
 
 function Row({ course, grades, rmp, removeFromCompare, color }: RowProps) {
@@ -333,8 +333,9 @@ const CompareTable = ({
                 rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
                 removeFromCompare={removeFromCompare}
                 color={
-                  sortedResults.length > 1 &&
-                  searchQueryColors[index % searchQueryColors.length]
+                  sortedResults.length > 1 ?
+                  searchQueryColors[index % searchQueryColors.length] :
+                  undefined
                 }
               />
             ))}
