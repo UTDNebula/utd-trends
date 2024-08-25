@@ -2,12 +2,9 @@
   "name": "UTD-Trends",
   "private": true,
   "scripts": {
-    "predev": "ts-node scripts/generateAutocompleteGraph.ts",
     "dev": "next dev",
-    "dev:nodag": "next dev",
-    "prebuild": "ts-node scripts/generateAutocompleteGraph.ts",
     "build": "next build",
-    "build:nodag": "next build",
+    "buildautocomplete": "ts-node scripts/generateAutocompleteGraph.ts",
     "start": "next start",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
