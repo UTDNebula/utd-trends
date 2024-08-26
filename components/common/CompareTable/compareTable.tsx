@@ -108,10 +108,10 @@ function Row({ course, grades, rmp, removeFromCompare, color }: RowProps) {
             <Typography
               className="text-base text-black rounded-full px-5 py-2 inline"
               sx={{
-                backgroundColor: colorMidpoint(5, 0, rmp.data.avgRating ),
+                backgroundColor: colorMidpoint(5, 0, rmp.data.avgRating),
               }}
             >
-              {rmp.data.avgRating .toFixed(1)}
+              {rmp.data.avgRating.toFixed(1)}
             </Typography>
           )) ||
           null}
@@ -129,11 +129,7 @@ function Row({ course, grades, rmp, removeFromCompare, color }: RowProps) {
             <Typography
               className="text-base text-black rounded-full px-5 py-2 inline"
               sx={{
-                backgroundColor: colorMidpoint(
-                  0,
-                  5,
-                  rmp.data.avgDifficulty,
-                ),
+                backgroundColor: colorMidpoint(0, 5, rmp.data.avgDifficulty),
               }}
             >
               {rmp.data.avgDifficulty.toFixed(1)}
@@ -154,11 +150,7 @@ function Row({ course, grades, rmp, removeFromCompare, color }: RowProps) {
             <Typography
               className="text-base text-black rounded-full px-5 py-2 inline"
               sx={{
-                backgroundColor: colorMidpoint(
-                  100,
-                  0,
-                  rmp.data.wouldTakeAgain,
-                ),
+                backgroundColor: colorMidpoint(100, 0, rmp.data.wouldTakeAgain),
               }}
             >
               {rmp.data.wouldTakeAgain.toFixed(0) + '%'}
@@ -242,9 +234,9 @@ const CompareTable = ({
         }
         if (orderBy === 'rating') {
           if (order === 'asc') {
-            return aRmp.data.avgRating  - bRmp.data.avgRating ;
+            return aRmp.data.avgRating - bRmp.data.avgRating;
           }
-          return bRmp.data.avgRating  - aRmp.data.avgRating ;
+          return bRmp.data.avgRating - aRmp.data.avgRating;
         }
         if (orderBy === 'difficulty') {
           if (order === 'asc') {
@@ -254,15 +246,9 @@ const CompareTable = ({
         }
         if (orderBy === 'would_take_again') {
           if (order === 'asc') {
-            return (
-              aRmp.data.wouldTakeAgain -
-              bRmp.data.wouldTakeAgain
-            );
+            return aRmp.data.wouldTakeAgain - bRmp.data.wouldTakeAgain;
           }
-          return (
-            bRmp.data.wouldTakeAgain -
-            aRmp.data.wouldTakeAgain
-          );
+          return bRmp.data.wouldTakeAgain - aRmp.data.wouldTakeAgain;
         }
       }
       return 0;

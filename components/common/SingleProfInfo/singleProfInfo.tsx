@@ -45,7 +45,7 @@ function SingleProfInfo({ rmp }: Props) {
   return (
     <Grid container spacing={2} className="p-4">
       <Grid item xs={6}>
-        <p className="text-xl font-bold">{rmp.data.avgRating }</p>
+        <p className="text-xl font-bold">{rmp.data.avgRating}</p>
         <p>Professor rating</p>
       </Grid>
       <Grid item xs={6}>

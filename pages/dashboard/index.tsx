@@ -443,10 +443,7 @@ export const Dashboard: NextPage = () => {
   const [rmp, setRmp] = useState<{
     [key: string]: GenericFetchedData<RMPInterface>;
   }>({});
-  function addToRmp(
-    key: string,
-    value: GenericFetchedData<RMPInterface>,
-  ) {
+  function addToRmp(key: string, value: GenericFetchedData<RMPInterface>) {
     setRmp((old) => {
       if (typeof old[key] !== 'undefined') {
         old[key] = value;
@@ -584,7 +581,7 @@ export const Dashboard: NextPage = () => {
           typeof router.query.minRating === 'string' &&
           typeof courseRmp !== 'undefined' &&
           courseRmp.state === 'done' &&
-          courseRmp.data.avgRating  < parseFloat(router.query.minRating)
+          courseRmp.data.avgRating < parseFloat(router.query.minRating)
         ) {
           return false;
         }
