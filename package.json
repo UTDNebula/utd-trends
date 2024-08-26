@@ -2,19 +2,15 @@
   "name": "UTD-Trends",
   "private": true,
   "scripts": {
-    "predev": "ts-node scripts/generateAutocompleteGraph.ts",
     "dev": "next dev",
-    "dev:nodag": "next dev",
-    "prebuild": "ts-node scripts/generateAutocompleteGraph.ts",
-    "buildcombos": "ts-node -O \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/generateCombosTable.ts",
     "build": "next build",
-    "build:nodag": "next build",
+    "buildautocomplete": "ts-node scripts/generateAutocompleteGraph.ts",
+    "buildcombos": "ts-node -O \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/generateCombosTable.ts",
     "start": "next start",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "next lint --fix",
-    "lint:check": "next lint",
-    "prepare": "husky install"
+    "lint:check": "next lint"
   },
   "engines": {
     "node": "^18"
@@ -26,6 +22,7 @@
     "@mui/icons-material": "^5.4.4",
     "@mui/material": "^5.4.2",
     "@vercel/analytics": "^1.0.0",
+    "@vercel/speed-insights": "^1.0.12",
     "apexcharts": "^3.33.2",
     "autoprefixer": "^10.4.2",
     "autosuggest-highlight": "^3.3.4",
@@ -70,8 +67,6 @@
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
-    "husky": "^8.0.3",
-    "lint-staged": "^15.1.0",
     "prettier": "^2.5.1",
     "react-styleguidist": "^13.1.1",
     "typescript": "^5.0.4"
@@ -85,12 +80,6 @@
     "plugins": [
       "@babel/plugin-transform-runtime",
       "babel-plugin-styled-components"
-    ]
-  },
-  "lint-staged": {
-    "*": [
-      "eslint --cache --fix",
-      "prettier --write ./**/*.{tsx,ts,js}"
     ]
   },
   "browserslist": "> 0.25%, not dead",

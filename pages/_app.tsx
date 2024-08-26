@@ -3,10 +3,12 @@ import '../styles/globals.css';
 import { useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
 import localFont from 'next/font/local';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React from 'react';
 
 import FeedbackPopup from '../components/common/FeedbackPopup/feedbackPopup';
@@ -95,6 +97,8 @@ function MyApp({ Component, pageProps }: AppProps) {
     },
   });
 
+  const router = useRouter();
+
   return (
     <>
       <Head>
@@ -134,6 +138,30 @@ function MyApp({ Component, pageProps }: AppProps) {
         </div>
       </ThemeProvider>
       <Analytics />
+      <SpeedInsights route={router.pathname} />
+      {showGitInfo ? (
+        <>
+          <Card
+            className="w-fit h-fit bg-light fixed bottom-2 right-2 rounded-full"
+            elevation={darkModeElevation}
+          >
+            <Tooltip title="Open GitHub commit for this instance">
+              <a
+                href={
+                  'https://github.com/UTDNebula/utd-trends/commit/' +
+                  process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
+                }
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <IconButton size="large">
+                  <GitHub className="fill-dark text-3xl" />
+                </IconButton>
+              </a>
+            </Tooltip>
+          </Card>
+        </>
+      ) : null}
     </>
   );
 }
