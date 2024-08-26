@@ -12,6 +12,9 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 
+import FeedbackPopup from '../components/common/FeedbackPopup/feedbackPopup';
+import GitHubButton from '../components/common/GitHubButton/gitHubButton';
+
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
@@ -75,24 +78,31 @@ const kallisto = localFont({
 function MyApp({ Component, pageProps }: AppProps) {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
-  const showGitInfo =
-    typeof process.env.NEXT_PUBLIC_VERCEL_ENV !== 'undefined' &&
-    process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' &&
-    typeof process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA !== 'undefined' &&
-    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA !== '';
-  const darkModeElevation = prefersDarkMode ? 3 : 1;
-
   const muiTheme = createTheme({
     palette: {
       mode: prefersDarkMode ? 'dark' : 'light',
+      //copied from tailwind.config.js
       primary: {
-        main: '#7486ce',
+        main: '#573dff',
+      },
+      secondary: {
+        main: '#573dff',
+        light: '#c2c8ff',
+      },
+      error: {
+        main: '#ff5743',
       },
     },
     typography: {
       fontFamily: 'inherit',
     },
   });
+
+  const showGitInfo =
+    typeof process.env.NEXT_PUBLIC_VERCEL_ENV !== 'undefined' &&
+    process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' &&
+    typeof process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA !== 'undefined' &&
+    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA !== '';
 
   const router = useRouter();
 
@@ -121,18 +131,24 @@ function MyApp({ Component, pageProps }: AppProps) {
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
       <ThemeProvider theme={muiTheme}>
-        <main className={inter.variable + ' ' + kallisto.variable}>
+        <div
+          className={
+            inter.variable +
+            ' ' +
+            kallisto.variable +
+            ' h-full text-haiti dark:text-white'
+          }
+        >
           <Component {...pageProps} />
-        </main>
+          <FeedbackPopup />
+          <GitHubButton />
+        </div>
       </ThemeProvider>
       <Analytics />
       <SpeedInsights route={router.pathname} />
-      {showGitInfo ? (
+      {showGitInfo && (
         <>
-          <Card
-            className="w-fit h-fit bg-light fixed bottom-2 right-2 rounded-full"
-            elevation={darkModeElevation}
-          >
+          <Card className="w-fit h-fit bg-light fixed bottom-2 right-2 rounded-full">
             <Tooltip title="Open GitHub commit for this instance">
               <a
                 href={
@@ -149,7 +165,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             </Tooltip>
           </Card>
         </>
-      ) : null}
+      )}
     </>
   );
 }

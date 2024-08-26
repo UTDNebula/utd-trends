@@ -9,7 +9,7 @@ function Document() {
           name="description"
           content="A data visualization tool built to help students view historical course and section data."
         />
-        <meta name="theme-color" content="#573DFF" />
+        <meta name="theme-color" content="#573dff" />
 
         <meta property="og:title" content="UTD Trends" />
         <meta
@@ -29,7 +29,7 @@ function Document() {
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:domain" content="trends.utdnebula.com" />
       </Head>
-      <body className="font-inter">
+      <body className="font-inter bg-white dark:bg-black">
         <Main />
         <NextScript />
       </body>

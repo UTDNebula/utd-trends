@@ -11,3 +11,13 @@ export type Professor = {
   profFirst: string;
   profLast: string;
 };
+
+export function convertToProfOnly(searchQuery: SearchQuery): Professor | {} {
+  if (!('profFirst' in searchQuery && 'profLast' in searchQuery)) {
+    return {};
+  }
+  return {
+    profFirst: searchQuery.profFirst as string,
+    profLast: searchQuery.profLast as string,
+  };
+}

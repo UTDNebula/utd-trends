@@ -1,14 +1,14 @@
 /*
 Build the autocomplete radix tree
-Run on `npm run dev` and `npm run build`
 Documentation: https://nebula-labs.atlassian.net/wiki/spaces/TRENDS/pages/67993601/Autocomplete+Documentation
 */
 import * as fs from 'fs';
 import { DirectedGraph } from 'graphology';
+
 import * as aggregatedData from '../data/autocomplete_data.json';
 import SearchQuery from '../modules/SearchQuery/SearchQuery';
 
-type NodeAttributes = {
+export type NodeAttributes = {
   c: string;
   d?: SearchQuery;
   visited?: boolean;
@@ -21,6 +21,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
 
     const graph: DirectedGraph<NodeAttributes> = new DirectedGraph({
       allowSelfLoops: false,
+      type: 'directed',
     });
     let numNodes = 0; //allows a unique name for each node
     let numEdges = 0;
@@ -36,7 +37,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       data?: SearchQuery,
     ): string {
       characters = characters.toUpperCase();
-      let preExisting = graph.findOutNeighbor(
+      const preExisting = graph.findOutNeighbor(
         node,
         (neighbor: string, attributes: NodeAttributes) =>
           attributes?.c === characters[0],
@@ -50,15 +51,15 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
         }
         return addSearchQueryCharacter(preExisting, characters.slice(1), data);
       }
-      if (characters.length <= 1) {
-        let newData: NodeAttributes = {
+      if (characters.length == 1) {
+        let attributes: NodeAttributes = {
           c: characters[0],
           visited: false,
         };
         if (typeof data !== 'undefined') {
-          newData.d = data;
+          attributes.d = data;
         }
-        const newNode = graph.addNode(numNodes++, newData);
+        const newNode = graph.addNode(numNodes++, attributes);
         graph.addEdgeWithKey(numEdges++, node, newNode);
         return newNode;
       }
@@ -72,12 +73,13 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
 
     // add a string to the graph with multiple parents pointing to its first character
     function addWithParents(
+      //main parent must be first!!! Otherwise can lead to accessing unmatched data like typing GEOS 2305 CE and getting ce2305 because it looped back
       nodes: string[],
       characters: string,
       data?: SearchQuery,
     ) {
       const nodeFirstChar = addSearchQueryCharacter(
-        nodes.pop() as string,
+        nodes.shift() as string,
         characters[0],
         characters.length > 1 ? undefined : data,
       );
@@ -97,53 +99,30 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       return nodeFirstChar;
     }
 
-    //Add node in format: <prefix>[<number>| <number>[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]]
-    //and: (<number>|<number> )<prefix>[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]
-    function addPrefixFirst(
-      prefix: string,
-      number: string,
-      sectionNumber: string,
-      profFirst: string,
-      profLast: string,
-    ) {
-      //<prefix>[<number>| <number>
-      const prefixNode = addSearchQueryCharacter(root, prefix, {
-        prefix: prefix,
-      });
+    //Add node in format: <prefix>[<number>| <number>[.<section>]
+    //and: (<number>|<number> )<prefix>[.<section>]
+    function addCourse(prefix: string, number: string, sectionNumber: string) {
+      //<prefix>[ ]<number>
+      const prefixNode = addSearchQueryCharacter(root, prefix);
       const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
       const classNode = addWithParents([prefixNode, prefixSpaceNode], number, {
         prefix: prefix,
         number: number,
       });
 
-      //(<number>|<number> )<prefix>
+      //<number>[ ]<prefix>
       const classNode2 = addSearchQueryCharacter(root, number);
       const classSpaceNode = addSearchQueryCharacter(classNode2, ' ');
-      const prefixNode2 = addWithParents([classNode2, classSpaceNode], prefix, {
+      addWithParents([classNode2, classSpaceNode], prefix, {
         prefix: prefix,
         number: number,
       });
 
-      //...[ <professorLast>|(<professorFirst> <professorLast>)]]
-      const professorFirstNameNode = addWithParents(
-        [classNode, prefixNode2, classNode2],
-        ' ' + profFirst + ' ',
-      );
-      const professorLastNameNode = addWithParents(
-        [classNode, prefixNode2, classNode2, professorFirstNameNode],
-        ' ' + profLast,
-        {
-          prefix: prefix,
-          number: number,
-          profFirst: profFirst,
-          profLast: profLast,
-        },
-      );
-
       if (sectionNumber === 'HON') {
-        //...[.<section>][ <professorLast>|(<professorFirst> <professorLast>)]]
+        //<prefix>[ ]<number>.<section>
+        //<number>.<section>
         const sectionNode = addWithParents(
-          [classNode, prefixNode2, classNode2],
+          [classNode, classNode2],
           '.' + sectionNumber,
           {
             prefix: prefix,
@@ -151,76 +130,26 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
             sectionNumber: sectionNumber,
           },
         );
-        const professorFirstNameNode2 = addSearchQueryCharacter(
-          sectionNode,
-          ' ' + profFirst + ' ',
-        );
-        const professorLastNameNode2 = addWithParents(
-          [sectionNode, professorFirstNameNode2],
-          ' ' + profLast,
+        //<number>.<section> <prefix>
+        const sectionAndPrefixNode = addSearchQueryCharacter(
+          classNode2,
+          '.' + sectionNumber + ' ' + prefix,
           {
             prefix: prefix,
             number: number,
             sectionNumber: sectionNumber,
-            profFirst: profFirst,
-            profLast: profLast,
           },
         );
       }
     }
 
-    //Add nodes in format: (<professorLast>|<professorFirst> <professorLast>) ((<prefix> <number>|<prefix><number>)|(<number><prefix> |<number><prefix>))
-    function addProfFirst(
-      prefix: string,
-      number: string,
-      sectionNumber: string,
-      profFirst: string,
-      profLast: string,
-    ) {
-      const professorFirstNameNode = addSearchQueryCharacter(
-        root,
-        profFirst + ' ',
-      );
-      const professorLastNameNode = addWithParents(
-        [root, professorFirstNameNode],
-        profLast,
-        {
-          profFirst: profFirst,
-          profLast: profLast,
-        },
-      );
-      const professorSpaceNode = addSearchQueryCharacter(
-        professorLastNameNode,
-        ' ',
-      );
-
-      const prefixNode = addSearchQueryCharacter(professorSpaceNode, prefix);
-      const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
-      const classNode = addWithParents([prefixNode, prefixSpaceNode], number, {
-        prefix: prefix,
-        number: number,
+    //Add nodes in format: (<professorLast>|<professorFirst> <professorLast>)
+    function addProfessor(profFirst: string, profLast: string) {
+      const profFirstNode = addSearchQueryCharacter(root, profFirst + ' ');
+      const profLastNode = addWithParents([profFirstNode, root], profLast, {
         profFirst: profFirst,
         profLast: profLast,
       });
-
-      const classNode2 = addSearchQueryCharacter(professorSpaceNode, number);
-      const classSpaceNode = addSearchQueryCharacter(classNode2, ' ');
-      const prefixNode2 = addWithParents([classNode2, classSpaceNode], prefix, {
-        prefix: prefix,
-        number: number,
-        profFirst: profFirst,
-        profLast: profLast,
-      });
-
-      if (sectionNumber === 'HON') {
-        addWithParents([classNode, classNode2], '.' + sectionNumber, {
-          prefix: prefix,
-          number: number,
-          sectionNumber: sectionNumber,
-          profFirst: profFirst,
-          profLast: profLast,
-        });
-      }
     }
 
     for (
@@ -248,6 +177,11 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
             sectionItr++
           ) {
             const sectionData = academicSessionData.sections[sectionItr];
+            addCourse(
+              prefixData.subject_prefix,
+              courseNumberData.course_number,
+              sectionData.section_number,
+            );
             for (
               let professorItr = 0;
               professorItr < sectionData.professors.length;
@@ -260,20 +194,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
                 professorData.first_name !== '' && //handle blank name
                 professorData.last_name !== ''
               ) {
-                addPrefixFirst(
-                  prefixData.subject_prefix,
-                  courseNumberData.course_number,
-                  sectionData.section_number,
-                  professorData.first_name,
-                  professorData.last_name,
-                );
-                addProfFirst(
-                  prefixData.subject_prefix,
-                  courseNumberData.course_number,
-                  sectionData.section_number,
-                  professorData.first_name,
-                  professorData.last_name,
-                );
+                addProfessor(professorData.first_name, professorData.last_name);
               }
             }
           }

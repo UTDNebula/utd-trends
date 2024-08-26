@@ -1,22 +1,19 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-type RateMyProfessorInfo = {
-  found: boolean;
-  data?: {
-    legacyId: string;
-    averageRating: number;
-    numRatings: number;
-    wouldTakeAgainPercentage: number;
-    averageDifficulty: number;
-    department: string;
-    firstName: string;
-    lastName: string;
-  };
+export type RateMyProfessorData = {
+  legacyId: string;
+  averageRating: number;
+  numRatings: number;
+  wouldTakeAgainPercentage: number;
+  averageDifficulty: number;
+  department: string;
+  firstName: string;
+  lastName: string;
 };
 
 type Data = {
   message: string;
-  data?: RateMyProfessorInfo;
+  data?: RateMyProfessorData;
 };
 
 export default function handler(
@@ -32,6 +29,7 @@ export default function handler(
     )
   ) {
     res.status(400).json({ message: 'Incorrect query present' });
+    return;
   }
   const url = new URL(
     'https://www.ratemyprofessors.com/search/professors/1273?',
@@ -55,26 +53,20 @@ export default function handler(
           res.status(200).json({
             message: 'success',
             data: {
-              found: true,
-              data: {
-                legacyId: regexArray[1],
-                averageRating: Number(regexArray[2]),
-                numRatings: Number(regexArray[3]),
-                wouldTakeAgainPercentage: Number(regexArray[4]),
-                averageDifficulty: Number(regexArray[5]),
-                department: regexArray[6],
-                firstName: regexArray[7],
-                lastName: regexArray[8],
-              },
+              legacyId: regexArray[1],
+              averageRating: Number(regexArray[2]),
+              numRatings: Number(regexArray[3]),
+              wouldTakeAgainPercentage: Number(regexArray[4]),
+              averageDifficulty: Number(regexArray[5]),
+              department: regexArray[6],
+              firstName: regexArray[7],
+              lastName: regexArray[8],
             },
           });
           resolve();
         } else {
           res.status(200).json({
-            message: 'success',
-            data: {
-              found: false,
-            },
+            message: 'not found',
           });
           resolve();
         }
