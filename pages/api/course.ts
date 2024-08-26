@@ -1,14 +1,47 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-export type GradesData = {
+export type CourseData = {
   _id: string;
-  grade_distribution: number[];
-}[];
+  activity_type: string;
+  attributes?: string;
+  catalog_year: number;
+  class_level: string;
+  co_or_pre_requisites?: string;
+  corequisites?: string;
+  course_number: string;
+  credit_hours: number;
+  description: string;
+  enrollment_reqs: string;
+  grading: string;
+  internal_course_number: string;
+  laboratory_contact_hours: number;
+  lecture_contact_hours: number;
+  offering_frequency: string;
+  prerequisites: {
+    name: string;
+    options: {
+      name: string;
+      options: {
+        condition: string;
+        description: string;
+        type: string;
+      }[];
+      required: number;
+      type: string;
+    }[];
+    required: number;
+    type: string;
+  };
+  school: string;
+  sections: string[];
+  subject_prefix: string;
+  title: string;
+};
 
 type Data = {
   message: string;
-  data?: GradesData;
+  data?: CourseData;
 };
 
 export default function handler(
@@ -26,17 +59,7 @@ export default function handler(
   }
   if (
     !('prefix' in req.query && typeof req.query.prefix === 'string') &&
-    !('number' in req.query && typeof req.query.number === 'string') &&
-    !(
-      'profFirst' in req.query &&
-      typeof req.query.profFirst === 'string' &&
-      'profLast' in req.query &&
-      typeof req.query.profLast === 'string'
-    ) &&
-    !(
-      'sectionNumber' in req.query &&
-      typeof req.query.sectionNumber === 'string'
-    )
+    !('number' in req.query && typeof req.query.number === 'string')
   ) {
     res.status(400).json({ message: 'Incorrect query present' });
     return;
@@ -45,28 +68,14 @@ export default function handler(
     'x-api-key': process.env.REACT_APP_NEBULA_API_KEY as string,
     Accept: 'application/json',
   };
-  const url = new URL('https://api.utdnebula.com/grades/semester');
+  const url = new URL('https://api.utdnebula.com/course');
   if ('prefix' in req.query && typeof req.query.prefix === 'string') {
-    url.searchParams.append('prefix', req.query.prefix);
+    url.searchParams.append('subject_prefix', req.query.prefix);
   }
   if ('number' in req.query && typeof req.query.number === 'string') {
-    url.searchParams.append('number', req.query.number);
+    url.searchParams.append('course_number', req.query.number);
   }
-  if (
-    'profFirst' in req.query &&
-    typeof req.query.profFirst === 'string' &&
-    'profLast' in req.query &&
-    typeof req.query.profLast === 'string'
-  ) {
-    url.searchParams.append('first_name', req.query.profFirst);
-    url.searchParams.append('last_name', req.query.profLast);
-  }
-  if (
-    'sectionNumber' in req.query &&
-    typeof req.query.sectionNumber === 'string'
-  ) {
-    url.searchParams.append('section_number', req.query.sectionNumber);
-  }
+
   return new Promise<void>((resolve) => {
     fetch(url.href, {
       method: 'GET',
@@ -74,7 +83,7 @@ export default function handler(
     })
       .then((response) => response.json())
       .then((data) => {
-        //console.log('data', data, data.message);
+        // console.log('data', data, data.message);
         if (data.message !== 'success') {
           throw new Error(data.message);
         }

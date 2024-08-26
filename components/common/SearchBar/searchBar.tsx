@@ -1,4 +1,4 @@
-import { Autocomplete, TextField } from '@mui/material';
+import { Autocomplete, Button, TextField } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import { useRouter } from 'next/router';
@@ -14,10 +14,9 @@ import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel
  * Props type used by the SearchBar component
  */
 interface SearchProps {
-  manageQuery?: boolean;
-  path?: string;
-  selectValue?: (value: SearchQuery[]) => void;
-  changeValue?: (value: SearchQuery[]) => void;
+  manageQuery?: 'onSelect' | 'onChange';
+  onSelect?: (value: SearchQuery[]) => void;
+  onChange?: (value: SearchQuery[]) => void;
   className?: string;
   input_className?: string;
 }
@@ -28,7 +27,14 @@ interface SearchProps {
  *
  * Styled for the splash page
  */
-const SearchBar = (props: SearchProps) => {
+let wasEmpty = false; // tracks if the searchbar was empty before the new entry (to create a new browser navigation entry push())
+const SearchBar = ({
+  manageQuery,
+  onSelect,
+  onChange,
+  className,
+  input_className,
+}: SearchProps) => {
   //what you can choose from
   const [options, setOptions] = useState<SearchQuery[]>([]);
   //initial loading prop for first load
@@ -48,20 +54,21 @@ const SearchBar = (props: SearchProps) => {
   //set value from query
   const router = useRouter();
   useEffect(() => {
-    if (props.manageQuery) {
-      if (router.isReady && typeof router.query.searchTerms !== 'undefined') {
-        let array = router.query.searchTerms;
-        if (!Array.isArray(array)) {
-          array = array.split(',');
-        }
-        setValue(array.map((el) => decodeSearchQueryLabel(el)));
+    if (router.isReady && typeof router.query.searchTerms !== 'undefined') {
+      let array = router.query.searchTerms;
+      if (!Array.isArray(array)) {
+        array = array.split(',');
       }
+      setValue(array.map((el) => decodeSearchQueryLabel(el)));
     }
-  }, [router.isReady]);
+  }, [router.isReady, router.query.searchTerms]); // useEffect is called every time the query changes
 
   //update url with what's in value
   function updateQueries(newValue: SearchQuery[]) {
-    if (props.manageQuery && typeof props.path === 'string' && router.isReady) {
+    if (typeof manageQuery !== 'undefined' && router.isReady) {
+      if (typeof onChange !== 'undefined') {
+        onChange(newValue);
+      }
       const newQuery = router.query;
       if (newValue.length > 0) {
         newQuery.searchTerms = newValue
@@ -70,14 +77,26 @@ const SearchBar = (props: SearchProps) => {
       } else {
         delete newQuery.searchTerms;
       }
-      router.replace(
-        {
-          pathname: props.path,
-          query: newQuery,
-        },
-        undefined,
-        { shallow: true },
-      );
+      if (wasEmpty) {
+        // if the searchbar was cleared before this entry,
+        router.push(
+          {
+            query: router.query,
+          },
+          undefined,
+          { shallow: true },
+        );
+        router.pathname;
+        wasEmpty = false;
+      } //otherwise, just update the current navigation entry query
+      else
+        router.replace(
+          {
+            query: newQuery,
+          },
+          undefined,
+          { shallow: true },
+        );
     }
   }
 
@@ -138,24 +157,29 @@ const SearchBar = (props: SearchProps) => {
         if (error instanceof DOMException) {
           // ignore aborts
         } else {
-          console.log(error);
+          console.error('Autocomplete', error);
         }
       });
   }
 
   //update parent and queries
-  function onValueChange(newValue: SearchQuery[]) {
-    if (typeof props.changeValue !== 'undefined') {
-      props.changeValue(newValue);
+  function onChange_internal(newValue: SearchQuery[]) {
+    if (typeof onChange !== 'undefined') {
+      onChange(newValue);
     }
-    updateQueries(newValue);
+    if (newValue.length == 0) {
+      wasEmpty = true; // so that the next search creates a new navigation entry (push())
+    }
+    if (manageQuery === 'onChange') {
+      updateQueries(newValue);
+    }
   }
 
   //add value
   function addValue(newValue: SearchQuery) {
     setValue((old) => {
       const oldAndNew = [...old, newValue];
-      onValueChange(oldAndNew);
+      onChange_internal(oldAndNew);
       return oldAndNew;
     });
   }
@@ -163,7 +187,17 @@ const SearchBar = (props: SearchProps) => {
   //change all values
   function updateValue(newValue: SearchQuery[]) {
     setValue(newValue);
-    onValueChange(newValue);
+    onChange_internal(newValue);
+  }
+
+  //update parent and queries
+  function onSelect_internal(newValue: SearchQuery[]) {
+    if (typeof onSelect !== 'undefined') {
+      onSelect(newValue);
+    }
+    if (manageQuery === 'onSelect') {
+      updateQueries(newValue);
+    }
   }
 
   //returns results on enter
@@ -171,129 +205,139 @@ const SearchBar = (props: SearchProps) => {
     if (event.key === 'Enter' && inputValue === '') {
       event.preventDefault();
       event.stopPropagation();
-      if (typeof props.selectValue !== 'undefined') {
-        props.selectValue(value);
-      }
+      onSelect_internal(value);
     }
   }
 
   return (
-    <Autocomplete
-      multiple
-      freeSolo
-      loading={loading}
-      //highligh first option to add with enter
-      autoHighlight={true}
-      clearOnBlur={false}
-      className={props.className}
-      getOptionLabel={(option) => {
-        if (typeof option === 'string') {
-          return option;
-        }
-        return searchQueryLabel(option);
-      }}
-      options={options}
-      //don't filter options, done in fetch
-      filterOptions={(options) => options}
-      value={value}
-      onChange={(
-        event: React.SyntheticEvent,
-        newValue: (string | SearchQuery)[],
-      ) => {
-        //should never happen
-        if (!newValue.every((el) => typeof el !== 'string')) {
-          return;
-        }
-        //remove from options
-        if (newValue.length > value.length) {
-          setOptions((old) =>
-            old.filter(
-              (item) =>
-                !searchQueryEqual(
-                  newValue[newValue.length - 1] as SearchQuery,
-                  item,
-                ),
-            ),
-          );
-        }
-        updateValue(newValue as SearchQuery[]);
-      }}
-      inputValue={inputValue}
-      onInputChange={(event, newInputValue) => {
-        setInputValue(newInputValue);
-        loadNewOptions(newInputValue);
-      }}
-      renderInput={(params) => {
-        params.inputProps.onKeyDown = handleKeyDown;
-        return (
-          <TextField
-            {...params}
-            variant="outlined"
-            className={props.input_className}
-            placeholder="ex. CS 1200"
-          />
-        );
-      }}
-      //for handling spaces, when options are already loaded
-      onInput={(event) => {
-        const value = (event.target as HTMLInputElement).value;
-        // if the last character in the new string is a space, check for autocomplete
-        if (
-          value[value.length - 1] === ' ' &&
-          // but if the user is deleting text, don't try to autocomplete
-          (event.nativeEvent as InputEvent).inputType === 'insertText'
-        ) {
-          const noSections = options.filter(
-            (el: SearchQuery) => !('sectionNumber' in el),
-          );
-          if (
-            value.length > 0 &&
-            (options.length === 1 ||
-              //all but one is a section
-              noSections.length === 1)
-          ) {
-            event.preventDefault();
-            event.stopPropagation();
-            addValue(options.length === 1 ? options[0] : noSections[0]);
-            setOptions([]);
-            (event.target as HTMLInputElement).value = '';
+    <div className={'flex items-center gap-2 ' + (className ?? '')}>
+      <Autocomplete
+        multiple
+        freeSolo
+        loading={loading}
+        //highligh first option to add with enter
+        autoHighlight={true}
+        clearOnBlur={false}
+        className="grow"
+        getOptionLabel={(option) => {
+          if (typeof option === 'string') {
+            return option;
           }
-        }
-      }}
-      renderOption={(props, option, { inputValue }) => {
-        const text = searchQueryLabel(option);
-        //add spaces between prefix and course number
-        const matches = match(
-          text,
-          inputValue
-            .replace(
-              //CS1200 -> CS 1200
-              /([a-zA-Z]{2,4})([0-9][0-9V]?[0-9]{0,2})/,
-              '$1 $2',
-            )
-            .replace(
-              //1200CS -> 1200 CS
-              /([0-9][0-9V][0-9]{2})([a-zA-Z]{1,4})/,
-              '$1 $2',
-            ),
-        );
-        const parts = parse(text, matches);
-        return (
-          <li {...props}>
-            {parts.map((part, index) => (
-              <span
-                key={index}
-                className={
-                  'whitespace-pre-wrap' + (part.highlight ? ' font-bold' : '')
-                }
-              >
-                {part.text}
-              </span>
-            ))}
-          </li>
-        );
-      }}
-    />
+          return searchQueryLabel(option);
+        }}
+        options={options}
+        //don't filter options, done in fetch
+        filterOptions={(options) => options}
+        value={value}
+        onChange={(
+          event: React.SyntheticEvent,
+          newValue: (string | SearchQuery)[],
+        ) => {
+          //should never happen
+          if (!newValue.every((el) => typeof el !== 'string')) {
+            return;
+          }
+          //remove from options
+          if (newValue.length > value.length) {
+            setOptions((old) =>
+              old.filter(
+                (item) =>
+                  !searchQueryEqual(
+                    newValue[newValue.length - 1] as SearchQuery,
+                    item,
+                  ),
+              ),
+            );
+          }
+          updateValue(newValue as SearchQuery[]);
+        }}
+        inputValue={inputValue}
+        onInputChange={(event, newInputValue) => {
+          setInputValue(newInputValue);
+          loadNewOptions(newInputValue);
+        }}
+        renderInput={(params) => {
+          params.inputProps.onKeyDown = handleKeyDown;
+          return (
+            <TextField
+              {...params}
+              variant="outlined"
+              className={input_className}
+              placeholder="ex. GOVT 2306"
+            />
+          );
+        }}
+        //for handling spaces, when options are already loaded
+        onInput={(event) => {
+          const value = (event.target as HTMLInputElement).value;
+          // if the last character in the new string is a space, check for autocomplete
+          if (
+            value[value.length - 1] === ' ' &&
+            // but if the user is deleting text, don't try to autocomplete
+            (event.nativeEvent as InputEvent).inputType === 'insertText'
+          ) {
+            const noSections = options.filter(
+              (el: SearchQuery) => !('sectionNumber' in el),
+            );
+            if (
+              value.length > 0 &&
+              (options.length === 1 ||
+                //all but one is a section
+                noSections.length === 1)
+            ) {
+              event.preventDefault();
+              event.stopPropagation();
+              addValue(options.length === 1 ? options[0] : noSections[0]);
+              setOptions([]);
+              (event.target as HTMLInputElement).value = '';
+            }
+          }
+        }}
+        renderOption={(props, option, { inputValue }) => {
+          const text =
+            typeof option === 'string' ? option : searchQueryLabel(option);
+          //add spaces between prefix and course number
+          const matches = match(
+            text,
+            inputValue
+              .replace(
+                //CS1200 -> CS 1200
+                /([a-zA-Z]{2,4})([0-9][0-9V]?[0-9]{0,2})/,
+                '$1 $2',
+              )
+              .replace(
+                //1200CS -> 1200 CS
+                /([0-9][0-9V][0-9]{2})([a-zA-Z]{1,4})/,
+                '$1 $2',
+              ),
+          );
+          const parts = parse(text, matches);
+          return (
+            <li {...props}>
+              {parts.map((part, index) => (
+                <span
+                  key={index}
+                  className={
+                    'whitespace-pre-wrap' + (part.highlight ? ' font-bold' : '')
+                  }
+                >
+                  {part.text}
+                </span>
+              ))}
+            </li>
+          );
+        }}
+      />
+      <Button
+        variant="contained"
+        disableElevation
+        size="large"
+        className="shrink-0 normal-case bg-royal hover:bg-royalDark"
+        onClick={() => onSelect_internal(value)}
+      >
+        Search
+      </Button>
+    </div>
   );
 };
 

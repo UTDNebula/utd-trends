@@ -1,3 +1,4 @@
+import { Alert } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -8,7 +9,7 @@ import Filters, {
   type FiltersType,
 } from '../components/common/Filters/filters';
 import SearchBar from '../components/common/SearchBar/searchBar';
-import SearchQuery from '../modules/SearchQuery/SearchQuery';
+import type SearchQuery from '../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
 import Background from '../public/background.png';
 
@@ -16,18 +17,30 @@ import Background from '../public/background.png';
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
 const Home: NextPage = () => {
+  const [errorMessage, setErrorMessage] = useState(false);
+  function searchOptionsChange(chosenOptions: SearchQuery[]) {
+    if (chosenOptions.length) {
+      setErrorMessage(false);
+    }
+  }
+
   const [filters, setFilters] = useState<FiltersType>({});
 
   const router = useRouter();
-  function searchOptionChosen(chosenOption: SearchQuery[]) {
-    console.log('The option chosen was: ', chosenOption);
-    router.push({
-      pathname: '/dashboard',
-      query: {
-        ...filters,
-        searchTerms: chosenOption.map((el) => searchQueryLabel(el)).join(','),
-      },
-    });
+  function searchOptionChosen(chosenOptions: SearchQuery[]) {
+    if (chosenOptions.length) {
+      router.push({
+        pathname: '/dashboard',
+        query: {
+          ...filters,
+          searchTerms: chosenOptions
+            .map((el) => searchQueryLabel(el))
+            .join(','),
+        },
+      });
+    } else {
+      setErrorMessage(true);
+    }
   }
 
   useEffect(() => {
@@ -70,8 +83,14 @@ const Home: NextPage = () => {
             Explore and compare past grades, professor ratings, and reviews to
             find the perfect class.
           </p>
+          {errorMessage && (
+            <Alert severity="error" className="mb-2">
+              Select an option before searching.
+            </Alert>
+          )}
           <SearchBar
-            selectValue={searchOptionChosen}
+            onSelect={searchOptionChosen}
+            onChange={searchOptionsChange}
             className="mb-3"
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />

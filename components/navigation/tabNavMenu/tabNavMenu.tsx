@@ -1,4 +1,4 @@
-import { Divider, Tab, Tabs } from '@mui/material';
+import { Tab, Tabs } from '@mui/material';
 import React from 'react';
 
 /**
@@ -9,6 +9,7 @@ type TabNavMenuProps = {
   // Turning animation of the carousel is handled by the parent, and this method is
   // responsible for playing the animation and setting the value to the correct new value
   turner: (displacement: number) => void;
+  options: string[];
 };
 
 /**
@@ -24,23 +25,14 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
       aria-label="Tab switcher"
       className="w-full grid grid-flow-row justify-center shadow dark:shadow-lg"
     >
-      <Tab
-        label="Grades"
-        className="text-lg text-gray-600 dark:text-gray-200 normal-case"
-        value={0}
-      />
-      <Tab
-        label=""
-        icon={<Divider orientation="vertical" />}
-        disabled
-        value={-1}
-        className="w-px min-w-[1px]"
-      />
-      <Tab
-        label="Professor Ratings"
-        className="text-lg text-gray-600 dark:text-gray-200 normal-case"
-        value={1}
-      />
+      {props.options.map((option, index) => (
+        <Tab
+          label={option}
+          key={index}
+          className="text-lg text-gray-600 dark:text-gray-200 normal-case"
+          value={index}
+        />
+      ))}
     </Tabs>
   );
 };

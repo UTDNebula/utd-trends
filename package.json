@@ -6,6 +6,7 @@
     "dev": "next dev",
     "dev:nodag": "next dev",
     "prebuild": "ts-node scripts/generateAutocompleteGraph.ts",
+    "buildcombos": "ts-node -O \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/generateCombosTable.ts",
     "build": "next build",
     "build:nodag": "next build",
     "start": "next start",

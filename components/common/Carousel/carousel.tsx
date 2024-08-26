@@ -5,7 +5,8 @@ import React, { useState } from 'react';
 import { TabNavMenu } from '../../navigation/tabNavMenu/tabNavMenu';
 
 interface CarouselProps {
-  children: ReactJSXElement[];
+  names: string[] | string;
+  children: ReactJSXElement[] | ReactJSXElement;
 }
 
 /**
@@ -37,7 +38,7 @@ const variants = {
  * @param props the props passed from the parent component
  * @returns
  */
-export const Carousel = (props: CarouselProps) => {
+export const Carousel = ({ names, children }: CarouselProps) => {
   //The card currently being displayed
   const [currentCard, setCard] = useState(0);
   //The Direction that the card is moving in
@@ -50,42 +51,36 @@ export const Carousel = (props: CarouselProps) => {
    */
   const turn = (displacement: number) => {
     //set direction
+    // console.log("displacement=",displacement);
     setDir(displacement);
     setCard(currentCard + displacement);
   };
 
   return (
     <>
-      <TabNavMenu value={currentCard} turner={turn} />
-      <div
-        className="relative p-2 pt-0 lg:p-10"
-        style={{
-          height: '90%',
-          overflowX: 'hidden',
-        }}
-      >
-        <AnimatePresence>
-          <div className="h-full">
-            <motion.div
-              className="h-full"
-              key={currentCard}
-              custom={direction}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{
-                x: { type: 'spring', stiffness: 300, damping: 30 },
-                opacity: { duration: 0.2 },
-              }}
-            >
-              <div className="w-full h-full lg:h-full rounded-md mb-10">
-                {props.children[currentCard]}
-              </div>
-            </motion.div>
-          </div>
-        </AnimatePresence>
-      </div>
+      <TabNavMenu
+        value={currentCard}
+        options={Array.isArray(names) ? names : [names]}
+        turner={turn}
+      />
+      <AnimatePresence>
+        <div className="p-4 lg:p-6">
+          <motion.div
+            key={currentCard}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              x: { type: 'spring', stiffness: 300, damping: 30 },
+              opacity: { duration: 0.2 },
+            }}
+          >
+            {Array.isArray(children) ? children[currentCard] : children}
+          </motion.div>
+        </div>
+      </AnimatePresence>
     </>
   );
 };
