@@ -4,8 +4,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "buildautocomplete": "ts-node scripts/generateAutocompleteGraph.ts",
-    "buildcombos": "ts-node -O \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/generateCombosTable.ts",
+    "buildautocomplete": "ts-node src/scripts/generateAutocompleteGraph.ts",
+    "buildcombos": "ts-node -O \"{\\\"module\\\":\\\"commonjs\\\"}\" src/scripts/generateCombosTable.ts",
     "start": "next start",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
