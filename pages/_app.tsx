@@ -1,6 +1,7 @@
 import '../styles/globals.css';
 
-import { useMediaQuery } from '@mui/material';
+import GitHub from '@mui/icons-material/GitHub';
+import { Card, IconButton, Tooltip, useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
@@ -97,6 +98,12 @@ function MyApp({ Component, pageProps }: AppProps) {
     },
   });
 
+  const showGitInfo =
+    typeof process.env.NEXT_PUBLIC_VERCEL_ENV !== 'undefined' &&
+    process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' &&
+    typeof process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA !== 'undefined' &&
+    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA !== '';
+
   const router = useRouter();
 
   return (
@@ -139,12 +146,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       </ThemeProvider>
       <Analytics />
       <SpeedInsights route={router.pathname} />
-      {showGitInfo ? (
+      {showGitInfo && (
         <>
-          <Card
-            className="w-fit h-fit bg-light fixed bottom-2 right-2 rounded-full"
-            elevation={darkModeElevation}
-          >
+          <Card className="w-fit h-fit bg-light fixed bottom-2 right-2 rounded-full">
             <Tooltip title="Open GitHub commit for this instance">
               <a
                 href={
@@ -161,7 +165,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             </Tooltip>
           </Card>
         </>
-      ) : null}
+      )}
     </>
   );
 }
