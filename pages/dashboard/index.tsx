@@ -19,9 +19,8 @@ import fetchWithCache, {
   cacheIndexRmp,
   expireTime,
 } from '../../modules/fetchWithCache';
-import SearchQuery, {
-  convertToProfOnly,
-} from '../../modules/SearchQuery/SearchQuery';
+import type SearchQuery from '../../modules/SearchQuery/SearchQuery';
+import { convertToProfOnly } from '../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
 import type { GradesData } from '../../pages/api/grades';
@@ -54,13 +53,13 @@ function removeDuplicates(array: SearchQuery[]) {
 }
 
 //Fetch course+prof combos matching a specific course/prof
-function autocompleteForSearchResultsFetch(
+function combosSearchResultsFetch(
   searchTerms: SearchQuery[],
   controller: AbortController,
 ): Promise<SearchQuery[]>[] {
   return searchTerms.map((searchTerm) => {
     return fetchWithCache(
-      '/api/autocomplete?limit=50&input=' + searchQueryLabel(searchTerm),
+      '/api/combo?input=' + searchQueryLabel(searchTerm),
       cacheIndexNebula,
       expireTime,
       {
@@ -75,7 +74,10 @@ function autocompleteForSearchResultsFetch(
       if (response.message !== 'success') {
         throw new Error(response.message);
       }
-      return response.data as SearchQuery[];
+      return response.data.map((obj: SearchQuery) => ({
+        ...searchTerm,
+        ...obj,
+      }));
     });
   });
 }
@@ -88,30 +90,30 @@ function fetchSearchResults(
   filterTerms: SearchQuery[], //filterTerms is blank if the searchTerms are ALL courses or ALL professors
   controller: AbortController,
 ) {
-  return Promise.all(
-    autocompleteForSearchResultsFetch(searchTerms, controller),
-  ).then((allSearchTermResults: SearchQuery[][]) => {
-    const results: SearchQuery[] = [];
-    allSearchTermResults.map((searchTermResults) =>
-      searchTermResults.map((searchTermResult) => {
-        if (filterTerms.length > 0) {
-          filterTerms.map((filterTerm) => {
-            if (
-              (filterTerm.profFirst === searchTermResult.profFirst &&
-                filterTerm.profLast === searchTermResult.profLast) ||
-              (filterTerm.prefix === searchTermResult.prefix &&
-                filterTerm.number === searchTermResult.number)
-            ) {
-              results.push(searchTermResult);
-            }
-          });
-        } else {
-          results.push(searchTermResult);
-        }
-      }),
-    );
-    return results;
-  });
+  return Promise.all(combosSearchResultsFetch(searchTerms, controller)).then(
+    (allSearchTermResults: SearchQuery[][]) => {
+      const results: SearchQuery[] = [];
+      allSearchTermResults.map((searchTermResults) =>
+        searchTermResults.map((searchTermResult) => {
+          if (filterTerms.length > 0) {
+            filterTerms.map((filterTerm) => {
+              if (
+                (filterTerm.profFirst === searchTermResult.profFirst &&
+                  filterTerm.profLast === searchTermResult.profLast) ||
+                (filterTerm.prefix === searchTermResult.prefix &&
+                  filterTerm.number === searchTermResult.number)
+              ) {
+                results.push(searchTermResult);
+              }
+            });
+          } else {
+            results.push(searchTermResult);
+          }
+        }),
+      );
+      return results;
+    },
+  );
 }
 
 //Find GPA, total, and grade_distribution based on including some set of semesters
@@ -297,7 +299,7 @@ export const Dashboard: NextPage = () => {
         }
       }
 
-      //Get results from autocomplete
+      //Get results from combos
       if (courseSearchTerms.length > 0) {
         fetchSearchResults(courseSearchTerms, professorSearchTerms, controller)
           .then((res) => {

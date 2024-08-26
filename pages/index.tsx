@@ -9,7 +9,7 @@ import Filters, {
   type FiltersType,
 } from '../components/common/Filters/filters';
 import SearchBar from '../components/common/SearchBar/searchBar';
-import SearchQuery from '../modules/SearchQuery/SearchQuery';
+import type SearchQuery from '../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
 import Background from '../public/background.png';
 

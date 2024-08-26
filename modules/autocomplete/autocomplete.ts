@@ -3,12 +3,7 @@ import { DirectedGraph } from 'graphology';
 import SearchQuery from '../SearchQuery/SearchQuery';
 import searchQueryEqual from '../searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../searchQueryLabel/searchQueryLabel';
-
-type NodeAttributes = {
-  c: string;
-  d?: SearchQuery;
-  visited?: boolean;
-};
+import type { NodeAttributes } from '../../scripts/generateAutocompleteGraph';
 
 const root = '0';
 
@@ -202,7 +197,7 @@ function validateSearch(searchQuery: SearchQuery, searchBy: string) {
     return true;
   }
   if (
-    (searchBy === 'professor' || searchBy === 'both') &&
+    searchBy === 'professor' &&
     !('prefix' in searchQuery) &&
     !('number' in searchQuery) &&
     !('sectionNumber' in searchQuery)
@@ -210,7 +205,7 @@ function validateSearch(searchQuery: SearchQuery, searchBy: string) {
     return true;
   }
   if (
-    (searchBy === 'course' || searchBy === 'both') &&
+    searchBy === 'course' &&
     !('profFirst' in searchQuery) &&
     !('profLast' in searchQuery) &&
     Object.keys(searchQuery).length !== 1
