@@ -111,6 +111,6 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
   }
 }
 
-fs.writeFileSync('data/combo_table.json', JSON.stringify(table));
+fs.writeFileSync('src/data/combo_table.json', JSON.stringify(table));
 
 console.log('Combo table generation done.');

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
-import Background from '../../../public/background.png';
+import Background from '../../../../public/background.png';
 import SearchBar from '../../common/SearchBar/searchBar';
 
 /**

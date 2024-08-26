@@ -12,7 +12,9 @@ export type Professor = {
   profLast: string;
 };
 
-export function convertToProfOnly(searchQuery: SearchQuery): Professor | {} {
+export function convertToProfOnly(
+  searchQuery: SearchQuery,
+): Professor | Record<string, never> {
   if (!('profFirst' in searchQuery && 'profLast' in searchQuery)) {
     return {};
   }

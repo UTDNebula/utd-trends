@@ -5,13 +5,13 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
+import Background from '../../public/background.png';
 import Filters, {
   type FiltersType,
 } from '../components/common/Filters/filters';
 import SearchBar from '../components/common/SearchBar/searchBar';
 import type SearchQuery from '../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
-import Background from '../public/background.png';
 
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
