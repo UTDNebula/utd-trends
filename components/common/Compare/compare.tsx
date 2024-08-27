@@ -54,7 +54,13 @@ const Compare = ({ courses, grades, rmp, removeFromCompare }: CompareProps) => {
           series={courses.map((course) => {
             const grade = grades[searchQueryLabel(course)];
             return {
-              name: searchQueryLabel(course),
+              name: searchQueryLabel(course) +
+                ((typeof course.profFirst === 'undefined' &&
+                  typeof course.profLast === 'undefined') ||
+                (typeof course.prefix === 'undefined' &&
+                  typeof course.number === 'undefined')
+                  ? ' (Overall)' //Indicates that this entry is an aggregate for the entire course/professor
+                  : ''),
               data:
                 grade.state === 'done'
                   ? convertNumbersToPercents(grade.data)
