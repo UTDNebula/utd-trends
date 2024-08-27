@@ -54,7 +54,8 @@ const Compare = ({ courses, grades, rmp, removeFromCompare }: CompareProps) => {
           series={courses.map((course) => {
             const grade = grades[searchQueryLabel(course)];
             return {
-              name: searchQueryLabel(course) +
+              name:
+                searchQueryLabel(course) +
                 ((typeof course.profFirst === 'undefined' &&
                   typeof course.profLast === 'undefined') ||
                 (typeof course.prefix === 'undefined' &&
