@@ -54,31 +54,31 @@ function removeDuplicates(array: SearchQuery[]) {
 
 //Fetch course+prof combos matching a specific course/prof
 function combosSearchResultsFetch(
-  searchTerms: SearchQuery[],
+  searchTerm: SearchQuery,
   controller: AbortController,
-): Promise<SearchQuery[]>[] {
-  return searchTerms.map((searchTerm) => {
-    return fetchWithCache(
-      '/api/combo?input=' + searchQueryLabel(searchTerm),
-      cacheIndexNebula,
-      expireTime,
-      {
-        // use the search terms to fetch all the result course-professor combinations
-        signal: controller.signal,
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-        },
+): Promise<SearchQuery[]> {
+  return fetchWithCache(
+    '/api/combo?input=' + searchQueryLabel(searchTerm),
+    cacheIndexNebula,
+    expireTime,
+    {
+      // use the search terms to fetch all the result course-professor combinations
+      signal: controller.signal,
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
       },
-    ).then((response) => {
-      if (response.message !== 'success') {
-        throw new Error(response.message);
-      }
-      return response.data.map((obj: SearchQuery) => ({
+    },
+  ).then((response) => {
+    if (response.message !== 'success') {
+      throw new Error(response.message);
+    }
+    return [searchTerm].concat(
+      response.data.map((obj: SearchQuery) => ({
         ...searchTerm,
         ...obj,
-      }));
-    });
+      })),
+    );
   });
 }
 
@@ -90,30 +90,32 @@ function fetchSearchResults(
   filterTerms: SearchQuery[], //filterTerms is blank if the searchTerms are ALL courses or ALL professors
   controller: AbortController,
 ) {
-  return Promise.all(combosSearchResultsFetch(searchTerms, controller)).then(
-    (allSearchTermResults: SearchQuery[][]) => {
-      const results: SearchQuery[] = [];
-      allSearchTermResults.map((searchTermResults) =>
-        searchTermResults.map((searchTermResult) => {
-          if (filterTerms.length > 0) {
-            filterTerms.map((filterTerm) => {
-              if (
-                (filterTerm.profFirst === searchTermResult.profFirst &&
-                  filterTerm.profLast === searchTermResult.profLast) ||
-                (filterTerm.prefix === searchTermResult.prefix &&
-                  filterTerm.number === searchTermResult.number)
-              ) {
-                results.push(searchTermResult);
-              }
-            });
-          } else {
-            results.push(searchTermResult);
-          }
-        }),
-      );
-      return results;
-    },
-  );
+  return Promise.all(
+    searchTerms.map((searchTerm) =>
+      combosSearchResultsFetch(searchTerm, controller),
+    ),
+  ).then((allSearchTermResults: SearchQuery[][]) => {
+    const results: SearchQuery[] = [];
+    allSearchTermResults.map((searchTermResults) =>
+      searchTermResults.map((searchTermResult) => {
+        if (filterTerms.length > 0) {
+          filterTerms.map((filterTerm) => {
+            if (
+              (filterTerm.profFirst === searchTermResult.profFirst &&
+                filterTerm.profLast === searchTermResult.profLast) ||
+              (filterTerm.prefix === searchTermResult.prefix &&
+                filterTerm.number === searchTermResult.number)
+            ) {
+              results.push(searchTermResult);
+            }
+          });
+        } else {
+          results.push(searchTermResult);
+        }
+      }),
+    );
+    return results;
+  });
 }
 
 //Find GPA, total, and grade_distribution based on including some set of semesters
@@ -536,13 +538,14 @@ export const Dashboard: NextPage = () => {
 
     //RMP data
     //Get list of profs from results
-    let professorsInResults = results
-      //Remove course data from each
-      .map((result) => convertToProfOnly(result))
-      //Remove empty objects (used to be only course data)
-      .filter((obj) => Object.keys(obj).length !== 0);
     //Remove duplicates so as not to fetch multiple times
-    professorsInResults = removeDuplicates(professorsInResults);
+    const professorsInResults = removeDuplicates(
+      results
+        //Remove course data from each
+        .map((result) => convertToProfOnly(result))
+        //Remove empty objects (used to be only course data)
+        .filter((obj) => Object.keys(obj).length !== 0) as SearchQuery[],
+    );
     //Fetch each professor
     //also fetch single profs from search
     if (

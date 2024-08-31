@@ -8,7 +8,7 @@ module.exports = {
     links: [
       {
         rel: 'stylesheet',
-        href: './styles/globals.css',
+        href: './src/styles/globals.css',
       },
     ],
   },
@@ -24,27 +24,27 @@ module.exports = {
     {
       name: 'Common Components',
       content: 'styleguidistDocs/common.md',
-      components: ['./components/common/**/*.tsx'],
+      components: ['./src/components/common/**/*.tsx'],
     },
     {
       name: 'Navigation Components',
-      components: ['./components/navigation/**/*.tsx'],
+      components: ['./src/components/navigation/**/*.tsx'],
     },
     {
       name: 'Graph Components',
-      content: './components/graph/GraphProps.md',
-      components: ['./components/graph/**/*.tsx'],
+      content: './src/components/graph/GraphProps.md',
+      components: ['./src/components/graph/**/*.tsx'],
     },
     {
       name: 'Icon Components',
-      components: ['./components/icons/**/*.tsx'],
+      components: ['./src/components/icons/**/*.tsx'],
     },
   ],
 
   propsParser: require('react-docgen-typescript').parse,
   require: [
     path.resolve(__dirname, 'styleguide/setup.js'),
-    path.join(__dirname, './styles/globals.css'),
+    path.join(__dirname, './src/styles/globals.css'),
   ],
   webpackConfig: {
     plugins: [
