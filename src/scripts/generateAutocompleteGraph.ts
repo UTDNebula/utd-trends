@@ -52,7 +52,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
         return addSearchQueryCharacter(preExisting, characters.slice(1), data);
       }
       if (characters.length == 1) {
-        let attributes: NodeAttributes = {
+        const attributes: NodeAttributes = {
           c: characters[0],
           visited: false,
         };
@@ -121,17 +121,13 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
       if (sectionNumber === 'HON') {
         //<prefix>[ ]<number>.<section>
         //<number>.<section>
-        const sectionNode = addWithParents(
-          [classNode, classNode2],
-          '.' + sectionNumber,
-          {
-            prefix: prefix,
-            number: number,
-            sectionNumber: sectionNumber,
-          },
-        );
+        addWithParents([classNode, classNode2], '.' + sectionNumber, {
+          prefix: prefix,
+          number: number,
+          sectionNumber: sectionNumber,
+        });
         //<number>.<section> <prefix>
-        const sectionAndPrefixNode = addSearchQueryCharacter(
+        addSearchQueryCharacter(
           classNode2,
           '.' + sectionNumber + ' ' + prefix,
           {
@@ -146,7 +142,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
     //Add nodes in format: (<professorLast>|<professorFirst> <professorLast>)
     function addProfessor(profFirst: string, profLast: string) {
       const profFirstNode = addSearchQueryCharacter(root, profFirst + ' ');
-      const profLastNode = addWithParents([profFirstNode, root], profLast, {
+      addWithParents([profFirstNode, root], profLast, {
         profFirst: profFirst,
         profLast: profLast,
       });
@@ -257,7 +253,7 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
     );
 
     fs.writeFileSync(
-      'data/autocomplete_graph.json',
+      'src/data/autocomplete_graph.json',
       JSON.stringify(graph.export()),
     );
 

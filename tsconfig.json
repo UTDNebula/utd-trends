@@ -26,8 +26,8 @@
   "ts-node": {
     "transpileOnly": true,
     "moduleTypes": {
-      "scripts/generateAutocompleteGraph.ts": "cjs",
-      "scripts/generateCombosTable.ts": "cjs"
+      "src/scripts/generateAutocompleteGraph.ts": "cjs",
+      "src/scripts/generateCombosTable.ts": "cjs"
     }
   }
 }

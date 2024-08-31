@@ -541,13 +541,14 @@ export const Dashboard: NextPage = () => {
 
     //RMP data
     //Get list of profs from results
-    let professorsInResults = results
-      //Remove course data from each
-      .map((result) => convertToProfOnly(result))
-      //Remove empty objects (used to be only course data)
-      .filter((obj) => Object.keys(obj).length !== 0);
     //Remove duplicates so as not to fetch multiple times
-    professorsInResults = removeDuplicates(professorsInResults);
+    const professorsInResults = removeDuplicates(
+      results
+        //Remove course data from each
+        .map((result) => convertToProfOnly(result))
+        //Remove empty objects (used to be only course data)
+        .filter((obj) => Object.keys(obj).length !== 0) as SearchQuery[],
+    );
     //Fetch each professor
     //also fetch single profs from search
     if (
