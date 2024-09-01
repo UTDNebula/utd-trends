@@ -38,12 +38,7 @@ export default function handler(
   return new Promise<void>((resolve) => {
     res.status(200).json({
       message: 'success',
-      data: searchAutocomplete(
-        graph,
-        input,
-        limit,
-        searchBy,
-      ),
+      data: searchAutocomplete(graph, input, limit, searchBy),
     });
     resolve();
   });
