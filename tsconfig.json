@@ -19,8 +19,7 @@
       "rsg-components/*": [
         "./node_modules/react-styleguidist/lib/client/rsg-components/*"
       ]
-    },
-    "downlevelIteration": true
+    }
   },
   "include": ["src", "next-env.d.ts", "**/*.ts", "**/*.tsx", "/**/**/*/.tsx"],
   "exclude": ["node_modules"],
