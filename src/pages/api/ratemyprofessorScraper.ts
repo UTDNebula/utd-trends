@@ -104,17 +104,12 @@ export default function handler(
 ) {
   const profFirst = req.query.profFirst;
   const profLast = req.query.profLast;
-  if (
-    typeof profFirst !== 'string' ||
-    typeof profLast !== 'string'
-  ) {
+  if (typeof profFirst !== 'string' || typeof profLast !== 'string') {
     res.status(400).json({ message: 'Incorrect query present' });
     return;
   }
   return new Promise<void>((resolve) => {
-    const name = profFirst.split(' ')[0] +
-      ' ' +
-      profLast;
+    const name = profFirst.split(' ')[0] + ' ' + profLast;
 
     // create fetch object for professor
     const graphQlUrlProp = getGraphQlUrlProp(name);
@@ -136,7 +131,7 @@ export default function handler(
         }
         //Remove profs not at UTD and with bad name match
         const professors = response.data.newSearch.teachers.edges.filter(
-          (prof: {node: RMPInterface}) =>
+          (prof: { node: RMPInterface }) =>
             prof.node.school.name === SCHOOL_NAME &&
             prof.node.firstName.includes(profFirst) &&
             prof.node.lastName.includes(profLast),

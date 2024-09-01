@@ -12,31 +12,24 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>,
 ) {
-  if (
-    !(
-      'REACT_APP_NEBULA_API_KEY' in process.env &&
-      typeof process.env.REACT_APP_NEBULA_API_KEY === 'string'
-    )
-  ) {
-    res.status(400).json({ message: 'API key is undefined' });
+  const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
+  if (typeof API_KEY !== 'string') {
+    res.status(500).json({ message: 'API key is undefined' });
+    return;
   }
-  if (
-    !(
-      'profFirst' in req.query &&
-      typeof req.query.profFirst === 'string' &&
-      'profLast' in req.query &&
-      typeof req.query.profLast === 'string'
-    )
-  ) {
+  const profFirst = req.query.profFirst;
+  const profLast = req.query.profLast;
+  if (typeof profFirst !== 'string' || typeof profLast !== 'string') {
     res.status(400).json({ message: 'Incorrect query present' });
+    return;
   }
   const headers = {
-    'x-api-key': process.env.REACT_APP_NEBULA_API_KEY as string,
+    'x-api-key': API_KEY,
     Accept: 'application/json',
   };
   const url = new URL('https://api.utdnebula.com/professor');
-  url.searchParams.append('first_name', req.query.profFirst as string);
-  url.searchParams.append('last_name', req.query.profLast as string);
+  url.searchParams.append('first_name', profFirst);
+  url.searchParams.append('last_name', profLast);
   return new Promise<void>((resolve) => {
     fetch(url.href, {
       method: 'GET',
