@@ -60,7 +60,7 @@ function SingleProfInfo({ rmp }: Props) {
       </Grid>
       <Grid item xs={6}>
         <p className="text-xl font-bold">
-          {rmp.data.wouldTakeAgain.toFixed(0) + '%'}
+          {rmp.data.wouldTakeAgainPercent.toFixed(0) + '%'}
         </p>
         <p>Would take again</p>
       </Grid>

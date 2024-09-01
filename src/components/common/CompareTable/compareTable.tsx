@@ -150,10 +150,14 @@ function Row({ course, grades, rmp, removeFromCompare, color }: RowProps) {
             <Typography
               className="text-base text-black rounded-full px-5 py-2 inline"
               sx={{
-                backgroundColor: colorMidpoint(100, 0, rmp.data.wouldTakeAgain),
+                backgroundColor: colorMidpoint(
+                  100,
+                  0,
+                  rmp.data.wouldTakeAgainPercent,
+                ),
               }}
             >
-              {rmp.data.wouldTakeAgain.toFixed(0) + '%'}
+              {rmp.data.wouldTakeAgainPercent.toFixed(0) + '%'}
             </Typography>
           )) ||
           null}
@@ -246,9 +250,13 @@ const CompareTable = ({
         }
         if (orderBy === 'would_take_again') {
           if (order === 'asc') {
-            return aRmp.data.wouldTakeAgain - bRmp.data.wouldTakeAgain;
+            return (
+              aRmp.data.wouldTakeAgainPercent - bRmp.data.wouldTakeAgainPercent
+            );
           }
-          return bRmp.data.wouldTakeAgain - aRmp.data.wouldTakeAgain;
+          return (
+            bRmp.data.wouldTakeAgainPercent - aRmp.data.wouldTakeAgainPercent
+          );
         }
       }
       return 0;
