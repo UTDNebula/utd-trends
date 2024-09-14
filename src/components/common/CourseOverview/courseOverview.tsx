@@ -24,21 +24,15 @@ function parseDescription(course: CourseData): {
   requisites: string[];
   sameAsText: string;
   offeringFrequency: string;
+  courseTitle: string;
+  creditHours: string;
 } {
   //extracts info from the course description and formats it
-  const descriptionIntro =
-    course.subject_prefix +
-    ' ' +
-    course.course_number +
-    ' - ' +
-    course.title +
-    '  (' +
-    course.credit_hours +
-    ' semester credit hours) '; //part of the decription at the start to filter out
-  let formattedDescription =
-    course.description.indexOf(descriptionIntro) == 0
-      ? course.description.substring(descriptionIntro.length)
-      : course.description; //first, filter out the intro
+  const [descriptionBeforeCreditHours, descriptionAfterCreditHours] = course.description.split(/\([\d\-]{0,3} semester credit hour[s]?\)/);
+  let formattedDescription = descriptionAfterCreditHours || course.description;
+  const courseTitle = descriptionAfterCreditHours ? descriptionBeforeCreditHours.split(course.course_number + " - ")[1] : course.title;
+  const creditHours = course.course_number[1] =='V' ? course.description.split(" semester credit hours\)")[0].split("(")[1] : course.credit_hours.toString();
+
   const requisites = ['', '', '']; //holds the text (or empty) for 'Prerequisites', 'Corequisites', and 'Prerequisites or Corequisites'
   const requisiteNames = [
     '. Prerequisite: ',
@@ -190,7 +184,7 @@ function parseDescription(course: CourseData): {
       formattedDescription.lastIndexOf('.') + 1,
     );
 
-  return { formattedDescription, requisites, sameAsText, offeringFrequency };
+  return { formattedDescription, requisites, sameAsText, offeringFrequency, courseTitle, creditHours };
 }
 
 const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
@@ -222,9 +216,10 @@ const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
       })
       .then((response: CourseData[]) => {
         response.sort((a, b) => b.catalog_year - a.catalog_year); // sort by year descending, so index 0 has the most recent year
+        var selectedCourse = response[0];
         setCourseData({
           state: typeof response !== 'undefined' ? 'done' : 'error',
-          data: response[0] as CourseData,
+          data: selectedCourse as CourseData,
         });
       })
 
@@ -266,12 +261,12 @@ const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
     courseData.state === 'done' &&
     typeof courseData.data !== 'undefined'
   ) {
-    const { formattedDescription, requisites, sameAsText, offeringFrequency } =
+    const { formattedDescription, requisites, sameAsText, offeringFrequency, courseTitle } =
       parseDescription(courseData.data);
     courseComponent = (
       <>
         <p className="text-2xl font-bold text-center">
-          {courseData.data.title}
+          {courseTitle}
         </p>
         <p className="text-lg font-semibold text-center">
           {searchQueryLabel(course) + ' ' + sameAsText}
