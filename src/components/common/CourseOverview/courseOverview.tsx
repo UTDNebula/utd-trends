@@ -216,10 +216,9 @@ const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
       })
       .then((response: CourseData[]) => {
         response.sort((a, b) => b.catalog_year - a.catalog_year); // sort by year descending, so index 0 has the most recent year
-        var selectedCourse = response[0];
         setCourseData({
           state: typeof response !== 'undefined' ? 'done' : 'error',
-          data: selectedCourse as CourseData,
+          data: response[0] as CourseData,
         });
       })
 
@@ -261,7 +260,7 @@ const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
     courseData.state === 'done' &&
     typeof courseData.data !== 'undefined'
   ) {
-    const { formattedDescription, requisites, sameAsText, offeringFrequency, courseTitle } =
+    const { formattedDescription, requisites, sameAsText, offeringFrequency, courseTitle, creditHours } =
       parseDescription(courseData.data);
     courseComponent = (
       <>
@@ -275,7 +274,7 @@ const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
         <p>
           {formattedDescription +
             ' ' +
-            courseData.data.credit_hours +
+            creditHours +
             ' credit hours.'}
         </p>
         {requisites.map((requisite, index) => {
