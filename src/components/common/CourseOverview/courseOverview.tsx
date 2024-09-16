@@ -28,10 +28,10 @@ function parseDescription(course: CourseData): {
   creditHours: string;
 } {
   //extracts info from the course description and formats it
-  const [descriptionBeforeCreditHours, descriptionAfterCreditHours] = course.description.split(/\([\d\-]{0,3} semester credit hour[s]?\)/);
+  const [descriptionBeforeCreditHours, descriptionAfterCreditHours] = course.description.split(/\([\d-]{0,3} semester credit hour[s]?\)/);
   let formattedDescription = descriptionAfterCreditHours || course.description;
   const courseTitle = descriptionAfterCreditHours ? descriptionBeforeCreditHours.split(course.course_number + " - ")[1] : course.title;
-  const creditHours = course.course_number[1] =='V' ? course.description.split(" semester credit hours\)")[0].split("(")[1] : course.credit_hours.toString();
+  const creditHours = course.course_number[1] =='V' ? course.description.split(" semester credit hours)")[0].split("(")[1] : course.credit_hours.toString();
 
   const requisites = ['', '', '']; //holds the text (or empty) for 'Prerequisites', 'Corequisites', and 'Prerequisites or Corequisites'
   const requisiteNames = [
