@@ -28,10 +28,16 @@ function parseDescription(course: CourseData): {
   creditHours: string;
 } {
   //extracts info from the course description and formats it
-  const [descriptionBeforeCreditHours, descriptionAfterCreditHours] = course.description.split(/\([\d-]{0,3} semester credit hour[s]?\)/);
+  const [descriptionBeforeCreditHours, descriptionAfterCreditHours] =
+    course.description.split(/\([\d-]{0,3} semester credit hour[s]?\)/);
   let formattedDescription = descriptionAfterCreditHours || course.description;
-  const courseTitle = descriptionAfterCreditHours ? descriptionBeforeCreditHours.split(course.course_number + " - ")[1] : course.title;
-  const creditHours = course.course_number[1] =='V' ? course.description.split(" semester credit hours)")[0].split("(")[1] : course.credit_hours.toString();
+  const courseTitle = descriptionAfterCreditHours
+    ? descriptionBeforeCreditHours.split(course.course_number + ' - ')[1]
+    : course.title;
+  const creditHours =
+    course.course_number[1] == 'V'
+      ? course.description.split(' semester credit hours)')[0].split('(')[1]
+      : course.credit_hours.toString();
 
   const requisites = ['', '', '']; //holds the text (or empty) for 'Prerequisites', 'Corequisites', and 'Prerequisites or Corequisites'
   const requisiteNames = [
@@ -184,7 +190,14 @@ function parseDescription(course: CourseData): {
       formattedDescription.lastIndexOf('.') + 1,
     );
 
-  return { formattedDescription, requisites, sameAsText, offeringFrequency, courseTitle, creditHours };
+  return {
+    formattedDescription,
+    requisites,
+    sameAsText,
+    offeringFrequency,
+    courseTitle,
+    creditHours,
+  };
 }
 
 const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
@@ -260,23 +273,22 @@ const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
     courseData.state === 'done' &&
     typeof courseData.data !== 'undefined'
   ) {
-    const { formattedDescription, requisites, sameAsText, offeringFrequency, courseTitle, creditHours } =
-      parseDescription(courseData.data);
+    const {
+      formattedDescription,
+      requisites,
+      sameAsText,
+      offeringFrequency,
+      courseTitle,
+      creditHours,
+    } = parseDescription(courseData.data);
     courseComponent = (
       <>
-        <p className="text-2xl font-bold text-center">
-          {courseTitle}
-        </p>
+        <p className="text-2xl font-bold text-center">{courseTitle}</p>
         <p className="text-lg font-semibold text-center">
           {searchQueryLabel(course) + ' ' + sameAsText}
         </p>
         <p className="font-semibold">{courseData.data.school}</p>
-        <p>
-          {formattedDescription +
-            ' ' +
-            creditHours +
-            ' credit hours.'}
-        </p>
+        <p>{formattedDescription + ' ' + creditHours + ' credit hours.'}</p>
         {requisites.map((requisite, index) => {
           if (requisite === '') {
             return null;
