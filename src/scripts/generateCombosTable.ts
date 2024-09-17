@@ -3,7 +3,7 @@ Build the combos table
 */
 import * as fs from 'fs';
 
-import * as aggregatedData from '../data/autocomplete_data.json';
+import aggregatedData from '../data/autocomplete_data.json';
 import SearchQuery from '../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../modules/searchQueryEqual/searchQueryEqual';
 
@@ -11,32 +11,37 @@ export type TableType = { [key: string]: SearchQuery[] };
 
 const table: TableType = {};
 
-function addCombo(
+function addCombo(  //variables
   prefix: string,
   number: string,
   sectionNumber: string,
   profFirst: string,
   profLast: string,
-) {
-  const courseString = prefix + ' ' + number;
+) {           
+  const courseString = prefix + ' ' + number;   //string representation 
   const profString = profFirst + ' ' + profLast;
-  const courseObject: SearchQuery = { prefix, number };
+
+  const courseObject: SearchQuery = { prefix, number }; //searchquery object
   const profObject: SearchQuery = { profFirst, profLast };
+
+
   if (!Object.prototype.hasOwnProperty.call(table, courseString)) {
-    table[courseString] = [profObject];
+    table[courseString] = [profObject];   //add professor to course
   } else if (
     table[courseString].findIndex((x) => searchQueryEqual(profObject, x)) === -1
   ) {
-    table[courseString].push(profObject);
+    table[courseString].push(profObject);  //add from query
   }
   if (!Object.prototype.hasOwnProperty.call(table, profString)) {
-    table[profString] = [courseObject];
+    table[profString] = [courseObject]; //add course to professor
   } else if (
     table[profString].findIndex((x) => searchQueryEqual(courseObject, x)) === -1
   ) {
     table[profString].push(courseObject);
   }
-  if (sectionNumber === 'HON') {
+
+
+  if (sectionNumber === 'HON') {    //honor course separate
     const courseWSectionString = prefix + ' ' + number + '.' + sectionNumber;
     const courseWSectionObject: SearchQuery = {
       prefix,
@@ -44,7 +49,7 @@ function addCombo(
       sectionNumber,
     };
     if (!Object.prototype.hasOwnProperty.call(table, courseWSectionString)) {
-      table[courseWSectionString] = [profObject];
+      table[courseWSectionString] = [profObject];   //add from query like with regular course
     } else if (
       table[courseWSectionString].findIndex((x) =>
         searchQueryEqual(profObject, x),
@@ -62,8 +67,24 @@ function addCombo(
       table[profString].push(courseWSectionObject);
     }
   }
+
+
+sortResults(courseString);    //call sorting functions
+sortResults(profString);
 }
 
+function sortResults (key: string) {
+  if (Object.prototype.hasOwnProperty.call(table, key)) {
+    table[key].sort((a, b) => {
+      if ('profLast' in a && 'profLast' in b) {
+        return a.profFirst.localeCompare(b.profFirst) || a.profLast.localeCompare(b.profLast);  //sort by first name and last name
+    } else if ('prefix' in a && 'prefix' in b) {
+        return a.prefix.localeCompare(b.prefix) || a.number.localeCompare(b.number);  //sort course by prefix and number
+    }
+    return 0;
+  });
+}
+}
 for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
   const prefixData = aggregatedData.data[prefixItr];
   for (
