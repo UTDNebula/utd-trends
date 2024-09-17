@@ -242,7 +242,6 @@ const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
           <Skeleton />
         </p>
         <p className="text-lg font-semibold text-center">
-          {searchQueryLabel(course)}
         </p>
         <p className="font-semibold w-[80%]">
           <Skeleton />
