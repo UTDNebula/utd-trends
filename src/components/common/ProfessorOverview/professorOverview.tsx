@@ -78,6 +78,7 @@ const ProfessorOverview = ({
           state: typeof response.data !== 'undefined' ? 'done' : 'error',
           data: response.data as ProfessorInterface,
         });
+        console.log(response.data.image_uri);
         setSrc(response.data.image_uri);
       })
       .catch((error) => {
