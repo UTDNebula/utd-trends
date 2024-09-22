@@ -111,7 +111,7 @@ const ProfessorOverview = ({
       <div className="flex flex-col items-center">
         {profData.state === 'loading' && (
           <>
-            <Skeleton className="w-[15ch]" />
+            <Skeleton className="text-2xl font-bold w-[15ch]" />
             <Skeleton className="w-[25ch]" />
             <Skeleton className="w-[20ch]" />
             <Skeleton className="w-[10ch]" />
