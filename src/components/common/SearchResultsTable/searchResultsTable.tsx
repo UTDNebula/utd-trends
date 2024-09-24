@@ -14,6 +14,9 @@ import {
   TableRow,
   TableSortLabel,
   Typography,
+  Rating,
+  Stack,
+  styled,
 } from '@mui/material';
 import React, { useState } from 'react';
 
@@ -29,6 +32,19 @@ import type {
 } from '../../../pages/dashboard/index';
 import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
 import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
+
+// for star color for rating
+const StyledRating = styled(Rating)({
+  '& .MuiRating-iconFilled': {
+    color: '#5D3FD3',
+    stroke: '#5D3FD3', // Border color around the filled stars
+    strokeWidth: 0.3,
+  },
+  '& .MuiRating-iconEmpty': {
+    stroke: '#5D3FD3', // Border color around the empty stars
+    strokeWidth: 0.1, // Thickness of the border
+  },
+});
 
 function LoadingRow() {
   return (
@@ -186,14 +202,18 @@ function Row({
               </Skeleton>
             )) ||
             (rmp.state === 'done' && (
-              <Typography
-                className="text-base text-black rounded-full px-5 py-2 inline"
-                sx={{
-                  backgroundColor: colorMidpoint(5, 0, rmp.data.averageRating),
-                }}
-              >
-                {rmp.data.averageRating.toFixed(1)}
-              </Typography>
+              <Stack spacing={1}>
+                <StyledRating
+                  name="customized-color"
+                  defaultValue={rmp.data.averageRating}
+                  getLabelText={(value: number) =>
+                    `${value} Heart${value !== 1 ? 's' : ''}`
+                  }
+                  precision={0.1}
+                  sx={{ fontSize: 25 }}
+                  readOnly
+                />
+              </Stack>
             )) ||
             null}
         </TableCell>
