@@ -5,7 +5,10 @@ import {
   Collapse,
   IconButton,
   Paper,
+  Rating,
   Skeleton,
+  Stack,
+  styled,
   Table,
   TableBody,
   TableCell,
@@ -14,9 +17,6 @@ import {
   TableRow,
   TableSortLabel,
   Typography,
-  Rating,
-  Stack,
-  styled,
 } from '@mui/material';
 import React, { useState } from 'react';
 
