@@ -66,22 +66,21 @@ function addCombo( //variables
       table[profString].push(courseWSectionObject);
     }
   }
-
-  sortResults(courseString); //call sorting functions
-  sortResults(profString);
 }
 
 function sortResults(key: string) {
   if (Object.prototype.hasOwnProperty.call(table, key)) {
     table[key].sort((a, b) => {
-      if ('profLast' in a && 'profLast' in b) { //handle undefined variables based on searchQueryLabel
+      if ('profLast' in a && 'profLast' in b) {
+        //handle undefined variables based on searchQueryLabel
         const aFirstName = a.profFirst ?? '';
         const bFirstName = b.profFirst ?? '';
         const aLastName = a.profLast ?? '';
         const bLastName = b.profLast ?? '';
 
         return (
-          aLastName.localeCompare(bLastName) || aFirstName.localeCompare(bFirstName)  //sort by last name then first name
+          aLastName.localeCompare(bLastName) ||
+          aFirstName.localeCompare(bFirstName) //sort by last name then first name
         );
       } else if ('prefix' in a && 'prefix' in b) {
         const aPrefix = a.prefix ?? ''; //make sure the is no empty input for prefix and number
@@ -89,9 +88,9 @@ function sortResults(key: string) {
         const aNumber = a.number ?? '';
         const bNumber = b.number ?? '';
 
-        return aPrefix.localeCompare(bPrefix) || aNumber.localeCompare(bNumber);  //sort by prefix then number
+        return aPrefix.localeCompare(bPrefix) || aNumber.localeCompare(bNumber); //sort by prefix then number
       }
-      return 0; 
+      return 0;
     });
   }
 }
@@ -142,7 +141,9 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
     }
   }
 }
+for (const key in table) {
+  sortResults(key);
+}
 
 fs.writeFileSync('src/data/combo_table.json', JSON.stringify(table));
-
 console.log('Combo table generation done.');
