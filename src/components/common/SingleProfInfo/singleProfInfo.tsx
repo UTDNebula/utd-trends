@@ -17,25 +17,25 @@ function SingleProfInfo({ rmp }: Props) {
       <Grid container spacing={2} className="p-4">
         <Grid item xs={6}>
           <p className="text-xl font-bold">
-            <Skeleton />
+            <Skeleton variant="rounded" width="10%" height={25}/>
           </p>
           <p>Professor rating</p>
         </Grid>
         <Grid item xs={6}>
           <p className="text-xl font-bold">
-            <Skeleton />
+            <Skeleton variant="rounded" width="10%" height={25}/>
           </p>
           <p>Difficulty</p>
         </Grid>
         <Grid item xs={6}>
           <p className="text-xl font-bold">
-            <Skeleton />
+            <Skeleton variant="rounded" width="10%" height={25}/>
           </p>
           <p>Ratings given</p>
         </Grid>
         <Grid item xs={6}>
           <p className="text-xl font-bold">
-            <Skeleton />
+            <Skeleton variant="rounded" width="10%" height={25}/>
           </p>
           <p>Would take again</p>
         </Grid>
