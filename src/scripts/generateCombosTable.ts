@@ -81,7 +81,7 @@ function sortResults(key: string) {
         const bLastName = b.profLast ?? '';
 
         return (
-          aFirstName.localeCompare(bLastName) || aLastName.localeCompare(bFirstName)  //sort by last name then first name
+          aLastName.localeCompare(bLastName) || aFirstName.localeCompare(bFirstName)  //sort by last name then first name
         );
       } else if ('prefix' in a && 'prefix' in b) {
         const aPrefix = a.prefix ?? ''; //make sure the is no empty input for prefix and number
