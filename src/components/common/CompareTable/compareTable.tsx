@@ -227,7 +227,11 @@ const CompareTable = ({
         }
         return bGrades.data.gpa - aGrades.data.gpa;
       }
-      if (orderBy === 'rating' || orderBy === 'difficulty') {
+      if (
+        orderBy === 'rating' ||
+        orderBy === 'difficulty' ||
+        orderBy === 'would_take_again'
+      ) {
         const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
         const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
         //drop loading/error rows to bottom
