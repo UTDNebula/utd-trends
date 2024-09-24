@@ -11,26 +11,25 @@ export type TableType = { [key: string]: SearchQuery[] };
 
 const table: TableType = {};
 
-function addCombo(  //variables
+function addCombo( //variables
   prefix: string,
   number: string,
   sectionNumber: string,
   profFirst: string,
   profLast: string,
-) {           
-  const courseString = prefix + ' ' + number;   //string representation 
+) {
+  const courseString = prefix + ' ' + number; //string representation
   const profString = profFirst + ' ' + profLast;
 
   const courseObject: SearchQuery = { prefix, number }; //searchquery object
   const profObject: SearchQuery = { profFirst, profLast };
 
-
   if (!Object.prototype.hasOwnProperty.call(table, courseString)) {
-    table[courseString] = [profObject];   //add professor to course
+    table[courseString] = [profObject]; //add professor to course
   } else if (
     table[courseString].findIndex((x) => searchQueryEqual(profObject, x)) === -1
   ) {
-    table[courseString].push(profObject);  //add from query
+    table[courseString].push(profObject); //add from query
   }
   if (!Object.prototype.hasOwnProperty.call(table, profString)) {
     table[profString] = [courseObject]; //add course to professor
@@ -40,8 +39,8 @@ function addCombo(  //variables
     table[profString].push(courseObject);
   }
 
-
-  if (sectionNumber === 'HON') {    //honor course separate
+  if (sectionNumber === 'HON') {
+    //honor course separate
     const courseWSectionString = prefix + ' ' + number + '.' + sectionNumber;
     const courseWSectionObject: SearchQuery = {
       prefix,
@@ -49,7 +48,7 @@ function addCombo(  //variables
       sectionNumber,
     };
     if (!Object.prototype.hasOwnProperty.call(table, courseWSectionString)) {
-      table[courseWSectionString] = [profObject];   //add from query like with regular course
+      table[courseWSectionString] = [profObject]; //add from query like with regular course
     } else if (
       table[courseWSectionString].findIndex((x) =>
         searchQueryEqual(profObject, x),
@@ -68,23 +67,35 @@ function addCombo(  //variables
     }
   }
 
-
-sortResults(courseString);    //call sorting functions
-sortResults(profString);
+  sortResults(courseString); //call sorting functions
+  sortResults(profString);
 }
 
-function sortResults (key: string) {
+function sortResults(key: string) {
   if (Object.prototype.hasOwnProperty.call(table, key)) {
     table[key].sort((a, b) => {
-      if ('profLast' in a && 'profLast' in b) {
-        return a.profFirst.localeCompare(b.profFirst) || a.profLast.localeCompare(b.profLast);  //sort by first name and last name
-    } else if ('prefix' in a && 'prefix' in b) {
-        return a.prefix.localeCompare(b.prefix) || a.number.localeCompare(b.number);  //sort course by prefix and number
-    }
-    return 0;
-  });
+      if ('profLast' in a && 'profLast' in b) { //handle undefined variables based on searchQueryLabel
+        const aFirstName = a.profFirst ?? '';
+        const bFirstName = b.profFirst ?? '';
+        const aLastName = a.profLast ?? '';
+        const bLastName = b.profLast ?? '';
+
+        return (
+          aFirstName.localeCompare(bLastName) || aLastName.localeCompare(bFirstName)  //sort by last name then first name
+        );
+      } else if ('prefix' in a && 'prefix' in b) {
+        const aPrefix = a.prefix ?? ''; //make sure the is no empty input for prefix and number
+        const bPrefix = b.prefix ?? '';
+        const aNumber = a.number ?? '';
+        const bNumber = b.number ?? '';
+
+        return aPrefix.localeCompare(bPrefix) || aNumber.localeCompare(bNumber);  //sort by prefix then number
+      }
+      return 0; 
+    });
+  }
 }
-}
+
 for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
   const prefixData = aggregatedData.data[prefixItr];
   for (
