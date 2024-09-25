@@ -335,20 +335,16 @@ const CompareTable = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {sortedResults.map(
-              (
-                result //update rows with sortedResults
-              ) => (
-                <Row
-                  key={searchQueryLabel(result)}
-                  course={result}
-                  grades={grades[searchQueryLabel(result)]}
-                  rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
-                  removeFromCompare={removeFromCompare}
-                  color={colorMap[searchQueryLabel(result)]}
-                />
-              ),
-            )}
+            {sortedResults.map((result) => (
+              <Row
+                key={searchQueryLabel(result)}
+                course={result}
+                grades={grades[searchQueryLabel(result)]}
+                rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
+                removeFromCompare={removeFromCompare}
+                color={colorMap[searchQueryLabel(result)]}
+              />
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
