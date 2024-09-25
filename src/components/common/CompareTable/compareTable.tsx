@@ -24,6 +24,7 @@ import type {
   GenericFetchedData,
   GradesType,
 } from '../../../pages/dashboard/index';
+import { Key } from '@mui/icons-material';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(good: number, bad: number, value: number) {
@@ -57,9 +58,9 @@ type RowProps = {
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RateMyProfessorData>;
   removeFromCompare: (arg0: SearchQuery) => void;
-  color: string | undefined;
+  color: string | undefined; //colorIndex
 };
-
+// This is each column of the compare table
 function Row({ course, grades, rmp, removeFromCompare, color }: RowProps) {
   return (
     <TableRow>
@@ -73,7 +74,7 @@ function Row({ course, grades, rmp, removeFromCompare, color }: RowProps) {
             '&.Mui-checked': {
               color: color,
             },
-          }}
+          }} //Colored Checkbox based on colorIndex
         />
       </TableCell>
       <TableCell align="right">
@@ -227,7 +228,11 @@ const CompareTable = ({
         }
         return bGrades.data.gpa - aGrades.data.gpa;
       }
-      if (orderBy === 'rating' || orderBy === 'difficulty') {
+      if (
+        orderBy === 'rating' ||
+        orderBy === 'difficulty' ||
+        orderBy === 'would_take_again'
+      ) {
         const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
         const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
         //drop loading/error rows to bottom
@@ -274,6 +279,7 @@ const CompareTable = ({
     colorMap[searchQueryLabel(result)] =
       searchQueryColors[index % searchQueryColors.length];
   });
+
   return (
     //TODO: sticky header
     <>
@@ -330,20 +336,21 @@ const CompareTable = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {sortedResults.map((result, index) => (
-              <Row
-                key={searchQueryLabel(result)}
-                course={result}
-                grades={grades[searchQueryLabel(result)]}
-                rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
-                removeFromCompare={removeFromCompare}
-                color={
-                  sortedResults.length > 1
-                    ? searchQueryColors[index % searchQueryColors.length]
-                    : undefined
-                }
-              />
-            ))}
+            {sortedResults.map(
+              (
+                result,
+                index, //update rows with sortedResults
+              ) => (
+                <Row
+                  key={searchQueryLabel(result)}
+                  course={result}
+                  grades={grades[searchQueryLabel(result)]}
+                  rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
+                  removeFromCompare={removeFromCompare}
+                  color={colorMap[searchQueryLabel(result)]}
+                />
+              ),
+            )}
           </TableBody>
         </Table>
       </TableContainer>
