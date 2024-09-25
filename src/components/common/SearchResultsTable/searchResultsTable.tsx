@@ -13,6 +13,7 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
@@ -156,20 +157,24 @@ function Row({
             <CloseIcon />
           )) ||
             (grades.state === 'loading' && (
-              <Skeleton
-                variant="rounded"
-                className="rounded-full px-5 py-2 ml-auto"
-              >
-                <Typography className="text-base">4.00</Typography>
-              </Skeleton>
+              <Tooltip title="loading" placement="top" arrow>
+                <Skeleton
+                  variant="rounded"
+                  className="rounded-full px-5 py-2 ml-auto"
+                >
+                  <Typography className="text-base">4.00</Typography>
+                </Skeleton>
+              </Tooltip>
             )) ||
             (grades.state === 'done' && (
-              <Typography
-                className="text-base text-black rounded-full px-5 py-2 inline"
-                sx={{ backgroundColor: colorMidpoint(4, 0, grades.data.gpa) }}
-              >
-                {grades.data.gpa.toFixed(2)}
-              </Typography>
+              <Tooltip title={grades.data.gpa.toFixed(2)} placement="top" arrow>
+                <Typography
+                  className="text-base text-black rounded-full px-5 py-2 inline"
+                  sx={{ backgroundColor: colorMidpoint(4, 0, grades.data.gpa) }}
+                >
+                  {grades.data.gpa.toFixed(2)}
+                </Typography>
+               </Tooltip>
             )) ||
             null}
         </TableCell>
@@ -178,22 +183,26 @@ function Row({
             <CloseIcon />
           )) ||
             (rmp.state === 'loading' && (
-              <Skeleton
-                variant="rounded"
-                className="rounded-full px-5 py-2 ml-auto"
-              >
-                <Typography className="text-base">5.0</Typography>
-              </Skeleton>
+              <Tooltip title="loading" placement="top" arrow>
+                  <Skeleton
+                    variant="rounded"
+                    className="rounded-full px-5 py-2 ml-auto"
+                  >
+                    <Typography className="text-base">5.0</Typography>
+                  </Skeleton>
+              </Tooltip>
             )) ||
             (rmp.state === 'done' && (
-              <Typography
-                className="text-base text-black rounded-full px-5 py-2 inline"
-                sx={{
-                  backgroundColor: colorMidpoint(5, 0, rmp.data.averageRating),
-                }}
-              >
-                {rmp.data.averageRating.toFixed(1)}
-              </Typography>
+                <Tooltip title={rmp.data.averageRating.toFixed(1)} placement="top" arrow>
+                  <Typography
+                    className="text-base text-black rounded-full px-5 py-2 inline"
+                    sx={{
+                      backgroundColor: colorMidpoint(5, 0, rmp.data.averageRating),
+                    }}
+                  >
+                    {rmp.data.averageRating.toFixed(1)}
+                  </Typography>
+                </Tooltip>
             )) ||
             null}
         </TableCell>
