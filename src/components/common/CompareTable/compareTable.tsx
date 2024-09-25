@@ -24,7 +24,6 @@ import type {
   GenericFetchedData,
   GradesType,
 } from '../../../pages/dashboard/index';
-import { Key } from '@mui/icons-material';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(good: number, bad: number, value: number) {
@@ -338,8 +337,7 @@ const CompareTable = ({
           <TableBody>
             {sortedResults.map(
               (
-                result,
-                index, //update rows with sortedResults
+                result //update rows with sortedResults
               ) => (
                 <Row
                   key={searchQueryLabel(result)}
