@@ -174,7 +174,7 @@ function Row({
                 >
                   {grades.data.gpa.toFixed(2)}
                 </Typography>
-               </Tooltip>
+              </Tooltip>
             )) ||
             null}
         </TableCell>
@@ -184,25 +184,33 @@ function Row({
           )) ||
             (rmp.state === 'loading' && (
               <Tooltip title="loading" placement="top" arrow>
-                  <Skeleton
-                    variant="rounded"
-                    className="rounded-full px-5 py-2 ml-auto"
-                  >
-                    <Typography className="text-base">5.0</Typography>
-                  </Skeleton>
+                <Skeleton
+                  variant="rounded"
+                  className="rounded-full px-5 py-2 ml-auto"
+                >
+                  <Typography className="text-base">5.0</Typography>
+                </Skeleton>
               </Tooltip>
             )) ||
             (rmp.state === 'done' && (
-                <Tooltip title={rmp.data.averageRating.toFixed(1)} placement="top" arrow>
-                  <Typography
-                    className="text-base text-black rounded-full px-5 py-2 inline"
-                    sx={{
-                      backgroundColor: colorMidpoint(5, 0, rmp.data.averageRating),
-                    }}
-                  >
-                    {rmp.data.averageRating.toFixed(1)}
-                  </Typography>
-                </Tooltip>
+              <Tooltip
+                title={rmp.data.averageRating.toFixed(1)}
+                placement="top"
+                arrow
+              >
+                <Typography
+                  className="text-base text-black rounded-full px-5 py-2 inline"
+                  sx={{
+                    backgroundColor: colorMidpoint(
+                      5,
+                      0,
+                      rmp.data.averageRating,
+                    ),
+                  }}
+                >
+                  {rmp.data.averageRating.toFixed(1)}
+                </Typography>
+              </Tooltip>
             )) ||
             null}
         </TableCell>
