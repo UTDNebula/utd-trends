@@ -268,11 +268,12 @@ const CompareTable = ({
       return 0;
     });
   }
-// Color map for each course in the compare table based on searchQueryColors 
-const colorMap: { [key: string]: string } = {};
-includedResults.forEach((result, index) => {
-  colorMap[searchQueryLabel(result)] = searchQueryColors[index % searchQueryColors.length];
-});
+  // Color map for each course in the compare table based on searchQueryColors
+  const colorMap: { [key: string]: string } = {};
+  includedResults.forEach((result, index) => {
+    colorMap[searchQueryLabel(result)] =
+      searchQueryColors[index % searchQueryColors.length];
+  });
   return (
     //TODO: sticky header
     <>
