@@ -213,6 +213,7 @@ function Row({
                   sx={{ fontSize: 25 }}
                   readOnly
                 />
+                <Typography>{rmp.data.averageRating}</Typography>
               </Stack>
             )) ||
             null}
@@ -342,25 +343,33 @@ const SearchResultsTable = ({
         const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
         const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
         //drop loading/error rows to bottom
-        if (aRmp.state !== 'done' && bRmp.state !== 'done') {
+        if ((!aRmp || aRmp.state !== 'done') && (!bRmp || bRmp.state !== 'done')) {
+          // If both aRmp and bRmp are not done, treat them as equal and return 0
           return 0;
         }
-        if (aRmp.state !== 'done') {
-          return 9999;
-        }
-        if (bRmp.state !== 'done') {
+        if (!aRmp || aRmp.state !== 'done') {
           return -9999;
         }
+        if (!bRmp || bRmp.state !== 'done') {
+          return -9999;
+        }
+        const aRating = aRmp?.data?.averageRating ?? 0; // Fallback to 0 if undefined
+        const bRating = bRmp?.data?.averageRating ?? 0; // Fallback to 0 if undefined
+
+        const aDifficulty = aRmp?.data?.averageDifficulty ?? 0; // Fallback to 0 if undefined
+        const bDifficulty = bRmp?.data?.averageDifficulty ?? 0; // Fallback to 0 if undefined
+
+
         if (orderBy === 'rating') {
           if (order === 'asc') {
-            return aRmp.data.averageRating - bRmp.data.averageRating;
+            return aRating - bRating;
           }
-          return bRmp.data.averageRating - aRmp.data.averageRating;
+          return bRating - aRating;
         }
         if (order === 'asc') {
-          return aRmp.data.averageDifficulty - bRmp.data.averageDifficulty;
+          return aDifficulty - bDifficulty;
         }
-        return bRmp.data.averageDifficulty - aRmp.data.averageDifficulty;
+        return bDifficulty - aDifficulty;
       }
       return 0;
     });
