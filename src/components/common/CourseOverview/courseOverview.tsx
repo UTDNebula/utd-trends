@@ -26,6 +26,8 @@ function parseDescription(course: CourseData): {
   offeringFrequency: string;
   courseTitle: string;
   creditHours: string;
+  labFee: string | null;
+  notices: string[];
 } {
   //extracts info from the course description and formats it
   const [descriptionBeforeCreditHours, descriptionAfterCreditHours] =
@@ -39,6 +41,38 @@ function parseDescription(course: CourseData): {
       ? course.description.split(' semester credit hours)')[0].split('(')[1]
       : course.credit_hours.toString();
 
+  const labFeeMatch = / Lab fee of \$(\d*) required./.exec(
+    formattedDescription,
+  );
+  let labFee = null;
+  if (labFeeMatch != null) {
+    labFee = labFeeMatch[1];
+    formattedDescription = formattedDescription.replace(labFeeMatch[0], '');
+  }
+
+  const notices = [];
+
+  const consentRequiredMatch = /(?<=\.) ([^.:]* consent required.)/.exec(
+    formattedDescription,
+  );
+  if (consentRequiredMatch != null) {
+    notices.push(consentRequiredMatch[1]);
+    formattedDescription = formattedDescription.replace(
+      consentRequiredMatch[0],
+      '',
+    );
+  }
+
+  const creditString = ' Credit/No Credit only.';
+  const creditNoCreditIndex = formattedDescription.indexOf(creditString);
+  if (creditNoCreditIndex != -1) {
+    formattedDescription = formattedDescription.replace(creditString, '');
+    notices.push(creditString.substring(1));
+  }
+
+  console.log('notices', notices);
+
+  console.log(formattedDescription);
   const requisites = ['', '', '']; //holds the text (or empty) for 'Prerequisites', 'Corequisites', and 'Prerequisites or Corequisites'
   const requisiteNames = [
     '. Prerequisite: ',
@@ -190,6 +224,8 @@ function parseDescription(course: CourseData): {
       formattedDescription.lastIndexOf('.') + 1,
     );
 
+  console.log('requisites:', requisites);
+
   return {
     formattedDescription,
     requisites,
@@ -197,6 +233,8 @@ function parseDescription(course: CourseData): {
     offeringFrequency,
     courseTitle,
     creditHours,
+    labFee,
+    notices,
   };
 }
 
@@ -280,6 +318,8 @@ const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
       offeringFrequency,
       courseTitle,
       creditHours,
+      labFee,
+      notices,
     } = parseDescription(courseData.data);
     courseComponent = (
       <>
@@ -301,10 +341,20 @@ const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
             </p>
           );
         })}
+        {notices.map((notice, index) => (
+          <p key={index}>
+            <b>{notice}</b>
+          </p>
+        ))}
         {offeringFrequency !== '' && (
           <p>
             <b>Offering Frequency: </b>
             {offeringFrequency}
+          </p>
+        )}
+        {labFee && (
+          <p>
+            <b>Lab Fee:</b> ${labFee}
           </p>
         )}
       </>
