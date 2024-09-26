@@ -213,7 +213,6 @@ function Row({
                   sx={{ fontSize: 25 }}
                   readOnly
                 />
-                <Typography>{rmp.data.averageRating}</Typography>
               </Stack>
             )) ||
             null}
@@ -343,7 +342,10 @@ const SearchResultsTable = ({
         const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
         const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
         //drop loading/error rows to bottom
-        if ((!aRmp || aRmp.state !== 'done') && (!bRmp || bRmp.state !== 'done')) {
+        if (
+          (!aRmp || aRmp.state !== 'done') &&
+          (!bRmp || bRmp.state !== 'done')
+        ) {
           // If both aRmp and bRmp are not done, treat them as equal and return 0
           return 0;
         }
@@ -355,11 +357,8 @@ const SearchResultsTable = ({
         }
         const aRating = aRmp?.data?.averageRating ?? 0; // Fallback to 0 if undefined
         const bRating = bRmp?.data?.averageRating ?? 0; // Fallback to 0 if undefined
-
         const aDifficulty = aRmp?.data?.averageDifficulty ?? 0; // Fallback to 0 if undefined
         const bDifficulty = bRmp?.data?.averageDifficulty ?? 0; // Fallback to 0 if undefined
-
-
         if (orderBy === 'rating') {
           if (order === 'asc') {
             return aRating - bRating;
