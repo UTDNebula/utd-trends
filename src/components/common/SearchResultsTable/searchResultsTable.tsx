@@ -310,28 +310,26 @@ const SearchResultsTable = ({
         const bFirstName = b.profFirst ?? '';
         const aLastName = a.profLast ?? '';
         const bLastName = b.profLast ?? '';
-
-        if (order === 'asc')
-          return (
-            aLastName.localeCompare(bLastName) ||
-            aFirstName.localeCompare(bFirstName) //sort by last name then first name
-          );
-        else
-          return (
-            bLastName.localeCompare(aLastName) ||
-            bFirstName.localeCompare(aFirstName) //sort by last name then first name
-          );
-          
-      } else if ('prefix' in a && 'prefix' in b) {
         const aPrefix = a.prefix ?? ''; //make sure the is no empty input for prefix and number
         const bPrefix = b.prefix ?? '';
         const aNumber = a.number ?? '';
         const bNumber = b.number ?? '';
 
         if (order === 'asc')
-          return aPrefix.localeCompare(bPrefix) || aNumber.localeCompare(bNumber); //sort by prefix then number
+          return (
+            aLastName.localeCompare(bLastName) || //sort by last name then first name
+            aFirstName.localeCompare(bFirstName) || 
+            aPrefix.localeCompare(bPrefix) || //if names are equal/don't exist, then sort by prefix then number
+            aNumber.localeCompare(bNumber) 
+          );
         else
-          return bPrefix.localeCompare(aPrefix) || bNumber.localeCompare(aNumber); //sort by prefix then number
+          return (
+            bLastName.localeCompare(aLastName) || //sort by last name then first name
+            bFirstName.localeCompare(aFirstName) ||
+            bPrefix.localeCompare(aPrefix) || //if names are equal/don't exist, then, sort by prefix then number
+            bNumber.localeCompare(aNumber)
+          );
+          
       }
       return 0;
     }
