@@ -323,6 +323,11 @@ const SearchResultsTable = ({
             aNumber.localeCompare(bNumber) 
           );
         else
+          //keep the "(Overall)" result on top for descending sort too
+          if (typeof a.prefix === 'undefined' && typeof a.number === 'undefined')
+            return -1;
+          if ((typeof b.prefix === 'undefined' && typeof b.number === 'undefined'))
+            return 1;
           return (
             bLastName.localeCompare(aLastName) || //sort by last name then first name
             bFirstName.localeCompare(aFirstName) ||
