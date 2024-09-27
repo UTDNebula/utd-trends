@@ -261,20 +261,23 @@ const SearchResultsTable = ({
 }: SearchResultsTableProps) => {
   //Table sorting category
   const [orderBy, setOrderBy] = useState<
-    'none' | 'gpa' | 'rating' | 'difficulty'
-  >('none');
+    'name' | 'gpa' | 'rating' | 'difficulty'
+  >('name');
   //Table sorting direction
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
   //Cycle through sorting
-  function handleClick(col: 'gpa' | 'rating' | 'difficulty') {
+  function handleClick(col: 'name' | 'gpa' | 'rating' | 'difficulty') {
     if (orderBy !== col) {
       setOrderBy(col);
-      setOrder('asc');
+      if (col === 'name')
+        setOrder('asc') //default alphabetical behavior goes from a to z
+      else
+        setOrder('desc'); //default number behavior goes from high to low for our metrics
     } else {
       if (order === 'asc') {
         setOrder('desc');
-      } else if (order === 'desc') {
-        setOrderBy('none');
+      } else {
+        setOrder('asc');
       }
     }
   }
@@ -298,53 +301,84 @@ const SearchResultsTable = ({
 
   //Sort
   let sortedResults = includedResults;
-  if (orderBy !== 'none') {
-    sortedResults = [...includedResults].sort((a, b) => {
-      if (orderBy === 'gpa') {
-        const aGrades = grades[searchQueryLabel(a)];
-        const bGrades = grades[searchQueryLabel(b)];
-        //drop loading/error rows to bottom
-        if (aGrades.state !== 'done' && bGrades.state !== 'done') {
-          return 0;
-        }
-        if (aGrades.state !== 'done') {
-          return 9999;
-        }
-        if (bGrades.state !== 'done') {
-          return -9999;
-        }
-        if (order === 'asc') {
-          return aGrades.data.gpa - bGrades.data.gpa;
-        }
-        return bGrades.data.gpa - aGrades.data.gpa;
-      }
-      if (orderBy === 'rating' || orderBy === 'difficulty') {
-        const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
-        const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
-        //drop loading/error rows to bottom
-        if (aRmp.state !== 'done' && bRmp.state !== 'done') {
-          return 0;
-        }
-        if (aRmp.state !== 'done') {
-          return 9999;
-        }
-        if (bRmp.state !== 'done') {
-          return -9999;
-        }
-        if (orderBy === 'rating') {
-          if (order === 'asc') {
-            return aRmp.data.averageRating - bRmp.data.averageRating;
-          }
-          return bRmp.data.averageRating - aRmp.data.averageRating;
-        }
-        if (order === 'asc') {
-          return aRmp.data.averageDifficulty - bRmp.data.averageDifficulty;
-        }
-        return bRmp.data.averageDifficulty - aRmp.data.averageDifficulty;
+  sortedResults = [...includedResults].sort((a, b) => {
+    if (orderBy === 'name') {
+      //same logic as in generateCombosTable.ts
+      if ('profLast' in a && 'profLast' in b) {
+        //handle undefined variables based on searchQueryLabel
+        const aFirstName = a.profFirst ?? '';
+        const bFirstName = b.profFirst ?? '';
+        const aLastName = a.profLast ?? '';
+        const bLastName = b.profLast ?? '';
+
+        if (order === 'asc')
+          return (
+            aLastName.localeCompare(bLastName) ||
+            aFirstName.localeCompare(bFirstName) //sort by last name then first name
+          );
+        else
+          return (
+            bLastName.localeCompare(aLastName) ||
+            bFirstName.localeCompare(aFirstName) //sort by last name then first name
+          );
+          
+      } else if ('prefix' in a && 'prefix' in b) {
+        const aPrefix = a.prefix ?? ''; //make sure the is no empty input for prefix and number
+        const bPrefix = b.prefix ?? '';
+        const aNumber = a.number ?? '';
+        const bNumber = b.number ?? '';
+
+        if (order === 'asc')
+          return aPrefix.localeCompare(bPrefix) || aNumber.localeCompare(bNumber); //sort by prefix then number
+        else
+          return bPrefix.localeCompare(aPrefix) || bNumber.localeCompare(aNumber); //sort by prefix then number
       }
       return 0;
-    });
-  }
+    }
+    if (orderBy === 'gpa') {
+      const aGrades = grades[searchQueryLabel(a)];
+      const bGrades = grades[searchQueryLabel(b)];
+      //drop loading/error rows to bottom
+      if (aGrades.state !== 'done' && bGrades.state !== 'done') {
+        return 0;
+      }
+      if (aGrades.state !== 'done') {
+        return 9999;
+      }
+      if (bGrades.state !== 'done') {
+        return -9999;
+      }
+      if (order === 'asc') {
+        return aGrades.data.gpa - bGrades.data.gpa;
+      }
+      return bGrades.data.gpa - aGrades.data.gpa;
+    }
+    if (orderBy === 'rating' || orderBy === 'difficulty') {
+      const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
+      const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
+      //drop loading/error rows to bottom
+      if (aRmp.state !== 'done' && bRmp.state !== 'done') {
+        return 0;
+      }
+      if (aRmp.state !== 'done') {
+        return 9999;
+      }
+      if (bRmp.state !== 'done') {
+        return -9999;
+      }
+      if (orderBy === 'rating') {
+        if (order === 'asc') {
+          return aRmp.data.averageRating - bRmp.data.averageRating;
+        }
+        return bRmp.data.averageRating - aRmp.data.averageRating;
+      }
+      if (order === 'asc') {
+        return aRmp.data.averageDifficulty - bRmp.data.averageDifficulty;
+      }
+      return bRmp.data.averageDifficulty - aRmp.data.averageDifficulty;
+    }
+    return 0;
+  });
 
   return (
     //TODO: sticky header
@@ -358,7 +392,17 @@ const SearchResultsTable = ({
             <TableRow>
               <TableCell />
               <TableCell>Compare</TableCell>
-              <TableCell>Name</TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'name'}
+                  direction={orderBy === 'name' ? order : 'asc'}
+                  onClick={() => {
+                    handleClick('name');
+                  }}
+                >
+                  Name
+                </TableSortLabel>
+              </TableCell>
               <TableCell>
                 <TableSortLabel
                   active={orderBy === 'gpa'}
