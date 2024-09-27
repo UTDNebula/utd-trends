@@ -303,14 +303,14 @@ const SearchResultsTable = ({
       if (orderBy === 'gpa') {
         const aGrades = grades[searchQueryLabel(a)];
         const bGrades = grades[searchQueryLabel(b)];
-        
+
         if (!aGrades || aGrades.state !== 'done') {
-          return 9999; 
+          return 9999;
         }
         if (!bGrades || bGrades.state !== 'done') {
-          return -9999; 
+          return -9999;
         }
-        
+
         if (order === 'asc') {
           return aGrades.data.gpa - bGrades.data.gpa;
         }
@@ -319,12 +319,12 @@ const SearchResultsTable = ({
       if (orderBy === 'rating' || orderBy === 'difficulty') {
         const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
         const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
-        
+
         if (!aRmp || aRmp.state !== 'done') {
           return 9999;
         }
         if (!bRmp || bRmp.state !== 'done') {
-          return -9999; 
+          return -9999;
         }
         if (orderBy === 'rating') {
           if (order === 'asc') {
