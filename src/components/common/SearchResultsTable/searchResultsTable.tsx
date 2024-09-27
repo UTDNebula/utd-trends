@@ -270,9 +270,8 @@ const SearchResultsTable = ({
     if (orderBy !== col) {
       setOrderBy(col);
       if (col === 'name')
-        setOrder('asc') //default alphabetical behavior goes from a to z
-      else
-        setOrder('desc'); //default number behavior goes from high to low for our metrics
+        setOrder('asc'); //default alphabetical behavior goes from a to z
+      else setOrder('desc'); //default number behavior goes from high to low for our metrics
     } else {
       if (order === 'asc') {
         setOrder('desc');
@@ -318,23 +317,24 @@ const SearchResultsTable = ({
         if (order === 'asc')
           return (
             aLastName.localeCompare(bLastName) || //sort by last name then first name
-            aFirstName.localeCompare(bFirstName) || 
+            aFirstName.localeCompare(bFirstName) ||
             aPrefix.localeCompare(bPrefix) || //if names are equal/don't exist, then sort by prefix then number
-            aNumber.localeCompare(bNumber) 
+            aNumber.localeCompare(bNumber)
           );
-        else
-          //keep the "(Overall)" result on top for descending sort too
-          if (typeof a.prefix === 'undefined' && typeof a.number === 'undefined')
-            return -1;
-          if ((typeof b.prefix === 'undefined' && typeof b.number === 'undefined'))
-            return 1;
-          return (
-            bLastName.localeCompare(aLastName) || //sort by last name then first name
-            bFirstName.localeCompare(aFirstName) ||
-            bPrefix.localeCompare(aPrefix) || //if names are equal/don't exist, then, sort by prefix then number
-            bNumber.localeCompare(aNumber)
-          );
-          
+        //keep the "(Overall)" result on top for descending sort too
+        else if (
+          typeof a.prefix === 'undefined' &&
+          typeof a.number === 'undefined'
+        )
+          return -1;
+        if (typeof b.prefix === 'undefined' && typeof b.number === 'undefined')
+          return 1;
+        return (
+          bLastName.localeCompare(aLastName) || //sort by last name then first name
+          bFirstName.localeCompare(aFirstName) ||
+          bPrefix.localeCompare(aPrefix) || //if names are equal/don't exist, then, sort by prefix then number
+          bNumber.localeCompare(aNumber)
+        );
       }
       return 0;
     }
