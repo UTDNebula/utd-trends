@@ -304,6 +304,13 @@ const SearchResultsTable = ({
         const aGrades = grades[searchQueryLabel(a)];
         const bGrades = grades[searchQueryLabel(b)];
 
+        if (
+          (!aGrades || aGrades.state !== 'done') &&
+          (!bGrades || bGrades.state !== 'done')
+        ) {
+          return 0;
+        }
+
         if (!aGrades || aGrades.state !== 'done') {
           return 9999;
         }
@@ -319,6 +326,13 @@ const SearchResultsTable = ({
       if (orderBy === 'rating' || orderBy === 'difficulty') {
         const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
         const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
+
+        if (
+          (!aRmp || aRmp.state !== 'done') &&
+          (!bRmp || bRmp.state !== 'done')
+        ) {
+          return 0;
+        }
 
         if (!aRmp || aRmp.state !== 'done') {
           return 9999;
