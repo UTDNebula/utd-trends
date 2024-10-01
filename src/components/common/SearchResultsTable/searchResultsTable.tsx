@@ -5,7 +5,10 @@ import {
   Collapse,
   IconButton,
   Paper,
+  Rating,
   Skeleton,
+  Stack,
+  styled,
   Table,
   TableBody,
   TableCell,
@@ -29,6 +32,19 @@ import type {
 } from '../../../pages/dashboard/index';
 import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
 import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
+
+// for star color for rating
+const StyledRating = styled(Rating)({
+  '& .MuiRating-iconFilled': {
+    color: '#5D3FD3',
+    stroke: '#5D3FD3', // Border color around the filled stars
+    strokeWidth: 0.3,
+  },
+  '& .MuiRating-iconEmpty': {
+    stroke: '#5D3FD3', // Border color around the empty stars
+    strokeWidth: 0.1, // Thickness of the border
+  },
+});
 
 function LoadingRow() {
   return (
@@ -186,14 +202,18 @@ function Row({
               </Skeleton>
             )) ||
             (rmp.state === 'done' && (
-              <Typography
-                className="text-base text-black rounded-full px-5 py-2 inline"
-                sx={{
-                  backgroundColor: colorMidpoint(5, 0, rmp.data.averageRating),
-                }}
-              >
-                {rmp.data.averageRating.toFixed(1)}
-              </Typography>
+              <Stack spacing={1}>
+                <StyledRating
+                  name="customized-color"
+                  defaultValue={rmp.data.averageRating}
+                  getLabelText={(value: number) =>
+                    `${value} Heart${value !== 1 ? 's' : ''}`
+                  }
+                  precision={0.1}
+                  sx={{ fontSize: 25 }}
+                  readOnly
+                />
+              </Stack>
             )) ||
             null}
         </TableCell>
@@ -326,30 +346,34 @@ const SearchResultsTable = ({
       if (orderBy === 'rating' || orderBy === 'difficulty') {
         const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
         const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
-
+        //drop loading/error rows to bottom
         if (
           (!aRmp || aRmp.state !== 'done') &&
           (!bRmp || bRmp.state !== 'done')
         ) {
+          // If both aRmp and bRmp are not done, treat them as equal and return 0
           return 0;
         }
-
         if (!aRmp || aRmp.state !== 'done') {
           return 9999;
         }
         if (!bRmp || bRmp.state !== 'done') {
           return -9999;
         }
+        const aRating = aRmp?.data?.averageRating ?? 0; // Fallback to 0 if undefined
+        const bRating = bRmp?.data?.averageRating ?? 0; // Fallback to 0 if undefined
+        const aDifficulty = aRmp?.data?.averageDifficulty ?? 0; // Fallback to 0 if undefined
+        const bDifficulty = bRmp?.data?.averageDifficulty ?? 0; // Fallback to 0 if undefined
         if (orderBy === 'rating') {
           if (order === 'asc') {
-            return aRmp.data.averageRating - bRmp.data.averageRating;
+            return aRating - bRating;
           }
-          return bRmp.data.averageRating - aRmp.data.averageRating;
+          return bRating - aRating;
         }
         if (order === 'asc') {
-          return aRmp.data.averageDifficulty - bRmp.data.averageDifficulty;
+          return aDifficulty - bDifficulty;
         }
-        return bRmp.data.averageDifficulty - aRmp.data.averageDifficulty;
+        return bDifficulty - aDifficulty;
       }
       return 0;
     });
