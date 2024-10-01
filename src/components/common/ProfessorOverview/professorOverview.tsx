@@ -109,11 +109,9 @@ const ProfessorOverview = ({
         />
       )}
       <div className="flex flex-col items-center">
-        <p className="text-2xl font-bold self-center">
-          {searchQueryLabel(professor)}
-        </p>
         {profData.state === 'loading' && (
           <>
+            <Skeleton className="text-2xl font-bold w-[15ch]" />
             <Skeleton className="w-[25ch]" />
             <Skeleton className="w-[20ch]" />
             <Skeleton className="w-[10ch]" />
@@ -121,6 +119,9 @@ const ProfessorOverview = ({
         )}
         {profData.state === 'done' && typeof profData.data !== 'undefined' && (
           <>
+            <p className="text-2xl font-bold self-center">
+              {searchQueryLabel(professor)}
+            </p>
             {profData.data.email !== '' && (
               <Link
                 href={'mailto:' + profData.data.email}
@@ -130,6 +131,7 @@ const ProfessorOverview = ({
                 {profData.data.email}
               </Link>
             )}
+
             {profData.data.office.map_uri !== '' &&
               profData.data.office.building !== '' &&
               profData.data.office.room !== '' && (
