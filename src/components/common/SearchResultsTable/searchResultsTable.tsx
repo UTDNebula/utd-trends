@@ -323,16 +323,21 @@ const SearchResultsTable = ({
       if (orderBy === 'gpa') {
         const aGrades = grades[searchQueryLabel(a)];
         const bGrades = grades[searchQueryLabel(b)];
-        //drop loading/error rows to bottom
-        if (aGrades.state !== 'done' && bGrades.state !== 'done') {
+
+        if (
+          (!aGrades || aGrades.state !== 'done') &&
+          (!bGrades || bGrades.state !== 'done')
+        ) {
           return 0;
         }
-        if (aGrades.state !== 'done') {
+
+        if (!aGrades || aGrades.state !== 'done') {
           return 9999;
         }
-        if (bGrades.state !== 'done') {
+        if (!bGrades || bGrades.state !== 'done') {
           return -9999;
         }
+
         if (order === 'asc') {
           return aGrades.data.gpa - bGrades.data.gpa;
         }
