@@ -350,7 +350,7 @@ const SearchResultsTable = ({
           return 0;
         }
         if (!aRmp || aRmp.state !== 'done') {
-          return -9999;
+          return 9999;
         }
         if (!bRmp || bRmp.state !== 'done') {
           return -9999;
