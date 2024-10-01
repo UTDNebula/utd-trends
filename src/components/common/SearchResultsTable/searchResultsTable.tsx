@@ -332,11 +332,10 @@ const SearchResultsTable = ({
         }
         const aRating = aRmp?.data?.averageRating ?? 0; // Fallback to 0 if undefined
         const bRating = bRmp?.data?.averageRating ?? 0; // Fallback to 0 if undefined
-          if (order === 'asc') {
-            return aRating - bRating;
-          }
-          return bRating - aRating;
+        if (order === 'asc') {
+          return aRating - bRating;
         }
+        return bRating - aRating;
       }
       return 0;
     });
