@@ -12,7 +12,14 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
-const minGPAs = ['3.5', '3.0', '2.5', '2.0', '1.5', '1.0', '0.5'];
+const minGPAs = [
+  ['3.67', 'A-'],
+  ['3.33', 'B+'],
+  ['3', 'B'],
+  ['2.67', 'B-'],
+  ['2.33', 'C+'],
+  ['2', 'C'],
+];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
 const maxDiffs = ['0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5'];
 
@@ -130,9 +137,9 @@ const Filters = ({
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         >
-          <InputLabel id="minGPA">Min GPA</InputLabel>
+          <InputLabel id="minGPA">Min Letter Grade</InputLabel>
           <Select
-            label="Min GPA"
+            label="Min Letter Grade"
             labelId="minGPA"
             value={minGPA}
             onChange={(event: SelectChangeEvent) => {
@@ -142,9 +149,9 @@ const Filters = ({
             <MenuItem value="">
               <em>None</em>
             </MenuItem>
-            {minGPAs.map((value) => (
+            {minGPAs.map(([value, label]) => (
               <MenuItem key={value} value={value}>
-                {value}
+                {label}
               </MenuItem>
             ))}
           </Select>
