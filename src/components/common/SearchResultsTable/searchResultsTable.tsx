@@ -217,34 +217,6 @@ function Row({
             )) ||
             null}
         </TableCell>
-        <TableCell align="right">
-          {((typeof rmp === 'undefined' || rmp.state === 'error') && (
-            <CloseIcon />
-          )) ||
-            (rmp.state === 'loading' && (
-              <Skeleton
-                variant="rounded"
-                className="rounded-full px-5 py-2 ml-auto"
-              >
-                <Typography className="text-base">5.0</Typography>
-              </Skeleton>
-            )) ||
-            (rmp.state === 'done' && (
-              <Typography
-                className="text-base text-black rounded-full px-5 py-2 inline"
-                sx={{
-                  backgroundColor: colorMidpoint(
-                    0,
-                    5,
-                    rmp.data.averageDifficulty,
-                  ),
-                }}
-              >
-                {rmp.data.averageDifficulty.toFixed(1)}
-              </Typography>
-            )) ||
-            null}
-        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell className="p-0" colSpan={6}>
@@ -280,13 +252,11 @@ const SearchResultsTable = ({
   removeFromCompare,
 }: SearchResultsTableProps) => {
   //Table sorting category
-  const [orderBy, setOrderBy] = useState<
-    'none' | 'gpa' | 'rating' | 'difficulty'
-  >('none');
+  const [orderBy, setOrderBy] = useState<'none' | 'gpa' | 'rating'>('none');
   //Table sorting direction
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
   //Cycle through sorting
-  function handleClick(col: 'gpa' | 'rating' | 'difficulty') {
+  function handleClick(col: 'gpa' | 'rating') {
     if (orderBy !== col) {
       setOrderBy(col);
       setOrder('asc');
@@ -343,7 +313,7 @@ const SearchResultsTable = ({
         }
         return bGrades.data.gpa - aGrades.data.gpa;
       }
-      if (orderBy === 'rating' || orderBy === 'difficulty') {
+      if (orderBy === 'rating') {
         const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
         const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
         //drop loading/error rows to bottom
@@ -362,18 +332,10 @@ const SearchResultsTable = ({
         }
         const aRating = aRmp?.data?.averageRating ?? 0; // Fallback to 0 if undefined
         const bRating = bRmp?.data?.averageRating ?? 0; // Fallback to 0 if undefined
-        const aDifficulty = aRmp?.data?.averageDifficulty ?? 0; // Fallback to 0 if undefined
-        const bDifficulty = bRmp?.data?.averageDifficulty ?? 0; // Fallback to 0 if undefined
-        if (orderBy === 'rating') {
-          if (order === 'asc') {
-            return aRating - bRating;
-          }
-          return bRating - aRating;
-        }
         if (order === 'asc') {
-          return aDifficulty - bDifficulty;
+          return aRating - bRating;
         }
-        return bDifficulty - aDifficulty;
+        return bRating - aRating;
       }
       return 0;
     });
@@ -412,17 +374,6 @@ const SearchResultsTable = ({
                   }}
                 >
                   Rating
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'difficulty'}
-                  direction={orderBy === 'difficulty' ? order : 'asc'}
-                  onClick={() => {
-                    handleClick('difficulty');
-                  }}
-                >
-                  Difficulty
                 </TableSortLabel>
               </TableCell>
             </TableRow>
