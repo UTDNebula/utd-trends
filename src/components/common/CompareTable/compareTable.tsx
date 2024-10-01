@@ -1,7 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import {
   Checkbox,
-  Paper,
   Skeleton,
   Table,
   TableBody,
@@ -52,120 +51,167 @@ function colorMidpoint(good: number, bad: number, value: number) {
     .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
-type RowProps = {
-  course: SearchQuery;
-  grades: GenericFetchedData<GradesType>;
-  rmp: GenericFetchedData<RateMyProfessorData>;
-  removeFromCompare: (arg0: SearchQuery) => void;
-  color: string | undefined; //colorIndex
+type GradeRowProps = {
+  name: string;
+  values: GenericFetchedData<GradesType>[];
+  getValue: (arg0: GradesType) => number;
+  formatValue: (arg0: number) => string;
+  goodValue: number;
+  badValue: number;
+  loadingFiller: string;
 };
-// This is each column of the compare table
-function Row({ course, grades, rmp, removeFromCompare, color }: RowProps) {
+// This is each row of the compare table
+function GradeRow({
+  name,
+  values,
+  getValue,
+  formatValue,
+  goodValue,
+  badValue,
+  loadingFiller,
+}: GradeRowProps) {
   return (
-    <TableRow>
-      <TableCell>
-        <Checkbox
-          checked={true}
-          onClick={() => {
-            removeFromCompare(course);
-          }}
-          sx={{
-            '&.Mui-checked': {
-              color: color,
-            },
-          }} //Colored Checkbox based on colorIndex
-        />
-      </TableCell>
-      <TableCell align="right">
-        {((typeof grades === 'undefined' || grades.state === 'error') && (
-          <CloseIcon />
-        )) ||
-          (grades.state === 'loading' && (
-            <Skeleton variant="rounded" className="rounded-full px-5 py-2">
-              <Typography className="text-base">4.00</Typography>
-            </Skeleton>
+    <TableRow sx={{ '& td': { border: 0 } }}>
+      <TableCell align="right">{name}</TableCell>
+      {values.map((value, index) => (
+        <TableCell align="center" key={index}>
+          {((typeof value === 'undefined' || value.state === 'error') && (
+            <CloseIcon />
           )) ||
-          (grades.state === 'done' && (
-            <Typography
-              className="text-base text-black rounded-full px-5 py-2 inline"
-              sx={{ backgroundColor: colorMidpoint(4, 0, grades.data.gpa) }}
-            >
-              {grades.data.gpa.toFixed(2)}
-            </Typography>
+            (value.state === 'loading' && (
+              <Skeleton variant="rounded" className="rounded-full px-5 py-2">
+                <Typography className="text-base">{loadingFiller}</Typography>
+              </Skeleton>
+            )) ||
+            (value.state === 'done' && (
+              <Typography
+                className="text-base inline rounded-full px-5 py-2 text-black"
+                sx={{
+                  backgroundColor: colorMidpoint(
+                    goodValue,
+                    badValue,
+                    getValue(value.data),
+                  ),
+                }}
+              >
+                {formatValue(getValue(value.data))}
+              </Typography>
+            )) ||
+            null}
+        </TableCell>
+      ))}
+    </TableRow>
+  );
+}
+
+type RmpRowProps = {
+  name: string;
+  values: GenericFetchedData<RateMyProfessorData>[];
+  getValue: (arg0: RateMyProfessorData) => number;
+  formatValue: (arg0: number) => string;
+  goodValue: number;
+  badValue: number;
+  loadingFiller: string;
+};
+// This is each row of the compare table
+function RmpRow({
+  name,
+  values,
+  getValue,
+  formatValue,
+  goodValue,
+  badValue,
+  loadingFiller,
+}: RmpRowProps) {
+  return (
+    <TableRow sx={{ '& td': { border: 0 } }}>
+      <TableCell align="right">{name}</TableCell>
+      {values.map((value, index) => (
+        <TableCell align="center" key={index}>
+          {((typeof value === 'undefined' || value.state === 'error') && (
+            <CloseIcon />
           )) ||
-          null}
-      </TableCell>
-      <TableCell align="right">
-        {((typeof rmp === 'undefined' || rmp.state === 'error') && (
-          <CloseIcon />
-        )) ||
-          (rmp.state === 'loading' && (
-            <Skeleton variant="rounded" className="rounded-full px-5 py-2">
-              <Typography className="text-base">5.0</Typography>
-            </Skeleton>
-          )) ||
-          (rmp.state === 'done' && (
-            <Typography
-              className="text-base text-black rounded-full px-5 py-2 inline"
-              sx={{
-                backgroundColor: colorMidpoint(5, 0, rmp.data.averageRating),
-              }}
-            >
-              {rmp.data.averageRating.toFixed(1)}
-            </Typography>
-          )) ||
-          null}
-      </TableCell>
-      <TableCell align="right">
-        {((typeof rmp === 'undefined' || rmp.state === 'error') && (
-          <CloseIcon />
-        )) ||
-          (rmp.state === 'loading' && (
-            <Skeleton variant="rounded" className="rounded-full px-5 py-2">
-              <Typography className="text-base">5.0</Typography>
-            </Skeleton>
-          )) ||
-          (rmp.state === 'done' && (
-            <Typography
-              className="text-base text-black rounded-full px-5 py-2 inline"
-              sx={{
-                backgroundColor: colorMidpoint(
-                  0,
-                  5,
-                  rmp.data.averageDifficulty,
-                ),
-              }}
-            >
-              {rmp.data.averageDifficulty.toFixed(1)}
-            </Typography>
-          )) ||
-          null}
-      </TableCell>
-      <TableCell align="right">
-        {((typeof rmp === 'undefined' || rmp.state === 'error') && (
-          <CloseIcon />
-        )) ||
-          (rmp.state === 'loading' && (
-            <Skeleton variant="rounded" className="rounded-full px-5 py-2">
-              <Typography className="text-base">90%</Typography>
-            </Skeleton>
-          )) ||
-          (rmp.state === 'done' && (
-            <Typography
-              className="text-base text-black rounded-full px-5 py-2 inline"
-              sx={{
-                backgroundColor: colorMidpoint(
-                  100,
-                  0,
-                  rmp.data.wouldTakeAgainPercentage,
-                ),
-              }}
-            >
-              {rmp.data.wouldTakeAgainPercentage.toFixed(0) + '%'}
-            </Typography>
-          )) ||
-          null}
-      </TableCell>
+            (value.state === 'loading' && (
+              <Skeleton variant="rounded" className="rounded-full px-5 py-2">
+                <Typography className="text-base">{loadingFiller}</Typography>
+              </Skeleton>
+            )) ||
+            (value.state === 'done' && (
+              <Typography
+                className="text-base inline rounded-full px-5 py-2 text-black"
+                sx={{
+                  backgroundColor: colorMidpoint(
+                    goodValue,
+                    badValue,
+                    getValue(value.data),
+                  ),
+                }}
+              >
+                {formatValue(getValue(value.data))}
+              </Typography>
+            )) ||
+            null}
+        </TableCell>
+      ))}
+    </TableRow>
+  );
+}
+
+type NumRowProps = {
+  name: string;
+  gradeValues: GenericFetchedData<GradesType>[];
+  rmpValues: GenericFetchedData<RateMyProfessorData>[];
+  getGradeValue: (arg0: GradesType) => number;
+  getRmpValue: (arg0: RateMyProfessorData) => number;
+  loadingFiller: string;
+};
+// This is each row of the compare table
+function NumRow({
+  name,
+  gradeValues,
+  rmpValues,
+  getGradeValue,
+  getRmpValue,
+  loadingFiller,
+}: NumRowProps) {
+  return (
+    <TableRow sx={{ '& td': { border: 0 } }}>
+      <TableCell align="right">{name}</TableCell>
+      {gradeValues
+        .map((x, i) => [x, rmpValues[i]])
+        .map(([grade, rmp], index) => (
+          <TableCell align="center" key={index}>
+            {((typeof grade === 'undefined' || grade.state === 'error') && (
+              <CloseIcon />
+            )) ||
+              (grade.state === 'loading' && (
+                <Skeleton variant="rounded" className="rounded-full px-5 py-2">
+                  <Typography className="text-base">{loadingFiller}</Typography>
+                </Skeleton>
+              )) ||
+              (grade.state === 'done' && (
+                <Typography className="text-base inline">
+                  {getGradeValue(grade.data as GradesType)}
+                </Typography>
+              )) ||
+              null}
+            {' / '}
+            {((typeof rmp === 'undefined' || rmp.state === 'error') && (
+              <CloseIcon />
+            )) ||
+              (rmp.state === 'loading' && (
+                <Skeleton variant="rounded" className="rounded-full px-5 py-2">
+                  <Typography className="text-base">{loadingFiller}</Typography>
+                </Skeleton>
+              )) ||
+              (rmp.state === 'done' && (
+                <Typography className="text-base inline">
+                  {getRmpValue(rmp.data as RateMyProfessorData)}
+                </Typography>
+              )) ||
+              null}
+          </TableCell>
+        ))}
     </TableRow>
   );
 }
@@ -280,75 +326,88 @@ const CompareTable = ({
   });
 
   return (
-    //TODO: sticky header
-    <>
-      <Typography className="leading-tight text-3xl font-bold p-4"></Typography>
-      <TableContainer component={Paper}>
-        <Table stickyHeader aria-label="collapsible table">
+    <div className="overflow-x-auto">
+      <TableContainer className="w-fit">
+        <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Compare</TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'gpa'}
-                  direction={orderBy === 'gpa' ? order : 'asc'}
-                  onClick={() => {
-                    handleClick('gpa');
-                  }}
-                >
-                  GPA
-                </TableSortLabel>
+              <TableCell className="font-bold" sx={{ borderBottom: 'none' }}>
+                Compare
               </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'rating'}
-                  direction={orderBy === 'rating' ? order : 'asc'}
-                  onClick={() => {
-                    handleClick('rating');
-                  }}
+              {sortedResults.map((result) => (
+                <TableCell
+                  key={searchQueryLabel(result)}
+                  className="text-center"
+                  sx={{ borderBottom: 'none' }}
                 >
-                  Rating
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'difficulty'}
-                  direction={orderBy === 'difficulty' ? order : 'asc'}
-                  onClick={() => {
-                    handleClick('difficulty');
-                  }}
-                >
-                  Difficulty
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'would_take_again'}
-                  direction={orderBy === 'would_take_again' ? order : 'asc'}
-                  onClick={() => {
-                    handleClick('would_take_again');
-                  }}
-                >
-                  Would Take Again
-                </TableSortLabel>
-              </TableCell>
+                  {searchQueryLabel(result)}
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {sortedResults.map((result) => (
-              <Row
-                key={searchQueryLabel(result)}
-                course={result}
-                grades={grades[searchQueryLabel(result)]}
-                rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
-                removeFromCompare={removeFromCompare}
-                color={colorMap[searchQueryLabel(result)]}
-              />
-            ))}
+            <GradeRow
+              name="GPA"
+              values={sortedResults.map(
+                (result) => grades[searchQueryLabel(result)],
+              )}
+              getValue={(data: GradesType) => data.gpa}
+              formatValue={(value: number) => value.toFixed(2)}
+              goodValue={4}
+              badValue={0}
+              loadingFiller="4.00"
+            />
+            <RmpRow
+              name="Rating"
+              values={sortedResults.map(
+                (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
+              )}
+              getValue={(data: RateMyProfessorData) => data.averageRating}
+              formatValue={(value: number) => value.toFixed(1)}
+              goodValue={5}
+              badValue={0}
+              loadingFiller="5.0"
+            />
+            <RmpRow
+              name="Would Take Again"
+              values={sortedResults.map(
+                (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
+              )}
+              getValue={(data: RateMyProfessorData) =>
+                data.wouldTakeAgainPercentage
+              }
+              formatValue={(value: number) => value.toFixed(0) + '%'}
+              goodValue={100}
+              badValue={0}
+              loadingFiller="90%"
+            />
+            <RmpRow
+              name="Difficulty"
+              values={sortedResults.map(
+                (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
+              )}
+              getValue={(data: RateMyProfessorData) => data.averageDifficulty}
+              formatValue={(value: number) => value.toFixed(1)}
+              goodValue={0}
+              badValue={5}
+              loadingFiller="5.0"
+            />
+            <NumRow
+              name="# of Grades / Ratings"
+              gradeValues={sortedResults.map(
+                (result) => grades[searchQueryLabel(result)],
+              )}
+              rmpValues={sortedResults.map(
+                (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
+              )}
+              getGradeValue={(data: GradesType) => data.total}
+              getRmpValue={(data: RateMyProfessorData) => data.numRatings}
+              loadingFiller="100"
+            />
           </TableBody>
         </Table>
       </TableContainer>
-    </>
+    </div>
   );
 };
 

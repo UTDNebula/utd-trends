@@ -30,7 +30,7 @@ const Compare = ({ courses, grades, rmp, removeFromCompare }: CompareProps) => {
   }
 
   return (
-    <>
+    <div className="flex flex-col gap-4">
       <div className="h-64">
         <BarGraph
           title="Grades"
@@ -76,7 +76,7 @@ const Compare = ({ courses, grades, rmp, removeFromCompare }: CompareProps) => {
         rmp={rmp}
         removeFromCompare={removeFromCompare}
       />
-    </>
+    </div>
   );
 };
 
