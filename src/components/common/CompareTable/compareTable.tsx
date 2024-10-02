@@ -59,6 +59,8 @@ type GradeRowProps = {
   goodValue: number;
   badValue: number;
   loadingFiller: string;
+  cell_className: string;
+  colors: string[];
 };
 // This is each row of the compare table
 function GradeRow({
@@ -69,12 +71,19 @@ function GradeRow({
   goodValue,
   badValue,
   loadingFiller,
+  cell_className,
+  colors,
 }: GradeRowProps) {
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
       <TableCell align="right">{name}</TableCell>
       {values.map((value, index) => (
-        <TableCell align="center" key={index}>
+        <TableCell
+          align="center"
+          key={index}
+          className={cell_className}
+          style={{ borderColor: colors[index] }}
+        >
           {((typeof value === 'undefined' || value.state === 'error') && (
             <CloseIcon />
           )) ||
@@ -112,6 +121,8 @@ type RmpRowProps = {
   goodValue: number;
   badValue: number;
   loadingFiller: string;
+  cell_className: string;
+  colors: string[];
 };
 // This is each row of the compare table
 function RmpRow({
@@ -122,12 +133,19 @@ function RmpRow({
   goodValue,
   badValue,
   loadingFiller,
+  cell_className,
+  colors,
 }: RmpRowProps) {
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
       <TableCell align="right">{name}</TableCell>
       {values.map((value, index) => (
-        <TableCell align="center" key={index}>
+        <TableCell
+          align="center"
+          key={index}
+          className={cell_className}
+          style={{ borderColor: colors[index] }}
+        >
           {((typeof value === 'undefined' || value.state === 'error') && (
             <CloseIcon />
           )) ||
@@ -164,6 +182,8 @@ type NumRowProps = {
   getGradeValue: (arg0: GradesType) => number;
   getRmpValue: (arg0: RateMyProfessorData) => number;
   loadingFiller: string;
+  cell_className: string;
+  colors: string[];
 };
 // This is each row of the compare table
 function NumRow({
@@ -173,6 +193,8 @@ function NumRow({
   getGradeValue,
   getRmpValue,
   loadingFiller,
+  cell_className,
+  colors,
 }: NumRowProps) {
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
@@ -180,7 +202,12 @@ function NumRow({
       {gradeValues
         .map((x, i) => [x, rmpValues[i]])
         .map(([grade, rmp], index) => (
-          <TableCell align="center" key={index}>
+          <TableCell
+            align="center"
+            key={index}
+            className={cell_className}
+            style={{ borderColor: colors[index] }}
+          >
             {((typeof grade === 'undefined' || grade.state === 'error') && (
               <CloseIcon />
             )) ||
@@ -324,23 +351,35 @@ const CompareTable = ({
     colorMap[searchQueryLabel(result)] =
       searchQueryColors[index % searchQueryColors.length];
   });
+  const mappedColors = sortedResults.map(
+    (result) => colorMap[searchQueryLabel(result)],
+  );
 
   return (
     <div className="overflow-x-auto">
       <TableContainer className="w-fit">
-        <Table>
+        <Table size="small" className="border-spacing-x-2 border-separate">
           <TableHead>
             <TableRow>
               <TableCell className="font-bold" sx={{ borderBottom: 'none' }}>
                 Compare
               </TableCell>
-              {sortedResults.map((result) => (
+              {sortedResults.map((result, index) => (
                 <TableCell
                   key={searchQueryLabel(result)}
-                  className="text-center"
+                  className="text-center py-3 border-x-2 border-t-2 rounded-t-lg"
                   sx={{ borderBottom: 'none' }}
+                  style={{
+                    background:
+                      'linear-gradient(' +
+                      mappedColors[index] +
+                      ', transparent)',
+                    borderColor: mappedColors[index],
+                  }}
                 >
-                  {searchQueryLabel(result)}
+                  <p className="[text-shadow:_0_0_4px_rgb(255_255_255_/_0.4)] dark:[text-shadow:_0_0_4px_rgb(0_0_0_/_0.4)]">
+                    {searchQueryLabel(result)}
+                  </p>
                 </TableCell>
               ))}
             </TableRow>
@@ -356,6 +395,8 @@ const CompareTable = ({
               goodValue={4}
               badValue={0}
               loadingFiller="4.00"
+              cell_className="py-3 border-x-2"
+              colors={mappedColors}
             />
             <RmpRow
               name="Rating"
@@ -367,6 +408,8 @@ const CompareTable = ({
               goodValue={5}
               badValue={0}
               loadingFiller="5.0"
+              cell_className="py-3 border-x-2"
+              colors={mappedColors}
             />
             <RmpRow
               name="Would Take Again"
@@ -380,6 +423,8 @@ const CompareTable = ({
               goodValue={100}
               badValue={0}
               loadingFiller="90%"
+              cell_className="py-3 border-x-2"
+              colors={mappedColors}
             />
             <RmpRow
               name="Difficulty"
@@ -391,6 +436,8 @@ const CompareTable = ({
               goodValue={0}
               badValue={5}
               loadingFiller="5.0"
+              cell_className="py-3 border-x-2"
+              colors={mappedColors}
             />
             <NumRow
               name="# of Grades / Ratings"
@@ -403,6 +450,8 @@ const CompareTable = ({
               getGradeValue={(data: GradesType) => data.total}
               getRmpValue={(data: RateMyProfessorData) => data.numRatings}
               loadingFiller="100"
+              cell_className="py-3 border-x-2 border-b-2 rounded-b-lg"
+              colors={mappedColors}
             />
           </TableBody>
         </Table>
