@@ -5,10 +5,7 @@ import {
   Collapse,
   IconButton,
   Paper,
-  Rating,
   Skeleton,
-  Stack,
-  styled,
   Table,
   TableBody,
   TableCell,
@@ -30,21 +27,9 @@ import type {
   GenericFetchedData,
   GradesType,
 } from '../../../pages/dashboard/index';
+import Rating from '../Rating/rating';
 import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
 import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
-
-// for star color for rating
-const StyledRating = styled(Rating)({
-  '& .MuiRating-iconFilled': {
-    color: '#5D3FD3',
-    stroke: '#5D3FD3', // Border color around the filled stars
-    strokeWidth: 0.3,
-  },
-  '& .MuiRating-iconEmpty': {
-    stroke: '#5D3FD3', // Border color around the empty stars
-    strokeWidth: 0.1, // Thickness of the border
-  },
-});
 
 function LoadingRow() {
   return (
@@ -68,13 +53,8 @@ function LoadingRow() {
         </Skeleton>
       </TableCell>
       <TableCell align="right">
-        <Skeleton variant="rounded" className="rounded-full px-5 py-2 ml-auto">
-          <Typography className="text-base">5.0</Typography>
-        </Skeleton>
-      </TableCell>
-      <TableCell align="right">
-        <Skeleton variant="rounded" className="rounded-full px-5 py-2 ml-auto">
-          <Typography className="text-base">5.0</Typography>
+        <Skeleton variant="rounded" className="rounded-full ml-auto">
+          <Rating sx={{ fontSize: 25 }} readOnly />
         </Skeleton>
       </TableCell>
     </TableRow>
@@ -194,26 +174,17 @@ function Row({
             <CloseIcon />
           )) ||
             (rmp.state === 'loading' && (
-              <Skeleton
-                variant="rounded"
-                className="rounded-full px-5 py-2 ml-auto"
-              >
-                <Typography className="text-base">5.0</Typography>
+              <Skeleton variant="rounded" className="rounded-full ml-auto">
+                <Rating sx={{ fontSize: 25 }} readOnly />
               </Skeleton>
             )) ||
             (rmp.state === 'done' && (
-              <Stack spacing={1}>
-                <StyledRating
-                  name="customized-color"
-                  defaultValue={rmp.data.avgRating}
-                  getLabelText={(value: number) =>
-                    `${value} Heart${value !== 1 ? 's' : ''}`
-                  }
-                  precision={0.1}
-                  sx={{ fontSize: 25 }}
-                  readOnly
-                />
-              </Stack>
+              <Rating
+                defaultValue={rmp.data.avgRating}
+                precision={0.1}
+                sx={{ fontSize: 25 }}
+                readOnly
+              />
             )) ||
             null}
         </TableCell>
