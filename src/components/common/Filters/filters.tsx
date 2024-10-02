@@ -12,6 +12,8 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
+import Rating from '../Rating/rating';
+
 const minGPAs = ['3.5', '3.0', '2.5', '2.0', '1.5', '1.0', '0.5'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
 
@@ -147,13 +149,27 @@ const Filters = ({
             onChange={(event: SelectChangeEvent) => {
               onChange(event.target.value, 'minRating', setMinRating);
             }}
+            renderValue={(value) => (
+              <Rating
+                key={value}
+                defaultValue={Number(value)}
+                precision={0.5}
+                sx={{ fontSize: 18 }}
+                readOnly
+              />
+            )}
           >
             <MenuItem value="">
               <em>None</em>
             </MenuItem>
             {minRatings.map((value) => (
               <MenuItem key={value} value={value}>
-                {value}
+                <Rating
+                  defaultValue={Number(value)}
+                  precision={0.5}
+                  sx={{ fontSize: 25 }}
+                  readOnly
+                />
               </MenuItem>
             ))}
           </Select>
