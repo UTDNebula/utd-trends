@@ -111,6 +111,21 @@ function Row({
 }: RowProps) {
   const [open, setOpen] = useState(false);
 
+  const gpaToLetterGrade = (gpa: number): string => {
+    if (gpa >= 4.0) return 'A';
+    if (gpa >= 3.67) return 'A-';
+    if (gpa >= 3.33) return 'B+';
+    if (gpa >= 3.0) return 'B';
+    if (gpa >= 2.67) return 'B-';
+    if (gpa >= 2.33) return 'C+';
+    if (gpa >= 2.0) return 'C';
+    if (gpa >= 1.67) return 'C-';
+    if (gpa >= 1.33) return 'D+';
+    if (gpa >= 1.0) return 'D';
+    if (gpa >= 0.67) return 'D-';
+    return 'F';
+  };
+
   return (
     <>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
@@ -160,7 +175,7 @@ function Row({
                 variant="rounded"
                 className="rounded-full px-5 py-2 ml-auto"
               >
-                <Typography className="text-base">4.00</Typography>
+                <Typography className="text-base">A</Typography>
               </Skeleton>
             )) ||
             (grades.state === 'done' && (
@@ -168,7 +183,7 @@ function Row({
                 className="text-base text-black rounded-full px-5 py-2 inline"
                 sx={{ backgroundColor: colorMidpoint(4, 0, grades.data.gpa) }}
               >
-                {grades.data.gpa.toFixed(2)}
+                {gpaToLetterGrade(grades.data.gpa)}
               </Typography>
             )) ||
             null}
@@ -376,7 +391,7 @@ const SearchResultsTable = ({
                     handleClick('gpa');
                   }}
                 >
-                  GPA
+                  Grades
                 </TableSortLabel>
               </TableCell>
               <TableCell>
