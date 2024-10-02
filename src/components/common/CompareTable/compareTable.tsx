@@ -61,6 +61,9 @@ type GradeRowProps = {
   loadingFiller: string;
   cell_className: string;
   colors: string[];
+  orderBy: string;
+  order: 'asc' | 'desc';
+  handleClick: (arg0: string) => void;
 };
 // This is each row of the compare table
 function GradeRow({
@@ -73,10 +76,28 @@ function GradeRow({
   loadingFiller,
   cell_className,
   colors,
+  orderBy,
+  order,
+  handleClick,
 }: GradeRowProps) {
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
-      <TableCell align="right">{name}</TableCell>
+      <TableCell align="right" className="pl-0">
+        <TableSortLabel
+          active={orderBy === name}
+          direction={orderBy === name ? order : 'asc'}
+          onClick={() => {
+            handleClick(name);
+          }}
+          sx={{
+            '& .MuiTableSortLabel-icon': {
+              rotate: '-90deg',
+            },
+          }}
+        >
+          {name}
+        </TableSortLabel>
+      </TableCell>
       {values.map((value, index) => (
         <TableCell
           align="center"
@@ -123,6 +144,9 @@ type RmpRowProps = {
   loadingFiller: string;
   cell_className: string;
   colors: string[];
+  orderBy: string;
+  order: 'asc' | 'desc';
+  handleClick: (arg0: string) => void;
 };
 // This is each row of the compare table
 function RmpRow({
@@ -135,10 +159,28 @@ function RmpRow({
   loadingFiller,
   cell_className,
   colors,
+  orderBy,
+  order,
+  handleClick,
 }: RmpRowProps) {
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
-      <TableCell align="right">{name}</TableCell>
+      <TableCell align="right" className="pl-0">
+        <TableSortLabel
+          active={orderBy === name}
+          direction={orderBy === name ? order : 'asc'}
+          onClick={() => {
+            handleClick(name);
+          }}
+          sx={{
+            '& .MuiTableSortLabel-icon': {
+              rotate: '-90deg',
+            },
+          }}
+        >
+          {name}
+        </TableSortLabel>
+      </TableCell>
       {values.map((value, index) => (
         <TableCell
           align="center"
@@ -198,7 +240,9 @@ function NumRow({
 }: NumRowProps) {
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
-      <TableCell align="right">{name}</TableCell>
+      <TableCell align="right" className="pl-0">
+        {name}
+      </TableCell>
       {gradeValues
         .map((x, i) => [x, rmpValues[i]])
         .map(([grade, rmp], index) => (
@@ -257,15 +301,11 @@ const CompareTable = ({
   removeFromCompare,
 }: CompareTableProps) => {
   //Table sorting category
-  const [orderBy, setOrderBy] = useState<
-    'none' | 'gpa' | 'rating' | 'difficulty' | 'would_take_again'
-  >('none');
+  const [orderBy, setOrderBy] = useState<string>('none');
   //Table sorting direction
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
   //Cycle through sorting
-  function handleClick(
-    col: 'gpa' | 'rating' | 'difficulty' | 'would_take_again',
-  ) {
+  function handleClick(col: string) {
     if (orderBy !== col) {
       setOrderBy(col);
       setOrder('asc');
@@ -282,17 +322,20 @@ const CompareTable = ({
   let sortedResults = includedResults;
   if (orderBy !== 'none') {
     sortedResults = [...includedResults].sort((a, b) => {
-      if (orderBy === 'gpa') {
+      if (orderBy === 'GPA') {
         const aGrades = grades[searchQueryLabel(a)];
         const bGrades = grades[searchQueryLabel(b)];
         //drop loading/error rows to bottom
-        if (aGrades.state !== 'done' && bGrades.state !== 'done') {
+        if (
+          (!aGrades || aGrades.state !== 'done') &&
+          (!bGrades || bGrades.state !== 'done')
+        ) {
           return 0;
         }
-        if (aGrades.state !== 'done') {
+        if (!aGrades || aGrades.state !== 'done') {
           return 9999;
         }
-        if (bGrades.state !== 'done') {
+        if (!bGrades || bGrades.state !== 'done') {
           return -9999;
         }
         if (order === 'asc') {
@@ -301,35 +344,33 @@ const CompareTable = ({
         return bGrades.data.gpa - aGrades.data.gpa;
       }
       if (
-        orderBy === 'rating' ||
-        orderBy === 'difficulty' ||
-        orderBy === 'would_take_again'
+        orderBy === 'Rating' ||
+        orderBy === 'Would Take Again' ||
+        orderBy === 'Difficulty'
       ) {
         const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
         const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
         //drop loading/error rows to bottom
-        if (aRmp.state !== 'done' && bRmp.state !== 'done') {
+        if (
+          (!aRmp || aRmp.state !== 'done') &&
+          (!bRmp || bRmp.state !== 'done')
+        ) {
+          // If both aRmp and bRmp are not done, treat them as equal and return 0
           return 0;
         }
-        if (aRmp.state !== 'done') {
+        if (!aRmp || aRmp.state !== 'done') {
           return 9999;
         }
-        if (bRmp.state !== 'done') {
+        if (!bRmp || bRmp.state !== 'done') {
           return -9999;
         }
-        if (orderBy === 'rating') {
+        if (orderBy === 'Rating') {
           if (order === 'asc') {
             return aRmp.data.averageRating - bRmp.data.averageRating;
           }
           return bRmp.data.averageRating - aRmp.data.averageRating;
         }
-        if (orderBy === 'difficulty') {
-          if (order === 'asc') {
-            return aRmp.data.averageDifficulty - bRmp.data.averageDifficulty;
-          }
-          return bRmp.data.averageDifficulty - aRmp.data.averageDifficulty;
-        }
-        if (orderBy === 'would_take_again') {
+        if (orderBy === 'Would Take Again') {
           if (order === 'asc') {
             return (
               aRmp.data.wouldTakeAgainPercentage -
@@ -340,6 +381,12 @@ const CompareTable = ({
             bRmp.data.wouldTakeAgainPercentage -
             aRmp.data.wouldTakeAgainPercentage
           );
+        }
+        if (orderBy === 'Difficulty') {
+          if (order === 'asc') {
+            return aRmp.data.averageDifficulty - bRmp.data.averageDifficulty;
+          }
+          return bRmp.data.averageDifficulty - aRmp.data.averageDifficulty;
         }
       }
       return 0;
@@ -361,7 +408,10 @@ const CompareTable = ({
         <Table size="small" className="border-spacing-x-2 border-separate">
           <TableHead>
             <TableRow>
-              <TableCell className="font-bold" sx={{ borderBottom: 'none' }}>
+              <TableCell
+                className="font-bold px-0 text-center"
+                sx={{ borderBottom: 'none' }}
+              >
                 Compare
               </TableCell>
               {sortedResults.map((result, index) => (
@@ -397,6 +447,9 @@ const CompareTable = ({
               loadingFiller="4.00"
               cell_className="py-3 border-x-2"
               colors={mappedColors}
+              orderBy={orderBy}
+              order={order}
+              handleClick={handleClick}
             />
             <RmpRow
               name="Rating"
@@ -410,6 +463,9 @@ const CompareTable = ({
               loadingFiller="5.0"
               cell_className="py-3 border-x-2"
               colors={mappedColors}
+              orderBy={orderBy}
+              order={order}
+              handleClick={handleClick}
             />
             <RmpRow
               name="Would Take Again"
@@ -425,6 +481,9 @@ const CompareTable = ({
               loadingFiller="90%"
               cell_className="py-3 border-x-2"
               colors={mappedColors}
+              orderBy={orderBy}
+              order={order}
+              handleClick={handleClick}
             />
             <RmpRow
               name="Difficulty"
@@ -438,6 +497,9 @@ const CompareTable = ({
               loadingFiller="5.0"
               cell_className="py-3 border-x-2"
               colors={mappedColors}
+              orderBy={orderBy}
+              order={order}
+              handleClick={handleClick}
             />
             <NumRow
               name="# of Grades / Ratings"
