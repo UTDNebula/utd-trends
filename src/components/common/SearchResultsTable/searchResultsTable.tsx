@@ -12,9 +12,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TableSortLabel,
   Typography,
-  useMediaQuery,
 } from '@mui/material';
 import React, { useState } from 'react';
 
@@ -31,6 +29,7 @@ import type {
 import Rating from '../Rating/rating';
 import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
 import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
+import CustomTableSortLabel from '../CustomTableSortLabel/customTableSortLabel';
 
 function LoadingRow() {
   return (
@@ -223,11 +222,6 @@ const SearchResultsTable = ({
   addToCompare,
   removeFromCompare,
 }: SearchResultsTableProps) => {
-  //Selected arrow color
-  const sortArrowColor = useMediaQuery('(prefers-color-scheme: dark)')
-    ? 'white'
-    : 'black';
-
   //Table sorting category
   const [orderBy, setOrderBy] = useState<'none' | 'gpa' | 'rating'>('none');
   //Table sorting direction
@@ -332,42 +326,26 @@ const SearchResultsTable = ({
               <TableCell>Compare</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>
-                <TableSortLabel
+                <CustomTableSortLabel
                   active={orderBy === 'gpa'}
                   direction={orderBy === 'gpa' ? order : 'asc'}
                   onClick={() => {
                     handleClick('gpa');
                   }}
-                  sx={{
-                    '& .MuiTableSortLabel-icon': {
-                      opacity: 0.5, // Ensure the arrow is always visible
-                    },
-                    '&.Mui-active .MuiTableSortLabel-icon': {
-                      color: sortArrowColor, // Brighten the arrow
-                    },
-                  }}
                 >
                   GPA
-                </TableSortLabel>
+                </CustomTableSortLabel>
               </TableCell>
               <TableCell>
-                <TableSortLabel
+                <CustomTableSortLabel
                   active={orderBy === 'rating'}
                   direction={orderBy === 'rating' ? order : 'asc'}
                   onClick={() => {
                     handleClick('rating');
                   }}
-                  sx={{
-                    '& .MuiTableSortLabel-icon': {
-                      opacity: 0.5, // Ensure the arrow is always visible
-                    },
-                    '&.Mui-active .MuiTableSortLabel-icon': {
-                      color: sortArrowColor, // Brighten the arrow
-                    },
-                  }}
                 >
                   Rating
-                </TableSortLabel>
+                </CustomTableSortLabel>
               </TableCell>
             </TableRow>
           </TableHead>

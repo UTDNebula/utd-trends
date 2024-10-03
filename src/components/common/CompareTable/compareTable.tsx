@@ -8,7 +8,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TableSortLabel,
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
@@ -23,6 +22,7 @@ import type {
   GenericFetchedData,
   GradesType,
 } from '../../../pages/dashboard/index';
+import CustomTableSortLabel from '../CustomTableSortLabel/customTableSortLabel';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(good: number, bad: number, value: number) {
@@ -83,7 +83,7 @@ function GradeOrRmpRow<T>({
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
       <TableCell align="right" className="pl-0">
-        <TableSortLabel
+        <CustomTableSortLabel
           active={orderBy === name}
           direction={orderBy === name ? order : 'asc'}
           onClick={() => {
@@ -96,7 +96,7 @@ function GradeOrRmpRow<T>({
           }}
         >
           {name}
-        </TableSortLabel>
+        </CustomTableSortLabel>
       </TableCell>
       {values.map((value, index) => (
         <TableCell
