@@ -27,6 +27,7 @@ import type {
   GenericFetchedData,
   GradesType,
 } from '../../../pages/dashboard/index';
+import Rating from '../Rating/rating';
 import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
 import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
 
@@ -52,13 +53,8 @@ function LoadingRow() {
         </Skeleton>
       </TableCell>
       <TableCell align="right">
-        <Skeleton variant="rounded" className="rounded-full px-5 py-2 ml-auto">
-          <Typography className="text-base">5.0</Typography>
-        </Skeleton>
-      </TableCell>
-      <TableCell align="right">
-        <Skeleton variant="rounded" className="rounded-full px-5 py-2 ml-auto">
-          <Typography className="text-base">5.0</Typography>
+        <Skeleton variant="rounded" className="rounded-full ml-auto">
+          <Rating sx={{ fontSize: 25 }} readOnly />
         </Skeleton>
       </TableCell>
     </TableRow>
@@ -178,50 +174,17 @@ function Row({
             <CloseIcon />
           )) ||
             (rmp.state === 'loading' && (
-              <Skeleton
-                variant="rounded"
-                className="rounded-full px-5 py-2 ml-auto"
-              >
-                <Typography className="text-base">5.0</Typography>
+              <Skeleton variant="rounded" className="rounded-full ml-auto">
+                <Rating sx={{ fontSize: 25 }} readOnly />
               </Skeleton>
             )) ||
             (rmp.state === 'done' && (
-              <Typography
-                className="text-base text-black rounded-full px-5 py-2 inline"
-                sx={{
-                  backgroundColor: colorMidpoint(5, 0, rmp.data.averageRating),
-                }}
-              >
-                {rmp.data.averageRating.toFixed(1)}
-              </Typography>
-            )) ||
-            null}
-        </TableCell>
-        <TableCell align="right">
-          {((typeof rmp === 'undefined' || rmp.state === 'error') && (
-            <CloseIcon />
-          )) ||
-            (rmp.state === 'loading' && (
-              <Skeleton
-                variant="rounded"
-                className="rounded-full px-5 py-2 ml-auto"
-              >
-                <Typography className="text-base">5.0</Typography>
-              </Skeleton>
-            )) ||
-            (rmp.state === 'done' && (
-              <Typography
-                className="text-base text-black rounded-full px-5 py-2 inline"
-                sx={{
-                  backgroundColor: colorMidpoint(
-                    0,
-                    5,
-                    rmp.data.averageDifficulty,
-                  ),
-                }}
-              >
-                {rmp.data.averageDifficulty.toFixed(1)}
-              </Typography>
+              <Rating
+                defaultValue={rmp.data.averageRating}
+                precision={0.1}
+                sx={{ fontSize: 25 }}
+                readOnly
+              />
             )) ||
             null}
         </TableCell>
@@ -260,13 +223,11 @@ const SearchResultsTable = ({
   removeFromCompare,
 }: SearchResultsTableProps) => {
   //Table sorting category
-  const [orderBy, setOrderBy] = useState<
-    'name' | 'gpa' | 'rating' | 'difficulty'
-  >('name');
+  const [orderBy, setOrderBy] = useState<'name' | 'gpa' | 'rating'>('name');
   //Table sorting direction
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
   //Cycle through sorting
-  function handleClick(col: 'name' | 'gpa' | 'rating' | 'difficulty') {
+  function handleClick(col: 'name' | 'gpa' | 'rating') {
     if (orderBy !== col) {
       setOrderBy(col);
       if (col === 'name')
@@ -438,6 +399,17 @@ const SearchResultsTable = ({
                   onClick={() => {
                     handleClick('name');
                   }}
+                  sx={{
+                    '& .MuiTableSortLabel-icon': {
+                      opacity:
+                        orderBy === 'name' ? '1 !important' : '0.8 !important', // Ensure the arrow is always visible
+                      color:
+                        orderBy === 'name'
+                          ? 'black !important'
+                          : 'gray !important',
+                      visibility: 'visible !important', // Force visibility
+                    },
+                  }}
                 >
                   Name
                 </TableSortLabel>
@@ -445,9 +417,20 @@ const SearchResultsTable = ({
               <TableCell>
                 <TableSortLabel
                   active={orderBy === 'gpa'}
-                  direction={orderBy === 'gpa' ? order : 'asc'}
+                  direction={orderBy === 'gpa' ? order : 'desc'}
                   onClick={() => {
                     handleClick('gpa');
+                  }}
+                  sx={{
+                    '& .MuiTableSortLabel-icon': {
+                      opacity:
+                        orderBy === 'gpa' ? '1 !important' : '0.8 !important', // Ensure the arrow is always visible
+                      color:
+                        orderBy === 'gpa'
+                          ? 'black !important'
+                          : 'gray !important',
+                      visibility: 'visible !important', // Force visibility
+                    },
                   }}
                 >
                   GPA
@@ -456,23 +439,25 @@ const SearchResultsTable = ({
               <TableCell>
                 <TableSortLabel
                   active={orderBy === 'rating'}
-                  direction={orderBy === 'rating' ? order : 'asc'}
+                  direction={orderBy === 'rating' ? order : 'desc'}
                   onClick={() => {
                     handleClick('rating');
                   }}
-                >
-                  Rating
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'difficulty'}
-                  direction={orderBy === 'difficulty' ? order : 'asc'}
-                  onClick={() => {
-                    handleClick('difficulty');
+                  sx={{
+                    '& .MuiTableSortLabel-icon': {
+                      opacity:
+                        orderBy === 'rating'
+                          ? '1 !important'
+                          : '0.8 !important', // Ensure the arrow is always visible
+                      color:
+                        orderBy === 'rating'
+                          ? 'black !important'
+                          : 'gray !important',
+                      visibility: 'visible !important', // Force visibility
+                    },
                   }}
                 >
-                  Difficulty
+                  Rating
                 </TableSortLabel>
               </TableCell>
             </TableRow>
