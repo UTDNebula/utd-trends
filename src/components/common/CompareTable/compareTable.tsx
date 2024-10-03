@@ -51,10 +51,10 @@ function colorMidpoint(good: number, bad: number, value: number) {
     .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
-type GradeRowProps = {
+type GradeOrRmpRowProps<T> = {
   name: string;
-  values: GenericFetchedData<GradesType>[];
-  getValue: (arg0: GradesType) => number;
+  values: GenericFetchedData<T>[];
+  getValue: (arg0: T) => number;
   formatValue: (arg0: number) => string;
   goodValue: number;
   badValue: number;
@@ -65,21 +65,21 @@ type GradeRowProps = {
   order: 'asc' | 'desc';
   handleClick: (arg0: string) => void;
 };
-// This is each row of the compare table
-function GradeRow({
+// This is for grade or rmp related rows in the compare table, it displays grade or rmp data for each course
+function GradeOrRmpRow<T>({
   name,
-  values,
-  getValue,
-  formatValue,
-  goodValue,
+  values, // data points to show with fetch state
+  getValue, // basically knows what path to take to get the specific data point from the object
+  formatValue, // formatting for display
+  goodValue, // for gradient
   badValue,
-  loadingFiller,
-  cell_className,
-  colors,
-  orderBy,
+  loadingFiller, // there is no loading in the compare component since you can't add to it until everything is loaded but nice to have
+  cell_className, // for specifying border mostly
+  colors, // border colors
+  orderBy, // for controlling sorting
   order,
   handleClick,
-}: GradeRowProps) {
+}: GradeOrRmpRowProps<T>) {
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
       <TableCell align="right" className="pl-0">
@@ -116,7 +116,7 @@ function GradeRow({
             (value.state === 'done' && (
               <Typography
                 className="text-base inline rounded-full px-5 py-2 text-black"
-                sx={{
+                style={{
                   backgroundColor: colorMidpoint(
                     goodValue,
                     badValue,
@@ -124,6 +124,9 @@ function GradeRow({
                   ),
                 }}
               >
+                {/*value.data is all the data past the state of loading, done, or error.
+                getValue returns the specific value from the data structure, like gpa.
+                formatValue makes it look pretty like 3.7216373 displaying as 3.72.*/}
                 {formatValue(getValue(value.data))}
               </Typography>
             )) ||
@@ -134,90 +137,7 @@ function GradeRow({
   );
 }
 
-type RmpRowProps = {
-  name: string;
-  values: GenericFetchedData<RateMyProfessorData>[];
-  getValue: (arg0: RateMyProfessorData) => number;
-  formatValue: (arg0: number) => string;
-  goodValue: number;
-  badValue: number;
-  loadingFiller: string;
-  cell_className: string;
-  colors: string[];
-  orderBy: string;
-  order: 'asc' | 'desc';
-  handleClick: (arg0: string) => void;
-};
-// This is each row of the compare table
-function RmpRow({
-  name,
-  values,
-  getValue,
-  formatValue,
-  goodValue,
-  badValue,
-  loadingFiller,
-  cell_className,
-  colors,
-  orderBy,
-  order,
-  handleClick,
-}: RmpRowProps) {
-  return (
-    <TableRow sx={{ '& td': { border: 0 } }}>
-      <TableCell align="right" className="pl-0">
-        <TableSortLabel
-          active={orderBy === name}
-          direction={orderBy === name ? order : 'asc'}
-          onClick={() => {
-            handleClick(name);
-          }}
-          sx={{
-            '& .MuiTableSortLabel-icon': {
-              rotate: '-90deg',
-            },
-          }}
-        >
-          {name}
-        </TableSortLabel>
-      </TableCell>
-      {values.map((value, index) => (
-        <TableCell
-          align="center"
-          key={index}
-          className={cell_className}
-          style={{ borderColor: colors[index] }}
-        >
-          {((typeof value === 'undefined' || value.state === 'error') && (
-            <CloseIcon />
-          )) ||
-            (value.state === 'loading' && (
-              <Skeleton variant="rounded" className="rounded-full px-5 py-2">
-                <Typography className="text-base">{loadingFiller}</Typography>
-              </Skeleton>
-            )) ||
-            (value.state === 'done' && (
-              <Typography
-                className="text-base inline rounded-full px-5 py-2 text-black"
-                sx={{
-                  backgroundColor: colorMidpoint(
-                    goodValue,
-                    badValue,
-                    getValue(value.data),
-                  ),
-                }}
-              >
-                {formatValue(getValue(value.data))}
-              </Typography>
-            )) ||
-            null}
-        </TableCell>
-      ))}
-    </TableRow>
-  );
-}
-
-type NumRowProps = {
+type GradeAndRmpRowProps = {
   name: string;
   gradeValues: GenericFetchedData<GradesType>[];
   rmpValues: GenericFetchedData<RateMyProfessorData>[];
@@ -227,24 +147,26 @@ type NumRowProps = {
   cell_className: string;
   colors: string[];
 };
-// This is each row of the compare table
-function NumRow({
+// This is for total data points related rows in the compare table, it displays grade and rmp data for each course
+function GradeAndRmpRow({
   name,
-  gradeValues,
-  rmpValues,
-  getGradeValue,
-  getRmpValue,
-  loadingFiller,
-  cell_className,
-  colors,
-}: NumRowProps) {
+  gradeValues, // grade data points
+  rmpValues, // rmp data points
+  getGradeValue, // extract specific grade related point from object
+  getRmpValue, // extract specific rmp related point from object
+  loadingFiller, // no loading here yet
+  cell_className, // for specifying border mostly
+  colors, // border colors
+}: GradeAndRmpRowProps) {
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
       <TableCell align="right" className="pl-0">
         {name}
       </TableCell>
       {gradeValues
+        // combine values
         .map((x, i) => [x, rmpValues[i]])
+        // so ts can remember the type of rmp (which it can't do for rmpValues[index]) and know's that when its state is done, you can access its data value
         .map(([grade, rmp], index) => (
           <TableCell
             align="center"
@@ -414,6 +336,7 @@ const CompareTable = ({
               >
                 Compare
               </TableCell>
+              {/*the course names along the top*/}
               {sortedResults.map((result, index) => (
                 <TableCell
                   key={searchQueryLabel(result)}
@@ -427,7 +350,7 @@ const CompareTable = ({
                     borderColor: mappedColors[index],
                   }}
                 >
-                  <p className="[text-shadow:_0_0_4px_rgb(255_255_255_/_0.4)] dark:[text-shadow:_0_0_4px_rgb(0_0_0_/_0.4)]">
+                  <p className="[text-shadow:_0_0_4px_rgb(255_255_255_/_1)] dark:[text-shadow:_0_0_4px_rgb(0_0_0_/_1)]">
                     {searchQueryLabel(result)}
                   </p>
                 </TableCell>
@@ -435,7 +358,7 @@ const CompareTable = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            <GradeRow
+            <GradeOrRmpRow<GradesType>
               name="GPA"
               values={sortedResults.map(
                 (result) => grades[searchQueryLabel(result)],
@@ -451,7 +374,7 @@ const CompareTable = ({
               order={order}
               handleClick={handleClick}
             />
-            <RmpRow
+            <GradeOrRmpRow<RateMyProfessorData>
               name="Rating"
               values={sortedResults.map(
                 (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
@@ -467,7 +390,7 @@ const CompareTable = ({
               order={order}
               handleClick={handleClick}
             />
-            <RmpRow
+            <GradeOrRmpRow<RateMyProfessorData>
               name="Would Take Again"
               values={sortedResults.map(
                 (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
@@ -485,7 +408,7 @@ const CompareTable = ({
               order={order}
               handleClick={handleClick}
             />
-            <RmpRow
+            <GradeOrRmpRow<RateMyProfessorData>
               name="Difficulty"
               values={sortedResults.map(
                 (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
@@ -501,7 +424,7 @@ const CompareTable = ({
               order={order}
               handleClick={handleClick}
             />
-            <NumRow
+            <GradeAndRmpRow
               name="# of Grades / Ratings"
               gradeValues={sortedResults.map(
                 (result) => grades[searchQueryLabel(result)],
