@@ -14,6 +14,7 @@ import {
   TableRow,
   TableSortLabel,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
 import React, { useState } from 'react';
 
@@ -222,6 +223,11 @@ const SearchResultsTable = ({
   addToCompare,
   removeFromCompare,
 }: SearchResultsTableProps) => {
+  //Selected arrow color
+  const sortArrowColor = useMediaQuery('(prefers-color-scheme: dark)')
+    ? 'white'
+    : 'black';
+
   //Table sorting category
   const [orderBy, setOrderBy] = useState<'none' | 'gpa' | 'rating'>('none');
   //Table sorting direction
@@ -334,13 +340,10 @@ const SearchResultsTable = ({
                   }}
                   sx={{
                     '& .MuiTableSortLabel-icon': {
-                      opacity:
-                        orderBy === 'gpa' ? '1 !important' : '0.8 !important', // Ensure the arrow is always visible
-                      color:
-                        orderBy === 'gpa'
-                          ? 'black !important'
-                          : 'gray !important',
-                      visibility: 'visible !important', // Force visibility
+                      opacity: 0.5, // Ensure the arrow is always visible
+                    },
+                    '&.Mui-active .MuiTableSortLabel-icon': {
+                      color: sortArrowColor, // Brighten the arrow
                     },
                   }}
                 >
@@ -356,15 +359,10 @@ const SearchResultsTable = ({
                   }}
                   sx={{
                     '& .MuiTableSortLabel-icon': {
-                      opacity:
-                        orderBy === 'rating'
-                          ? '1 !important'
-                          : '0.8 !important', // Ensure the arrow is always visible
-                      color:
-                        orderBy === 'rating'
-                          ? 'black !important'
-                          : 'gray !important',
-                      visibility: 'visible !important', // Force visibility
+                      opacity: 0.5, // Ensure the arrow is always visible
+                    },
+                    '&.Mui-active .MuiTableSortLabel-icon': {
+                      color: sortArrowColor, // Brighten the arrow
                     },
                   }}
                 >
