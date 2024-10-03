@@ -334,7 +334,12 @@ const SearchResultsTable = ({
                   }}
                   sx={{
                     '& .MuiTableSortLabel-icon': {
-                      opacity: '1 !important', // Ensure the arrow is always visible
+                      opacity:
+                        orderBy === 'gpa' ? '1 !important' : '0.8 !important', // Ensure the arrow is always visible
+                      color:
+                        orderBy === 'gpa'
+                          ? 'black !important'
+                          : 'gray !important',
                       visibility: 'visible !important', // Force visibility
                     },
                   }}
@@ -351,7 +356,14 @@ const SearchResultsTable = ({
                   }}
                   sx={{
                     '& .MuiTableSortLabel-icon': {
-                      opacity: '1 !important', // Ensure the arrow is always visible
+                      opacity:
+                        orderBy === 'rating'
+                          ? '1 !important'
+                          : '0.8 !important', // Ensure the arrow is always visible
+                      color:
+                        orderBy === 'rating'
+                          ? 'black !important'
+                          : 'gray !important',
                       visibility: 'visible !important', // Force visibility
                     },
                   }}
