@@ -303,55 +303,75 @@ const SearchResultsTable = ({
   sortedResults = [...includedResults].sort((a, b) => {
     if (orderBy === 'name') {
       //same logic as in generateCombosTable.ts
-        //handle undefined variables based on searchQueryLabel
-        const aFirstName = a.profFirst ?? '';
-        const bFirstName = b.profFirst ?? '';
-        const aLastName = a.profLast ?? '';
-        const bLastName = b.profLast ?? '';
-        const aPrefix = a.prefix ?? ''; //make sure the is no empty input for prefix and number
-        const bPrefix = b.prefix ?? '';
-        const aNumber = a.number ?? '';
-        const bNumber = b.number ?? '';
+      //handle undefined variables based on searchQueryLabel
+      const aFirstName = a.profFirst ?? '';
+      const bFirstName = b.profFirst ?? '';
+      const aLastName = a.profLast ?? '';
+      const bLastName = b.profLast ?? '';
+      const aPrefix = a.prefix ?? ''; //make sure the is no empty input for prefix and number
+      const bPrefix = b.prefix ?? '';
+      const aNumber = a.number ?? '';
+      const bNumber = b.number ?? '';
 
-        if (order === 'asc') {
-          //ascending alphabetical automatically sorts Overall results correctly
-          if ((typeof a.profFirst === 'undefined' && typeof a.profLast === 'undefined') ||
-              (typeof a.prefix === 'undefined' && typeof a.number === 'undefined'))
-            return -1;
-          if ((typeof b.profFirst === 'undefined' && typeof b.profLast === 'undefined') ||
-              (typeof b.prefix === 'undefined' && typeof b.number === 'undefined'))
-            return 1;
-          return (
-            aLastName.localeCompare(bLastName) || //sort by last name then first name
-            aFirstName.localeCompare(bFirstName) ||
-            aPrefix.localeCompare(bPrefix) || //if names are equal/don't exist, then sort by prefix then number
-            aNumber.localeCompare(bNumber)
-          );
-        }
-        //keep the "(Overall)" result on top for descending sort too
-        else {
-          // catches the case where a is an Overall result AND b is an Overall result
-          if (((typeof a.profFirst === 'undefined' && typeof a.profLast === 'undefined') ||
-              (typeof a.prefix === 'undefined' && typeof a.number === 'undefined')) && 
-              ((typeof b.profFirst === 'undefined' && typeof b.profLast === 'undefined') ||
-              (typeof b.prefix === 'undefined' && typeof b.number === 'undefined')))
-            return bLastName.localeCompare(aLastName) || //sort by last name then first name
-            bFirstName.localeCompare(aFirstName) ||
-            bPrefix.localeCompare(aPrefix) || //if names are equal/don't exist, then, sort by prefix then number
-            bNumber.localeCompare(aNumber)
-          if ((typeof a.profFirst === 'undefined' && typeof a.profLast === 'undefined') ||
-              (typeof a.prefix === 'undefined' && typeof a.number === 'undefined'))
-            return -1;
-          if ((typeof b.profFirst === 'undefined' && typeof b.profLast === 'undefined') ||
-              (typeof b.prefix === 'undefined' && typeof b.number === 'undefined'))
-            return 1;
+      if (order === 'asc') {
+        //ascending alphabetical automatically sorts Overall results correctly
+        if (
+          (typeof a.profFirst === 'undefined' &&
+            typeof a.profLast === 'undefined') ||
+          (typeof a.prefix === 'undefined' && typeof a.number === 'undefined')
+        )
+          return -1;
+        if (
+          (typeof b.profFirst === 'undefined' &&
+            typeof b.profLast === 'undefined') ||
+          (typeof b.prefix === 'undefined' && typeof b.number === 'undefined')
+        )
+          return 1;
+        return (
+          aLastName.localeCompare(bLastName) || //sort by last name then first name
+          aFirstName.localeCompare(bFirstName) ||
+          aPrefix.localeCompare(bPrefix) || //if names are equal/don't exist, then sort by prefix then number
+          aNumber.localeCompare(bNumber)
+        );
+      }
+      //keep the "(Overall)" result on top for descending sort too
+      else {
+        // catches the case where a is an Overall result AND b is an Overall result
+        if (
+          ((typeof a.profFirst === 'undefined' &&
+            typeof a.profLast === 'undefined') ||
+            (typeof a.prefix === 'undefined' &&
+              typeof a.number === 'undefined')) &&
+          ((typeof b.profFirst === 'undefined' &&
+            typeof b.profLast === 'undefined') ||
+            (typeof b.prefix === 'undefined' &&
+              typeof b.number === 'undefined'))
+        )
           return (
             bLastName.localeCompare(aLastName) || //sort by last name then first name
             bFirstName.localeCompare(aFirstName) ||
             bPrefix.localeCompare(aPrefix) || //if names are equal/don't exist, then, sort by prefix then number
             bNumber.localeCompare(aNumber)
           );
-        }
+        if (
+          (typeof a.profFirst === 'undefined' &&
+            typeof a.profLast === 'undefined') ||
+          (typeof a.prefix === 'undefined' && typeof a.number === 'undefined')
+        )
+          return -1;
+        if (
+          (typeof b.profFirst === 'undefined' &&
+            typeof b.profLast === 'undefined') ||
+          (typeof b.prefix === 'undefined' && typeof b.number === 'undefined')
+        )
+          return 1;
+        return (
+          bLastName.localeCompare(aLastName) || //sort by last name then first name
+          bFirstName.localeCompare(aFirstName) ||
+          bPrefix.localeCompare(aPrefix) || //if names are equal/don't exist, then, sort by prefix then number
+          bNumber.localeCompare(aNumber)
+        );
+      }
       return 0;
     }
     if (orderBy === 'gpa') {
