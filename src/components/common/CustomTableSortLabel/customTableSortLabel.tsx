@@ -16,9 +16,7 @@ function CustomTableSortLabel(props: unknown) {
     },
   });
 
-  return (
-    <StyledTableSortLabel {...props} />
-  );
+  return <StyledTableSortLabel {...props} />;
 }
 
 export default CustomTableSortLabel;
