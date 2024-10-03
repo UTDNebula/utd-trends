@@ -1,6 +1,12 @@
-import { TableSortLabel, styled, useMediaQuery } from '@mui/material';
+import {
+  styled,
+  TableSortLabel,
+  TableSortLabelProps,
+  useMediaQuery,
+} from '@mui/material';
+import React from 'react';
 
-function CustomTableSortLabel(props: unknown) {
+function CustomTableSortLabel(props: TableSortLabelProps) {
   //Selected arrow color
   const sortArrowColor = useMediaQuery('(prefers-color-scheme: dark)')
     ? 'white'
