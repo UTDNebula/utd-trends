@@ -332,6 +332,17 @@ const SearchResultsTable = ({
                   onClick={() => {
                     handleClick('gpa');
                   }}
+                  sx={{
+                    '& .MuiTableSortLabel-icon': {
+                      opacity:
+                        orderBy === 'gpa' ? '1 !important' : '0.8 !important', // Ensure the arrow is always visible
+                      color:
+                        orderBy === 'gpa'
+                          ? 'black !important'
+                          : 'gray !important',
+                      visibility: 'visible !important', // Force visibility
+                    },
+                  }}
                 >
                   GPA
                 </TableSortLabel>
@@ -342,6 +353,19 @@ const SearchResultsTable = ({
                   direction={orderBy === 'rating' ? order : 'asc'}
                   onClick={() => {
                     handleClick('rating');
+                  }}
+                  sx={{
+                    '& .MuiTableSortLabel-icon': {
+                      opacity:
+                        orderBy === 'rating'
+                          ? '1 !important'
+                          : '0.8 !important', // Ensure the arrow is always visible
+                      color:
+                        orderBy === 'rating'
+                          ? 'black !important'
+                          : 'gray !important',
+                      visibility: 'visible !important', // Force visibility
+                    },
                   }}
                 >
                   Rating
