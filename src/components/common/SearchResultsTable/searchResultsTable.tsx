@@ -26,10 +26,10 @@ import type {
   GenericFetchedData,
   GradesType,
 } from '../../../pages/dashboard/index';
-import TableSortLabel from '../TableSortLabel/tableSortLabel';
 import Rating from '../Rating/rating';
 import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
 import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
+import TableSortLabel from '../TableSortLabel/tableSortLabel';
 
 function LoadingRow() {
   return (
