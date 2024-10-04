@@ -209,6 +209,46 @@ function GradeAndRmpRow({
   );
 }
 
+type CheckboxRowProps = {
+  courses: SearchQuery[];
+  removeFromCompare: (arg0: SearchQuery) => void;
+  cell_className: string;
+  colors: string[];
+};
+// This is for checkboxes to remove courses from the compare table
+function CheckboxRow({
+  courses,
+  removeFromCompare, // remove course function
+  cell_className, // for specifying border mostly
+  colors, // border colors
+}: CheckboxRowProps) {
+  return (
+    <TableRow sx={{ '& td': { border: 0 } }}>
+      <TableCell className="pl-0" />
+      {courses.map((course, index) => (
+        <TableCell
+          align="center"
+          key={index}
+          className={cell_className}
+          style={{ borderColor: colors[index] }}
+        >
+          <Checkbox
+            checked={true}
+            onClick={() => {
+              removeFromCompare(course);
+            }}
+            sx={{
+              '&.Mui-checked': {
+                color: colors[index],
+              },
+            }} //Colored Checkbox based on graph
+          />
+        </TableCell>
+      ))}
+    </TableRow>
+  );
+}
+
 type CompareTableProps = {
   includedResults: SearchQuery[];
   grades: { [key: string]: GenericFetchedData<GradesType> };
@@ -435,7 +475,13 @@ const CompareTable = ({
               getGradeValue={(data: GradesType) => data.total}
               getRmpValue={(data: RateMyProfessorData) => data.numRatings}
               loadingFiller="100"
-              cell_className="py-3 border-x-2 border-b-2 rounded-b-lg"
+              cell_className="pt-3 pb-2 border-x-2"
+              colors={mappedColors}
+            />
+            <CheckboxRow
+              courses={sortedResults}
+              removeFromCompare={removeFromCompare}
+              cell_className="pt-0 pb-1 border-x-2 border-b-2 rounded-b-lg"
               colors={mappedColors}
             />
           </TableBody>
