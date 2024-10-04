@@ -26,7 +26,7 @@ import type {
   GenericFetchedData,
   GradesType,
 } from '../../../pages/dashboard/index';
-import CustomTableSortLabel from '../CustomTableSortLabel/customTableSortLabel';
+import TableSortLabel from '../TableSortLabel/tableSortLabel';
 import Rating from '../Rating/rating';
 import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
 import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
@@ -326,7 +326,7 @@ const SearchResultsTable = ({
               <TableCell>Compare</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>
-                <CustomTableSortLabel
+                <TableSortLabel
                   active={orderBy === 'gpa'}
                   direction={orderBy === 'gpa' ? order : 'asc'}
                   onClick={() => {
@@ -334,10 +334,10 @@ const SearchResultsTable = ({
                   }}
                 >
                   GPA
-                </CustomTableSortLabel>
+                </TableSortLabel>
               </TableCell>
               <TableCell>
-                <CustomTableSortLabel
+                <TableSortLabel
                   active={orderBy === 'rating'}
                   direction={orderBy === 'rating' ? order : 'asc'}
                   onClick={() => {
@@ -345,7 +345,7 @@ const SearchResultsTable = ({
                   }}
                 >
                   Rating
-                </CustomTableSortLabel>
+                </TableSortLabel>
               </TableCell>
             </TableRow>
           </TableHead>

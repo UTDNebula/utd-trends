@@ -1,19 +1,19 @@
 import {
   styled,
-  TableSortLabel,
+  TableSortLabel as _TableSortLabel,
   TableSortLabelProps,
   useMediaQuery,
 } from '@mui/material';
 import React from 'react';
 
-function CustomTableSortLabel(props: TableSortLabelProps) {
+function TableSortLabel(props: TableSortLabelProps) {
   //Selected arrow color
   const sortArrowColor = useMediaQuery('(prefers-color-scheme: dark)')
     ? 'white'
     : 'black';
 
   //Change arrow color for TableSortLabel
-  const StyledTableSortLabel = styled(TableSortLabel)({
+  const StyledTableSortLabel = styled(_TableSortLabel)({
     '& .MuiTableSortLabel-icon': {
       opacity: 0.5, // Ensure the arrow is always visible
     },
@@ -25,4 +25,4 @@ function CustomTableSortLabel(props: TableSortLabelProps) {
   return <StyledTableSortLabel {...props} />;
 }
 
-export default CustomTableSortLabel;
+export default TableSortLabel;

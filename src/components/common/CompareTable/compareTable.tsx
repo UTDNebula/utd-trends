@@ -22,7 +22,7 @@ import type {
   GenericFetchedData,
   GradesType,
 } from '../../../pages/dashboard/index';
-import CustomTableSortLabel from '../CustomTableSortLabel/customTableSortLabel';
+import TableSortLabel from '../TableSortLabel/tableSortLabel';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(good: number, bad: number, value: number) {
@@ -83,7 +83,7 @@ function GradeOrRmpRow<T>({
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
       <TableCell align="right" className="pl-0">
-        <CustomTableSortLabel
+        <TableSortLabel
           active={orderBy === name}
           direction={orderBy === name ? order : 'asc'}
           onClick={() => {
@@ -96,7 +96,7 @@ function GradeOrRmpRow<T>({
           }}
         >
           {name}
-        </CustomTableSortLabel>
+        </TableSortLabel>
       </TableCell>
       {values.map((value, index) => (
         <TableCell
@@ -105,8 +105,7 @@ function GradeOrRmpRow<T>({
           className={cell_className}
           style={{
             borderColor: colors[index],
-            backgroundColor:
-              colors[index] + '10', // add transparency
+            backgroundColor: colors[index] + '10', // add transparency
           }}
         >
           {((typeof value === 'undefined' || value.state === 'error') && (
@@ -178,8 +177,7 @@ function GradeAndRmpRow({
             className={cell_className}
             style={{
               borderColor: colors[index],
-              backgroundColor:
-                colors[index] + '10', // add transparency
+              backgroundColor: colors[index] + '10', // add transparency
             }}
           >
             {((typeof grade === 'undefined' || grade.state === 'error') && (
@@ -240,8 +238,7 @@ function CheckboxRow({
           className={cell_className}
           style={{
             borderColor: colors[index],
-            backgroundColor:
-              colors[index] + '10', // add transparency
+            backgroundColor: colors[index] + '10', // add transparency
           }}
         >
           <Checkbox
@@ -396,9 +393,7 @@ const CompareTable = ({
                   sx={{ borderBottom: 'none' }}
                   style={{
                     borderColor: mappedColors[index],
-                    backgroundColor:
-                      mappedColors[index] +
-                      '10', // add transparency
+                    backgroundColor: mappedColors[index] + '10', // add transparency
                   }}
                 >
                   {searchQueryLabel(result)}
