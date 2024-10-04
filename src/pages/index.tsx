@@ -6,9 +6,6 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import Background from '../../public/background.png';
-import Filters, {
-  type FiltersType,
-} from '../components/common/Filters/filters';
 import SearchBar from '../components/common/SearchBar/searchBar';
 import type SearchQuery from '../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
@@ -24,15 +21,12 @@ const Home: NextPage = () => {
     }
   }
 
-  const [filters, setFilters] = useState<FiltersType>({});
-
   const router = useRouter();
   function searchOptionChosen(chosenOptions: SearchQuery[]) {
     if (chosenOptions.length) {
       router.push({
         pathname: '/dashboard',
         query: {
-          ...filters,
           searchTerms: chosenOptions
             .map((el) => searchQueryLabel(el))
             .join(','),
@@ -94,7 +88,6 @@ const Home: NextPage = () => {
             className="mb-3"
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />
-          <Filters changeValue={(value) => setFilters(value)} />
         </div>
       </div>
     </>
