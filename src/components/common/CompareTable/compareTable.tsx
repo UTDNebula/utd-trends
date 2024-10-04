@@ -103,7 +103,11 @@ function GradeOrRmpRow<T>({
           align="center"
           key={index}
           className={cell_className}
-          style={{ borderColor: colors[index] }}
+          style={{
+            borderColor: colors[index],
+            backgroundColor:
+              colors[index] + '10', // add transparency
+          }}
         >
           {((typeof value === 'undefined' || value.state === 'error') && (
             <CloseIcon />
@@ -172,7 +176,11 @@ function GradeAndRmpRow({
             align="center"
             key={index}
             className={cell_className}
-            style={{ borderColor: colors[index] }}
+            style={{
+              borderColor: colors[index],
+              backgroundColor:
+                colors[index] + '10', // add transparency
+            }}
           >
             {((typeof grade === 'undefined' || grade.state === 'error') && (
               <CloseIcon />
@@ -230,7 +238,11 @@ function CheckboxRow({
           align="center"
           key={index}
           className={cell_className}
-          style={{ borderColor: colors[index] }}
+          style={{
+            borderColor: colors[index],
+            backgroundColor:
+              colors[index] + '10', // add transparency
+          }}
         >
           <Checkbox
             checked={true}
@@ -383,16 +395,13 @@ const CompareTable = ({
                   className="text-center py-3 border-x-2 border-t-2 rounded-t-lg"
                   sx={{ borderBottom: 'none' }}
                   style={{
-                    background:
-                      'linear-gradient(' +
-                      mappedColors[index] +
-                      ', transparent)',
                     borderColor: mappedColors[index],
+                    backgroundColor:
+                      mappedColors[index] +
+                      '10', // add transparency
                   }}
                 >
-                  <p className="[text-shadow:_0_0_4px_rgb(255_255_255_/_1)] dark:[text-shadow:_0_0_4px_rgb(0_0_0_/_1)]">
-                    {searchQueryLabel(result)}
-                  </p>
+                  {searchQueryLabel(result)}
                 </TableCell>
               ))}
             </TableRow>
