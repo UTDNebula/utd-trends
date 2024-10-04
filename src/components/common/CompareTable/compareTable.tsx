@@ -57,9 +57,9 @@ type RowProps = {
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RateMyProfessorData>;
   removeFromCompare: (arg0: SearchQuery) => void;
-  color: string | undefined; //colorIndex
+  color: string | undefined;
 };
-// This is each column of the compare table
+
 function Row({ course, grades, rmp, removeFromCompare, color }: RowProps) {
   return (
     <TableRow>
@@ -73,7 +73,7 @@ function Row({ course, grades, rmp, removeFromCompare, color }: RowProps) {
             '&.Mui-checked': {
               color: color,
             },
-          }} //Colored Checkbox based on colorIndex
+          }}
         />
       </TableCell>
       <TableCell align="right">
@@ -227,11 +227,7 @@ const CompareTable = ({
         }
         return bGrades.data.gpa - aGrades.data.gpa;
       }
-      if (
-        orderBy === 'rating' ||
-        orderBy === 'difficulty' ||
-        orderBy === 'would_take_again'
-      ) {
+      if (orderBy === 'rating' || orderBy === 'difficulty') {
         const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
         const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
         //drop loading/error rows to bottom
@@ -272,12 +268,6 @@ const CompareTable = ({
       return 0;
     });
   }
-  // Color map for each course in the compare table based on searchQueryColors
-  const colorMap: { [key: string]: string } = {};
-  includedResults.forEach((result, index) => {
-    colorMap[searchQueryLabel(result)] =
-      searchQueryColors[index % searchQueryColors.length];
-  });
 
   return (
     //TODO: sticky header
@@ -335,14 +325,18 @@ const CompareTable = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {sortedResults.map((result) => (
+            {sortedResults.map((result, index) => (
               <Row
                 key={searchQueryLabel(result)}
                 course={result}
                 grades={grades[searchQueryLabel(result)]}
                 rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
                 removeFromCompare={removeFromCompare}
-                color={colorMap[searchQueryLabel(result)]}
+                color={
+                  sortedResults.length > 1
+                    ? searchQueryColors[index % searchQueryColors.length]
+                    : undefined
+                }
               />
             ))}
           </TableBody>

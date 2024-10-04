@@ -1,6 +1,6 @@
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { TabNavMenu } from '../../navigation/tabNavMenu/tabNavMenu';
 
@@ -16,8 +16,8 @@ interface CarouselProps {
 const variants = {
   enter: (dir: number) => {
     return {
-      x: dir > 0 ? 500 : -500, // velocity in x direction
-      opacity: 0, // child opacity
+      x: dir > 0 ? 500 : -500, //velocity in x direction
+      opacity: 0, //child opacity
     };
   },
   center: {
@@ -39,20 +39,10 @@ const variants = {
  * @returns
  */
 export const Carousel = ({ names, children }: CarouselProps) => {
-  // The card currently being displayed
+  //The card currently being displayed
   const [currentCard, setCard] = useState(0);
-  // The Direction that the card is moving in
+  //The Direction that the card is moving in
   const [direction, setDir] = useState(0);
-
-  /**
-   * When children change, ensure currentCard is within valid bounds
-   */
-  useEffect(() => {
-    if (Array.isArray(children) && currentCard >= children.length) {
-      // If currentCard is out of bounds, reset it to 0
-      setCard(0);
-    }
-  }, [children, currentCard]);
 
   /**
    * Turn
@@ -60,14 +50,10 @@ export const Carousel = ({ names, children }: CarouselProps) => {
    * @param displacement a positive value will cause the card to move right, negative value cause card to move left
    */
   const turn = (displacement: number) => {
+    //set direction
+    // console.log("displacement=",displacement);
     setDir(displacement);
-    setCard((prevCard) => {
-      const newCard = prevCard + displacement;
-      if (Array.isArray(children)) {
-        return Math.max(0, Math.min(newCard, children.length - 1));
-      }
-      return newCard;
-    });
+    setCard(currentCard + displacement);
   };
 
   return (
