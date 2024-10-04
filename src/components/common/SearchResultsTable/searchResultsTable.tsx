@@ -14,6 +14,7 @@ import {
   TableRow,
   TableSortLabel,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
 import React, { useState } from 'react';
 
@@ -259,6 +260,11 @@ const SearchResultsTable = ({
   addToCompare,
   removeFromCompare,
 }: SearchResultsTableProps) => {
+  //Selected arrow color
+  const sortArrowColor = useMediaQuery('(prefers-color-scheme: dark)')
+    ? 'white'
+    : 'black';
+
   //Table sorting category
   const [orderBy, setOrderBy] = useState<
     'name' | 'gpa' | 'rating' | 'difficulty'
@@ -449,6 +455,14 @@ const SearchResultsTable = ({
                   onClick={() => {
                     handleClick('gpa');
                   }}
+                  sx={{
+                    '& .MuiTableSortLabel-icon': {
+                      opacity: 0.5, // Ensure the arrow is always visible
+                    },
+                    '&.Mui-active .MuiTableSortLabel-icon': {
+                      color: sortArrowColor, // Brighten the arrow
+                    },
+                  }}
                 >
                   GPA
                 </TableSortLabel>
@@ -459,6 +473,14 @@ const SearchResultsTable = ({
                   direction={orderBy === 'rating' ? order : 'asc'}
                   onClick={() => {
                     handleClick('rating');
+                  }}
+                  sx={{
+                    '& .MuiTableSortLabel-icon': {
+                      opacity: 0.5, // Ensure the arrow is always visible
+                    },
+                    '&.Mui-active .MuiTableSortLabel-icon': {
+                      color: sortArrowColor, // Brighten the arrow
+                    },
                   }}
                 >
                   Rating
