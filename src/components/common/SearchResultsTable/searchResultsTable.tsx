@@ -409,6 +409,14 @@ const SearchResultsTable = ({
                   onClick={() => {
                     handleClick('name');
                   }}
+                  sx={{
+                    '& .MuiTableSortLabel-icon': {
+                      opacity: 0.5, // Ensure the arrow is always visible
+                    },
+                    '&.Mui-active .MuiTableSortLabel-icon': {
+                      color: sortArrowColor, // Brighten the arrow
+                    },
+                  }}
                 >
                   Name
                 </TableSortLabel>
@@ -416,7 +424,7 @@ const SearchResultsTable = ({
               <TableCell>
                 <TableSortLabel
                   active={orderBy === 'gpa'}
-                  direction={orderBy === 'gpa' ? order : 'asc'}
+                  direction={orderBy === 'gpa' ? order : 'desc'}
                   onClick={() => {
                     handleClick('gpa');
                   }}
@@ -435,7 +443,7 @@ const SearchResultsTable = ({
               <TableCell>
                 <TableSortLabel
                   active={orderBy === 'rating'}
-                  direction={orderBy === 'rating' ? order : 'asc'}
+                  direction={orderBy === 'rating' ? order : 'desc'}
                   onClick={() => {
                     handleClick('rating');
                   }}
