@@ -223,19 +223,21 @@ const SearchResultsTable = ({
   removeFromCompare,
 }: SearchResultsTableProps) => {
   //Table sorting category
-  const [orderBy, setOrderBy] = useState<'none' | 'gpa' | 'rating'>('none');
+  const [orderBy, setOrderBy] = useState<'name' | 'gpa' | 'rating'>('name');
   //Table sorting direction
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
   //Cycle through sorting
-  function handleClick(col: 'gpa' | 'rating') {
+  function handleClick(col: 'name' | 'gpa' | 'rating') {
     if (orderBy !== col) {
       setOrderBy(col);
-      setOrder('asc');
+      if (col === 'name')
+        setOrder('asc'); //default alphabetical behavior goes from a to z
+      else setOrder('desc'); //default number behavior goes from high to low for our metrics
     } else {
       if (order === 'asc') {
         setOrder('desc');
-      } else if (order === 'desc') {
-        setOrderBy('none');
+      } else {
+        setOrder('asc');
       }
     }
   }
@@ -259,58 +261,128 @@ const SearchResultsTable = ({
 
   //Sort
   let sortedResults = includedResults;
-  if (orderBy !== 'none') {
-    sortedResults = [...includedResults].sort((a, b) => {
-      if (orderBy === 'gpa') {
-        const aGrades = grades[searchQueryLabel(a)];
-        const bGrades = grades[searchQueryLabel(b)];
+  sortedResults = [...includedResults].sort((a, b) => {
+    if (orderBy === 'name') {
+      //same logic as in generateCombosTable.ts
+      //handle undefined variables based on searchQueryLabel
+      const aFirstName = a.profFirst ?? '';
+      const bFirstName = b.profFirst ?? '';
+      const aLastName = a.profLast ?? '';
+      const bLastName = b.profLast ?? '';
+      const aPrefix = a.prefix ?? ''; //make sure the is no empty input for prefix and number
+      const bPrefix = b.prefix ?? '';
+      const aNumber = a.number ?? '';
+      const bNumber = b.number ?? '';
 
+      if (order === 'asc') {
+        //ascending alphabetical automatically sorts Overall results correctly
         if (
-          (!aGrades || aGrades.state !== 'done') &&
-          (!bGrades || bGrades.state !== 'done')
-        ) {
-          return 0;
-        }
-
-        if (!aGrades || aGrades.state !== 'done') {
-          return 9999;
-        }
-        if (!bGrades || bGrades.state !== 'done') {
-          return -9999;
-        }
-
-        if (order === 'asc') {
-          return aGrades.data.gpa - bGrades.data.gpa;
-        }
-        return bGrades.data.gpa - aGrades.data.gpa;
+          (typeof a.profFirst === 'undefined' &&
+            typeof a.profLast === 'undefined') ||
+          (typeof a.prefix === 'undefined' && typeof a.number === 'undefined')
+        )
+          return -1;
+        if (
+          (typeof b.profFirst === 'undefined' &&
+            typeof b.profLast === 'undefined') ||
+          (typeof b.prefix === 'undefined' && typeof b.number === 'undefined')
+        )
+          return 1;
+        return (
+          aLastName.localeCompare(bLastName) || //sort by last name then first name
+          aFirstName.localeCompare(bFirstName) ||
+          aPrefix.localeCompare(bPrefix) || //if names are equal/don't exist, then sort by prefix then number
+          aNumber.localeCompare(bNumber)
+        );
       }
-      if (orderBy === 'rating') {
-        const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
-        const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
-        //drop loading/error rows to bottom
+      //keep the "(Overall)" result on top for descending sort too
+      else {
+        // catches the case where a is an Overall result AND b is an Overall result
         if (
-          (!aRmp || aRmp.state !== 'done') &&
-          (!bRmp || bRmp.state !== 'done')
-        ) {
-          // If both aRmp and bRmp are not done, treat them as equal and return 0
-          return 0;
-        }
-        if (!aRmp || aRmp.state !== 'done') {
-          return 9999;
-        }
-        if (!bRmp || bRmp.state !== 'done') {
-          return -9999;
-        }
-        const aRating = aRmp?.data?.averageRating ?? 0; // Fallback to 0 if undefined
-        const bRating = bRmp?.data?.averageRating ?? 0; // Fallback to 0 if undefined
-        if (order === 'asc') {
-          return aRating - bRating;
-        }
-        return bRating - aRating;
+          ((typeof a.profFirst === 'undefined' &&
+            typeof a.profLast === 'undefined') ||
+            (typeof a.prefix === 'undefined' &&
+              typeof a.number === 'undefined')) &&
+          ((typeof b.profFirst === 'undefined' &&
+            typeof b.profLast === 'undefined') ||
+            (typeof b.prefix === 'undefined' &&
+              typeof b.number === 'undefined'))
+        )
+          return (
+            bLastName.localeCompare(aLastName) || //sort by last name then first name
+            bFirstName.localeCompare(aFirstName) ||
+            bPrefix.localeCompare(aPrefix) || //if names are equal/don't exist, then, sort by prefix then number
+            bNumber.localeCompare(aNumber)
+          );
+        if (
+          (typeof a.profFirst === 'undefined' &&
+            typeof a.profLast === 'undefined') ||
+          (typeof a.prefix === 'undefined' && typeof a.number === 'undefined')
+        )
+          return -1;
+        if (
+          (typeof b.profFirst === 'undefined' &&
+            typeof b.profLast === 'undefined') ||
+          (typeof b.prefix === 'undefined' && typeof b.number === 'undefined')
+        )
+          return 1;
+        return (
+          bLastName.localeCompare(aLastName) || //sort by last name then first name
+          bFirstName.localeCompare(aFirstName) ||
+          bPrefix.localeCompare(aPrefix) || //if names are equal/don't exist, then, sort by prefix then number
+          bNumber.localeCompare(aNumber)
+        );
       }
       return 0;
-    });
-  }
+    }
+    if (orderBy === 'gpa') {
+      const aGrades = grades[searchQueryLabel(a)];
+      const bGrades = grades[searchQueryLabel(b)];
+      if (
+        (!aGrades || aGrades.state !== 'done') &&
+        (!bGrades || bGrades.state !== 'done')
+      ) {
+        return 0;
+      }
+
+      if (!aGrades || aGrades.state !== 'done') {
+        return 9999;
+      }
+      if (!bGrades || bGrades.state !== 'done') {
+        return -9999;
+      }
+
+      if (order === 'asc') {
+        return aGrades.data.gpa - bGrades.data.gpa;
+      }
+      return bGrades.data.gpa - aGrades.data.gpa;
+    }
+    if (orderBy === 'rating') {
+      const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
+      const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
+      //drop loading/error rows to bottom
+      if (
+        (!aRmp || aRmp.state !== 'done') &&
+        (!bRmp || bRmp.state !== 'done')
+      ) {
+        // If both aRmp and bRmp are not done, treat them as equal and return 0
+        return 0;
+      }
+      if (!aRmp || aRmp.state !== 'done') {
+        return 9999;
+      }
+      if (!bRmp || bRmp.state !== 'done') {
+        return -9999;
+      }
+      const aRating = aRmp?.data?.averageRating ?? 0; // Fallback to 0 if undefined
+      const bRating = bRmp?.data?.averageRating ?? 0; // Fallback to 0 if undefined
+      if (order === 'asc') {
+        return aRating - bRating;
+      }
+      return bRating - aRating;
+    }
+    return 0;
+  });
 
   return (
     //TODO: sticky header
@@ -324,11 +396,29 @@ const SearchResultsTable = ({
             <TableRow>
               <TableCell />
               <TableCell>Compare</TableCell>
-              <TableCell>Name</TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'name'}
+                  direction={orderBy === 'name' ? order : 'asc'}
+                  onClick={() => {
+                    handleClick('name');
+                  }}
+                  sx={{
+                    '& .MuiTableSortLabel-icon': {
+                      opacity: 0.5, // Ensure the arrow is always visible
+                    },
+                    '&.Mui-active .MuiTableSortLabel-icon': {
+                      color: sortArrowColor, // Brighten the arrow
+                    },
+                  }}
+                >
+                  Name
+                </TableSortLabel>
+              </TableCell>
               <TableCell>
                 <TableSortLabel
                   active={orderBy === 'gpa'}
-                  direction={orderBy === 'gpa' ? order : 'asc'}
+                  direction={orderBy === 'gpa' ? order : 'desc'}
                   onClick={() => {
                     handleClick('gpa');
                   }}
@@ -339,7 +429,7 @@ const SearchResultsTable = ({
               <TableCell>
                 <TableSortLabel
                   active={orderBy === 'rating'}
-                  direction={orderBy === 'rating' ? order : 'asc'}
+                  direction={orderBy === 'rating' ? order : 'desc'}
                   onClick={() => {
                     handleClick('rating');
                   }}
