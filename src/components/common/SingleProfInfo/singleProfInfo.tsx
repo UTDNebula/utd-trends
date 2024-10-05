@@ -1,4 +1,5 @@
 import { Grid, Skeleton } from '@mui/material';
+import Link from 'next/link';
 import React from 'react';
 
 import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
@@ -63,6 +64,17 @@ function SingleProfInfo({ rmp }: Props) {
           {rmp.data.wouldTakeAgainPercent.toFixed(0) + '%'}
         </p>
         <p>Would take again</p>
+      </Grid>
+      <Grid item xs={12}>
+        <Link
+          href={
+            'https://www.ratemyprofessors.com/professor/' + rmp.data.legacyId
+          }
+          target="_blank"
+          className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+        >
+          Visit Rate My Professors
+        </Link>
       </Grid>
     </Grid>
   );

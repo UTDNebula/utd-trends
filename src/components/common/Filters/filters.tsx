@@ -17,15 +17,8 @@ import Rating from '../Rating/rating';
 const minGPAs = ['3.5', '3.0', '2.5', '2.0', '1.5', '1.0', '0.5'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
 
-export interface FiltersType {
-  minGPA?: string;
-  minRating?: string;
-}
-
 interface FiltersProps {
   manageQuery?: boolean;
-  path?: string;
-  changeValue?: (value: FiltersType) => void;
   className?: string;
   academicSessions?: string[];
   chosenSessions?: string[];
@@ -37,8 +30,6 @@ interface FiltersProps {
  */
 const Filters = ({
   manageQuery,
-  path,
-  changeValue,
   className,
   academicSessions,
   chosenSessions,
@@ -78,27 +69,11 @@ const Filters = ({
       }
       router.replace(
         {
-          pathname: path,
           query: newQuery,
         },
         undefined,
         { shallow: true },
       );
-    }
-    if (typeof changeValue !== 'undefined') {
-      const newSet: FiltersType = {};
-      if (minGPA !== '') {
-        newSet.minGPA = minGPA;
-      }
-      if (minRating !== '') {
-        newSet.minRating = minRating;
-      }
-      if (newValue !== '') {
-        newSet[toSet] = newValue;
-      } else {
-        delete newSet[toSet];
-      }
-      changeValue(newSet);
     }
   }
 
