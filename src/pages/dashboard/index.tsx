@@ -740,7 +740,13 @@ export const Dashboard: NextPage = () => {
               removeFromCompare={removeFromCompare}
             />
           </Grid>
-          <Grid item xs={false} sm={5} md={5} className="w-full">
+          <Grid
+            item
+            xs={false}
+            sm={5}
+            md={5}
+            className="sticky bottom-2 h-min gridsm:min-h-screen w-full"
+          >
             <Card>
               <Carousel names={names}>{tabs}</Carousel>
             </Card>
