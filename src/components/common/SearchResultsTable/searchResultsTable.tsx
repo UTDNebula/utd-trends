@@ -403,14 +403,6 @@ const SearchResultsTable = ({
                   onClick={() => {
                     handleClick('name');
                   }}
-                  sx={{
-                    '& .MuiTableSortLabel-icon': {
-                      opacity: 0.5, // Ensure the arrow is always visible
-                    },
-                    '&.Mui-active .MuiTableSortLabel-icon': {
-                      color: sortArrowColor, // Brighten the arrow
-                    },
-                  }}
                 >
                   Name
                 </TableSortLabel>
