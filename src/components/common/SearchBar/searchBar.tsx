@@ -192,7 +192,7 @@ const SearchBar = ({
   }
 
   //update parent and queries
-  function onSelect_internal(newValue: SearchQuery[]) {    
+  function onSelect_internal(newValue: SearchQuery[]) {
     setErrorTooltip(!newValue.length); //Check if tooltip needs to be displayed
     if (typeof onSelect !== 'undefined') {
       onSelect(newValue);
@@ -335,7 +335,7 @@ const SearchBar = ({
         }}
       />
       <Tooltip
-        title="Select an option before searching" 
+        title="Select an option before searching"
         placement="top"
         open={openErrorTooltip}
         onOpen={() => setErrorTooltip(true)}
@@ -348,8 +348,11 @@ const SearchBar = ({
           variant="contained"
           disableElevation
           size="large"
-          className={value.length == 0 ? "shrink-0 normal-case bg-royal hover:bg-royalDark text-cornflower-100"
-                                          : "shrink-0 normal-case bg-royal hover:bg-royalDark"} //darkens the text when no valid search terms are entered (pseudo-disables the search button)
+          className={
+            value.length == 0
+              ? 'shrink-0 normal-case bg-royal hover:bg-royalDark text-cornflower-100'
+              : 'shrink-0 normal-case bg-royal hover:bg-royalDark'
+          } //darkens the text when no valid search terms are entered (pseudo-disables the search button)
           onClick={() => onSelect_internal(value)}
         >
           Search
