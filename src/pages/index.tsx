@@ -1,4 +1,3 @@
-import { Alert } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -14,11 +13,7 @@ import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
 const Home: NextPage = () => {
-  const [errorMessage, setErrorMessage] = useState(false);
-  function searchOptionsChange(chosenOptions: SearchQuery[]) {
-    if (chosenOptions.length) {
-      setErrorMessage(false);
-    }
+  function searchOptionsChange(chosenOptions: SearchQuery[]) { // does nothing on change
   }
 
   const router = useRouter();
@@ -32,8 +27,6 @@ const Home: NextPage = () => {
             .join(','),
         },
       });
-    } else {
-      setErrorMessage(true);
     }
   }
 
@@ -77,11 +70,6 @@ const Home: NextPage = () => {
             Explore and compare past grades, professor ratings, and reviews to
             find the perfect class.
           </p>
-          {errorMessage && (
-            <Alert severity="error" className="mb-2">
-              Select an option before searching.
-            </Alert>
-          )}
           <SearchBar
             onSelect={searchOptionChosen}
             onChange={searchOptionsChange}

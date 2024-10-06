@@ -1,4 +1,4 @@
-import { Autocomplete, Button, TextField } from '@mui/material';
+import { Autocomplete, Button, TextField, Tooltip } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import { useRouter } from 'next/router';
@@ -39,6 +39,7 @@ const SearchBar = ({
   const [options, setOptions] = useState<SearchQuery[]>([]);
   //initial loading prop for first load
   const [loading, setLoading] = useState(false);
+  const [openErrorTooltip, setErrorTooltip] = React.useState(false);
 
   //text in search
   const [inputValue, _setInputValue] = useState('');
@@ -191,7 +192,8 @@ const SearchBar = ({
   }
 
   //update parent and queries
-  function onSelect_internal(newValue: SearchQuery[]) {
+  function onSelect_internal(newValue: SearchQuery[]) {    
+    setErrorTooltip(!newValue.length); //Check if tooltip needs to be displayed
     if (typeof onSelect !== 'undefined') {
       onSelect(newValue);
     }
@@ -332,15 +334,27 @@ const SearchBar = ({
           );
         }}
       />
-      <Button
-        variant="contained"
-        disableElevation
-        size="large"
-        className="shrink-0 normal-case bg-royal hover:bg-royalDark"
-        onClick={() => onSelect_internal(value)}
+      <Tooltip
+        title="Select an option before searching" 
+        placement="top"
+        open={openErrorTooltip}
+        onOpen={() => setErrorTooltip(true)}
+        onClose={() => setErrorTooltip(false)}
+        disableFocusListener
+        disableHoverListener
+        disableTouchListener
       >
-        Search
-      </Button>
+        <Button
+          variant="contained"
+          disableElevation
+          size="large"
+          className={value.length == 0 ? "shrink-0 normal-case bg-royal hover:bg-royalDark text-cornflower-100"
+                                          : "shrink-0 normal-case bg-royal hover:bg-royalDark"} //darkens the text when no valid search terms are entered (pseudo-disables the search button)
+          onClick={() => onSelect_internal(value)}
+        >
+          Search
+        </Button>
+      </Tooltip>
     </div>
   );
 };
