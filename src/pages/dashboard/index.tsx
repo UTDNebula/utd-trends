@@ -345,7 +345,8 @@ export const Dashboard: NextPage = () => {
     setChosenSessions((old) => {
       const newVal = func(old);
       if (results.state === 'done') {
-        setGrades((grades) => {
+        setGrades((oldGrades) => {
+          const grades = { ...oldGrades }
           //Relavent keys
           for (const result of [
             ...(results.state === 'done' ? results.data : []),
@@ -427,11 +428,11 @@ export const Dashboard: NextPage = () => {
   }>({});
   function addToGrades(key: string, value: GenericFetchedData<GradesType>) {
     setGrades((old) => {
-      if (typeof old[key] !== 'undefined') {
-        old[key] = value;
-        return old;
-      }
       const newVal = { ...old };
+      if (typeof newVal[key] !== 'undefined') {
+        newVal[key] = value;
+        return newVal;
+      }
       if (Object.keys(newVal).length >= MAX_ENTRIES) {
         // Remove the oldest entry
         const oldestKey = Object.keys(newVal)[0];
@@ -522,7 +523,8 @@ export const Dashboard: NextPage = () => {
         fetchAndStoreGradesData(result, controller);
       } else {
         //Recalc gpa and such from past stored data for new page
-        setGrades((grades) => {
+        setGrades((oldGrades) => {
+          const grades = { ...oldGrades }
           const entry = grades[searchQueryLabel(result)];
           if (entry && entry.state === 'done') {
             entry.data = {
