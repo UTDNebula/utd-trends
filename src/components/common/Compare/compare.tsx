@@ -7,15 +7,8 @@ import type {
   GenericFetchedData,
   GradesType,
 } from '../../../pages/dashboard/index';
-import { BarGraph } from '../../graph/BarGraph/BarGraph';
+import BarGraph from '../../graph/BarGraph/barGraph';
 import CompareTable from '../CompareTable/compareTable';
-
-type CompareProps = {
-  courses: SearchQuery[];
-  grades: { [key: string]: GenericFetchedData<GradesType> };
-  rmp: { [key: string]: GenericFetchedData<RateMyProfessorData> };
-  removeFromCompare: { (arg0: SearchQuery): void };
-};
 
 function convertNumbersToPercents(distribution: GradesType): number[] {
   const total = distribution.total;
@@ -23,6 +16,13 @@ function convertNumbersToPercents(distribution: GradesType): number[] {
     (frequencyOfLetterGrade) => (frequencyOfLetterGrade / total) * 100,
   );
 }
+
+type CompareProps = {
+  courses: SearchQuery[];
+  grades: { [key: string]: GenericFetchedData<GradesType> };
+  rmp: { [key: string]: GenericFetchedData<RateMyProfessorData> };
+  removeFromCompare: { (arg0: SearchQuery): void };
+};
 
 const Compare = ({ courses, grades, rmp, removeFromCompare }: CompareProps) => {
   if (courses.length === 0) {
@@ -50,7 +50,22 @@ const Compare = ({ courses, grades, rmp, removeFromCompare }: CompareProps) => {
             'F',
             'W',
           ]}
-          yaxisFormatter={(value) => Number(value).toLocaleString() + '%'}
+          yaxisFormatter={(value) =>
+            Number(value).toFixed(0).toLocaleString() + '%'
+          }
+          tooltipFormatter={(value, { seriesIndex, dataPointIndex }) => {
+            let response = Number(value).toFixed(2).toLocaleString() + '%';
+            const grade = grades[searchQueryLabel(courses[seriesIndex])];
+            if (grade.state === 'done') {
+              response +=
+                '% (' +
+                grade.data.grade_distribution[dataPointIndex]
+                  .toFixed(0)
+                  .toLocaleString() +
+                ')';
+            }
+            return response;
+          }}
           series={courses.map((course) => {
             const grade = grades[searchQueryLabel(course)];
             return {
