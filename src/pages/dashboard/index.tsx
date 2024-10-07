@@ -346,7 +346,7 @@ export const Dashboard: NextPage = () => {
       const newVal = func(old);
       if (results.state === 'done') {
         setGrades((oldGrades) => {
-          const grades = { ...oldGrades }
+          const grades = { ...oldGrades };
           //Relavent keys
           for (const result of [
             ...(results.state === 'done' ? results.data : []),
@@ -451,7 +451,7 @@ export const Dashboard: NextPage = () => {
     value: GenericFetchedData<RateMyProfessorData>,
   ) {
     setRmp((old) => {
-      const newVal = {...old };
+      const newVal = { ...old };
       if (typeof newVal[key] !== 'undefined') {
         newVal[key] = value;
         return newVal;
@@ -524,7 +524,7 @@ export const Dashboard: NextPage = () => {
       } else {
         //Recalc gpa and such from past stored data for new page
         setGrades((oldGrades) => {
-          const grades = { ...oldGrades }
+          const grades = { ...oldGrades };
           const entry = grades[searchQueryLabel(result)];
           if (entry && entry.state === 'done') {
             entry.data = {
