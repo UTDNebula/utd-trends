@@ -450,11 +450,11 @@ export const Dashboard: NextPage = () => {
     value: GenericFetchedData<RateMyProfessorData>,
   ) {
     setRmp((old) => {
-      if (typeof old[key] !== 'undefined') {
-        old[key] = value;
-        return old;
+      const newVal = {...old };
+      if (typeof newVal[key] !== 'undefined') {
+        newVal[key] = value;
+        return newVal;
       }
-      const newVal = { ...old };
       if (Object.keys(newVal).length >= MAX_ENTRIES) {
         // Remove the oldest entry
         const oldestKey = Object.keys(newVal)[0];
