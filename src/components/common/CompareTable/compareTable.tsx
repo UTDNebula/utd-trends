@@ -401,7 +401,7 @@ const CompareTable = ({
               {sortedResults.map((result, index) => (
                 <TableCell
                   key={searchQueryLabel(result)}
-                  className="text-center py-3 border-x-2 border-t-2 rounded-t-lg"
+                  className="text-center py-3 border-x-2 border-t-2 rounded-t-lg w-min"
                   sx={{ borderBottom: 'none' }}
                   style={{
                     borderColor: mappedColors[index],
