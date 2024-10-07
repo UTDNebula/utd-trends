@@ -1,7 +1,6 @@
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Checkbox,
-  Collapse,
   FormControl,
   FormControlLabel,
   IconButton,
@@ -77,23 +76,35 @@ const Filters = ({
     }
   }
 
-  //For academic sessions
-  const [open, setOpen] = useState(false);
-
   //All of these must be defined to work
-  const showAcademicSessions =
     typeof academicSessions !== 'undefined' &&
     typeof chosenSessions !== 'undefined' &&
     typeof addChosenSessions !== 'undefined';
 
+  //handle select all options for semester
+    const selectAll = (selectAll: boolean) => {
+      if (selectAll) {
+        addChosenSessions(() => academicSessions ?? []);
+      } else {
+        addChosenSessions(() => []);
+      }
+    };
+
+  //handle recent semester options for semester
+  const selectRecent = () => {
+    const recentSessions = academicSessions?.slice(0,3) ?? [];
+    addChosenSessions(() => recentSessions);
+  };
+
   return (
     <div className={'flex flex-col gap-2 ' + className ?? ''}>
       <div className="flex gap-2">
+         {/* min GPA dropdown*/}
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         >
-          <InputLabel id="minGPA">Min GPA</InputLabel>
+          <InputLabel id="minGPA">Min GPA</InputLabel>    
           <Select
             label="Min GPA"
             labelId="minGPA"
@@ -104,14 +115,16 @@ const Filters = ({
           >
             <MenuItem value="">
               <em>None</em>
-            </MenuItem>
-            {minGPAs.map((value) => (
+            </MenuItem>    {/* dropdown options*/}
+            {minGPAs.map((value) => (   
               <MenuItem key={value} value={value}>
                 {value}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
+        
+        {/* min rating dropdown*/}
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
@@ -136,7 +149,7 @@ const Filters = ({
           >
             <MenuItem value="">
               <em>None</em>
-            </MenuItem>
+            </MenuItem>        {/* dropdown options*/}
             {minRatings.map((value) => (
               <MenuItem key={value} value={value}>
                 <Rating
@@ -149,61 +162,67 @@ const Filters = ({
             ))}
           </Select>
         </FormControl>
-        {showAcademicSessions && (
-          <IconButton
-            aria-label="expand academic session picker"
-            size="small"
-            onClick={() => setOpen(!open)}
-            className={
-              'w-10 transition-transform' +
-              (open ? ' rotate-90' : ' rotate-180') +
-              (academicSessions.length !== chosenSessions.length
-                ? ' border-2 border-persimmon-500 border-solid'
-                : '')
-            }
-            title={
-              academicSessions.length !== chosenSessions.length
-                ? 'Not showing all academic sessions'
-                : 'Choose academic sessions'
-            }
-          >
-            <KeyboardArrowIcon />
-          </IconButton>
-        )}
-      </div>
-      {showAcademicSessions && (
-        <Collapse in={open} timeout="auto" unmountOnExit>
-          <div className="flex flex-wrap gap-2">
-            {academicSessions.map((session) => (
-              <FormControlLabel
-                key={session}
-                control={
-                  <Checkbox
-                    checked={chosenSessions.includes(session)}
-                    onClick={() => {
-                      addChosenSessions((oldChosenSessions: string[]) => {
-                        if (oldChosenSessions.includes(session)) {
-                          return oldChosenSessions.filter(
-                            (el) => el !== session,
-                          );
-                        }
-                        const newSessions = oldChosenSessions.concat([session]);
-                        return newSessions;
-                      });
-                    }}
-                  />
-                }
-                label={
-                  '20' +
+
+        {/* semester dropdown */}
+        <FormControl
+          size="small"
+          className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+        >
+          <InputLabel id="Semester">Semester</InputLabel>
+          <Select
+            label="Semester"
+            labelId="Semester"
+            value={chosenSessions ?? []}
+            onChange={(event: SelectChangeEvent<string[]>) => {
+              const value = event.target.value as string[];
+              addChosenSessions(() => value);
+              }}
+              renderValue={(selected) => (selected.length > 0 ? "Semester" : "Select a semester")} 
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 400, // Adjust this height as necessary
+                    width: 'auto',
+                    transform: 'translateY(10px)', // This moves the dropdown down
+                  },
+                },
+              }}
+            >
+
+            {/* select all sessions */}
+            <MenuItem value="select-all" >
+            <Checkbox
+              checked={chosenSessions?.length === academicSessions?.length}
+              onClick={() => selectAll(true)}
+            />
+              Select All
+            </MenuItem>
+              
+            {/* recent sessions */}
+            <MenuItem value="recent">
+            <Checkbox
+              checked={
+                JSON.stringify(chosenSessions?.slice(0,6)) ===
+                JSON.stringify(academicSessions?.slice(0,6))
+              }
+              onClick={selectRecent}
+              />
+              Recent
+            </MenuItem>
+          
+          {/* indiv options */}
+            {academicSessions?.map((session) => (
+              <MenuItem key={session} value={session}>
+                <Checkbox checked={chosenSessions?.includes(session)} />
+                    {'20' +
                   session.slice(0, 2) +
                   ' ' +
-                  { U: 'Summer', F: 'Fall', S: 'Spring' }[session.slice(2)]
-                }
-              />
-            ))}
-          </div>
-        </Collapse>
-      )}
+                  { U: 'Summer', F: 'Fall', S: 'Spring' }[session.slice(2)]}
+              </MenuItem>
+              ))}
+          </Select>
+        </FormControl>
+      </div>
     </div>
   );
 };
