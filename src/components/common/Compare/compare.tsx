@@ -33,7 +33,7 @@ const Compare = ({ courses, grades, rmp, removeFromCompare }: CompareProps) => {
     <>
       <div className="h-64">
         <BarGraph
-          title="Grades"
+          title="% of Students"
           xaxisLabels={[
             'A+',
             'A',

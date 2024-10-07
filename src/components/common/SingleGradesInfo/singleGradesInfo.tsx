@@ -39,7 +39,7 @@ function SingleGradesInfo({ course, grades }: Props) {
         <BarGraph
           title="# of Students"
           xaxisLabels={[
-            'megan',
+            'A+',
             'A',
             'A-',
             'B+',
