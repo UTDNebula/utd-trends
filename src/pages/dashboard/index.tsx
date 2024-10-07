@@ -741,9 +741,11 @@ export const Dashboard: NextPage = () => {
             />
           </Grid>
           <Grid item xs={false} sm={5} md={5} className="w-full">
-            <Card>
-              <Carousel names={names}>{tabs}</Carousel>
-            </Card>
+            <div className="sticky top-0 gridsm:max-h-screen overflow-y-auto pt-4">
+              <Card>
+                <Carousel names={names}>{tabs}</Carousel>
+              </Card>
+            </div>
           </Grid>
         </Grid>
       </>

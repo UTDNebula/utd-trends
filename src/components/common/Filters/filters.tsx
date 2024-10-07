@@ -11,6 +11,7 @@ import {
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import Rating from '../Rating/rating';
 
 const minGPAs = [
   ['3.67', 'A-'],
@@ -21,18 +22,9 @@ const minGPAs = [
   ['2', 'C'],
 ];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
-const maxDiffs = ['0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5'];
-
-export interface FiltersType {
-  minGPA?: string;
-  minRating?: string;
-  maxDiff?: string;
-}
 
 interface FiltersProps {
   manageQuery?: boolean;
-  path?: string;
-  changeValue?: (value: FiltersType) => void;
   className?: string;
   academicSessions?: string[];
   chosenSessions?: string[];
@@ -44,8 +36,6 @@ interface FiltersProps {
  */
 const Filters = ({
   manageQuery,
-  path,
-  changeValue,
   className,
   academicSessions,
   chosenSessions,
@@ -53,7 +43,6 @@ const Filters = ({
 }: FiltersProps) => {
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
-  const [maxDiff, setMaxDiff] = useState('');
 
   //set value from query
   const router = useRouter();
@@ -66,22 +55,14 @@ const Filters = ({
         if (typeof router.query.minRating === 'string') {
           setMinRating(router.query.minRating);
         }
-        if (typeof router.query.maxDiff === 'string') {
-          setMaxDiff(router.query.maxDiff);
-        }
       }
     }
-  }, [
-    router.isReady,
-    router.query.minGPA,
-    router.query.minRating,
-    router.query.maxDiff,
-  ]); // useEffect is called on query update (so on back navigation, the filters selected are set based on the url)
+  }, [router.isReady, router.query.minGPA, router.query.minRating]); // useEffect is called on query update (so on back navigation, the filters selected are set based on the url)
 
   //Update URL, state, and parent
   function onChange(
     newValue: string,
-    toSet: 'minGPA' | 'minRating' | 'maxDiff',
+    toSet: 'minGPA' | 'minRating',
     setter: (value: string) => void,
   ) {
     setter(newValue);
@@ -94,30 +75,11 @@ const Filters = ({
       }
       router.replace(
         {
-          pathname: path,
           query: newQuery,
         },
         undefined,
         { shallow: true },
       );
-    }
-    if (typeof changeValue !== 'undefined') {
-      const newSet: FiltersType = {};
-      if (minGPA !== '') {
-        newSet.minGPA = minGPA;
-      }
-      if (minRating !== '') {
-        newSet.minRating = minRating;
-      }
-      if (maxDiff !== '') {
-        newSet.maxDiff = maxDiff;
-      }
-      if (newValue !== '') {
-        newSet[toSet] = newValue;
-      } else {
-        delete newSet[toSet];
-      }
-      changeValue(newSet);
     }
   }
 
@@ -168,36 +130,27 @@ const Filters = ({
             onChange={(event: SelectChangeEvent) => {
               onChange(event.target.value, 'minRating', setMinRating);
             }}
+            renderValue={(value) => (
+              <Rating
+                key={value}
+                defaultValue={Number(value)}
+                precision={0.5}
+                sx={{ fontSize: 18 }}
+                readOnly
+              />
+            )}
           >
             <MenuItem value="">
               <em>None</em>
             </MenuItem>
             {minRatings.map((value) => (
               <MenuItem key={value} value={value}>
-                {value}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl
-          size="small"
-          className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
-        >
-          <InputLabel id="maxDiff">Max Difficulty</InputLabel>
-          <Select
-            label="Max Difficulty"
-            labelId="maxDiff"
-            value={maxDiff}
-            onChange={(event: SelectChangeEvent) => {
-              onChange(event.target.value, 'maxDiff', setMaxDiff);
-            }}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            {maxDiffs.map((value) => (
-              <MenuItem key={value} value={value}>
-                {value}
+                <Rating
+                  defaultValue={Number(value)}
+                  precision={0.5}
+                  sx={{ fontSize: 25 }}
+                  readOnly
+                />
               </MenuItem>
             ))}
           </Select>
