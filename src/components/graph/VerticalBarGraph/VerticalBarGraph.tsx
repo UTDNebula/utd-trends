@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 
 import GraphProps from '../../../modules/GraphProps/GraphProps';
 import searchQueryColors, {
-  rainbowColors,
+  useRainbowColors,
 } from '../../../modules/searchQueryColors/searchQueryColors';
 import { FullscreenCloseIcon } from '../../icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '../../icons/FullscreenOpenIcon/fullscreenOpenIcon';
@@ -36,6 +36,8 @@ export function VerticalBarGraph(props: GraphProps) {
     series = [];
     noDataText = 'Grade data unavailable for selected courses';
   }
+
+  const rainbowColors = useRainbowColors();
 
   const options: ApexOptions = {
     chart: {
