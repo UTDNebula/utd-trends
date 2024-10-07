@@ -29,20 +29,20 @@ const rainbowColors_dark = [
 ];
 
 const rainbowColors_light = [
-  '#31f400',
-  '#56f400',
-  '#7af400',
-  '#9ef400',
-  '#c3f400',
-  '#e8f400',
-  '#f4db00',
-  '#f4b700',
-  '#f49300',
+  '#79ff57',
+  '#92ff57',
+  '#abff57',
+  '#c4ff57',
+  '#ddff57',
+  '#f7ff57',
+  '#ffee57',
+  '#ffd557',
+  '#ffbc57',
   '#ffa357',
-  '#f44900',
-  '#f42400',
-  '#f40000',
-  '#878787',
+  '#ff8957',
+  '#ff7057',
+  '#ff5757',
+  '#b8b8b8',
 ];
 
 export function useRainbowColors() {
