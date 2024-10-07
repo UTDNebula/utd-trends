@@ -37,7 +37,7 @@ function SingleGradesInfo({ course, grades }: Props) {
     <div className="p-2">
       <div className="h-64">
         <BarGraph
-          title="Grades"
+          title="# of Students"
           xaxisLabels={[
             'A+',
             'A',
