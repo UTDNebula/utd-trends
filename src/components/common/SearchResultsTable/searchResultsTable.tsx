@@ -21,7 +21,7 @@ import React, { useState } from 'react';
 import SearchQuery, {
   convertToProfOnly,
 } from '../../../modules/SearchQuery/SearchQuery';
-import { rainbowColors } from '../../../modules/searchQueryColors/searchQueryColors';
+import { useRainbowColors } from '../../../modules/searchQueryColors/searchQueryColors';
 import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
@@ -46,21 +46,6 @@ const gpaToLetterGrade = (gpa: number): string => {
   if (gpa >= 1.0) return 'D';
   if (gpa >= 0.67) return 'D-';
   return 'F';
-};
-
-const gpaToColor = (gpa: number): string => {
-  if (gpa >= 4.0) return rainbowColors[1];
-  if (gpa >= 3.67) return rainbowColors[2];
-  if (gpa >= 3.33) return rainbowColors[3];
-  if (gpa >= 3.0) return rainbowColors[4];
-  if (gpa >= 2.67) return rainbowColors[5];
-  if (gpa >= 2.33) return rainbowColors[6];
-  if (gpa >= 2.0) return rainbowColors[7];
-  if (gpa >= 1.67) return rainbowColors[8];
-  if (gpa >= 1.33) return rainbowColors[9];
-  if (gpa >= 1.0) return rainbowColors[10];
-  if (gpa >= 0.67) return rainbowColors[11];
-  return rainbowColors[12];
 };
 
 function LoadingRow() {
@@ -111,6 +96,22 @@ function Row({
   removeFromCompare,
 }: RowProps) {
   const [open, setOpen] = useState(false);
+
+  const rainbowColors = useRainbowColors();
+  const gpaToColor = (gpa: number): string => {
+    if (gpa >= 4.0) return rainbowColors[1];
+    if (gpa >= 3.67) return rainbowColors[2];
+    if (gpa >= 3.33) return rainbowColors[3];
+    if (gpa >= 3.0) return rainbowColors[4];
+    if (gpa >= 2.67) return rainbowColors[5];
+    if (gpa >= 2.33) return rainbowColors[6];
+    if (gpa >= 2.0) return rainbowColors[7];
+    if (gpa >= 1.67) return rainbowColors[8];
+    if (gpa >= 1.33) return rainbowColors[9];
+    if (gpa >= 1.0) return rainbowColors[10];
+    if (gpa >= 0.67) return rainbowColors[11];
+    return rainbowColors[12];
+  };
 
   return (
     <>
