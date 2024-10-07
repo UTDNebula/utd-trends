@@ -179,6 +179,7 @@ const SearchBar = ({
 
   //change all values
   function updateValue(newValue: SearchQuery[]) {
+    if (newValue.length) setErrorTooltip(false); //close the tooltip if there is at least 1 valid search term
     setValue(newValue);
     onChange_internal(newValue);
   }
