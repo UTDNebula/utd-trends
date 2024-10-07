@@ -327,7 +327,7 @@ const SearchBar = ({
         }}
       />
       <Tooltip
-        title="Select an option before searching"
+        title="Select a course or professor before searching"
         placement="top"
         open={openErrorTooltip}
         onOpen={() => setErrorTooltip(true)}
@@ -342,7 +342,7 @@ const SearchBar = ({
           size="large"
           className={
             'shrink-0 normal-case bg-royal hover:bg-royalDark' +
-            (value.length == 0 ? ' text-cornflower-100' : '')
+            (value.length == 0 ? ' text-cornflower-200' : '')
           } //darkens the text when no valid search terms are entered (pseudo-disables the search button)
           onClick={() => onSelect_internal(value)}
         >

@@ -13,7 +13,6 @@ import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
 const Home: NextPage = () => {
-
   const router = useRouter();
   function searchOptionChosen(chosenOptions: SearchQuery[]) {
     if (chosenOptions.length) {
