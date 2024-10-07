@@ -1,8 +1,3 @@
-The BarGraph component only uses `xaxisLabels`, `series` and `title` props.
-
-The interactive example below demonstrates and displays the structure and function of the props. It also shows what happens when the length of the `xaxisLabels` array is not equal to the length of each `data` array inside of each `series` object. (Hint: the labels misalign and basically become meaningless)  
-If all entries of `series` array are removed, the user is prompted to "select a class" in order to view data.
-
 ### Bar Graph Example
 
 ```ts
@@ -45,13 +40,13 @@ const resetGraph = () => {
 };
 const name = 'Bar Graph Example';
 <div style={{ width: '100%', height: '300px' }}>
-  <BarGraph
+  <VerticalBarGraph
     xaxisLabels={currentAxisLabel}
     series={currentData}
     title={name}
-  ></BarGraph>
+  ></VerticalBarGraph>
   <div style={{ margin: '1.5rem', marginTop: '2.5rem' }}>
-    Current props being passed to the <code>BarGraph</code> component:
+    Current props being passed to the <code>VerticalBarGraph</code> component:
     <div
       style={{
         border: '1px solid black',
@@ -60,7 +55,9 @@ const name = 'Bar Graph Example';
       }}
     >
       <code>
-        <div style={{ magin: '0.5rem', padding: '0.25rem' }}>&lt;BarGraph</div>
+        <div style={{ magin: '0.5rem', padding: '0.25rem' }}>
+          &lt;VerticalBarGraph
+        </div>
         <div
           style={{ magin: '0.5rem', padding: '0.25rem', marginLeft: '2rem' }}
         >
@@ -79,7 +76,7 @@ const name = 'Bar Graph Example';
           <strong>title</strong> = "{name}"
         </div>
         <div style={{ magin: '0.5rem', padding: '0.25rem' }}>
-          &gt;&lt;/BarGraph&gt;
+          &gt;&lt;/VerticalBarGraph&gt;
         </div>
       </code>
     </div>
