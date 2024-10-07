@@ -64,6 +64,7 @@ type GradeOrRmpRowProps<T> = {
   orderBy: string;
   order: 'asc' | 'desc';
   handleClick: (arg0: string) => void;
+  defaultAscSort?: boolean;
 };
 // This is for grade or rmp related rows in the compare table, it displays grade or rmp data for each course
 function GradeOrRmpRow<T>({
@@ -79,13 +80,14 @@ function GradeOrRmpRow<T>({
   orderBy, // for controlling sorting
   order,
   handleClick,
+  defaultAscSort,
 }: GradeOrRmpRowProps<T>) {
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
       <TableCell align="right" className="pl-0">
         <TableSortLabel
           active={orderBy === name}
-          direction={orderBy === name ? order : 'asc'}
+          direction={orderBy === name ? order : defaultAscSort ? 'asc' : 'desc'}
           onClick={() => {
             handleClick(name);
           }}
@@ -279,12 +281,22 @@ const CompareTable = ({
   function handleClick(col: string) {
     if (orderBy !== col) {
       setOrderBy(col);
-      setOrder('asc');
+      if (col === 'Difficulty')
+        setOrder('asc'); //default difficulty behavior goes from low to high
+      else setOrder('desc'); //default number behavior goes from high to low for our metrics
     } else {
-      if (order === 'asc') {
-        setOrder('desc');
-      } else if (order === 'desc') {
-        setOrderBy('none');
+      if (col === 'Difficulty') {
+        if (order === 'asc') {
+          setOrder('desc');
+        } else if (order === 'desc') {
+          setOrderBy('none');
+        }
+      } else {
+        if (order === 'desc') {
+          setOrder('asc');
+        } else if (order === 'asc') {
+          setOrderBy('none');
+        }
       }
     }
   }
@@ -467,6 +479,7 @@ const CompareTable = ({
               orderBy={orderBy}
               order={order}
               handleClick={handleClick}
+              defaultAscSort
             />
             <GradeAndRmpRow
               name="# of Grades / Ratings"
