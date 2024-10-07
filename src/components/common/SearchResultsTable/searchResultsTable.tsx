@@ -110,7 +110,10 @@ function Row({
 
   return (
     <>
-      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+      <TableRow
+        onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
+        sx={{ '& > *': { borderBottom: 'unset' } }}
+      >
         <TableCell>
           <IconButton
             aria-label="expand row"
@@ -121,7 +124,11 @@ function Row({
             <KeyboardArrowIcon />
           </IconButton>
         </TableCell>
-        <TableCell>
+        <TableCell
+          onClick={
+            (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the compare checkbox
+          }
+        >
           <Checkbox
             checked={inCompare}
             onClick={() => {
