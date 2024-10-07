@@ -349,9 +349,8 @@ const SearchBar = ({
           disableElevation
           size="large"
           className={
-            value.length == 0
-              ? 'shrink-0 normal-case bg-royal hover:bg-royalDark text-cornflower-100'
-              : 'shrink-0 normal-case bg-royal hover:bg-royalDark'
+            'shrink-0 normal-case bg-royal hover:bg-royalDark' +
+            (value.length == 0 ? ' text-cornflower-100' : '')
           } //darkens the text when no valid search terms are entered (pseudo-disables the search button)
           onClick={() => onSelect_internal(value)}
         >
