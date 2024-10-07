@@ -16,7 +16,6 @@ import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel
 interface SearchProps {
   manageQuery?: 'onSelect' | 'onChange';
   onSelect?: (value: SearchQuery[]) => void;
-  onChange?: (value: SearchQuery[]) => void;
   className?: string;
   input_className?: string;
 }
@@ -31,7 +30,6 @@ let wasEmpty = false; // tracks if the searchbar was empty before the new entry 
 const SearchBar = ({
   manageQuery,
   onSelect,
-  onChange,
   className,
   input_className,
 }: SearchProps) => {
@@ -67,9 +65,6 @@ const SearchBar = ({
   //update url with what's in value
   function updateQueries(newValue: SearchQuery[]) {
     if (typeof manageQuery !== 'undefined' && router.isReady) {
-      if (typeof onChange !== 'undefined') {
-        onChange(newValue);
-      }
       const newQuery = router.query;
       if (newValue.length > 0) {
         newQuery.searchTerms = newValue
@@ -165,9 +160,6 @@ const SearchBar = ({
 
   //update parent and queries
   function onChange_internal(newValue: SearchQuery[]) {
-    if (typeof onChange !== 'undefined') {
-      onChange(newValue);
-    }
     if (newValue.length == 0) {
       wasEmpty = true; // so that the next search creates a new navigation entry (push())
     }

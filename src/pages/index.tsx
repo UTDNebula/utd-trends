@@ -13,9 +13,6 @@ import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
 const Home: NextPage = () => {
-  function searchOptionsChange(chosenOptions: SearchQuery[]) {
-    // does nothing on change
-  }
 
   const router = useRouter();
   function searchOptionChosen(chosenOptions: SearchQuery[]) {
@@ -73,7 +70,6 @@ const Home: NextPage = () => {
           </p>
           <SearchBar
             onSelect={searchOptionChosen}
-            onChange={searchOptionsChange}
             className="mb-3"
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />
