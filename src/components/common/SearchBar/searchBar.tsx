@@ -190,7 +190,7 @@ const SearchBar = ({
     if (typeof onSelect !== 'undefined') {
       onSelect(newValue);
     }
-    if (manageQuery === 'onSelect') {
+    if (newValue.length && manageQuery === 'onSelect') {
       updateQueries(newValue);
     }
   }
