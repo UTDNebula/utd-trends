@@ -161,10 +161,10 @@ const Filters = ({
         size="small"
         className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
       >
-        <InputLabel id="Semester">Semester</InputLabel>
+        <InputLabel id="Semesters">Semesters</InputLabel>
         <Select
-          label="Semester"
-          labelId="Semester"
+          label="Semesters"
+          labelId="Semesters"
           multiple
           value={chosenSessions}
           onChange={(event: SelectChangeEvent<string[]>) => {
@@ -189,6 +189,7 @@ const Filters = ({
               .map((session) => displayAcademicSessionName(session))
               .join(', ');
           }}
+          MenuProps={{autoFocus: false}}
         >
           {/* select all sessions */}
           <MenuItem value="select-all">
