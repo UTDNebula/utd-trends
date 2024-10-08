@@ -81,25 +81,12 @@ const Filters = ({
     }
   }
 
-  //All of these must be defined to work
-  typeof academicSessions !== 'undefined' &&
-    typeof chosenSessions !== 'undefined' &&
-    typeof addChosenSessions !== 'undefined';
-
-  //handle select all options for semester
-  const selectAll = (selectAll: boolean) => {
-    if (selectAll) {
-      addChosenSessions(() => academicSessions ?? []);
-    } else {
-      addChosenSessions(() => []);
-    }
-  };
-
-  //handle recent semester options for semester
-  const selectRecent = () => {
-    const recentSessions = academicSessions?.slice(0, 3) ?? [];
-    addChosenSessions(() => recentSessions);
-  };
+  function displayAcademicSessionName(id: string) {
+    return '20' +
+      id.slice(0, 2) +
+      ' ' +
+      { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)];
+  }
 
   return (
     <div className={'flex flex-col gap-2 ' + (className ?? '')}>
@@ -179,43 +166,36 @@ const Filters = ({
           <Select
             label="Semester"
             labelId="Semester"
+            multiple
             value={chosenSessions ?? []}
             onChange={(event: SelectChangeEvent<string[]>) => {
-              const value = event.target.value as string[];
-              addChosenSessions(() => value);
+              const {
+                target: { value },
+              } = event;
+              if (value.includes('select-all')) {
+                if (chosenSessions?.length === academicSessions?.length) {
+                  addChosenSessions(() => []);
+                } else {
+                  addChosenSessions(() => academicSessions);
+                }
+              } else {
+                addChosenSessions(() => value);
+              }
             }}
-            renderValue={(selected) =>
-              selected.length > 0 ? 'Semester' : 'Select a semester'
-            }
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 400, // Adjust this height as necessary
-                  width: 'auto',
-                  transform: 'translateY(10px)', // This moves the dropdown down
-                },
-              },
+            renderValue={(selected) => {
+              if (chosenSessions?.length === academicSessions?.length) {
+                return 'All selected';
+              }
+              return selected.map((session) => displayAcademicSessionName(session)).join(', ');
             }}
           >
             {/* select all sessions */}
             <MenuItem value="select-all">
               <Checkbox
                 checked={chosenSessions?.length === academicSessions?.length}
-                onClick={() => selectAll(true)}
+                indeterminate={chosenSessions?.length !== academicSessions?.length && chosenSessions?.length !== 0}
               />
               <ListItemText primary="Select All" />
-            </MenuItem>
-
-            {/* recent sessions */}
-            <MenuItem value="recent">
-              <Checkbox
-                checked={
-                  JSON.stringify(chosenSessions?.slice(0, 6)) ===
-                  JSON.stringify(academicSessions?.slice(0, 6))
-                }
-                onClick={selectRecent}
-              />
-              <ListItemText primary="Recent" />
             </MenuItem>
 
             {/* indiv options */}
@@ -223,12 +203,7 @@ const Filters = ({
               <MenuItem key={session} value={session}>
                 <Checkbox checked={chosenSessions?.includes(session)} />
                 <ListItemText
-                  primary={
-                    '20' +
-                    session.slice(0, 2) +
-                    ' ' +
-                    { U: 'Summer', F: 'Fall', S: 'Spring' }[session.slice(2)]
-                  }
+                  primary={displayAcademicSessionName(session)}
                 />
               </MenuItem>
             ))}
