@@ -183,9 +183,7 @@ function Row({
             null}
         </TableCell>
         <TableCell align="right">
-          {((typeof rmp === 'undefined' || rmp.state === 'error') && (
-            <></>
-          )) ||
+          {((typeof rmp === 'undefined' || rmp.state === 'error') && <></>) ||
             (rmp.state === 'loading' && (
               <Skeleton variant="rounded" className="rounded-full ml-auto">
                 <Rating sx={{ fontSize: 25 }} readOnly />
