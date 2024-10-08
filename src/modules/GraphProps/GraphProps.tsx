@@ -6,7 +6,10 @@
 type GraphProps = {
   xaxisLabels?: string[];
   yaxisFormatter?: (val: number) => string;
-  series: any[];
+  series: {
+    name: string;
+    data: number[];
+  }[];
   title: string;
   labels?: string[];
   includedColors?: boolean[];

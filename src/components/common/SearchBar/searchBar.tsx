@@ -82,7 +82,6 @@ const SearchBar = ({
           undefined,
           { shallow: true },
         );
-        router.pathname;
         wasEmpty = false;
       } //otherwise, just update the current navigation entry query
       else
