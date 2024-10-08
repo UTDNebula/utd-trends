@@ -574,6 +574,13 @@ export const Dashboard: NextPage = () => {
         //Remove if over threshold
         const courseGrades = grades[searchQueryLabel(result)];
         if (
+          typeof courseGrades !== 'undefined' &&
+          courseGrades.state === 'done' &&
+          courseGrades.data.gpa === -1
+        ) {
+          return false;
+        }
+        if (
           typeof router.query.minGPA === 'string' &&
           typeof courseGrades !== 'undefined' &&
           courseGrades.state === 'done' &&

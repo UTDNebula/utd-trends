@@ -282,17 +282,17 @@ const SearchResultsTable = ({
           gutterBottom
           className="leading-tight text-3xl font-bold"
         >
-          No results found
+          No results
         </Typography>
         <Typography variant="body1">
-          There is no overlap between the selected courses and professors.
+          There is no overlap for the selected courses, professors, and filters.
         </Typography>
       </div>
     );
   }
 
   //Sort
-  const sortedResults = [...includedResults].sort((a, b) => {
+  const sortedResults = includedResults.sort((a, b) => {
     if (orderBy === 'name') {
       //same logic as in generateCombosTable.ts
       //handle undefined variables based on searchQueryLabel

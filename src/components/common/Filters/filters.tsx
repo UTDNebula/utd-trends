@@ -1,11 +1,8 @@
-import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Checkbox,
-  Collapse,
   FormControl,
-  FormControlLabel,
-  IconButton,
   InputLabel,
+  ListItemText,
   MenuItem,
 } from '@mui/material';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
@@ -26,10 +23,9 @@ const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
 
 interface FiltersProps {
   manageQuery?: boolean;
-  className?: string;
-  academicSessions?: string[];
-  chosenSessions?: string[];
-  addChosenSessions?: (arg0: (arg0: string[]) => string[]) => void;
+  academicSessions: string[];
+  chosenSessions: string[];
+  addChosenSessions: (arg0: (arg0: string[]) => string[]) => void;
 }
 
 /**
@@ -37,7 +33,6 @@ interface FiltersProps {
  */
 const Filters = ({
   manageQuery,
-  className,
   academicSessions,
   chosenSessions,
   addChosenSessions,
@@ -84,133 +79,151 @@ const Filters = ({
     }
   }
 
-  //For academic sessions
-  const [open, setOpen] = useState(false);
+  function displayAcademicSessionName(id: string) {
+    return (
+      '20' +
+      id.slice(0, 2) +
+      ' ' +
+      { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)]
+    );
+  }
 
-  //All of these must be defined to work
-  const showAcademicSessions =
-    typeof academicSessions !== 'undefined' &&
-    typeof chosenSessions !== 'undefined' &&
-    typeof addChosenSessions !== 'undefined';
+  function compareSemesters(a: string, b: string) {
+    const x = a.substring(0, 2).localeCompare(b.substring(0, 2));
+    if (x == 0) {
+      const a_char = a[2];
+      const b_char = b[2];
+      // a_char and b_char cannot both be the same semester because x == 0
+      if (a_char == 'S') return -1;
+      if (a_char == 'U' && b_char == 'S') return 1;
+      if (a_char == 'U' && b_char == 'F') return -1;
+      if (a_char == 'F') return 1;
+      return 0;
+    } else return x;
+  }
 
   return (
-    <div className={'flex flex-col gap-2 ' + (className ?? '')}>
-      <div className="flex gap-2">
-        <FormControl
-          size="small"
-          className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+    <div className="flex gap-2">
+      {/* min GPA dropdown*/}
+      <FormControl
+        size="small"
+        className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+      >
+        <InputLabel id="minGPA">Min Letter Grade</InputLabel>
+        <Select
+          label="Min Letter Grade"
+          labelId="minGPA"
+          value={minGPA}
+          onChange={(event: SelectChangeEvent) => {
+            onChange(event.target.value, 'minGPA', setMinGPA);
+          }}
         >
-          <InputLabel id="minGPA">Min Letter Grade</InputLabel>
-          <Select
-            label="Min Letter Grade"
-            labelId="minGPA"
-            value={minGPA}
-            onChange={(event: SelectChangeEvent) => {
-              onChange(event.target.value, 'minGPA', setMinGPA);
-            }}
-          >
-            <MenuItem value="">
-              <em>None</em>
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+          {/* dropdown options*/}
+          {minGPAs.map(([value, label]) => (
+            <MenuItem key={value} value={value}>
+              {label}
             </MenuItem>
-            {minGPAs.map(([value, label]) => (
-              <MenuItem key={value} value={value}>
-                {label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl
-          size="small"
-          className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+          ))}
+        </Select>
+      </FormControl>
+
+      {/* min rating dropdown*/}
+      <FormControl
+        size="small"
+        className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+      >
+        <InputLabel id="minRating">Min Rating</InputLabel>
+        <Select
+          label="Min Rating"
+          labelId="minRating"
+          value={minRating}
+          onChange={(event: SelectChangeEvent) => {
+            onChange(event.target.value, 'minRating', setMinRating);
+          }}
+          renderValue={(value) => (
+            <Rating
+              key={value}
+              defaultValue={Number(value)}
+              precision={0.5}
+              sx={{ fontSize: 18 }}
+              readOnly
+            />
+          )}
         >
-          <InputLabel id="minRating">Min Rating</InputLabel>
-          <Select
-            label="Min Rating"
-            labelId="minRating"
-            value={minRating}
-            onChange={(event: SelectChangeEvent) => {
-              onChange(event.target.value, 'minRating', setMinRating);
-            }}
-            renderValue={(value) => (
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>{' '}
+          {/* dropdown options*/}
+          {minRatings.map((value) => (
+            <MenuItem key={value} value={value}>
               <Rating
-                key={value}
                 defaultValue={Number(value)}
                 precision={0.5}
-                sx={{ fontSize: 18 }}
+                sx={{ fontSize: 25 }}
                 readOnly
               />
-            )}
-          >
-            <MenuItem value="">
-              <em>None</em>
             </MenuItem>
-            {minRatings.map((value) => (
-              <MenuItem key={value} value={value}>
-                <Rating
-                  defaultValue={Number(value)}
-                  precision={0.5}
-                  sx={{ fontSize: 25 }}
-                  readOnly
-                />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        {showAcademicSessions && (
-          <IconButton
-            aria-label="expand academic session picker"
-            size="small"
-            onClick={() => setOpen(!open)}
-            className={
-              'w-10 transition-transform' +
-              (open ? ' rotate-90' : ' rotate-180') +
-              (academicSessions.length !== chosenSessions.length
-                ? ' border-2 border-persimmon-500 border-solid'
-                : '')
+          ))}
+        </Select>
+      </FormControl>
+
+      {/* semester dropdown */}
+      <FormControl
+        size="small"
+        className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+      >
+        <InputLabel id="Semesters">Semesters</InputLabel>
+        <Select
+          label="Semesters"
+          labelId="Semesters"
+          multiple
+          value={chosenSessions}
+          onChange={(event: SelectChangeEvent<string[]>) => {
+            const {
+              target: { value },
+            } = event;
+            if (value.includes('select-all')) {
+              if (chosenSessions.length === academicSessions.length) {
+                addChosenSessions(() => []);
+              } else {
+                addChosenSessions(() => academicSessions);
+              }
+            } else {
+              addChosenSessions(() => value as string[]);
             }
-            title={
-              academicSessions.length !== chosenSessions.length
-                ? 'Not showing all academic sessions'
-                : 'Choose academic sessions'
+          }}
+          renderValue={(selected) => {
+            if (chosenSessions.length === academicSessions.length) {
+              return 'All selected';
             }
-          >
-            <KeyboardArrowIcon />
-          </IconButton>
-        )}
-      </div>
-      {showAcademicSessions && (
-        <Collapse in={open} timeout="auto" unmountOnExit>
-          <div className="flex flex-wrap gap-2">
-            {academicSessions.map((session) => (
-              <FormControlLabel
-                key={session}
-                control={
-                  <Checkbox
-                    checked={chosenSessions.includes(session)}
-                    onClick={() => {
-                      addChosenSessions((oldChosenSessions: string[]) => {
-                        if (oldChosenSessions.includes(session)) {
-                          return oldChosenSessions.filter(
-                            (el) => el !== session,
-                          );
-                        }
-                        const newSessions = oldChosenSessions.concat([session]);
-                        return newSessions;
-                      });
-                    }}
-                  />
-                }
-                label={
-                  '20' +
-                  session.slice(0, 2) +
-                  ' ' +
-                  { U: 'Summer', F: 'Fall', S: 'Spring' }[session.slice(2)]
-                }
-              />
-            ))}
-          </div>
-        </Collapse>
-      )}
+            return selected.sort((a, b) => compareSemesters(a, b)).join(', ');
+          }}
+          MenuProps={{ autoFocus: false }}
+        >
+          {/* select all sessions */}
+          <MenuItem value="select-all">
+            <Checkbox
+              checked={chosenSessions.length === academicSessions.length}
+              indeterminate={
+                chosenSessions.length !== academicSessions.length &&
+                chosenSessions.length !== 0
+              }
+            />
+            <ListItemText primary="Select All" />
+          </MenuItem>
+
+          {/* indiv options */}
+          {academicSessions.map((session) => (
+            <MenuItem key={session} value={session}>
+              <Checkbox checked={chosenSessions.includes(session)} />
+              <ListItemText primary={displayAcademicSessionName(session)} />
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
     </div>
   );
 };
