@@ -109,7 +109,8 @@ export default function handler(
     return;
   }
   return new Promise<void>((resolve) => {
-    const name = profFirst.split(' ')[0] + ' ' + profLast;
+    const singleProfFirst = profFirst.split(' ')[0];
+    const name = singleProfFirst + ' ' + profLast;
 
     // create fetch object for professor
     const graphQlUrlProp = getGraphQlUrlProp(name);
@@ -133,7 +134,7 @@ export default function handler(
         const professors = response.data.newSearch.teachers.edges.filter(
           (prof: { node: RMPInterface }) =>
             prof.node.school.name === SCHOOL_NAME &&
-            prof.node.firstName.includes(profFirst) &&
+            prof.node.firstName.includes(singleProfFirst) &&
             prof.node.lastName.includes(profLast),
         );
         //Pick prof instance with most ratings
