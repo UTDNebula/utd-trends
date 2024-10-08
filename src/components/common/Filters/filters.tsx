@@ -82,10 +82,12 @@ const Filters = ({
   }
 
   function displayAcademicSessionName(id: string) {
-    return '20' +
+    return (
+      '20' +
       id.slice(0, 2) +
       ' ' +
-      { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)];
+      { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)]
+    );
   }
 
   return (
@@ -186,14 +188,19 @@ const Filters = ({
               if (chosenSessions?.length === academicSessions?.length) {
                 return 'All selected';
               }
-              return selected.map((session) => displayAcademicSessionName(session)).join(', ');
+              return selected
+                .map((session) => displayAcademicSessionName(session))
+                .join(', ');
             }}
           >
             {/* select all sessions */}
             <MenuItem value="select-all">
               <Checkbox
                 checked={chosenSessions?.length === academicSessions?.length}
-                indeterminate={chosenSessions?.length !== academicSessions?.length && chosenSessions?.length !== 0}
+                indeterminate={
+                  chosenSessions?.length !== academicSessions?.length &&
+                  chosenSessions?.length !== 0
+                }
               />
               <ListItemText primary="Select All" />
             </MenuItem>
@@ -202,9 +209,7 @@ const Filters = ({
             {academicSessions?.map((session) => (
               <MenuItem key={session} value={session}>
                 <Checkbox checked={chosenSessions?.includes(session)} />
-                <ListItemText
-                  primary={displayAcademicSessionName(session)}
-                />
+                <ListItemText primary={displayAcademicSessionName(session)} />
               </MenuItem>
             ))}
           </Select>
