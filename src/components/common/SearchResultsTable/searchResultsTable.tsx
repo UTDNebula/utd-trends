@@ -439,26 +439,40 @@ const SearchResultsTable = ({
                 </TableSortLabel>
               </TableCell>
               <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'gpa'}
-                  direction={orderBy === 'gpa' ? order : 'desc'}
-                  onClick={() => {
-                    handleClick('gpa');
-                  }}
+                <Tooltip
+                  title="Average GPA Across Course Sections"
+                  placement="top"
                 >
-                  Grades
-                </TableSortLabel>
+                  <div>
+                    <TableSortLabel
+                      active={orderBy === 'gpa'}
+                      direction={orderBy === 'gpa' ? order : 'desc'}
+                      onClick={() => {
+                        handleClick('gpa');
+                      }}
+                    >
+                      Grades
+                    </TableSortLabel>
+                  </div>
+                </Tooltip>
               </TableCell>
               <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'rating'}
-                  direction={orderBy === 'rating' ? order : 'desc'}
-                  onClick={() => {
-                    handleClick('rating');
-                  }}
+                <Tooltip
+                  title="Average Professor Rating from Rate My Professors"
+                  placement="top"
                 >
-                  Rating
-                </TableSortLabel>
+                  <div>
+                    <TableSortLabel
+                      active={orderBy === 'rating'}
+                      direction={orderBy === 'rating' ? order : 'desc'}
+                      onClick={() => {
+                        handleClick('rating');
+                      }}
+                    >
+                      Rating
+                    </TableSortLabel>
+                  </div>
+                </Tooltip>
               </TableCell>
             </TableRow>
           </TableHead>
