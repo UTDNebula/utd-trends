@@ -11,9 +11,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TableSortLabel,
   Typography,
-  useMediaQuery,
 } from '@mui/material';
 import React, { useState } from 'react';
 
@@ -31,6 +29,7 @@ import type {
 import Rating from '../Rating/rating';
 import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
 import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
+import TableSortLabel from '../TableSortLabel/tableSortLabel';
 
 const gpaToLetterGrade = (gpa: number): string => {
   if (gpa >= 4.0) return 'A';
@@ -232,11 +231,6 @@ const SearchResultsTable = ({
   addToCompare,
   removeFromCompare,
 }: SearchResultsTableProps) => {
-  //Selected arrow color
-  const sortArrowColor = useMediaQuery('(prefers-color-scheme: dark)')
-    ? 'white'
-    : 'black';
-
   //Table sorting category
   const [orderBy, setOrderBy] = useState<'name' | 'gpa' | 'rating'>('name');
   //Table sorting direction
@@ -275,8 +269,7 @@ const SearchResultsTable = ({
   }
 
   //Sort
-  let sortedResults = includedResults;
-  sortedResults = [...includedResults].sort((a, b) => {
+  const sortedResults = [...includedResults].sort((a, b) => {
     if (orderBy === 'name') {
       //same logic as in generateCombosTable.ts
       //handle undefined variables based on searchQueryLabel
@@ -418,14 +411,6 @@ const SearchResultsTable = ({
                   onClick={() => {
                     handleClick('name');
                   }}
-                  sx={{
-                    '& .MuiTableSortLabel-icon': {
-                      opacity: 0.5, // Ensure the arrow is always visible
-                    },
-                    '&.Mui-active .MuiTableSortLabel-icon': {
-                      color: sortArrowColor, // Brighten the arrow
-                    },
-                  }}
                 >
                   Name
                 </TableSortLabel>
@@ -437,14 +422,6 @@ const SearchResultsTable = ({
                   onClick={() => {
                     handleClick('gpa');
                   }}
-                  sx={{
-                    '& .MuiTableSortLabel-icon': {
-                      opacity: 0.5, // Ensure the arrow is always visible
-                    },
-                    '&.Mui-active .MuiTableSortLabel-icon': {
-                      color: sortArrowColor, // Brighten the arrow
-                    },
-                  }}
                 >
                   Grades
                 </TableSortLabel>
@@ -455,14 +432,6 @@ const SearchResultsTable = ({
                   direction={orderBy === 'rating' ? order : 'desc'}
                   onClick={() => {
                     handleClick('rating');
-                  }}
-                  sx={{
-                    '& .MuiTableSortLabel-icon': {
-                      opacity: 0.5, // Ensure the arrow is always visible
-                    },
-                    '&.Mui-active .MuiTableSortLabel-icon': {
-                      color: sortArrowColor, // Brighten the arrow
-                    },
                   }}
                 >
                   Rating
