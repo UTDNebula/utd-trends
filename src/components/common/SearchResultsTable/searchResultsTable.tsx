@@ -1,3 +1,4 @@
+import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Checkbox,
@@ -160,14 +161,17 @@ function Row({
           </Typography>
         </TableCell>
         <TableCell align="right">
-          {(grades.state === 'loading' && (
-            <Skeleton
-              variant="rounded"
-              className="rounded-full px-5 py-2 ml-auto"
-            >
-              <Typography className="text-base">A</Typography>
-            </Skeleton>
+          {((typeof grades === 'undefined' || grades.state === 'error') && (
+            <CloseIcon />
           )) ||
+            (grades.state === 'loading' && (
+              <Skeleton
+                variant="rounded"
+                className="rounded-full px-5 py-2 ml-auto"
+              >
+                <Typography className="text-base">A</Typography>
+              </Skeleton>
+            )) ||
             (grades.state === 'done' && (
               <Typography
                 className="text-base text-black rounded-full px-5 py-2 inline"
@@ -179,11 +183,14 @@ function Row({
             null}
         </TableCell>
         <TableCell align="right">
-          {(rmp.state === 'loading' && (
-            <Skeleton variant="rounded" className="rounded-full ml-auto">
-              <Rating sx={{ fontSize: 25 }} readOnly />
-            </Skeleton>
+          {((typeof rmp === 'undefined' || rmp.state === 'error') && (
+            <CloseIcon />
           )) ||
+            (rmp.state === 'loading' && (
+              <Skeleton variant="rounded" className="rounded-full ml-auto">
+                <Rating sx={{ fontSize: 25 }} readOnly />
+              </Skeleton>
+            )) ||
             (rmp.state === 'done' && (
               <Rating
                 defaultValue={rmp.data.averageRating}
