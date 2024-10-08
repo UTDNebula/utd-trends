@@ -3,7 +3,6 @@ import { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 
-import GraphProps from '../../../modules/GraphProps/GraphProps';
 import searchQueryColors, {
   useRainbowColors,
 } from '../../../modules/searchQueryColors/searchQueryColors';
@@ -12,19 +11,28 @@ import { FullscreenOpenIcon } from '../../icons/FullscreenOpenIcon/fullscreenOpe
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-/**
- * Creates a pre-configured ApexCharts horizontal bar graph component. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`. This component also gets returned from a BarGraph component on a small screen.
- * @param props
- * @returns horizontal bar graph
- */
-export function HorizontalBarGraph(props: GraphProps) {
-  function xaxisFormatter(value: string) {
-    if (typeof props.yaxisFormatter === 'undefined') {
-      return value;
-    }
-    return props.yaxisFormatter(Number(value));
-  }
+type GraphProps = {
+  xaxisLabels?: string[];
+  yaxisFormatter?: (val: number) => string;
+  tooltipFormatter?: (
+    val: number,
+    extra: { series: number[]; seriesIndex: number; dataPointIndex: number },
+  ) => string;
+  series: {
+    name: string;
+    data: number[];
+  }[];
+  title: string;
+  labels?: string[];
+  includedColors?: boolean[];
+};
 
+/**
+ * Creates a pre-configured ApexCharts vertical bar graph component. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`. This component also gets returned from a BarGraph component on a large screen.
+ * @param props
+ * @returns vertical bar graph
+ */
+function BarGraph(props: GraphProps) {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
@@ -73,7 +81,7 @@ export function HorizontalBarGraph(props: GraphProps) {
     plotOptions: {
       bar: {
         distributed: series.length === 1,
-        horizontal: true,
+        horizontal: false,
       },
     },
     dataLabels: {
@@ -84,8 +92,10 @@ export function HorizontalBarGraph(props: GraphProps) {
     },
     xaxis: {
       categories: props.xaxisLabels,
+    },
+    yaxis: {
       labels: {
-        formatter: xaxisFormatter,
+        formatter: props.yaxisFormatter,
       },
     },
     colors:
@@ -119,6 +129,11 @@ export function HorizontalBarGraph(props: GraphProps) {
     theme: {
       mode: useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light',
     },
+    tooltip: {
+      y: {
+        formatter: props.tooltipFormatter ?? props.yaxisFormatter,
+      },
+    },
   };
 
   const graph = (
@@ -142,3 +157,5 @@ export function HorizontalBarGraph(props: GraphProps) {
     </>
   );
 }
+
+export default BarGraph;

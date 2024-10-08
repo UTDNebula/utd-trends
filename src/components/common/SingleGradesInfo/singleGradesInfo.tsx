@@ -7,7 +7,14 @@ import type {
   GenericFetchedData,
   GradesType,
 } from '../../../pages/dashboard/index';
-import { BarGraph } from '../../graph/BarGraph/BarGraph';
+import BarGraph from '../../graph/BarGraph/barGraph';
+
+function convertNumbersToPercents(distribution: GradesType): number[] {
+  const total = distribution.total;
+  return distribution.grade_distribution.map(
+    (frequencyOfLetterGrade) => (frequencyOfLetterGrade / total) * 100,
+  );
+}
 
 type Props = {
   course: SearchQuery;
@@ -33,6 +40,9 @@ function SingleGradesInfo({ course, grades }: Props) {
       </div>
     );
   }
+
+  const percents = convertNumbersToPercents(grades.data);
+
   return (
     <div className="p-2">
       <div className="h-64">
@@ -54,7 +64,13 @@ function SingleGradesInfo({ course, grades }: Props) {
             'F',
             'W',
           ]}
-          yaxisFormatter={(value) => Number(value).toLocaleString()}
+          yaxisFormatter={(value) => Number(value).toFixed(0).toLocaleString()}
+          tooltipFormatter={(value, { dataPointIndex }) =>
+            Number(value).toFixed(0).toLocaleString() +
+            ' (' +
+            percents[dataPointIndex].toFixed(2) +
+            '%)'
+          }
           series={[
             {
               name: searchQueryLabel(course),
