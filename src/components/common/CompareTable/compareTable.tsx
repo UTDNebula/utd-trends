@@ -218,21 +218,44 @@ function GradeAndRmpRow({
 }
 
 type CheckboxRowProps = {
+  name: string;
   courses: SearchQuery[];
   removeFromCompare: (arg0: SearchQuery) => void;
   cell_className: string;
   colors: string[];
+  orderBy: string;
+  order: 'asc' | 'desc';
+  handleClick: (arg0: string) => void;
 };
 // This is for checkboxes to remove courses from the compare table
 function CheckboxRow({
+  name,
   courses,
   removeFromCompare, // remove course function
   cell_className, // for specifying border mostly
   colors, // border colors
+  orderBy, // for controlling sorting
+  order,
+  handleClick,
 }: CheckboxRowProps) {
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
-      <TableCell className="pl-0" />
+      <TableCell align="right" className="pl-0">
+        <TableSortLabel
+          active={orderBy === name}
+          direction={orderBy === name ? order : 'desc'}
+          onClick={() => {
+            handleClick(name);
+          }}
+          sx={{
+            '& .MuiTableSortLabel-icon': {
+              rotate: '-90deg',
+            },
+          }}
+        >
+          {name}
+        </TableSortLabel>
+      </TableCell>
       {courses.map((course, index) => (
         <TableCell
           align="center"
@@ -274,9 +297,9 @@ const CompareTable = ({
   removeFromCompare,
 }: CompareTableProps) => {
   //Table sorting category
-  const [orderBy, setOrderBy] = useState<string>('none');
+  const [orderBy, setOrderBy] = useState<string>('Key');
   //Table sorting direction
-  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+  const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   //Cycle through sorting
   function handleClick(col: string) {
     if (orderBy !== col) {
@@ -285,96 +308,88 @@ const CompareTable = ({
         setOrder('asc'); //default difficulty behavior goes from low to high
       else setOrder('desc'); //default number behavior goes from high to low for our metrics
     } else {
-      if (col === 'Difficulty') {
-        if (order === 'asc') {
-          setOrder('desc');
-        } else if (order === 'desc') {
-          setOrderBy('none');
-        }
-      } else {
+      if (col !== 'Key') {
         if (order === 'desc') {
           setOrder('asc');
-        } else if (order === 'asc') {
-          setOrderBy('none');
+        } else {
+          setOrder('desc');
         }
       }
     }
   }
 
   //Sort
-  let sortedResults = includedResults;
-  if (orderBy !== 'none') {
-    sortedResults = [...includedResults].sort((a, b) => {
-      if (orderBy === 'GPA') {
-        const aGrades = grades[searchQueryLabel(a)];
-        const bGrades = grades[searchQueryLabel(b)];
-        //drop loading/error rows to bottom
-        if (
-          (!aGrades || aGrades.state !== 'done') &&
-          (!bGrades || bGrades.state !== 'done')
-        ) {
-          return 0;
-        }
-        if (!aGrades || aGrades.state !== 'done') {
-          return 9999;
-        }
-        if (!bGrades || bGrades.state !== 'done') {
-          return -9999;
-        }
-        if (order === 'asc') {
-          return aGrades.data.gpa - bGrades.data.gpa;
-        }
-        return bGrades.data.gpa - aGrades.data.gpa;
-      }
+  const sortedResults = [...includedResults].sort((a, b) => {
+    if (orderBy === 'GPA') {
+      const aGrades = grades[searchQueryLabel(a)];
+      const bGrades = grades[searchQueryLabel(b)];
+      //drop loading/error rows to bottom
       if (
-        orderBy === 'Rating' ||
-        orderBy === 'Would Take Again' ||
-        orderBy === 'Difficulty'
+        (!aGrades || aGrades.state !== 'done') &&
+        (!bGrades || bGrades.state !== 'done')
       ) {
-        const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
-        const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
-        //drop loading/error rows to bottom
-        if (
-          (!aRmp || aRmp.state !== 'done') &&
-          (!bRmp || bRmp.state !== 'done')
-        ) {
-          // If both aRmp and bRmp are not done, treat them as equal and return 0
-          return 0;
+        return 0;
+      }
+      if (!aGrades || aGrades.state !== 'done') {
+        return 9999;
+      }
+      if (!bGrades || bGrades.state !== 'done') {
+        return -9999;
+      }
+      if (order === 'asc') {
+        return aGrades.data.gpa - bGrades.data.gpa;
+      }
+      return bGrades.data.gpa - aGrades.data.gpa;
+    }
+    if (
+      orderBy === 'Rating' ||
+      orderBy === 'Would Take Again' ||
+      orderBy === 'Difficulty'
+    ) {
+      const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
+      const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
+      //drop loading/error rows to bottom
+      if (
+        (!aRmp || aRmp.state !== 'done') &&
+        (!bRmp || bRmp.state !== 'done')
+      ) {
+        // If both aRmp and bRmp are not done, treat them as equal and return 0
+        return 0;
+      }
+      if (!aRmp || aRmp.state !== 'done') {
+        return 9999;
+      }
+      if (!bRmp || bRmp.state !== 'done') {
+        return -9999;
+      }
+      if (orderBy === 'Rating') {
+        if (order === 'asc') {
+          return aRmp.data.averageRating - bRmp.data.averageRating;
         }
-        if (!aRmp || aRmp.state !== 'done') {
-          return 9999;
-        }
-        if (!bRmp || bRmp.state !== 'done') {
-          return -9999;
-        }
-        if (orderBy === 'Rating') {
-          if (order === 'asc') {
-            return aRmp.data.averageRating - bRmp.data.averageRating;
-          }
-          return bRmp.data.averageRating - aRmp.data.averageRating;
-        }
-        if (orderBy === 'Would Take Again') {
-          if (order === 'asc') {
-            return (
-              aRmp.data.wouldTakeAgainPercentage -
-              bRmp.data.wouldTakeAgainPercentage
-            );
-          }
+        return bRmp.data.averageRating - aRmp.data.averageRating;
+      }
+      if (orderBy === 'Would Take Again') {
+        if (order === 'asc') {
           return (
-            bRmp.data.wouldTakeAgainPercentage -
-            aRmp.data.wouldTakeAgainPercentage
+            aRmp.data.wouldTakeAgainPercentage -
+            bRmp.data.wouldTakeAgainPercentage
           );
         }
-        if (orderBy === 'Difficulty') {
-          if (order === 'asc') {
-            return aRmp.data.averageDifficulty - bRmp.data.averageDifficulty;
-          }
-          return bRmp.data.averageDifficulty - aRmp.data.averageDifficulty;
-        }
+        return (
+          bRmp.data.wouldTakeAgainPercentage -
+          aRmp.data.wouldTakeAgainPercentage
+        );
       }
-      return 0;
-    });
-  }
+      if (orderBy === 'Difficulty') {
+        if (order === 'asc') {
+          return aRmp.data.averageDifficulty - bRmp.data.averageDifficulty;
+        }
+        return bRmp.data.averageDifficulty - aRmp.data.averageDifficulty;
+      }
+    }
+    return 0;
+  });
+
   // Color map for each course in the compare table based on searchQueryColors
   const colorMap: { [key: string]: string } = {};
   includedResults.forEach((result, index) => {
@@ -496,10 +511,14 @@ const CompareTable = ({
               colors={mappedColors}
             />
             <CheckboxRow
+              name="Key"
               courses={sortedResults}
               removeFromCompare={removeFromCompare}
               cell_className="pt-0 pb-1 border-x-2 border-b-2 rounded-b-lg"
               colors={mappedColors}
+              orderBy={orderBy}
+              order={order}
+              handleClick={handleClick}
             />
           </TableBody>
         </Table>

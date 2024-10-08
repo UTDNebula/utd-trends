@@ -260,8 +260,7 @@ const SearchResultsTable = ({
   }
 
   //Sort
-  let sortedResults = includedResults;
-  sortedResults = [...includedResults].sort((a, b) => {
+  const sortedResults = [...includedResults].sort((a, b) => {
     if (orderBy === 'name') {
       //same logic as in generateCombosTable.ts
       //handle undefined variables based on searchQueryLabel
