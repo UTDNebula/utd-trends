@@ -111,7 +111,7 @@ function GradeOrRmpRow<T>({
           }}
         >
           {((typeof value === 'undefined' || value.state === 'error') && (
-            <CloseIcon />
+            <></>
           )) ||
             (value.state === 'loading' && (
               <Skeleton variant="rounded" className="rounded-full px-5 py-2">
