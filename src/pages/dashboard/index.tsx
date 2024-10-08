@@ -345,7 +345,8 @@ export const Dashboard: NextPage = () => {
     setChosenSessions((old) => {
       const newVal = func(old);
       if (results.state === 'done') {
-        setGrades((grades) => {
+        setGrades((oldGrades) => {
+          const grades = { ...oldGrades };
           //Relavent keys
           for (const result of [
             ...(results.state === 'done' ? results.data : []),
@@ -427,11 +428,11 @@ export const Dashboard: NextPage = () => {
   }>({});
   function addToGrades(key: string, value: GenericFetchedData<GradesType>) {
     setGrades((old) => {
-      if (typeof old[key] !== 'undefined') {
-        old[key] = value;
-        return old;
-      }
       const newVal = { ...old };
+      if (typeof newVal[key] !== 'undefined') {
+        newVal[key] = value;
+        return newVal;
+      }
       if (Object.keys(newVal).length >= MAX_ENTRIES) {
         // Remove the oldest entry
         const oldestKey = Object.keys(newVal)[0];
@@ -447,11 +448,11 @@ export const Dashboard: NextPage = () => {
   }>({});
   function addToRmp(key: string, value: GenericFetchedData<RMPInterface>) {
     setRmp((old) => {
-      if (typeof old[key] !== 'undefined') {
-        old[key] = value;
-        return old;
-      }
       const newVal = { ...old };
+      if (typeof newVal[key] !== 'undefined') {
+        newVal[key] = value;
+        return newVal;
+      }
       if (Object.keys(newVal).length >= MAX_ENTRIES) {
         // Remove the oldest entry
         const oldestKey = Object.keys(newVal)[0];
@@ -519,7 +520,8 @@ export const Dashboard: NextPage = () => {
         fetchAndStoreGradesData(result, controller);
       } else {
         //Recalc gpa and such from past stored data for new page
-        setGrades((grades) => {
+        setGrades((oldGrades) => {
+          const grades = { ...oldGrades };
           const entry = grades[searchQueryLabel(result)];
           if (entry && entry.state === 'done') {
             entry.data = {
@@ -715,7 +717,7 @@ export const Dashboard: NextPage = () => {
     contentComponent = (
       <>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={7} md={7}>
+          <Grid item xs={12} sm={6} md={6}>
             <Filters
               manageQuery
               academicSessions={academicSessions}
@@ -723,10 +725,10 @@ export const Dashboard: NextPage = () => {
               addChosenSessions={addChosenSessions}
             />
           </Grid>
-          <Grid item xs={false} sm={5} md={5}></Grid>
+          <Grid item xs={false} sm={6} md={6}></Grid>
         </Grid>
         <Grid container component="main" wrap="wrap-reverse" spacing={2}>
-          <Grid item xs={12} sm={7} md={7}>
+          <Grid item xs={12} sm={6} md={6}>
             <SearchResultsTable
               resultsLoading={results.state}
               includedResults={includedResults}
@@ -737,10 +739,12 @@ export const Dashboard: NextPage = () => {
               removeFromCompare={removeFromCompare}
             />
           </Grid>
-          <Grid item xs={false} sm={5} md={5} className="w-full">
-            <Card>
-              <Carousel names={names}>{tabs}</Carousel>
-            </Card>
+          <Grid item xs={false} sm={6} md={6} className="w-full">
+            <div className="sticky top-0 gridsm:max-h-screen overflow-y-auto pt-4">
+              <Card>
+                <Carousel names={names}>{tabs}</Carousel>
+              </Card>
+            </div>
           </Grid>
         </Grid>
       </>

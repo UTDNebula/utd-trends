@@ -1,4 +1,4 @@
-import { Autocomplete, Button, TextField } from '@mui/material';
+import { Autocomplete, Button, TextField, Tooltip } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import { useRouter } from 'next/router';
@@ -16,7 +16,6 @@ import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel
 interface SearchProps {
   manageQuery?: 'onSelect' | 'onChange';
   onSelect?: (value: SearchQuery[]) => void;
-  onChange?: (value: SearchQuery[]) => void;
   className?: string;
   input_className?: string;
 }
@@ -31,7 +30,6 @@ let wasEmpty = false; // tracks if the searchbar was empty before the new entry 
 const SearchBar = ({
   manageQuery,
   onSelect,
-  onChange,
   className,
   input_className,
 }: SearchProps) => {
@@ -39,6 +37,7 @@ const SearchBar = ({
   const [options, setOptions] = useState<SearchQuery[]>([]);
   //initial loading prop for first load
   const [loading, setLoading] = useState(false);
+  const [openErrorTooltip, setErrorTooltip] = React.useState(false);
 
   //text in search
   const [inputValue, _setInputValue] = useState('');
@@ -66,9 +65,6 @@ const SearchBar = ({
   //update url with what's in value
   function updateQueries(newValue: SearchQuery[]) {
     if (typeof manageQuery !== 'undefined' && router.isReady) {
-      if (typeof onChange !== 'undefined') {
-        onChange(newValue);
-      }
       const newQuery = router.query;
       if (newValue.length > 0) {
         newQuery.searchTerms = newValue
@@ -86,7 +82,6 @@ const SearchBar = ({
           undefined,
           { shallow: true },
         );
-        router.pathname;
         wasEmpty = false;
       } //otherwise, just update the current navigation entry query
       else
@@ -164,9 +159,6 @@ const SearchBar = ({
 
   //update parent and queries
   function onChange_internal(newValue: SearchQuery[]) {
-    if (typeof onChange !== 'undefined') {
-      onChange(newValue);
-    }
     if (newValue.length == 0) {
       wasEmpty = true; // so that the next search creates a new navigation entry (push())
     }
@@ -186,16 +178,18 @@ const SearchBar = ({
 
   //change all values
   function updateValue(newValue: SearchQuery[]) {
+    if (newValue.length) setErrorTooltip(false); //close the tooltip if there is at least 1 valid search term
     setValue(newValue);
     onChange_internal(newValue);
   }
 
   //update parent and queries
   function onSelect_internal(newValue: SearchQuery[]) {
+    setErrorTooltip(!newValue.length); //Check if tooltip needs to be displayed
     if (typeof onSelect !== 'undefined') {
       onSelect(newValue);
     }
-    if (manageQuery === 'onSelect') {
+    if (newValue.length && manageQuery === 'onSelect') {
       updateQueries(newValue);
     }
   }
@@ -332,15 +326,29 @@ const SearchBar = ({
           );
         }}
       />
-      <Button
-        variant="contained"
-        disableElevation
-        size="large"
-        className="shrink-0 normal-case bg-royal hover:bg-royalDark"
-        onClick={() => onSelect_internal(value)}
+      <Tooltip
+        title="Select a course or professor before searching"
+        placement="top"
+        open={openErrorTooltip}
+        onOpen={() => setErrorTooltip(true)}
+        onClose={() => setErrorTooltip(false)}
+        disableFocusListener
+        disableHoverListener
+        disableTouchListener
       >
-        Search
-      </Button>
+        <Button
+          variant="contained"
+          disableElevation
+          size="large"
+          className={
+            'shrink-0 normal-case bg-royal hover:bg-royalDark' +
+            (value.length == 0 ? ' text-cornflower-200' : '')
+          } //darkens the text when no valid search terms are entered (pseudo-disables the search button)
+          onClick={() => onSelect_internal(value)}
+        >
+          Search
+        </Button>
+      </Tooltip>
     </div>
   );
 };
