@@ -1,10 +1,8 @@
-import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Checkbox,
   FormControl,
-  FormControlLabel,
-  IconButton,
   InputLabel,
+  ListItemText,
   MenuItem,
 } from '@mui/material';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
@@ -77,34 +75,34 @@ const Filters = ({
   }
 
   //All of these must be defined to work
-    typeof academicSessions !== 'undefined' &&
+  typeof academicSessions !== 'undefined' &&
     typeof chosenSessions !== 'undefined' &&
     typeof addChosenSessions !== 'undefined';
 
   //handle select all options for semester
-    const selectAll = (selectAll: boolean) => {
-      if (selectAll) {
-        addChosenSessions(() => academicSessions ?? []);
-      } else {
-        addChosenSessions(() => []);
-      }
-    };
+  const selectAll = (selectAll: boolean) => {
+    if (selectAll) {
+      addChosenSessions(() => academicSessions ?? []);
+    } else {
+      addChosenSessions(() => []);
+    }
+  };
 
   //handle recent semester options for semester
   const selectRecent = () => {
-    const recentSessions = academicSessions?.slice(0,3) ?? [];
+    const recentSessions = academicSessions?.slice(0, 3) ?? [];
     addChosenSessions(() => recentSessions);
   };
 
   return (
     <div className={'flex flex-col gap-2 ' + className ?? ''}>
       <div className="flex gap-2">
-         {/* min GPA dropdown*/}
+        {/* min GPA dropdown*/}
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         >
-          <InputLabel id="minGPA">Min GPA</InputLabel>    
+          <InputLabel id="minGPA">Min GPA</InputLabel>
           <Select
             label="Min GPA"
             labelId="minGPA"
@@ -115,15 +113,16 @@ const Filters = ({
           >
             <MenuItem value="">
               <em>None</em>
-            </MenuItem>    {/* dropdown options*/}
-            {minGPAs.map((value) => (   
+            </MenuItem>{' '}
+            {/* dropdown options*/}
+            {minGPAs.map((value) => (
               <MenuItem key={value} value={value}>
                 {value}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
-        
+
         {/* min rating dropdown*/}
         <FormControl
           size="small"
@@ -149,7 +148,8 @@ const Filters = ({
           >
             <MenuItem value="">
               <em>None</em>
-            </MenuItem>        {/* dropdown options*/}
+            </MenuItem>{' '}
+            {/* dropdown options*/}
             {minRatings.map((value) => (
               <MenuItem key={value} value={value}>
                 <Rating
@@ -176,50 +176,55 @@ const Filters = ({
             onChange={(event: SelectChangeEvent<string[]>) => {
               const value = event.target.value as string[];
               addChosenSessions(() => value);
-              }}
-              renderValue={(selected) => (selected.length > 0 ? "Semester" : "Select a semester")} 
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 400, // Adjust this height as necessary
-                    width: 'auto',
-                    transform: 'translateY(10px)', // This moves the dropdown down
-                  },
+            }}
+            renderValue={(selected) =>
+              selected.length > 0 ? 'Semester' : 'Select a semester'
+            }
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 400, // Adjust this height as necessary
+                  width: 'auto',
+                  transform: 'translateY(10px)', // This moves the dropdown down
                 },
-              }}
-            >
-
+              },
+            }}
+          >
             {/* select all sessions */}
-            <MenuItem value="select-all" >
-            <Checkbox
-              checked={chosenSessions?.length === academicSessions?.length}
-              onClick={() => selectAll(true)}
-            />
-              Select All
+            <MenuItem value="select-all">
+              <Checkbox
+                checked={chosenSessions?.length === academicSessions?.length}
+                onClick={() => selectAll(true)}
+              />
+              <ListItemText primary="Select All" />
             </MenuItem>
-              
+
             {/* recent sessions */}
             <MenuItem value="recent">
-            <Checkbox
-              checked={
-                JSON.stringify(chosenSessions?.slice(0,6)) ===
-                JSON.stringify(academicSessions?.slice(0,6))
-              }
-              onClick={selectRecent}
+              <Checkbox
+                checked={
+                  JSON.stringify(chosenSessions?.slice(0, 6)) ===
+                  JSON.stringify(academicSessions?.slice(0, 6))
+                }
+                onClick={selectRecent}
               />
-              Recent
+              <ListItemText primary="Recent" />
             </MenuItem>
-          
-          {/* indiv options */}
+
+            {/* indiv options */}
             {academicSessions?.map((session) => (
               <MenuItem key={session} value={session}>
                 <Checkbox checked={chosenSessions?.includes(session)} />
-                    {'20' +
-                  session.slice(0, 2) +
-                  ' ' +
-                  { U: 'Summer', F: 'Fall', S: 'Spring' }[session.slice(2)]}
+                <ListItemText
+                  primary={
+                    '20' +
+                    session.slice(0, 2) +
+                    ' ' +
+                    { U: 'Summer', F: 'Fall', S: 'Spring' }[session.slice(2)]
+                  }
+                />
               </MenuItem>
-              ))}
+            ))}
           </Select>
         </FormControl>
       </div>
