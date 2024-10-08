@@ -166,7 +166,7 @@ function parseDescription(course: CourseData): {
       offeringFrequency = 'Summer';
       break;
     default:
-      '';
+      offeringFrequency = '';
       break;
   }
 
