@@ -11,6 +11,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
@@ -118,34 +119,44 @@ function Row({
         sx={{ '& > *': { borderBottom: 'unset' } }}
       >
         <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-            className={'transition-transform' + (open ? ' rotate-90' : '')}
+          <Tooltip
+            title={open ? 'Minimize Result' : 'Expand Result'}
+            placement="top"
           >
-            <KeyboardArrowIcon />
-          </IconButton>
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => setOpen(!open)}
+              className={'transition-transform' + (open ? ' rotate-90' : '')}
+            >
+              <KeyboardArrowIcon />
+            </IconButton>
+          </Tooltip>
         </TableCell>
         <TableCell
           onClick={
             (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the compare checkbox
           }
         >
-          <Checkbox
-            checked={inCompare}
-            onClick={() => {
-              if (inCompare) {
-                removeFromCompare(course);
-              } else {
-                addToCompare(course);
+          <Tooltip
+            title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
+            placement="top"
+          >
+            <Checkbox
+              checked={inCompare}
+              onClick={() => {
+                if (inCompare) {
+                  removeFromCompare(course);
+                } else {
+                  addToCompare(course);
+                }
+              }}
+              disabled={
+                (typeof grades !== 'undefined' && grades.state === 'loading') ||
+                (typeof rmp !== 'undefined' && rmp.state === 'loading')
               }
-            }}
-            disabled={
-              (typeof grades !== 'undefined' && grades.state === 'loading') ||
-              (typeof rmp !== 'undefined' && rmp.state === 'loading')
-            }
-          />
+            />
+          </Tooltip>
         </TableCell>
         <TableCell component="th" scope="row">
           <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
@@ -171,12 +182,17 @@ function Row({
               </Skeleton>
             )) ||
             (grades.state === 'done' && (
-              <Typography
-                className="text-base text-black rounded-full px-5 py-2 inline"
-                sx={{ backgroundColor: gpaToColor(grades.data.gpa) }}
+              <Tooltip
+                title={'GPA: ' + grades.data.gpa.toFixed(2)}
+                placement="top"
               >
-                {gpaToLetterGrade(grades.data.gpa)}
-              </Typography>
+                <Typography
+                  className="text-base text-black rounded-full px-5 py-2 inline"
+                  sx={{ backgroundColor: gpaToColor(grades.data.gpa) }}
+                >
+                  {gpaToLetterGrade(grades.data.gpa)}
+                </Typography>
+              </Tooltip>
             )) ||
             null}
         </TableCell>
@@ -188,12 +204,19 @@ function Row({
               </Skeleton>
             )) ||
             (rmp.state === 'done' && (
-              <Rating
-                defaultValue={rmp.data.avgRating}
-                precision={0.1}
-                sx={{ fontSize: 25 }}
-                readOnly
-              />
+              <Tooltip
+                title={'Professor rating: ' + rmp.data.avgRating}
+                placement="top"
+              >
+                <div>
+                  <Rating
+                    defaultValue={rmp.data.avgRating}
+                    precision={0.1}
+                    sx={{ fontSize: 25 }}
+                    readOnly
+                  />
+                </div>
+              </Tooltip>
             )) ||
             null}
         </TableCell>
@@ -416,26 +439,40 @@ const SearchResultsTable = ({
                 </TableSortLabel>
               </TableCell>
               <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'gpa'}
-                  direction={orderBy === 'gpa' ? order : 'desc'}
-                  onClick={() => {
-                    handleClick('gpa');
-                  }}
+                <Tooltip
+                  title="Average GPA Across Course Sections"
+                  placement="top"
                 >
-                  Grades
-                </TableSortLabel>
+                  <div>
+                    <TableSortLabel
+                      active={orderBy === 'gpa'}
+                      direction={orderBy === 'gpa' ? order : 'desc'}
+                      onClick={() => {
+                        handleClick('gpa');
+                      }}
+                    >
+                      Grades
+                    </TableSortLabel>
+                  </div>
+                </Tooltip>
               </TableCell>
               <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'rating'}
-                  direction={orderBy === 'rating' ? order : 'desc'}
-                  onClick={() => {
-                    handleClick('rating');
-                  }}
+                <Tooltip
+                  title="Average Professor Rating from Rate My Professors"
+                  placement="top"
                 >
-                  Rating
-                </TableSortLabel>
+                  <div>
+                    <TableSortLabel
+                      active={orderBy === 'rating'}
+                      direction={orderBy === 'rating' ? order : 'desc'}
+                      onClick={() => {
+                        handleClick('rating');
+                      }}
+                    >
+                      Rating
+                    </TableSortLabel>
+                  </div>
+                </Tooltip>
               </TableCell>
             </TableRow>
           </TableHead>
