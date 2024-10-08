@@ -162,7 +162,7 @@ const ProfessorOverview = ({
           </>
         )}
       </div>
-      <SingleGradesInfo course={professor} grades={grades} />
+      <SingleGradesInfo title="# of Students (Overall)" course={professor} grades={grades} />
       <SingleProfInfo rmp={rmp} />
     </div>
   );
