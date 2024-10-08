@@ -205,7 +205,7 @@ function Row({
             )) ||
             (rmp.state === 'done' && (
               <Tooltip
-                title={'Professor rating: ' + rmp.data.averageRating}
+                title={'Professor rating: ' + rmp.data.avgRating}
                 placement="top"
               >
                 <div>
