@@ -3,6 +3,7 @@ import '../styles/globals.css';
 import GitHub from '@mui/icons-material/GitHub';
 import { Card, IconButton, Tooltip, useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { GoogleAnalytics } from '@next/third-parties/google'
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import type { AppProps } from 'next/app';
@@ -14,7 +15,6 @@ import React from 'react';
 
 import FeedbackPopup from '../components/common/FeedbackPopup/feedbackPopup';
 import GitHubButton from '../components/common/GitHubButton/gitHubButton';
-import GoogleAnalytics from '../components/common/GoogleAnalytics/googleAnalytics';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -109,7 +109,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <>
-      <GoogleAnalytics />
+      <GoogleAnalytics gaId="G-CC86XR1562" />
       <Head>
         <title>UTD Trends</title>
         <link
