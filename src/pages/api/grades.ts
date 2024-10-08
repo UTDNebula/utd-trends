@@ -15,57 +15,43 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>,
 ) {
-  if (
-    !(
-      'REACT_APP_NEBULA_API_KEY' in process.env &&
-      typeof process.env.REACT_APP_NEBULA_API_KEY === 'string'
-    )
-  ) {
+  const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
+  if (typeof API_KEY !== 'string') {
     res.status(500).json({ message: 'API key is undefined' });
     return;
   }
+  const prefix = req.query.prefix;
+  const number = req.query.number;
+  const profFirst = req.query.profFirst;
+  const profLast = req.query.profLast;
+  const sectionNumber = req.query.sectionNumber;
   if (
-    !('prefix' in req.query && typeof req.query.prefix === 'string') &&
-    !('number' in req.query && typeof req.query.number === 'string') &&
-    !(
-      'profFirst' in req.query &&
-      typeof req.query.profFirst === 'string' &&
-      'profLast' in req.query &&
-      typeof req.query.profLast === 'string'
-    ) &&
-    !(
-      'sectionNumber' in req.query &&
-      typeof req.query.sectionNumber === 'string'
-    )
+    typeof prefix !== 'string' &&
+    typeof number !== 'string' &&
+    typeof profFirst !== 'string' &&
+    typeof profLast !== 'string' &&
+    typeof sectionNumber !== 'string'
   ) {
     res.status(400).json({ message: 'Incorrect query present' });
     return;
   }
   const headers = {
-    'x-api-key': process.env.REACT_APP_NEBULA_API_KEY as string,
+    'x-api-key': API_KEY,
     Accept: 'application/json',
   };
   const url = new URL('https://api.utdnebula.com/grades/semester');
-  if ('prefix' in req.query && typeof req.query.prefix === 'string') {
-    url.searchParams.append('prefix', req.query.prefix);
+  if (typeof prefix === 'string') {
+    url.searchParams.append('prefix', prefix);
   }
-  if ('number' in req.query && typeof req.query.number === 'string') {
-    url.searchParams.append('number', req.query.number);
+  if (typeof number === 'string') {
+    url.searchParams.append('number', number);
   }
-  if (
-    'profFirst' in req.query &&
-    typeof req.query.profFirst === 'string' &&
-    'profLast' in req.query &&
-    typeof req.query.profLast === 'string'
-  ) {
-    url.searchParams.append('first_name', req.query.profFirst);
-    url.searchParams.append('last_name', req.query.profLast);
+  if (typeof profFirst === 'string' && typeof profLast === 'string') {
+    url.searchParams.append('first_name', profFirst);
+    url.searchParams.append('last_name', profLast);
   }
-  if (
-    'sectionNumber' in req.query &&
-    typeof req.query.sectionNumber === 'string'
-  ) {
-    url.searchParams.append('section_number', req.query.sectionNumber);
+  if (typeof sectionNumber === 'string') {
+    url.searchParams.append('section_number', sectionNumber);
   }
   return new Promise<void>((resolve) => {
     fetch(url.href, {

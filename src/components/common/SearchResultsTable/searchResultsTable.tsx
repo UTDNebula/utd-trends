@@ -21,7 +21,7 @@ import SearchQuery, {
 import { useRainbowColors } from '../../../modules/searchQueryColors/searchQueryColors';
 import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
+import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
 import type {
   GenericFetchedData,
   GradesType,
@@ -79,7 +79,7 @@ function LoadingRow() {
 type RowProps = {
   course: SearchQuery;
   grades: GenericFetchedData<GradesType>;
-  rmp: GenericFetchedData<RateMyProfessorData>;
+  rmp: GenericFetchedData<RMPInterface>;
   inCompare: boolean;
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
@@ -189,7 +189,7 @@ function Row({
             )) ||
             (rmp.state === 'done' && (
               <Rating
-                defaultValue={rmp.data.averageRating}
+                defaultValue={rmp.data.avgRating}
                 precision={0.1}
                 sx={{ fontSize: 25 }}
                 readOnly
@@ -216,7 +216,7 @@ type SearchResultsTableProps = {
   resultsLoading: 'loading' | 'done';
   includedResults: SearchQuery[];
   grades: { [key: string]: GenericFetchedData<GradesType> };
-  rmp: { [key: string]: GenericFetchedData<RateMyProfessorData> };
+  rmp: { [key: string]: GenericFetchedData<RMPInterface> };
   compare: SearchQuery[];
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
@@ -382,8 +382,8 @@ const SearchResultsTable = ({
       if (!bRmp || bRmp.state !== 'done') {
         return -9999;
       }
-      const aRating = aRmp?.data?.averageRating ?? 0; // Fallback to 0 if undefined
-      const bRating = bRmp?.data?.averageRating ?? 0; // Fallback to 0 if undefined
+      const aRating = aRmp?.data?.avgRating ?? 0; // Fallback to 0 if undefined
+      const bRating = bRmp?.data?.avgRating ?? 0; // Fallback to 0 if undefined
       if (order === 'asc') {
         return aRating - bRating;
       }

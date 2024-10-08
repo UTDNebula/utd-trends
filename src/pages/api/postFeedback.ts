@@ -10,12 +10,8 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>,
 ) {
-  if (
-    !(
-      'REACT_APP_GOOGLE_CREDENTIALS' in process.env &&
-      typeof process.env.REACT_APP_GOOGLE_CREDENTIALS === 'string'
-    )
-  ) {
+  const CREDENTIALS = process.env.REACT_APP_GOOGLE_CREDENTIALS;
+  if (typeof CREDENTIALS !== 'string') {
     res.status(500).json({ message: 'API key is undefined' });
     return;
   }
@@ -24,7 +20,8 @@ export default function handler(
     return;
   }
   const body = JSON.parse(req.body);
-  if (!('rating' in body && typeof body.rating === 'number')) {
+  const rating = body.rating;
+  if (typeof rating !== 'number') {
     res.status(400).json({ message: 'Incorrect body paramaters present' });
     return;
   }
@@ -37,9 +34,7 @@ export default function handler(
     env = body.env;
   }
   return new Promise<void>((resolve) => {
-    const client = auth.fromJSON(
-      JSON.parse(process.env.REACT_APP_GOOGLE_CREDENTIALS as string),
-    );
+    const client = auth.fromJSON(JSON.parse(CREDENTIALS));
     if (client instanceof JWT) {
       client.scopes = ['https://www.googleapis.com/auth/spreadsheets'];
     }
@@ -50,7 +45,7 @@ export default function handler(
         data: {
           range: 'Data!A1:E1',
           majorDimension: 'ROWS',
-          values: [[Date.now(), env, body.rating, extra]],
+          values: [[Date.now(), env, rating, extra]],
         },
       })
       .then((data) => {

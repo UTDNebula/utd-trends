@@ -17,7 +17,7 @@ import SearchQuery, {
 } from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
+import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
 import type {
   GenericFetchedData,
   GradesType,
@@ -145,9 +145,9 @@ function GradeOrRmpRow<T>({
 type GradeAndRmpRowProps = {
   name: string;
   gradeValues: GenericFetchedData<GradesType>[];
-  rmpValues: GenericFetchedData<RateMyProfessorData>[];
+  rmpValues: GenericFetchedData<RMPInterface>[];
   getGradeValue: (arg0: GradesType) => number;
-  getRmpValue: (arg0: RateMyProfessorData) => number;
+  getRmpValue: (arg0: RMPInterface) => number;
   loadingFiller: string;
   cell_className: string;
   colors: string[];
@@ -207,7 +207,7 @@ function GradeAndRmpRow({
               )) ||
               (rmp.state === 'done' && (
                 <Typography className="text-base inline">
-                  {getRmpValue(rmp.data as RateMyProfessorData)}
+                  {getRmpValue(rmp.data as RMPInterface)}
                 </Typography>
               )) ||
               null}
@@ -286,7 +286,7 @@ function CheckboxRow({
 type CompareTableProps = {
   includedResults: SearchQuery[];
   grades: { [key: string]: GenericFetchedData<GradesType> };
-  rmp: { [key: string]: GenericFetchedData<RateMyProfessorData> };
+  rmp: { [key: string]: GenericFetchedData<RMPInterface> };
   removeFromCompare: (arg0: SearchQuery) => void;
 };
 
@@ -364,27 +364,25 @@ const CompareTable = ({
       }
       if (orderBy === 'Rating') {
         if (order === 'asc') {
-          return aRmp.data.averageRating - bRmp.data.averageRating;
+          return aRmp.data.avgRating - bRmp.data.avgRating;
         }
-        return bRmp.data.averageRating - aRmp.data.averageRating;
+        return bRmp.data.avgRating - aRmp.data.avgRating;
       }
       if (orderBy === 'Would Take Again') {
         if (order === 'asc') {
           return (
-            aRmp.data.wouldTakeAgainPercentage -
-            bRmp.data.wouldTakeAgainPercentage
+            aRmp.data.wouldTakeAgainPercent - bRmp.data.wouldTakeAgainPercent
           );
         }
         return (
-          bRmp.data.wouldTakeAgainPercentage -
-          aRmp.data.wouldTakeAgainPercentage
+          bRmp.data.wouldTakeAgainPercent - aRmp.data.wouldTakeAgainPercent
         );
       }
       if (orderBy === 'Difficulty') {
         if (order === 'asc') {
-          return aRmp.data.averageDifficulty - bRmp.data.averageDifficulty;
+          return aRmp.data.avgDifficulty - bRmp.data.avgDifficulty;
         }
-        return bRmp.data.averageDifficulty - aRmp.data.averageDifficulty;
+        return bRmp.data.avgDifficulty - aRmp.data.avgDifficulty;
       }
     }
     return 0;
@@ -445,12 +443,12 @@ const CompareTable = ({
               order={order}
               handleClick={handleClick}
             />
-            <GradeOrRmpRow<RateMyProfessorData>
+            <GradeOrRmpRow<RMPInterface>
               name="Rating"
               values={sortedResults.map(
                 (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
               )}
-              getValue={(data: RateMyProfessorData) => data.averageRating}
+              getValue={(data: RMPInterface) => data.avgRating}
               formatValue={(value: number) => value.toFixed(1)}
               goodValue={5}
               badValue={0}
@@ -461,14 +459,12 @@ const CompareTable = ({
               order={order}
               handleClick={handleClick}
             />
-            <GradeOrRmpRow<RateMyProfessorData>
+            <GradeOrRmpRow<RMPInterface>
               name="Would Take Again"
               values={sortedResults.map(
                 (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
               )}
-              getValue={(data: RateMyProfessorData) =>
-                data.wouldTakeAgainPercentage
-              }
+              getValue={(data: RMPInterface) => data.wouldTakeAgainPercent}
               formatValue={(value: number) => value.toFixed(0) + '%'}
               goodValue={100}
               badValue={0}
@@ -479,12 +475,12 @@ const CompareTable = ({
               order={order}
               handleClick={handleClick}
             />
-            <GradeOrRmpRow<RateMyProfessorData>
+            <GradeOrRmpRow<RMPInterface>
               name="Difficulty"
               values={sortedResults.map(
                 (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
               )}
-              getValue={(data: RateMyProfessorData) => data.averageDifficulty}
+              getValue={(data: RMPInterface) => data.avgDifficulty}
               formatValue={(value: number) => value.toFixed(1)}
               goodValue={0}
               badValue={5}
@@ -505,7 +501,7 @@ const CompareTable = ({
                 (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
               )}
               getGradeValue={(data: GradesType) => data.total}
-              getRmpValue={(data: RateMyProfessorData) => data.numRatings}
+              getRmpValue={(data: RMPInterface) => data.numRatings}
               loadingFiller="100"
               cell_className="pt-3 pb-2 border-x-2"
               colors={mappedColors}

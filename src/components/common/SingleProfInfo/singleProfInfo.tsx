@@ -2,11 +2,11 @@ import { Grid, Skeleton } from '@mui/material';
 import Link from 'next/link';
 import React from 'react';
 
-import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
+import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
 import type { GenericFetchedData } from '../../../pages/dashboard/index';
 
 type Props = {
-  rmp: GenericFetchedData<RateMyProfessorData>;
+  rmp: GenericFetchedData<RMPInterface>;
 };
 
 function SingleProfInfo({ rmp }: Props) {
@@ -46,11 +46,11 @@ function SingleProfInfo({ rmp }: Props) {
   return (
     <Grid container spacing={2} className="p-4">
       <Grid item xs={6}>
-        <p className="text-xl font-bold">{rmp.data.averageRating}</p>
+        <p className="text-xl font-bold">{rmp.data.avgRating}</p>
         <p>Professor rating</p>
       </Grid>
       <Grid item xs={6}>
-        <p className="text-xl font-bold">{rmp.data.averageDifficulty}</p>
+        <p className="text-xl font-bold">{rmp.data.avgDifficulty}</p>
         <p>Difficulty</p>
       </Grid>
       <Grid item xs={6}>
@@ -61,7 +61,7 @@ function SingleProfInfo({ rmp }: Props) {
       </Grid>
       <Grid item xs={6}>
         <p className="text-xl font-bold">
-          {rmp.data.wouldTakeAgainPercentage.toFixed(0) + '%'}
+          {rmp.data.wouldTakeAgainPercent.toFixed(0) + '%'}
         </p>
         <p>Would take again</p>
       </Grid>

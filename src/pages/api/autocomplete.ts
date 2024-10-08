@@ -18,32 +18,28 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>,
 ) {
-  if ('input' in req.query && typeof req.query.input === 'string') {
-    let searchBy = 'any';
-    if (
-      'searchBy' in req.query &&
-      typeof req.query.searchBy === 'string' &&
-      (req.query.searchBy === 'professor' || req.query.searchBy === 'course')
-    ) {
-      searchBy = req.query.searchBy;
-    }
-    let limit = 20;
-    if ('limit' in req.query && typeof req.query.limit === 'string') {
-      limit = Number(req.query.limit);
-    }
-    return new Promise<void>((resolve) => {
-      res.status(200).json({
-        message: 'success',
-        data: searchAutocomplete(
-          graph,
-          req.query.input as string,
-          limit,
-          searchBy,
-        ),
-      });
-      resolve();
-    });
-  } else {
+  const input = req.query.input;
+  if (typeof input !== 'string') {
     res.status(400).json({ message: 'Incorrect query parameters' });
+    return;
   }
+  let searchBy = 'any';
+  if (
+    'searchBy' in req.query &&
+    typeof req.query.searchBy === 'string' &&
+    (req.query.searchBy === 'professor' || req.query.searchBy === 'course')
+  ) {
+    searchBy = req.query.searchBy;
+  }
+  let limit = 20;
+  if ('limit' in req.query && typeof req.query.limit === 'string') {
+    limit = Number(req.query.limit);
+  }
+  return new Promise<void>((resolve) => {
+    res.status(200).json({
+      message: 'success',
+      data: searchAutocomplete(graph, input, limit, searchBy),
+    });
+    resolve();
+  });
 }
