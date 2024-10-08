@@ -371,13 +371,11 @@ const CompareTable = ({
       if (orderBy === 'Would Take Again') {
         if (order === 'asc') {
           return (
-            aRmp.data.wouldTakeAgainPercent -
-            bRmp.data.wouldTakeAgainPercent
+            aRmp.data.wouldTakeAgainPercent - bRmp.data.wouldTakeAgainPercent
           );
         }
         return (
-          bRmp.data.wouldTakeAgainPercent -
-          aRmp.data.wouldTakeAgainPercent
+          bRmp.data.wouldTakeAgainPercent - aRmp.data.wouldTakeAgainPercent
         );
       }
       if (orderBy === 'Difficulty') {
@@ -466,9 +464,7 @@ const CompareTable = ({
               values={sortedResults.map(
                 (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
               )}
-              getValue={(data: RMPInterface) =>
-                data.wouldTakeAgainPercent
-              }
+              getValue={(data: RMPInterface) => data.wouldTakeAgainPercent}
               formatValue={(value: number) => value.toFixed(0) + '%'}
               goodValue={100}
               badValue={0}

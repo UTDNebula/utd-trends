@@ -13,7 +13,7 @@ import CompareTable from '../CompareTable/compareTable';
 type CompareProps = {
   courses: SearchQuery[];
   grades: { [key: string]: GenericFetchedData<GradesType> };
-  rmp: { [key: string]: GenericFetchedData<RateMyProfessorData> };
+  rmp: { [key: string]: GenericFetchedData<RMPInterface> };
   removeFromCompare: { (arg0: SearchQuery): void };
 };
 
