@@ -1,1 +1,0 @@
-### Related Term Card Example
