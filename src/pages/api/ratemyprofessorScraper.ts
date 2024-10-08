@@ -109,7 +109,8 @@ export default function handler(
     return;
   }
   return new Promise<void>((resolve) => {
-    const name = profFirst.split(' ')[0] + ' ' + profLast;
+    profFirst = profFirst.split(' ')[0]
+    const name = profFirst + ' ' + profLast;
 
     // create fetch object for professor
     const graphQlUrlProp = getGraphQlUrlProp(name);
