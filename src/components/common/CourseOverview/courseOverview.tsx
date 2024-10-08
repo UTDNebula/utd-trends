@@ -319,7 +319,11 @@ const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
   return (
     <div className="flex flex-col gap-2">
       {courseComponent}
-      <SingleGradesInfo title="# of Students (Overall)" course={course} grades={grades} />
+      <SingleGradesInfo
+        title="# of Students (Overall)"
+        course={course}
+        grades={grades}
+      />
     </div>
   );
 };
