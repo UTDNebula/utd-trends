@@ -2,7 +2,7 @@ import React from 'react';
 
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
+import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
 import type {
   GenericFetchedData,
   GradesType,
@@ -10,19 +10,19 @@ import type {
 import BarGraph from '../../graph/BarGraph/barGraph';
 import CompareTable from '../CompareTable/compareTable';
 
+type CompareProps = {
+  courses: SearchQuery[];
+  grades: { [key: string]: GenericFetchedData<GradesType> };
+  rmp: { [key: string]: GenericFetchedData<RMPInterface> };
+  removeFromCompare: { (arg0: SearchQuery): void };
+};
+
 function convertNumbersToPercents(distribution: GradesType): number[] {
   const total = distribution.total;
   return distribution.grade_distribution.map(
     (frequencyOfLetterGrade) => (frequencyOfLetterGrade / total) * 100,
   );
 }
-
-type CompareProps = {
-  courses: SearchQuery[];
-  grades: { [key: string]: GenericFetchedData<GradesType> };
-  rmp: { [key: string]: GenericFetchedData<RateMyProfessorData> };
-  removeFromCompare: { (arg0: SearchQuery): void };
-};
 
 const Compare = ({ courses, grades, rmp, removeFromCompare }: CompareProps) => {
   if (courses.length === 0) {

@@ -9,7 +9,7 @@ import fetchWithCache, {
 } from '../../../modules/fetchWithCache';
 import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
+import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
 import type {
   GenericFetchedData,
   GradesType,
@@ -40,7 +40,7 @@ interface ProfessorInterface {
 type ProfessorOverviewProps = {
   professor: SearchQuery;
   grades: GenericFetchedData<GradesType>;
-  rmp: GenericFetchedData<RateMyProfessorData>;
+  rmp: GenericFetchedData<RMPInterface>;
 };
 
 const ProfessorOverview = ({
