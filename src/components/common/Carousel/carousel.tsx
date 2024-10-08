@@ -1,6 +1,6 @@
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { TabNavMenu } from '../../navigation/tabNavMenu/tabNavMenu';
 
@@ -43,6 +43,10 @@ const Carousel = ({ names, children }: CarouselProps) => {
   const [currentCard, setCurrentCard] = useState(0);
   // The Direction that the card is moving in
   const [direction, setDirection] = useState(0);
+
+  useEffect(() => {
+    setCurrentCard(0);
+  }, [children]);
 
   /**
    * On each re-render, ensure currentCard is within valid bounds
