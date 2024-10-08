@@ -162,7 +162,7 @@ function Row({
         </TableCell>
         <TableCell align="right">
           {((typeof grades === 'undefined' || grades.state === 'error') && (
-            <CloseIcon />
+            <></>
           )) ||
             (grades.state === 'loading' && (
               <Skeleton
@@ -183,9 +183,7 @@ function Row({
             null}
         </TableCell>
         <TableCell align="right">
-          {((typeof rmp === 'undefined' || rmp.state === 'error') && (
-            <CloseIcon />
-          )) ||
+          {((typeof rmp === 'undefined' || rmp.state === 'error') && <></>) ||
             (rmp.state === 'loading' && (
               <Skeleton variant="rounded" className="rounded-full ml-auto">
                 <Rating sx={{ fontSize: 25 }} readOnly />

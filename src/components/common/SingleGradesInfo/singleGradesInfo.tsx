@@ -17,11 +17,12 @@ function convertNumbersToPercents(distribution: GradesType): number[] {
 }
 
 type Props = {
+  title?: string;
   course: SearchQuery;
   grades: GenericFetchedData<GradesType>;
 };
 
-function SingleGradesInfo({ course, grades }: Props) {
+function SingleGradesInfo({ title, course, grades }: Props) {
   if (typeof grades === 'undefined' || grades.state === 'error') {
     return null;
   }
@@ -47,7 +48,7 @@ function SingleGradesInfo({ course, grades }: Props) {
     <div className="p-2">
       <div className="h-64">
         <BarGraph
-          title="# of Students"
+          title={title ?? '# of Students'}
           xaxisLabels={[
             'A+',
             'A',
