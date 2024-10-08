@@ -24,7 +24,7 @@ import { convertToProfOnly } from '../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
 import type { GradesData } from '../../pages/api/grades';
-import type { RateMyProfessorData } from '../../pages/api/ratemyprofessorScraper';
+import { RMPInterface } from '../api/ratemyprofessorScraper';
 
 //Limit cached number of grades and rmp data entries
 const MAX_ENTRIES = 1000;
@@ -205,7 +205,7 @@ function fetchGradesData(
 function fetchRmpData(
   professor: SearchQuery,
   controller: AbortController,
-): Promise<RateMyProfessorData> {
+): Promise<RMPInterface> {
   return fetchWithCache(
     '/api/ratemyprofessorScraper?profFirst=' +
       encodeURIComponent(String(professor.profFirst)) +
@@ -444,12 +444,9 @@ export const Dashboard: NextPage = () => {
   }
   //Store rmp scores by profs
   const [rmp, setRmp] = useState<{
-    [key: string]: GenericFetchedData<RateMyProfessorData>;
+    [key: string]: GenericFetchedData<RMPInterface>;
   }>({});
-  function addToRmp(
-    key: string,
-    value: GenericFetchedData<RateMyProfessorData>,
-  ) {
+  function addToRmp(key: string, value: GenericFetchedData<RMPInterface>) {
     setRmp((old) => {
       const newVal = { ...old };
       if (typeof newVal[key] !== 'undefined') {
@@ -497,7 +494,7 @@ export const Dashboard: NextPage = () => {
   ) {
     addToRmp(searchQueryLabel(professor), { state: 'loading' });
     fetchRmpData(professor, controller)
-      .then((res: RateMyProfessorData) => {
+      .then((res: RMPInterface) => {
         //Add to storage
         //Set loading status to done
         addToRmp(searchQueryLabel(professor), {
@@ -589,7 +586,7 @@ export const Dashboard: NextPage = () => {
           typeof router.query.minRating === 'string' &&
           typeof courseRmp !== 'undefined' &&
           courseRmp.state === 'done' &&
-          courseRmp.data.averageRating < parseFloat(router.query.minRating)
+          courseRmp.data.avgRating < parseFloat(router.query.minRating)
         ) {
           return false;
         }
@@ -597,7 +594,7 @@ export const Dashboard: NextPage = () => {
           typeof router.query.maxDiff === 'string' &&
           typeof courseRmp !== 'undefined' &&
           courseRmp.state === 'done' &&
-          courseRmp.data.averageDifficulty > parseFloat(router.query.maxDiff)
+          courseRmp.data.avgDifficulty > parseFloat(router.query.maxDiff)
         ) {
           return false;
         }
@@ -616,7 +613,7 @@ export const Dashboard: NextPage = () => {
   }>({});
   //Saved data for their professors
   const [compareRmp, setCompareRmp] = useState<{
-    [key: string]: GenericFetchedData<RateMyProfessorData>;
+    [key: string]: GenericFetchedData<RMPInterface>;
   }>({});
 
   //Add a course+prof combo to compare (happens from search results)
