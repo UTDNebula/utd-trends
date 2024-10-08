@@ -14,6 +14,7 @@ import React from 'react';
 
 import FeedbackPopup from '../components/common/FeedbackPopup/feedbackPopup';
 import GitHubButton from '../components/common/GitHubButton/gitHubButton';
+import GoogleAnalytics from '../components/common/GoogleAnalytics/googleAnalytics';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -108,6 +109,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <>
+      <GoogleAnalytics />
       <Head>
         <title>UTD Trends</title>
         <link
