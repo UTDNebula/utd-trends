@@ -58,7 +58,7 @@ const Compare = ({ courses, grades, rmp, removeFromCompare }: CompareProps) => {
             const grade = grades[searchQueryLabel(courses[seriesIndex])];
             if (grade.state === 'done') {
               response +=
-                '% (' +
+                ' (' +
                 grade.data.grade_distribution[dataPointIndex]
                   .toFixed(0)
                   .toLocaleString() +
