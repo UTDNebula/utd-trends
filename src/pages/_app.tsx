@@ -3,7 +3,7 @@ import '../styles/globals.css';
 import GitHub from '@mui/icons-material/GitHub';
 import { Card, IconButton, Tooltip, useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { GoogleAnalytics } from '@next/third-parties/google'
+import { GoogleAnalytics } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import type { AppProps } from 'next/app';
