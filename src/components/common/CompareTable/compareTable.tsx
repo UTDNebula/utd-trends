@@ -387,7 +387,7 @@ const CompareTable = ({
 
   return (
     <div className="overflow-x-auto">
-      <TableContainer className="w-fit">
+      <TableContainer className="w-fit mb-4">
         <Table size="small" className="border-spacing-x-2 border-separate">
           <TableHead>
             <TableRow>
