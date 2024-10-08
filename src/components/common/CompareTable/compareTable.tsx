@@ -118,7 +118,7 @@ function GradeOrRmpRow<T>({
                 <Typography className="text-base">{loadingFiller}</Typography>
               </Skeleton>
             )) ||
-            (value.state === 'done' && (
+            (value.state === 'done' && getValue(value.data) !== -1 && (
               <Typography
                 className="text-base inline rounded-full px-5 py-2 text-black"
                 style={{
