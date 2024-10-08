@@ -297,7 +297,7 @@ const CompareTable = ({
   removeFromCompare,
 }: CompareTableProps) => {
   //Table sorting category
-  const [orderBy, setOrderBy] = useState<string>('Key');
+  const [orderBy, setOrderBy] = useState<string>('Color');
   //Table sorting direction
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   //Cycle through sorting
@@ -308,7 +308,7 @@ const CompareTable = ({
         setOrder('asc'); //default difficulty behavior goes from low to high
       else setOrder('desc'); //default number behavior goes from high to low for our metrics
     } else {
-      if (col !== 'Key') {
+      if (col !== 'Color') {
         if (order === 'desc') {
           setOrder('asc');
         } else {
@@ -511,7 +511,7 @@ const CompareTable = ({
               colors={mappedColors}
             />
             <CheckboxRow
-              name="Key"
+              name="Color"
               courses={sortedResults}
               removeFromCompare={removeFromCompare}
               cell_className="pt-0 pb-1 border-x-2 border-b-2 rounded-b-lg"
