@@ -1,4 +1,3 @@
-import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Checkbox,
@@ -12,15 +11,14 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TableSortLabel,
   Typography,
-  useMediaQuery,
 } from '@mui/material';
 import React, { useState } from 'react';
 
 import SearchQuery, {
   convertToProfOnly,
 } from '../../../modules/SearchQuery/SearchQuery';
+import { useRainbowColors } from '../../../modules/searchQueryColors/searchQueryColors';
 import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
@@ -31,6 +29,22 @@ import type {
 import Rating from '../Rating/rating';
 import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
 import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
+import TableSortLabel from '../TableSortLabel/tableSortLabel';
+
+const gpaToLetterGrade = (gpa: number): string => {
+  if (gpa >= 4.0) return 'A';
+  if (gpa >= 3.67) return 'A-';
+  if (gpa >= 3.33) return 'B+';
+  if (gpa >= 3.0) return 'B';
+  if (gpa >= 2.67) return 'B-';
+  if (gpa >= 2.33) return 'C+';
+  if (gpa >= 2.0) return 'C';
+  if (gpa >= 1.67) return 'C-';
+  if (gpa >= 1.33) return 'D+';
+  if (gpa >= 1.0) return 'D';
+  if (gpa >= 0.67) return 'D-';
+  return 'F';
+};
 
 function LoadingRow() {
   return (
@@ -62,33 +76,6 @@ function LoadingRow() {
   );
 }
 
-//Find the color corresponding to a number in a range
-function colorMidpoint(good: number, bad: number, value: number) {
-  const min = bad < good ? bad : good;
-  const max = bad > good ? bad : good;
-
-  // Ensure value is within bounds
-  if (value < min) value = min;
-  if (value > max) value = max;
-
-  // Normalize the value between 0 and 1
-  let ratio = (value - min) / (max - min);
-  if (bad > good) {
-    ratio = 1 - ratio;
-  }
-
-  const startColor = { r: 0xff, g: 0x57, b: 0x57 };
-  const endColor = { r: 0x79, g: 0xff, b: 0x57 };
-
-  const r = Math.round(startColor.r + ratio * (endColor.r - startColor.r));
-  const g = Math.round(startColor.g + ratio * (endColor.g - startColor.g));
-  const b = Math.round(startColor.b + ratio * (endColor.b - startColor.b));
-
-  return `#${r.toString(16).padStart(2, '0')}${g
-    .toString(16)
-    .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-}
-
 type RowProps = {
   course: SearchQuery;
   grades: GenericFetchedData<GradesType>;
@@ -108,9 +95,28 @@ function Row({
 }: RowProps) {
   const [open, setOpen] = useState(false);
 
+  const rainbowColors = useRainbowColors();
+  const gpaToColor = (gpa: number): string => {
+    if (gpa >= 4.0) return rainbowColors[1];
+    if (gpa >= 3.67) return rainbowColors[2];
+    if (gpa >= 3.33) return rainbowColors[3];
+    if (gpa >= 3.0) return rainbowColors[4];
+    if (gpa >= 2.67) return rainbowColors[5];
+    if (gpa >= 2.33) return rainbowColors[6];
+    if (gpa >= 2.0) return rainbowColors[7];
+    if (gpa >= 1.67) return rainbowColors[8];
+    if (gpa >= 1.33) return rainbowColors[9];
+    if (gpa >= 1.0) return rainbowColors[10];
+    if (gpa >= 0.67) return rainbowColors[11];
+    return rainbowColors[12];
+  };
+
   return (
     <>
-      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+      <TableRow
+        onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
+        sx={{ '& > *': { borderBottom: 'unset' } }}
+      >
         <TableCell>
           <IconButton
             aria-label="expand row"
@@ -121,7 +127,11 @@ function Row({
             <KeyboardArrowIcon />
           </IconButton>
         </TableCell>
-        <TableCell>
+        <TableCell
+          onClick={
+            (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the compare checkbox
+          }
+        >
           <Checkbox
             checked={inCompare}
             onClick={() => {
@@ -150,30 +160,28 @@ function Row({
         </TableCell>
         <TableCell align="right">
           {((typeof grades === 'undefined' || grades.state === 'error') && (
-            <CloseIcon />
+            <></>
           )) ||
             (grades.state === 'loading' && (
               <Skeleton
                 variant="rounded"
                 className="rounded-full px-5 py-2 ml-auto"
               >
-                <Typography className="text-base">4.00</Typography>
+                <Typography className="text-base">A</Typography>
               </Skeleton>
             )) ||
             (grades.state === 'done' && (
               <Typography
                 className="text-base text-black rounded-full px-5 py-2 inline"
-                sx={{ backgroundColor: colorMidpoint(4, 0, grades.data.gpa) }}
+                sx={{ backgroundColor: gpaToColor(grades.data.gpa) }}
               >
-                {grades.data.gpa.toFixed(2)}
+                {gpaToLetterGrade(grades.data.gpa)}
               </Typography>
             )) ||
             null}
         </TableCell>
         <TableCell align="right">
-          {((typeof rmp === 'undefined' || rmp.state === 'error') && (
-            <CloseIcon />
-          )) ||
+          {((typeof rmp === 'undefined' || rmp.state === 'error') && <></>) ||
             (rmp.state === 'loading' && (
               <Skeleton variant="rounded" className="rounded-full ml-auto">
                 <Rating sx={{ fontSize: 25 }} readOnly />
@@ -223,11 +231,6 @@ const SearchResultsTable = ({
   addToCompare,
   removeFromCompare,
 }: SearchResultsTableProps) => {
-  //Selected arrow color
-  const sortArrowColor = useMediaQuery('(prefers-color-scheme: dark)')
-    ? 'white'
-    : 'black';
-
   //Table sorting category
   const [orderBy, setOrderBy] = useState<'name' | 'gpa' | 'rating'>('name');
   //Table sorting direction
@@ -266,8 +269,7 @@ const SearchResultsTable = ({
   }
 
   //Sort
-  let sortedResults = includedResults;
-  sortedResults = [...includedResults].sort((a, b) => {
+  const sortedResults = [...includedResults].sort((a, b) => {
     if (orderBy === 'name') {
       //same logic as in generateCombosTable.ts
       //handle undefined variables based on searchQueryLabel
@@ -409,14 +411,6 @@ const SearchResultsTable = ({
                   onClick={() => {
                     handleClick('name');
                   }}
-                  sx={{
-                    '& .MuiTableSortLabel-icon': {
-                      opacity: 0.5, // Ensure the arrow is always visible
-                    },
-                    '&.Mui-active .MuiTableSortLabel-icon': {
-                      color: sortArrowColor, // Brighten the arrow
-                    },
-                  }}
                 >
                   Name
                 </TableSortLabel>
@@ -428,16 +422,8 @@ const SearchResultsTable = ({
                   onClick={() => {
                     handleClick('gpa');
                   }}
-                  sx={{
-                    '& .MuiTableSortLabel-icon': {
-                      opacity: 0.5, // Ensure the arrow is always visible
-                    },
-                    '&.Mui-active .MuiTableSortLabel-icon': {
-                      color: sortArrowColor, // Brighten the arrow
-                    },
-                  }}
                 >
-                  GPA
+                  Grades
                 </TableSortLabel>
               </TableCell>
               <TableCell>
@@ -446,14 +432,6 @@ const SearchResultsTable = ({
                   direction={orderBy === 'rating' ? order : 'desc'}
                   onClick={() => {
                     handleClick('rating');
-                  }}
-                  sx={{
-                    '& .MuiTableSortLabel-icon': {
-                      opacity: 0.5, // Ensure the arrow is always visible
-                    },
-                    '&.Mui-active .MuiTableSortLabel-icon': {
-                      color: sortArrowColor, // Brighten the arrow
-                    },
                   }}
                 >
                   Rating
