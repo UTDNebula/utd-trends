@@ -189,7 +189,7 @@ const Filters = ({
               .map((session) => displayAcademicSessionName(session))
               .join(', ');
           }}
-          MenuProps={{autoFocus: false}}
+          MenuProps={{ autoFocus: false }}
         >
           {/* select all sessions */}
           <MenuItem value="select-all">
