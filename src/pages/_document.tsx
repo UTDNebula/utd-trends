@@ -1,6 +1,8 @@
 import { Head, Html, Main, NextScript } from 'next/document';
 import React from 'react';
 
+import tailwindConfig from '../../tailwind.config.js';
+
 function Document() {
   return (
     <Html lang="en">
@@ -9,7 +11,10 @@ function Document() {
           name="description"
           content="A data visualization tool built to help students view historical course and section data."
         />
-        <meta name="theme-color" content="#573dff" />
+        <meta
+          name="theme-color"
+          content={tailwindConfig.theme.extend.colors.royal}
+        />
 
         <meta property="og:title" content="UTD Trends" />
         <meta
