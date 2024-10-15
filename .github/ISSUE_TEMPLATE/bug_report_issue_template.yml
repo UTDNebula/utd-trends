@@ -8,7 +8,7 @@ body:
       value: |
         Thanks for taking the time to fill out this bug report! By giving as
         much detail as possible, you'll help us identify what went wrong and
-        fixing the behavior.
+        fix the behavior.
   - type: textarea
     id: what-was-expected
     attributes:
@@ -30,9 +30,11 @@ body:
     id: version
     attributes:
       label: Version
-      description: What version of our software are you running?
+      description: What version of our software are you using?
       options:
-        - Beta 0.1.0
+        - trends.utdnebula.com
+        - dev.trends.utdnebula.com
+        - a branch (specify above)
     validations:
       required: true
   - type: dropdown
@@ -57,7 +59,7 @@ body:
     id: terms
     attributes:
       label: Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://about.utdnebula.com/docs/code-of-conduct/)
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://nebula-labs.atlassian.net/wiki/x/vAA-DQ)
       options:
         - label: I agree to follow this project's Code of Conduct
           required: true
