@@ -4,7 +4,6 @@ import GitHub from '@mui/icons-material/GitHub';
 import { Card, IconButton, Tooltip, useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { GoogleAnalytics } from '@next/third-parties/google';
-import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
@@ -146,7 +145,6 @@ function MyApp({ Component, pageProps }: AppProps) {
           <GitHubButton />
         </div>
       </ThemeProvider>
-      <Analytics />
       <SpeedInsights route={router.pathname} />
       {showGitInfo && (
         <>
