@@ -13,6 +13,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 
+import tailwindConfig from '../../tailwind.config.js';
 import FeedbackPopup from '../components/common/FeedbackPopup/feedbackPopup';
 import GitHubButton from '../components/common/GitHubButton/gitHubButton';
 
@@ -78,20 +79,19 @@ const kallisto = localFont({
 
 function MyApp({ Component, pageProps }: AppProps) {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-
   const muiTheme = createTheme({
     palette: {
       mode: prefersDarkMode ? 'dark' : 'light',
       //copied from tailwind.config.js
       primary: {
-        main: '#573dff',
+        main: tailwindConfig.theme.extend.colors.royal,
       },
       secondary: {
-        main: '#573dff',
-        light: '#c2c8ff',
+        main: tailwindConfig.theme.extend.colors.royal,
+        light: tailwindConfig.theme.extend.colors.periwinkle,
       },
       error: {
-        main: '#ff5743',
+        main: tailwindConfig.theme.extend.colors.persimmon['500'],
       },
     },
     typography: {
