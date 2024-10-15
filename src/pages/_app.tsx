@@ -3,6 +3,7 @@ import '../styles/globals.css';
 import GitHub from '@mui/icons-material/GitHub';
 import { Card, IconButton, Tooltip, useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
@@ -11,9 +12,9 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 
+import tailwindConfig from '../../tailwind.config.js';
 import FeedbackPopup from '../components/common/FeedbackPopup/feedbackPopup';
 import GitHubButton from '../components/common/GitHubButton/gitHubButton';
-import GoogleAnalytics from '../components/common/GoogleAnalytics/googleAnalytics';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -77,20 +78,19 @@ const kallisto = localFont({
 
 function MyApp({ Component, pageProps }: AppProps) {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-
   const muiTheme = createTheme({
     palette: {
       mode: prefersDarkMode ? 'dark' : 'light',
       //copied from tailwind.config.js
       primary: {
-        main: '#573dff',
+        main: tailwindConfig.theme.extend.colors.royal,
       },
       secondary: {
-        main: '#573dff',
-        light: '#c2c8ff',
+        main: tailwindConfig.theme.extend.colors.royal,
+        light: tailwindConfig.theme.extend.colors.periwinkle,
       },
       error: {
-        main: '#ff5743',
+        main: tailwindConfig.theme.extend.colors.persimmon['500'],
       },
     },
     typography: {
@@ -108,7 +108,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <>
-      <GoogleAnalytics />
+      <GoogleAnalytics gaId="G-CC86XR1562" />
       <Head>
         <title>UTD Trends</title>
         <link
