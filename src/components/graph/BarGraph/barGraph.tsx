@@ -134,6 +134,13 @@ function BarGraph(props: GraphProps) {
         formatter: props.tooltipFormatter ?? props.yaxisFormatter,
       },
     },
+    states: {
+      active: {
+        filter: {
+          type: 'none',
+        },
+      },
+    },
   };
 
   const graph = (
