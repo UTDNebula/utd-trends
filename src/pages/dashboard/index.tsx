@@ -709,7 +709,6 @@ export const Dashboard: NextPage = () => {
     } else {
       panelTVert.current?.collapse();
       setPanelsDirection('horizontal');
-      panelLRef.current?.resize(50);
     }
   };
   // Resets RHS & LHS to 50/50 when double clicking handle
@@ -805,7 +804,13 @@ export const Dashboard: NextPage = () => {
             className="p-1 w-[2px] rounded-md opacity-75 transition ease-in-out bg-transparent hover:bg-blue-950 duration-75"
             onDoubleClick={handleResizeDoubleClick}
           />
-          <Panel className="pl-1" id="RHS" ref={panelRRef} minSize={40}>
+          <Panel
+            className="pl-1"
+            id="RHS"
+            ref={panelRRef}
+            minSize={40}
+            defaultSize={50}
+          >
             <Card>
               <Carousel names={names}>{tabs}</Carousel>
             </Card>
