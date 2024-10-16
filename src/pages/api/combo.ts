@@ -13,12 +13,13 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>,
 ) {
-  if ('input' in req.query && typeof req.query.input === 'string') {
-    res.status(200).json({
-      message: 'success',
-      data: (comboTable as TableType)[req.query.input],
-    });
-  } else {
+  const input = req.query.input;
+  if (typeof input !== 'string') {
     res.status(400).json({ message: 'Incorrect query parameters' });
+    return;
   }
+  res.status(200).json({
+    message: 'success',
+    data: (comboTable as TableType)[input],
+  });
 }

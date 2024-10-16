@@ -1,4 +1,3 @@
-import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Checkbox,
@@ -12,7 +11,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TableSortLabel,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
@@ -20,15 +19,33 @@ import React, { useState } from 'react';
 import SearchQuery, {
   convertToProfOnly,
 } from '../../../modules/SearchQuery/SearchQuery';
+import { useRainbowColors } from '../../../modules/searchQueryColors/searchQueryColors';
 import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import type { RateMyProfessorData } from '../../../pages/api/ratemyprofessorScraper';
+import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
 import type {
   GenericFetchedData,
   GradesType,
 } from '../../../pages/dashboard/index';
+import Rating from '../Rating/rating';
 import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
 import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
+import TableSortLabel from '../TableSortLabel/tableSortLabel';
+
+const gpaToLetterGrade = (gpa: number): string => {
+  if (gpa >= 4.0) return 'A';
+  if (gpa >= 3.67) return 'A-';
+  if (gpa >= 3.33) return 'B+';
+  if (gpa >= 3.0) return 'B';
+  if (gpa >= 2.67) return 'B-';
+  if (gpa >= 2.33) return 'C+';
+  if (gpa >= 2.0) return 'C';
+  if (gpa >= 1.67) return 'C-';
+  if (gpa >= 1.33) return 'D+';
+  if (gpa >= 1.0) return 'D';
+  if (gpa >= 0.67) return 'D-';
+  return 'F';
+};
 
 function LoadingRow() {
   return (
@@ -52,50 +69,18 @@ function LoadingRow() {
         </Skeleton>
       </TableCell>
       <TableCell align="right">
-        <Skeleton variant="rounded" className="rounded-full px-5 py-2 ml-auto">
-          <Typography className="text-base">5.0</Typography>
-        </Skeleton>
-      </TableCell>
-      <TableCell align="right">
-        <Skeleton variant="rounded" className="rounded-full px-5 py-2 ml-auto">
-          <Typography className="text-base">5.0</Typography>
+        <Skeleton variant="rounded" className="rounded-full ml-auto">
+          <Rating sx={{ fontSize: 25 }} readOnly />
         </Skeleton>
       </TableCell>
     </TableRow>
   );
 }
 
-//Find the color corresponding to a number in a range
-function colorMidpoint(good: number, bad: number, value: number) {
-  const min = bad < good ? bad : good;
-  const max = bad > good ? bad : good;
-
-  // Ensure value is within bounds
-  if (value < min) value = min;
-  if (value > max) value = max;
-
-  // Normalize the value between 0 and 1
-  let ratio = (value - min) / (max - min);
-  if (bad > good) {
-    ratio = 1 - ratio;
-  }
-
-  const startColor = { r: 0xff, g: 0x57, b: 0x57 };
-  const endColor = { r: 0x79, g: 0xff, b: 0x57 };
-
-  const r = Math.round(startColor.r + ratio * (endColor.r - startColor.r));
-  const g = Math.round(startColor.g + ratio * (endColor.g - startColor.g));
-  const b = Math.round(startColor.b + ratio * (endColor.b - startColor.b));
-
-  return `#${r.toString(16).padStart(2, '0')}${g
-    .toString(16)
-    .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-}
-
 type RowProps = {
   course: SearchQuery;
   grades: GenericFetchedData<GradesType>;
-  rmp: GenericFetchedData<RateMyProfessorData>;
+  rmp: GenericFetchedData<RMPInterface>;
   inCompare: boolean;
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
@@ -111,34 +96,67 @@ function Row({
 }: RowProps) {
   const [open, setOpen] = useState(false);
 
+  const rainbowColors = useRainbowColors();
+  const gpaToColor = (gpa: number): string => {
+    if (gpa >= 4.0) return rainbowColors[1];
+    if (gpa >= 3.67) return rainbowColors[2];
+    if (gpa >= 3.33) return rainbowColors[3];
+    if (gpa >= 3.0) return rainbowColors[4];
+    if (gpa >= 2.67) return rainbowColors[5];
+    if (gpa >= 2.33) return rainbowColors[6];
+    if (gpa >= 2.0) return rainbowColors[7];
+    if (gpa >= 1.67) return rainbowColors[8];
+    if (gpa >= 1.33) return rainbowColors[9];
+    if (gpa >= 1.0) return rainbowColors[10];
+    if (gpa >= 0.67) return rainbowColors[11];
+    return rainbowColors[12];
+  };
+
   return (
     <>
-      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+      <TableRow
+        onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
+        sx={{ '& > *': { borderBottom: 'unset' } }}
+      >
         <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-            className={'transition-transform' + (open ? ' rotate-90' : '')}
+          <Tooltip
+            title={open ? 'Minimize Result' : 'Expand Result'}
+            placement="top"
           >
-            <KeyboardArrowIcon />
-          </IconButton>
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => setOpen(!open)}
+              className={'transition-transform' + (open ? ' rotate-90' : '')}
+            >
+              <KeyboardArrowIcon />
+            </IconButton>
+          </Tooltip>
         </TableCell>
-        <TableCell>
-          <Checkbox
-            checked={inCompare}
-            onClick={() => {
-              if (inCompare) {
-                removeFromCompare(course);
-              } else {
-                addToCompare(course);
+        <TableCell
+          onClick={
+            (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the compare checkbox
+          }
+        >
+          <Tooltip
+            title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
+            placement="top"
+          >
+            <Checkbox
+              checked={inCompare}
+              onClick={() => {
+                if (inCompare) {
+                  removeFromCompare(course);
+                } else {
+                  addToCompare(course);
+                }
+              }}
+              disabled={
+                (typeof grades !== 'undefined' && grades.state === 'loading') ||
+                (typeof rmp !== 'undefined' && rmp.state === 'loading')
               }
-            }}
-            disabled={
-              (typeof grades !== 'undefined' && grades.state === 'loading') ||
-              (typeof rmp !== 'undefined' && rmp.state === 'loading')
-            }
-          />
+            />
+          </Tooltip>
         </TableCell>
         <TableCell component="th" scope="row">
           <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
@@ -153,75 +171,52 @@ function Row({
         </TableCell>
         <TableCell align="right">
           {((typeof grades === 'undefined' || grades.state === 'error') && (
-            <CloseIcon />
+            <></>
           )) ||
             (grades.state === 'loading' && (
               <Skeleton
                 variant="rounded"
                 className="rounded-full px-5 py-2 ml-auto"
               >
-                <Typography className="text-base">4.00</Typography>
+                <Typography className="text-base">A</Typography>
               </Skeleton>
             )) ||
             (grades.state === 'done' && (
-              <Typography
-                className="text-base text-black rounded-full px-5 py-2 inline"
-                sx={{ backgroundColor: colorMidpoint(4, 0, grades.data.gpa) }}
+              <Tooltip
+                title={'GPA: ' + grades.data.gpa.toFixed(2)}
+                placement="top"
               >
-                {grades.data.gpa.toFixed(2)}
-              </Typography>
+                <Typography
+                  className="text-base text-black rounded-full px-5 py-2 inline"
+                  sx={{ backgroundColor: gpaToColor(grades.data.gpa) }}
+                >
+                  {gpaToLetterGrade(grades.data.gpa)}
+                </Typography>
+              </Tooltip>
             )) ||
             null}
         </TableCell>
         <TableCell align="right">
-          {((typeof rmp === 'undefined' || rmp.state === 'error') && (
-            <CloseIcon />
-          )) ||
+          {((typeof rmp === 'undefined' || rmp.state === 'error') && <></>) ||
             (rmp.state === 'loading' && (
-              <Skeleton
-                variant="rounded"
-                className="rounded-full px-5 py-2 ml-auto"
-              >
-                <Typography className="text-base">5.0</Typography>
+              <Skeleton variant="rounded" className="rounded-full ml-auto">
+                <Rating sx={{ fontSize: 25 }} readOnly />
               </Skeleton>
             )) ||
             (rmp.state === 'done' && (
-              <Typography
-                className="text-base text-black rounded-full px-5 py-2 inline"
-                sx={{
-                  backgroundColor: colorMidpoint(5, 0, rmp.data.averageRating),
-                }}
+              <Tooltip
+                title={'Professor rating: ' + rmp.data.avgRating}
+                placement="top"
               >
-                {rmp.data.averageRating.toFixed(1)}
-              </Typography>
-            )) ||
-            null}
-        </TableCell>
-        <TableCell align="right">
-          {((typeof rmp === 'undefined' || rmp.state === 'error') && (
-            <CloseIcon />
-          )) ||
-            (rmp.state === 'loading' && (
-              <Skeleton
-                variant="rounded"
-                className="rounded-full px-5 py-2 ml-auto"
-              >
-                <Typography className="text-base">5.0</Typography>
-              </Skeleton>
-            )) ||
-            (rmp.state === 'done' && (
-              <Typography
-                className="text-base text-black rounded-full px-5 py-2 inline"
-                sx={{
-                  backgroundColor: colorMidpoint(
-                    0,
-                    5,
-                    rmp.data.averageDifficulty,
-                  ),
-                }}
-              >
-                {rmp.data.averageDifficulty.toFixed(1)}
-              </Typography>
+                <div>
+                  <Rating
+                    defaultValue={rmp.data.avgRating}
+                    precision={0.1}
+                    sx={{ fontSize: 25 }}
+                    readOnly
+                  />
+                </div>
+              </Tooltip>
             )) ||
             null}
         </TableCell>
@@ -244,7 +239,7 @@ type SearchResultsTableProps = {
   resultsLoading: 'loading' | 'done';
   includedResults: SearchQuery[];
   grades: { [key: string]: GenericFetchedData<GradesType> };
-  rmp: { [key: string]: GenericFetchedData<RateMyProfessorData> };
+  rmp: { [key: string]: GenericFetchedData<RMPInterface> };
   compare: SearchQuery[];
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
@@ -260,21 +255,21 @@ const SearchResultsTable = ({
   removeFromCompare,
 }: SearchResultsTableProps) => {
   //Table sorting category
-  const [orderBy, setOrderBy] = useState<
-    'none' | 'gpa' | 'rating' | 'difficulty'
-  >('none');
+  const [orderBy, setOrderBy] = useState<'name' | 'gpa' | 'rating'>('name');
   //Table sorting direction
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
   //Cycle through sorting
-  function handleClick(col: 'gpa' | 'rating' | 'difficulty') {
+  function handleClick(col: 'name' | 'gpa' | 'rating') {
     if (orderBy !== col) {
       setOrderBy(col);
-      setOrder('asc');
+      if (col === 'name')
+        setOrder('asc'); //default alphabetical behavior goes from a to z
+      else setOrder('desc'); //default number behavior goes from high to low for our metrics
     } else {
       if (order === 'asc') {
         setOrder('desc');
-      } else if (order === 'desc') {
-        setOrderBy('none');
+      } else {
+        setOrder('asc');
       }
     }
   }
@@ -287,64 +282,138 @@ const SearchResultsTable = ({
           gutterBottom
           className="leading-tight text-3xl font-bold"
         >
-          No results found
+          No results
         </Typography>
         <Typography variant="body1">
-          There is no overlap between the selected courses and professors.
+          There is no overlap for the selected courses, professors, and filters.
         </Typography>
       </div>
     );
   }
 
   //Sort
-  let sortedResults = includedResults;
-  if (orderBy !== 'none') {
-    sortedResults = [...includedResults].sort((a, b) => {
-      if (orderBy === 'gpa') {
-        const aGrades = grades[searchQueryLabel(a)];
-        const bGrades = grades[searchQueryLabel(b)];
-        //drop loading/error rows to bottom
-        if (aGrades.state !== 'done' && bGrades.state !== 'done') {
-          return 0;
-        }
-        if (aGrades.state !== 'done') {
-          return 9999;
-        }
-        if (bGrades.state !== 'done') {
-          return -9999;
-        }
-        if (order === 'asc') {
-          return aGrades.data.gpa - bGrades.data.gpa;
-        }
-        return bGrades.data.gpa - aGrades.data.gpa;
+  const sortedResults = includedResults.sort((a, b) => {
+    if (orderBy === 'name') {
+      //same logic as in generateCombosTable.ts
+      //handle undefined variables based on searchQueryLabel
+      const aFirstName = a.profFirst ?? '';
+      const bFirstName = b.profFirst ?? '';
+      const aLastName = a.profLast ?? '';
+      const bLastName = b.profLast ?? '';
+      const aPrefix = a.prefix ?? ''; //make sure the is no empty input for prefix and number
+      const bPrefix = b.prefix ?? '';
+      const aNumber = a.number ?? '';
+      const bNumber = b.number ?? '';
+
+      if (order === 'asc') {
+        //ascending alphabetical automatically sorts Overall results correctly
+        if (
+          (typeof a.profFirst === 'undefined' &&
+            typeof a.profLast === 'undefined') ||
+          (typeof a.prefix === 'undefined' && typeof a.number === 'undefined')
+        )
+          return -1;
+        if (
+          (typeof b.profFirst === 'undefined' &&
+            typeof b.profLast === 'undefined') ||
+          (typeof b.prefix === 'undefined' && typeof b.number === 'undefined')
+        )
+          return 1;
+        return (
+          aLastName.localeCompare(bLastName) || //sort by last name then first name
+          aFirstName.localeCompare(bFirstName) ||
+          aPrefix.localeCompare(bPrefix) || //if names are equal/don't exist, then sort by prefix then number
+          aNumber.localeCompare(bNumber)
+        );
       }
-      if (orderBy === 'rating' || orderBy === 'difficulty') {
-        const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
-        const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
-        //drop loading/error rows to bottom
-        if (aRmp.state !== 'done' && bRmp.state !== 'done') {
-          return 0;
-        }
-        if (aRmp.state !== 'done') {
-          return 9999;
-        }
-        if (bRmp.state !== 'done') {
-          return -9999;
-        }
-        if (orderBy === 'rating') {
-          if (order === 'asc') {
-            return aRmp.data.averageRating - bRmp.data.averageRating;
-          }
-          return bRmp.data.averageRating - aRmp.data.averageRating;
-        }
-        if (order === 'asc') {
-          return aRmp.data.averageDifficulty - bRmp.data.averageDifficulty;
-        }
-        return bRmp.data.averageDifficulty - aRmp.data.averageDifficulty;
+      //keep the "(Overall)" result on top for descending sort too
+      else {
+        // catches the case where a is an Overall result AND b is an Overall result
+        if (
+          ((typeof a.profFirst === 'undefined' &&
+            typeof a.profLast === 'undefined') ||
+            (typeof a.prefix === 'undefined' &&
+              typeof a.number === 'undefined')) &&
+          ((typeof b.profFirst === 'undefined' &&
+            typeof b.profLast === 'undefined') ||
+            (typeof b.prefix === 'undefined' &&
+              typeof b.number === 'undefined'))
+        )
+          return (
+            bLastName.localeCompare(aLastName) || //sort by last name then first name
+            bFirstName.localeCompare(aFirstName) ||
+            bPrefix.localeCompare(aPrefix) || //if names are equal/don't exist, then, sort by prefix then number
+            bNumber.localeCompare(aNumber)
+          );
+        if (
+          (typeof a.profFirst === 'undefined' &&
+            typeof a.profLast === 'undefined') ||
+          (typeof a.prefix === 'undefined' && typeof a.number === 'undefined')
+        )
+          return -1;
+        if (
+          (typeof b.profFirst === 'undefined' &&
+            typeof b.profLast === 'undefined') ||
+          (typeof b.prefix === 'undefined' && typeof b.number === 'undefined')
+        )
+          return 1;
+        return (
+          bLastName.localeCompare(aLastName) || //sort by last name then first name
+          bFirstName.localeCompare(aFirstName) ||
+          bPrefix.localeCompare(aPrefix) || //if names are equal/don't exist, then, sort by prefix then number
+          bNumber.localeCompare(aNumber)
+        );
       }
       return 0;
-    });
-  }
+    }
+    if (orderBy === 'gpa') {
+      const aGrades = grades[searchQueryLabel(a)];
+      const bGrades = grades[searchQueryLabel(b)];
+      if (
+        (!aGrades || aGrades.state !== 'done') &&
+        (!bGrades || bGrades.state !== 'done')
+      ) {
+        return 0;
+      }
+
+      if (!aGrades || aGrades.state !== 'done') {
+        return 9999;
+      }
+      if (!bGrades || bGrades.state !== 'done') {
+        return -9999;
+      }
+
+      if (order === 'asc') {
+        return aGrades.data.gpa - bGrades.data.gpa;
+      }
+      return bGrades.data.gpa - aGrades.data.gpa;
+    }
+    if (orderBy === 'rating') {
+      const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
+      const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
+      //drop loading/error rows to bottom
+      if (
+        (!aRmp || aRmp.state !== 'done') &&
+        (!bRmp || bRmp.state !== 'done')
+      ) {
+        // If both aRmp and bRmp are not done, treat them as equal and return 0
+        return 0;
+      }
+      if (!aRmp || aRmp.state !== 'done') {
+        return 9999;
+      }
+      if (!bRmp || bRmp.state !== 'done') {
+        return -9999;
+      }
+      const aRating = aRmp?.data?.avgRating ?? 0; // Fallback to 0 if undefined
+      const bRating = bRmp?.data?.avgRating ?? 0; // Fallback to 0 if undefined
+      if (order === 'asc') {
+        return aRating - bRating;
+      }
+      return bRating - aRating;
+    }
+    return 0;
+  });
 
   return (
     //TODO: sticky header
@@ -358,39 +427,52 @@ const SearchResultsTable = ({
             <TableRow>
               <TableCell />
               <TableCell>Compare</TableCell>
-              <TableCell>Name</TableCell>
               <TableCell>
                 <TableSortLabel
-                  active={orderBy === 'gpa'}
-                  direction={orderBy === 'gpa' ? order : 'asc'}
+                  active={orderBy === 'name'}
+                  direction={orderBy === 'name' ? order : 'asc'}
                   onClick={() => {
-                    handleClick('gpa');
+                    handleClick('name');
                   }}
                 >
-                  GPA
+                  Name
                 </TableSortLabel>
               </TableCell>
               <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'rating'}
-                  direction={orderBy === 'rating' ? order : 'asc'}
-                  onClick={() => {
-                    handleClick('rating');
-                  }}
+                <Tooltip
+                  title="Average GPA Across Course Sections"
+                  placement="top"
                 >
-                  Rating
-                </TableSortLabel>
+                  <div>
+                    <TableSortLabel
+                      active={orderBy === 'gpa'}
+                      direction={orderBy === 'gpa' ? order : 'desc'}
+                      onClick={() => {
+                        handleClick('gpa');
+                      }}
+                    >
+                      Grades
+                    </TableSortLabel>
+                  </div>
+                </Tooltip>
               </TableCell>
               <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'difficulty'}
-                  direction={orderBy === 'difficulty' ? order : 'asc'}
-                  onClick={() => {
-                    handleClick('difficulty');
-                  }}
+                <Tooltip
+                  title="Average Professor Rating from Rate My Professors"
+                  placement="top"
                 >
-                  Difficulty
-                </TableSortLabel>
+                  <div>
+                    <TableSortLabel
+                      active={orderBy === 'rating'}
+                      direction={orderBy === 'rating' ? order : 'desc'}
+                      onClick={() => {
+                        handleClick('rating');
+                      }}
+                    >
+                      Rating
+                    </TableSortLabel>
+                  </div>
+                </Tooltip>
               </TableCell>
             </TableRow>
           </TableHead>

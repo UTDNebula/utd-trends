@@ -3,21 +3,36 @@ import { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 
-import GraphProps from '../../../modules/GraphProps/GraphProps';
 import searchQueryColors, {
-  rainbowColors,
+  useRainbowColors,
 } from '../../../modules/searchQueryColors/searchQueryColors';
 import { FullscreenCloseIcon } from '../../icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '../../icons/FullscreenOpenIcon/fullscreenOpenIcon';
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
+type GraphProps = {
+  xaxisLabels?: string[];
+  yaxisFormatter?: (val: number) => string;
+  tooltipFormatter?: (
+    val: number,
+    extra: { series: number[]; seriesIndex: number; dataPointIndex: number },
+  ) => string;
+  series: {
+    name: string;
+    data: number[];
+  }[];
+  title: string;
+  labels?: string[];
+  includedColors?: boolean[];
+};
+
 /**
  * Creates a pre-configured ApexCharts vertical bar graph component. Takes in `series`, `title`, and `xaxisLabels` via `GraphProps`. This component also gets returned from a BarGraph component on a large screen.
  * @param props
  * @returns vertical bar graph
  */
-export function VerticalBarGraph(props: GraphProps) {
+function BarGraph(props: GraphProps) {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
@@ -36,6 +51,8 @@ export function VerticalBarGraph(props: GraphProps) {
     series = [];
     noDataText = 'Grade data unavailable for selected courses';
   }
+
+  const rainbowColors = useRainbowColors();
 
   const options: ApexOptions = {
     chart: {
@@ -112,6 +129,11 @@ export function VerticalBarGraph(props: GraphProps) {
     theme: {
       mode: useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light',
     },
+    tooltip: {
+      y: {
+        formatter: props.tooltipFormatter ?? props.yaxisFormatter,
+      },
+    },
   };
 
   const graph = (
@@ -135,3 +157,5 @@ export function VerticalBarGraph(props: GraphProps) {
     </>
   );
 }
+
+export default BarGraph;

@@ -31,7 +31,7 @@ import { convertToProfOnly } from '../../modules/SearchQuery/SearchQuery';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
 import type { GradesData } from '../../pages/api/grades';
-import type { RateMyProfessorData } from '../../pages/api/ratemyprofessorScraper';
+import { RMPInterface } from '../api/ratemyprofessorScraper';
 
 //Limit cached number of grades and rmp data entries
 const MAX_ENTRIES = 1000;
@@ -212,7 +212,7 @@ function fetchGradesData(
 function fetchRmpData(
   professor: SearchQuery,
   controller: AbortController,
-): Promise<RateMyProfessorData> {
+): Promise<RMPInterface> {
   return fetchWithCache(
     '/api/ratemyprofessorScraper?profFirst=' +
       encodeURIComponent(String(professor.profFirst)) +
@@ -352,7 +352,8 @@ export const Dashboard: NextPage = () => {
     setChosenSessions((old) => {
       const newVal = func(old);
       if (results.state === 'done') {
-        setGrades((grades) => {
+        setGrades((oldGrades) => {
+          const grades = { ...oldGrades };
           //Relavent keys
           for (const result of [
             ...(results.state === 'done' ? results.data : []),
@@ -434,11 +435,11 @@ export const Dashboard: NextPage = () => {
   }>({});
   function addToGrades(key: string, value: GenericFetchedData<GradesType>) {
     setGrades((old) => {
-      if (typeof old[key] !== 'undefined') {
-        old[key] = value;
-        return old;
-      }
       const newVal = { ...old };
+      if (typeof newVal[key] !== 'undefined') {
+        newVal[key] = value;
+        return newVal;
+      }
       if (Object.keys(newVal).length >= MAX_ENTRIES) {
         // Remove the oldest entry
         const oldestKey = Object.keys(newVal)[0];
@@ -450,18 +451,15 @@ export const Dashboard: NextPage = () => {
   }
   //Store rmp scores by profs
   const [rmp, setRmp] = useState<{
-    [key: string]: GenericFetchedData<RateMyProfessorData>;
+    [key: string]: GenericFetchedData<RMPInterface>;
   }>({});
-  function addToRmp(
-    key: string,
-    value: GenericFetchedData<RateMyProfessorData>,
-  ) {
+  function addToRmp(key: string, value: GenericFetchedData<RMPInterface>) {
     setRmp((old) => {
-      if (typeof old[key] !== 'undefined') {
-        old[key] = value;
-        return old;
-      }
       const newVal = { ...old };
+      if (typeof newVal[key] !== 'undefined') {
+        newVal[key] = value;
+        return newVal;
+      }
       if (Object.keys(newVal).length >= MAX_ENTRIES) {
         // Remove the oldest entry
         const oldestKey = Object.keys(newVal)[0];
@@ -503,7 +501,7 @@ export const Dashboard: NextPage = () => {
   ) {
     addToRmp(searchQueryLabel(professor), { state: 'loading' });
     fetchRmpData(professor, controller)
-      .then((res: RateMyProfessorData) => {
+      .then((res: RMPInterface) => {
         //Add to storage
         //Set loading status to done
         addToRmp(searchQueryLabel(professor), {
@@ -529,7 +527,8 @@ export const Dashboard: NextPage = () => {
         fetchAndStoreGradesData(result, controller);
       } else {
         //Recalc gpa and such from past stored data for new page
-        setGrades((grades) => {
+        setGrades((oldGrades) => {
+          const grades = { ...oldGrades };
           const entry = grades[searchQueryLabel(result)];
           if (entry && entry.state === 'done') {
             entry.data = {
@@ -582,6 +581,13 @@ export const Dashboard: NextPage = () => {
         //Remove if over threshold
         const courseGrades = grades[searchQueryLabel(result)];
         if (
+          typeof courseGrades !== 'undefined' &&
+          courseGrades.state === 'done' &&
+          courseGrades.data.gpa === -1
+        ) {
+          return false;
+        }
+        if (
           typeof router.query.minGPA === 'string' &&
           typeof courseGrades !== 'undefined' &&
           courseGrades.state === 'done' &&
@@ -594,7 +600,7 @@ export const Dashboard: NextPage = () => {
           typeof router.query.minRating === 'string' &&
           typeof courseRmp !== 'undefined' &&
           courseRmp.state === 'done' &&
-          courseRmp.data.averageRating < parseFloat(router.query.minRating)
+          courseRmp.data.avgRating < parseFloat(router.query.minRating)
         ) {
           return false;
         }
@@ -602,7 +608,7 @@ export const Dashboard: NextPage = () => {
           typeof router.query.maxDiff === 'string' &&
           typeof courseRmp !== 'undefined' &&
           courseRmp.state === 'done' &&
-          courseRmp.data.averageDifficulty > parseFloat(router.query.maxDiff)
+          courseRmp.data.avgDifficulty > parseFloat(router.query.maxDiff)
         ) {
           return false;
         }
@@ -621,7 +627,7 @@ export const Dashboard: NextPage = () => {
   }>({});
   //Saved data for their professors
   const [compareRmp, setCompareRmp] = useState<{
-    [key: string]: GenericFetchedData<RateMyProfessorData>;
+    [key: string]: GenericFetchedData<RMPInterface>;
   }>({});
 
   //Add a course+prof combo to compare (happens from search results)
@@ -761,7 +767,7 @@ export const Dashboard: NextPage = () => {
     contentComponent = (
       <>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={7} md={7}>
+          <Grid item xs={12} sm={6} md={6}>
             <Filters
               manageQuery
               academicSessions={academicSessions}
@@ -769,7 +775,7 @@ export const Dashboard: NextPage = () => {
               addChosenSessions={addChosenSessions}
             />
           </Grid>
-          <Grid item xs={false} sm={5} md={5}></Grid>
+          <Grid item xs={false} sm={6} md={6}></Grid>
         </Grid>
         <PanelGroup className="pt-4" direction={panelsDirection}>
           <Panel
@@ -816,25 +822,6 @@ export const Dashboard: NextPage = () => {
             </Card>
           </Panel>
         </PanelGroup>
-
-        {/* <Grid container component="main" wrap="wrap-reverse" spacing={2}>
-          <Grid item xs={12} sm={6} md={6}>
-            <SearchResultsTable
-              resultsLoading={results.state}
-              includedResults={includedResults}
-              grades={grades}
-              rmp={rmp}
-              compare={compare}
-              addToCompare={addToCompare}
-              removeFromCompare={removeFromCompare}
-            />
-          </Grid>
-          <Grid item xs={false} sm={6} md={6}>
-            <Card>
-              <Carousel names={names}>{tabs}</Carousel>
-            </Card>
-          </Grid>
-        </Grid> */}
       </>
     );
   }

@@ -1,14 +1,10 @@
-import { Alert } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import Background from '../../public/background.png';
-import Filters, {
-  type FiltersType,
-} from '../components/common/Filters/filters';
 import SearchBar from '../components/common/SearchBar/searchBar';
 import type SearchQuery from '../modules/SearchQuery/SearchQuery';
 import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
@@ -17,29 +13,17 @@ import searchQueryLabel from '../modules/searchQueryLabel/searchQueryLabel';
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
 const Home: NextPage = () => {
-  const [errorMessage, setErrorMessage] = useState(false);
-  function searchOptionsChange(chosenOptions: SearchQuery[]) {
-    if (chosenOptions.length) {
-      setErrorMessage(false);
-    }
-  }
-
-  const [filters, setFilters] = useState<FiltersType>({});
-
   const router = useRouter();
   function searchOptionChosen(chosenOptions: SearchQuery[]) {
     if (chosenOptions.length) {
       router.push({
         pathname: '/dashboard',
         query: {
-          ...filters,
           searchTerms: chosenOptions
             .map((el) => searchQueryLabel(el))
             .join(','),
         },
       });
-    } else {
-      setErrorMessage(true);
     }
   }
 
@@ -83,18 +67,11 @@ const Home: NextPage = () => {
             Explore and compare past grades, professor ratings, and reviews to
             find the perfect class.
           </p>
-          {errorMessage && (
-            <Alert severity="error" className="mb-2">
-              Select an option before searching.
-            </Alert>
-          )}
           <SearchBar
             onSelect={searchOptionChosen}
-            onChange={searchOptionsChange}
             className="mb-3"
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />
-          <Filters changeValue={(value) => setFilters(value)} />
         </div>
       </div>
     </>
