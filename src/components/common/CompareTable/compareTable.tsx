@@ -120,27 +120,23 @@ function GradeOrRmpRow<T>({
               </Skeleton>
             )) ||
             (value.state === 'done' && getValue(value.data) !== -1 && (
-              <Tooltip
-              title={`${name}: ${formatValue(getValue(value.data))}`} 
-            >
-    
-              <Typography
-                className="text-base inline rounded-full px-5 py-2 text-black"
-                style={{
-                  backgroundColor: colorMidpoint(
-                    goodValue,
-                    badValue,
-                    getValue(value.data),
-                  ),
-                }}
-              >
-                {/*value.data is all the data past the state of loading, done, or error.
+              <Tooltip title={`${name}: ${formatValue(getValue(value.data))}`}>
+                <Typography
+                  className="text-base inline rounded-full px-5 py-2 text-black"
+                  style={{
+                    backgroundColor: colorMidpoint(
+                      goodValue,
+                      badValue,
+                      getValue(value.data),
+                    ),
+                  }}
+                >
+                  {/*value.data is all the data past the state of loading, done, or error.
                 getValue returns the specific value from the data structure, like gpa.
                 formatValue makes it look pretty like 3.7216373 displaying as 3.72.*/}
-                {formatValue(getValue(value.data))}
-              </Typography>
-            </Tooltip>
-
+                  {formatValue(getValue(value.data))}
+                </Typography>
+              </Tooltip>
             )) ||
             null}
         </TableCell>
@@ -277,14 +273,14 @@ function CheckboxRow({
             <Checkbox
               checked={true}
               onClick={() => {
-              removeFromCompare(course);
-            }}
-            sx={{
-              '&.Mui-checked': {
-                color: colors[index],
-              },
-            }} //Colored Checkbox based on graph
-          />
+                removeFromCompare(course);
+              }}
+              sx={{
+                '&.Mui-checked': {
+                  color: colors[index],
+                },
+              }} //Colored Checkbox based on graph
+            />
           </Tooltip>
         </TableCell>
       ))}
