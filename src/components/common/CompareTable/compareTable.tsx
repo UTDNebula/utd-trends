@@ -8,6 +8,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
@@ -85,20 +86,24 @@ function GradeOrRmpRow<T>({
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
       <TableCell align="right" className="pl-0">
-        <TableSortLabel
-          active={orderBy === name}
-          direction={orderBy === name ? order : defaultAscSort ? 'asc' : 'desc'}
-          onClick={() => {
-            handleClick(name);
-          }}
-          sx={{
-            '& .MuiTableSortLabel-icon': {
-              rotate: '-90deg',
-            },
-          }}
-        >
-          {name}
-        </TableSortLabel>
+        <Tooltip title={`Sort by ${name}`} placement="bottom">
+          <TableSortLabel
+            active={orderBy === name}
+            direction={
+              orderBy === name ? order : defaultAscSort ? 'asc' : 'desc'
+            }
+            onClick={() => {
+              handleClick(name);
+            }}
+            sx={{
+              '& .MuiTableSortLabel-icon': {
+                rotate: '-90deg',
+              },
+            }}
+          >
+            {name}
+          </TableSortLabel>
+        </Tooltip>
       </TableCell>
       {values.map((value, index) => (
         <TableCell
@@ -119,21 +124,23 @@ function GradeOrRmpRow<T>({
               </Skeleton>
             )) ||
             (value.state === 'done' && getValue(value.data) !== -1 && (
-              <Typography
-                className="text-base inline rounded-full px-5 py-2 text-black"
-                style={{
-                  backgroundColor: colorMidpoint(
-                    goodValue,
-                    badValue,
-                    getValue(value.data),
-                  ),
-                }}
-              >
-                {/*value.data is all the data past the state of loading, done, or error.
+              <Tooltip title={`${name}: ${formatValue(getValue(value.data))}`}>
+                <Typography
+                  className="text-base inline rounded-full px-5 py-2 text-black"
+                  style={{
+                    backgroundColor: colorMidpoint(
+                      goodValue,
+                      badValue,
+                      getValue(value.data),
+                    ),
+                  }}
+                >
+                  {/*value.data is all the data past the state of loading, done, or error.
                 getValue returns the specific value from the data structure, like gpa.
                 formatValue makes it look pretty like 3.7216373 displaying as 3.72.*/}
-                {formatValue(getValue(value.data))}
-              </Typography>
+                  {formatValue(getValue(value.data))}
+                </Typography>
+              </Tooltip>
             )) ||
             null}
         </TableCell>
@@ -266,17 +273,19 @@ function CheckboxRow({
             backgroundColor: colors[index] + '10', // add transparency
           }}
         >
-          <Checkbox
-            checked={true}
-            onClick={() => {
-              removeFromCompare(course);
-            }}
-            sx={{
-              '&.Mui-checked': {
-                color: colors[index],
-              },
-            }} //Colored Checkbox based on graph
-          />
+          <Tooltip title="Remove from Compare">
+            <Checkbox
+              checked={true}
+              onClick={() => {
+                removeFromCompare(course);
+              }}
+              sx={{
+                '&.Mui-checked': {
+                  color: colors[index],
+                },
+              }} //Colored Checkbox based on graph
+            />
+          </Tooltip>
         </TableCell>
       ))}
     </TableRow>
