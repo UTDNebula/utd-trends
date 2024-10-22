@@ -1,4 +1,4 @@
-import { Badge,Tab, Tabs  } from '@mui/material';
+import { Badge, Tab, Tabs } from '@mui/material';
 import React from 'react';
 
 /**
