@@ -68,6 +68,7 @@ const Home: NextPage = () => {
             find the perfect class.
           </p>
           <SearchBar
+            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus={true}
             onSelect={searchOptionChosen}
             className="mb-3"
