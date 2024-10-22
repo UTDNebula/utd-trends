@@ -1,12 +1,12 @@
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
-
 import { TabNavMenu } from '../../navigation/tabNavMenu/tabNavMenu';
 
 interface CarouselProps {
   names: string[] | string;
   children: ReactJSXElement[] | ReactJSXElement;
+  compareLength: number;
 }
 
 /**
@@ -16,8 +16,8 @@ interface CarouselProps {
 const variants = {
   enter: (dir: number) => {
     return {
-      x: dir > 0 ? 500 : -500, // velocity in x direction
-      opacity: 0, // child opacity
+      x: dir > 0 ? 500 : -500, //velocity in x direction
+      opacity: 0, //child opacity
     };
   },
   center: {
@@ -38,19 +38,11 @@ const variants = {
  * @param props the props passed from the parent component
  * @returns
  */
-const Carousel = ({ names, children }: CarouselProps) => {
-  // The card currently being displayed
-  const [currentCard, setCurrentCard] = useState(0);
-  // The Direction that the card is moving in
-  const [direction, setDirection] = useState(0);
-
-  /**
-   * On each re-render, ensure currentCard is within valid bounds
-   */
-  if (Array.isArray(children) && currentCard >= children.length) {
-    // If currentCard is out of bounds, reset it to 0
-    setCurrentCard(0);
-  }
+export const Carousel = ({ names, children, compareLength }: CarouselProps) => {
+  //The card currently being displayed
+  const [currentCard, setCard] = useState(0);
+  //The Direction that the card is moving in
+  const [direction, setDir] = useState(0);
 
   /**
    * Turn
@@ -58,14 +50,10 @@ const Carousel = ({ names, children }: CarouselProps) => {
    * @param displacement a positive value will cause the card to move right, negative value cause card to move left
    */
   const turn = (displacement: number) => {
-    setDirection(displacement);
-    setCurrentCard((prevCard) => {
-      const newCard = prevCard + displacement;
-      if (Array.isArray(children)) {
-        return Math.max(0, Math.min(newCard, children.length - 1));
-      }
-      return newCard;
-    });
+    //set direction
+    // console.log("displacement=",displacement);
+    setDir(displacement);
+    setCard(currentCard + displacement);
   };
 
   return (
@@ -74,6 +62,7 @@ const Carousel = ({ names, children }: CarouselProps) => {
         value={currentCard}
         options={Array.isArray(names) ? names : [names]}
         turner={turn}
+        compareLength={compareLength}
       />
       <AnimatePresence>
         <div className="p-4 lg:p-6">
@@ -89,16 +78,7 @@ const Carousel = ({ names, children }: CarouselProps) => {
               opacity: { duration: 0.2 },
             }}
           >
-            {Array.isArray(children)
-              ? children.map((child, index) => (
-                  <div
-                    key={index}
-                    className={index === currentCard ? 'block' : 'hidden'}
-                  >
-                    {child}
-                  </div>
-                ))
-              : children}
+            {Array.isArray(children) ? children[currentCard] : children}
           </motion.div>
         </div>
       </AnimatePresence>

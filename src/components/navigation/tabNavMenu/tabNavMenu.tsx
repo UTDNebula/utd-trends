@@ -1,5 +1,6 @@
 import { Tab, Tabs } from '@mui/material';
 import React from 'react';
+import { Badge } from '@mui/material';
 
 /**
  * Props type used by the TabNavMenu component
@@ -10,6 +11,7 @@ type TabNavMenuProps = {
   // responsible for playing the animation and setting the value to the correct new value
   turner: (displacement: number) => void;
   options: string[];
+  compareLength: number;
 };
 
 /**
@@ -27,10 +29,23 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
     >
       {props.options.map((option, index) => (
         <Tab
-          label={option}
           key={index}
           className="text-lg text-gray-600 dark:text-gray-200 normal-case"
           value={index}
+          label={
+            index === props.options.length - 1 ? (
+              <div className="flex items-center">
+                {option}
+                <Badge
+                  badgeContent={props.compareLength} // Replace 0 with the actual notification count
+                  color="secondary"
+                  className="ml-4"
+                />
+              </div>
+            ) : (
+              option
+            )
+          }
         />
       ))}
     </Tabs>
