@@ -1,6 +1,7 @@
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
+
 import { TabNavMenu } from '../../navigation/tabNavMenu/tabNavMenu';
 
 interface CarouselProps {
