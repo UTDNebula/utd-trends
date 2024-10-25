@@ -763,7 +763,7 @@ export const Dashboard: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Results - Nebula Labs</title>
+        <title>Results - UTD Trends</title>
         <link
           rel="canonical"
           href="https://trends.utdnebula.com/dashboard"
