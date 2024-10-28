@@ -33,7 +33,7 @@ const SearchBar = ({
   onSelect,
   className,
   input_className,
-  autoFocus
+  autoFocus,
 }: SearchProps) => {
   //what you can choose from
   const [options, setOptions] = useState<SearchQuery[]>([]);
