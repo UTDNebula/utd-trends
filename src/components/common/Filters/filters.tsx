@@ -5,11 +5,11 @@ import {
   ListItemText,
   MenuItem,
 } from '@mui/material';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
-import Rating from '../Rating/rating';
+import Rating from '@/components/common/Rating/rating';
 
 const minGPAs = [
   ['3.67', 'A-'],

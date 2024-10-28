@@ -4,27 +4,29 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
-import Carousel from '../../components/common/Carousel/carousel';
-import Compare from '../../components/common/Compare/compare';
-import CourseOverview from '../../components/common/CourseOverview/courseOverview';
-import DashboardEmpty from '../../components/common/DashboardEmpty/dashboardEmpty';
-import DashboardError from '../../components/common/DashboardError/dashboardError';
-import Filters from '../../components/common/Filters/filters';
-import ProfessorOverview from '../../components/common/ProfessorOverview/professorOverview';
-import SearchResultsTable from '../../components/common/SearchResultsTable/searchResultsTable';
-import TopMenu from '../../components/navigation/topMenu/topMenu';
-import decodeSearchQueryLabel from '../../modules/decodeSearchQueryLabel/decodeSearchQueryLabel';
+import Carousel from '@/components/common/Carousel/carousel';
+import Compare from '@/components/common/Compare/compare';
+import CourseOverview from '@/components/common/CourseOverview/courseOverview';
+import DashboardEmpty from '@/components/common/DashboardEmpty/dashboardEmpty';
+import DashboardError from '@/components/common/DashboardError/dashboardError';
+import Filters from '@/components/common/Filters/filters';
+import ProfessorOverview from '@/components/common/ProfessorOverview/professorOverview';
+import SearchResultsTable from '@/components/common/SearchResultsTable/searchResultsTable';
+import TopMenu from '@/components/navigation/topMenu/topMenu';
 import fetchWithCache, {
   cacheIndexNebula,
   cacheIndexRmp,
   expireTime,
-} from '../../modules/fetchWithCache';
-import type SearchQuery from '../../modules/SearchQuery/SearchQuery';
-import { convertToProfOnly } from '../../modules/SearchQuery/SearchQuery';
-import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
-import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
-import type { GradesData } from '../../pages/api/grades';
-import { RMPInterface } from '../api/ratemyprofessorScraper';
+} from '@/modules/fetchWithCache/fetchWithCache';
+import {
+  convertToProfOnly,
+  decodeSearchQueryLabel,
+  type SearchQuery,
+  searchQueryEqual,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
+import type { GradesData } from '@/pages/api/grades';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
 //Limit cached number of grades and rmp data entries
 const MAX_ENTRIES = 1000;

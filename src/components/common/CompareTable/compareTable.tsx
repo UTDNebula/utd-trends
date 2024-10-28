@@ -12,17 +12,15 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
-import SearchQuery, {
+import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
+import { compareColors } from '@/modules/colors/colors';
+import {
   convertToProfOnly,
-} from '../../../modules/SearchQuery/SearchQuery';
-import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
-import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
-import type {
-  GenericFetchedData,
-  GradesType,
-} from '../../../pages/dashboard/index';
-import TableSortLabel from '../TableSortLabel/tableSortLabel';
+  type SearchQuery,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(good: number, bad: number, value: number) {
@@ -388,11 +386,11 @@ const CompareTable = ({
     return 0;
   });
 
-  // Color map for each course in the compare table based on searchQueryColors
+  // Color map for each course in the compare table based on compareColors
   const colorMap: { [key: string]: string } = {};
   includedResults.forEach((result, index) => {
     colorMap[searchQueryLabel(result)] =
-      searchQueryColors[index % searchQueryColors.length];
+      compareColors[index % compareColors.length];
   });
   const mappedColors = sortedResults.map(
     (result) => colorMap[searchQueryLabel(result)],

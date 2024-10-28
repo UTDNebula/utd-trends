@@ -1,6 +1,3 @@
-/*
-This API route is currently just for skedge
-*/
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 type Data = {

@@ -2,8 +2,8 @@ import { Grid, Skeleton } from '@mui/material';
 import Link from 'next/link';
 import React from 'react';
 
-import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
-import type { GenericFetchedData } from '../../../pages/dashboard/index';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { GenericFetchedData } from '@/pages/dashboard/index';
 
 type Props = {
   rmp: GenericFetchedData<RMPInterface>;

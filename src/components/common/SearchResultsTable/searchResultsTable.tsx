@@ -16,21 +16,19 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
-import SearchQuery, {
+import Rating from '@/components/common/Rating/rating';
+import SingleGradesInfo from '@/components/common/SingleGradesInfo/singleGradesInfo';
+import SingleProfInfo from '@/components/common/SingleProfInfo/singleProfInfo';
+import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
+import { useRainbowColors } from '@/modules/colors/colors';
+import {
   convertToProfOnly,
-} from '../../../modules/SearchQuery/SearchQuery';
-import { useRainbowColors } from '../../../modules/searchQueryColors/searchQueryColors';
-import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
-import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
-import type {
-  GenericFetchedData,
-  GradesType,
-} from '../../../pages/dashboard/index';
-import Rating from '../Rating/rating';
-import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
-import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
-import TableSortLabel from '../TableSortLabel/tableSortLabel';
+  type SearchQuery,
+  searchQueryEqual,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 const gpaToLetterGrade = (gpa: number): string => {
   if (gpa >= 4.0) return 'A';
