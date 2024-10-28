@@ -275,6 +275,26 @@ export const Dashboard: NextPage = () => {
           );
         }
       });
+      if (
+        professorSearchTerms.length === 1 &&
+        grades[searchQueryLabel(professorSearchTerms[0])] &&
+        grades[searchQueryLabel(professorSearchTerms[0])].state === 'done'
+      ) {
+        const entry = grades[searchQueryLabel(professorSearchTerms[0])];
+        if (entry && entry.state === 'done') {
+          addAcademicSessions(entry.data.grades.map((session) => session._id));
+        }
+      }
+      if (
+        courseSearchTerms.length === 1 &&
+        grades[searchQueryLabel(courseSearchTerms[0])] &&
+        grades[searchQueryLabel(courseSearchTerms[0])].state === 'done'
+      ) {
+        const entry = grades[searchQueryLabel(courseSearchTerms[0])];
+        if (entry && entry.state === 'done') {
+          addAcademicSessions(entry.data.grades.map((session) => session._id));
+        }
+      }
 
       //To cancel on rerender
       const controller = new AbortController();
