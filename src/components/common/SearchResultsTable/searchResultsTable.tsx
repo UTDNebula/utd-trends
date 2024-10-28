@@ -112,6 +112,17 @@ function Row({
     return rainbowColors[12];
   };
 
+  //returns a metric to see if professor gpa is increasing/decreasing
+  function GPA_trending({ course, grades, rmp, inCompare }: RowProps) {
+    var indicator = 0; //temporary holder (0 means don't display while -1 is downward and opposite for 1)
+    var semesters = 0; //check how many semesters we have from past 4 (must have at least 2) to display
+    var teacher_name = '';
+    // if (rmp.status) {
+    //   teacher_name = '${rmp.firstName} ${rmp.lastName}'; // we loaded details and made teacher's last name
+    // }
+    return indicator;
+  }
+
   return (
     <>
       <TableRow
