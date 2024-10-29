@@ -194,6 +194,7 @@ function fetchGradesData(
     if (response.data == null) {
       throw new Error('null data');
     }
+    console.log(response.data); //what is the grades
     return {
       ...calculateGrades(response.data),
       grades: response.data, //type GradesData

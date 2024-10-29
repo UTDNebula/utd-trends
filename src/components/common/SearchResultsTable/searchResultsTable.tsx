@@ -112,14 +112,65 @@ function Row({
     return rainbowColors[12];
   };
 
+  //helper function for the sorting map
+  function decreasingMap(map: { [key: string]: number }): { [key: string]: number } {
+    let sorted = Array.from(Object.entries(map)).sort((a, b) => {
+      return b[0].localeCompare(a[0]);
+    });
+    let topEntry = sorted.slice(0,4); //max top 4
+    return Object.fromEntries(topEntry); //return sorted map
+  }
+
   //returns a metric to see if professor gpa is increasing/decreasing
   function GPA_trending({ course, grades, rmp, inCompare }: RowProps) {
-    var indicator = 0; //temporary holder (0 means don't display while -1 is downward and opposite for 1)
-    var semesters = 0; //check how many semesters we have from past 4 (must have at least 2) to display
-    var teacher_name = '${rmp.firstName} ${rmp.lastName}'; // we loaded details and made teacher's last name
-    var teacher_grades = grades; //has the last 4 semesters like a map with semester to average gpa for that sem
+    let indicator = 0; //temporary holder (0 means don't display while -1 is downward and opposite for 1)
+    let teacher_name = `${((rmp as any).data as RMPInterface).firstName} ${((rmp as any).data as RMPInterface).lastName}`;
+
+    const teacher_grades = (grades as any).data as Array<{
+      _id: string;
+      grade_distribution: number[];
+    }>;
+
+    // Initialize a Map to store GPA values with semester ID as the key
+    const gpaMap: { [key: string]: number } = {};
+
+    // Iterate over each semester's grades
+    teacher_grades.forEach((semester) => {
+      let totalWeightedGradePoints = 0;
+      let totalStudents = 0;
+
+      semester.grade_distribution.forEach((count, index) => {
+        // Calculate grade point based on index (assuming 4.0 scale downwards)
+        const gradePoint = 4.0 - (index > 1 ? index : 0) * 0.33;
+        totalWeightedGradePoints += count * gradePoint;
+        totalStudents += count;
+      });
+
+      const averageGPA =
+        totalStudents > 0 ? totalWeightedGradePoints / totalStudents : 0;
+
+      // Store the GPA in the map with `_id` as the key
+      gpaMap[semester._id] = averageGPA;
+    });
+    let sortedMap = decreasingMap(gpaMap);
+    if (sortedMap.size <= 1){return 0;} //dont have enough entries
+    let threshold = 0.3 //can edit this as needed
+    let averageGPAOfAll = 0;
+    for (let value of Object.values(sortedMap)){
+      averageGPAOfAll += value;
+    }
+    averageGPAOfAll /= sortedMap.size;
+    let temp = Array.from(Object.values(sortedMap));
+    let low = 0;
+    let high = temp.length - 1;
+    while (low != high || high < low){
+      low+=1;
+      high-=1;
+    }
+    let medianGPA = (temp[low] + temp[high]) / 2;
+    if (averageGPAOfAll - medianGPA > threshold ? indicator = 1 : indicator = -1){}
     return indicator;
-  }
+  };
 
   return (
     <>
