@@ -168,7 +168,8 @@ function Row({
       high-=1;
     }
     let medianGPA = (temp[low] + temp[high]) / 2;
-    if (averageGPAOfAll - medianGPA > threshold ? indicator = 1 : indicator = -1){}
+    // averageGPAOfAll - medianGPA > threshold ? indicator = 1 : indicator = -1
+    indicator = (averageGPAOfAll - medianGPA > threshold) ? 1 : -1
     return indicator;
   };
 
