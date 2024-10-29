@@ -39,9 +39,7 @@ export default function handler(
     'x-api-key': API_KEY,
     Accept: 'application/json',
   };
-  const url = new URL(
-    'https://api-gateway-djz4awx7.uc.gateway.dev/grades/semester',
-  );
+  const url = new URL('https://api.utdnebula.com/grades/semester');
   if (typeof prefix === 'string') {
     url.searchParams.append('prefix', prefix);
   }

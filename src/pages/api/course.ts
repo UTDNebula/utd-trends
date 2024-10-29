@@ -63,7 +63,7 @@ export default function handler(
     'x-api-key': API_KEY,
     Accept: 'application/json',
   };
-  const url = new URL('https://api-gateway-djz4awx7.uc.gateway.dev/course');
+  const url = new URL('https://api.utdnebula.com/course');
   if (typeof prefix === 'string') {
     url.searchParams.append('subject_prefix', prefix);
   }
