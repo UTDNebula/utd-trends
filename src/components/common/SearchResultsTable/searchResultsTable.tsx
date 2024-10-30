@@ -117,6 +117,7 @@ function Row({
       <TableRow
         onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
         sx={{ '& > *': { borderBottom: 'unset' } }}
+        className="cursor-pointer"
       >
         <TableCell>
           <Tooltip
@@ -159,7 +160,7 @@ function Row({
           </Tooltip>
         </TableCell>
         <TableCell component="th" scope="row">
-          <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
+          <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text">
             {searchQueryLabel(course) +
               ((typeof course.profFirst === 'undefined' &&
                 typeof course.profLast === 'undefined') ||
