@@ -189,10 +189,10 @@ function GradeAndRmpRow({
         </Tooltip>
       </TableCell>
       {gradeValues
-        // Combine values by mapping gradeValues and rmpValues together
+        // Combine values
         .map((x, i) => [x, rmpValues[i]])
+        // so ts can remember the type of rmp (which it can't do for rmpValues[index]) and know's that when its state is done, you can access its data value
         .map(([grade, rmp], index) => {
-          // Extract values if state is 'done'
           const gradeValue =
             grade.state === 'done'
               ? getGradeValue(grade.data as GradesType)
@@ -211,12 +211,10 @@ function GradeAndRmpRow({
               }}
             >
               <Tooltip
-                // Tooltip showing both Grades and Ratings
                 title={`Grades: ${gradeValue !== null ? gradeValue : 'N/A'} / Ratings: ${rmpValue !== null ? rmpValue : 'N/A'}`}
                 placement="top"
               >
                 <span>
-                  {/* Displaying grade value */}
                   {((typeof grade === 'undefined' ||
                     grade.state === 'error') && <CloseIcon />) ||
                     (grade.state === 'loading' && (
@@ -236,7 +234,6 @@ function GradeAndRmpRow({
                     )) ||
                     null}
                   {' / '}
-                  {/* Displaying rmp value */}
                   {((typeof rmp === 'undefined' || rmp.state === 'error') && (
                     <CloseIcon />
                   )) ||
