@@ -187,7 +187,7 @@ function Row({
                 placement="top"
               >
                 <Typography
-                  className="text-base text-black rounded-full px-5 py-2 inline"
+                  className="text-base text-black text-center rounded-full px-5 py-2 w-16 block"
                   sx={{ backgroundColor: gpaToColor(grades.data.gpa) }}
                 >
                   {gpaToLetterGrade(grades.data.gpa)}
