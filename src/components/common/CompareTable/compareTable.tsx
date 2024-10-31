@@ -105,7 +105,20 @@ function GradeOrRmpRow<T>({
           }}
         >
           {tooltipTitles[name] ? (
-            <Tooltip title={tooltipTitles[name]} placement="top">
+            <Tooltip
+              title={tooltipTitles[name]}
+              placement="left"
+              PopperProps={{
+                modifiers: [
+                  {
+                    name: 'offset',
+                    options: {
+                      offset: [0, 10], // Adjust these values as needed
+                    },
+                  },
+                ],
+              }}
+            >
               <span>{name}</span>
             </Tooltip>
           ) : (
@@ -184,7 +197,20 @@ function GradeAndRmpRow({
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
       <TableCell align="right" className="pl-0">
-        <Tooltip title="Sort by # Grades/Ratings" placement="top">
+        <Tooltip
+          title="Total # of Grades & Ratings"
+          placement="left"
+          PopperProps={{
+            modifiers: [
+              {
+                name: 'offset',
+                options: {
+                  offset: [0, -8], // Adjust these values as needed
+                },
+              },
+            ],
+          }}
+        >
           <span>{name}</span>
         </Tooltip>
       </TableCell>
