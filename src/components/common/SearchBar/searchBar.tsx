@@ -26,7 +26,6 @@ interface SearchProps {
  *
  * Styled for the splash page
  */
-let wasEmpty = false; // tracks if the searchbar was empty before the new entry (to create a new browser navigation entry push())
 const SearchBar = ({
   manageQuery,
   onSelect,
@@ -73,25 +72,13 @@ const SearchBar = ({
       } else {
         delete newQuery.searchTerms;
       }
-      if (wasEmpty) {
-        // if the searchbar was cleared before this entry,
-        router.push(
-          {
-            query: router.query,
-          },
-          undefined,
-          { shallow: true },
-        );
-        wasEmpty = false;
-      } //otherwise, just update the current navigation entry query
-      else
-        router.replace(
-          {
-            query: newQuery,
-          },
-          undefined,
-          { shallow: true },
-        );
+      router.push(
+        {
+          query: router.query,
+        },
+        undefined,
+        { shallow: true },
+      );
     }
   }
 
@@ -159,9 +146,6 @@ const SearchBar = ({
 
   //update parent and queries
   function onChange_internal(newValue: SearchQuery[]) {
-    if (newValue.length == 0) {
-      wasEmpty = true; // so that the next search creates a new navigation entry (push())
-    }
     if (manageQuery === 'onChange') {
       updateQueries(newValue);
     }
