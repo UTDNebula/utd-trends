@@ -1,4 +1,4 @@
-import { Card, Grid } from '@mui/material';
+import { Card, Grid2 as Grid } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -724,7 +724,7 @@ export const Dashboard: NextPage = () => {
     contentComponent = (
       <>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={6}>
+          <Grid size={{ xs: 12, sm: 6, md: 6 }}>
             <Filters
               manageQuery
               academicSessions={academicSessions}
@@ -732,10 +732,10 @@ export const Dashboard: NextPage = () => {
               addChosenSessions={addChosenSessions}
             />
           </Grid>
-          <Grid item xs={false} sm={6} md={6}></Grid>
+          <Grid size={{ xs: false, sm: 6, md: 6 }}></Grid>
         </Grid>
         <Grid container component="main" wrap="wrap-reverse" spacing={2}>
-          <Grid item xs={12} sm={6} md={6}>
+          <Grid size={{ xs: 12, sm: 6, md: 6 }}>
             <SearchResultsTable
               resultsLoading={results.state}
               includedResults={includedResults}
@@ -746,7 +746,7 @@ export const Dashboard: NextPage = () => {
               removeFromCompare={removeFromCompare}
             />
           </Grid>
-          <Grid item xs={false} sm={6} md={6} className="w-full">
+          <Grid size={{ xs: false, sm: 6, md: 6 }}>
             <div className="sticky top-0 gridsm:max-h-screen overflow-y-auto pt-4">
               <Card>
                 <Carousel names={names}>{tabs}</Carousel>
