@@ -438,7 +438,7 @@ const SearchResultsTable = ({
                   Name
                 </TableSortLabel>
               </TableCell>
-              <TableCell>
+              <TableCell align="center">
                 <Tooltip
                   title="Average GPA Across Course Sections"
                   placement="top"
@@ -456,7 +456,7 @@ const SearchResultsTable = ({
                   </div>
                 </Tooltip>
               </TableCell>
-              <TableCell>
+              <TableCell align="center">
                 <Tooltip
                   title="Average Professor Rating from Rate My Professors"
                   placement="top"
