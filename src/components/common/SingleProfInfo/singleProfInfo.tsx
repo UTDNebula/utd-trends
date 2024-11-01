@@ -1,4 +1,4 @@
-import { Grid, Skeleton } from '@mui/material';
+import { Grid, Skeleton, Chip } from '@mui/material';
 import Link from 'next/link';
 import React from 'react';
 
@@ -16,6 +16,7 @@ function SingleProfInfo({ rmp }: Props) {
   if (rmp.state === 'loading') {
     return (
       <Grid container spacing={2} className="p-4">
+        {/* Loading skeletons for each metric */}
         <Grid item xs={6}>
           <p className="text-xl font-bold">
             <Skeleton variant="rounded" width="10%" height={25} />
@@ -43,8 +44,32 @@ function SingleProfInfo({ rmp }: Props) {
       </Grid>
     );
   }
+
+  // Extract top 10 tags by count, sorted in descending order
+  const topTags = rmp.data.teacherRatingTags
+    .sort((a, b) => b.tagCount - a.tagCount)
+    .slice(0, 10);
+
   return (
     <Grid container spacing={2} className="p-4">
+      {/* Display Tags at the top */}
+      {topTags && topTags.length > 0 && (
+        <Grid item xs={12}>
+          <p className="font-semibold">Top Tags:</p>
+          <div className="flex gap-1 flex-wrap mt-2">
+            {topTags.map((tag, index) => (
+              <Chip
+                key={index}
+                label={${tag.tagName} (${tag.tagCount})}
+                variant="outlined"
+                size="small"
+              />
+            ))}
+          </div>
+        </Grid>
+      )}
+      
+      {/* Professor rating and Difficulty displayed below tags */}
       <Grid item xs={6}>
         <p className="text-xl font-bold">{rmp.data.avgRating}</p>
         <p>Professor rating</p>
@@ -65,6 +90,7 @@ function SingleProfInfo({ rmp }: Props) {
         </p>
         <p>Would take again</p>
       </Grid>
+
       <Grid item xs={12}>
         <Link
           href={
