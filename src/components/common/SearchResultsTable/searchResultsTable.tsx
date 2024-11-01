@@ -427,7 +427,7 @@ const SearchResultsTable = ({
             <TableRow>
               <TableCell />
               <TableCell>Compare</TableCell>
-              <TableCell>
+              <TableCell data-tutorial-id="step-1">
                 <TableSortLabel
                   active={orderBy === 'name'}
                   direction={orderBy === 'name' ? order : 'asc'}
@@ -438,7 +438,7 @@ const SearchResultsTable = ({
                   Name
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="center">
+              <TableCell align="center" data-tutorial-id="step-2">
                 <Tooltip
                   title="Average GPA Across Course Sections"
                   placement="top"

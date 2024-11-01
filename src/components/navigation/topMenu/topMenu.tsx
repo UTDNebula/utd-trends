@@ -1,4 +1,5 @@
-import { Share } from '@mui/icons-material';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import ShareIcon from '@mui/icons-material/Share';
 import { IconButton, Snackbar, Tooltip, useMediaQuery } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -7,6 +8,7 @@ import React, { useState } from 'react';
 
 import Background from '../../../../public/background.png';
 import SearchBar from '../../common/SearchBar/searchBar';
+import Tutorial from '../../common/Tutorial/tutorial';
 
 /**
  * This is a component to hold UTD Trends branding and basic navigation
@@ -51,6 +53,8 @@ export function TopMenu() {
     />
   );
 
+  const [openTutorial, setOpenTutorial] = useState(false);
+
   return (
     <>
       <div
@@ -72,25 +76,38 @@ export function TopMenu() {
           UTD TRENDS
         </Link>
         {matches && searchBar}
-        <Tooltip title="Share link to search" className="ml-auto">
-          <IconButton
-            className="aspect-square"
-            size="medium"
-            onClick={() => {
-              let url = window.location.href;
-              if (
-                router.query &&
-                Object.keys(router.query).length === 0 &&
-                Object.getPrototypeOf(router.query) === Object.prototype
-              ) {
-                url = 'https://trends.utdnebula.com/';
-              }
-              shareLink(url);
-            }}
-          >
-            <Share className="text-3xl mr-1" />
-          </IconButton>
-        </Tooltip>
+        <div className="flex gap-4 ml-auto">
+          <Tooltip title="Open tutorial">
+            <IconButton
+              className="w-12 h-12"
+              size="medium"
+              onClick={() => {
+                setOpenTutorial(true);
+              }}
+            >
+              <QuestionMarkIcon className="text-3xl" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Share link to search">
+            <IconButton
+              className="w-12 h-12"
+              size="medium"
+              onClick={() => {
+                let url = window.location.href;
+                if (
+                  router.query &&
+                  Object.keys(router.query).length === 0 &&
+                  Object.getPrototypeOf(router.query) === Object.prototype
+                ) {
+                  url = 'https://trends.utdnebula.com/';
+                }
+                shareLink(url);
+              }}
+            >
+              <ShareIcon className="text-3xl mr-1" />
+            </IconButton>
+          </Tooltip>
+        </div>
         {!matches && searchBar}
       </div>
       <Snackbar
@@ -99,6 +116,7 @@ export function TopMenu() {
         onClose={() => setOpenCopied(false)}
         message="Copied!"
       />
+      <Tutorial open={openTutorial} close={() => setOpenTutorial(false)} />
     </>
   );
 }
