@@ -1,58 +1,93 @@
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
 import CloseIcon from '@mui/icons-material/Close';
-import { Button, IconButton, Popover, Typography } from '@mui/material';
+import { Backdrop, Button, IconButton, Popover } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
 type TutorialPopupProps = {
-  anchorEl: Element;
+  element: Element;
   open: boolean;
-  children: ReactJSXElement;
   incrementStep: () => void;
   close: () => void;
+  title: string;
   buttonText: string;
+  children: ReactJSXElement;
 };
 
 const TutorialPopup = ({
   element,
   open,
-  children,
   incrementStep,
   close,
+  title,
   buttonText,
+  children,
 }: TutorialPopupProps) => {
+  useEffect(() => {
+    if (open) {
+      element.classList.add('tutorial-raise');
+    } else {
+      element.classList.remove('tutorial-raise');
+    }
+    return () => element.classList.remove('tutorial-raise');
+  }, [open]);
+
   return (
-    ///TODO: scroll into view on open
     <Popover
       open={open}
       anchorEl={element}
       anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       className="pointer-events-auto"
+      disableScrollLock={true}
+      marginThreshold={null}
     >
-      <div className="p-2" role="dialog" aria-modal="true">
-        <IconButton onClick={close}>
-          <CloseIcon />
-        </IconButton>
-        {children}
-        <Button onClick={incrementStep}>{buttonText}</Button>
+      <div
+        className="p-2 flex flex-col items-start min-w-32"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className="flex w-full items-center gap-2 pl-2">
+          <p className="text-lg font-bold">{title}</p>
+          <IconButton onClick={close} className="ml-auto">
+            <CloseIcon />
+          </IconButton>
+        </div>
+        <div className="p-2">{children}</div>
+        <Button
+          variant="contained"
+          className="self-end"
+          onClick={incrementStep}
+        >
+          {buttonText}
+        </Button>
       </div>
     </Popover>
   );
 };
 
-const tutorialText: { [key: string]: ReactJSXElement } = {
-  'step-1': (
-    <>
-      <Typography>Hi</Typography>
-      <Typography>Bye</Typography>
-    </>
-  ),
-  'step-2': (
-    <>
-      <Typography>Hello</Typography>
-      <Typography>Goodbye</Typography>
-    </>
-  ),
+type StepContent = { title: string; content: ReactJSXElement };
+
+const tutorialText: { [key: string]: StepContent } = {
+  'step-1': {
+    title: 'hey',
+    content: (
+      <>
+        <p className="font-semibold">Hi</p>
+        <p>Bye</p>
+      </>
+    ),
+  },
+  'step-2': {
+    title: 'howdyyyyyyyyy',
+    content: (
+      <>
+        <p className="font-semibold">Hello</p>
+        <p>Goodbye</p>
+        <p className="font-semibold">Hello</p>
+        <p>Goodbye</p>
+      </>
+    ),
+  },
 };
 
 type TutorialProps = {
@@ -64,7 +99,7 @@ const Tutorial = ({ open, close }: TutorialProps) => {
   type Step = {
     id: string;
     element: Element;
-    tutorial: ReactJSXElement;
+    tutorial: StepContent;
   };
   const [steps, setSteps] = useState<Step[]>([]);
   const [place, setPlace] = useState(0);
@@ -88,7 +123,8 @@ const Tutorial = ({ open, close }: TutorialProps) => {
 
   return (
     <>
-      {steps.map(({ element, tutorial }, index) => (
+      <Backdrop sx={(theme) => ({ zIndex: theme.zIndex.modal })} open={open} />
+      {steps.map(({ element, tutorial: { title, content } }, index) => (
         <TutorialPopup
           key={index}
           element={element}
@@ -101,9 +137,10 @@ const Tutorial = ({ open, close }: TutorialProps) => {
             setPlace(place + 1);
           }}
           close={close}
+          title={title}
           buttonText={index === steps.length - 1 ? 'Done' : 'Next'}
         >
-          {tutorial}
+          {content}
         </TutorialPopup>
       ))}
     </>

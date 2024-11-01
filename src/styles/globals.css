@@ -27,4 +27,8 @@ body,
   .bg-darken {
     background-color: rgba(0, 0, 0, 0.6);
   }
+
+  .tutorial-raise {
+    z-index: calc(var(--mui-zIndex-modal) + 1);
+  }
 }
