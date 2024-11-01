@@ -13,7 +13,7 @@ type TutorialPopupProps = {
 };
 
 const TutorialPopup = ({
-  anchorEl,
+  element,
   open,
   children,
   incrementStep,
@@ -21,9 +21,10 @@ const TutorialPopup = ({
   buttonText,
 }: TutorialPopupProps) => {
   return (
+    ///TODO: scroll into view on open
     <Popover
       open={open}
-      anchorEl={anchorEl}
+      anchorEl={element}
       anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       className="pointer-events-auto"
@@ -90,7 +91,7 @@ const Tutorial = ({ open, close }: TutorialProps) => {
       {steps.map(({ element, tutorial }, index) => (
         <TutorialPopup
           key={index}
-          anchorEl={element}
+          element={element}
           open={open && place === index}
           incrementStep={() => {
             if (place === steps.length - 1) {
