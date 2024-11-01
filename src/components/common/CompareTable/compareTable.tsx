@@ -220,11 +220,13 @@ function GradeAndRmpRow({
         // so ts can remember the type of rmp (which it can't do for rmpValues[index]) and know's that when its state is done, you can access its data value
         .map(([grade, rmp], index) => {
           const gradeValue =
-            grade.state === 'done'
+            typeof grade !== 'undefined' && grade.state === 'done'
               ? getGradeValue(grade.data as GradesType)
               : null;
           const rmpValue =
-            rmp.state === 'done' ? getRmpValue(rmp.data as RMPInterface) : null;
+            typeof rmp !== 'undefined' && rmp.state === 'done'
+              ? getRmpValue(rmp.data as RMPInterface)
+              : null;
 
           return (
             <TableCell
