@@ -231,6 +231,7 @@ function fetchRmpData(
 export const Dashboard: NextPage = () => {
   const router = useRouter();
 
+  const [pageTitle, setPageTitle] = useState<String>('');
   //Searches seperated into courses and professors to create combos
   const [courses, setCourses] = useState<SearchQuery[]>([]);
   const [professors, setProfessors] = useState<SearchQuery[]>([]);
@@ -263,6 +264,8 @@ export const Dashboard: NextPage = () => {
       });
       setCourses(courseSearchTerms);
       setProfessors(professorSearchTerms);
+
+      updatePageTitle(courseSearchTerms, professorSearchTerms);
 
       //Clear fetched data
       setResults({ state: 'loading' });
@@ -334,6 +337,20 @@ export const Dashboard: NextPage = () => {
       };
     }
   }, [router.isReady, router.query.searchTerms]);
+
+  function updatePageTitle(
+    courseSearchTerms: SearchQuery[],
+    professorSearchTerms: SearchQuery[],
+  ) {
+    var str = '';
+    courseSearchTerms.map((term) => {
+      str += searchQueryLabel(term) + ', ';
+    });
+    professorSearchTerms.map((term) => {
+      str += searchQueryLabel(term) + ', ';
+    });
+    setPageTitle(str);
+  }
 
   //Compiled list of academic sessions grade data is available for
   const [academicSessions, setAcademicSessions] = useState<string[]>([]);
@@ -763,7 +780,7 @@ export const Dashboard: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Results - UTD Trends</title>
+        <title>{pageTitle + ' - UTD TRENDS'}</title>
         <link
           rel="canonical"
           href="https://trends.utdnebula.com/dashboard"
