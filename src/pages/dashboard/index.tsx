@@ -231,7 +231,7 @@ function fetchRmpData(
 export const Dashboard: NextPage = () => {
   const router = useRouter();
 
-  const [pageTitle, setPageTitle] = useState<String>('');
+  const [pageTitle, setPageTitle] = useState<string>('');
   //Searches seperated into courses and professors to create combos
   const [courses, setCourses] = useState<SearchQuery[]>([]);
   const [professors, setProfessors] = useState<SearchQuery[]>([]);
@@ -342,7 +342,7 @@ export const Dashboard: NextPage = () => {
     courseSearchTerms: SearchQuery[],
     professorSearchTerms: SearchQuery[],
   ) {
-    var str = '';
+    let str = '';
     courseSearchTerms.map((term) => {
       str += searchQueryLabel(term) + ', ';
     });
