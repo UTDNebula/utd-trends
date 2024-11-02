@@ -349,6 +349,10 @@ export const Dashboard: NextPage = () => {
     professorSearchTerms.map((term) => {
       str += searchQueryLabel(term) + ', ';
     });
+    str =
+      str.lastIndexOf(', ') === str.length - 2
+        ? str.substring(0, str.lastIndexOf(', ')) + ' - '
+        : str;
     setPageTitle(str);
   }
 
@@ -780,7 +784,7 @@ export const Dashboard: NextPage = () => {
   return (
     <>
       <Head>
-        <title>{pageTitle + ' - UTD TRENDS'}</title>
+        <title>{'Results - ' + pageTitle + 'UTD TRENDS'}</title>
         <link
           rel="canonical"
           href="https://trends.utdnebula.com/dashboard"
