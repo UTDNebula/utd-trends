@@ -19,7 +19,9 @@ import React, { useState } from 'react';
 import SearchQuery, {
   convertToProfOnly,
 } from '../../../modules/SearchQuery/SearchQuery';
-import { useRainbowColors } from '../../../modules/searchQueryColors/searchQueryColors';
+import searchQueryColors, {
+  useRainbowColors,
+} from '../../../modules/searchQueryColors/searchQueryColors';
 import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
@@ -84,6 +86,7 @@ type RowProps = {
   inCompare: boolean;
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
+  checkboxColor: string;
 };
 
 function Row({
@@ -93,6 +96,7 @@ function Row({
   inCompare,
   addToCompare,
   removeFromCompare,
+  checkboxColor,
 }: RowProps) {
   const [open, setOpen] = useState(false);
 
@@ -150,6 +154,11 @@ function Row({
                 } else {
                   addToCompare(course);
                 }
+              }}
+              sx={{
+                '&.Mui-checked': {
+                  color: checkboxColor,
+                },
               }}
               disabled={
                 (typeof grades !== 'undefined' && grades.state === 'loading') ||
@@ -415,6 +424,26 @@ const SearchResultsTable = ({
     return 0;
   });
 
+  const isInCompare = (item: SearchQuery) =>
+    compare.some((compItem) => searchQueryEqual(compItem, item));
+
+  let colorIndex = 0;
+  const colorMap: { [key: string]: string } = {};
+
+  includedResults.forEach((result) => {
+    const inCompare = isInCompare(result);
+
+    if (inCompare) {
+      colorMap[searchQueryLabel(result)] =
+        searchQueryColors[colorIndex % searchQueryColors.length];
+      colorIndex++;
+    }
+  });
+
+  const mappedColors = sortedResults.map(
+    (result) => colorMap[searchQueryLabel(result)],
+  );
+
   return (
     //TODO: sticky header
     <>
@@ -478,7 +507,7 @@ const SearchResultsTable = ({
           </TableHead>
           <TableBody>
             {resultsLoading === 'done'
-              ? sortedResults.map((result) => (
+              ? sortedResults.map((result, index) => (
                   <Row
                     key={searchQueryLabel(result)}
                     course={result}
@@ -491,6 +520,7 @@ const SearchResultsTable = ({
                     }
                     addToCompare={addToCompare}
                     removeFromCompare={removeFromCompare}
+                    checkboxColor={mappedColors[index]}
                   />
                 ))
               : Array(10)
