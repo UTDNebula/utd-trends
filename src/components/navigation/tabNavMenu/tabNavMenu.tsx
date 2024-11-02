@@ -32,14 +32,10 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
           className="text-lg text-gray-600 dark:text-gray-200 normal-case"
           value={index}
           label={
-            index === props.options.length - 1 ? (
-              <div className="flex items-center">
+            index === props.options.length - 1 && props.compareLength ? (
+              <div className="flex items-center gap-4">
                 {option}
-                <Badge
-                  badgeContent={props.compareLength} // Replace 0 with the actual notification count
-                  color="secondary"
-                  className="ml-4"
-                />
+                <Badge badgeContent={props.compareLength} color="primary" />
               </div>
             ) : (
               option

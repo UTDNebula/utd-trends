@@ -39,7 +39,7 @@ const variants = {
  * @param props the props passed from the parent component
  * @returns
  */
-export const Carousel = ({ names, children, compareLength }: CarouselProps) => {
+const Carousel = ({ names, children, compareLength }: CarouselProps) => {
   // The card currently being displayed
   const [currentCard, setCurrentCard] = useState(0);
   // The Direction that the card is moving in
