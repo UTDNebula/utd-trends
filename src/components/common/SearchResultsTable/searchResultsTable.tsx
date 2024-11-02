@@ -86,7 +86,7 @@ type RowProps = {
   inCompare: boolean;
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
-  checkboxColor: string;
+  color?: string;
 };
 
 function Row({
@@ -96,7 +96,7 @@ function Row({
   inCompare,
   addToCompare,
   removeFromCompare,
-  checkboxColor,
+  color,
 }: RowProps) {
   const [open, setOpen] = useState(false);
 
@@ -155,15 +155,19 @@ function Row({
                   addToCompare(course);
                 }
               }}
-              sx={{
-                '&.Mui-checked': {
-                  color: checkboxColor,
-                },
-              }}
               disabled={
                 (typeof grades !== 'undefined' && grades.state === 'loading') ||
                 (typeof rmp !== 'undefined' && rmp.state === 'loading')
               }
+              sx={
+                color
+                  ? {
+                      '&.Mui-checked': {
+                        color: color,
+                      },
+                    }
+                  : undefined
+              } // Apply color if defined
             />
           </Tooltip>
         </TableCell>
@@ -300,6 +304,13 @@ const SearchResultsTable = ({
     );
   }
 
+  // Build colorMap based on the 'compare' array
+  const colorMap: { [key: string]: string } = {};
+  compare.forEach((course, index) => {
+    colorMap[searchQueryLabel(course)] =
+      searchQueryColors[index % searchQueryColors.length];
+  });
+
   //Sort
   const sortedResults = includedResults.sort((a, b) => {
     if (orderBy === 'name') {
@@ -424,26 +435,6 @@ const SearchResultsTable = ({
     return 0;
   });
 
-  const isInCompare = (item: SearchQuery) =>
-    compare.some((compItem) => searchQueryEqual(compItem, item));
-
-  let colorIndex = 0;
-  const colorMap: { [key: string]: string } = {};
-
-  includedResults.forEach((result) => {
-    const inCompare = isInCompare(result);
-
-    if (inCompare) {
-      colorMap[searchQueryLabel(result)] =
-        searchQueryColors[colorIndex % searchQueryColors.length];
-      colorIndex++;
-    }
-  });
-
-  const mappedColors = sortedResults.map(
-    (result) => colorMap[searchQueryLabel(result)],
-  );
-
   return (
     //TODO: sticky header
     <>
@@ -507,7 +498,7 @@ const SearchResultsTable = ({
           </TableHead>
           <TableBody>
             {resultsLoading === 'done'
-              ? sortedResults.map((result, index) => (
+              ? sortedResults.map((result) => (
                   <Row
                     key={searchQueryLabel(result)}
                     course={result}
@@ -520,7 +511,7 @@ const SearchResultsTable = ({
                     }
                     addToCompare={addToCompare}
                     removeFromCompare={removeFromCompare}
-                    checkboxColor={mappedColors[index]}
+                    color={colorMap[searchQueryLabel(result)]} // Use color from colorMap
                   />
                 ))
               : Array(10)
