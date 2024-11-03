@@ -25,6 +25,7 @@ const TutorialPopup = ({
   useEffect(() => {
     if (open) {
       element.classList.add('tutorial-raise');
+      element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     } else {
       element.classList.remove('tutorial-raise');
     }
