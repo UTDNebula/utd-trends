@@ -66,10 +66,17 @@ const TutorialPopup = ({
   );
 };
 
-type StepContent = { title: string; content: ReactJSXElement };
+type StepTemplate = {
+  id: string;
+  element?: Element;
+  title: string;
+  content: ReactJSXElement;
+};
+type Step = StepTemplate & { element: Element };
 
-const tutorialText: { [key: string]: StepContent } = {
-  'step-1': {
+const stepsTemplate: StepTemplate[] = [
+  {
+    id: 'grades',
     title: 'hey',
     content: (
       <>
@@ -78,7 +85,8 @@ const tutorialText: { [key: string]: StepContent } = {
       </>
     ),
   },
-  'step-2': {
+  {
+    id: 'rating',
     title: 'howdyyyyyyyyy',
     content: (
       <>
@@ -89,7 +97,7 @@ const tutorialText: { [key: string]: StepContent } = {
       </>
     ),
   },
-};
+];
 
 type TutorialProps = {
   open: boolean;
@@ -97,35 +105,31 @@ type TutorialProps = {
 };
 
 const Tutorial = ({ open, close }: TutorialProps) => {
-  type Step = {
-    id: string;
-    element: Element;
-    tutorial: StepContent;
-  };
   const [steps, setSteps] = useState<Step[]>([]);
   const [place, setPlace] = useState(0);
 
   useEffect(() => {
     // For each element, set anchor based on `data-tutorial-id`
     const elements = document.querySelectorAll('[data-tutorial-id]');
-    const newSteps: Step[] = [];
-    elements.forEach((el) => {
-      const id = el.getAttribute('data-tutorial-id') as string;
-      newSteps.push({
-        id: id,
-        element: el,
-        tutorial: tutorialText[id],
-      });
+    if (!elements.length) {
+      close();
+      return;
+    }
+    const newSteps = stepsTemplate;
+    elements.forEach((element) => {
+      const id = element.getAttribute('data-tutorial-id') as string;
+      newSteps[newSteps.findIndex((step) => step.id === id)].element = element;
     });
-    newSteps.sort((a, b) => Number(a.id) - Number(b.id));
-    setSteps(newSteps);
+    setSteps(
+      newSteps.filter((step) => typeof step.element !== 'undefined') as Step[],
+    );
     setPlace(0);
   }, [open]);
 
   return (
     <>
       <Backdrop sx={(theme) => ({ zIndex: theme.zIndex.modal })} open={open} />
-      {steps.map(({ element, tutorial: { title, content } }, index) => (
+      {steps.map(({ element, title, content }, index) => (
         <TutorialPopup
           key={index}
           element={element}
