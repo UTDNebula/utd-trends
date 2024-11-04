@@ -107,8 +107,12 @@ const Filters = ({
       {/* min GPA dropdown*/}
       <FormControl
         size="small"
-        className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
-      >
+        className={`w-full ${
+          minGPA 
+            ? '[&>.MuiInputBase-root]:bg-gray-200 [&>.MuiInputBase-root]:dark:bg-gray-900' 
+            : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti'
+        }`}
+       >
         <InputLabel id="minGPA">Min Letter Grade</InputLabel>
         <Select
           label="Min Letter Grade"
@@ -133,7 +137,11 @@ const Filters = ({
       {/* min rating dropdown*/}
       <FormControl
         size="small"
-        className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+        className={`w-full ${
+          minRating
+            ? '[&>.MuiInputBase-root]:bg-gray-200 [&>.MuiInputBase-root]:dark:bg-gray-900'
+            : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti'
+        }`}
       >
         <InputLabel id="minRating">Min Rating</InputLabel>
         <Select
@@ -173,7 +181,11 @@ const Filters = ({
       {/* semester dropdown */}
       <FormControl
         size="small"
-        className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+        className={`w-full ${
+          chosenSessions.length
+            ? '[&>.MuiInputBase-root]:bg-gray-200 [&>.MuiInputBase-root]:dark:bg-gray-900'
+            : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti'
+        }`}
       >
         <InputLabel id="Semesters">Semesters</InputLabel>
         <Select
