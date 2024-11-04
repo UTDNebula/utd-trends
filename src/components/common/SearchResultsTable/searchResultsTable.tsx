@@ -19,7 +19,7 @@ import React, { useState } from 'react';
 import SearchQuery, {
   convertToProfOnly,
 } from '../../../modules/SearchQuery/SearchQuery';
-import searchQueryColors, {
+import {
   useRainbowColors,
 } from '../../../modules/searchQueryColors/searchQueryColors';
 import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
@@ -256,6 +256,7 @@ type SearchResultsTableProps = {
   compare: SearchQuery[];
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
+  colorMap: { [key: string]: string };
 };
 
 const SearchResultsTable = ({
@@ -266,6 +267,7 @@ const SearchResultsTable = ({
   compare,
   addToCompare,
   removeFromCompare,
+  colorMap,
 }: SearchResultsTableProps) => {
   //Table sorting category
   const [orderBy, setOrderBy] = useState<'name' | 'gpa' | 'rating'>('name');
@@ -303,13 +305,6 @@ const SearchResultsTable = ({
       </div>
     );
   }
-
-  // Build colorMap based on the 'compare' array
-  const colorMap: { [key: string]: string } = {};
-  compare.forEach((course, index) => {
-    colorMap[searchQueryLabel(course)] =
-      searchQueryColors[index % searchQueryColors.length];
-  });
 
   //Sort
   const sortedResults = includedResults.sort((a, b) => {

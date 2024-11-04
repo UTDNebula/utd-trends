@@ -21,6 +21,7 @@ import fetchWithCache, {
 } from '../../modules/fetchWithCache';
 import type SearchQuery from '../../modules/SearchQuery/SearchQuery';
 import { convertToProfOnly } from '../../modules/SearchQuery/SearchQuery';
+import searchQueryColors from '../../modules/searchQueryColors/searchQueryColors';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
 import type { GradesData } from '../../pages/api/grades';
@@ -226,6 +227,15 @@ function fetchRmpData(
     }
     return response.data;
   });
+}
+
+// Add this utility function after the existing type definitions
+function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
+  const colorMap: { [key: string]: string } = {};
+  courses.forEach((course, index) => {
+    colorMap[searchQueryLabel(course)] = searchQueryColors[index % searchQueryColors.length];
+  });
+  return colorMap;
 }
 
 export const Dashboard: NextPage = () => {
@@ -679,6 +689,9 @@ export const Dashboard: NextPage = () => {
     }
   }
 
+  // Add this after the compare state declaration
+  const colorMap = createColorMap(compare);
+
   //Main content: loading, error, or normal
   let contentComponent;
 
@@ -719,6 +732,7 @@ export const Dashboard: NextPage = () => {
         grades={compareGrades}
         rmp={compareRmp}
         removeFromCompare={removeFromCompare}
+        colorMap={colorMap}  // Add this prop
       />,
     );
     contentComponent = (
@@ -744,6 +758,7 @@ export const Dashboard: NextPage = () => {
               compare={compare}
               addToCompare={addToCompare}
               removeFromCompare={removeFromCompare}
+              colorMap={colorMap}  // Add this prop
             />
           </Grid>
           <Grid item xs={false} sm={6} md={6} className="w-full">
