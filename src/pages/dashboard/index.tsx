@@ -735,6 +735,22 @@ export const Dashboard: NextPage = () => {
         removeFromCompare={removeFromCompare}
       />,
     );
+    const searchResultsTable = (
+      <SearchResultsTable
+        resultsLoading={results.state}
+        includedResults={includedResults}
+        grades={grades}
+        rmp={rmp}
+        compare={compare}
+        addToCompare={addToCompare}
+        removeFromCompare={removeFromCompare}
+      />
+    );
+    const carousel = (
+      <Card>
+        <Carousel names={names}>{tabs}</Carousel>
+      </Card>
+    );
     contentComponent = (
       <>
         <Grid container spacing={2}>
@@ -749,42 +765,14 @@ export const Dashboard: NextPage = () => {
           <Grid item xs={false} sm={6} md={6}></Grid>
         </Grid>
         {isSmallScreen ? (
-          <Grid container component="main" wrap="wrap-reverse" spacing={2}>
-            <Grid item xs={12} sm={6} md={6}>
-              <SearchResultsTable
-                resultsLoading={results.state}
-                includedResults={includedResults}
-                grades={grades}
-                rmp={rmp}
-                compare={compare}
-                addToCompare={addToCompare}
-                removeFromCompare={removeFromCompare}
-              />
-            </Grid>
-            <Grid item xs={false} sm={6} md={6}>
-              <Card>
-                <Carousel names={names}>{tabs}</Carousel>
-              </Card>
-            </Grid>
-          </Grid>
+          <div>
+            {carousel}
+            {searchResultsTable}
+          </div>
         ) : (
-          <PanelGroup className="pt-4" direction="horizontal">
-            <Panel
-              className="pr-1 min-h-fit"
-              id="LHS"
-              ref={panelLRef}
-              minSize={40}
-              defaultSize={50}
-            >
-              <SearchResultsTable
-                resultsLoading={results.state}
-                includedResults={includedResults}
-                grades={grades}
-                rmp={rmp}
-                compare={compare}
-                addToCompare={addToCompare}
-                removeFromCompare={removeFromCompare}
-              />
+          <PanelGroup direction="horizontal">
+            <Panel ref={panelLRef} minSize={40} defaultSize={50}>
+              {searchResultsTable}
             </Panel>
             <PanelResizeHandle
               className="p-1 mx-1 w-0.5 rounded-full opacity-25 transition ease-in-out bg-transparent hover:bg-royal"
@@ -796,9 +784,7 @@ export const Dashboard: NextPage = () => {
               minSize={30}
               defaultSize={50}
             >
-              <Card>
-                <Carousel names={names}>{tabs}</Carousel>
-              </Card>
+              {carousel}
             </Panel>
           </PanelGroup>
         )}
