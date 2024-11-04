@@ -9,7 +9,6 @@ import {
   PanelGroup,
   PanelResizeHandle,
 } from 'react-resizable-panels';
-import { Direction } from 'react-resizable-panels/dist/declarations/src/types';
 
 import Carousel from '../../components/common/Carousel/carousel';
 import Compare from '../../components/common/Compare/compare';
@@ -688,35 +687,10 @@ export const Dashboard: NextPage = () => {
 
   const panelLRef = useRef<ImperativePanelHandle>(null);
   const panelRRef = useRef<ImperativePanelHandle>(null);
-  const panelTVert = useRef<ImperativePanelHandle>(null);
   const isSmallScreen = useMediaQuery('(max-width: 650px)');
-  const [panelsDirection, setPanelsDirection] =
-    useState<Direction>('horizontal');
   // Runs when window is resized to change format
-  useEffect(function mount() {
-    window.addEventListener('resize', handleWhenResized);
-    return () => {
-      window.removeEventListener('resize', handleWhenResized);
-    };
-  });
   // Runs once to decide mobile or desktop layout for initial load
-  useEffect(() => {
-    let ignore = false;
-    if (!ignore) handleWhenResized();
-    return () => {
-      ignore = true;
-    };
-  });
   // Changing using useMediaQuery when window size is >650px or <650px
-  const handleWhenResized = () => {
-    if (isSmallScreen) {
-      panelTVert.current?.expand();
-      setPanelsDirection('vertical');
-    } else {
-      panelTVert.current?.collapse();
-      setPanelsDirection('horizontal');
-    }
-  };
   // Resets RHS & LHS to 50/50 when double clicking handle
   const handleResizeDoubleClick = () => {
     panelLRef.current?.resize(50);
@@ -777,51 +751,61 @@ export const Dashboard: NextPage = () => {
           </Grid>
           <Grid item xs={false} sm={6} md={6}></Grid>
         </Grid>
-        <PanelGroup className="pt-4" direction={panelsDirection}>
-          <Panel
-            className="pb-1 min-h-fit"
-            id="RHSVert"
-            ref={panelTVert}
-            collapsible={true}
-          >
-            <Card>
-              <Carousel names={names}>{tabs}</Carousel>
-            </Card>
-          </Panel>
-          <PanelResizeHandle disabled />
-          <Panel
-            className="pr-1 min-h-fit"
-            id="LHS"
-            ref={panelLRef}
-            minSize={20}
-            defaultSize={50}
-          >
-            <SearchResultsTable
-              resultsLoading={results.state}
-              includedResults={includedResults}
-              grades={grades}
-              rmp={rmp}
-              compare={compare}
-              addToCompare={addToCompare}
-              removeFromCompare={removeFromCompare}
+        {isSmallScreen ? (
+          <Grid container component="main" wrap="wrap-reverse" spacing={2}>
+            <Grid item xs={12} sm={6} md={6}>
+              <SearchResultsTable
+                resultsLoading={results.state}
+                includedResults={includedResults}
+                grades={grades}
+                rmp={rmp}
+                compare={compare}
+                addToCompare={addToCompare}
+                removeFromCompare={removeFromCompare}
+              />
+            </Grid>
+            <Grid item xs={false} sm={6} md={6}>
+              <Card>
+                <Carousel names={names}>{tabs}</Carousel>
+              </Card>
+            </Grid>
+          </Grid>
+        ) : (
+          <PanelGroup className="pt-4" direction="horizontal">
+            <Panel
+              className="pr-1 min-h-fit"
+              id="LHS"
+              ref={panelLRef}
+              minSize={40}
+              defaultSize={50}
+            >
+              <SearchResultsTable
+                resultsLoading={results.state}
+                includedResults={includedResults}
+                grades={grades}
+                rmp={rmp}
+                compare={compare}
+                addToCompare={addToCompare}
+                removeFromCompare={removeFromCompare}
+              />
+            </Panel>
+            <PanelResizeHandle
+              className="p-1 w-[2px] rounded-md opacity-75 transition ease-in-out bg-transparent hover:bg-blue-950 duration-75"
+              onDoubleClick={handleResizeDoubleClick}
             />
-          </Panel>
-          <PanelResizeHandle
-            className="p-1 w-[2px] rounded-md opacity-75 transition ease-in-out bg-transparent hover:bg-blue-950 duration-75"
-            onDoubleClick={handleResizeDoubleClick}
-          />
-          <Panel
-            className="pl-1"
-            id="RHS"
-            ref={panelRRef}
-            minSize={40}
-            defaultSize={50}
-          >
-            <Card>
-              <Carousel names={names}>{tabs}</Carousel>
-            </Card>
-          </Panel>
-        </PanelGroup>
+            <Panel
+              className="pl-1"
+              id="RHS"
+              ref={panelRRef}
+              minSize={30}
+              defaultSize={50}
+            >
+              <Card>
+                <Carousel names={names}>{tabs}</Carousel>
+              </Card>
+            </Panel>
+          </PanelGroup>
+        )}
       </>
     );
   }
