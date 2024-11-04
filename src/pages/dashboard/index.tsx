@@ -282,50 +282,14 @@ export const Dashboard: NextPage = () => {
       //Get course/prof info
       if (courseSearchTerms.length === 1) {
         if (!(searchQueryLabel(courseSearchTerms[0]) in rhsGrades.course)) {
-          addRHSGrades(
-            searchQueryLabel(courseSearchTerms[0]),
-            {
-              state: 'loading',
-            },
-            true,
-          );
-          fetchGradesData(courseSearchTerms[0], controller)
-            .then((rhsGrade) => {
-              addRHSGrades(
-                searchQueryLabel(courseSearchTerms[0]),
-                {
-                  state: rhsGrade.gpa !== -1 ? 'done' : 'error',
-                  data: rhsGrade,
-                },
-                true,
-              );
-            })
-            .catch((err) => console.error('Grades data for ' + searchQueryLabel(courseSearchTerms[0]), err));
+          fetchAndAddRHSGrades(courseSearchTerms[0], controller);
         }
       }
       if (professorSearchTerms.length === 1) {
         if (
           !(searchQueryLabel(professorSearchTerms[0]) in rhsGrades.professor)
         ) {
-          addRHSGrades(
-            searchQueryLabel(professorSearchTerms[0]),
-            {
-              state: 'loading',
-            },
-            false,
-          );
-          fetchGradesData(professorSearchTerms[0], controller)
-            .then((rhsGrade) => {
-              addRHSGrades(
-                searchQueryLabel(professorSearchTerms[0]),
-                {
-                  state: rhsGrade.gpa !== -1 ? 'done' : 'error',
-                  data: rhsGrade,
-                },
-                false,
-              );
-            })
-            .catch((err) => console.error('Grades data for ' + searchQueryLabel(courseSearchTerms[0]), err));
+          fetchAndAddRHSGrades(professorSearchTerms[0], controller);
         }
       }
 
@@ -469,20 +433,35 @@ export const Dashboard: NextPage = () => {
     });
   }
 
+  // holds data for course and professor overviews
   type rhsGradesType = { [key: string]: GenericFetchedData<GradesType> };
   const [rhsGrades, setRHSGrades] = useState<{
     course: rhsGradesType;
     professor: rhsGradesType;
   }>({ course: {}, professor: {} });
-  function addRHSGrades(
-    rhsKey: string,
-    rhsGrade: GenericFetchedData<GradesType>,
-    course: boolean,
+  function fetchAndAddRHSGrades(
+    query: SearchQuery,
+    controller: AbortController,
   ) {
+    const rhsKey = searchQueryLabel(query);
+    // only update course on course query or vice versa
+    const isCourse = typeof query.prefix !== 'undefined';
     setRHSGrades((old) => ({
-      course: course ? { [rhsKey]: rhsGrade } : old.course,
-      professor: course ? old.professor : { [rhsKey]: rhsGrade },
+      course: isCourse ? { [rhsKey]: { state: 'loading' } } : old.course,
+      professor: isCourse ? old.professor : { [rhsKey]: { state: 'loading' } },
     }));
+    fetchGradesData(query, controller)
+      .then((rhsGrade) => {
+        const rhsGradeFetched: GenericFetchedData<GradesType> = {
+          state: rhsGrade.gpa !== -1 ? 'done' : 'error',
+          data: rhsGrade,
+        };
+        setRHSGrades((old) => ({
+          course: isCourse ? { [rhsKey]: rhsGradeFetched } : old.course,
+          professor: isCourse ? old.professor : { [rhsKey]: rhsGradeFetched },
+        }));
+      })
+      .catch((err) => console.error('Grades data for ' + rhsKey, err));
   }
 
   //Store rmp scores by profs
