@@ -19,9 +19,7 @@ import React, { useState } from 'react';
 import SearchQuery, {
   convertToProfOnly,
 } from '../../../modules/SearchQuery/SearchQuery';
-import {
-  useRainbowColors,
-} from '../../../modules/searchQueryColors/searchQueryColors';
+import { useRainbowColors } from '../../../modules/searchQueryColors/searchQueryColors';
 import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
@@ -506,7 +504,7 @@ const SearchResultsTable = ({
                     }
                     addToCompare={addToCompare}
                     removeFromCompare={removeFromCompare}
-                    color={colorMap[searchQueryLabel(result)]} // Use color from colorMap
+                    color={colorMap[searchQueryLabel(result)]}
                   />
                 ))
               : Array(10)

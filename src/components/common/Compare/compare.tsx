@@ -25,7 +25,13 @@ function convertNumbersToPercents(distribution: GradesType): number[] {
   );
 }
 
-const Compare = ({ courses, grades, rmp, removeFromCompare, colorMap }: CompareProps) => {
+const Compare = ({
+  courses,
+  grades,
+  rmp,
+  removeFromCompare,
+  colorMap,
+}: CompareProps) => {
   if (courses.length === 0) {
     return <p>Click a checkbox to add something to compare.</p>;
   }

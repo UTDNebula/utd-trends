@@ -233,7 +233,8 @@ function fetchRmpData(
 function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
   const colorMap: { [key: string]: string } = {};
   courses.forEach((course, index) => {
-    colorMap[searchQueryLabel(course)] = searchQueryColors[index % searchQueryColors.length];
+    colorMap[searchQueryLabel(course)] =
+      searchQueryColors[index % searchQueryColors.length];
   });
   return colorMap;
 }
@@ -732,7 +733,7 @@ export const Dashboard: NextPage = () => {
         grades={compareGrades}
         rmp={compareRmp}
         removeFromCompare={removeFromCompare}
-        colorMap={colorMap}  // Add this prop
+        colorMap={colorMap}
       />,
     );
     contentComponent = (
@@ -758,7 +759,7 @@ export const Dashboard: NextPage = () => {
               compare={compare}
               addToCompare={addToCompare}
               removeFromCompare={removeFromCompare}
-              colorMap={colorMap}  // Add this prop
+              colorMap={colorMap}
             />
           </Grid>
           <Grid item xs={false} sm={6} md={6} className="w-full">
