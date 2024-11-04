@@ -787,12 +787,11 @@ export const Dashboard: NextPage = () => {
               />
             </Panel>
             <PanelResizeHandle
-              className="p-1 w-[2px] rounded-md opacity-75 transition ease-in-out bg-transparent hover:bg-blue-950 duration-75"
+              className="p-1 mx-1 w-0.5 rounded-full opacity-25 transition ease-in-out bg-transparent hover:bg-royal"
               onDoubleClick={handleResizeDoubleClick}
             />
             <Panel
-              className="pl-1"
-              id="RHS"
+              className="mt-4"
               ref={panelRRef}
               minSize={30}
               defaultSize={50}
