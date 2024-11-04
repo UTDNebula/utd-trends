@@ -8,6 +8,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
@@ -82,6 +83,12 @@ function GradeOrRmpRow<T>({
   handleClick,
   defaultAscSort,
 }: GradeOrRmpRowProps<T>) {
+  const tooltipTitles: { [key: string]: string } = {
+    GPA: 'Sort by GPA',
+    Rating: 'Sort by Rating',
+    'Would Take Again': 'Sort by Would Take Again %',
+    Difficulty: 'Sort by Difficulty',
+  };
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
       <TableCell align="right" className="pl-0">
@@ -97,7 +104,26 @@ function GradeOrRmpRow<T>({
             },
           }}
         >
-          {name}
+          {tooltipTitles[name] ? (
+            <Tooltip
+              title={tooltipTitles[name]}
+              placement="left"
+              PopperProps={{
+                modifiers: [
+                  {
+                    name: 'offset',
+                    options: {
+                      offset: [0, 10], // Adjust these values as needed
+                    },
+                  },
+                ],
+              }}
+            >
+              <span>{name}</span>
+            </Tooltip>
+          ) : (
+            name
+          )}
         </TableSortLabel>
       </TableCell>
       {values.map((value, index) => (
@@ -119,21 +145,26 @@ function GradeOrRmpRow<T>({
               </Skeleton>
             )) ||
             (value.state === 'done' && getValue(value.data) !== -1 && (
-              <Typography
-                className="text-base inline rounded-full px-5 py-2 text-black"
-                style={{
-                  backgroundColor: colorMidpoint(
-                    goodValue,
-                    badValue,
-                    getValue(value.data),
-                  ),
-                }}
+              <Tooltip
+                title={`${name}: ${formatValue(getValue(value.data))}`}
+                placement="top"
               >
-                {/*value.data is all the data past the state of loading, done, or error.
+                <Typography
+                  className="text-base inline rounded-full px-5 py-2 text-black"
+                  style={{
+                    backgroundColor: colorMidpoint(
+                      goodValue,
+                      badValue,
+                      getValue(value.data),
+                    ),
+                  }}
+                >
+                  {/*value.data is all the data past the state of loading, done, or error.
                 getValue returns the specific value from the data structure, like gpa.
                 formatValue makes it look pretty like 3.7216373 displaying as 3.72.*/}
-                {formatValue(getValue(value.data))}
-              </Typography>
+                  {formatValue(getValue(value.data))}
+                </Typography>
+              </Tooltip>
             )) ||
             null}
         </TableCell>
@@ -166,57 +197,98 @@ function GradeAndRmpRow({
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
       <TableCell align="right" className="pl-0">
-        {name}
+        <Tooltip
+          title="Total # of Grades & Ratings"
+          placement="left"
+          PopperProps={{
+            modifiers: [
+              {
+                name: 'offset',
+                options: {
+                  offset: [0, -8], // Adjust these values as needed
+                },
+              },
+            ],
+          }}
+        >
+          <span>{name}</span>
+        </Tooltip>
       </TableCell>
       {gradeValues
-        // combine values
+        // Combine values
         .map((x, i) => [x, rmpValues[i]])
         // so ts can remember the type of rmp (which it can't do for rmpValues[index]) and know's that when its state is done, you can access its data value
-        .map(([grade, rmp], index) => (
-          <TableCell
-            align="center"
-            key={index}
-            className={cell_className}
-            style={{
-              borderColor: colors[index],
-              backgroundColor: colors[index] + '10', // add transparency
-            }}
-          >
-            {((typeof grade === 'undefined' || grade.state === 'error') && (
-              <CloseIcon />
-            )) ||
-              (grade.state === 'loading' && (
-                <Skeleton variant="rounded" className="rounded-full px-5 py-2">
-                  <Typography className="text-base">{loadingFiller}</Typography>
-                </Skeleton>
-              )) ||
-              (grade.state === 'done' && (
-                <Typography className="text-base inline">
-                  {getGradeValue(grade.data as GradesType)}
-                </Typography>
-              )) ||
-              null}
-            {' / '}
-            {((typeof rmp === 'undefined' || rmp.state === 'error') && (
-              <CloseIcon />
-            )) ||
-              (rmp.state === 'loading' && (
-                <Skeleton variant="rounded" className="rounded-full px-5 py-2">
-                  <Typography className="text-base">{loadingFiller}</Typography>
-                </Skeleton>
-              )) ||
-              (rmp.state === 'done' && (
-                <Typography className="text-base inline">
-                  {getRmpValue(rmp.data as RMPInterface)}
-                </Typography>
-              )) ||
-              null}
-          </TableCell>
-        ))}
+        .map(([grade, rmp], index) => {
+          const gradeValue =
+            typeof grade !== 'undefined' && grade.state === 'done'
+              ? getGradeValue(grade.data as GradesType)
+              : null;
+          const rmpValue =
+            typeof rmp !== 'undefined' && rmp.state === 'done'
+              ? getRmpValue(rmp.data as RMPInterface)
+              : null;
+
+          return (
+            <TableCell
+              align="center"
+              key={index}
+              className={cell_className}
+              style={{
+                borderColor: colors[index],
+                backgroundColor: colors[index] + '10', // add transparency
+              }}
+            >
+              <Tooltip
+                title={`Grades: ${gradeValue !== null ? gradeValue : 'N/A'} / Ratings: ${rmpValue !== null ? rmpValue : 'N/A'}`}
+                placement="top"
+              >
+                <span>
+                  {((typeof grade === 'undefined' ||
+                    grade.state === 'error') && <CloseIcon />) ||
+                    (grade.state === 'loading' && (
+                      <Skeleton
+                        variant="rounded"
+                        className="rounded-full px-5 py-2"
+                      >
+                        <Typography className="text-base">
+                          {loadingFiller}
+                        </Typography>
+                      </Skeleton>
+                    )) ||
+                    (grade.state === 'done' && (
+                      <Typography className="text-base inline">
+                        {gradeValue}
+                      </Typography>
+                    )) ||
+                    null}
+                  {' / '}
+                  {((typeof rmp === 'undefined' || rmp.state === 'error') && (
+                    <CloseIcon />
+                  )) ||
+                    (rmp.state === 'loading' && (
+                      <Skeleton
+                        variant="rounded"
+                        className="rounded-full px-5 py-2"
+                      >
+                        <Typography className="text-base">
+                          {loadingFiller}
+                        </Typography>
+                      </Skeleton>
+                    )) ||
+                    (rmp.state === 'done' && (
+                      <Typography className="text-base inline">
+                        {rmpValue}
+                      </Typography>
+                    )) ||
+                    null}
+                </span>
+              </Tooltip>
+            </TableCell>
+          );
+        })}
     </TableRow>
   );
 }
-
 type CheckboxRowProps = {
   name: string;
   courses: SearchQuery[];
@@ -266,17 +338,19 @@ function CheckboxRow({
             backgroundColor: colors[index] + '10', // add transparency
           }}
         >
-          <Checkbox
-            checked={true}
-            onClick={() => {
-              removeFromCompare(course);
-            }}
-            sx={{
-              '&.Mui-checked': {
-                color: colors[index],
-              },
-            }} //Colored Checkbox based on graph
-          />
+          <Tooltip title="Remove from Compare">
+            <Checkbox
+              checked={true}
+              onClick={() => {
+                removeFromCompare(course);
+              }}
+              sx={{
+                '&.Mui-checked': {
+                  color: colors[index],
+                },
+              }} //Colored Checkbox based on graph
+            />
+          </Tooltip>
         </TableCell>
       ))}
     </TableRow>
@@ -443,6 +517,7 @@ const CompareTable = ({
               order={order}
               handleClick={handleClick}
             />
+
             <GradeOrRmpRow<RMPInterface>
               name="Rating"
               values={sortedResults.map(
