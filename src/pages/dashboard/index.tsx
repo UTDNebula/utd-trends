@@ -687,10 +687,7 @@ export const Dashboard: NextPage = () => {
 
   const panelLRef = useRef<ImperativePanelHandle>(null);
   const panelRRef = useRef<ImperativePanelHandle>(null);
-  const isSmallScreen = useMediaQuery('(max-width: 650px)');
-  // Runs when window is resized to change format
-  // Runs once to decide mobile or desktop layout for initial load
-  // Changing using useMediaQuery when window size is >650px or <650px
+  const isSmallScreen = useMediaQuery('(max-width: 600px)');
   // Resets RHS & LHS to 50/50 when double clicking handle
   const handleResizeDoubleClick = () => {
     panelLRef.current?.resize(50);
