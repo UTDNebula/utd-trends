@@ -108,11 +108,11 @@ const Filters = ({
       <FormControl
         size="small"
         className={`w-full ${
-          minGPA 
-            ? '[&>.MuiInputBase-root]:bg-gray-200 [&>.MuiInputBase-root]:dark:bg-gray-900' 
+          minGPA
+            ? '[&>.MuiInputBase-root]:bg-gray-200 [&>.MuiInputBase-root]:dark:bg-gray-900'
             : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti'
         }`}
-       >
+      >
         <InputLabel id="minGPA">Min Letter Grade</InputLabel>
         <Select
           label="Min Letter Grade"
