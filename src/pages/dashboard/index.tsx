@@ -281,23 +281,51 @@ export const Dashboard: NextPage = () => {
 
       //Get course/prof info
       if (courseSearchTerms.length === 1) {
-        if (
-          typeof grades[searchQueryLabel(courseSearchTerms[0])] === 'undefined'
-        ) {
-          fetchAndStoreGradesData(courseSearchTerms[0], controller);
+        if (!(searchQueryLabel(courseSearchTerms[0]) in rhsGrades.course)) {
+          addRHSGrades(
+            searchQueryLabel(courseSearchTerms[0]),
+            {
+              state: 'loading',
+            },
+            true,
+          );
+          fetchGradesData(courseSearchTerms[0], controller)
+            .then((rhsGrade) => {
+              addRHSGrades(
+                searchQueryLabel(courseSearchTerms[0]),
+                {
+                  state: rhsGrade.gpa !== -1 ? 'done' : 'error',
+                  data: rhsGrade,
+                },
+                true,
+              );
+            })
+            .catch((err) => console.error('Grades data for ' + searchQueryLabel(courseSearchTerms[0]), err));
         }
       }
       if (professorSearchTerms.length === 1) {
         if (
-          typeof grades[searchQueryLabel(professorSearchTerms[0])] ===
-          'undefined'
+          !(searchQueryLabel(professorSearchTerms[0]) in rhsGrades.professor)
         ) {
-          fetchAndStoreGradesData(professorSearchTerms[0], controller);
-        }
-        if (
-          typeof rmp[searchQueryLabel(professorSearchTerms[0])] === 'undefined'
-        ) {
-          fetchAndStoreRmpData(professorSearchTerms[0], controller);
+          addRHSGrades(
+            searchQueryLabel(professorSearchTerms[0]),
+            {
+              state: 'loading',
+            },
+            false,
+          );
+          fetchGradesData(professorSearchTerms[0], controller)
+            .then((rhsGrade) => {
+              addRHSGrades(
+                searchQueryLabel(professorSearchTerms[0]),
+                {
+                  state: rhsGrade.gpa !== -1 ? 'done' : 'error',
+                  data: rhsGrade,
+                },
+                false,
+              );
+            })
+            .catch((err) => console.error('Grades data for ' + searchQueryLabel(courseSearchTerms[0]), err));
         }
       }
 
@@ -350,9 +378,7 @@ export const Dashboard: NextPage = () => {
           //Relavent keys
           for (const result of [
             ...(results.state === 'done' ? results.data : []),
-          ]
-            .concat(courses.length === 1 ? courses[0] : [])
-            .concat(professors.length === 1 ? professors[0] : [])) {
+          ]) {
             const entry = grades[searchQueryLabel(result)];
             if (entry && entry.state === 'done') {
               entry.data = {
@@ -442,6 +468,23 @@ export const Dashboard: NextPage = () => {
       return newVal;
     });
   }
+
+  type rhsGradesType = { [key: string]: GenericFetchedData<GradesType> };
+  const [rhsGrades, setRHSGrades] = useState<{
+    course: rhsGradesType;
+    professor: rhsGradesType;
+  }>({ course: {}, professor: {} });
+  function addRHSGrades(
+    rhsKey: string,
+    rhsGrade: GenericFetchedData<GradesType>,
+    course: boolean,
+  ) {
+    setRHSGrades((old) => ({
+      course: course ? { [rhsKey]: rhsGrade } : old.course,
+      professor: course ? old.professor : { [rhsKey]: rhsGrade },
+    }));
+  }
+
   //Store rmp scores by profs
   const [rmp, setRmp] = useState<{
     [key: string]: GenericFetchedData<RMPInterface>;
@@ -696,7 +739,7 @@ export const Dashboard: NextPage = () => {
         <ProfessorOverview
           key="professor"
           professor={professors[0]}
-          grades={grades[searchQueryLabel(professors[0])]}
+          grades={rhsGrades.professor[searchQueryLabel(professors[0])]}
           rmp={rmp[searchQueryLabel(professors[0])]}
         />,
       );
@@ -707,7 +750,7 @@ export const Dashboard: NextPage = () => {
         <CourseOverview
           key="course"
           course={courses[0]}
-          grades={grades[searchQueryLabel(courses[0])]}
+          grades={rhsGrades.course[searchQueryLabel(courses[0])]}
         />,
       );
     }
