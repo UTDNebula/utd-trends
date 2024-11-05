@@ -39,6 +39,8 @@ const Filters = ({
 }: FiltersProps) => {
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
+  const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
+  var recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
   academicSessions.sort((a, b) => compareSemesters(b, a)); // display the semesters in order of recency (most recent first)
 
   //set value from query
@@ -55,6 +57,37 @@ const Filters = ({
       }
     }
   }, [router.isReady, router.query.minGPA, router.query.minRating]); // useEffect is called on query update (so on back navigation, the filters selected are set based on the url)
+
+  function getRecentSemesters() {
+    var recentSemesters: string[] = [];
+    // get current month and year
+    var today = new Date();
+    var mm = today.getMonth() + 1; // January is 1
+    var yyyy = today.getFullYear();
+
+    var season = 'F';
+    if (mm <= 5)
+      // jan - may
+      season = 'S';
+    else season = 'F';
+
+    // generate recent semesters dynamically from the current day
+    for (let i = MAX_NUM_RECENT_SEMESTERS; i >= 1; i--) {
+      if (season === 'S') {
+        // then the previous semester is last year's Fall
+        yyyy = yyyy - 1;
+        season = 'F';
+      } // then the previous long-semester is this year's Spring
+      else season = 'S';
+
+      recentSemesters.push(yyyy.toString().substring(2) + season);
+    }
+
+    recentSemesters = recentSemesters.filter((value) =>
+      academicSessions.includes(value),
+    ); // recent semesters has up-to
+    return recentSemesters;
+  }
 
   //Update URL, state, and parent
   function onChange(
@@ -192,6 +225,15 @@ const Filters = ({
               } else {
                 addChosenSessions(() => academicSessions);
               }
+            } else if (value.includes('recent')) {
+              if (
+                chosenSessions.length === recentSemesters.length &&
+                chosenSessions.every((el) => recentSemesters.includes(el))
+              ) {
+                addChosenSessions(() => academicSessions);
+              } else {
+                addChosenSessions(() => recentSemesters);
+              }
             } else {
               addChosenSessions(() => value as string[]);
             }
@@ -210,10 +252,25 @@ const Filters = ({
               checked={chosenSessions.length === academicSessions.length}
               indeterminate={
                 chosenSessions.length !== academicSessions.length &&
-                chosenSessions.length !== 0
+                chosenSessions.length !== 0 &&
+                !(
+                  chosenSessions.length === recentSemesters.length &&
+                  chosenSessions.every((el) => recentSemesters.includes(el))
+                ) // select-all is not indeterminate when recent is checked
               }
             />
             <ListItemText primary="Select All" />
+          </MenuItem>
+
+          {/* recent sessions -- last <recentSemesters.length> long-semesters from current semester*/}
+          <MenuItem className="h-10" value="recent">
+            <Checkbox
+              checked={
+                chosenSessions.length === recentSemesters.length &&
+                chosenSessions.every((el) => recentSemesters.includes(el))
+              }
+            />
+            <ListItemText primary="Recent" />
           </MenuItem>
 
           {/* indiv options */}
