@@ -119,12 +119,12 @@ const Filters = ({
             onChange(event.target.value, 'minGPA', setMinGPA);
           }}
         >
-          <MenuItem value="">
+          <MenuItem className="h-10" value="">
             <em>None</em>
           </MenuItem>
           {/* dropdown options*/}
           {minGPAs.map(([value, label]) => (
-            <MenuItem key={value} value={value}>
+            <MenuItem className="h-10" key={value} value={value}>
               {label}
             </MenuItem>
           ))}
@@ -154,12 +154,12 @@ const Filters = ({
             />
           )}
         >
-          <MenuItem value="">
+          <MenuItem className="h-10" value="">
             <em>None</em>
           </MenuItem>{' '}
           {/* dropdown options*/}
           {minRatings.map((value) => (
-            <MenuItem key={value} value={value}>
+            <MenuItem className="h-10" key={value} value={value}>
               <Rating
                 defaultValue={Number(value)}
                 precision={0.5}
@@ -205,7 +205,7 @@ const Filters = ({
           MenuProps={{ autoFocus: false }}
         >
           {/* select all sessions */}
-          <MenuItem value="select-all">
+          <MenuItem className="h-10" value="select-all">
             <Checkbox
               checked={chosenSessions.length === academicSessions.length}
               indeterminate={
@@ -218,7 +218,7 @@ const Filters = ({
 
           {/* indiv options */}
           {academicSessions.map((session) => (
-            <MenuItem key={session} value={session}>
+            <MenuItem className="h-10" key={session} value={session}>
               <Checkbox checked={chosenSessions.includes(session)} />
               <ListItemText primary={displayAcademicSessionName(session)} />
             </MenuItem>
