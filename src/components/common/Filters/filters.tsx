@@ -40,7 +40,7 @@ const Filters = ({
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
-  var recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
+  const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
   academicSessions.sort((a, b) => compareSemesters(b, a)); // display the semesters in order of recency (most recent first)
 
   //set value from query
@@ -59,13 +59,13 @@ const Filters = ({
   }, [router.isReady, router.query.minGPA, router.query.minRating]); // useEffect is called on query update (so on back navigation, the filters selected are set based on the url)
 
   function getRecentSemesters() {
-    var recentSemesters: string[] = [];
+    let recentSemesters: string[] = [];
     // get current month and year
-    var today = new Date();
-    var mm = today.getMonth() + 1; // January is 1
-    var yyyy = today.getFullYear();
+    const today = new Date();
+    const mm = today.getMonth() + 1; // January is 1
+    let yyyy = today.getFullYear();
 
-    var season = 'F';
+    let season = 'F';
     if (mm <= 5)
       // jan - may
       season = 'S';
