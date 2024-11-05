@@ -39,6 +39,7 @@ const Filters = ({
 }: FiltersProps) => {
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
+  academicSessions.sort((a, b) => compareSemesters(b, a)); // display the semesters in order of recency (most recent first)
 
   //set value from query
   const router = useRouter();
