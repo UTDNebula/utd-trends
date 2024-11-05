@@ -247,9 +247,12 @@ const Filters = ({
           MenuProps={{ autoFocus: false }}
         >
           {/* select all sessions */}
-          <MenuItem className="h-10" value="select-all">
+          <MenuItem className="h-10 items-center" value="select-all">
             <Checkbox
-              checked={chosenSessions.length === academicSessions.length}
+              checked={
+                academicSessions.length > 0 &&
+                chosenSessions.length === academicSessions.length
+              }
               indeterminate={
                 chosenSessions.length !== academicSessions.length &&
                 chosenSessions.length !== 0 &&
@@ -258,24 +261,37 @@ const Filters = ({
                   chosenSessions.every((el) => recentSemesters.includes(el))
                 ) // select-all is not indeterminate when recent is checked
               }
+              disabled={academicSessions.length == 0}
             />
-            <ListItemText primary="Select All" />
+            <ListItemText
+              className={academicSessions.length > 0 ? '' : 'text-gray-400'}
+              primary="Select All"
+            />
           </MenuItem>
 
           {/* recent sessions -- last <recentSemesters.length> long-semesters from current semester*/}
-          <MenuItem className="h-10" value="recent">
+          <MenuItem className="h-10 items-center" value="recent">
             <Checkbox
               checked={
+                recentSemesters.length > 0 &&
                 chosenSessions.length === recentSemesters.length &&
                 chosenSessions.every((el) => recentSemesters.includes(el))
               }
+              disabled={recentSemesters.length == 0}
             />
-            <ListItemText primary="Recent" />
+            <ListItemText
+              className={recentSemesters.length > 0 ? '' : 'text-gray-400'}
+              primary="Recent"
+            />
           </MenuItem>
 
           {/* indiv options */}
           {academicSessions.map((session) => (
-            <MenuItem className="h-10" key={session} value={session}>
+            <MenuItem
+              className="h-10 items-center"
+              key={session}
+              value={session}
+            >
               <Checkbox checked={chosenSessions.includes(session)} />
               <ListItemText primary={displayAcademicSessionName(session)} />
             </MenuItem>
