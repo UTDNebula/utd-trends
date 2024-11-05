@@ -45,14 +45,12 @@ function SingleProfInfo({ rmp }: Props) {
     );
   }
 
-  // Extract top 10 tags by count, sorted in descending order
   const topTags = rmp.data.teacherRatingTags
     .sort((a, b) => b.tagCount - a.tagCount)
     .slice(0, 10);
 
   return (
     <Grid container spacing={2} className="p-4">
-      {/* Display Tags at the top */}
       {topTags && topTags.length > 0 && (
         <Grid item xs={12}>
           <p className="font-semibold">Top Tags:</p>
@@ -60,7 +58,7 @@ function SingleProfInfo({ rmp }: Props) {
             {topTags.map((tag, index) => (
               <Chip
                 key={index}
-                label={${tag.tagName} (${tag.tagCount})}
+                label={`${tag.tagName} (${tag.tagCount})`}
                 variant="outlined"
                 size="small"
               />
@@ -68,8 +66,7 @@ function SingleProfInfo({ rmp }: Props) {
           </div>
         </Grid>
       )}
-      
-      {/* Professor rating and Difficulty displayed below tags */}
+
       <Grid item xs={6}>
         <p className="text-xl font-bold">{rmp.data.avgRating}</p>
         <p>Professor rating</p>
