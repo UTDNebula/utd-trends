@@ -748,7 +748,9 @@ export const Dashboard: NextPage = () => {
     );
     const carousel = (
       <Card>
-        <Carousel names={names}>{tabs}</Carousel>
+        <Carousel names={names} compareLength={compare.length}>
+          {tabs}
+        </Carousel>
       </Card>
     );
     contentComponent = (
@@ -770,21 +772,23 @@ export const Dashboard: NextPage = () => {
             {searchResultsTable}
           </div>
         ) : (
-          <PanelGroup direction="horizontal">
+          <PanelGroup direction="horizontal" className="overflow-visible">
             <Panel ref={panelLRef} minSize={40} defaultSize={50}>
               {searchResultsTable}
             </Panel>
             <PanelResizeHandle
-              className="p-1 mx-1 w-0.5 rounded-full opacity-25 transition ease-in-out bg-transparent hover:bg-royal"
+              className="mt-4 p-1 mx-1 w-0.5 rounded-full opacity-25 data-[resize-handle-state=drag]:opacity-50 transition ease-in-out bg-transparent hover:bg-royal data-[resize-handle-state=drag]:bg-royal"
               onDoubleClick={handleResizeDoubleClick}
             />
             <Panel
-              className="mt-4"
+              className="overflow-visible"
               ref={panelRRef}
               minSize={30}
               defaultSize={50}
             >
-              {carousel}
+              <div className="sticky top-0 max-h-[calc(100vh-1rem)] overflow-y-auto pt-4">
+                {carousel}
+              </div>
             </Panel>
           </PanelGroup>
         )}
@@ -797,6 +801,7 @@ export const Dashboard: NextPage = () => {
   return (
     <>
       <Head>
+        <title>Results - UTD Trends</title>
         <link
           rel="canonical"
           href="https://trends.utdnebula.com/dashboard"

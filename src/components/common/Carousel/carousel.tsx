@@ -7,6 +7,7 @@ import { TabNavMenu } from '../../navigation/tabNavMenu/tabNavMenu';
 interface CarouselProps {
   names: string[] | string;
   children: ReactJSXElement[] | ReactJSXElement;
+  compareLength: number;
 }
 
 /**
@@ -38,7 +39,7 @@ const variants = {
  * @param props the props passed from the parent component
  * @returns
  */
-const Carousel = ({ names, children }: CarouselProps) => {
+const Carousel = ({ names, children, compareLength }: CarouselProps) => {
   // The card currently being displayed
   const [currentCard, setCurrentCard] = useState(0);
   // The Direction that the card is moving in
@@ -74,6 +75,7 @@ const Carousel = ({ names, children }: CarouselProps) => {
         value={currentCard}
         options={Array.isArray(names) ? names : [names]}
         turner={turn}
+        compareLength={compareLength}
       />
       <AnimatePresence>
         <div className="p-4 lg:p-6">
