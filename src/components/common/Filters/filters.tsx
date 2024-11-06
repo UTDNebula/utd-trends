@@ -182,7 +182,7 @@ const Filters = ({
       <FormControl
         size="small"
         className={`w-full ${
-          chosenSessions.length
+          chosenSessions.length !== academicSessions.length
             ? '[&>.MuiInputBase-root]:bg-gray-200 [&>.MuiInputBase-root]:dark:bg-gray-900'
             : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti'
         }`}
