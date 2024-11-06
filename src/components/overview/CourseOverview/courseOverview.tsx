@@ -12,7 +12,7 @@ import type {
   GenericFetchedData,
   GradesType,
 } from '../../../pages/dashboard/index';
-import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
+import SingleGradesInfo from '../../common/SingleGradesInfo/singleGradesInfo';
 
 type CourseOverviewProps = {
   course: SearchQuery;

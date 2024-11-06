@@ -4,15 +4,15 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
-import Carousel from '../../components/common/Carousel/carousel';
-import Compare from '../../components/common/Compare/compare';
-import CourseOverview from '../../components/common/CourseOverview/courseOverview';
-import DashboardEmpty from '../../components/common/DashboardEmpty/dashboardEmpty';
-import DashboardError from '../../components/common/DashboardError/dashboardError';
-import Filters from '../../components/common/Filters/filters';
-import ProfessorOverview from '../../components/common/ProfessorOverview/professorOverview';
-import SearchResultsTable from '../../components/common/SearchResultsTable/searchResultsTable';
+import Compare from '../../components/compare/Compare/compare';
+import DashboardEmpty from '../../components/dashboard/DashboardEmpty/dashboardEmpty';
+import DashboardError from '../../components/dashboard/DashboardError/dashboardError';
+import Carousel from '../../components/navigation/Carousel/carousel';
 import TopMenu from '../../components/navigation/topMenu/topMenu';
+import CourseOverview from '../../components/overview/CourseOverview/courseOverview';
+import ProfessorOverview from '../../components/overview/ProfessorOverview/professorOverview';
+import Filters from '../../components/search/Filters/filters';
+import SearchResultsTable from '../../components/search/SearchResultsTable/searchResultsTable';
 import decodeSearchQueryLabel from '../../modules/decodeSearchQueryLabel/decodeSearchQueryLabel';
 import fetchWithCache, {
   cacheIndexNebula,
