@@ -786,7 +786,7 @@ export const Dashboard: NextPage = () => {
               minSize={30}
               defaultSize={50}
             >
-              <div className="sticky top-0 max-h-[calc(100vh-1rem)] overflow-y-auto pt-4">
+              <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto mt-4">
                 {carousel}
               </div>
             </Panel>
