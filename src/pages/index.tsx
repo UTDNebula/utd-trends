@@ -80,7 +80,7 @@ const Home: NextPage = () => {
           href="https://utdgrades.com/"
           target="_blank"
           rel="noopener"
-          className="absolute bottom-4 bg-white text-black py-3 px-5 rounded transition hover:scale-[1.01]"
+          className="absolute bottom-4 bg-white dark:bg-black text-black dark:text-white py-3 px-5 rounded transition hover:scale-[1.01]"
         >
           Also check out <b>UTD Grades</b>
         </a>
