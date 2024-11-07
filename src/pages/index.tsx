@@ -78,7 +78,7 @@ const Home: NextPage = () => {
         <a
           href="https://utdgrades.com/"
           target="_blank"
-          className="absolute bottom-4 bg-white text-black py-3 px-5 rounded-full [box-shadow:_0_2px_6px_rgb(0_0_0_/_0.2)] transition hover:[box-shadow:_0_2px_8px_rgb(0_0_0_/_0.2)] hover:scale-[1.01]"
+          className="absolute bottom-4 bg-white text-black py-3 px-5 rounded [box-shadow:_0_2px_6px_rgb(0_0_0_/_0.2)] transition hover:[box-shadow:_0_2px_8px_rgb(0_0_0_/_0.2)] hover:scale-[1.01]"
         >
           Also check out <b>UTD Grades</b>
         </a>
