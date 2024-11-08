@@ -163,7 +163,7 @@ function Row({
             onClick={
               (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
             }
-            className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
+            className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit"
           >
             {searchQueryLabel(course) +
               ((typeof course.profFirst === 'undefined' &&
