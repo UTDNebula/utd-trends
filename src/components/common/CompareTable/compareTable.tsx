@@ -205,11 +205,14 @@ function GradeAndRmpRow({
                   <Typography className="text-base">{loadingFiller}</Typography>
                 </Skeleton>
               )) ||
-              (rmp.state === 'done' && (
-                <Typography className="text-base inline">
-                  {getRmpValue(rmp.data as RMPInterface)}
-                </Typography>
-              )) ||
+              (rmp.state === 'done' &&
+                getRmpValue(rmp.data as RMPInterface) == 0 && <CloseIcon />) ||
+              (rmp.state === 'done' &&
+                getRmpValue(rmp.data as RMPInterface) != 0 && (
+                  <Typography className="text-base inline">
+                    {getRmpValue(rmp.data as RMPInterface)}
+                  </Typography>
+                )) ||
               null}
           </TableCell>
         ))}
