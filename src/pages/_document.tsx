@@ -15,8 +15,6 @@ function Document() {
           name="theme-color"
           content={tailwindConfig.theme.extend.colors.royal}
         />
-
-        <meta property="og:title" content="UTD Trends" />
         <meta
           property="og:description"
           content="A data visualization tool built to help students view historical course and section data."

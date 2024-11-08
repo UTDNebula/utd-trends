@@ -782,6 +782,11 @@ export const Dashboard: NextPage = () => {
           key="canonical"
         />
         <meta
+          key="og:title"
+          property="og:title"
+          content={'Results - ' + pageTitle + 'UTD TRENDS'}
+        />
+        <meta
           property="og:url"
           content="https://trends.utdnebula.com/dashboard"
         />
