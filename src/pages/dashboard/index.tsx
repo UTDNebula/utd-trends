@@ -758,7 +758,7 @@ export const Dashboard: NextPage = () => {
     );
   }
 
-  let pageTitle = 'test';
+  let pageTitle = '';
   courses.map((term) => {
     pageTitle += searchQueryLabel(term) + ', ';
   });
