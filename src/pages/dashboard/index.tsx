@@ -231,6 +231,7 @@ function fetchRmpData(
 export const Dashboard: NextPage = () => {
   const router = useRouter();
 
+  const [pageTitle, setPageTitle] = useState<string>('');
   //Searches seperated into courses and professors to create combos
   const [courses, setCourses] = useState<SearchQuery[]>([]);
   const [professors, setProfessors] = useState<SearchQuery[]>([]);
@@ -263,6 +264,8 @@ export const Dashboard: NextPage = () => {
       });
       setCourses(courseSearchTerms);
       setProfessors(professorSearchTerms);
+
+      updatePageTitle(courseSearchTerms, professorSearchTerms);
 
       //Clear fetched data
       setResults({ state: 'loading' });
@@ -334,6 +337,24 @@ export const Dashboard: NextPage = () => {
       };
     }
   }, [router.isReady, router.query.searchTerms]);
+
+  function updatePageTitle(
+    courseSearchTerms: SearchQuery[],
+    professorSearchTerms: SearchQuery[],
+  ) {
+    let str = '';
+    courseSearchTerms.map((term) => {
+      str += searchQueryLabel(term) + ', ';
+    });
+    professorSearchTerms.map((term) => {
+      str += searchQueryLabel(term) + ', ';
+    });
+    str =
+      str.lastIndexOf(', ') === str.length - 2
+        ? str.substring(0, str.lastIndexOf(', ')) + ' - '
+        : str;
+    setPageTitle(str);
+  }
 
   //Compiled list of academic sessions grade data is available for
   const [academicSessions, setAcademicSessions] = useState<string[]>([]);
@@ -757,18 +778,6 @@ export const Dashboard: NextPage = () => {
       </>
     );
   }
-
-  let pageTitle = 'test';
-  courses.map((term) => {
-    pageTitle += searchQueryLabel(term) + ', ';
-  });
-  professors.map((term) => {
-    pageTitle += searchQueryLabel(term) + ', ';
-  });
-  pageTitle =
-    pageTitle.lastIndexOf(', ') === pageTitle.length - 2
-      ? pageTitle.substring(0, pageTitle.lastIndexOf(', ')) + ' - '
-      : pageTitle;
 
   /* Final page */
 
