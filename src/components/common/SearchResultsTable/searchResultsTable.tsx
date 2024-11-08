@@ -119,6 +119,7 @@ function Row({
     <>
       <TableRow
         onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
+        className="cursor-pointer"
       >
         <TableCell className="border-b-0">
           <Tooltip
@@ -135,19 +136,15 @@ function Row({
             </IconButton>
           </Tooltip>
         </TableCell>
-        <TableCell
-          onClick={
-            (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the compare checkbox
-          }
-          className="border-b-0"
-        >
+        <TableCell className="border-b-0">
           <Tooltip
             title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
             placement="top"
           >
             <Checkbox
               checked={inCompare}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
                 if (inCompare) {
                   removeFromCompare(course);
                 } else {
@@ -162,7 +159,12 @@ function Row({
           </Tooltip>
         </TableCell>
         <TableCell component="th" scope="row" className="w-full border-b-0">
-          <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
+          <Typography
+            onClick={
+              (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
+            }
+            className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
+          >
             {searchQueryLabel(course) +
               ((typeof course.profFirst === 'undefined' &&
                 typeof course.profLast === 'undefined') ||
