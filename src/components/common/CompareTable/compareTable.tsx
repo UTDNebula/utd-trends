@@ -16,7 +16,6 @@ import React, { useState } from 'react';
 import SearchQuery, {
   convertToProfOnly,
 } from '../../../modules/SearchQuery/SearchQuery';
-import searchQueryColors from '../../../modules/searchQueryColors/searchQueryColors';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
 import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
 import type {
@@ -362,6 +361,7 @@ type CompareTableProps = {
   grades: { [key: string]: GenericFetchedData<GradesType> };
   rmp: { [key: string]: GenericFetchedData<RMPInterface> };
   removeFromCompare: (arg0: SearchQuery) => void;
+  colorMap: { [key: string]: string };
 };
 
 const CompareTable = ({
@@ -369,6 +369,7 @@ const CompareTable = ({
   grades,
   rmp,
   removeFromCompare,
+  colorMap,
 }: CompareTableProps) => {
   //Table sorting category
   const [orderBy, setOrderBy] = useState<string>('Color');
@@ -462,12 +463,7 @@ const CompareTable = ({
     return 0;
   });
 
-  // Color map for each course in the compare table based on searchQueryColors
-  const colorMap: { [key: string]: string } = {};
-  includedResults.forEach((result, index) => {
-    colorMap[searchQueryLabel(result)] =
-      searchQueryColors[index % searchQueryColors.length];
-  });
+  // Update mappedColors to use the passed colorMap
   const mappedColors = sortedResults.map(
     (result) => colorMap[searchQueryLabel(result)],
   );

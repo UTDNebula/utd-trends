@@ -84,6 +84,7 @@ type RowProps = {
   inCompare: boolean;
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
+  color?: string;
 };
 
 function Row({
@@ -93,6 +94,7 @@ function Row({
   inCompare,
   addToCompare,
   removeFromCompare,
+  color,
 }: RowProps) {
   const [open, setOpen] = useState(false);
 
@@ -153,6 +155,15 @@ function Row({
                 (typeof grades !== 'undefined' && grades.state === 'loading') ||
                 (typeof rmp !== 'undefined' && rmp.state === 'loading')
               }
+              sx={
+                color
+                  ? {
+                      '&.Mui-checked': {
+                        color: color,
+                      },
+                    }
+                  : undefined
+              } // Apply color if defined
             />
           </Tooltip>
         </TableCell>
@@ -246,6 +257,7 @@ type SearchResultsTableProps = {
   compare: SearchQuery[];
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
+  colorMap: { [key: string]: string };
 };
 
 const SearchResultsTable = ({
@@ -256,6 +268,7 @@ const SearchResultsTable = ({
   compare,
   addToCompare,
   removeFromCompare,
+  colorMap,
 }: SearchResultsTableProps) => {
   //Table sorting category
   const [orderBy, setOrderBy] = useState<'name' | 'gpa' | 'rating'>('name');
@@ -494,6 +507,7 @@ const SearchResultsTable = ({
                     }
                     addToCompare={addToCompare}
                     removeFromCompare={removeFromCompare}
+                    color={colorMap[searchQueryLabel(result)]}
                   />
                 ))
               : Array(10)
