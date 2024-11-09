@@ -13,6 +13,7 @@ import {
   TableRow,
   Tooltip,
   Typography,
+  useMediaQuery
 } from '@mui/material';
 import React, { useState } from 'react';
 
@@ -97,6 +98,8 @@ function Row({
   color,
 }: RowProps) {
   const [open, setOpen] = useState(false);
+  const isSmallScreen = useMediaQuery('(max-width:600px)');
+
 
   const rainbowColors = useRainbowColors();
   const gpaToColor = (gpa: number): string => {
@@ -137,6 +140,16 @@ function Row({
           </Tooltip>
         </TableCell>
         <TableCell>
+        {isSmallScreen && (
+            <Typography
+              className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
+              sx={{
+                whiteSpace: 'nowrap',       // Prevents text from wrapping to a new line
+              }}
+            >
+            {searchQueryLabel(convertToProfOnly(course))}
+            </Typography>
+          )}
           <Tooltip
             title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
             placement="top"
@@ -167,22 +180,22 @@ function Row({
             />
           </Tooltip>
         </TableCell>
-        <TableCell component="th" scope="row">
-          <Typography
-            onClick={
-              (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
-            }
-            className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
-          >
-            {searchQueryLabel(course) +
-              ((typeof course.profFirst === 'undefined' &&
-                typeof course.profLast === 'undefined') ||
-              (typeof course.prefix === 'undefined' &&
-                typeof course.number === 'undefined')
-                ? ' (Overall)'
-                : '')}
-          </Typography>
-        </TableCell>
+        {!isSmallScreen && (
+  <TableCell component="th" scope="row">
+    <Typography
+      onClick={(e) => e.stopPropagation()} // prevents opening/closing the card when clicking on the text
+      className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
+    >
+      {searchQueryLabel(course) +
+        ((typeof course.profFirst === 'undefined' &&
+          typeof course.profLast === 'undefined') ||
+        (typeof course.prefix === 'undefined' &&
+          typeof course.number === 'undefined')
+          ? ' (Overall)'
+          : '')}
+    </Typography>
+  </TableCell>
+)}
         <TableCell align="right">
           {((typeof grades === 'undefined' || grades.state === 'error') && (
             <></>
