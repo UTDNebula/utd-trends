@@ -15,7 +15,6 @@ type CompareProps = {
   grades: { [key: string]: GenericFetchedData<GradesType> };
   rmp: { [key: string]: GenericFetchedData<RMPInterface> };
   removeFromCompare: { (arg0: SearchQuery): void };
-  colorMap: { [key: string]: string };
 };
 
 function convertNumbersToPercents(distribution: GradesType): number[] {
@@ -25,13 +24,7 @@ function convertNumbersToPercents(distribution: GradesType): number[] {
   );
 }
 
-const Compare = ({
-  courses,
-  grades,
-  rmp,
-  removeFromCompare,
-  colorMap,
-}: CompareProps) => {
+const Compare = ({ courses, grades, rmp, removeFromCompare }: CompareProps) => {
   if (courses.length === 0) {
     return <p>Click a checkbox to add something to compare.</p>;
   }
@@ -97,7 +90,6 @@ const Compare = ({
         grades={grades}
         rmp={rmp}
         removeFromCompare={removeFromCompare}
-        colorMap={colorMap}
       />
     </div>
   );

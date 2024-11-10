@@ -84,7 +84,6 @@ type RowProps = {
   inCompare: boolean;
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
-  color?: string;
 };
 
 function Row({
@@ -94,7 +93,6 @@ function Row({
   inCompare,
   addToCompare,
   removeFromCompare,
-  color,
 }: RowProps) {
   const [open, setOpen] = useState(false);
 
@@ -119,7 +117,6 @@ function Row({
       <TableRow
         onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
         sx={{ '& > *': { borderBottom: 'unset' } }}
-        className="cursor-pointer"
       >
         <TableCell>
           <Tooltip
@@ -136,15 +133,18 @@ function Row({
             </IconButton>
           </Tooltip>
         </TableCell>
-        <TableCell>
+        <TableCell
+          onClick={
+            (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the compare checkbox
+          }
+        >
           <Tooltip
             title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
             placement="top"
           >
             <Checkbox
               checked={inCompare}
-              onClick={(e) => {
-                e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
+              onClick={() => {
                 if (inCompare) {
                   removeFromCompare(course);
                 } else {
@@ -155,25 +155,11 @@ function Row({
                 (typeof grades !== 'undefined' && grades.state === 'loading') ||
                 (typeof rmp !== 'undefined' && rmp.state === 'loading')
               }
-              sx={
-                color
-                  ? {
-                      '&.Mui-checked': {
-                        color: color,
-                      },
-                    }
-                  : undefined
-              } // Apply color if defined
             />
           </Tooltip>
         </TableCell>
         <TableCell component="th" scope="row">
-          <Typography
-            onClick={
-              (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
-            }
-            className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
-          >
+          <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
             {searchQueryLabel(course) +
               ((typeof course.profFirst === 'undefined' &&
                 typeof course.profLast === 'undefined') ||
@@ -201,7 +187,7 @@ function Row({
                 placement="top"
               >
                 <Typography
-                  className="text-base text-black text-center rounded-full px-5 py-2 w-16 block"
+                  className="text-base text-black rounded-full px-5 py-2 inline"
                   sx={{ backgroundColor: gpaToColor(grades.data.gpa) }}
                 >
                   {gpaToLetterGrade(grades.data.gpa)}
@@ -258,7 +244,6 @@ type SearchResultsTableProps = {
   compare: SearchQuery[];
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
-  colorMap: { [key: string]: string };
 };
 
 const SearchResultsTable = ({
@@ -269,7 +254,6 @@ const SearchResultsTable = ({
   compare,
   addToCompare,
   removeFromCompare,
-  colorMap,
 }: SearchResultsTableProps) => {
   //Table sorting category
   const [orderBy, setOrderBy] = useState<'name' | 'gpa' | 'rating'>('name');
@@ -455,7 +439,7 @@ const SearchResultsTable = ({
                   Name
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="center">
+              <TableCell>
                 <Tooltip
                   title="Average GPA Across Course Sections"
                   placement="top"
@@ -473,7 +457,7 @@ const SearchResultsTable = ({
                   </div>
                 </Tooltip>
               </TableCell>
-              <TableCell align="center">
+              <TableCell>
                 <Tooltip
                   title="Average Professor Rating from Rate My Professors"
                   placement="top"
@@ -508,7 +492,6 @@ const SearchResultsTable = ({
                     }
                     addToCompare={addToCompare}
                     removeFromCompare={removeFromCompare}
-                    color={colorMap[searchQueryLabel(result)]}
                   />
                 ))
               : Array(10)
