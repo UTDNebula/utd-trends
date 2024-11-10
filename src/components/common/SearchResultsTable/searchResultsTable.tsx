@@ -159,15 +159,29 @@ function Row({
           </Tooltip>
         </TableCell>
         <TableCell component="th" scope="row">
-          <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
-            {searchQueryLabel(course) +
-              ((typeof course.profFirst === 'undefined' &&
-                typeof course.profLast === 'undefined') ||
-              (typeof course.prefix === 'undefined' &&
-                typeof course.number === 'undefined')
-                ? ' (Overall)'
-                : '')}
-          </Typography>
+          <Tooltip
+            title={
+              rmp !== undefined && rmp.state === 'done'
+                ? 'Tags: ' +
+                  rmp.data.teacherRatingTags
+                    .sort((a, b) => b.tagCount - a.tagCount)
+                    .slice(0, 3)
+                    .map((tag) => tag.tagName)
+                    .join(', ')
+                : 'No Tags Available'
+            }
+            placement="top"
+          >
+            <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
+              {searchQueryLabel(course) +
+                ((typeof course.profFirst === 'undefined' &&
+                  typeof course.profLast === 'undefined') ||
+                (typeof course.prefix === 'undefined' &&
+                  typeof course.number === 'undefined')
+                  ? ' (Overall)'
+                  : '')}
+            </Typography>
+          </Tooltip>
         </TableCell>
         <TableCell align="right">
           {((typeof grades === 'undefined' || grades.state === 'error') && (
