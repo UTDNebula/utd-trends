@@ -57,9 +57,10 @@ function SingleProfInfo({ rmp }: Props) {
           <div className="flex gap-1 flex-wrap mt-2">
             {topTags.map((tag, index) => (
               <Chip
+                className="text-sm bg-cornflower-50 dark:bg-cornflower-700"
                 key={index}
                 label={`${tag.tagName} (${tag.tagCount})`}
-                variant="outlined"
+                // variant="outlined"
                 size="small"
               />
             ))}
