@@ -144,8 +144,9 @@ function GradeOrRmpRow<T>({
               </Skeleton>
             )) ||
             (value.state === 'done' &&
-              name !== 'GPA' &&
-              (value.data as RMPInterface).numRatings > 0 && ( // do not display RMP data (non-GPA data) if there are no reviews
+              (name !== 'GPA'
+                ? (value.data as RMPInterface).numRatings > 0
+                : true) && ( // do not display RMP data (non-GPA data) if there are no reviews
                 <Tooltip
                   title={`${name}: ${formatValue(getValue(value.data))}`}
                   placement="top"
