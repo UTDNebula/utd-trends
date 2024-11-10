@@ -275,11 +275,9 @@ function GradeAndRmpRow({
                       </Skeleton>
                     )) ||
                     (rmp.state === 'done' &&
-                      getRmpValue(rmp.data as RMPInterface) == 0 && (
-                        <CloseIcon />
-                      )) ||
-                    (rmp.state === 'done' &&
-                      getRmpValue(rmp.data as RMPInterface) != 0 && (
+                getRmpValue(rmp.data as RMPInterface) == 0 && <CloseIcon />) ||
+              (rmp.state === 'done' &&
+                getRmpValue(rmp.data as RMPInterface) != 0 && (
                         <Typography className="text-base inline">
                           {rmpValue}
                         </Typography>
