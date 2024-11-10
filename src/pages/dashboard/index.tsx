@@ -784,7 +784,13 @@ export const Dashboard: NextPage = () => {
         <meta
           key="og:title"
           property="og:title"
-          content={'Results - ' + pageTitle + 'UTD TRENDS'}
+          content={
+            'Results - ' +
+            (router.query.searchTerms as string[])
+              .map((el) => decodeSearchQueryLabel(el))
+              .join(', ') +
+            'UTD TRENDS'
+          }
         />
         <meta
           property="og:url"
