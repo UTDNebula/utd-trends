@@ -217,7 +217,8 @@ function Row({
                 <Rating sx={{ fontSize: 25 }} readOnly />
               </Skeleton>
             )) ||
-            (rmp.state === 'done' && (
+            (rmp.state === 'done' && rmp.data.numRatings == 0 && <></>) ||
+            (rmp.state === 'done' && rmp.data.numRatings != 0 && (
               <Tooltip
                 title={'Professor rating: ' + rmp.data.avgRating}
                 placement="top"
@@ -409,16 +410,16 @@ const SearchResultsTable = ({
       const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
       //drop loading/error rows to bottom
       if (
-        (!aRmp || aRmp.state !== 'done') &&
-        (!bRmp || bRmp.state !== 'done')
+        (!aRmp || aRmp.state !== 'done' || aRmp.data.numRatings == 0) &&
+        (!bRmp || bRmp.state !== 'done' || bRmp.data.numRatings == 0)
       ) {
         // If both aRmp and bRmp are not done, treat them as equal and return 0
         return 0;
       }
-      if (!aRmp || aRmp.state !== 'done') {
+      if (!aRmp || aRmp.state !== 'done' || aRmp.data.numRatings == 0) {
         return 9999;
       }
-      if (!bRmp || bRmp.state !== 'done') {
+      if (!bRmp || bRmp.state !== 'done' || bRmp.data.numRatings == 0) {
         return -9999;
       }
       const aRating = aRmp?.data?.avgRating ?? 0; // Fallback to 0 if undefined

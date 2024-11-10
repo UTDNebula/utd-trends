@@ -143,28 +143,31 @@ function GradeOrRmpRow<T>({
                 <Typography className="text-base">{loadingFiller}</Typography>
               </Skeleton>
             )) ||
-            (value.state === 'done' && getValue(value.data) !== -1 && (
-              <Tooltip
-                title={`${name}: ${formatValue(getValue(value.data))}`}
-                placement="top"
-              >
-                <Typography
-                  className="text-base inline rounded-full px-5 py-2 text-black"
-                  style={{
-                    backgroundColor: colorMidpoint(
-                      goodValue,
-                      badValue,
-                      getValue(value.data),
-                    ),
-                  }}
+            (value.state === 'done' &&
+              (name !== 'GPA'
+                ? (value.data as RMPInterface).numRatings > 0
+                : true) && ( // do not display RMP data (non-GPA data) if there are no reviews
+                <Tooltip
+                  title={`${name}: ${formatValue(getValue(value.data))}`}
+                  placement="top"
                 >
-                  {/*value.data is all the data past the state of loading, done, or error.
+                  <Typography
+                    className="text-base inline rounded-full px-5 py-2 text-black"
+                    style={{
+                      backgroundColor: colorMidpoint(
+                        goodValue,
+                        badValue,
+                        getValue(value.data),
+                      ),
+                    }}
+                  >
+                    {/*value.data is all the data past the state of loading, done, or error.
                 getValue returns the specific value from the data structure, like gpa.
                 formatValue makes it look pretty like 3.7216373 displaying as 3.72.*/}
-                  {formatValue(getValue(value.data))}
-                </Typography>
-              </Tooltip>
-            )) ||
+                    {formatValue(getValue(value.data))}
+                  </Typography>
+                </Tooltip>
+              )) ||
             null}
         </TableCell>
       ))}
@@ -274,7 +277,8 @@ function GradeAndRmpRow({
                         </Typography>
                       </Skeleton>
                     )) ||
-                    (rmp.state === 'done' && (
+                    (rmp.state === 'done' && rmpValue == 0 && <CloseIcon />) ||
+                    (rmp.state === 'done' && rmpValue != 0 && (
                       <Typography className="text-base inline">
                         {rmpValue}
                       </Typography>
