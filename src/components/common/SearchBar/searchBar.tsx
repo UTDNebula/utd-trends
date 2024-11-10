@@ -18,6 +18,7 @@ interface SearchProps {
   onSelect?: (value: SearchQuery[]) => void;
   className?: string;
   input_className?: string;
+  autoFocus?: boolean;
 }
 
 /**
@@ -32,6 +33,7 @@ const SearchBar = ({
   onSelect,
   className,
   input_className,
+  autoFocus,
 }: SearchProps) => {
   //what you can choose from
   const [options, setOptions] = useState<SearchQuery[]>([]);
@@ -262,6 +264,8 @@ const SearchBar = ({
               variant="outlined"
               className={input_className}
               placeholder="ex. GOVT 2306"
+              //eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus={autoFocus}
             />
           );
         }}
