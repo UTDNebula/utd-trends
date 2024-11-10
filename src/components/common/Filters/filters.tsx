@@ -109,7 +109,7 @@ const Filters = ({
         size="small"
         className={`w-full ${
           minGPA
-            ? '[&>.MuiInputBase-root]:bg-gray-200 [&>.MuiInputBase-root]:dark:bg-gray-900'
+            ? '[&>.MuiInputBase-root]:bg-gray-200 [&>.MuiInputBase-root]:dark:bg-gray-800'
             : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti'
         }`}
       >
@@ -139,7 +139,7 @@ const Filters = ({
         size="small"
         className={`w-full ${
           minRating
-            ? '[&>.MuiInputBase-root]:bg-gray-200 [&>.MuiInputBase-root]:dark:bg-gray-900'
+            ? '[&>.MuiInputBase-root]:bg-gray-200 [&>.MuiInputBase-root]:dark:bg-gray-800'
             : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti'
         }`}
       >
@@ -183,7 +183,7 @@ const Filters = ({
         size="small"
         className={`w-full ${
           chosenSessions.length !== academicSessions.length
-            ? '[&>.MuiInputBase-root]:bg-gray-200 [&>.MuiInputBase-root]:dark:bg-gray-900'
+            ? '[&>.MuiInputBase-root]:bg-gray-200 [&>.MuiInputBase-root]:dark:bg-gray-800'
             : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti'
         }`}
       >
