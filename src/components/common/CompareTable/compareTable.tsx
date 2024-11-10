@@ -143,7 +143,7 @@ function GradeOrRmpRow<T>({
                 <Typography className="text-base">{loadingFiller}</Typography>
               </Skeleton>
             )) ||
-            (value.state === 'done' && getValue(value.data) !== -1 && (
+            (value.state === 'done' && getValue(value.data) > 0 && (
               <Tooltip
                 title={`${name}: ${formatValue(getValue(value.data))}`}
                 placement="top"
@@ -274,16 +274,12 @@ function GradeAndRmpRow({
                         </Typography>
                       </Skeleton>
                     )) ||
-                    (rmp.state === 'done' &&
-                      getRmpValue(rmp.data as RMPInterface) == 0 && (
-                        <CloseIcon />
-                      )) ||
-                    (rmp.state === 'done' &&
-                      getRmpValue(rmp.data as RMPInterface) != 0 && (
-                        <Typography className="text-base inline">
-                          {rmpValue}
-                        </Typography>
-                      )) ||
+                    (rmp.state === 'done' && rmpValue == 0 && <CloseIcon />) ||
+                    (rmp.state === 'done' && rmpValue != 0 && (
+                      <Typography className="text-base inline">
+                        {rmpValue}
+                      </Typography>
+                    )) ||
                     null}
                 </span>
               </Tooltip>
