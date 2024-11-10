@@ -66,9 +66,9 @@ function LoadingRow() {
       <TableCell align="center">
         <Skeleton
           variant="rounded"
-          className="rounded-full px-5 py-2 w-16 block mx-auto"
+          className="rounded-full px-5 py-2 min-w-16 block mx-auto"
         >
-          <Typography className="text-base w-6">A+</Typography>
+          <Typography className="text-base">A+</Typography>
         </Skeleton>
       </TableCell>
       <TableCell align="center">
