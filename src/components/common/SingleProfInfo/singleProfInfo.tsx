@@ -51,13 +51,13 @@ function SingleProfInfo({ rmp }: Props) {
   if (rmp.data.numRatings == 0) {
     return (
       <Grid container spacing={2} className="p-4">
-        <Grid item xs={6}>
+        <Grid size={6}>
           <p className="text-xl font-bold">
             {rmp.data.numRatings.toLocaleString()}
           </p>
           <p>Ratings given</p>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Link
             href={
               'https://www.ratemyprofessors.com/professor/' + rmp.data.legacyId
