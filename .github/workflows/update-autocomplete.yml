@@ -20,7 +20,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout 270-bug-new-courses-missing-from-search-due-to-outdated-autocomplete-graph
+          git checkout develop
           git branch -D update-course-data || true  # Delete branch if it exists locally
           git checkout -b update-course-data
 
@@ -59,7 +59,7 @@ jobs:
               owner: owner,
               repo: repo,
               head: 'update-course-data',
-              base: '270-bug-new-courses-missing-from-search-due-to-outdated-autocomplete-graph',
+              base: 'develop',
               state: 'open',
             });
 
@@ -69,7 +69,7 @@ jobs:
                 owner: owner,
                 repo: repo,
                 head: 'update-course-data',
-                base: '270-bug-new-courses-missing-from-search-due-to-outdated-autocomplete-graph',
+                base: 'develop',
                 body: [
                   'Fetch and rebuild autocomplete graph and combos table',
                   '',
