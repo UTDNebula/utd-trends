@@ -37,7 +37,7 @@ jobs:
       - name: Build autocomplete graph
         run: npm run buildautocomplete
 
-      - name: Build combos table
+      - name: Build combow table
         run: npm run buildcombos
 
       - name: Commit changes
