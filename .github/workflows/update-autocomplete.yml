@@ -79,14 +79,4 @@ jobs:
                   '[actions/github-script](https://github.com/actions/github-script)',
                 ].join('\n'),
               });
-            } else {
-              const existingPR = pulls.data[0];
-              await github.rest.issues.createComment({
-                owner: owner,
-                repo: repo,
-                issue_number: existingPR.number,
-                body: [
-                  `Updated by Job ${context.job}`,
-                ].join('\n'),
-              });
             }
