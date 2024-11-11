@@ -60,7 +60,7 @@ jobs:
             const pulls = await github.rest.pulls.list({
               owner: owner,
               repo: repo,
-              head: context.ref,
+              head: 'update-course-data',
               base: '270-bug-new-courses-missing-from-search-due-to-outdated-autocomplete-graph',
               state: 'open',
             });
@@ -70,7 +70,7 @@ jobs:
                 title: 'Update course data from API',
                 owner: owner,
                 repo: repo,
-                head: context.ref,
+                head: 'update-course-data',
                 base: '270-bug-new-courses-missing-from-search-due-to-outdated-autocomplete-graph',
                 body: [
                   'Fetch and rebuild autocomplete graph and combos table',
