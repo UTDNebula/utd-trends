@@ -44,7 +44,7 @@ jobs:
           git commit -m "Update course data from API"
           git push -f origin update-course-data
 
-      - name: 'Create PR'
+      - name: Create PR
         uses: actions/github-script@v6
         with:
           script: |
@@ -56,7 +56,7 @@ jobs:
               base: '270-bug-new-courses-missing-from-search-due-to-outdated-autocomplete-graph',
               state: 'open',
             });
-            
+
             if (pulls.data.length < 1) {
               await github.rest.pulls.create({
                 title: 'Update course data from API',
