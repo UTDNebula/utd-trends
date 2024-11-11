@@ -9,15 +9,18 @@ body,
   margin: 0;
   height: 100%;
   width: 100%;
-  background-color: rgb(var(--light-DEFAULT));
+  background-color: white; /* Default background color */
+  transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+.dark-mode html,
+.dark-mode body {
+  background-color: black; /* Dark mode background */
+  color: white; /* Text color in dark mode */
 }
 
 * {
   box-sizing: border-box;
-}
-
-.apexcharts-toolbar {
-  z-index: 0 !important;
 }
 
 @layer utilities {
