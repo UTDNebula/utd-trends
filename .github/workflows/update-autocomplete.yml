@@ -1,6 +1,8 @@
 name: Update course data from API
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
 
 jobs:
   main:
