@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
 
+
 jobs:
   main:
     name: Fetch and rebuild autocomplete graph and combos table
