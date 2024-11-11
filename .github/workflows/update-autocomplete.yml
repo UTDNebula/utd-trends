@@ -9,11 +9,14 @@ jobs:
     name: Fetch and rebuild autocomplete graph and combos table
     runs-on: ubuntu-latest
     permissions:
+      contents: write
       pull-requests: write
 
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create or reset the update branch
         run: |
