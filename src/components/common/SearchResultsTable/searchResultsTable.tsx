@@ -16,13 +16,13 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
+import gpaToLetterGrade from '../../../modules/gpaToLetterGrade/gpaToLetterGrade';
 import SearchQuery, {
   convertToProfOnly,
 } from '../../../modules/SearchQuery/SearchQuery';
 import { useRainbowColors } from '../../../modules/searchQueryColors/searchQueryColors';
 import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import gpaToLetterGrade from '../../../modules/gpaToLetterGrade/gpaToLetterGrade';
 import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
 import type {
   GenericFetchedData,

@@ -9,8 +9,8 @@ import {
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import gpaToLetterGrade from '../../../modules/gpaToLetterGrade/gpaToLetterGrade';
 
+import gpaToLetterGrade from '../../../modules/gpaToLetterGrade/gpaToLetterGrade';
 import Rating from '../Rating/rating';
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
