@@ -58,18 +58,21 @@ function LoadingRow() {
       <TableCell>
         <Checkbox disabled />
       </TableCell>
-      <TableCell component="th" scope="row">
-        <Typography className="w-[20ch] leading-tight text-lg text-gray-600 dark:text-gray-200">
+      <TableCell component="th" scope="row" className="w-full">
+        <Typography className="w-full leading-tight text-lg">
           <Skeleton />
         </Typography>
       </TableCell>
-      <TableCell align="right">
-        <Skeleton variant="rounded" className="rounded-full px-5 py-2 ml-auto">
-          <Typography className="text-base">4.00</Typography>
+      <TableCell align="center">
+        <Skeleton
+          variant="rounded"
+          className="rounded-full px-5 py-2 min-w-16 block mx-auto"
+        >
+          <Typography className="text-base">A+</Typography>
         </Skeleton>
       </TableCell>
-      <TableCell align="right">
-        <Skeleton variant="rounded" className="rounded-full ml-auto">
+      <TableCell align="center">
+        <Skeleton variant="rounded" className="rounded-full mx-auto">
           <Rating sx={{ fontSize: 25 }} readOnly />
         </Skeleton>
       </TableCell>
@@ -118,10 +121,9 @@ function Row({
     <>
       <TableRow
         onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
-        sx={{ '& > *': { borderBottom: 'unset' } }}
         className="cursor-pointer"
       >
-        <TableCell>
+        <TableCell className="border-b-0">
           <Tooltip
             title={open ? 'Minimize Result' : 'Expand Result'}
             placement="top"
@@ -136,7 +138,7 @@ function Row({
             </IconButton>
           </Tooltip>
         </TableCell>
-        <TableCell>
+        <TableCell className="border-b-0">
           <Tooltip
             title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
             placement="top"
@@ -167,12 +169,12 @@ function Row({
             />
           </Tooltip>
         </TableCell>
-        <TableCell component="th" scope="row">
+        <TableCell component="th" scope="row" className="w-full border-b-0">
           <Typography
             onClick={
               (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
             }
-            className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
+            className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit"
           >
             {searchQueryLabel(course) +
               ((typeof course.profFirst === 'undefined' &&
@@ -183,16 +185,16 @@ function Row({
                 : '')}
           </Typography>
         </TableCell>
-        <TableCell align="right">
+        <TableCell align="center" className="border-b-0">
           {((typeof grades === 'undefined' || grades.state === 'error') && (
             <></>
           )) ||
             (grades.state === 'loading' && (
               <Skeleton
                 variant="rounded"
-                className="rounded-full px-5 py-2 ml-auto"
+                className="rounded-full px-5 py-2 w-16 block mx-auto"
               >
-                <Typography className="text-base">A</Typography>
+                <Typography className="text-base w-6">A+</Typography>
               </Skeleton>
             )) ||
             (grades.state === 'done' && (
@@ -201,7 +203,7 @@ function Row({
                 placement="top"
               >
                 <Typography
-                  className="text-base text-black text-center rounded-full px-5 py-2 w-16 block"
+                  className="text-base text-black text-center rounded-full px-5 py-2 w-16 block mx-auto"
                   sx={{ backgroundColor: gpaToColor(grades.data.gpa) }}
                 >
                   {gpaToLetterGrade(grades.data.gpa)}
@@ -210,10 +212,10 @@ function Row({
             )) ||
             null}
         </TableCell>
-        <TableCell align="right">
+        <TableCell align="center" className="border-b-0">
           {((typeof rmp === 'undefined' || rmp.state === 'error') && <></>) ||
             (rmp.state === 'loading' && (
-              <Skeleton variant="rounded" className="rounded-full ml-auto">
+              <Skeleton variant="rounded" className="rounded-full">
                 <Rating sx={{ fontSize: 25 }} readOnly />
               </Skeleton>
             )) ||
