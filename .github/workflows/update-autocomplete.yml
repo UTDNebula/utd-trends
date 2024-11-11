@@ -31,13 +31,16 @@ jobs:
       - name: Install for ts-node
         run: npm install
 
+      - name: Add API Key
+        run: echo "REACT_APP_NEBULA_API_KEY=${{ secrets.NEBULA_API_KEY }}" >> .env.local
+
       - name: Fetch new data from api
         run: npm run fetchdata
 
       - name: Build autocomplete graph
         run: npm run buildautocomplete
 
-      - name: Build combow table
+      - name: Build combos table
         run: npm run buildcombos
 
       - name: Commit changes
