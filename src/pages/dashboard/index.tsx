@@ -1,4 +1,4 @@
-import { Card, Grid, useMediaQuery } from '@mui/material';
+import { Card, Grid2 as Grid, useMediaQuery } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -27,6 +27,7 @@ import fetchWithCache, {
 } from '../../modules/fetchWithCache';
 import type SearchQuery from '../../modules/SearchQuery/SearchQuery';
 import { convertToProfOnly } from '../../modules/SearchQuery/SearchQuery';
+import searchQueryColors from '../../modules/searchQueryColors/searchQueryColors';
 import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
 import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
 import type { GradesData } from '../../pages/api/grades';
@@ -234,6 +235,16 @@ function fetchRmpData(
   });
 }
 
+// Add this utility function after the existing type definitions
+function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
+  const colorMap: { [key: string]: string } = {};
+  courses.forEach((course, index) => {
+    colorMap[searchQueryLabel(course)] =
+      searchQueryColors[index % searchQueryColors.length];
+  });
+  return colorMap;
+}
+
 export const Dashboard: NextPage = () => {
   const router = useRouter();
 
@@ -287,23 +298,15 @@ export const Dashboard: NextPage = () => {
 
       //Get course/prof info
       if (courseSearchTerms.length === 1) {
-        if (
-          typeof grades[searchQueryLabel(courseSearchTerms[0])] === 'undefined'
-        ) {
-          fetchAndStoreGradesData(courseSearchTerms[0], controller);
+        if (!(searchQueryLabel(courseSearchTerms[0]) in rhsGrades.course)) {
+          fetchAndAddRHSGrades(courseSearchTerms[0], controller);
         }
       }
       if (professorSearchTerms.length === 1) {
         if (
-          typeof grades[searchQueryLabel(professorSearchTerms[0])] ===
-          'undefined'
+          !(searchQueryLabel(professorSearchTerms[0]) in rhsGrades.professor)
         ) {
-          fetchAndStoreGradesData(professorSearchTerms[0], controller);
-        }
-        if (
-          typeof rmp[searchQueryLabel(professorSearchTerms[0])] === 'undefined'
-        ) {
-          fetchAndStoreRmpData(professorSearchTerms[0], controller);
+          fetchAndAddRHSGrades(professorSearchTerms[0], controller);
         }
       }
 
@@ -356,9 +359,7 @@ export const Dashboard: NextPage = () => {
           //Relavent keys
           for (const result of [
             ...(results.state === 'done' ? results.data : []),
-          ]
-            .concat(courses.length === 1 ? courses[0] : [])
-            .concat(professors.length === 1 ? professors[0] : [])) {
+          ]) {
             const entry = grades[searchQueryLabel(result)];
             if (entry && entry.state === 'done') {
               entry.data = {
@@ -448,6 +449,38 @@ export const Dashboard: NextPage = () => {
       return newVal;
     });
   }
+
+  // holds data for course and professor overviews
+  type rhsGradesType = { [key: string]: GenericFetchedData<GradesType> };
+  const [rhsGrades, setRHSGrades] = useState<{
+    course: rhsGradesType;
+    professor: rhsGradesType;
+  }>({ course: {}, professor: {} });
+  function fetchAndAddRHSGrades(
+    query: SearchQuery,
+    controller: AbortController,
+  ) {
+    const rhsKey = searchQueryLabel(query);
+    // only update course on course query or vice versa
+    const isCourse = typeof query.prefix !== 'undefined';
+    setRHSGrades((old) => ({
+      course: isCourse ? { [rhsKey]: { state: 'loading' } } : old.course,
+      professor: isCourse ? old.professor : { [rhsKey]: { state: 'loading' } },
+    }));
+    fetchGradesData(query, controller)
+      .then((rhsGrade) => {
+        const rhsGradeFetched: GenericFetchedData<GradesType> = {
+          state: rhsGrade.gpa !== -1 ? 'done' : 'error',
+          data: rhsGrade,
+        };
+        setRHSGrades((old) => ({
+          course: isCourse ? { [rhsKey]: rhsGradeFetched } : old.course,
+          professor: isCourse ? old.professor : { [rhsKey]: rhsGradeFetched },
+        }));
+      })
+      .catch((err) => console.error('Grades data for ' + rhsKey, err));
+  }
+
   //Store rmp scores by profs
   const [rmp, setRmp] = useState<{
     [key: string]: GenericFetchedData<RMPInterface>;
@@ -693,6 +726,9 @@ export const Dashboard: NextPage = () => {
     panelLRef.current?.resize(50);
   };
 
+  // Add this after the compare state declaration
+  const colorMap = createColorMap(compare);
+
   //Main content: loading, error, or normal
   let contentComponent;
 
@@ -710,7 +746,7 @@ export const Dashboard: NextPage = () => {
         <ProfessorOverview
           key="professor"
           professor={professors[0]}
-          grades={grades[searchQueryLabel(professors[0])]}
+          grades={rhsGrades.professor[searchQueryLabel(professors[0])]}
           rmp={rmp[searchQueryLabel(professors[0])]}
         />,
       );
@@ -721,7 +757,7 @@ export const Dashboard: NextPage = () => {
         <CourseOverview
           key="course"
           course={courses[0]}
-          grades={grades[searchQueryLabel(courses[0])]}
+          grades={rhsGrades.course[searchQueryLabel(courses[0])]}
         />,
       );
     }
@@ -733,6 +769,7 @@ export const Dashboard: NextPage = () => {
         grades={compareGrades}
         rmp={compareRmp}
         removeFromCompare={removeFromCompare}
+        colorMap={colorMap}
       />,
     );
     const searchResultsTable = (
@@ -744,6 +781,7 @@ export const Dashboard: NextPage = () => {
         compare={compare}
         addToCompare={addToCompare}
         removeFromCompare={removeFromCompare}
+        colorMap={colorMap}
       />
     );
     const carousel = (
@@ -756,7 +794,7 @@ export const Dashboard: NextPage = () => {
     contentComponent = (
       <>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={6}>
+          <Grid size={{ xs: 12, sm: 6, md: 6 }}>
             <Filters
               manageQuery
               academicSessions={academicSessions}
@@ -764,7 +802,7 @@ export const Dashboard: NextPage = () => {
               addChosenSessions={addChosenSessions}
             />
           </Grid>
-          <Grid item xs={false} sm={6} md={6}></Grid>
+          <Grid size={{ xs: false, sm: 6, md: 6 }}></Grid>
         </Grid>
         {isSmallScreen ? (
           <div>
