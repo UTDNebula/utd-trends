@@ -819,7 +819,7 @@ export const Dashboard: NextPage = () => {
               onDoubleClick={handleResizeDoubleClick}
             />
             <Panel
-              className="overflow-visible"
+              className="overflow-visible min-w-0"
               ref={panelRRef}
               minSize={30}
               defaultSize={50}
