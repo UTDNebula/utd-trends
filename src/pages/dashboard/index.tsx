@@ -21,6 +21,7 @@ import fetchWithCache, {
 } from '@/modules/fetchWithCache/fetchWithCache';
 import {
   convertToProfOnly,
+  decodeSearchQueryLabel,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
