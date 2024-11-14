@@ -18,9 +18,29 @@ function SingleProfInfo({ rmp }: Props) {
   }
 
   if (rmp.state === 'loading') {
+    const loadingTags = ['Group projects (54)', 'Lecture heavy (29)', 'Hilarious (13)', 'Respected (9)', 'Clear grading criteria (9)'];
     return (
       <Grid container spacing={2} className="p-4">
         {/* Loading skeletons for each metric */}
+        <Grid item size={12}>
+          <div className="flex gap-1 flex-wrap">
+            {loadingTags.map((tag, index) => (
+              <Skeleton key={index} variant="rounded" className="rounded-full">
+                <Chip
+                  label={tag}
+                />
+              </Skeleton>
+            ))}
+            <Skeleton variant="rounded" className="rounded-full">
+              <IconButton
+                size="small"
+              >
+              <MoreHorizIcon />
+              </IconButton>
+            </Skeleton>
+          </div>
+        </Grid>
+
         <Grid size={6}>
           <Skeleton variant="rounded">
             <p className="text-xl font-bold">5.0</p>
