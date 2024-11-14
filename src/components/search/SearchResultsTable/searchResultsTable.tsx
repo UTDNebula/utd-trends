@@ -27,10 +27,10 @@ import type {
   GenericFetchedData,
   GradesType,
 } from '../../../pages/dashboard/index';
-import Rating from '../Rating/rating';
-import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
-import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
-import TableSortLabel from '../TableSortLabel/tableSortLabel';
+import Rating from '../../common/Rating/rating';
+import SingleGradesInfo from '../../common/SingleGradesInfo/singleGradesInfo';
+import SingleProfInfo from '../../common/SingleProfInfo/singleProfInfo';
+import TableSortLabel from '../../common/TableSortLabel/tableSortLabel';
 
 const gpaToLetterGrade = (gpa: number): string => {
   if (gpa >= 4.0) return 'A';

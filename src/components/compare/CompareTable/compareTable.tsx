@@ -22,7 +22,7 @@ import type {
   GenericFetchedData,
   GradesType,
 } from '../../../pages/dashboard/index';
-import TableSortLabel from '../TableSortLabel/tableSortLabel';
+import TableSortLabel from '../../common/TableSortLabel/tableSortLabel';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(good: number, bad: number, value: number) {

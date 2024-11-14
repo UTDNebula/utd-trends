@@ -14,8 +14,8 @@ import type {
   GenericFetchedData,
   GradesType,
 } from '../../../pages/dashboard/index';
-import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
-import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
+import SingleGradesInfo from '../../common/SingleGradesInfo/singleGradesInfo';
+import SingleProfInfo from '../../common/SingleProfInfo/singleProfInfo';
 
 const fallbackSrc = 'https://profiles.utdallas.edu/img/default.png';
 
