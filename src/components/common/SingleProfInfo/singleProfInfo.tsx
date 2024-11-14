@@ -1,4 +1,4 @@
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Chip, Grid2 as Grid, IconButton, Skeleton } from '@mui/material';
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -37,7 +37,7 @@ function SingleProfInfo({ rmp }: Props) {
             ))}
             <Skeleton variant="rounded" className="rounded-full">
               <IconButton size="small">
-                <MoreHorizIcon />
+                <ExpandMoreIcon />
               </IconButton>
             </Skeleton>
           </div>
@@ -117,15 +117,13 @@ function SingleProfInfo({ rmp }: Props) {
                 variant="outlined"
               />
             ))}
-            {!showMore && (
-              <IconButton
-                size="small"
-                aria-label="show more"
-                onClick={() => setShowMore(true)}
-              >
-                <MoreHorizIcon />
-              </IconButton>
-            )}
+            <IconButton
+              size="small"
+              aria-label="show more"
+              onClick={() => setShowMore(!showMore)}
+            >
+              <ExpandMoreIcon className={showMore ? 'rotate-90' : '-rotate-90'} />
+            </IconButton>
           </div>
         </Grid>
       )}
