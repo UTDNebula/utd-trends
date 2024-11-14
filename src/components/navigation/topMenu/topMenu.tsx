@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
 import Background from '@/../public/background.png';
-import SearchBar from '@/components/common/SearchBar/searchBar';
+import SearchBar from '@/components/search/SearchBar/searchBar';
 
 /**
  * This is a component to hold UTD Trends branding and basic navigation

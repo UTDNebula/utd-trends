@@ -1,6 +1,6 @@
 import React from 'react';
 
-import CompareTable from '@/components/common/CompareTable/compareTable';
+import CompareTable from '@/components/compare/CompareTable/compareTable';
 import BarGraph from '@/components/graph/BarGraph/barGraph';
 import {
   type SearchQuery,
@@ -14,6 +14,7 @@ type CompareProps = {
   grades: { [key: string]: GenericFetchedData<GradesType> };
   rmp: { [key: string]: GenericFetchedData<RMPInterface> };
   removeFromCompare: { (arg0: SearchQuery): void };
+  colorMap: { [key: string]: string };
 };
 
 function convertNumbersToPercents(distribution: GradesType): number[] {
@@ -23,7 +24,13 @@ function convertNumbersToPercents(distribution: GradesType): number[] {
   );
 }
 
-const Compare = ({ courses, grades, rmp, removeFromCompare }: CompareProps) => {
+const Compare = ({
+  courses,
+  grades,
+  rmp,
+  removeFromCompare,
+  colorMap,
+}: CompareProps) => {
   if (courses.length === 0) {
     return <p>Click a checkbox to add something to compare.</p>;
   }
@@ -89,6 +96,7 @@ const Compare = ({ courses, grades, rmp, removeFromCompare }: CompareProps) => {
         grades={grades}
         rmp={rmp}
         removeFromCompare={removeFromCompare}
+        colorMap={colorMap}
       />
     </div>
   );
