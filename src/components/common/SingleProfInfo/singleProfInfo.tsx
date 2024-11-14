@@ -1,6 +1,7 @@
-import { Chip, Grid2 as Grid, Skeleton } from '@mui/material';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Chip, Grid2 as Grid, IconButton, Skeleton } from '@mui/material';
 import Link from 'next/link';
-import React from 'react';
+import React, { useState } from 'react';
 
 import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
 import type { GenericFetchedData } from '../../../pages/dashboard/index';
@@ -10,9 +11,12 @@ type Props = {
 };
 
 function SingleProfInfo({ rmp }: Props) {
+  const [showMore, setShowMore] = useState(false);
+
   if (typeof rmp === 'undefined' || rmp.state === 'error') {
     return null;
   }
+
   if (rmp.state === 'loading') {
     return (
       <Grid container spacing={2} className="p-4">
@@ -41,6 +45,7 @@ function SingleProfInfo({ rmp }: Props) {
           </Skeleton>
           <p>Would take again</p>
         </Grid>
+
         <Grid size={12}>
           <Skeleton variant="rounded">
             <p>Visit Rate My Professors</p>
@@ -49,6 +54,7 @@ function SingleProfInfo({ rmp }: Props) {
       </Grid>
     );
   }
+
   if (rmp.data.numRatings == 0) {
     return (
       <Grid container spacing={2} className="p-4">
@@ -75,23 +81,29 @@ function SingleProfInfo({ rmp }: Props) {
 
   const topTags = rmp.data.teacherRatingTags
     .sort((a, b) => b.tagCount - a.tagCount)
-    .slice(0, 10);
+    .slice(0, showMore ? 10 : 5);
 
   return (
     <Grid container spacing={2} className="p-4">
       {topTags && topTags.length > 0 && (
         <Grid item size={12}>
-          <p className="font-semibold">Top Tags:</p>
-          <div className="flex gap-1 flex-wrap mt-2">
+          <div className="flex gap-1 flex-wrap">
             {topTags.map((tag, index) => (
               <Chip
-                className="text-sm bg-cornflower-50 dark:bg-cornflower-700"
                 key={index}
                 label={`${tag.tagName} (${tag.tagCount})`}
-                // variant="outlined"
-                size="small"
+                variant="outlined"
               />
             ))}
+            {!showMore && (
+              <IconButton
+                size="small"
+                aria-label="show more"
+                onClick={() => setShowMore(true)}
+              >
+                <MoreHorizIcon />
+              </IconButton>
+            )}
           </div>
         </Grid>
       )}
