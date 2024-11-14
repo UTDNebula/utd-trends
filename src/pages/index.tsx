@@ -50,12 +50,12 @@ const Home: NextPage = () => {
         />
         <div className="max-w-xl">
           <h2 className="text-sm font-semibold mb-3 text-cornflower-600 dark:text-cornflower-400 tracking-wider">
-            POWERED BY{' '}
+            POWERED BY {/*eslint-disable-next-line react/jsx-no-target-blank*/}
             <a
               href="https://www.utdnebula.com/"
               target="_blank"
+              rel="noopener"
               className="underline decoration-transparent hover:decoration-inherit transition"
-              rel="noreferrer"
             >
               NEBULA LABS
             </a>
@@ -68,11 +68,22 @@ const Home: NextPage = () => {
             find the perfect class.
           </p>
           <SearchBar
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus={true}
             onSelect={searchOptionChosen}
             className="mb-3"
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />
         </div>
+        {/*eslint-disable-next-line react/jsx-no-target-blank*/}
+        <a
+          href="https://utdgrades.com/"
+          target="_blank"
+          rel="noopener"
+          className="absolute bottom-4 bg-white dark:bg-black text-black dark:text-white py-3 px-5 rounded transition hover:scale-[1.01]"
+        >
+          Also check out <b>UTD Grades</b>
+        </a>
       </div>
     </>
   );

@@ -58,18 +58,21 @@ function LoadingRow() {
       <TableCell>
         <Checkbox disabled />
       </TableCell>
-      <TableCell component="th" scope="row">
-        <Typography className="w-[20ch] leading-tight text-lg text-gray-600 dark:text-gray-200">
+      <TableCell component="th" scope="row" className="w-full">
+        <Typography className="w-full leading-tight text-lg">
           <Skeleton />
         </Typography>
       </TableCell>
-      <TableCell align="right">
-        <Skeleton variant="rounded" className="rounded-full px-5 py-2 ml-auto">
-          <Typography className="text-base">4.00</Typography>
+      <TableCell align="center">
+        <Skeleton
+          variant="rounded"
+          className="rounded-full px-5 py-2 min-w-16 block mx-auto"
+        >
+          <Typography className="text-base">A+</Typography>
         </Skeleton>
       </TableCell>
-      <TableCell align="right">
-        <Skeleton variant="rounded" className="rounded-full ml-auto">
+      <TableCell align="center">
+        <Skeleton variant="rounded" className="rounded-full mx-auto">
           <Rating sx={{ fontSize: 25 }} readOnly />
         </Skeleton>
       </TableCell>
@@ -84,6 +87,7 @@ type RowProps = {
   inCompare: boolean;
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
+  color?: string;
 };
 
 function Row({
@@ -93,6 +97,7 @@ function Row({
   inCompare,
   addToCompare,
   removeFromCompare,
+  color,
 }: RowProps) {
   const [open, setOpen] = useState(false);
 
@@ -116,9 +121,9 @@ function Row({
     <>
       <TableRow
         onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
-        sx={{ '& > *': { borderBottom: 'unset' } }}
+        className="cursor-pointer"
       >
-        <TableCell>
+        <TableCell className="border-b-0">
           <Tooltip
             title={open ? 'Minimize Result' : 'Expand Result'}
             placement="top"
@@ -133,18 +138,15 @@ function Row({
             </IconButton>
           </Tooltip>
         </TableCell>
-        <TableCell
-          onClick={
-            (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the compare checkbox
-          }
-        >
+        <TableCell className="border-b-0">
           <Tooltip
             title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
             placement="top"
           >
             <Checkbox
               checked={inCompare}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
                 if (inCompare) {
                   removeFromCompare(course);
                 } else {
@@ -155,11 +157,25 @@ function Row({
                 (typeof grades !== 'undefined' && grades.state === 'loading') ||
                 (typeof rmp !== 'undefined' && rmp.state === 'loading')
               }
+              sx={
+                color
+                  ? {
+                      '&.Mui-checked': {
+                        color: color,
+                      },
+                    }
+                  : undefined
+              } // Apply color if defined
             />
           </Tooltip>
         </TableCell>
-        <TableCell component="th" scope="row">
-          <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200">
+        <TableCell component="th" scope="row" className="w-full border-b-0">
+          <Typography
+            onClick={
+              (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
+            }
+            className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit"
+          >
             {searchQueryLabel(course) +
               ((typeof course.profFirst === 'undefined' &&
                 typeof course.profLast === 'undefined') ||
@@ -169,16 +185,16 @@ function Row({
                 : '')}
           </Typography>
         </TableCell>
-        <TableCell align="right">
+        <TableCell align="center" className="border-b-0">
           {((typeof grades === 'undefined' || grades.state === 'error') && (
             <></>
           )) ||
             (grades.state === 'loading' && (
               <Skeleton
                 variant="rounded"
-                className="rounded-full px-5 py-2 ml-auto"
+                className="rounded-full px-5 py-2 w-16 block mx-auto"
               >
-                <Typography className="text-base">A</Typography>
+                <Typography className="text-base w-6">A+</Typography>
               </Skeleton>
             )) ||
             (grades.state === 'done' && (
@@ -187,7 +203,7 @@ function Row({
                 placement="top"
               >
                 <Typography
-                  className="text-base text-black rounded-full px-5 py-2 inline"
+                  className="text-base text-black text-center rounded-full px-5 py-2 w-16 block mx-auto"
                   sx={{ backgroundColor: gpaToColor(grades.data.gpa) }}
                 >
                   {gpaToLetterGrade(grades.data.gpa)}
@@ -196,14 +212,15 @@ function Row({
             )) ||
             null}
         </TableCell>
-        <TableCell align="right">
+        <TableCell align="center" className="border-b-0">
           {((typeof rmp === 'undefined' || rmp.state === 'error') && <></>) ||
             (rmp.state === 'loading' && (
-              <Skeleton variant="rounded" className="rounded-full ml-auto">
+              <Skeleton variant="rounded" className="rounded-full">
                 <Rating sx={{ fontSize: 25 }} readOnly />
               </Skeleton>
             )) ||
-            (rmp.state === 'done' && (
+            (rmp.state === 'done' && rmp.data.numRatings == 0 && <></>) ||
+            (rmp.state === 'done' && rmp.data.numRatings != 0 && (
               <Tooltip
                 title={'Professor rating: ' + rmp.data.avgRating}
                 placement="top"
@@ -243,6 +260,7 @@ type SearchResultsTableProps = {
   compare: SearchQuery[];
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
+  colorMap: { [key: string]: string };
 };
 
 const SearchResultsTable = ({
@@ -253,6 +271,7 @@ const SearchResultsTable = ({
   compare,
   addToCompare,
   removeFromCompare,
+  colorMap,
 }: SearchResultsTableProps) => {
   //Table sorting category
   const [orderBy, setOrderBy] = useState<'name' | 'gpa' | 'rating'>('name');
@@ -393,16 +412,16 @@ const SearchResultsTable = ({
       const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
       //drop loading/error rows to bottom
       if (
-        (!aRmp || aRmp.state !== 'done') &&
-        (!bRmp || bRmp.state !== 'done')
+        (!aRmp || aRmp.state !== 'done' || aRmp.data.numRatings == 0) &&
+        (!bRmp || bRmp.state !== 'done' || bRmp.data.numRatings == 0)
       ) {
         // If both aRmp and bRmp are not done, treat them as equal and return 0
         return 0;
       }
-      if (!aRmp || aRmp.state !== 'done') {
+      if (!aRmp || aRmp.state !== 'done' || aRmp.data.numRatings == 0) {
         return 9999;
       }
-      if (!bRmp || bRmp.state !== 'done') {
+      if (!bRmp || bRmp.state !== 'done' || bRmp.data.numRatings == 0) {
         return -9999;
       }
       const aRating = aRmp?.data?.avgRating ?? 0; // Fallback to 0 if undefined
@@ -438,7 +457,7 @@ const SearchResultsTable = ({
                   Name
                 </TableSortLabel>
               </TableCell>
-              <TableCell>
+              <TableCell align="center">
                 <Tooltip
                   title="Average GPA Across Course Sections"
                   placement="top"
@@ -456,7 +475,7 @@ const SearchResultsTable = ({
                   </div>
                 </Tooltip>
               </TableCell>
-              <TableCell>
+              <TableCell align="center">
                 <Tooltip
                   title="Average Professor Rating from Rate My Professors"
                   placement="top"
@@ -491,6 +510,7 @@ const SearchResultsTable = ({
                     }
                     addToCompare={addToCompare}
                     removeFromCompare={removeFromCompare}
+                    color={colorMap[searchQueryLabel(result)]}
                   />
                 ))
               : Array(10)
