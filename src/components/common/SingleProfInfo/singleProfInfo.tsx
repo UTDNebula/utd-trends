@@ -1,4 +1,4 @@
-import { Chip, Grid, Skeleton } from '@mui/material';
+import { Chip, Grid2 as Grid, Skeleton } from '@mui/material';
 import Link from 'next/link';
 import React from 'react';
 
@@ -17,29 +17,57 @@ function SingleProfInfo({ rmp }: Props) {
     return (
       <Grid container spacing={2} className="p-4">
         {/* Loading skeletons for each metric */}
-        <Grid item xs={6}>
-          <p className="text-xl font-bold">
-            <Skeleton variant="rounded" width="10%" height={25} />
-          </p>
+        <Grid size={6}>
+          <Skeleton variant="rounded">
+            <p className="text-xl font-bold">5.0</p>
+          </Skeleton>
           <p>Professor rating</p>
         </Grid>
-        <Grid item xs={6}>
-          <p className="text-xl font-bold">
-            <Skeleton variant="rounded" width="10%" height={25} />
-          </p>
+        <Grid size={6}>
+          <Skeleton variant="rounded">
+            <p className="text-xl font-bold">5.0</p>
+          </Skeleton>
           <p>Difficulty</p>
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
+          <Skeleton variant="rounded">
+            <p className="text-xl font-bold">1,000</p>
+          </Skeleton>
+          <p>Ratings given</p>
+        </Grid>
+        <Grid size={6}>
+          <Skeleton variant="rounded">
+            <p className="text-xl font-bold">99%</p>
+          </Skeleton>
+          <p>Would take again</p>
+        </Grid>
+        <Grid size={12}>
+          <Skeleton variant="rounded">
+            <p>Visit Rate My Professors</p>
+          </Skeleton>
+        </Grid>
+      </Grid>
+    );
+  }
+  if (rmp.data.numRatings == 0) {
+    return (
+      <Grid container spacing={2} className="p-4">
+        <Grid size={6}>
           <p className="text-xl font-bold">
-            <Skeleton variant="rounded" width="10%" height={25} />
+            {rmp.data.numRatings.toLocaleString()}
           </p>
           <p>Ratings given</p>
         </Grid>
-        <Grid item xs={6}>
-          <p className="text-xl font-bold">
-            <Skeleton variant="rounded" width="10%" height={25} />
-          </p>
-          <p>Would take again</p>
+        <Grid size={12}>
+          <Link
+            href={
+              'https://www.ratemyprofessors.com/professor/' + rmp.data.legacyId
+            }
+            target="_blank"
+            className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+          >
+            Visit Rate My Professors
+          </Link>
         </Grid>
       </Grid>
     );
@@ -52,7 +80,7 @@ function SingleProfInfo({ rmp }: Props) {
   return (
     <Grid container spacing={2} className="p-4">
       {topTags && topTags.length > 0 && (
-        <Grid item xs={12}>
+        <Grid item size={12}>
           <p className="font-semibold">Top Tags:</p>
           <div className="flex gap-1 flex-wrap mt-2">
             {topTags.map((tag, index) => (
@@ -68,28 +96,28 @@ function SingleProfInfo({ rmp }: Props) {
         </Grid>
       )}
 
-      <Grid item xs={6}>
+      <Grid size={6}>
         <p className="text-xl font-bold">{rmp.data.avgRating}</p>
         <p>Professor rating</p>
       </Grid>
-      <Grid item xs={6}>
+      <Grid size={6}>
         <p className="text-xl font-bold">{rmp.data.avgDifficulty}</p>
         <p>Difficulty</p>
       </Grid>
-      <Grid item xs={6}>
+      <Grid size={6}>
         <p className="text-xl font-bold">
           {rmp.data.numRatings.toLocaleString()}
         </p>
         <p>Ratings given</p>
       </Grid>
-      <Grid item xs={6}>
+      <Grid size={6}>
         <p className="text-xl font-bold">
           {rmp.data.wouldTakeAgainPercent.toFixed(0) + '%'}
         </p>
         <p>Would take again</p>
       </Grid>
 
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Link
           href={
             'https://www.ratemyprofessors.com/professor/' + rmp.data.legacyId
