@@ -1,5 +1,11 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Chip, Grid2 as Grid, IconButton, Skeleton } from '@mui/material';
+import {
+  Chip,
+  Collapse,
+  Grid2 as Grid,
+  IconButton,
+  Skeleton,
+} from '@mui/material';
 import Link from 'next/link';
 import React, { useState } from 'react';
 
@@ -101,29 +107,49 @@ function SingleProfInfo({ rmp }: Props) {
     );
   }
 
-  const topTags = rmp.data.teacherRatingTags
-    .sort((a, b) => b.tagCount - a.tagCount)
-    .slice(0, showMore ? 10 : 5);
+  const topTags = rmp.data.teacherRatingTags.sort(
+    (a, b) => b.tagCount - a.tagCount,
+  );
+  const first5 = topTags.slice(0, 5);
+  const next5 = topTags.slice(5, 10);
 
   return (
     <Grid container spacing={2} className="p-4">
-      {topTags && topTags.length > 0 && (
+      {first5.length > 0 && (
         <Grid size={12}>
-          <div className="flex gap-1 flex-wrap">
-            {topTags.map((tag, index) => (
+          <div className="flex gap-y-1 flex-wrap">
+            {first5.map((tag, index) => (
               <Chip
                 key={index}
                 label={`${tag.tagName} (${tag.tagCount})`}
                 variant="outlined"
+                className="mr-1"
               />
             ))}
-            <IconButton
-              size="small"
-              aria-label="show more"
-              onClick={() => setShowMore(!showMore)}
-            >
-              <ExpandMoreIcon className={showMore ? 'rotate-90' : '-rotate-90'} />
-            </IconButton>
+            {next5.length > 0 && (
+              <>
+                {next5.map((tag, index) => (
+                  <Collapse key={index} in={showMore} orientation="horizontal">
+                    <Chip
+                      label={`${tag.tagName} (${tag.tagCount})`}
+                      variant="outlined"
+                      className="mr-1"
+                    />
+                  </Collapse>
+                ))}
+                <IconButton
+                  size="small"
+                  aria-label="show more"
+                  onClick={() => setShowMore(!showMore)}
+                >
+                  <ExpandMoreIcon
+                    className={
+                      'transition ' + (showMore ? 'rotate-90' : '-rotate-90')
+                    }
+                  />
+                </IconButton>
+              </>
+            )}
           </div>
         </Grid>
       )}
