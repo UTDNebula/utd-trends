@@ -4,28 +4,30 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
-import Compare from '../../components/compare/Compare/compare';
-import DashboardEmpty from '../../components/dashboard/DashboardEmpty/dashboardEmpty';
-import DashboardError from '../../components/dashboard/DashboardError/dashboardError';
-import Carousel from '../../components/navigation/Carousel/carousel';
-import TopMenu from '../../components/navigation/topMenu/topMenu';
-import CourseOverview from '../../components/overview/CourseOverview/courseOverview';
-import ProfessorOverview from '../../components/overview/ProfessorOverview/professorOverview';
-import Filters from '../../components/search/Filters/filters';
-import SearchResultsTable from '../../components/search/SearchResultsTable/searchResultsTable';
-import decodeSearchQueryLabel from '../../modules/decodeSearchQueryLabel/decodeSearchQueryLabel';
+import Compare from '@/components/compare/Compare/compare';
+import DashboardEmpty from '@/components/dashboard/DashboardEmpty/dashboardEmpty';
+import DashboardError from '@/components/dashboard/DashboardError/dashboardError';
+import Carousel from '@/components/navigation/Carousel/carousel';
+import TopMenu from '@/components/navigation/topMenu/topMenu';
+import CourseOverview from '@/components/overview/CourseOverview/courseOverview';
+import ProfessorOverview from '@/components/overview/ProfessorOverview/professorOverview';
+import Filters from '@/components/search/Filters/filters';
+import SearchResultsTable from '@/components/search/SearchResultsTable/searchResultsTable';
+import { compareColors } from '@/modules/colors/colors';
 import fetchWithCache, {
   cacheIndexNebula,
   cacheIndexRmp,
   expireTime,
-} from '../../modules/fetchWithCache';
-import type SearchQuery from '../../modules/SearchQuery/SearchQuery';
-import { convertToProfOnly } from '../../modules/SearchQuery/SearchQuery';
-import searchQueryColors from '../../modules/searchQueryColors/searchQueryColors';
-import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
-import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
-import type { GradesData } from '../../pages/api/grades';
-import { RMPInterface } from '../api/ratemyprofessorScraper';
+} from '@/modules/fetchWithCache/fetchWithCache';
+import {
+  convertToProfOnly,
+  decodeSearchQueryLabel,
+  type SearchQuery,
+  searchQueryEqual,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
+import type { GradesData } from '@/pages/api/grades';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
 //Limit cached number of grades and rmp data entries
 const MAX_ENTRIES = 1000;
@@ -234,7 +236,7 @@ function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
   const colorMap: { [key: string]: string } = {};
   courses.forEach((course, index) => {
     colorMap[searchQueryLabel(course)] =
-      searchQueryColors[index % searchQueryColors.length];
+      compareColors[index % compareColors.length];
   });
   return colorMap;
 }

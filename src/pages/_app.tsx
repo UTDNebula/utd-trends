@@ -1,4 +1,4 @@
-import '../styles/globals.css';
+import '@/styles/globals.css';
 
 import { useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -12,9 +12,9 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 
-import tailwindConfig from '../../tailwind.config.js';
-import FeedbackPopup from '../components/common/FeedbackPopup/feedbackPopup';
-import GitHubButton from '../components/common/GitHubButton/gitHubButton';
+import tailwindConfig from '@/../tailwind.config.js';
+import FeedbackPopup from '@/components/common/FeedbackPopup/feedbackPopup';
+import GitHubButton from '@/components/common/GitHubButton/gitHubButton';
 
 const inter = Inter({
   subsets: ['latin'],

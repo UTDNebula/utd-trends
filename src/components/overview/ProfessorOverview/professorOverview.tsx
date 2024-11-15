@@ -3,19 +3,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
+import SingleGradesInfo from '@/components/common/SingleGradesInfo/singleGradesInfo';
+import SingleProfInfo from '@/components/common/SingleProfInfo/singleProfInfo';
 import fetchWithCache, {
   cacheIndexNebula,
   expireTime,
-} from '../../../modules/fetchWithCache';
-import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
-import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
-import type {
-  GenericFetchedData,
-  GradesType,
-} from '../../../pages/dashboard/index';
-import SingleGradesInfo from '../../common/SingleGradesInfo/singleGradesInfo';
-import SingleProfInfo from '../../common/SingleProfInfo/singleProfInfo';
+} from '@/modules/fetchWithCache/fetchWithCache';
+import {
+  type SearchQuery,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 const fallbackSrc = 'https://profiles.utdallas.edu/img/default.png';
 
