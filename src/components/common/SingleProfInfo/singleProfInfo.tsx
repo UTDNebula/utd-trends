@@ -34,21 +34,6 @@ function SingleProfInfo({ rmp }: Props) {
     return (
       <Grid container spacing={2} className="p-4">
         {/* Loading skeletons for each metric */}
-        <Grid size={12}>
-          <div className="flex gap-1 flex-wrap">
-            {loadingTags.map((tag, index) => (
-              <Skeleton key={index} variant="rounded" className="rounded-full">
-                <Chip label={tag} />
-              </Skeleton>
-            ))}
-            <Skeleton variant="rounded" className="rounded-full">
-              <IconButton size="small">
-                <ExpandMoreIcon />
-              </IconButton>
-            </Skeleton>
-          </div>
-        </Grid>
-
         <Grid size={6}>
           <Skeleton variant="rounded">
             <p className="text-xl font-bold">5.0</p>
@@ -72,6 +57,21 @@ function SingleProfInfo({ rmp }: Props) {
             <p className="text-xl font-bold">99%</p>
           </Skeleton>
           <p>Would take again</p>
+        </Grid>
+
+        <Grid size={12}>
+          <div className="flex gap-1 flex-wrap">
+            {loadingTags.map((tag, index) => (
+              <Skeleton key={index} variant="rounded" className="rounded-full">
+                <Chip label={tag} />
+              </Skeleton>
+            ))}
+            <Skeleton variant="rounded" className="rounded-full">
+              <IconButton size="small">
+                <ExpandMoreIcon />
+              </IconButton>
+            </Skeleton>
+          </div>
         </Grid>
 
         <Grid size={12}>
@@ -115,6 +115,27 @@ function SingleProfInfo({ rmp }: Props) {
 
   return (
     <Grid container spacing={2} className="p-4">
+      <Grid size={6}>
+        <p className="text-xl font-bold">{rmp.data.avgRating}</p>
+        <p>Professor rating</p>
+      </Grid>
+      <Grid size={6}>
+        <p className="text-xl font-bold">{rmp.data.avgDifficulty}</p>
+        <p>Difficulty</p>
+      </Grid>
+      <Grid size={6}>
+        <p className="text-xl font-bold">
+          {rmp.data.numRatings.toLocaleString()}
+        </p>
+        <p>Ratings given</p>
+      </Grid>
+      <Grid size={6}>
+        <p className="text-xl font-bold">
+          {rmp.data.wouldTakeAgainPercent.toFixed(0) + '%'}
+        </p>
+        <p>Would take again</p>
+      </Grid>
+
       {first5.length > 0 && (
         <Grid size={12}>
           <div className="flex gap-y-1 flex-wrap">
@@ -153,27 +174,6 @@ function SingleProfInfo({ rmp }: Props) {
           </div>
         </Grid>
       )}
-
-      <Grid size={6}>
-        <p className="text-xl font-bold">{rmp.data.avgRating}</p>
-        <p>Professor rating</p>
-      </Grid>
-      <Grid size={6}>
-        <p className="text-xl font-bold">{rmp.data.avgDifficulty}</p>
-        <p>Difficulty</p>
-      </Grid>
-      <Grid size={6}>
-        <p className="text-xl font-bold">
-          {rmp.data.numRatings.toLocaleString()}
-        </p>
-        <p>Ratings given</p>
-      </Grid>
-      <Grid size={6}>
-        <p className="text-xl font-bold">
-          {rmp.data.wouldTakeAgainPercent.toFixed(0) + '%'}
-        </p>
-        <p>Would take again</p>
-      </Grid>
 
       <Grid size={12}>
         <Link
