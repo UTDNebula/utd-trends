@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import React, { useCallback, useState } from 'react';
 
 import Background from '@/../public/background.png';
-import Tutorial from '@/components/common/Tutorial/tutorial';
+import Tutorial from '@/components/dashboard/Tutorial/tutorial';
 import SearchBar from '@/components/search/SearchBar/searchBar';
 
 /**

@@ -1,4 +1,4 @@
-import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
+import type { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
 import CloseIcon from '@mui/icons-material/Close';
 import { Backdrop, Button, IconButton, Popover } from '@mui/material';
 import React, { useEffect, useState } from 'react';
