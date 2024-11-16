@@ -1,8 +1,14 @@
-import { Card, Grid2 as Grid } from '@mui/material';
+import { Card, Grid2 as Grid, useMediaQuery } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  ImperativePanelHandle,
+  Panel,
+  PanelGroup,
+  PanelResizeHandle,
+} from 'react-resizable-panels';
 
 import Compare from '@/components/compare/Compare/compare';
 import DashboardEmpty from '@/components/dashboard/DashboardEmpty/dashboardEmpty';
@@ -714,6 +720,14 @@ export const Dashboard: NextPage = () => {
     }
   }
 
+  const panelLRef = useRef<ImperativePanelHandle>(null);
+  const panelRRef = useRef<ImperativePanelHandle>(null);
+  const isSmallScreen = useMediaQuery('(max-width: 600px)');
+  // Resets RHS & LHS to 50/50 when double clicking handle
+  const handleResizeDoubleClick = () => {
+    panelLRef.current?.resize(50);
+  };
+
   // Add this after the compare state declaration
   const colorMap = createColorMap(compare);
 
@@ -760,6 +774,25 @@ export const Dashboard: NextPage = () => {
         colorMap={colorMap}
       />,
     );
+    const searchResultsTable = (
+      <SearchResultsTable
+        resultsLoading={results.state}
+        includedResults={includedResults}
+        grades={grades}
+        rmp={rmp}
+        compare={compare}
+        addToCompare={addToCompare}
+        removeFromCompare={removeFromCompare}
+        colorMap={colorMap}
+      />
+    );
+    const carousel = (
+      <Card>
+        <Carousel names={names} compareLength={compare.length}>
+          {tabs}
+        </Carousel>
+      </Card>
+    );
     contentComponent = (
       <>
         <Grid container spacing={2}>
@@ -773,29 +806,32 @@ export const Dashboard: NextPage = () => {
           </Grid>
           <Grid size={{ xs: false, sm: 6, md: 6 }}></Grid>
         </Grid>
-        <Grid container component="main" wrap="wrap-reverse" spacing={2}>
-          <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-            <SearchResultsTable
-              resultsLoading={results.state}
-              includedResults={includedResults}
-              grades={grades}
-              rmp={rmp}
-              compare={compare}
-              addToCompare={addToCompare}
-              removeFromCompare={removeFromCompare}
-              colorMap={colorMap}
+        {isSmallScreen ? (
+          <div>
+            {carousel}
+            {searchResultsTable}
+          </div>
+        ) : (
+          <PanelGroup direction="horizontal" className="overflow-visible">
+            <Panel ref={panelLRef} minSize={40} defaultSize={50}>
+              {searchResultsTable}
+            </Panel>
+            <PanelResizeHandle
+              className="mt-4 p-1 mx-1 w-0.5 rounded-full opacity-25 data-[resize-handle-state=drag]:opacity-50 transition ease-in-out bg-transparent hover:bg-royal data-[resize-handle-state=drag]:bg-royal"
+              onDoubleClick={handleResizeDoubleClick}
             />
-          </Grid>
-          <Grid size={{ xs: false, sm: 6, md: 6 }}>
-            <div className="sticky top-0 gridsm:max-h-screen overflow-y-auto pt-4">
-              <Card>
-                <Carousel names={names} compareLength={compare.length}>
-                  {tabs}
-                </Carousel>
-              </Card>
-            </div>
-          </Grid>
-        </Grid>
+            <Panel
+              className="overflow-visible min-w-0"
+              ref={panelRRef}
+              minSize={30}
+              defaultSize={50}
+            >
+              <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto mt-4">
+                {carousel}
+              </div>
+            </Panel>
+          </PanelGroup>
+        )}
       </>
     );
   }
