@@ -426,7 +426,7 @@ const SearchResultsTable = ({
               </TableCell>
               <TableCell>
                 <Tooltip
-                  title="Average GPA Across Course Sections"
+                  title="Average Letter Grade Across Course Sections"
                   placement="top"
                 >
                   <div>

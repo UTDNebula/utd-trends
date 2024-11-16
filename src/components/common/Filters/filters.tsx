@@ -100,14 +100,7 @@ const Filters = ({
   return (
     <div className="flex gap-2">
       {/* min letter grade dropdown*/}
-      <Tooltip
-        title={
-          minGPA !== ''
-            ? 'Selected: ' + gpaToLetterGrade(Number(minGPA))
-            : 'Select Minimum Letter Grade'
-        }
-        placement="top"
-      >
+      <Tooltip title={'Select Minimum Letter Grade Average'} placement="top">
         <FormControl
           size="small"
           className={`w-full ${
@@ -139,14 +132,7 @@ const Filters = ({
       </Tooltip>
 
       {/* min rating dropdown*/}
-      <Tooltip
-        title={
-          minRating !== ''
-            ? 'Selected: ' + minRating + ' Stars'
-            : 'Select Minimum Rating'
-        }
-        placement="top"
-      >
+      <Tooltip title={'Select Minimum Professor Rating'} placement="top">
         <FormControl
           size="small"
           className={`w-full ${
@@ -193,15 +179,7 @@ const Filters = ({
 
       {/* semester dropdown */}
       <Tooltip
-        title={
-          chosenSessions.length > 0
-            ? 'Selected: ' +
-              chosenSessions
-                .sort((a, b) => compareSemesters(a, b))
-                .map((term) => displayAcademicSessionName(term))
-                .join(', ')
-            : 'Select Semesters'
-        }
+        title={'Select Semesters to Include Grades from'}
         placement="top"
       >
         <FormControl
