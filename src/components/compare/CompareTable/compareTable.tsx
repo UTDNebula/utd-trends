@@ -13,16 +13,14 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
-import SearchQuery, {
+import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
+import {
   convertToProfOnly,
-} from '../../../modules/SearchQuery/SearchQuery';
-import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
-import type {
-  GenericFetchedData,
-  GradesType,
-} from '../../../pages/dashboard/index';
-import TableSortLabel from '../TableSortLabel/tableSortLabel';
+  type SearchQuery,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(good: number, bad: number, value: number) {
