@@ -172,16 +172,14 @@ function Row({
         <TableCell component="th" scope="row" className="w-full border-b-0">
           <Tooltip
             title={
-              (rmp !== undefined &&
-                rmp.state === 'done' &&
-                rmp.data.teacherRatingTags.length > 0 &&
-                'Tags: ' +
-                  rmp.data.teacherRatingTags
-                    .sort((a, b) => b.tagCount - a.tagCount)
-                    .slice(0, 3)
-                    .map((tag) => tag.tagName)
-                    .join(', ')) ||
-              (rmp !== undefined && rmp.state === 'done' && 'No Tags found')
+              rmp !== undefined &&
+              rmp.state === 'done' &&
+              'Tags: ' +
+                rmp.data.teacherRatingTags
+                  .sort((a, b) => b.tagCount - a.tagCount)
+                  .slice(0, 3)
+                  .map((tag) => tag.tagName)
+                  .join(', ')
             }
             placement="top"
           >
