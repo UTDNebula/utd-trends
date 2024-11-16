@@ -78,6 +78,7 @@ const kallisto = localFont({
 function MyApp({ Component, pageProps }: AppProps) {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const muiTheme = createTheme({
+    cssVariables: true,
     palette: {
       mode: prefersDarkMode ? 'dark' : 'light',
       //copied from tailwind.config.js
