@@ -5,8 +5,8 @@ Documentation: https://nebula-labs.atlassian.net/wiki/spaces/TRENDS/pages/679936
 import { writeFileSync } from 'fs';
 import { DirectedGraph } from 'graphology';
 
-import * as aggregatedData from '../data/aggregated_data.json';
-import SearchQuery from '../modules/SearchQuery/SearchQuery';
+import * as aggregatedData from '@/data/aggregated_data.json';
+import { type SearchQuery } from '@/modules/SearchQuery/SearchQuery';
 
 export type NodeAttributes = {
   c: string;

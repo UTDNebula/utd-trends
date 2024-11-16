@@ -16,21 +16,19 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
-import SearchQuery, {
+import Rating from '@/components/common/Rating/rating';
+import SingleGradesInfo from '@/components/common/SingleGradesInfo/singleGradesInfo';
+import SingleProfInfo from '@/components/common/SingleProfInfo/singleProfInfo';
+import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
+import { useRainbowColors } from '@/modules/colors/colors';
+import {
   convertToProfOnly,
-} from '../../../modules/SearchQuery/SearchQuery';
-import { useRainbowColors } from '../../../modules/searchQueryColors/searchQueryColors';
-import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
-import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
-import type {
-  GenericFetchedData,
-  GradesType,
-} from '../../../pages/dashboard/index';
-import Rating from '../Rating/rating';
-import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
-import SingleProfInfo from '../SingleProfInfo/singleProfInfo';
-import TableSortLabel from '../TableSortLabel/tableSortLabel';
+  type SearchQuery,
+  searchQueryEqual,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 const gpaToLetterGrade = (gpa: number): string => {
   if (gpa >= 4.0) return 'A';
@@ -170,20 +168,38 @@ function Row({
           </Tooltip>
         </TableCell>
         <TableCell component="th" scope="row" className="w-full border-b-0">
-          <Typography
-            onClick={
-              (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
+          <Tooltip
+            title={
+              typeof course.profFirst !== 'undefined' &&
+              typeof course.profLast !== 'undefined' &&
+              (rmp !== undefined &&
+              rmp.state === 'done' &&
+              rmp.data.teacherRatingTags.length > 0
+                ? 'Tags: ' +
+                  rmp.data.teacherRatingTags
+                    .sort((a, b) => b.tagCount - a.tagCount)
+                    .slice(0, 3)
+                    .map((tag) => tag.tagName)
+                    .join(', ')
+                : 'No Tags Available')
             }
-            className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit"
+            placement="top"
           >
-            {searchQueryLabel(course) +
-              ((typeof course.profFirst === 'undefined' &&
-                typeof course.profLast === 'undefined') ||
-              (typeof course.prefix === 'undefined' &&
-                typeof course.number === 'undefined')
-                ? ' (Overall)'
-                : '')}
-          </Typography>
+            <Typography
+              onClick={
+                (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
+              }
+              className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit"
+            >
+              {searchQueryLabel(course) +
+                ((typeof course.profFirst === 'undefined' &&
+                  typeof course.profLast === 'undefined') ||
+                (typeof course.prefix === 'undefined' &&
+                  typeof course.number === 'undefined')
+                  ? ' (Overall)'
+                  : '')}
+            </Typography>
+          </Tooltip>
         </TableCell>
         <TableCell align="center" className="border-b-0">
           {((typeof grades === 'undefined' || grades.state === 'error') && (
