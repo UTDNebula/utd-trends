@@ -1,6 +1,6 @@
 import { useMediaQuery } from '@mui/material';
 
-const searchQueryColors = [
+export const compareColors = [
   '#eb5757',
   '#2d9cdb',
   '#499F68',
@@ -9,7 +9,6 @@ const searchQueryColors = [
   '#f2c94c',
   '#1f78b4',
 ];
-export default searchQueryColors;
 
 const rainbowColors_dark = [
   '#9eff83',

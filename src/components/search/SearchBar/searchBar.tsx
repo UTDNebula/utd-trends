@@ -4,11 +4,12 @@ import parse from 'autosuggest-highlight/parse';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 
-import decodeSearchQueryLabel from '../../../modules/decodeSearchQueryLabel/decodeSearchQueryLabel';
-import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
-import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
-import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-// import { searchAutocomplete } from '../../autocomplete';
+import {
+  decodeSearchQueryLabel,
+  type SearchQuery,
+  searchQueryEqual,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
 
 /**
  * Props type used by the SearchBar component

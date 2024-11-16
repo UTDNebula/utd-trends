@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 const RMP_GRAPHQL_URL = 'https://www.ratemyprofessors.com/graphql';
 const SCHOOL_ID = '1273';

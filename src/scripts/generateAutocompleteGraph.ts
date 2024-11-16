@@ -5,8 +5,8 @@ Documentation: https://nebula-labs.atlassian.net/wiki/spaces/TRENDS/pages/679936
 import * as fs from 'fs';
 import { DirectedGraph } from 'graphology';
 
-import * as aggregatedData from '../data/autocomplete_data.json';
-import SearchQuery from '../modules/SearchQuery/SearchQuery';
+import * as aggregatedData from '@/data/autocomplete_data.json';
+import { type SearchQuery } from '@/modules/SearchQuery/SearchQuery';
 
 export type NodeAttributes = {
   c: string;
@@ -141,8 +141,14 @@ fetch('https://catfact.ninja/fact', { method: 'GET' })
 
     //Add nodes in format: (<professorLast>|<professorFirst> <professorLast>)
     function addProfessor(profFirst: string, profLast: string) {
-      const profFirstNode = addSearchQueryCharacter(root, profFirst + ' ');
-      addWithParents([profFirstNode, root], profLast, {
+      //seperate first names so you can skip them when searching
+      const firstNames = profFirst.split(' ');
+      const nodes = [root];
+      for (const name of firstNames) {
+        //push to start, order is specific for addWithParents
+        nodes.unshift(addSearchQueryCharacter(nodes[0], name + ' '));
+      }
+      addWithParents(nodes, profLast, {
         profFirst: profFirst,
         profLast: profLast,
       });
