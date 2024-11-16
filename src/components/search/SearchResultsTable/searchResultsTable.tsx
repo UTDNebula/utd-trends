@@ -168,20 +168,38 @@ function Row({
           </Tooltip>
         </TableCell>
         <TableCell component="th" scope="row" className="w-full border-b-0">
-          <Typography
-            onClick={
-              (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
+          <Tooltip
+            title={
+              typeof course.profFirst !== 'undefined' &&
+              typeof course.profLast !== 'undefined' &&
+              (rmp !== undefined &&
+              rmp.state === 'done' &&
+              rmp.data.teacherRatingTags.length > 0
+                ? 'Tags: ' +
+                  rmp.data.teacherRatingTags
+                    .sort((a, b) => b.tagCount - a.tagCount)
+                    .slice(0, 3)
+                    .map((tag) => tag.tagName)
+                    .join(', ')
+                : 'No Tags Available')
             }
-            className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit"
+            placement="top"
           >
-            {searchQueryLabel(course) +
-              ((typeof course.profFirst === 'undefined' &&
-                typeof course.profLast === 'undefined') ||
-              (typeof course.prefix === 'undefined' &&
-                typeof course.number === 'undefined')
-                ? ' (Overall)'
-                : '')}
-          </Typography>
+            <Typography
+              onClick={
+                (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
+              }
+              className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit"
+            >
+              {searchQueryLabel(course) +
+                ((typeof course.profFirst === 'undefined' &&
+                  typeof course.profLast === 'undefined') ||
+                (typeof course.prefix === 'undefined' &&
+                  typeof course.number === 'undefined')
+                  ? ' (Overall)'
+                  : '')}
+            </Typography>
+          </Tooltip>
         </TableCell>
         <TableCell align="center" className="border-b-0">
           {((typeof grades === 'undefined' || grades.state === 'error') && (
