@@ -88,6 +88,7 @@ type RowProps = {
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
   color?: string;
+  showTutorial: boolean;
 };
 
 function Row({
@@ -98,6 +99,7 @@ function Row({
   addToCompare,
   removeFromCompare,
   color,
+  showTutorial,
 }: RowProps) {
   const [open, setOpen] = useState(false);
 
@@ -122,8 +124,12 @@ function Row({
       <TableRow
         onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
         className="cursor-pointer"
+        data-tutorial-id={showTutorial && 'result'}
       >
-        <TableCell className="border-b-0">
+        <TableCell
+          className="border-b-0"
+          data-tutorial-id={showTutorial && 'dropdown'}
+        >
           <Tooltip
             title={open ? 'Minimize Result' : 'Expand Result'}
             placement="top"
@@ -138,7 +144,10 @@ function Row({
             </IconButton>
           </Tooltip>
         </TableCell>
-        <TableCell className="border-b-0">
+        <TableCell
+          className="border-b-0"
+          data-tutorial-id={showTutorial && 'compare'}
+        >
           <Tooltip
             title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
             placement="top"
@@ -254,6 +263,7 @@ function Row({
 
 type SearchResultsTableProps = {
   resultsLoading: 'loading' | 'done';
+  numSearches: number;
   includedResults: SearchQuery[];
   grades: { [key: string]: GenericFetchedData<GradesType> };
   rmp: { [key: string]: GenericFetchedData<RMPInterface> };
@@ -265,6 +275,7 @@ type SearchResultsTableProps = {
 
 const SearchResultsTable = ({
   resultsLoading,
+  numSearches,
   includedResults,
   grades,
   rmp,
@@ -457,7 +468,7 @@ const SearchResultsTable = ({
                   Name
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="center" data-tutorial-id="grades">
+              <TableCell align="center">
                 <Tooltip
                   title="Average GPA Across Course Sections"
                   placement="top"
@@ -475,7 +486,7 @@ const SearchResultsTable = ({
                   </div>
                 </Tooltip>
               </TableCell>
-              <TableCell align="center" data-tutorial-id="rating">
+              <TableCell align="center">
                 <Tooltip
                   title="Average Professor Rating from Rate My Professors"
                   placement="top"
@@ -497,7 +508,7 @@ const SearchResultsTable = ({
           </TableHead>
           <TableBody>
             {resultsLoading === 'done'
-              ? sortedResults.map((result) => (
+              ? sortedResults.map((result, index) => (
                   <Row
                     key={searchQueryLabel(result)}
                     course={result}
@@ -511,6 +522,7 @@ const SearchResultsTable = ({
                     addToCompare={addToCompare}
                     removeFromCompare={removeFromCompare}
                     color={colorMap[searchQueryLabel(result)]}
+                    showTutorial={index === numSearches}
                   />
                 ))
               : Array(10)

@@ -4,7 +4,7 @@ import { IconButton, Snackbar, Tooltip, useMediaQuery } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import Background from '../../../../public/background.png';
 import SearchBar from '../../common/SearchBar/searchBar';
@@ -54,6 +54,7 @@ export function TopMenu() {
   );
 
   const [openTutorial, setOpenTutorial] = useState(false);
+  const closeTutorial = useCallback(() => setOpenTutorial(false), []);
 
   return (
     <>
@@ -116,7 +117,7 @@ export function TopMenu() {
         onClose={() => setOpenCopied(false)}
         message="Copied!"
       />
-      <Tutorial open={openTutorial} close={() => setOpenTutorial(false)} />
+      <Tutorial open={openTutorial} close={closeTutorial} />
     </>
   );
 }

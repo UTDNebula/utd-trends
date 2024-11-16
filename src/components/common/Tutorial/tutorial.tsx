@@ -10,7 +10,15 @@ type TutorialPopupProps = {
   close: () => void;
   title: string;
   buttonText: string;
-  children: ReactJSXElement;
+  anchorOrigin: {
+    vertical: 'center' | 'bottom' | 'top';
+    horizontal: 'center' | 'left' | 'right';
+  };
+  transformOrigin: {
+    vertical: 'center' | 'bottom' | 'top';
+    horizontal: 'center' | 'left' | 'right';
+  };
+  children: ReactJSXElement | string;
 };
 
 const TutorialPopup = ({
@@ -20,30 +28,43 @@ const TutorialPopup = ({
   close,
   title,
   buttonText,
+  anchorOrigin,
+  transformOrigin,
   children,
 }: TutorialPopupProps) => {
   useEffect(() => {
     if (open) {
       element.classList.add('tutorial-raise');
-      element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      if (element.tagName === 'TR' || element.tagName === 'TD') {
+        element.classList.add('tutorial-table');
+      }
+      //Wait to scroll untill classes applies
+      setTimeout(
+        () => element.scrollIntoView({ behavior: 'smooth', block: 'nearest' }),
+        0,
+      );
     } else {
       element.classList.remove('tutorial-raise');
+      element.classList.remove('tutorial-table');
     }
-    return () => element.classList.remove('tutorial-raise');
-  }, [open]);
+    return () => {
+      element.classList.remove('tutorial-raise');
+      element.classList.remove('tutorial-table');
+    };
+  }, [open, element]);
 
   return (
     <Popover
       open={open}
       anchorEl={element}
-      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      anchorOrigin={anchorOrigin}
+      transformOrigin={transformOrigin}
       className="pointer-events-auto"
       disableScrollLock={true}
-      marginThreshold={null}
+      marginThreshold={0}
     >
       <div
-        className="p-2 flex flex-col items-start min-w-32"
+        className="p-2 flex flex-col items-start min-w-32 max-w-96"
         role="dialog"
         aria-modal="true"
       >
@@ -70,32 +91,63 @@ type StepTemplate = {
   id: string;
   element?: Element;
   title: string;
-  content: ReactJSXElement;
+  content: ReactJSXElement | string;
+  anchorOrigin: {
+    vertical: 'center' | 'bottom' | 'top';
+    horizontal: 'center' | 'left' | 'right';
+  };
+  transformOrigin: {
+    vertical: 'center' | 'bottom' | 'top';
+    horizontal: 'center' | 'left' | 'right';
+  };
 };
 type Step = StepTemplate & { element: Element };
 
 const stepsTemplate: StepTemplate[] = [
   {
-    id: 'grades',
-    title: 'hey',
-    content: (
-      <>
-        <p className="font-semibold">Hi</p>
-        <p>Bye</p>
-      </>
-    ),
+    id: 'search',
+    title: 'Search',
+    content:
+      "Search for any number of courses and professors and we'll find all the combinations of classes they teach.",
+    anchorOrigin: { vertical: 'bottom', horizontal: 'center' },
+    transformOrigin: { vertical: 'top', horizontal: 'center' },
   },
   {
-    id: 'rating',
-    title: 'howdyyyyyyyyy',
-    content: (
-      <>
-        <p className="font-semibold">Hello</p>
-        <p>Goodbye</p>
-        <p className="font-semibold">Hello</p>
-        <p>Goodbye</p>
-      </>
-    ),
+    id: 'RHS',
+    title: 'Overviews and Compare',
+    content: 'See an overview of your search on this side.',
+    anchorOrigin: { vertical: 'top', horizontal: 'left' },
+    transformOrigin: { vertical: 'bottom', horizontal: 'right' },
+  },
+  {
+    id: 'result',
+    title: 'Results',
+    content:
+      'See the average grade for a course and Rate My Professors score here.',
+    anchorOrigin: { vertical: 'bottom', horizontal: 'center' },
+    transformOrigin: { vertical: 'top', horizontal: 'center' },
+  },
+  {
+    id: 'dropdown',
+    title: 'More information',
+    content: 'Open a result for more detailed information.',
+    anchorOrigin: { vertical: 'bottom', horizontal: 'center' },
+    transformOrigin: { vertical: 'top', horizontal: 'center' },
+  },
+  {
+    id: 'compare',
+    title: 'Compare',
+    content: 'Click the checkbox to add an item to the compare tab.',
+    anchorOrigin: { vertical: 'bottom', horizontal: 'center' },
+    transformOrigin: { vertical: 'top', horizontal: 'center' },
+  },
+  {
+    id: 'LHS',
+    title: "That's all!",
+    content:
+      'Try searching for a class you need to take and looking through the results.',
+    anchorOrigin: { vertical: 'top', horizontal: 'right' },
+    transformOrigin: { vertical: 'bottom', horizontal: 'left' },
   },
 ];
 
@@ -115,24 +167,26 @@ const Tutorial = ({ open, close }: TutorialProps) => {
       close();
       return;
     }
-    const newSteps = stepsTemplate;
+    const newSteps = [...stepsTemplate];
     elements.forEach((element) => {
       const id = element.getAttribute('data-tutorial-id') as string;
-      newSteps[newSteps.findIndex((step) => step.id === id)].element = element;
+      const foundStep = newSteps.findIndex((step) => step.id === id);
+      if (foundStep !== -1) {
+        newSteps[foundStep].element = element;
+      }
     });
     setSteps(
       newSteps.filter((step) => typeof step.element !== 'undefined') as Step[],
     );
     setPlace(0);
-  }, [open]);
+  }, [open, close]);
 
   return (
     <>
       <Backdrop sx={(theme) => ({ zIndex: theme.zIndex.modal })} open={open} />
-      {steps.map(({ element, title, content }, index) => (
+      {steps.map(({ content, ...otherProps }, index) => (
         <TutorialPopup
           key={index}
-          element={element}
           open={open && place === index}
           incrementStep={() => {
             if (place === steps.length - 1) {
@@ -142,8 +196,8 @@ const Tutorial = ({ open, close }: TutorialProps) => {
             setPlace(place + 1);
           }}
           close={close}
-          title={title}
           buttonText={index === steps.length - 1 ? 'Done' : 'Next'}
+          {...otherProps}
         >
           {content}
         </TutorialPopup>

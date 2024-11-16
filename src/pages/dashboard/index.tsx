@@ -772,9 +772,10 @@ export const Dashboard: NextPage = () => {
           <Grid size={{ xs: false, sm: 6, md: 6 }}></Grid>
         </Grid>
         <Grid container component="main" wrap="wrap-reverse" spacing={2}>
-          <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 6 }} data-tutorial-id="LHS">
             <SearchResultsTable
               resultsLoading={results.state}
+              numSearches={courses.length + professors.length}
               includedResults={includedResults}
               grades={grades}
               rmp={rmp}
@@ -784,7 +785,7 @@ export const Dashboard: NextPage = () => {
               colorMap={colorMap}
             />
           </Grid>
-          <Grid size={{ xs: false, sm: 6, md: 6 }}>
+          <Grid size={{ xs: false, sm: 6, md: 6 }} data-tutorial-id="RHS">
             <div className="sticky top-0 gridsm:max-h-screen overflow-y-auto pt-4">
               <Card>
                 <Carousel names={names} compareLength={compare.length}>

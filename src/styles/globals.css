@@ -29,6 +29,11 @@ body,
   }
 
   .tutorial-raise {
+    position: relative;
     z-index: calc(var(--mui-zIndex-modal) + 1);
+    scroll-margin: 10rem;
+  }
+  .tutorial-table {
+    background-color: var(--mui-palette-background-paper);
   }
 }
