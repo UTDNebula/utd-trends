@@ -1,7 +1,7 @@
 import {
   styled,
   TableSortLabel as _TableSortLabel,
-  TableSortLabelProps,
+  type TableSortLabelProps,
   useMediaQuery,
 } from '@mui/material';
 import React from 'react';

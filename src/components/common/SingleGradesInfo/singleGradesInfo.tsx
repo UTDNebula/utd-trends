@@ -1,13 +1,12 @@
 import { Skeleton } from '@mui/material';
 import React from 'react';
 
-import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
-import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import type {
-  GenericFetchedData,
-  GradesType,
-} from '../../../pages/dashboard/index';
-import BarGraph from '../../graph/BarGraph/barGraph';
+import BarGraph from '@/components/graph/BarGraph/barGraph';
+import {
+  type SearchQuery,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
+import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 function convertNumbersToPercents(distribution: GradesType): number[] {
   const total = distribution.total;

@@ -6,12 +6,12 @@ import {
   MenuItem,
   Tooltip,
 } from '@mui/material';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
-import gpaToLetterGrade from '../../../modules/gpaToLetterGrade/gpaToLetterGrade';
-import Rating from '../Rating/rating';
+import Rating from '@/components/common/Rating/rating';
+import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
@@ -34,6 +34,9 @@ const Filters = ({
 }: FiltersProps) => {
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
+  const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
+  const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
+  academicSessions.sort((a, b) => compareSemesters(b, a)); // display the semesters in order of recency (most recent first)
 
   //set value from query
   const router = useRouter();
@@ -49,6 +52,37 @@ const Filters = ({
       }
     }
   }, [router.isReady, router.query.minGPA, router.query.minRating]); // useEffect is called on query update (so on back navigation, the filters selected are set based on the url)
+
+  function getRecentSemesters() {
+    let recentSemesters: string[] = [];
+    // get current month and year
+    const today = new Date();
+    const mm = today.getMonth() + 1; // January is 1
+    let yyyy = today.getFullYear();
+
+    let season = 'F';
+    if (mm <= 5)
+      // jan - may
+      season = 'S';
+    else season = 'F';
+
+    // generate recent semesters dynamically from the current day
+    for (let i = MAX_NUM_RECENT_SEMESTERS; i >= 1; i--) {
+      if (season === 'S') {
+        // then the previous semester is last year's Fall
+        yyyy = yyyy - 1;
+        season = 'F';
+      } // then the previous long-semester is this year's Spring
+      else season = 'S';
+
+      recentSemesters.push(yyyy.toString().substring(2) + season);
+    }
+
+    recentSemesters = recentSemesters.filter((value) =>
+      academicSessions.includes(value),
+    ); // recent semesters has up-to
+    return recentSemesters;
+  }
 
   //Update URL, state, and parent
   function onChange(
@@ -118,12 +152,12 @@ const Filters = ({
               onChange(event.target.value, 'minGPA', setMinGPA);
             }}
           >
-            <MenuItem value="">
+            <MenuItem className="h-10" value="">
               <em>None</em>
             </MenuItem>
             {/* dropdown options*/}
             {minGPAs.map((value) => (
-              <MenuItem key={value} value={value}>
+              <MenuItem className="h-10" key={value} value={value}>
                 {gpaToLetterGrade(Number(value))}
               </MenuItem>
             ))}
@@ -159,12 +193,12 @@ const Filters = ({
               />
             )}
           >
-            <MenuItem value="">
+            <MenuItem className="h-10" value="">
               <em>None</em>
             </MenuItem>{' '}
             {/* dropdown options*/}
             {minRatings.map((value) => (
-              <MenuItem key={value} value={value}>
+              <MenuItem className="h-10" key={value} value={value}>
                 <Rating
                   defaultValue={Number(value)}
                   precision={0.5}
@@ -206,6 +240,15 @@ const Filters = ({
                 } else {
                   addChosenSessions(() => academicSessions);
                 }
+              } else if (value.includes('recent')) {
+                if (
+                  chosenSessions.length === recentSemesters.length &&
+                  chosenSessions.every((el) => recentSemesters.includes(el))
+                ) {
+                  addChosenSessions(() => academicSessions);
+                } else {
+                  addChosenSessions(() => recentSemesters);
+                }
               } else {
                 addChosenSessions(() => value as string[]);
               }
@@ -219,20 +262,47 @@ const Filters = ({
             MenuProps={{ autoFocus: false }}
           >
             {/* select all sessions */}
-            <MenuItem value="select-all">
+            <MenuItem className="h-10 items-center" value="select-all">
               <Checkbox
-                checked={chosenSessions.length === academicSessions.length}
+                checked={
+                  academicSessions.length > 0 &&
+                  chosenSessions.length === academicSessions.length
+                }
                 indeterminate={
                   chosenSessions.length !== academicSessions.length &&
-                  chosenSessions.length !== 0
+                  chosenSessions.length !== 0 &&
+                  !(
+                    chosenSessions.length === recentSemesters.length &&
+                    chosenSessions.every((el) => recentSemesters.includes(el))
+                  ) // select-all is not indeterminate when recent is checked
                 }
+                disabled={academicSessions.length == 0}
               />
-              <ListItemText primary="Select All" />
+              <ListItemText
+                className={academicSessions.length > 0 ? '' : 'text-gray-400'}
+                primary="Select All"
+              />
+            </MenuItem>
+            
+            {/* recent sessions -- last <recentSemesters.length> long-semesters from current semester*/}
+            <MenuItem className="h-10 items-center" value="recent">
+              <Checkbox
+                checked={
+                  recentSemesters.length > 0 &&
+                  chosenSessions.length === recentSemesters.length &&
+                  chosenSessions.every((el) => recentSemesters.includes(el))
+                }
+                disabled={recentSemesters.length == 0}
+              />
+              <ListItemText
+                className={recentSemesters.length > 0 ? '' : 'text-gray-400'}
+                primary="Recent"
+              />
             </MenuItem>
 
             {/* indiv options */}
             {academicSessions.map((session) => (
-              <MenuItem key={session} value={session}>
+              <MenuItem className="h-10 items-center" key={session} value={session}>
                 <Checkbox checked={chosenSessions.includes(session)} />
                 <ListItemText primary={displayAcademicSessionName(session)} />
               </MenuItem>

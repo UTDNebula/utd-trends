@@ -4,11 +4,12 @@ import parse from 'autosuggest-highlight/parse';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 
-import decodeSearchQueryLabel from '../../../modules/decodeSearchQueryLabel/decodeSearchQueryLabel';
-import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
-import searchQueryEqual from '../../../modules/searchQueryEqual/searchQueryEqual';
-import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-// import { searchAutocomplete } from '../../autocomplete';
+import {
+  decodeSearchQueryLabel,
+  type SearchQuery,
+  searchQueryEqual,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
 
 /**
  * Props type used by the SearchBar component
@@ -18,6 +19,7 @@ interface SearchProps {
   onSelect?: (value: SearchQuery[]) => void;
   className?: string;
   input_className?: string;
+  autoFocus?: boolean;
 }
 
 /**
@@ -32,6 +34,7 @@ const SearchBar = ({
   onSelect,
   className,
   input_className,
+  autoFocus,
 }: SearchProps) => {
   //what you can choose from
   const [options, setOptions] = useState<SearchQuery[]>([]);
@@ -262,6 +265,8 @@ const SearchBar = ({
               variant="outlined"
               className={input_className}
               placeholder="ex. GOVT 2306"
+              //eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus={autoFocus}
             />
           );
         }}

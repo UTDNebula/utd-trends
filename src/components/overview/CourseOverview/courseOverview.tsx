@@ -1,18 +1,17 @@
 import { Skeleton } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
+import SingleGradesInfo from '@/components/common/SingleGradesInfo/singleGradesInfo';
 import fetchWithCache, {
   cacheIndexNebula,
   expireTime,
-} from '../../../modules/fetchWithCache';
-import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
-import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import { CourseData } from '../../../pages/api/course';
-import type {
-  GenericFetchedData,
-  GradesType,
-} from '../../../pages/dashboard/index';
-import SingleGradesInfo from '../SingleGradesInfo/singleGradesInfo';
+} from '@/modules/fetchWithCache/fetchWithCache';
+import {
+  type SearchQuery,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
+import type { CourseData } from '@/pages/api/course';
+import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 type CourseOverviewProps = {
   course: SearchQuery;
