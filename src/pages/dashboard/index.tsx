@@ -4,7 +4,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  ImperativePanelHandle,
+  type ImperativePanelHandle,
   Panel,
   PanelGroup,
   PanelResizeHandle,
