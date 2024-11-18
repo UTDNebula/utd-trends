@@ -4,21 +4,16 @@ import {
   InputLabel,
   ListItemText,
   MenuItem,
+  Tooltip,
 } from '@mui/material';
 import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import Rating from '@/components/common/Rating/rating';
+import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
 
-const minGPAs = [
-  ['3.67', 'A-'],
-  ['3.33', 'B+'],
-  ['3', 'B'],
-  ['2.67', 'B-'],
-  ['2.33', 'C+'],
-  ['2', 'C'],
-];
+const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
 
 interface FiltersProps {
@@ -138,166 +133,187 @@ const Filters = ({
 
   return (
     <div className="flex gap-2">
-      {/* min GPA dropdown*/}
-      <FormControl
-        size="small"
-        className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
-      >
-        <InputLabel id="minGPA">Min Letter Grade</InputLabel>
-        <Select
-          label="Min Letter Grade"
-          labelId="minGPA"
-          value={minGPA}
-          onChange={(event: SelectChangeEvent) => {
-            onChange(event.target.value, 'minGPA', setMinGPA);
-          }}
+      {/* min letter grade dropdown*/}
+      <Tooltip title={'Select Minimum Letter Grade Average'} placement="top">
+        <FormControl
+          size="small"
+          className={`w-full ${
+            minGPA
+              ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
+              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+          }`}
         >
-          <MenuItem className="h-10" value="">
-            <em>None</em>
-          </MenuItem>
-          {/* dropdown options*/}
-          {minGPAs.map(([value, label]) => (
-            <MenuItem className="h-10" key={value} value={value}>
-              {label}
+          <InputLabel id="minGPA">Min Letter Grade</InputLabel>
+          <Select
+            label="Min Letter Grade"
+            labelId="minGPA"
+            value={minGPA}
+            onChange={(event: SelectChangeEvent) => {
+              onChange(event.target.value, 'minGPA', setMinGPA);
+            }}
+          >
+            <MenuItem className="h-10" value="">
+              <em>None</em>
             </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+            {/* dropdown options*/}
+            {minGPAs.map((value) => (
+              <MenuItem className="h-10" key={value} value={value}>
+                {gpaToLetterGrade(Number(value))}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Tooltip>
 
       {/* min rating dropdown*/}
-      <FormControl
-        size="small"
-        className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
-      >
-        <InputLabel id="minRating">Min Rating</InputLabel>
-        <Select
-          label="Min Rating"
-          labelId="minRating"
-          value={minRating}
-          onChange={(event: SelectChangeEvent) => {
-            onChange(event.target.value, 'minRating', setMinRating);
-          }}
-          renderValue={(value) => (
-            <Rating
-              key={value}
-              defaultValue={Number(value)}
-              precision={0.5}
-              sx={{ fontSize: 18 }}
-              readOnly
-            />
-          )}
+      <Tooltip title={'Select Minimum Professor Rating'} placement="top">
+        <FormControl
+          size="small"
+          className={`w-full ${
+            minRating
+              ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
+              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+          }`}
         >
-          <MenuItem className="h-10" value="">
-            <em>None</em>
-          </MenuItem>{' '}
-          {/* dropdown options*/}
-          {minRatings.map((value) => (
-            <MenuItem className="h-10" key={value} value={value}>
+          <InputLabel id="minRating">Min Rating</InputLabel>
+          <Select
+            label="Min Rating"
+            labelId="minRating"
+            value={minRating}
+            onChange={(event: SelectChangeEvent) => {
+              onChange(event.target.value, 'minRating', setMinRating);
+            }}
+            renderValue={(value) => (
               <Rating
+                key={value}
                 defaultValue={Number(value)}
                 precision={0.5}
-                sx={{ fontSize: 25 }}
+                sx={{ fontSize: 18 }}
                 readOnly
               />
+            )}
+          >
+            <MenuItem className="h-10" value="">
+              <em>None</em>
             </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+            {/* dropdown options*/}
+            {minRatings.map((value) => (
+              <MenuItem className="h-10" key={value} value={value}>
+                <Rating
+                  defaultValue={Number(value)}
+                  precision={0.5}
+                  sx={{ fontSize: 25 }}
+                  readOnly
+                />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Tooltip>
 
       {/* semester dropdown */}
-      <FormControl
-        size="small"
-        className="w-full [&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+      <Tooltip
+        title={'Select Semesters to Include Grades from'}
+        placement="top"
       >
-        <InputLabel id="Semesters">Semesters</InputLabel>
-        <Select
-          label="Semesters"
-          labelId="Semesters"
-          multiple
-          value={chosenSessions}
-          onChange={(event: SelectChangeEvent<string[]>) => {
-            const {
-              target: { value },
-            } = event;
-            if (value.includes('select-all')) {
-              if (chosenSessions.length === academicSessions.length) {
-                addChosenSessions(() => []);
-              } else {
-                addChosenSessions(() => academicSessions);
-              }
-            } else if (value.includes('recent')) {
-              if (
-                chosenSessions.length === recentSemesters.length &&
-                chosenSessions.every((el) => recentSemesters.includes(el))
-              ) {
-                addChosenSessions(() => academicSessions);
-              } else {
-                addChosenSessions(() => recentSemesters);
-              }
-            } else {
-              addChosenSessions(() => value as string[]);
-            }
-          }}
-          renderValue={(selected) => {
-            if (chosenSessions.length === academicSessions.length) {
-              return 'All selected';
-            }
-            return selected.sort((a, b) => compareSemesters(a, b)).join(', ');
-          }}
-          MenuProps={{ autoFocus: false }}
+        <FormControl
+          size="small"
+          className={`w-full ${
+            chosenSessions.length !== academicSessions.length
+              ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
+              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+          }`}
         >
-          {/* select all sessions */}
-          <MenuItem className="h-10 items-center" value="select-all">
-            <Checkbox
-              checked={
-                academicSessions.length > 0 &&
-                chosenSessions.length === academicSessions.length
-              }
-              indeterminate={
-                chosenSessions.length !== academicSessions.length &&
-                chosenSessions.length !== 0 &&
-                !(
+          <InputLabel id="Semesters">Semesters</InputLabel>
+          <Select
+            label="Semesters"
+            labelId="Semesters"
+            multiple
+            value={chosenSessions}
+            onChange={(event: SelectChangeEvent<string[]>) => {
+              const {
+                target: { value },
+              } = event;
+              if (value.includes('select-all')) {
+                if (chosenSessions.length === academicSessions.length) {
+                  addChosenSessions(() => []);
+                } else {
+                  addChosenSessions(() => academicSessions);
+                }
+              } else if (value.includes('recent')) {
+                if (
                   chosenSessions.length === recentSemesters.length &&
                   chosenSessions.every((el) => recentSemesters.includes(el))
-                ) // select-all is not indeterminate when recent is checked
+                ) {
+                  addChosenSessions(() => academicSessions);
+                } else {
+                  addChosenSessions(() => recentSemesters);
+                }
+              } else {
+                addChosenSessions(() => value as string[]);
               }
-              disabled={academicSessions.length == 0}
-            />
-            <ListItemText
-              className={academicSessions.length > 0 ? '' : 'text-gray-400'}
-              primary="Select All"
-            />
-          </MenuItem>
-
-          {/* recent sessions -- last <recentSemesters.length> long-semesters from current semester*/}
-          <MenuItem className="h-10 items-center" value="recent">
-            <Checkbox
-              checked={
-                recentSemesters.length > 0 &&
-                chosenSessions.length === recentSemesters.length &&
-                chosenSessions.every((el) => recentSemesters.includes(el))
+            }}
+            renderValue={(selected) => {
+              if (chosenSessions.length === academicSessions.length) {
+                return 'All selected';
               }
-              disabled={recentSemesters.length == 0}
-            />
-            <ListItemText
-              className={recentSemesters.length > 0 ? '' : 'text-gray-400'}
-              primary="Recent"
-            />
-          </MenuItem>
-
-          {/* indiv options */}
-          {academicSessions.map((session) => (
-            <MenuItem
-              className="h-10 items-center"
-              key={session}
-              value={session}
-            >
-              <Checkbox checked={chosenSessions.includes(session)} />
-              <ListItemText primary={displayAcademicSessionName(session)} />
+              return selected.sort((a, b) => compareSemesters(a, b)).join(', ');
+            }}
+            MenuProps={{ autoFocus: false }}
+          >
+            {/* select all sessions */}
+            <MenuItem className="h-10 items-center" value="select-all">
+              <Checkbox
+                checked={
+                  academicSessions.length > 0 &&
+                  chosenSessions.length === academicSessions.length
+                }
+                indeterminate={
+                  chosenSessions.length !== academicSessions.length &&
+                  chosenSessions.length !== 0 &&
+                  !(
+                    chosenSessions.length === recentSemesters.length &&
+                    chosenSessions.every((el) => recentSemesters.includes(el))
+                  ) // select-all is not indeterminate when recent is checked
+                }
+                disabled={academicSessions.length == 0}
+              />
+              <ListItemText
+                className={academicSessions.length > 0 ? '' : 'text-gray-400'}
+                primary="Select All"
+              />
             </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+
+            {/* recent sessions -- last <recentSemesters.length> long-semesters from current semester*/}
+            <MenuItem className="h-10 items-center" value="recent">
+              <Checkbox
+                checked={
+                  recentSemesters.length > 0 &&
+                  chosenSessions.length === recentSemesters.length &&
+                  chosenSessions.every((el) => recentSemesters.includes(el))
+                }
+                disabled={recentSemesters.length == 0}
+              />
+              <ListItemText
+                className={recentSemesters.length > 0 ? '' : 'text-gray-400'}
+                primary="Recent"
+              />
+            </MenuItem>
+
+            {/* indiv options */}
+            {academicSessions.map((session) => (
+              <MenuItem
+                className="h-10 items-center"
+                key={session}
+                value={session}
+              >
+                <Checkbox checked={chosenSessions.includes(session)} />
+                <ListItemText primary={displayAcademicSessionName(session)} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Tooltip>
     </div>
   );
 };

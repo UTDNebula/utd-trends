@@ -21,6 +21,7 @@ import SingleGradesInfo from '@/components/common/SingleGradesInfo/singleGradesI
 import SingleProfInfo from '@/components/common/SingleProfInfo/singleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
 import { useRainbowColors } from '@/modules/colors/colors';
+import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
 import {
   convertToProfOnly,
   type SearchQuery,
@@ -29,21 +30,6 @@ import {
 } from '@/modules/SearchQuery/SearchQuery';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
-
-const gpaToLetterGrade = (gpa: number): string => {
-  if (gpa >= 4.0) return 'A';
-  if (gpa >= 3.67) return 'A-';
-  if (gpa >= 3.33) return 'B+';
-  if (gpa >= 3.0) return 'B';
-  if (gpa >= 2.67) return 'B-';
-  if (gpa >= 2.33) return 'C+';
-  if (gpa >= 2.0) return 'C';
-  if (gpa >= 1.67) return 'C-';
-  if (gpa >= 1.33) return 'D+';
-  if (gpa >= 1.0) return 'D';
-  if (gpa >= 0.67) return 'D-';
-  return 'F';
-};
 
 function LoadingRow() {
   return (
@@ -475,7 +461,7 @@ const SearchResultsTable = ({
               </TableCell>
               <TableCell align="center">
                 <Tooltip
-                  title="Average GPA Across Course Sections"
+                  title="Average Letter Grade Across Course Sections"
                   placement="top"
                 >
                   <div>
