@@ -140,7 +140,7 @@ const Filters = ({
           className={`w-full ${
             minGPA
               ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
-              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti'
+              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
           }`}
         >
           <InputLabel id="minGPA">Min Letter Grade</InputLabel>
@@ -172,7 +172,7 @@ const Filters = ({
           className={`w-full ${
             minRating
               ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
-              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti'
+              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
           }`}
         >
           <InputLabel id="minRating">Min Rating</InputLabel>
@@ -221,7 +221,7 @@ const Filters = ({
           className={`w-full ${
             chosenSessions.length !== academicSessions.length
               ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
-              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti'
+              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
           }`}
         >
           <InputLabel id="Semesters">Semesters</InputLabel>
