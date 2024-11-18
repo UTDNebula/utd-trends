@@ -283,7 +283,7 @@ const Filters = ({
                 primary="Select All"
               />
             </MenuItem>
-            
+
             {/* recent sessions -- last <recentSemesters.length> long-semesters from current semester*/}
             <MenuItem className="h-10 items-center" value="recent">
               <Checkbox
@@ -302,7 +302,11 @@ const Filters = ({
 
             {/* indiv options */}
             {academicSessions.map((session) => (
-              <MenuItem className="h-10 items-center" key={session} value={session}>
+              <MenuItem
+                className="h-10 items-center"
+                key={session}
+                value={session}
+              >
                 <Checkbox checked={chosenSessions.includes(session)} />
                 <ListItemText primary={displayAcademicSessionName(session)} />
               </MenuItem>
