@@ -195,7 +195,7 @@ const Filters = ({
           >
             <MenuItem className="h-10" value="">
               <em>None</em>
-            </MenuItem>{' '}
+            </MenuItem>
             {/* dropdown options*/}
             {minRatings.map((value) => (
               <MenuItem className="h-10" key={value} value={value}>
