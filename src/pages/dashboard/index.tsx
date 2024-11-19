@@ -1,5 +1,5 @@
 import { Card, Grid } from '@mui/material';
-import type { NextPage } from 'next';
+import type { NextPage, NextPageContext } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -239,7 +239,26 @@ function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
   return colorMap;
 }
 
-export const Dashboard: NextPage = () => {
+export async function getServerSideProps(
+  context: NextPageContext,
+): Promise<{ props: { pageTitle: string } }> {
+  const searchTerms22 = context.query.searchTerms;
+  let pageTitle = '';
+  if (searchTerms22 === undefined) pageTitle = '';
+  else if (typeof searchTerms22 === 'string') pageTitle = searchTerms22;
+  else
+    searchTerms22.map((term) => {
+      pageTitle += term + ', ';
+    });
+  pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
+  return { props: { pageTitle: pageTitle } };
+}
+
+export const Dashboard: NextPage<{ pageTitle: string }> = ({
+  pageTitle,
+}: {
+  pageTitle: string;
+}): React.ReactNode => {
   const router = useRouter();
 
   //Searches seperated into courses and professors to create combos
@@ -798,15 +817,6 @@ export const Dashboard: NextPage = () => {
     );
   }
 
-  let pageTitle = '';
-  courses.map((term) => {
-    pageTitle += searchQueryLabel(term) + ', ';
-  });
-  professors.map((term) => {
-    pageTitle += searchQueryLabel(term) + ', ';
-  });
-  pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
-
   /* Final page */
 
   return (
@@ -821,7 +831,7 @@ export const Dashboard: NextPage = () => {
         <meta
           key="og:title"
           property="og:title"
-          content={'Results - ' + pageTitle + 'UTD TRENDS'}
+          content={'Resultses - ' + pageTitle + 'UTD TRENDS'}
         />
         <meta
           property="og:url"
