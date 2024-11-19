@@ -805,10 +805,7 @@ export const Dashboard: NextPage = () => {
   professors.map((term) => {
     pageTitle += searchQueryLabel(term) + ', ';
   });
-  pageTitle =
-    pageTitle.lastIndexOf(', ') === pageTitle.length - 2
-      ? pageTitle.substring(0, pageTitle.lastIndexOf(', ')) + ' - '
-      : pageTitle;
+  pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
 
   /* Final page */
 
@@ -824,13 +821,7 @@ export const Dashboard: NextPage = () => {
         <meta
           key="og:title"
           property="og:title"
-          content={
-            'Results - ' +
-            (router.query.searchTerms as string[])
-              .map((el) => decodeSearchQueryLabel(el))
-              .join(', ') +
-            'UTD TRENDS'
-          }
+          content={'Results - ' + pageTitle + 'UTD TRENDS'}
         />
         <meta
           property="og:url"

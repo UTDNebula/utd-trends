@@ -181,15 +181,6 @@ const SearchBar = ({
     }
   }
 
-  //returns results on enter
-  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter' && inputValue === '') {
-      event.preventDefault();
-      event.stopPropagation();
-      onSelect_internal(value);
-    }
-  }
-
   useEffect(() => {
     fetch('/api/autocomplete');
   }, []);
@@ -242,7 +233,6 @@ const SearchBar = ({
           loadNewOptions(newInputValue);
         }}
         renderInput={(params) => {
-          params.inputProps.onKeyDown = handleKeyDown;
           return (
             <TextField
               {...params}
