@@ -1,20 +1,20 @@
 import React from 'react';
 
-import SearchQuery from '../../../modules/SearchQuery/SearchQuery';
-import searchQueryLabel from '../../../modules/searchQueryLabel/searchQueryLabel';
-import type { RMPInterface } from '../../../pages/api/ratemyprofessorScraper';
-import type {
-  GenericFetchedData,
-  GradesType,
-} from '../../../pages/dashboard/index';
-import BarGraph from '../../graph/BarGraph/barGraph';
-import CompareTable from '../CompareTable/compareTable';
+import CompareTable from '@/components/compare/CompareTable/compareTable';
+import BarGraph from '@/components/graph/BarGraph/barGraph';
+import {
+  type SearchQuery,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 type CompareProps = {
   courses: SearchQuery[];
   grades: { [key: string]: GenericFetchedData<GradesType> };
   rmp: { [key: string]: GenericFetchedData<RMPInterface> };
   removeFromCompare: { (arg0: SearchQuery): void };
+  colorMap: { [key: string]: string };
 };
 
 function convertNumbersToPercents(distribution: GradesType): number[] {
@@ -24,7 +24,13 @@ function convertNumbersToPercents(distribution: GradesType): number[] {
   );
 }
 
-const Compare = ({ courses, grades, rmp, removeFromCompare }: CompareProps) => {
+const Compare = ({
+  courses,
+  grades,
+  rmp,
+  removeFromCompare,
+  colorMap,
+}: CompareProps) => {
   if (courses.length === 0) {
     return <p>Click a checkbox to add something to compare.</p>;
   }
@@ -90,6 +96,7 @@ const Compare = ({ courses, grades, rmp, removeFromCompare }: CompareProps) => {
         grades={grades}
         rmp={rmp}
         removeFromCompare={removeFromCompare}
+        colorMap={colorMap}
       />
     </div>
   );

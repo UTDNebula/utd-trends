@@ -1,6 +1,3 @@
-/*
-This API route is currently just for skedge
-*/
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 type Data = {
@@ -27,7 +24,7 @@ export default function handler(
     'x-api-key': API_KEY,
     Accept: 'application/json',
   };
-  const url = new URL('https://api-gateway-djz4awx7.uc.gateway.dev/professor');
+  const url = new URL('https://api.utdnebula.com/professor');
   url.searchParams.append('first_name', profFirst);
   url.searchParams.append('last_name', profLast);
   return new Promise<void>((resolve) => {

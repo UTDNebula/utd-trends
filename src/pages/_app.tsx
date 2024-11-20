@@ -1,10 +1,8 @@
-import '../styles/globals.css';
+import '@/styles/globals.css';
 
-import GitHub from '@mui/icons-material/GitHub';
-import { Card, IconButton, Tooltip, useMediaQuery } from '@mui/material';
+import { useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { GoogleAnalytics } from '@next/third-parties/google';
-import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
@@ -13,9 +11,9 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 
-import tailwindConfig from '../../tailwind.config.js';
-import FeedbackPopup from '../components/common/FeedbackPopup/feedbackPopup';
-import GitHubButton from '../components/common/GitHubButton/gitHubButton';
+import tailwindConfig from '@/../tailwind.config.js';
+import FeedbackPopup from '@/components/common/FeedbackPopup/feedbackPopup';
+import GitHubButton from '@/components/common/GitHubButton/gitHubButton';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -99,12 +97,6 @@ function MyApp({ Component, pageProps }: AppProps) {
     },
   });
 
-  const showGitInfo =
-    typeof process.env.NEXT_PUBLIC_VERCEL_ENV !== 'undefined' &&
-    process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' &&
-    typeof process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA !== 'undefined' &&
-    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA !== '';
-
   const router = useRouter();
 
   return (
@@ -146,28 +138,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           <GitHubButton />
         </div>
       </ThemeProvider>
-      <Analytics />
       <SpeedInsights route={router.pathname} />
-      {showGitInfo && (
-        <>
-          <Card className="w-fit h-fit bg-light fixed bottom-2 right-2 rounded-full">
-            <Tooltip title="Open GitHub commit for this instance">
-              <a
-                href={
-                  'https://github.com/UTDNebula/utd-trends/commit/' +
-                  process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
-                }
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <IconButton size="large">
-                  <GitHub className="fill-dark text-3xl" />
-                </IconButton>
-              </a>
-            </Tooltip>
-          </Card>
-        </>
-      )}
     </>
   );
 }

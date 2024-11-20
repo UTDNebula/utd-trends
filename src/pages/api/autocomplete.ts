@@ -1,11 +1,11 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
-import autocompleteGraph from '../../data/autocomplete_graph.json';
+import autocompleteGraph from '@/data/autocomplete_graph.json';
 import {
   getGraph,
   searchAutocomplete,
-} from '../../modules/autocomplete/autocomplete';
-import type SearchQuery from '../../modules/SearchQuery/SearchQuery';
+} from '@/modules/autocomplete/autocomplete';
+import { type SearchQuery } from '@/modules/SearchQuery/SearchQuery';
 
 const graph = getGraph(autocompleteGraph as object);
 

@@ -1,13 +1,11 @@
 import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
-import { ApexOptions } from 'apexcharts';
+import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 
-import searchQueryColors, {
-  useRainbowColors,
-} from '../../../modules/searchQueryColors/searchQueryColors';
-import { FullscreenCloseIcon } from '../../icons/FullscreenCloseIcon/fullscreenCloseIcon';
-import { FullscreenOpenIcon } from '../../icons/FullscreenOpenIcon/fullscreenOpenIcon';
+import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
+import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
+import { compareColors, useRainbowColors } from '@/modules/colors/colors';
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
@@ -101,7 +99,7 @@ function BarGraph(props: GraphProps) {
     colors:
       series.length === 1
         ? rainbowColors
-        : searchQueryColors.filter(
+        : compareColors.filter(
             (searchQuery, i) => props.includedColors?.[i] ?? 1,
           ),
     stroke: {
