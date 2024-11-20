@@ -251,11 +251,14 @@ export async function getServerSideProps(
       pageTitle += term + ', ';
     });
   pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
-  document.title = pageTitle;
   return { props: { pageTitle: pageTitle } };
 }
 
-export const Dashboard: NextPage = () => {
+export const Dashboard: NextPage<{ pageTitle: string }> = ({
+  pageTitle,
+}: {
+  pageTitle: string;
+}): React.ReactNode => {
   const router = useRouter();
 
   //Searches seperated into courses and professors to create combos
@@ -814,7 +817,7 @@ export const Dashboard: NextPage = () => {
     );
   }
 
-  let pageTitle = '';
+  pageTitle = '';
   courses.map((term) => {
     pageTitle += searchQueryLabel(term) + ', ';
   });
