@@ -166,7 +166,6 @@ const SearchBar = ({
   function updateValue(newValue: SearchQuery[]) {
     if (newValue.length) setErrorTooltip(false); //close the tooltip if there is at least 1 valid search term
     setValue(newValue);
-    onChange_internal(newValue);
     onSelect_internal(newValue); // clicking enter to select a autocomplete suggestion triggers a new search (it also 'Enters' for the searchbar)
   }
 
