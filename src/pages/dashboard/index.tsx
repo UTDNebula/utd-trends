@@ -242,12 +242,12 @@ function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
 export async function getServerSideProps(
   context: NextPageContext,
 ): Promise<{ props: { pageTitle: string } }> {
-  const searchTerms22 = context.query.searchTerms;
+  const searchTerms = context.query.searchTerms;
   let pageTitle = '';
-  if (searchTerms22 === undefined) pageTitle = '';
-  else if (typeof searchTerms22 === 'string') pageTitle = searchTerms22;
+  if (searchTerms === undefined) pageTitle = '';
+  else if (typeof searchTerms === 'string') pageTitle = searchTerms;
   else
-    searchTerms22.map((term) => {
+    searchTerms.map((term) => {
       pageTitle += term + ', ';
     });
   pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
@@ -816,6 +816,15 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
       </>
     );
   }
+
+  pageTitle = '';
+  courses.map((term) => {
+    pageTitle += searchQueryLabel(term) + ', ';
+  });
+  professors.map((term) => {
+    pageTitle += searchQueryLabel(term) + ', ';
+  });
+  pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
 
   /* Final page */
 
