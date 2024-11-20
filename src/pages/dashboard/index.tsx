@@ -246,11 +246,31 @@ export async function getServerSideProps(
   let pageTitle = '';
   if (searchTerms === undefined) pageTitle = '';
   else if (typeof searchTerms === 'string') pageTitle = searchTerms;
-  else
-    searchTerms.map((term) => {
-      pageTitle += term + ', ';
+  else {
+    let searchQueryTerms = searchTerms.map((el) => decodeSearchQueryLabel(el));
+
+    const courseSearchTerms: SearchQuery[] = [];
+    const professorSearchTerms: SearchQuery[] = [];
+
+    // split the search terms into professors and courses
+    searchQueryTerms.map((searchQueryTerm) => {
+      if (typeof searchQueryTerm.profLast !== 'undefined') {
+        professorSearchTerms.push(searchQueryTerm);
+      }
+      if (typeof searchQueryTerm.prefix !== 'undefined') {
+        courseSearchTerms.push(searchQueryTerm);
+      }
     });
-  pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
+
+    courseSearchTerms.map((term) => {
+      pageTitle += searchQueryLabel(term) + ', ';
+    });
+    professorSearchTerms.map((term) => {
+      pageTitle += searchQueryLabel(term) + ', ';
+    });
+    pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
+  }
+  // pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
   return { props: { pageTitle: pageTitle } };
 }
 
@@ -827,13 +847,6 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
       </>
     );
   }
-
-  // // Sync document.title dynamically
-  // useEffect(() => {
-  //   document.title = 'Results - ' + dynamicPageTitle + 'UTD TRENDS';
-  // }, [dynamicPageTitle]);
-
-  /* Final page */
 
   return (
     <>
