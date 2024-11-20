@@ -239,14 +239,13 @@ function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
   return colorMap;
 }
 
-export async function getServerSideProps(
-  context: NextPageContext,
-): Promise<{ props: { pageTitle: string } }> {
-  let array = context.query.searchTerms ?? [];
+function getSearchTerms(searchTermInput : string | string[] | undefined) : { pageTitle : string, courseSearchTerms : SearchQuery[], professorSearchTerms : SearchQuery[]}
+{
+  let array = searchTermInput ?? [];
   if (!Array.isArray(array)) {
     array = array.split(',');
   }
-  const searchTerms = array.map((el) => decodeSearchQueryLabel(el));
+  let searchTerms = array.map((el) => decodeSearchQueryLabel(el));
 
   const courseSearchTerms: SearchQuery[] = [];
   const professorSearchTerms: SearchQuery[] = [];
@@ -269,6 +268,14 @@ export async function getServerSideProps(
     pageTitle += searchQueryLabel(term) + ', ';
   });
   pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
+
+  return {pageTitle, courseSearchTerms, professorSearchTerms};
+}
+
+export async function getServerSideProps(
+  context: NextPageContext,
+): Promise<{ props: { pageTitle: string } }> {
+  const { pageTitle } = getSearchTerms(context.query.searchTerms);
   return { props: { pageTitle: pageTitle } };
 }
 
@@ -292,36 +299,10 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
   //On search change, seperate into courses and profs, clear data, and fetch new results
   useEffect(() => {
     if (router.isReady) {
-      let array = router.query.searchTerms ?? [];
-      if (!Array.isArray(array)) {
-        array = array.split(',');
-      }
-      const searchTerms = array.map((el) => decodeSearchQueryLabel(el));
-
-      const courseSearchTerms: SearchQuery[] = [];
-      const professorSearchTerms: SearchQuery[] = [];
-
-      // split the search terms into professors and courses
-      searchTerms.map((searchTerm) => {
-        if (typeof searchTerm.profLast !== 'undefined') {
-          professorSearchTerms.push(searchTerm);
-        }
-        if (typeof searchTerm.prefix !== 'undefined') {
-          courseSearchTerms.push(searchTerm);
-        }
-      });
+      const {pageTitle, courseSearchTerms, professorSearchTerms} = getSearchTerms(router.query.searchTerms)
       setCourses(courseSearchTerms);
       setProfessors(professorSearchTerms);
-
-      let newTitle = '';
-      courseSearchTerms.map((term) => {
-        newTitle += searchQueryLabel(term) + ', ';
-      });
-      professorSearchTerms.map((term) => {
-        newTitle += searchQueryLabel(term) + ', ';
-      });
-      newTitle = newTitle.slice(0, -2) + (newTitle.length > 0 ? ' - ' : '');
-      setDynamicPageTitle(newTitle);
+      setDynamicPageTitle(pageTitle);
 
       //Clear fetched data
       setResults({ state: 'loading' });
