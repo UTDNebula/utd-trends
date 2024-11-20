@@ -247,7 +247,9 @@ export async function getServerSideProps(
   if (searchTerms === undefined) pageTitle = '';
   else if (typeof searchTerms === 'string') pageTitle = searchTerms;
   else {
-    const searchQueryTerms = searchTerms.map((el) => decodeSearchQueryLabel(el));
+    const searchQueryTerms = searchTerms.map((el) =>
+      decodeSearchQueryLabel(el),
+    );
 
     const courseSearchTerms: SearchQuery[] = [];
     const professorSearchTerms: SearchQuery[] = [];
