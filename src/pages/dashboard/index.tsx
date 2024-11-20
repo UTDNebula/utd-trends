@@ -239,13 +239,16 @@ function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
   return colorMap;
 }
 
-function getSearchTerms(searchTermInput : string | string[] | undefined) : { pageTitle : string, courseSearchTerms : SearchQuery[], professorSearchTerms : SearchQuery[]}
-{
+function getSearchTerms(searchTermInput: string | string[] | undefined): {
+  pageTitle: string;
+  courseSearchTerms: SearchQuery[];
+  professorSearchTerms: SearchQuery[];
+} {
   let array = searchTermInput ?? [];
   if (!Array.isArray(array)) {
     array = array.split(',');
   }
-  let searchTerms = array.map((el) => decodeSearchQueryLabel(el));
+  const searchTerms = array.map((el) => decodeSearchQueryLabel(el));
 
   const courseSearchTerms: SearchQuery[] = [];
   const professorSearchTerms: SearchQuery[] = [];
@@ -269,7 +272,7 @@ function getSearchTerms(searchTermInput : string | string[] | undefined) : { pag
   });
   pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
 
-  return {pageTitle, courseSearchTerms, professorSearchTerms};
+  return { pageTitle, courseSearchTerms, professorSearchTerms };
 }
 
 export async function getServerSideProps(
@@ -299,7 +302,8 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
   //On search change, seperate into courses and profs, clear data, and fetch new results
   useEffect(() => {
     if (router.isReady) {
-      const {pageTitle, courseSearchTerms, professorSearchTerms} = getSearchTerms(router.query.searchTerms)
+      const { pageTitle, courseSearchTerms, professorSearchTerms } =
+        getSearchTerms(router.query.searchTerms);
       setCourses(courseSearchTerms);
       setProfessors(professorSearchTerms);
       setDynamicPageTitle(pageTitle);
