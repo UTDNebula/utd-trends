@@ -239,16 +239,20 @@ function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
   return colorMap;
 }
 
+/**
+ * Seperates courses and professors from a string of comma-delimited searchTerms or string[] of searchTerms
+ * @param searchTermInput
+ * @returns an array of courseSearchTerms and professorSearchTerms
+ */
 function getSearchTerms(searchTermInput: string | string[] | undefined): {
-  pageTitle: string;
   courseSearchTerms: SearchQuery[];
   professorSearchTerms: SearchQuery[];
 } {
   let array = searchTermInput ?? [];
   if (!Array.isArray(array)) {
-    array = array.split(',');
+    array = array.split(','); // if searchTermsInput is a comma-delimited string, make it an array
   }
-  const searchTerms = array.map((el) => decodeSearchQueryLabel(el));
+  const searchTerms = array.map((el) => decodeSearchQueryLabel(el)); // convert an array of strings to an array of SearchQuery's
 
   const courseSearchTerms: SearchQuery[] = [];
   const professorSearchTerms: SearchQuery[] = [];
@@ -263,6 +267,19 @@ function getSearchTerms(searchTermInput: string | string[] | undefined): {
     }
   });
 
+  return { courseSearchTerms, professorSearchTerms };
+}
+
+/**
+ *
+ * @param courseSearchTerms
+ * @param professorSearchTerms
+ * @returns an empty string or a comma-delimited list of courses and professors, ending with a " - "
+ */
+function buildPageTitle(
+  courseSearchTerms: SearchQuery[],
+  professorSearchTerms: SearchQuery[],
+): string {
   let pageTitle = '';
   courseSearchTerms.map((term) => {
     pageTitle += searchQueryLabel(term) + ', ';
@@ -271,15 +288,21 @@ function getSearchTerms(searchTermInput: string | string[] | undefined): {
     pageTitle += searchQueryLabel(term) + ', ';
   });
   pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
-
-  return { pageTitle, courseSearchTerms, professorSearchTerms };
+  return pageTitle;
 }
 
 export async function getServerSideProps(
   context: NextPageContext,
 ): Promise<{ props: { pageTitle: string } }> {
-  const { pageTitle } = getSearchTerms(context.query.searchTerms);
-  return { props: { pageTitle: pageTitle } };
+  const { courseSearchTerms, professorSearchTerms } = getSearchTerms(
+    context.query.searchTerms,
+  );
+
+  return {
+    props: {
+      pageTitle: buildPageTitle(courseSearchTerms, professorSearchTerms),
+    },
+  };
 }
 
 export const Dashboard: NextPage<{ pageTitle: string }> = ({
@@ -289,7 +312,6 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
 }): React.ReactNode => {
   const router = useRouter();
 
-  const [dynamicPageTitle, setDynamicPageTitle] = useState(pageTitle);
   //Searches seperated into courses and professors to create combos
   const [courses, setCourses] = useState<SearchQuery[]>([]);
   const [professors, setProfessors] = useState<SearchQuery[]>([]);
@@ -302,11 +324,11 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
   //On search change, seperate into courses and profs, clear data, and fetch new results
   useEffect(() => {
     if (router.isReady) {
-      const { pageTitle, courseSearchTerms, professorSearchTerms } =
-        getSearchTerms(router.query.searchTerms);
+      const { courseSearchTerms, professorSearchTerms } = getSearchTerms(
+        router.query.searchTerms,
+      );
       setCourses(courseSearchTerms);
       setProfessors(professorSearchTerms);
-      setDynamicPageTitle(pageTitle);
 
       //Clear fetched data
       setResults({ state: 'loading' });
@@ -834,7 +856,9 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
   return (
     <>
       <Head>
-        <title>{'Results - ' + dynamicPageTitle + 'UTD TRENDS'}</title>
+        <title>
+          {'Results - ' + buildPageTitle(courses, professors) + 'UTD TRENDS'}
+        </title>
         <link
           rel="canonical"
           href="https://trends.utdnebula.com/dashboard"
@@ -843,7 +867,7 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
         <meta
           key="og:title"
           property="og:title"
-          content={'Results - ' + dynamicPageTitle + 'UTD TRENDS'}
+          content={'Results - ' + pageTitle + 'UTD TRENDS'}
         />
         <meta
           property="og:url"
