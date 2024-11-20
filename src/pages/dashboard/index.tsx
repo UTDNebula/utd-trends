@@ -242,37 +242,33 @@ function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
 export async function getServerSideProps(
   context: NextPageContext,
 ): Promise<{ props: { pageTitle: string } }> {
-  const searchTerms = context.query.searchTerms;
-  let pageTitle = '';
-  if (searchTerms === undefined) pageTitle = '';
-  else if (typeof searchTerms === 'string') pageTitle = searchTerms;
-  else {
-    const searchQueryTerms = searchTerms.map((el) =>
-      decodeSearchQueryLabel(el),
-    );
-
-    const courseSearchTerms: SearchQuery[] = [];
-    const professorSearchTerms: SearchQuery[] = [];
-
-    // split the search terms into professors and courses
-    searchQueryTerms.map((searchQueryTerm) => {
-      if (typeof searchQueryTerm.profLast !== 'undefined') {
-        professorSearchTerms.push(searchQueryTerm);
-      }
-      if (typeof searchQueryTerm.prefix !== 'undefined') {
-        courseSearchTerms.push(searchQueryTerm);
-      }
-    });
-
-    courseSearchTerms.map((term) => {
-      pageTitle += searchQueryLabel(term) + ', ';
-    });
-    professorSearchTerms.map((term) => {
-      pageTitle += searchQueryLabel(term) + ', ';
-    });
-    pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
+  let array = context.query.searchTerms ?? [];
+  if (!Array.isArray(array)) {
+    array = array.split(',');
   }
-  // pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
+  const searchTerms = array.map((el) => decodeSearchQueryLabel(el));
+
+  const courseSearchTerms: SearchQuery[] = [];
+  const professorSearchTerms: SearchQuery[] = [];
+
+  // split the search terms into professors and courses
+  searchTerms.map((searchTerm) => {
+    if (typeof searchTerm.profLast !== 'undefined') {
+      professorSearchTerms.push(searchTerm);
+    }
+    if (typeof searchTerm.prefix !== 'undefined') {
+      courseSearchTerms.push(searchTerm);
+    }
+  });
+
+  let pageTitle = '';
+  courseSearchTerms.map((term) => {
+    pageTitle += searchQueryLabel(term) + ', ';
+  });
+  professorSearchTerms.map((term) => {
+    pageTitle += searchQueryLabel(term) + ', ';
+  });
+  pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
   return { props: { pageTitle: pageTitle } };
 }
 
@@ -862,7 +858,7 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
         <meta
           key="og:title"
           property="og:title"
-          content={'Resultses - ' + dynamicPageTitle + 'UTD TRENDS'}
+          content={'Results - ' + dynamicPageTitle + 'UTD TRENDS'}
         />
         <meta
           property="og:url"
