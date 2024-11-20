@@ -261,6 +261,7 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
 }): React.ReactNode => {
   const router = useRouter();
 
+  const [dynamicPageTitle, setDynamicPageTitle] = useState(pageTitle);
   //Searches seperated into courses and professors to create combos
   const [courses, setCourses] = useState<SearchQuery[]>([]);
   const [professors, setProfessors] = useState<SearchQuery[]>([]);
@@ -293,6 +294,16 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
       });
       setCourses(courseSearchTerms);
       setProfessors(professorSearchTerms);
+
+      let newTitle = '';
+      courseSearchTerms.map((term) => {
+        newTitle += searchQueryLabel(term) + ', ';
+      });
+      professorSearchTerms.map((term) => {
+        newTitle += searchQueryLabel(term) + ', ';
+      });
+      newTitle = newTitle.slice(0, -2) + (newTitle.length > 0 ? ' - ' : '');
+      setDynamicPageTitle(newTitle);
 
       //Clear fetched data
       setResults({ state: 'loading' });
@@ -817,21 +828,17 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
     );
   }
 
-  pageTitle = '';
-  courses.map((term) => {
-    pageTitle += searchQueryLabel(term) + ', ';
-  });
-  professors.map((term) => {
-    pageTitle += searchQueryLabel(term) + ', ';
-  });
-  pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
+  // // Sync document.title dynamically
+  // useEffect(() => {
+  //   document.title = 'Results - ' + dynamicPageTitle + 'UTD TRENDS';
+  // }, [dynamicPageTitle]);
 
   /* Final page */
 
   return (
     <>
       <Head>
-        <title>{'Results - ' + pageTitle + 'UTD TRENDS'}</title>
+        <title>{'Results - ' + dynamicPageTitle + 'UTD TRENDS'}</title>
         <link
           rel="canonical"
           href="https://trends.utdnebula.com/dashboard"
@@ -840,7 +847,7 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
         <meta
           key="og:title"
           property="og:title"
-          content={'Resultses - ' + pageTitle + 'UTD TRENDS'}
+          content={'Resultses - ' + dynamicPageTitle + 'UTD TRENDS'}
         />
         <meta
           property="og:url"
