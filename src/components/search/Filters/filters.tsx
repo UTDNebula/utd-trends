@@ -1,5 +1,6 @@
 import {
   Checkbox,
+  Divider,
   FormControl,
   InputLabel,
   ListItemText,
@@ -299,6 +300,7 @@ const Filters = ({
                 primary="Recent"
               />
             </MenuItem>
+            <Divider />
 
             {/* indiv options */}
             {academicSessions.map((session) => (
