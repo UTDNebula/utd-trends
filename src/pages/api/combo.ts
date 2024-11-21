@@ -1,8 +1,8 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
-import comboTable from '../../data/combo_table.json';
-import type SearchQuery from '../../modules/SearchQuery/SearchQuery';
-import type { TableType } from '../../scripts/generateCombosTable';
+import comboTable from '@/data/combo_table.json';
+import { type SearchQuery } from '@/modules/SearchQuery/SearchQuery';
+import type { TableType } from '@/scripts/generateCombosTable';
 
 type Data = {
   message: string;

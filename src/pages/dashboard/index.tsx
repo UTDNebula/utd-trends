@@ -1,31 +1,39 @@
-import { Card, Grid } from '@mui/material';
+import { Card, Grid2 as Grid, useMediaQuery } from '@mui/material';
 import type { NextPage, NextPageContext } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  type ImperativePanelHandle,
+  Panel,
+  PanelGroup,
+  PanelResizeHandle,
+} from 'react-resizable-panels';
 
-import Carousel from '../../components/common/Carousel/carousel';
-import Compare from '../../components/common/Compare/compare';
-import CourseOverview from '../../components/common/CourseOverview/courseOverview';
-import DashboardEmpty from '../../components/common/DashboardEmpty/dashboardEmpty';
-import DashboardError from '../../components/common/DashboardError/dashboardError';
-import Filters from '../../components/common/Filters/filters';
-import ProfessorOverview from '../../components/common/ProfessorOverview/professorOverview';
-import SearchResultsTable from '../../components/common/SearchResultsTable/searchResultsTable';
-import TopMenu from '../../components/navigation/topMenu/topMenu';
-import decodeSearchQueryLabel from '../../modules/decodeSearchQueryLabel/decodeSearchQueryLabel';
+import Compare from '@/components/compare/Compare/compare';
+import DashboardEmpty from '@/components/dashboard/DashboardEmpty/dashboardEmpty';
+import DashboardError from '@/components/dashboard/DashboardError/dashboardError';
+import Carousel from '@/components/navigation/Carousel/carousel';
+import TopMenu from '@/components/navigation/topMenu/topMenu';
+import CourseOverview from '@/components/overview/CourseOverview/courseOverview';
+import ProfessorOverview from '@/components/overview/ProfessorOverview/professorOverview';
+import Filters from '@/components/search/Filters/filters';
+import SearchResultsTable from '@/components/search/SearchResultsTable/searchResultsTable';
+import { compareColors } from '@/modules/colors/colors';
 import fetchWithCache, {
   cacheIndexNebula,
   cacheIndexRmp,
   expireTime,
-} from '../../modules/fetchWithCache';
-import type SearchQuery from '../../modules/SearchQuery/SearchQuery';
-import { convertToProfOnly } from '../../modules/SearchQuery/SearchQuery';
-import searchQueryColors from '../../modules/searchQueryColors/searchQueryColors';
-import searchQueryEqual from '../../modules/searchQueryEqual/searchQueryEqual';
-import searchQueryLabel from '../../modules/searchQueryLabel/searchQueryLabel';
-import type { GradesData } from '../../pages/api/grades';
-import { RMPInterface } from '../api/ratemyprofessorScraper';
+} from '@/modules/fetchWithCache/fetchWithCache';
+import {
+  convertToProfOnly,
+  decodeSearchQueryLabel,
+  type SearchQuery,
+  searchQueryEqual,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
+import type { GradesData } from '@/pages/api/grades';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
 //Limit cached number of grades and rmp data entries
 const MAX_ENTRIES = 1000;
@@ -234,7 +242,7 @@ function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
   const colorMap: { [key: string]: string } = {};
   courses.forEach((course, index) => {
     colorMap[searchQueryLabel(course)] =
-      searchQueryColors[index % searchQueryColors.length];
+      compareColors[index % compareColors.length];
   });
   return colorMap;
 }
@@ -767,6 +775,14 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
     }
   }
 
+  const panelLRef = useRef<ImperativePanelHandle>(null);
+  const panelRRef = useRef<ImperativePanelHandle>(null);
+  const isSmallScreen = useMediaQuery('(max-width: 600px)');
+  // Resets RHS & LHS to 50/50 when double clicking handle
+  const handleResizeDoubleClick = () => {
+    panelLRef.current?.resize(50);
+  };
+
   // Add this after the compare state declaration
   const colorMap = createColorMap(compare);
 
@@ -813,10 +829,29 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
         colorMap={colorMap}
       />,
     );
+    const searchResultsTable = (
+      <SearchResultsTable
+        resultsLoading={results.state}
+        includedResults={includedResults}
+        grades={grades}
+        rmp={rmp}
+        compare={compare}
+        addToCompare={addToCompare}
+        removeFromCompare={removeFromCompare}
+        colorMap={colorMap}
+      />
+    );
+    const carousel = (
+      <Card>
+        <Carousel names={names} compareLength={compare.length}>
+          {tabs}
+        </Carousel>
+      </Card>
+    );
     contentComponent = (
       <>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={6}>
+          <Grid size={{ xs: 12, sm: 6, md: 6 }}>
             <Filters
               manageQuery
               academicSessions={academicSessions}
@@ -824,31 +859,34 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
               addChosenSessions={addChosenSessions}
             />
           </Grid>
-          <Grid item xs={false} sm={6} md={6}></Grid>
+          <Grid size={{ xs: false, sm: 6, md: 6 }}></Grid>
         </Grid>
-        <Grid container component="main" wrap="wrap-reverse" spacing={2}>
-          <Grid item xs={12} sm={6} md={6}>
-            <SearchResultsTable
-              resultsLoading={results.state}
-              includedResults={includedResults}
-              grades={grades}
-              rmp={rmp}
-              compare={compare}
-              addToCompare={addToCompare}
-              removeFromCompare={removeFromCompare}
-              colorMap={colorMap}
+        {isSmallScreen ? (
+          <div>
+            {carousel}
+            {searchResultsTable}
+          </div>
+        ) : (
+          <PanelGroup direction="horizontal" className="overflow-visible">
+            <Panel ref={panelLRef} minSize={40} defaultSize={50}>
+              {searchResultsTable}
+            </Panel>
+            <PanelResizeHandle
+              className="mt-4 p-1 mx-1 w-0.5 rounded-full opacity-25 data-[resize-handle-state=drag]:opacity-50 transition ease-in-out bg-transparent hover:bg-royal data-[resize-handle-state=drag]:bg-royal"
+              onDoubleClick={handleResizeDoubleClick}
             />
-          </Grid>
-          <Grid item xs={false} sm={6} md={6} className="w-full">
-            <div className="sticky top-0 gridsm:max-h-screen overflow-y-auto pt-4">
-              <Card>
-                <Carousel names={names} compareLength={compare.length}>
-                  {tabs}
-                </Carousel>
-              </Card>
-            </div>
-          </Grid>
-        </Grid>
+            <Panel
+              className="overflow-visible min-w-0"
+              ref={panelRRef}
+              minSize={30}
+              defaultSize={50}
+            >
+              <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto mt-4">
+                {carousel}
+              </div>
+            </Panel>
+          </PanelGroup>
+        )}
       </>
     );
   }
