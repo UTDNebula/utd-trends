@@ -28,7 +28,6 @@ interface SearchProps {
  *
  * Styled for the splash page
  */
-let wasEmpty = false; // tracks if the searchbar was empty before the new entry (to create a new browser navigation entry push())
 const SearchBar = ({
   manageQuery,
   onSelect,
@@ -76,25 +75,13 @@ const SearchBar = ({
       } else {
         delete newQuery.searchTerms;
       }
-      if (wasEmpty) {
-        // if the searchbar was cleared before this entry,
-        router.push(
-          {
-            query: router.query,
-          },
-          undefined,
-          { shallow: true },
-        );
-        wasEmpty = false;
-      } //otherwise, just update the current navigation entry query
-      else
-        router.replace(
-          {
-            query: newQuery,
-          },
-          undefined,
-          { shallow: true },
-        );
+      router.push(
+        {
+          query: router.query,
+        },
+        undefined,
+        { shallow: true },
+      );
     }
   }
 
@@ -162,9 +149,6 @@ const SearchBar = ({
 
   //update parent and queries
   function onChange_internal(newValue: SearchQuery[]) {
-    if (newValue.length == 0) {
-      wasEmpty = true; // so that the next search creates a new navigation entry (push())
-    }
     if (manageQuery === 'onChange') {
       updateQueries(newValue);
     }
@@ -183,7 +167,7 @@ const SearchBar = ({
   function updateValue(newValue: SearchQuery[]) {
     if (newValue.length) setErrorTooltip(false); //close the tooltip if there is at least 1 valid search term
     setValue(newValue);
-    onChange_internal(newValue);
+    onSelect_internal(newValue); // clicking enter to select a autocomplete suggestion triggers a new search (it also 'Enters' for the searchbar)
   }
 
   //update parent and queries
@@ -194,15 +178,6 @@ const SearchBar = ({
     }
     if (newValue.length && manageQuery === 'onSelect') {
       updateQueries(newValue);
-    }
-  }
-
-  //returns results on enter
-  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter' && inputValue === '') {
-      event.preventDefault();
-      event.stopPropagation();
-      onSelect_internal(value);
     }
   }
 
@@ -258,7 +233,6 @@ const SearchBar = ({
           loadNewOptions(newInputValue);
         }}
         renderInput={(params) => {
-          params.inputProps.onKeyDown = handleKeyDown;
           return (
             <TextField
               {...params}

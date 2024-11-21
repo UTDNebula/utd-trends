@@ -9,17 +9,15 @@ function Document() {
       <Head prefix="og: http://ogp.me/ns#">
         <meta
           name="description"
-          content="A data visualization tool built to help students view historical course and section data."
+          content="Choose the perfect classes for you: Nebula Labs's data analytics platform to help you make informed decisions about your coursework with grade and Rate My Professors data."
         />
         <meta
           name="theme-color"
           content={tailwindConfig.theme.extend.colors.royal}
         />
-
-        <meta property="og:title" content="UTD Trends" />
         <meta
           property="og:description"
-          content="A data visualization tool built to help students view historical course and section data."
+          content="Choose the perfect classes for you: Nebula Labs's data analytics platform to help you make informed decisions about your coursework with grade and Rate My Professors data."
         />
         <meta property="og:type" content="website" />
         <meta
