@@ -1,5 +1,5 @@
 import { Card, Grid2 as Grid, useMediaQuery } from '@mui/material';
-import type { NextPage } from 'next';
+import type { NextPage, NextPageContext } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -247,7 +247,77 @@ function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
   return colorMap;
 }
 
-export const Dashboard: NextPage = () => {
+/**
+ * Seperates courses and professors from a string of comma-delimited searchTerms or string[] of searchTerms
+ * @param searchTermInput
+ * @returns an array of courseSearchTerms and professorSearchTerms
+ */
+function getSearchTerms(searchTermInput: string | string[] | undefined): {
+  courseSearchTerms: SearchQuery[];
+  professorSearchTerms: SearchQuery[];
+} {
+  let array = searchTermInput ?? [];
+  if (!Array.isArray(array)) {
+    array = array.split(','); // if searchTermsInput is a comma-delimited string, make it an array
+  }
+  const searchTerms = array.map((el) => decodeSearchQueryLabel(el)); // convert an array of strings to an array of SearchQuery's
+
+  const courseSearchTerms: SearchQuery[] = [];
+  const professorSearchTerms: SearchQuery[] = [];
+
+  // split the search terms into professors and courses
+  searchTerms.map((searchTerm) => {
+    if (typeof searchTerm.profLast !== 'undefined') {
+      professorSearchTerms.push(searchTerm);
+    }
+    if (typeof searchTerm.prefix !== 'undefined') {
+      courseSearchTerms.push(searchTerm);
+    }
+  });
+
+  return { courseSearchTerms, professorSearchTerms };
+}
+
+/**
+ *
+ * @param courseSearchTerms
+ * @param professorSearchTerms
+ * @returns an empty string or a comma-delimited list of courses and professors, ending with a " - "
+ */
+function buildPageTitle(
+  courseSearchTerms: SearchQuery[],
+  professorSearchTerms: SearchQuery[],
+): string {
+  let pageTitle = '';
+  courseSearchTerms.map((term) => {
+    pageTitle += searchQueryLabel(term) + ', ';
+  });
+  professorSearchTerms.map((term) => {
+    pageTitle += searchQueryLabel(term) + ', ';
+  });
+  pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
+  return pageTitle;
+}
+
+export async function getServerSideProps(
+  context: NextPageContext,
+): Promise<{ props: { pageTitle: string } }> {
+  const { courseSearchTerms, professorSearchTerms } = getSearchTerms(
+    context.query.searchTerms,
+  );
+
+  return {
+    props: {
+      pageTitle: buildPageTitle(courseSearchTerms, professorSearchTerms),
+    },
+  };
+}
+
+export const Dashboard: NextPage<{ pageTitle: string }> = ({
+  pageTitle,
+}: {
+  pageTitle: string;
+}): React.ReactNode => {
   const router = useRouter();
 
   //Searches seperated into courses and professors to create combos
@@ -262,24 +332,9 @@ export const Dashboard: NextPage = () => {
   //On search change, seperate into courses and profs, clear data, and fetch new results
   useEffect(() => {
     if (router.isReady) {
-      let array = router.query.searchTerms ?? [];
-      if (!Array.isArray(array)) {
-        array = array.split(',');
-      }
-      const searchTerms = array.map((el) => decodeSearchQueryLabel(el));
-
-      const courseSearchTerms: SearchQuery[] = [];
-      const professorSearchTerms: SearchQuery[] = [];
-
-      // split the search terms into professors and courses
-      searchTerms.map((searchTerm) => {
-        if (typeof searchTerm.profLast !== 'undefined') {
-          professorSearchTerms.push(searchTerm);
-        }
-        if (typeof searchTerm.prefix !== 'undefined') {
-          courseSearchTerms.push(searchTerm);
-        }
-      });
+      const { courseSearchTerms, professorSearchTerms } = getSearchTerms(
+        router.query.searchTerms,
+      );
       setCourses(courseSearchTerms);
       setProfessors(professorSearchTerms);
 
@@ -836,16 +891,21 @@ export const Dashboard: NextPage = () => {
     );
   }
 
-  /* Final page */
-
   return (
     <>
       <Head>
-        <title>Results - UTD Trends</title>
+        <title>
+          {'Results - ' + buildPageTitle(courses, professors) + 'UTD TRENDS'}
+        </title>
         <link
           rel="canonical"
           href="https://trends.utdnebula.com/dashboard"
           key="canonical"
+        />
+        <meta
+          key="og:title"
+          property="og:title"
+          content={'Results - ' + pageTitle + 'UTD TRENDS'}
         />
         <meta
           property="og:url"

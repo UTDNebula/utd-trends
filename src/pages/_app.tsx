@@ -103,7 +103,8 @@ function MyApp({ Component, pageProps }: AppProps) {
     <>
       <GoogleAnalytics gaId="G-CC86XR1562" />
       <Head>
-        <title>UTD Trends</title>
+        <title>UTD TRENDS</title>
+        <meta key="og:title" property="og:title" content="UTD TRENDS" />
         <link
           rel="icon"
           type="image/png"
