@@ -12,11 +12,7 @@
     "lint": "next lint --fix",
     "lint:check": "next lint"
   },
-  "engines": {
-    "node": "^18"
-  },
   "dependencies": {
-    "@babel/runtime": "^7.17.9",
     "@emotion/react": "^11.8.1",
     "@emotion/styled": "^11.6.0",
     "@mui/icons-material": "^6.1.2",
@@ -42,19 +38,11 @@
     "ts-node": "^10.9.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.17.9",
-    "@babel/plugin-transform-runtime": "^7.17.0",
-    "@babel/preset-env": "^7.21.4",
-    "@babel/preset-react": "^7.16.7",
-    "@babel/preset-typescript": "^7.21.4",
     "@types/autosuggest-highlight": "^3.2.0",
     "@types/node": "^22.7.5",
     "@types/react": "^18.2.0",
     "@typescript-eslint/eslint-plugin": "^8.8.1",
     "@typescript-eslint/parser": "^8.8.1",
-    "babel-loader": "^9.1.2",
-    "babel-plugin-styled-components": "^2.1.1",
-    "babel-polyfill": "^6.26.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.14",
     "eslint-config-prettier": "^9.1.0",
@@ -64,17 +52,6 @@
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "prettier": "^3.3.3",
     "typescript": "^5.0.4"
-  },
-  "babel": {
-    "presets": [
-      "@babel/preset-env",
-      "@babel/preset-react",
-      "@babel/preset-typescript"
-    ],
-    "plugins": [
-      "@babel/plugin-transform-runtime",
-      "babel-plugin-styled-components"
-    ]
   },
   "browserslist": "> 0.25%, not dead",
   "eslintConfig": {
