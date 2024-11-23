@@ -34,12 +34,10 @@ import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 function LoadingRow() {
   return (
     <TableRow>
-      <TableCell>
-        <IconButton aria-label="expand row" size="small" disabled>
+      <TableCell className="flex gap-1">
+        <IconButton aria-label="expand row" size="medium" disabled>
           <KeyboardArrowIcon />
         </IconButton>
-      </TableCell>
-      <TableCell>
         <Checkbox disabled />
       </TableCell>
       <TableCell component="th" scope="row" className="w-full">
@@ -107,22 +105,20 @@ function Row({
         onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
         className="cursor-pointer"
       >
-        <TableCell className="border-b-0">
+        <TableCell className="border-b-0 flex gap-1">
           <Tooltip
             title={open ? 'Minimize Result' : 'Expand Result'}
             placement="top"
           >
             <IconButton
               aria-label="expand row"
-              size="small"
+              size="medium"
               onClick={() => setOpen(!open)}
               className={'transition-transform' + (open ? ' rotate-90' : '')}
             >
-              <KeyboardArrowIcon />
+              <KeyboardArrowIcon fontSize="inherit" />
             </IconButton>
           </Tooltip>
-        </TableCell>
-        <TableCell className="border-b-0">
           <Tooltip
             title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
             placement="top"
@@ -446,8 +442,7 @@ const SearchResultsTable = ({
         <Table stickyHeader aria-label="collapsible table">
           <TableHead>
             <TableRow>
-              <TableCell />
-              <TableCell>Compare</TableCell>
+              <TableCell>Actions</TableCell>
               <TableCell>
                 <TableSortLabel
                   active={orderBy === 'name'}
