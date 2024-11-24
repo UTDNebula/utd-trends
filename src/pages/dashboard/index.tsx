@@ -329,6 +329,8 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
     state: 'loading',
   });
 
+  const [searchResultsLoading, setSearchResultsLoading] = useState<'loading' | 'done' | 'error'>('done');
+
   //On search change, seperate into courses and profs, clear data, and fetch new results
   useEffect(() => {
     if (router.isReady) {
@@ -375,10 +377,12 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
               state: 'done',
               data: res,
             });
+            setSearchResultsLoading('done');
             getData(res, controller);
           })
           .catch((error) => {
             setResults({ state: 'error', data: [] });
+            setSearchResultsLoading('error');
             console.error('Search Results', error);
           });
       } else if (professorSearchTerms.length > 0) {
@@ -388,10 +392,12 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
               state: 'done',
               data: res,
             });
+            setSearchResultsLoading('done');
             getData(res, controller);
           })
           .catch((error) => {
             setResults({ state: 'error', data: [] });
+            setSearchResultsLoading('error');
             console.error('Search Results', error);
           });
       }
@@ -399,7 +405,7 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
         controller.abort();
       };
     }
-  }, [router.isReady, router.query.searchTerms]);
+  }, [router.isReady, router.query.searchTerms, searchResultsLoading]);
 
   //Compiled list of academic sessions grade data is available for
   const [academicSessions, setAcademicSessions] = useState<string[]>([]);
@@ -913,7 +919,7 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
         />
       </Head>
       <div className="w-full bg-light h-full">
-        <TopMenu />
+        <TopMenu setSearchResultsLoading={setSearchResultsLoading}/>
         <main className="p-4">{contentComponent}</main>
       </div>
     </>

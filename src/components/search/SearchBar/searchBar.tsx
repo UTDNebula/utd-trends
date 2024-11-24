@@ -17,6 +17,7 @@ import {
 interface SearchProps {
   manageQuery?: 'onSelect' | 'onChange';
   onSelect?: (value: SearchQuery[]) => void;
+  setSearchResultsLoading: (value: 'loading' | 'done' | 'error') => void;
   className?: string;
   input_className?: string;
   autoFocus?: boolean;
@@ -31,6 +32,7 @@ interface SearchProps {
 const SearchBar = ({
   manageQuery,
   onSelect,
+  setSearchResultsLoading,
   className,
   input_className,
   autoFocus,
@@ -213,6 +215,8 @@ const SearchBar = ({
           if (!newValue.every((el) => typeof el !== 'string')) {
             return;
           }
+          if (typeof setSearchResultsLoading !== 'undefined')
+            setSearchResultsLoading('loading');
           //remove from options
           if (newValue.length > value.length) {
             setOptions((old) =>
@@ -323,7 +327,11 @@ const SearchBar = ({
             'shrink-0 normal-case bg-royal hover:bg-royalDark' +
             (value.length == 0 ? ' text-cornflower-200' : '')
           } //darkens the text when no valid search terms are entered (pseudo-disables the search button)
-          onClick={() => onSelect_internal(value)}
+          onClick={() => { 
+            if (typeof setSearchResultsLoading !== 'undefined')
+              setSearchResultsLoading('loading');
+            onSelect_internal(value) 
+          }}
         >
           Search
         </Button>
