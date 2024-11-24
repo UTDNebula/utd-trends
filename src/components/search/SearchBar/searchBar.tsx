@@ -1,4 +1,10 @@
-import { Autocomplete, Button, TextField, Tooltip } from '@mui/material';
+import {
+  Autocomplete,
+  Button,
+  CircularProgress,
+  TextField,
+  Tooltip,
+} from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import { useRouter } from 'next/router';
@@ -17,7 +23,8 @@ import {
 interface SearchProps {
   manageQuery?: 'onSelect' | 'onChange';
   onSelect?: (value: SearchQuery[]) => void;
-  setSearchResultsLoading: (value: 'loading' | 'done' | 'error') => void;
+  searchResultsLoading?: 'loading' | 'done' | 'error';
+  setSearchResultsLoading?: (value: 'loading' | 'done' | 'error') => void;
   className?: string;
   input_className?: string;
   autoFocus?: boolean;
@@ -32,6 +39,7 @@ interface SearchProps {
 const SearchBar = ({
   manageQuery,
   onSelect,
+  searchResultsLoading,
   setSearchResultsLoading,
   className,
   input_className,
@@ -193,7 +201,7 @@ const SearchBar = ({
         multiple
         freeSolo
         loading={loading}
-        //highligh first option to add with enter
+        //highlight first option to add with enter
         autoHighlight={true}
         clearOnBlur={false}
         className="grow"
@@ -324,16 +332,20 @@ const SearchBar = ({
           disableElevation
           size="large"
           className={
-            'shrink-0 normal-case bg-royal hover:bg-royalDark' +
+            'h-11 w-[5.5rem] shrink-0 normal-case bg-royal hover:bg-royalDark' +
             (value.length == 0 ? ' text-cornflower-200' : '')
           } //darkens the text when no valid search terms are entered (pseudo-disables the search button)
-          onClick={() => { 
+          onClick={() => {
             if (typeof setSearchResultsLoading !== 'undefined')
               setSearchResultsLoading('loading');
-            onSelect_internal(value) 
+            onSelect_internal(value);
           }}
         >
-          Search
+          {searchResultsLoading === 'loading' ? (
+            <CircularProgress className="h-6 w-6 text-cornflower-50 dark:text-cornflower-800" />
+          ) : (
+            'Search'
+          )}
         </Button>
       </Tooltip>
     </div>

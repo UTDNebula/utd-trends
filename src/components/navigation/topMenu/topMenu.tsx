@@ -12,6 +12,7 @@ import SearchBar from '@/components/search/SearchBar/searchBar';
  * Props type used by the TopMenu component
  */
 interface TopMenuProps {
+  searchResultsLoading: 'loading' | 'done' | 'error';
   setSearchResultsLoading: (value: 'loading' | 'done' | 'error') => void;
 }
 
@@ -19,7 +20,10 @@ interface TopMenuProps {
  * This is a component to hold UTD Trends branding and basic navigation
  * @returns
  */
-export function TopMenu({setSearchResultsLoading} : TopMenuProps) {
+export function TopMenu({
+  searchResultsLoading,
+  setSearchResultsLoading,
+}: TopMenuProps) {
   const router = useRouter();
   const [openCopied, setOpenCopied] = useState(false);
 
@@ -53,6 +57,7 @@ export function TopMenu({setSearchResultsLoading} : TopMenuProps) {
   const searchBar = (
     <SearchBar
       manageQuery="onSelect"
+      searchResultsLoading={searchResultsLoading}
       setSearchResultsLoading={setSearchResultsLoading}
       className={'shrink ' + (matches ? 'basis-[32rem]' : 'basis-full')}
       input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"

@@ -329,7 +329,9 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
     state: 'loading',
   });
 
-  const [searchResultsLoading, setSearchResultsLoading] = useState<'loading' | 'done' | 'error'>('done');
+  const [searchResultsLoading, setSearchResultsLoading] = useState<
+    'loading' | 'done' | 'error'
+  >('done');
 
   //On search change, seperate into courses and profs, clear data, and fetch new results
   useEffect(() => {
@@ -919,7 +921,10 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
         />
       </Head>
       <div className="w-full bg-light h-full">
-        <TopMenu setSearchResultsLoading={setSearchResultsLoading}/>
+        <TopMenu
+          searchResultsLoading={searchResultsLoading}
+          setSearchResultsLoading={setSearchResultsLoading}
+        />
         <main className="p-4">{contentComponent}</main>
       </div>
     </>
