@@ -9,6 +9,7 @@ import localFont from 'next/font/local';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
+import resolveConfig from 'tailwindcss/resolveConfig';
 
 import tailwindConfig from '@/../tailwind.config.js';
 import FeedbackPopup from '@/components/common/FeedbackPopup/feedbackPopup';
@@ -74,19 +75,23 @@ const kallisto = localFont({
   variable: '--font-kallisto',
 });
 
+const fullTailwindConfig = resolveConfig(tailwindConfig);
+
 function MyApp({ Component, pageProps }: AppProps) {
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  const colors = fullTailwindConfig.theme.colors as any;
   const palette = {
     palette: {
       //copied from tailwind.config.js
       primary: {
-        main: tailwindConfig.theme.extend.colors.royal,
+        main: colors.royal as string,
       },
       secondary: {
-        main: tailwindConfig.theme.extend.colors.royal,
-        light: tailwindConfig.theme.extend.colors.periwinkle,
+        main: colors.royal as string,
+        light: colors.periwinkle as string,
       },
       error: {
-        main: tailwindConfig.theme.extend.colors.persimmon['500'],
+        main: colors.persimmon['500'] as string,
       },
     },
   };
@@ -98,6 +103,15 @@ function MyApp({ Component, pageProps }: AppProps) {
     },
     typography: {
       fontFamily: 'inherit',
+    },
+    breakpoints: {
+      values: {
+        xs: 0,
+        sm: parseInt(fullTailwindConfig.theme.screens.sm),
+        md: parseInt(fullTailwindConfig.theme.screens.md),
+        lg: parseInt(fullTailwindConfig.theme.screens.lg),
+        xl: parseInt(fullTailwindConfig.theme.screens.xl),
+      },
     },
   });
 
