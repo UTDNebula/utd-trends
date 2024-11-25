@@ -1,6 +1,5 @@
 import '@/styles/globals.css';
 
-import { useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { SpeedInsights } from '@vercel/speed-insights/react';
@@ -76,10 +75,8 @@ const kallisto = localFont({
 });
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const muiTheme = createTheme({
+  const palette = {
     palette: {
-      mode: prefersDarkMode ? 'dark' : 'light',
       //copied from tailwind.config.js
       primary: {
         main: tailwindConfig.theme.extend.colors.royal,
@@ -91,6 +88,13 @@ function MyApp({ Component, pageProps }: AppProps) {
       error: {
         main: tailwindConfig.theme.extend.colors.persimmon['500'],
       },
+    },
+  };
+  const muiTheme = createTheme({
+    cssVariables: true,
+    colorSchemes: {
+      light: palette,
+      dark: palette,
     },
     typography: {
       fontFamily: 'inherit',
