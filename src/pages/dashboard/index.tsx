@@ -806,7 +806,11 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
   //Main content: loading, error, or normal
   let contentComponent;
 
-  if (courses.length === 0 && professors.length === 0) {
+  if (
+    courses.length === 0 &&
+    professors.length === 0 &&
+    results.state !== 'loading'
+  ) {
     contentComponent = <DashboardEmpty />;
   } else if (results.state === 'error') {
     contentComponent = <DashboardError />;
