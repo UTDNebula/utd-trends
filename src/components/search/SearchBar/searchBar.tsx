@@ -8,7 +8,7 @@ import {
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { type Key, useEffect, useRef, useState } from 'react';
 
 import {
   decodeSearchQueryLabel,
@@ -283,7 +283,7 @@ const SearchBar = ({
             }
           }
         }}
-        renderOption={(props, option, { inputValue }) => {
+        renderOption={(props: { key: Key }, option, { inputValue }) => {
           const text =
             typeof option === 'string' ? option : searchQueryLabel(option);
           //add spaces between prefix and course number
@@ -302,8 +302,9 @@ const SearchBar = ({
               ),
           );
           const parts = parse(text, matches);
+          const { key, ...otherProps } = props;
           return (
-            <li {...props}>
+            <li key={key} {...otherProps}>
               {parts.map((part, index) => (
                 <span
                   key={index}
