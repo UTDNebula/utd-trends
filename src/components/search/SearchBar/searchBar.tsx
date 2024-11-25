@@ -23,8 +23,8 @@ import {
 interface SearchProps {
   manageQuery?: 'onSelect' | 'onChange';
   onSelect?: (value: SearchQuery[]) => void;
-  searchResultsLoading?: 'loading' | 'done' | 'error';
-  setSearchResultsLoading?: (value: 'loading' | 'done' | 'error') => void;
+  resultsLoading?: 'loading' | 'done' | 'error';
+  setResultsLoading?: () => void;
   className?: string;
   input_className?: string;
   autoFocus?: boolean;
@@ -39,8 +39,8 @@ interface SearchProps {
 const SearchBar = ({
   manageQuery,
   onSelect,
-  searchResultsLoading,
-  setSearchResultsLoading,
+  resultsLoading,
+  setResultsLoading,
   className,
   input_className,
   autoFocus,
@@ -183,6 +183,9 @@ const SearchBar = ({
   //update parent and queries
   function onSelect_internal(newValue: SearchQuery[]) {
     setErrorTooltip(!newValue.length); //Check if tooltip needs to be displayed
+    if (newValue.length && typeof setResultsLoading !== 'undefined') {
+      setResultsLoading();
+    }
     if (typeof onSelect !== 'undefined') {
       onSelect(newValue);
     }
@@ -223,8 +226,6 @@ const SearchBar = ({
           if (!newValue.every((el) => typeof el !== 'string')) {
             return;
           }
-          if (typeof setSearchResultsLoading !== 'undefined')
-            setSearchResultsLoading('loading');
           //remove from options
           if (newValue.length > value.length) {
             setOptions((old) =>
@@ -335,13 +336,9 @@ const SearchBar = ({
             'h-11 w-[5.5rem] shrink-0 normal-case bg-royal hover:bg-royalDark' +
             (value.length == 0 ? ' text-cornflower-200' : '')
           } //darkens the text when no valid search terms are entered (pseudo-disables the search button)
-          onClick={() => {
-            if (typeof setSearchResultsLoading !== 'undefined')
-              setSearchResultsLoading('loading');
-            onSelect_internal(value);
-          }}
+          onClick={() => onSelect_internal(value)}
         >
-          {searchResultsLoading === 'loading' ? (
+          {resultsLoading === 'loading' ? (
             <CircularProgress className="h-6 w-6 text-cornflower-50 dark:text-cornflower-800" />
           ) : (
             'Search'
