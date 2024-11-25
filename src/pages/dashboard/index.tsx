@@ -378,8 +378,12 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
             getData(res, controller);
           })
           .catch((error) => {
-            setResults({ state: 'error', data: [] });
-            console.error('Search Results', error);
+            if (
+              !(error instanceof DOMException && error.name == 'AbortError')
+            ) {
+              setResults({ state: 'error', data: [] });
+              console.error('Search Results', error);
+            }
           });
       } else if (professorSearchTerms.length > 0) {
         fetchSearchResults(professorSearchTerms, courseSearchTerms, controller)
@@ -391,8 +395,12 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
             getData(res, controller);
           })
           .catch((error) => {
-            setResults({ state: 'error', data: [] });
-            console.error('Search Results', error);
+            if (
+              !(error instanceof DOMException && error.name == 'AbortError')
+            ) {
+              setResults({ state: 'error', data: [] });
+              console.error('Search Results', error);
+            }
           });
       }
       return () => {
@@ -535,7 +543,11 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
           professor: isCourse ? old.professor : { [rhsKey]: rhsGradeFetched },
         }));
       })
-      .catch((err) => console.error('Grades data for ' + rhsKey, err));
+      .catch((error) => {
+        if (!(error instanceof DOMException && error.name == 'AbortError')) {
+          console.error('Grades data for ' + rhsKey, error);
+        }
+      });
   }
 
   //Store rmp scores by profs
@@ -579,7 +591,9 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
       .catch((error) => {
         //Set loading status to error
         addToGrades(searchQueryLabel(course), { state: 'error' });
-        console.error('Grades data for ' + searchQueryLabel(course), error);
+        if (!(error instanceof DOMException && error.name == 'AbortError')) {
+          console.error('Grades data for ' + searchQueryLabel(course), error);
+        }
       });
   }
 
@@ -601,7 +615,9 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
       .catch((error) => {
         //Set loading status to error
         addToRmp(searchQueryLabel(professor), { state: 'error' });
-        console.error('RMP data for ' + searchQueryLabel(professor), error);
+        if (!(error instanceof DOMException && error.name == 'AbortError')) {
+          console.error('RMP data for ' + searchQueryLabel(professor), error);
+        }
       });
   }
 
@@ -612,7 +628,7 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
     for (const result of results) {
       const entry = grades[searchQueryLabel(result)];
       //Not already loading
-      if (typeof entry === 'undefined') {
+      if (typeof entry === 'undefined' || entry.state === 'error') {
         fetchAndStoreGradesData(result, controller);
       } else {
         //Recalc gpa and such from past stored data for new page
@@ -653,8 +669,9 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
       professorsInResults.push(professors[0]);
     }
     for (const professor of professorsInResults) {
+      const entry = rmp[searchQueryLabel(professor)];
       //Not already loading
-      if (typeof rmp[searchQueryLabel(professor)] === 'undefined') {
+      if (typeof entry === 'undefined' || entry.state === 'error') {
         fetchAndStoreRmpData(professor, controller);
       }
     }
