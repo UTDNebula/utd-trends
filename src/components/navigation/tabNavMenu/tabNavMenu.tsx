@@ -22,21 +22,18 @@ type TabNavMenuProps = {
  * which are held by the parent and passed to this component to be manipulated by the Tabs component.
  */
 export const TabNavMenu = (props: TabNavMenuProps) => {
-  const isSmallScreen = useMediaQuery('(max-width: 600px)');
   return (
     <div className="w-full flex items-center">
-      {isSmallScreen && (
-        <IconButton
-          aria-label="open overview"
-          onClick={() => props.setOpen(!props.open)}
-          size="medium"
-          className={
-            'ml-2 transition-transform' + (props.open ? ' rotate-90' : '')
-          }
-        >
-          <KeyboardArrowIcon fontSize="inherit" />
-        </IconButton>
-      )}
+      <IconButton
+        aria-label="open overview"
+        onClick={() => props.setOpen(!props.open)}
+        size="medium"
+        className={
+          'sm:hidden ml-2 transition-transform' + (props.open ? ' rotate-90' : '')
+        }
+      >
+        <KeyboardArrowIcon fontSize="inherit" />
+      </IconButton>
       <div className="flex-1 min-w-0 flex justify-center">
         <Tabs
           value={props.value}
