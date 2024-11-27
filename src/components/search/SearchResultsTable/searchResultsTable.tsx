@@ -105,49 +105,55 @@ function Row({
         onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
         className="cursor-pointer"
       >
-        <TableCell className="border-b-0 flex gap-1">
-          <Tooltip
-            title={open ? 'Minimize Result' : 'Expand Result'}
-            placement="top"
-          >
-            <IconButton
-              aria-label="expand row"
-              size="medium"
-              onClick={() => setOpen(!open)}
-              className={'transition-transform' + (open ? ' rotate-90' : '')}
+        <TableCell className="border-b-0">
+          <div className="flex items-center gap-1">
+            <Tooltip
+              title={open ? 'Minimize Result' : 'Expand Result'}
+              placement="top"
             >
-              <KeyboardArrowIcon fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip
-            title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
-            placement="top"
-          >
-            <Checkbox
-              checked={inCompare}
-              onClick={(e) => {
-                e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
-                if (inCompare) {
-                  removeFromCompare(course);
-                } else {
-                  addToCompare(course);
+              <IconButton
+                aria-label="expand row"
+                size="medium"
+                onClick={(e) => {
+                  e.stopPropagation(); // prevents double opening/closing
+                  setOpen(!open);
+                }}
+                className={'transition-transform' + (open ? ' rotate-90' : '')}
+              >
+                <KeyboardArrowIcon fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
+              placement="top"
+            >
+              <Checkbox
+                checked={inCompare}
+                onClick={(e) => {
+                  e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
+                  if (inCompare) {
+                    removeFromCompare(course);
+                  } else {
+                    addToCompare(course);
+                  }
+                }}
+                disabled={
+                  (typeof grades !== 'undefined' &&
+                    grades.state === 'loading') ||
+                  (typeof rmp !== 'undefined' && rmp.state === 'loading')
                 }
-              }}
-              disabled={
-                (typeof grades !== 'undefined' && grades.state === 'loading') ||
-                (typeof rmp !== 'undefined' && rmp.state === 'loading')
-              }
-              sx={
-                color
-                  ? {
-                      '&.Mui-checked': {
-                        color: color,
-                      },
-                    }
-                  : undefined
-              } // Apply color if defined
-            />
-          </Tooltip>
+                sx={
+                  color
+                    ? {
+                        '&.Mui-checked': {
+                          color: color,
+                        },
+                      }
+                    : undefined
+                } // Apply color if defined
+              />
+            </Tooltip>
+          </div>
         </TableCell>
         <TableCell component="th" scope="row" className="w-full border-b-0">
           <Tooltip
