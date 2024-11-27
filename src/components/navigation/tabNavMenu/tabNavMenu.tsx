@@ -23,16 +23,13 @@ type TabNavMenuProps = {
  */
 export const TabNavMenu = (props: TabNavMenuProps) => {
   return (
-    <div
-      className="w-full flex items-center cursor-pointer"
-      onClick={() => props.setOpen(!props.open)}
-    >
+    <div className="w-full flex items-center">
       <IconButton
         aria-label="open overview"
+        onClick={() => props.setOpen(!props.open)}
         size="medium"
         className={
-          'sm:hidden ml-2 transition-transform' +
-          (props.open ? ' rotate-90' : '')
+          'sm:hidden ml-2 transition-transform' + (props.open ? ' rotate-90' : '')
         }
       >
         <KeyboardArrowIcon fontSize="inherit" />
@@ -60,10 +57,7 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
                   option
                 )
               }
-              onClick={(e) => {
-                e.stopPropagation();
-                props.setOpen(true);
-              }}
+              onClick={() => props.setOpen(true)}
             />
           ))}
         </Tabs>
