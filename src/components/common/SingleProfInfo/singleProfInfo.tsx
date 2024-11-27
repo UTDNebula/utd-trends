@@ -117,18 +117,13 @@ function SingleProfInfo({ rmp }: Props) {
     <Grid container spacing={2} className="p-4">
       <Grid size={6}>
         <p className="text-xl font-bold">
-          {typeof rmp.data.avgRating !== undefined && rmp.data.avgRating > 0
-            ? rmp.data.avgRating
-            : 'N/A'}
+          {rmp.data.avgRating > 0 ? rmp.data.avgRating : 'N/A'}
         </p>
         <p>Professor rating</p>
       </Grid>
       <Grid size={6}>
         <p className="text-xl font-bold">
-          {typeof rmp.data.avgDifficulty !== undefined &&
-          rmp.data.avgDifficulty > 0
-            ? rmp.data.avgDifficulty
-            : 'N/A'}
+          {rmp.data.avgDifficulty > 0 ? rmp.data.avgDifficulty : 'N/A'}
         </p>
         <p>Difficulty</p>
       </Grid>
@@ -140,8 +135,7 @@ function SingleProfInfo({ rmp }: Props) {
       </Grid>
       <Grid size={6}>
         <p className="text-xl font-bold">
-          {typeof rmp.data.wouldTakeAgainPercent !== undefined &&
-          rmp.data.wouldTakeAgainPercent > 0
+          {rmp.data.wouldTakeAgainPercent > 0
             ? rmp.data.wouldTakeAgainPercent.toFixed(0) + '%'
             : 'N/A'}
         </p>
