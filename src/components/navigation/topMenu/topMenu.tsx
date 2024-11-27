@@ -52,7 +52,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
 
   return (
     <>
-      <div className="relative overflow-hidden flex items-center gap-y-0 gap-x-4 md:gap-x-8 lg:gap-x-16 py-1 md:py-2 px-4 md:px-8 lg:px-16 bg-lighten dark:bg-darken change-wrap">
+      <div className="relative overflow-hidden flex items-center gap-y-0 gap-x-4 md:gap-x-8 lg:gap-x-16 py-1 md:py-2 px-4 md:px-8 lg:px-16 bg-lighten dark:bg-darken flex-wrap sm:flex-nowrap">
         <Image
           src={Background}
           alt="gradient background"
@@ -69,7 +69,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
           manageQuery="onSelect"
           resultsLoading={resultsLoading}
           setResultsLoading={setResultsLoading}
-          className="change-order shrink"
+          className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
           input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         />
         <Tooltip title="Share link to search" className="ml-auto">

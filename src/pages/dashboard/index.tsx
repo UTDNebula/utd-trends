@@ -881,13 +881,13 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
           </Grid>
           <Grid size={{ xs: false, sm: 6, md: 6 }}></Grid>
         </Grid>
-        <div className="mobile-stacked-ui">
+        <div className="block sm:hidden">
           {carousel}
           {searchResultsTable}
         </div>
         <PanelGroup
           direction="horizontal"
-          className="desktop-sides-ui overflow-visible"
+          className="hidden sm:flex overflow-visible"
         >
           <Panel ref={panelLRef} minSize={40} defaultSize={50}>
             {searchResultsTable}

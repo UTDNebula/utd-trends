@@ -27,34 +27,4 @@ body,
   .bg-darken {
     background-color: rgba(0, 0, 0, 0.6);
   }
-
-  .change-order {
-    @apply order-last basis-full;
-  }
-  .change-wrap {
-    @apply flex-wrap;
-  }
-  @media screen(sm) {
-    .change-order {
-      @apply order-none basis-[32rem];
-    }
-    .change-wrap {
-      @apply flex-nowrap;
-    }
-  }
-
-  .mobile-stacked-ui {
-    display: block;
-  }
-  .desktop-sides-ui {
-    display: none;
-  }
-  @media screen(sm) {
-    .mobile-stacked-ui {
-      display: none;
-    }
-    .desktop-sides-ui {
-      display: flex;
-    }
-  }
 }
