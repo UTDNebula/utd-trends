@@ -881,7 +881,7 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
           </Grid>
           <Grid size={{ xs: false, sm: 6, md: 6 }}></Grid>
         </Grid>
-        <div className="block sm:hidden">
+        <div className="sm:hidden">
           {carousel}
           {searchResultsTable}
         </div>
