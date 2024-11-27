@@ -29,7 +29,8 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
         onClick={() => props.setOpen(!props.open)}
         size="medium"
         className={
-          'sm:hidden ml-2 transition-transform' + (props.open ? ' rotate-90' : '')
+          'sm:hidden ml-2 transition-transform' +
+          (props.open ? ' rotate-90' : '')
         }
       >
         <KeyboardArrowIcon fontSize="inherit" />
