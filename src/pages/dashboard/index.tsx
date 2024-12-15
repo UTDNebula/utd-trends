@@ -10,6 +10,7 @@ import {
   PanelResizeHandle,
 } from 'react-resizable-panels';
 
+import SkedgeAd from '@/components/common/SkedgeAd/skedgeAd';
 import Compare from '@/components/compare/Compare/compare';
 import DashboardEmpty from '@/components/dashboard/DashboardEmpty/dashboardEmpty';
 import DashboardError from '@/components/dashboard/DashboardError/dashboardError';
@@ -34,7 +35,6 @@ import {
 } from '@/modules/SearchQuery/SearchQuery';
 import type { GradesData } from '@/pages/api/grades';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import SkedgeAd from '@/components/common/SkedgeAd/skedgeAd';
 
 //Limit cached number of grades and rmp data entries
 const MAX_ENTRIES = 1000;
