@@ -34,6 +34,7 @@ import {
 } from '@/modules/SearchQuery/SearchQuery';
 import type { GradesData } from '@/pages/api/grades';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import SkedgeAd from '@/components/common/SkedgeAd/skedgeAd';
 
 //Limit cached number of grades and rmp data entries
 const MAX_ENTRIES = 1000;
@@ -916,6 +917,7 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
         <TopMenu />
         <main className="p-4">{contentComponent}</main>
       </div>
+      <SkedgeAd />
     </>
   );
 };
