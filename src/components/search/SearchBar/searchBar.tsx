@@ -167,7 +167,7 @@ const SearchBar = ({
 
   //change all values
   function updateValue(newValue: SearchQuery[]) {
-    console.log("inside updateValue");
+    console.log('inside updateValue');
     setValue(newValue);
     onSelect_internal(newValue); // clicking enter to select a autocomplete suggestion triggers a new search (it also 'Enters' for the searchbar)
   }
@@ -180,11 +180,11 @@ const SearchBar = ({
     }
     console.log(newValue);
     if (typeof onSelect !== 'undefined') {
-      console.log("inside onselect");
+      console.log('inside onselect');
       onSelect(newValue);
     }
     if (newValue.length && manageQuery === 'onSelect') {
-      console.log("inside updatequeries");
+      console.log('inside updatequeries');
       updateQueries(newValue);
     }
   }
