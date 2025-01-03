@@ -189,6 +189,15 @@ const SearchBar = ({
     }
   }
 
+  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter' && inputValue === '') {
+      console.log('handleKeyDown');
+      event.preventDefault();
+      event.stopPropagation();
+      onSelect_internal(value);
+    }
+  }
+
   useEffect(() => {
     fetch('/api/autocomplete');
   }, []);
@@ -241,6 +250,7 @@ const SearchBar = ({
           loadNewOptions(newInputValue);
         }}
         renderInput={(params) => {
+          params.inputProps.onKeyDown = handleKeyDown;
           return (
             <TextField
               {...params}
@@ -254,6 +264,7 @@ const SearchBar = ({
         }}
         //for handling spaces, when options are already loaded
         onInput={(event) => {
+          console.log('onInput');
           const value = (event.target as HTMLInputElement).value;
           // if the last character in the new string is a space, check for autocomplete
           if (
