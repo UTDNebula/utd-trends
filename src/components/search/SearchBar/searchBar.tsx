@@ -21,7 +21,7 @@ import {
  * Props type used by the SearchBar component
  */
 interface SearchProps {
-  manageQuery?: 'onSelect' | 'onChange';
+  manageQuery?: 'onSelect';
   onSelect?: (value: SearchQuery[]) => void;
   resultsLoading?: 'loading' | 'done' | 'error';
   setResultsLoading?: () => void;
@@ -157,25 +157,17 @@ const SearchBar = ({
       });
   }
 
-  //update parent and queries
-  function onChange_internal(newValue: SearchQuery[]) {
-    if (manageQuery === 'onChange') {
-      updateQueries(newValue);
-    }
-  }
-
   //add value
   function addValue(newValue: SearchQuery) {
     setValue((old) => {
       const oldAndNew = [...old, newValue];
-      onChange_internal(oldAndNew);
       return oldAndNew;
     });
   }
 
   //change all values
   function updateValue(newValue: SearchQuery[]) {
-    if (newValue.length) setErrorTooltip(false); //close the tooltip if there is at least 1 valid search term
+    console.log("inside updateValue");
     setValue(newValue);
     onSelect_internal(newValue); // clicking enter to select a autocomplete suggestion triggers a new search (it also 'Enters' for the searchbar)
   }
@@ -186,10 +178,13 @@ const SearchBar = ({
     if (newValue.length && typeof setResultsLoading !== 'undefined') {
       setResultsLoading();
     }
+    console.log(newValue);
     if (typeof onSelect !== 'undefined') {
+      console.log("inside onselect");
       onSelect(newValue);
     }
     if (newValue.length && manageQuery === 'onSelect') {
+      console.log("inside updatequeries");
       updateQueries(newValue);
     }
   }
