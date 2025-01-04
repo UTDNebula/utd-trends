@@ -74,6 +74,46 @@ const SearchBar = ({
     }
   }, [router.isReady, router.query.searchTerms]); // useEffect is called every time the query changes
 
+  // updateValue -> onSelect_internal -> updateQueries - clicking enter on an autocomplete suggestion in topMenu Searchbar
+  // updateValue -> onSelect_internal -> onSelect (custom function) - clicking enter on an autocomplete suggestion in home page SearchBar
+  // params.inputProps.onKeyDown -> handleKeyDown -> onSelect_internal -> updateQueries/onSelect - clicking enter in the SearchBar
+  // Button onClick -> onSelect_internal -> updateQueries/onSelect - Pressing the "Search" Button
+
+  //change all values
+  function updateValue(newValue: SearchQuery[]) {
+    setValue(newValue);
+    onSelect_internal(newValue); // clicking enter to select a autocomplete suggestion triggers a new search (it also 'Enters' for the searchbar)
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter' && inputValue === '') {
+      event.preventDefault();
+      event.stopPropagation();
+      onSelect_internal(value);
+    }
+  }
+
+  //update parent and queries
+  function onSelect_internal(newValue: SearchQuery[]) {
+    // called by updateValue(), handleKeyDown(), and is assigned to the button onClick action
+    if (
+      router.query.searchTerms ==
+      newValue.map((el) => searchQueryLabel(el)).join(',')
+    )
+      // do not initiate a new search when the searchTerms haven't changed
+      return;
+    setErrorTooltip(!newValue.length); //Check if tooltip needs to be displayed
+    if (newValue.length && typeof setResultsLoading !== 'undefined') {
+      setResultsLoading();
+    }
+    if (typeof onSelect !== 'undefined') {
+      onSelect(newValue);
+    }
+    if (newValue.length && manageQuery === 'onSelect') {
+      updateQueries(newValue);
+    }
+  }
+
   //update url with what's in value
   function updateQueries(newValue: SearchQuery[]) {
     if (typeof manageQuery !== 'undefined' && router.isReady) {
@@ -163,40 +203,6 @@ const SearchBar = ({
       const oldAndNew = [...old, newValue];
       return oldAndNew;
     });
-  }
-
-  //change all values
-  function updateValue(newValue: SearchQuery[]) {
-    setValue(newValue);
-    onSelect_internal(newValue); // clicking enter to select a autocomplete suggestion triggers a new search (it also 'Enters' for the searchbar)
-  }
-
-  //update parent and queries
-  function onSelect_internal(newValue: SearchQuery[]) {
-    if (
-      router.query.searchTerms ==
-      newValue.map((el) => searchQueryLabel(el)).join(',')
-    )
-      // do not initiate a new search when the searchTerms haven't changed
-      return;
-    setErrorTooltip(!newValue.length); //Check if tooltip needs to be displayed
-    if (newValue.length && typeof setResultsLoading !== 'undefined') {
-      setResultsLoading();
-    }
-    if (typeof onSelect !== 'undefined') {
-      onSelect(newValue);
-    }
-    if (newValue.length && manageQuery === 'onSelect') {
-      updateQueries(newValue);
-    }
-  }
-
-  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter' && inputValue === '') {
-      event.preventDefault();
-      event.stopPropagation();
-      onSelect_internal(value);
-    }
   }
 
   useEffect(() => {
