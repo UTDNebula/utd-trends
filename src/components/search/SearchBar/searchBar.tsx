@@ -167,31 +167,32 @@ const SearchBar = ({
 
   //change all values
   function updateValue(newValue: SearchQuery[]) {
-    console.log('inside updateValue');
     setValue(newValue);
     onSelect_internal(newValue); // clicking enter to select a autocomplete suggestion triggers a new search (it also 'Enters' for the searchbar)
   }
 
   //update parent and queries
   function onSelect_internal(newValue: SearchQuery[]) {
+    if (
+      router.query.searchTerms ==
+      newValue.map((el) => searchQueryLabel(el)).join(',')
+    )
+      // do not initiate a new search when the searchTerms haven't changed
+      return;
     setErrorTooltip(!newValue.length); //Check if tooltip needs to be displayed
     if (newValue.length && typeof setResultsLoading !== 'undefined') {
       setResultsLoading();
     }
-    console.log(newValue);
     if (typeof onSelect !== 'undefined') {
-      console.log('inside onselect');
       onSelect(newValue);
     }
     if (newValue.length && manageQuery === 'onSelect') {
-      console.log('inside updatequeries');
       updateQueries(newValue);
     }
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Enter' && inputValue === '') {
-      console.log('handleKeyDown');
       event.preventDefault();
       event.stopPropagation();
       onSelect_internal(value);
@@ -264,7 +265,6 @@ const SearchBar = ({
         }}
         //for handling spaces, when options are already loaded
         onInput={(event) => {
-          console.log('onInput');
           const value = (event.target as HTMLInputElement).value;
           // if the last character in the new string is a space, check for autocomplete
           if (
