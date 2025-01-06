@@ -352,7 +352,7 @@ const SearchBar = ({
           onClick={() => onSelect_internal(value)}
         >
           {resultsLoading === 'loading' ? (
-            <CircularProgress className="h-6 w-6 text-cornflower-50 dark:text-cornflower-800" />
+            <CircularProgress className="h-6 w-6 text-cornflower-50" />
           ) : (
             'Search'
           )}
