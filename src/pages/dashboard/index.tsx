@@ -164,7 +164,9 @@ function calculateGrades(grades: GradesData, academicSessions?: string[]) {
     gpa: gpa,
     total: total,
     grade_distribution: grade_distribution,
-    most_recent_semester: grades.map((session) => session._id).sort((a, b) => compareSemesters(b, a))[0],
+    most_recent_semester: grades
+      .map((session) => session._id)
+      .sort((a, b) => compareSemesters(b, a))[0],
   };
 }
 export type GradesType = {
