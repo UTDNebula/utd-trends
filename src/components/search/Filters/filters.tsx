@@ -39,13 +39,21 @@ export function compareSemesters(a: string, b: string) {
   } else return x;
 }
 
-export function displayAcademicSessionName(id: string) {
-  return (
-    '20' +
-    id.slice(0, 2) +
-    ' ' +
-    { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)]
-  );
+export function displayAcademicSessionName(id: string, yearFirst: boolean) {
+  if (yearFirst)
+    return (
+      '20' +
+      id.slice(0, 2) +
+      ' ' +
+      { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)]
+    );
+  else
+    return (
+      { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)] +
+      ' ' +
+      '20' +
+      id.slice(0, 2)
+    );
 }
 
 /**
@@ -310,7 +318,9 @@ const Filters = ({
                 value={session}
               >
                 <Checkbox checked={chosenSessions.includes(session)} />
-                <ListItemText primary={displayAcademicSessionName(session)} />
+                <ListItemText
+                  primary={displayAcademicSessionName(session, true)}
+                />
               </MenuItem>
             ))}
           </Select>

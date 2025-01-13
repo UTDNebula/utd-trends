@@ -205,7 +205,10 @@ function Row({
                 <Tooltip
                   title={
                     'Last taught in: ' +
-                    displayAcademicSessionName(grades.data.most_recent_semester)
+                    displayAcademicSessionName(
+                      grades.data.most_recent_semester,
+                      false,
+                    )
                   }
                   placement="top"
                 >
