@@ -172,7 +172,7 @@ function calculateGrades(grades: GradesData, academicSessions?: string[]) {
   }
 
   return {
-    // mean_gpa: mean_gpa,
+    mean_gpa: mean_gpa,
     gpa: median_gpa,
     total: total,
     grade_distribution: grade_distribution,
