@@ -20,16 +20,24 @@ import Rating from '@/components/common/Rating/rating';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/singleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/singleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
-import { displayAcademicSessionName } from '@/components/search/Filters/filters';
+import type { ProfessorInterface } from '@/components/overview/ProfessorOverview/professorOverview';
+import {
+  compareSemesters,
+  displayAcademicSessionName,
+  getCurrentSemester,
+  getLastLongSemester,
+} from '@/components/search/Filters/filters';
 import { useRainbowColors } from '@/modules/colors/colors';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
 import {
+  convertToCourseOnly,
   convertToProfOnly,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { SectionData } from '@/pages/api/section';
 import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 function LoadingRow() {
@@ -65,7 +73,9 @@ function LoadingRow() {
 
 type RowProps = {
   course: SearchQuery;
+  sections: GenericFetchedData<SectionData[]>;
   grades: GenericFetchedData<GradesType>;
+  professor: GenericFetchedData<ProfessorInterface>;
   rmp: GenericFetchedData<RMPInterface>;
   inCompare: boolean;
   addToCompare: (arg0: SearchQuery) => void;
@@ -75,7 +85,9 @@ type RowProps = {
 
 function Row({
   course,
+  sections,
   grades,
+  professor,
   rmp,
   inCompare,
   addToCompare,
@@ -99,6 +111,40 @@ function Row({
     if (gpa >= 0.67) return rainbowColors[11];
     return rainbowColors[12];
   };
+
+  function getMostRecentSemester(
+    most_recent_semester_from_grades: string,
+  ): string {
+    let { season, yyyy } = getCurrentSemester();
+    if (
+      typeof sections !== 'undefined' &&
+      typeof professor !== 'undefined' &&
+      sections.state === 'done' &&
+      professor.state === 'done'
+    ) {
+      const professorSections = sections.data.filter((section) =>
+        section.professors.includes(professor.data._id),
+      );
+      let semester = (yyyy % 100) + season;
+      while (
+        compareSemesters(semester, most_recent_semester_from_grades) > -1 &&
+        most_recent_semester_from_grades !== semester
+      ) {
+        // most recent semester in the grades is not the current semester
+        if (
+          professorSections.filter(
+            (section) => section.academic_session.name == semester,
+          ).length > 0
+        )
+          return semester;
+        else {
+          ({ season, yyyy } = getLastLongSemester(season, yyyy));
+          semester = (yyyy % 100) + season;
+        }
+      }
+    }
+    return most_recent_semester_from_grades;
+  }
 
   return (
     <>
@@ -206,14 +252,14 @@ function Row({
                   title={
                     'Last taught in: ' +
                     displayAcademicSessionName(
-                      grades.data.most_recent_semester,
+                      getMostRecentSemester(grades.data.most_recent_semester),
                       false,
                     )
                   }
                   placement="top"
                 >
                   <Typography className="text-xs text-black text-center rounded-full px-1 py-1 ml-1 w-8 block bg-cornflower-50">
-                    {grades.data.most_recent_semester}
+                    {getMostRecentSemester(grades.data.most_recent_semester)}
                   </Typography>
                 </Tooltip>
               )) ||
@@ -290,7 +336,9 @@ function Row({
 type SearchResultsTableProps = {
   resultsLoading: 'loading' | 'done';
   includedResults: SearchQuery[];
+  sectionsDataForCourse: { [key: string]: GenericFetchedData<SectionData[]> };
   grades: { [key: string]: GenericFetchedData<GradesType> };
+  professors: { [key: string]: GenericFetchedData<ProfessorInterface> };
   rmp: { [key: string]: GenericFetchedData<RMPInterface> };
   compare: SearchQuery[];
   addToCompare: (arg0: SearchQuery) => void;
@@ -301,7 +349,9 @@ type SearchResultsTableProps = {
 const SearchResultsTable = ({
   resultsLoading,
   includedResults,
+  sectionsDataForCourse,
   grades,
+  professors,
   rmp,
   compare,
   addToCompare,
@@ -535,7 +585,15 @@ const SearchResultsTable = ({
                   <Row
                     key={searchQueryLabel(result)}
                     course={result}
+                    sections={
+                      sectionsDataForCourse[
+                        searchQueryLabel(convertToCourseOnly(result))
+                      ]
+                    }
                     grades={grades[searchQueryLabel(result)]}
+                    professor={
+                      professors[searchQueryLabel(convertToProfOnly(result))]
+                    }
                     rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
                     inCompare={
                       compare.findIndex((obj) =>
