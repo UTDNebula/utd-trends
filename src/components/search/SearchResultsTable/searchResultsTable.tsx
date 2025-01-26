@@ -146,6 +146,11 @@ function Row({
     return most_recent_semester_from_grades;
   }
 
+  let most_recent_semester =
+    grades.state === 'done'
+      ? getMostRecentSemester(grades.data.most_recent_semester)
+      : '';
+
   return (
     <>
       <TableRow
@@ -251,15 +256,12 @@ function Row({
                 <Tooltip
                   title={
                     'Last taught in: ' +
-                    displayAcademicSessionName(
-                      getMostRecentSemester(grades.data.most_recent_semester),
-                      false,
-                    )
+                    displayAcademicSessionName(most_recent_semester, false)
                   }
                   placement="top"
                 >
                   <Typography className="text-xs text-black text-center rounded-full px-1 py-1 ml-1 w-8 block bg-cornflower-50">
-                    {getMostRecentSemester(grades.data.most_recent_semester)}
+                    {most_recent_semester}
                   </Typography>
                 </Tooltip>
               )) ||
