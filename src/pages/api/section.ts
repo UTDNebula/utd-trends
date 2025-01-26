@@ -11,13 +11,13 @@ export type SectionData = {
   _id: string;
   section_number: string;
   course_reference: string;
-  section_corequisites: any; //todo
+  section_corequisites: unknown; //todo
   academic_session: AcademicSession;
   professors: Array<string>;
-  teaching_assistants: Array<any>; //todo
+  teaching_assistants: Array<unknown>; //todo
   internal_class_number: string;
   instruction_mode: string;
-  meetings: Array<any>; //todo
+  meetings: Array<unknown>; //todo
   core_flags: Array<string>;
   syllabus_uri: string;
   grade_distribution: Array<number>;
