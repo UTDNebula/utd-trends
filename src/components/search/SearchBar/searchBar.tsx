@@ -263,7 +263,7 @@ const SearchBar = ({
               {...params}
               variant="outlined"
               className={input_className}
-              placeholder="ex. GOVT 2306"
+              placeholder="ex. GOVT 2306 Sara Johnson"
               //eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus={autoFocus}
             />
