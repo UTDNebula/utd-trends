@@ -146,7 +146,7 @@ function Row({
     return most_recent_semester_from_grades;
   }
 
-  let most_recent_semester =
+  const most_recent_semester =
     grades.state === 'done'
       ? getMostRecentSemester(grades.data.most_recent_semester)
       : '';
