@@ -290,7 +290,8 @@ const SearchBar = ({
           const value = (event.target as HTMLInputElement).value;
           // if the last character in the new string is a space, check for autocomplete
           if (
-            value[value.length - 1] === ' ' &&
+            (value[value.length - 1] === ' ' ||
+              value[value.length - 1] === ',') &&
             // but if the user is deleting text, don't try to autocomplete
             (event.nativeEvent as InputEvent).inputType === 'insertText'
           ) {
