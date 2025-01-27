@@ -74,6 +74,22 @@ const SearchBar = ({
     }
   }, [router.isReady, router.query.searchTerms]); // useEffect is called every time the query changes
 
+  const searchBarHints = [
+    'ex. GOVT 2306, Sara Johnson',
+    'ex. CS 1200, CS 2337',
+    'ex. MATH 2418',
+    'ex. John Cole, Jason Smith',
+  ];
+  const [searchBarHintIndex, setSearchBarHintIndex] = useState<number>(1);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSearchBarHintIndex(Math.floor(Math.random() * 4));
+    }, 7000);
+
+    return () => clearInterval(interval); // Cleanup when component unmounts
+  }, []); // run on mount
+
   // updateValue -> onSelect_internal -> updateQueries - clicking enter on an autocomplete suggestion in topMenu Searchbar
   // updateValue -> onSelect_internal -> onSelect (custom function) - clicking enter on an autocomplete suggestion in home page SearchBar
   // params.inputProps.onKeyDown -> handleKeyDown -> onSelect_internal -> updateQueries/onSelect - clicking enter in the SearchBar
@@ -263,7 +279,7 @@ const SearchBar = ({
               {...params}
               variant="outlined"
               className={input_className}
-              placeholder="ex. GOVT 2306 Sara Johnson"
+              placeholder={searchBarHints[searchBarHintIndex]}
               //eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus={autoFocus}
             />
