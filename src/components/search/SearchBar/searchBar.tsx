@@ -82,9 +82,13 @@ const SearchBar = ({
   ];
   const [searchBarHintIndex, setSearchBarHintIndex] = useState<number>(1);
 
+  function changeHint() {
+    setSearchBarHintIndex(Math.floor(Math.random() * 4));
+  }
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setSearchBarHintIndex(Math.floor(Math.random() * 4));
+      changeHint();
     }, 7000);
 
     return () => clearInterval(interval); // Cleanup when component unmounts
@@ -112,6 +116,7 @@ const SearchBar = ({
   //update parent and queries
   function onSelect_internal(newValue: SearchQuery[]) {
     // called by updateValue(), handleKeyDown(), and is assigned to the button onClick action
+    changeHint();
     if (
       router.query.searchTerms ==
       newValue.map((el) => searchQueryLabel(el)).join(',')
