@@ -260,7 +260,7 @@ function Row({
                   }
                   placement="top"
                 >
-                  <Typography className="text-xs text-black text-center rounded-full px-1 py-1 ml-1 w-8 block bg-cornflower-50">
+                  <Typography className="text-xs text-black text-center rounded-full px-1 py-1 ml-1 w-8 block bg-gray-100">
                     {most_recent_semester}
                   </Typography>
                 </Tooltip>
