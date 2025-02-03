@@ -161,7 +161,7 @@ function Row({
         section.professors.includes(professor.data._id),
       );
       // if upcoming semester
-      const upcomingSemester = (nextSemester.yyyy % 100) + nextSemester.season
+      const upcomingSemester = (nextSemester.yyyy % 100) + nextSemester.season;
       if (
         professorSections.filter(
           (section) => section.academic_session.name == upcomingSemester,
@@ -286,29 +286,31 @@ function Row({
               )) ||
               (grades.state === 'done' && (
                 <>
-                <Tooltip
-                  title={
-                    'Last taught in: ' +
-                    displayAcademicSessionName(most_recent_semester, false)
-                  }
-                  placement="top"
-                >
-                  <Typography className="text-xs text-black text-center rounded-full px-1 py-1 ml-1 w-8 block bg-cornflower-50">
-                    {most_recent_semester}
-                  </Typography>
-                </Tooltip>
-                {teachingNextSemester && <Tooltip
-                title={
-                  'Also teaching in ' +
-                  displayAcademicSessionName(teachingNextSemester, false)
-                }
-                placement="top"
-              >
-                <Typography className="text-xs text-black text-center rounded-full px-1 py-1 ml-1 w-8 block bg-cornflower-400">
-                  {teachingNextSemester}
-                </Typography>
-              </Tooltip>}
-              </>
+                  <Tooltip
+                    title={
+                      'Last taught in: ' +
+                      displayAcademicSessionName(most_recent_semester, false)
+                    }
+                    placement="top"
+                  >
+                    <Typography className="text-xs text-black text-center rounded-full px-1 py-1 ml-1 w-8 block bg-cornflower-50">
+                      {most_recent_semester}
+                    </Typography>
+                  </Tooltip>
+                  {teachingNextSemester && (
+                    <Tooltip
+                      title={
+                        'Also teaching in ' +
+                        displayAcademicSessionName(teachingNextSemester, false)
+                      }
+                      placement="top"
+                    >
+                      <Typography className="text-xs text-black text-center rounded-full px-1 py-1 ml-1 w-8 block bg-cornflower-400">
+                        {teachingNextSemester}
+                      </Typography>
+                    </Tooltip>
+                  )}
+                </>
               )) ||
               null}
           </div>

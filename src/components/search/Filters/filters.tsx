@@ -38,10 +38,6 @@ export function getCurrentSemester() {
   else season = 'F';
 
   return {
-    season: "F",
-    yyyy: 2024
-  }
-  return {
     season: season,
     yyyy: yyyy,
   };
@@ -76,7 +72,6 @@ export function getNextLongSemester(season: string, yyyy: number) {
     yyyy: yyyy,
   };
 }
-
 
 /** A comparator function used when sorting semesters by name. Returns -1 if semester 'a' is more older than semester 'b'. */
 export function compareSemesters(a: string, b: string) {
