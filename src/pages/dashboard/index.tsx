@@ -222,7 +222,7 @@ function fetchGradesData(
 function fetchCourseData(
   course: SearchQuery,
   controller: AbortController,
-): Promise<CourseData> {
+): Promise<CourseData[]> {
   return fetchWithCache(
     '/api/course?prefix=' +
       encodeURIComponent(String(course.prefix)) +
@@ -245,7 +245,7 @@ function fetchCourseData(
     })
     .then((response: CourseData[]) => {
       response.sort((a, b) => b.catalog_year - a.catalog_year); // sort by year descending, so index 0 has the most recent year
-      return response[0] as CourseData;
+      return [response[0], response[1]] as CourseData[];
     });
 
   controller.abort();
@@ -280,13 +280,17 @@ function fetchSectionsDataForCourse(
   course: SearchQuery,
   controller: AbortController,
 ): Promise<SectionData[]> {
-  return fetchCourseData(course, controller).then((courseData: CourseData) => {
-    return Promise.all(
-      courseData.sections.map((sectionID) =>
-        fetchSectionData(sectionID, controller),
-      ),
-    );
-  });
+  return fetchCourseData(course, controller).then(
+    (courseDatas: CourseData[]) => {
+      return Promise.all(
+        courseDatas.flatMap((courseData) =>
+          courseData.sections.map((sectionID) =>
+            fetchSectionData(sectionID, controller),
+          ),
+        ),
+      );
+    },
+  );
 }
 
 //Fetch RMP data from RMP
