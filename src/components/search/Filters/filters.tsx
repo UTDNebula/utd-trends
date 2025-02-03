@@ -38,6 +38,10 @@ export function getCurrentSemester() {
   else season = 'F';
 
   return {
+    season: "F",
+    yyyy: 2024
+  }
+  return {
     season: season,
     yyyy: yyyy,
   };
@@ -57,6 +61,22 @@ export function getLastLongSemester(season: string, yyyy: number) {
     yyyy: yyyy,
   };
 }
+
+/** returns the season and yyyy of the previous long semester */
+export function getNextLongSemester(season: string, yyyy: number) {
+  if (season === 'F') {
+    // then the previous semester is last year's Fall
+    yyyy = yyyy + 1;
+    season = 'S';
+  } // then the previous long-semester is this year's Spring
+  else season = 'F';
+
+  return {
+    season: season,
+    yyyy: yyyy,
+  };
+}
+
 
 /** A comparator function used when sorting semesters by name. Returns -1 if semester 'a' is more older than semester 'b'. */
 export function compareSemesters(a: string, b: string) {

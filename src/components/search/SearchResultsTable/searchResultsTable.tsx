@@ -26,6 +26,7 @@ import {
   displayAcademicSessionName,
   getCurrentSemester,
   getLastLongSemester,
+  getNextLongSemester,
 } from '@/components/search/Filters/filters';
 import { useRainbowColors } from '@/modules/colors/colors';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
@@ -125,6 +126,7 @@ function Row({
       const professorSections = sections.data.filter((section) =>
         section.professors.includes(professor.data._id),
       );
+
       let semester = (yyyy % 100) + season;
       while (
         compareSemesters(semester, most_recent_semester_from_grades) > -1 &&
@@ -146,10 +148,40 @@ function Row({
     return most_recent_semester_from_grades;
   }
 
+  function getTeachingNextSemester() {
+    const { season, yyyy } = getCurrentSemester();
+    const nextSemester = getNextLongSemester(season, yyyy);
+    if (
+      typeof sections !== 'undefined' &&
+      typeof professor !== 'undefined' &&
+      sections.state === 'done' &&
+      professor.state === 'done'
+    ) {
+      const professorSections = sections.data.filter((section) =>
+        section.professors.includes(professor.data._id),
+      );
+      // if upcoming semester
+      const upcomingSemester = (nextSemester.yyyy % 100) + nextSemester.season
+      if (
+        professorSections.filter(
+          (section) => section.academic_session.name == upcomingSemester,
+        ).length > 0
+      ) {
+        return upcomingSemester;
+      }
+    }
+    return null;
+  }
+
   const most_recent_semester =
     grades.state === 'done'
       ? getMostRecentSemester(grades.data.most_recent_semester)
       : '';
+
+  const teachingNextSemester =
+    grades.state === 'done' ? getTeachingNextSemester() : '';
+
+  console.log(teachingNextSemester);
 
   return (
     <>
@@ -253,6 +285,7 @@ function Row({
                 </Skeleton>
               )) ||
               (grades.state === 'done' && (
+                <>
                 <Tooltip
                   title={
                     'Last taught in: ' +
@@ -264,6 +297,18 @@ function Row({
                     {most_recent_semester}
                   </Typography>
                 </Tooltip>
+                {teachingNextSemester && <Tooltip
+                title={
+                  'Also teaching in ' +
+                  displayAcademicSessionName(teachingNextSemester, false)
+                }
+                placement="top"
+              >
+                <Typography className="text-xs text-black text-center rounded-full px-1 py-1 ml-1 w-8 block bg-cornflower-400">
+                  {teachingNextSemester}
+                </Typography>
+              </Tooltip>}
+              </>
               )) ||
               null}
           </div>
