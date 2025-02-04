@@ -25,7 +25,7 @@
     "verbatimModuleSyntax": true
   },
   "include": ["src", "next-env.d.ts", "**/*.ts", "**/*.tsx", "/**/**/*/.tsx"],
-  "exclude": ["node_modules", "**/tailwind.config.js"],
+  "exclude": ["node_modules"],
   "ts-node": {
     "transpileOnly": true,
     "moduleTypes": {

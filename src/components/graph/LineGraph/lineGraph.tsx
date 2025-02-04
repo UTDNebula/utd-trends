@@ -1,21 +1,25 @@
 import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import type { ApexOptions } from 'apexcharts';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 
-import { type SearchQuery, searchQueryLabel } from '@/modules/SearchQuery/SearchQuery';
+import {
+  type SearchQuery,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
 import type { GenericFetchedData } from '@/pages/dashboard/index';
+
 export type GPATrendType = {
-    years: string[];
-    gpa_values: number[];
-  };
+  season: string[];
+  years: string[];
+  gpa: number[];
+};
 
 type Props = {
-  course: SearchQuery;
+  recentSemesters: SearchQuery;
   gpaTrend: GenericFetchedData<GPATrendType>;
 };
 
-function GPATrendGraph({ course, gpaTrend }: Props) {
+function LineGraph({ recentSemesters, gpaTrend }: Props) {
   const [chartType, setChartType] = useState<'line' | 'bar'>('line');
   const [chartData, setChartData] = useState<{
     options: {
@@ -97,10 +101,12 @@ function GPATrendGraph({ course, gpaTrend }: Props) {
         },
       },
     },
-    series: [{
-      name: '',
-      data: [],
-    }],
+    series: [
+      {
+        name: '',
+        data: [],
+      },
+    ],
   });
 
   useEffect(() => {
@@ -108,25 +114,30 @@ function GPATrendGraph({ course, gpaTrend }: Props) {
       setChartData({
         options: {
           ...chartData.options,
-          xaxis: { 
-            categories: gpaTrend.data.years,
-            labels: { rotate: -45 } 
+          xaxis: {
+            categories: gpaTrend.data.season,
+            labels: { rotate: -45 },
           },
         },
-        series: [{
-          name: searchQueryLabel(course),
-          data: gpaTrend.data.gpa_values,
-        }],
+        series: [
+          {
+            name: searchQueryLabel(recentSemesters),
+            data: gpaTrend.data.gpa,
+          },
+        ],
       });
     }
-  }, [gpaTrend, course]);
+  }, [gpaTrend, recentSemesters]);
 
-  const handleChartToggle = (_event: React.MouseEvent<HTMLElement>, newChartType: 'line' | 'bar' | null) => {
+  const handleChartToggle = (
+    _event: React.MouseEvent<HTMLElement>,
+    newChartType: 'line' | 'bar' | null,
+  ) => {
     if (newChartType) {
       setChartType(newChartType);
     }
   };
-  
+
   if (typeof gpaTrend === 'undefined' || gpaTrend.state === 'error') {
     return null;
   }
@@ -146,8 +157,8 @@ function GPATrendGraph({ course, gpaTrend }: Props) {
         onChange={handleChartToggle}
         className="mb-2"
       >
-        <ToggleButton value="bar">📊</ToggleButton>
-        <ToggleButton value="line">📈</ToggleButton>
+        <ToggleButton value="bar"></ToggleButton>
+        <ToggleButton value="line"></ToggleButton>
       </ToggleButtonGroup>
       <div className="h-64">
         <Chart
@@ -161,4 +172,4 @@ function GPATrendGraph({ course, gpaTrend }: Props) {
   );
 }
 
-export default GPATrendGraph;
+export default LineGraph;
