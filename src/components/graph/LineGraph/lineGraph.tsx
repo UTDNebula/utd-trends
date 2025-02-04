@@ -1,12 +1,11 @@
 import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
-import Chart from 'react-apexcharts';
 
-import {
-  type SearchQuery,
-  searchQueryLabel,
-} from '@/modules/SearchQuery/SearchQuery';
 import type { GenericFetchedData } from '@/pages/dashboard/index';
+
+// Dynamically import react-apexcharts with SSR disabled.
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 export type GPATrendType = {
   season: string[];
@@ -15,11 +14,18 @@ export type GPATrendType = {
 };
 
 type Props = {
-  recentSemesters: SearchQuery;
-  gpaTrend: GenericFetchedData<GPATrendType>;
+  gpaTrend?: GenericFetchedData<GPATrendType>;
+  chartTitle?: string;
+  xAxisLabels?: string[];
+  yAxisFormatter?: (value: number) => string;
+  tooltipFormatter?: (value: number) => string;
+  series?: {
+    name: string;
+    data: number[];
+  }[];
 };
 
-function LineGraph({ recentSemesters, gpaTrend }: Props) {
+function LineGraph({ gpaTrend, chartTitle, xAxisLabels, yAxisFormatter, tooltipFormatter, series }: Props): React.ReactNode {
   const [chartType, setChartType] = useState<'line' | 'bar'>('line');
   const [chartData, setChartData] = useState<{
     options: {
@@ -77,7 +83,8 @@ function LineGraph({ recentSemesters, gpaTrend }: Props) {
         },
       },
       xaxis: {
-        categories: [] as string[],
+        categories: [],
+
         labels: {
           rotate: -45,
         },
@@ -110,10 +117,11 @@ function LineGraph({ recentSemesters, gpaTrend }: Props) {
   });
 
   useEffect(() => {
-    if (gpaTrend.state === 'done') {
-      setChartData({
+    if (gpaTrend && gpaTrend.state === 'done') {
+      setChartData(prev => ({
         options: {
-          ...chartData.options,
+          ...prev.options,
+
           xaxis: {
             categories: gpaTrend.data.season,
             labels: { rotate: -45 },
@@ -121,52 +129,68 @@ function LineGraph({ recentSemesters, gpaTrend }: Props) {
         },
         series: [
           {
-            name: searchQueryLabel(recentSemesters),
+            name: chartTitle || '',
+
             data: gpaTrend.data.gpa,
           },
         ],
-      });
-    }
-  }, [gpaTrend, recentSemesters]);
+      }));
+    } else if (series) {
+      setChartData(prev => ({
+        options: {
+          ...prev.options,
 
-  const handleChartToggle = (
-    _event: React.MouseEvent<HTMLElement>,
-    newChartType: 'line' | 'bar' | null,
-  ) => {
-    if (newChartType) {
-      setChartType(newChartType);
+          xaxis: {
+            categories: xAxisLabels || [],
+            labels: { rotate: -45 },
+          },
+
+          yaxis: {
+            ...prev.options.yaxis,
+            labels: {
+              formatter:
+                yAxisFormatter || ((value: number) => value.toFixed(2)),
+            },
+          },
+
+          tooltip: {
+            y: {
+              formatter:
+                tooltipFormatter || ((value: number) => value.toFixed(3)),
+            },
+          },
+        },
+
+        series: series,
+      }));
     }
+  }, [gpaTrend, series, xAxisLabels, yAxisFormatter, tooltipFormatter]);
+
+  if (gpaTrend) {
+    if (gpaTrend.state === 'error') {
+      return null;
+    }
+    if (gpaTrend.state === 'loading') {
+      return (
+        <div className="p-2">
+          <Skeleton variant="rounded" className="w-full h-60 m-2" />
+        </div>
+      );
+    }
+  }
+
+  const handleChartToggle = (_event: React.MouseEvent<HTMLElement>, newChartType: 'line' | 'bar' | null) => {
+    if (newChartType) setChartType(newChartType);
   };
-
-  if (typeof gpaTrend === 'undefined' || gpaTrend.state === 'error') {
-    return null;
-  }
-  if (gpaTrend.state === 'loading') {
-    return (
-      <div className="p-2">
-        <Skeleton variant="rounded" className="w-full h-60 m-2" />
-      </div>
-    );
-  }
 
   return (
     <div className="p-2">
-      <ToggleButtonGroup
-        value={chartType}
-        exclusive
-        onChange={handleChartToggle}
-        className="mb-2"
-      >
-        <ToggleButton value="bar"></ToggleButton>
-        <ToggleButton value="line"></ToggleButton>
+      <ToggleButtonGroup value={chartType} exclusive onChange={handleChartToggle} className="mb-2">
+        <ToggleButton value="bar" />
+        <ToggleButton value="line" />
       </ToggleButtonGroup>
       <div className="h-64">
-        <Chart
-          options={chartData.options}
-          series={chartData.series}
-          type={chartType}
-          height={250}
-        />
+        <Chart options={chartData.options} series={chartData.series} type={chartType} height={250} />
       </div>
     </div>
   );
