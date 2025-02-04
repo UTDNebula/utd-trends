@@ -1,4 +1,4 @@
-import { Card, Grid2 as Grid, useMediaQuery } from '@mui/material';
+import { Card, Grid2 as Grid } from '@mui/material';
 import type { NextPage, NextPageContext } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
