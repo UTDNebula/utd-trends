@@ -142,7 +142,7 @@ const stepsTemplate: StepTemplate[] = [
   {
     id: 'filters',
     title: 'Filters',
-    content: '...',
+    content: 'Use the filters to show more specific data.',
     anchorOrigin: { vertical: 'bottom', horizontal: 'center' },
     transformOrigin: { vertical: 'top', horizontal: 'center' },
   },
