@@ -1,10 +1,11 @@
+import CloseIcon from '@mui/icons-material/Close';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import ShareIcon from '@mui/icons-material/Share';
 import { IconButton, Snackbar, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import Background from '@/../public/background.png';
 import Tutorial from '@/components/dashboard/Tutorial/tutorial';
@@ -54,6 +55,22 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
 
   const [openTutorial, setOpenTutorial] = useState(false);
   const closeTutorial = useCallback(() => setOpenTutorial(false), []);
+  const [openTutorialHint, setOpenTutorialHint] = useState(false);
+  //Open if not already closed (based on localStorage)
+  useEffect(() => {
+    const previous = localStorage.getItem('tutorialHint');
+    let ask = previous === null;
+    if (previous !== null) {
+      const parsed = JSON.parse(previous);
+      if (parsed !== null && parsed.value !== 'closed') {
+        ask = true;
+      }
+    }
+    if (ask) {
+      setOpenTutorialHint(true);
+    }
+  }, []);
+  const cacheIndex = 0; //Increment this to open the popup for all users on next deployment
 
   return (
     <>
@@ -78,11 +95,49 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
           input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         />
         <div className="flex gap-4 ml-auto">
-          <Tooltip title="Open tutorial">
+          <Tooltip
+            open={openTutorialHint}
+            arrow
+            slotProps={{ tooltip: { className: 'animate-bounce' } }}
+            title={
+              <div
+                className="p-2 flex flex-col items-start min-w-32 max-w-96"
+                role="dialog"
+                aria-modal="true"
+              >
+                <div className="flex w-full items-center gap-2 pl-2">
+                  <p className="text-lg font-bold">Quick tutorial</p>
+                  <IconButton
+                    onClick={() => {
+                      setOpenTutorialHint(false);
+                      localStorage.setItem(
+                        'tutorialHint',
+                        JSON.stringify({
+                          value: 'closed',
+                          cacheIndex: cacheIndex,
+                        }),
+                      );
+                    }}
+                    className="ml-auto"
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </div>
+              </div>
+            }
+          >
             <IconButton
               className="w-12 h-12"
               size="medium"
               onClick={() => {
+                setOpenTutorialHint(false);
+                localStorage.setItem(
+                  'tutorialHint',
+                  JSON.stringify({
+                    value: 'closed',
+                    cacheIndex: cacheIndex,
+                  }),
+                );
                 setOpenTutorial(true);
               }}
             >
