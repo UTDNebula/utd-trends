@@ -128,22 +128,27 @@ const stepsTemplate: StepTemplate[] = [
     transformOrigin: { vertical: 'top', horizontal: 'center' },
   },
   {
-    id: 'dropdown',
-    title: 'More information',
-    content: 'Open a result for more detailed information.',
+    id: 'actions',
+    title: 'More Information & Compare',
+    content: (
+      <>
+        <p>Open a result for more detailed information.</p>
+        <p>Click the checkbox to add an item to the compare tab.</p>
+      </>
+    ),
     anchorOrigin: { vertical: 'bottom', horizontal: 'center' },
     transformOrigin: { vertical: 'top', horizontal: 'center' },
   },
   {
-    id: 'compare',
-    title: 'Compare',
-    content: 'Click the checkbox to add an item to the compare tab.',
+    id: 'filters',
+    title: 'Filters',
+    content: '...',
     anchorOrigin: { vertical: 'bottom', horizontal: 'center' },
     transformOrigin: { vertical: 'top', horizontal: 'center' },
   },
   {
     id: 'LHS',
-    title: "That's all!",
+    title: "That's All!",
     content:
       'Try searching for a class you need to take and looking through the results.',
     anchorOrigin: { vertical: 'top', horizontal: 'right' },
@@ -169,10 +174,12 @@ const Tutorial = ({ open, close }: TutorialProps) => {
     }
     const newSteps = [...stepsTemplate];
     elements.forEach((element) => {
-      const id = element.getAttribute('data-tutorial-id') as string;
-      const foundStep = newSteps.findIndex((step) => step.id === id);
-      if (foundStep !== -1) {
-        newSteps[foundStep].element = element;
+      if (element.checkVisibility()) {
+        const id = element.getAttribute('data-tutorial-id') as string;
+        const foundStep = newSteps.findIndex((step) => step.id === id);
+        if (foundStep !== -1) {
+          newSteps[foundStep].element = element;
+        }
       }
     });
     setSteps(
