@@ -1,8 +1,14 @@
-import { Card, Grid2 as Grid } from '@mui/material';
-import type { NextPage } from 'next';
+import { Card, Grid2 as Grid, useMediaQuery } from '@mui/material';
+import type { NextPage, NextPageContext } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  type ImperativePanelHandle,
+  Panel,
+  PanelGroup,
+  PanelResizeHandle,
+} from 'react-resizable-panels';
 
 import Compare from '@/components/compare/Compare/compare';
 import DashboardEmpty from '@/components/dashboard/DashboardEmpty/dashboardEmpty';
@@ -241,7 +247,77 @@ function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
   return colorMap;
 }
 
-export const Dashboard: NextPage = () => {
+/**
+ * Seperates courses and professors from a string of comma-delimited searchTerms or string[] of searchTerms
+ * @param searchTermInput
+ * @returns an array of courseSearchTerms and professorSearchTerms
+ */
+function getSearchTerms(searchTermInput: string | string[] | undefined): {
+  courseSearchTerms: SearchQuery[];
+  professorSearchTerms: SearchQuery[];
+} {
+  let array = searchTermInput ?? [];
+  if (!Array.isArray(array)) {
+    array = array.split(','); // if searchTermsInput is a comma-delimited string, make it an array
+  }
+  const searchTerms = array.map((el) => decodeSearchQueryLabel(el)); // convert an array of strings to an array of SearchQuery's
+
+  const courseSearchTerms: SearchQuery[] = [];
+  const professorSearchTerms: SearchQuery[] = [];
+
+  // split the search terms into professors and courses
+  searchTerms.map((searchTerm) => {
+    if (typeof searchTerm.profLast !== 'undefined') {
+      professorSearchTerms.push(searchTerm);
+    }
+    if (typeof searchTerm.prefix !== 'undefined') {
+      courseSearchTerms.push(searchTerm);
+    }
+  });
+
+  return { courseSearchTerms, professorSearchTerms };
+}
+
+/**
+ *
+ * @param courseSearchTerms
+ * @param professorSearchTerms
+ * @returns an empty string or a comma-delimited list of courses and professors, ending with a " - "
+ */
+function buildPageTitle(
+  courseSearchTerms: SearchQuery[],
+  professorSearchTerms: SearchQuery[],
+): string {
+  let pageTitle = '';
+  courseSearchTerms.map((term) => {
+    pageTitle += searchQueryLabel(term) + ', ';
+  });
+  professorSearchTerms.map((term) => {
+    pageTitle += searchQueryLabel(term) + ', ';
+  });
+  pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
+  return pageTitle;
+}
+
+export async function getServerSideProps(
+  context: NextPageContext,
+): Promise<{ props: { pageTitle: string } }> {
+  const { courseSearchTerms, professorSearchTerms } = getSearchTerms(
+    context.query.searchTerms,
+  );
+
+  return {
+    props: {
+      pageTitle: buildPageTitle(courseSearchTerms, professorSearchTerms),
+    },
+  };
+}
+
+export const Dashboard: NextPage<{ pageTitle: string }> = ({
+  pageTitle,
+}: {
+  pageTitle: string;
+}): React.ReactNode => {
   const router = useRouter();
 
   //Searches seperated into courses and professors to create combos
@@ -256,24 +332,9 @@ export const Dashboard: NextPage = () => {
   //On search change, seperate into courses and profs, clear data, and fetch new results
   useEffect(() => {
     if (router.isReady) {
-      let array = router.query.searchTerms ?? [];
-      if (!Array.isArray(array)) {
-        array = array.split(',');
-      }
-      const searchTerms = array.map((el) => decodeSearchQueryLabel(el));
-
-      const courseSearchTerms: SearchQuery[] = [];
-      const professorSearchTerms: SearchQuery[] = [];
-
-      // split the search terms into professors and courses
-      searchTerms.map((searchTerm) => {
-        if (typeof searchTerm.profLast !== 'undefined') {
-          professorSearchTerms.push(searchTerm);
-        }
-        if (typeof searchTerm.prefix !== 'undefined') {
-          courseSearchTerms.push(searchTerm);
-        }
-      });
+      const { courseSearchTerms, professorSearchTerms } = getSearchTerms(
+        router.query.searchTerms,
+      );
       setCourses(courseSearchTerms);
       setProfessors(professorSearchTerms);
 
@@ -317,8 +378,12 @@ export const Dashboard: NextPage = () => {
             getData(res, controller);
           })
           .catch((error) => {
-            setResults({ state: 'error', data: [] });
-            console.error('Search Results', error);
+            if (
+              !(error instanceof DOMException && error.name == 'AbortError')
+            ) {
+              setResults({ state: 'error', data: [] });
+              console.error('Search Results', error);
+            }
           });
       } else if (professorSearchTerms.length > 0) {
         fetchSearchResults(professorSearchTerms, courseSearchTerms, controller)
@@ -330,8 +395,12 @@ export const Dashboard: NextPage = () => {
             getData(res, controller);
           })
           .catch((error) => {
-            setResults({ state: 'error', data: [] });
-            console.error('Search Results', error);
+            if (
+              !(error instanceof DOMException && error.name == 'AbortError')
+            ) {
+              setResults({ state: 'error', data: [] });
+              console.error('Search Results', error);
+            }
           });
       }
       return () => {
@@ -474,7 +543,11 @@ export const Dashboard: NextPage = () => {
           professor: isCourse ? old.professor : { [rhsKey]: rhsGradeFetched },
         }));
       })
-      .catch((err) => console.error('Grades data for ' + rhsKey, err));
+      .catch((error) => {
+        if (!(error instanceof DOMException && error.name == 'AbortError')) {
+          console.error('Grades data for ' + rhsKey, error);
+        }
+      });
   }
 
   //Store rmp scores by profs
@@ -518,7 +591,9 @@ export const Dashboard: NextPage = () => {
       .catch((error) => {
         //Set loading status to error
         addToGrades(searchQueryLabel(course), { state: 'error' });
-        console.error('Grades data for ' + searchQueryLabel(course), error);
+        if (!(error instanceof DOMException && error.name == 'AbortError')) {
+          console.error('Grades data for ' + searchQueryLabel(course), error);
+        }
       });
   }
 
@@ -540,7 +615,9 @@ export const Dashboard: NextPage = () => {
       .catch((error) => {
         //Set loading status to error
         addToRmp(searchQueryLabel(professor), { state: 'error' });
-        console.error('RMP data for ' + searchQueryLabel(professor), error);
+        if (!(error instanceof DOMException && error.name == 'AbortError')) {
+          console.error('RMP data for ' + searchQueryLabel(professor), error);
+        }
       });
   }
 
@@ -551,7 +628,7 @@ export const Dashboard: NextPage = () => {
     for (const result of results) {
       const entry = grades[searchQueryLabel(result)];
       //Not already loading
-      if (typeof entry === 'undefined') {
+      if (typeof entry === 'undefined' || entry.state === 'error') {
         fetchAndStoreGradesData(result, controller);
       } else {
         //Recalc gpa and such from past stored data for new page
@@ -592,8 +669,9 @@ export const Dashboard: NextPage = () => {
       professorsInResults.push(professors[0]);
     }
     for (const professor of professorsInResults) {
+      const entry = rmp[searchQueryLabel(professor)];
       //Not already loading
-      if (typeof rmp[searchQueryLabel(professor)] === 'undefined') {
+      if (typeof entry === 'undefined' || entry.state === 'error') {
         fetchAndStoreRmpData(professor, controller);
       }
     }
@@ -714,13 +792,24 @@ export const Dashboard: NextPage = () => {
     }
   }
 
+  const panelLRef = useRef<ImperativePanelHandle>(null);
+  const panelRRef = useRef<ImperativePanelHandle>(null);
+  // Resets RHS & LHS to 50/50 when double clicking handle
+  const handleResizeDoubleClick = () => {
+    panelLRef.current?.resize(50);
+  };
+
   // Add this after the compare state declaration
   const colorMap = createColorMap(compare);
 
   //Main content: loading, error, or normal
   let contentComponent;
 
-  if (courses.length === 0 && professors.length === 0) {
+  if (
+    courses.length === 0 &&
+    professors.length === 0 &&
+    results.state !== 'loading'
+  ) {
     contentComponent = <DashboardEmpty />;
   } else if (results.state === 'error') {
     contentComponent = <DashboardError />;
@@ -760,6 +849,26 @@ export const Dashboard: NextPage = () => {
         colorMap={colorMap}
       />,
     );
+    const searchResultsTable = (
+      <SearchResultsTable
+        resultsLoading={results.state}
+        numSearches={courses.length + professors.length}
+        includedResults={includedResults}
+        grades={grades}
+        rmp={rmp}
+        compare={compare}
+        addToCompare={addToCompare}
+        removeFromCompare={removeFromCompare}
+        colorMap={colorMap}
+      />
+    );
+    const carousel = (
+      <Card>
+        <Carousel names={names} compareLength={compare.length}>
+          {tabs}
+        </Carousel>
+      </Card>
+    );
     contentComponent = (
       <>
         <Grid container spacing={2}>
@@ -773,44 +882,57 @@ export const Dashboard: NextPage = () => {
           </Grid>
           <Grid size={{ xs: false, sm: 6, md: 6 }}></Grid>
         </Grid>
-        <Grid container component="main" wrap="wrap-reverse" spacing={2}>
-          <Grid size={{ xs: 12, sm: 6, md: 6 }} data-tutorial-id="LHS">
-            <SearchResultsTable
-              resultsLoading={results.state}
-              numSearches={courses.length + professors.length}
-              includedResults={includedResults}
-              grades={grades}
-              rmp={rmp}
-              compare={compare}
-              addToCompare={addToCompare}
-              removeFromCompare={removeFromCompare}
-              colorMap={colorMap}
-            />
-          </Grid>
-          <Grid size={{ xs: false, sm: 6, md: 6 }} data-tutorial-id="RHS">
-            <div className="sticky top-0 gridsm:max-h-screen overflow-y-auto pt-4">
-              <Card>
-                <Carousel names={names} compareLength={compare.length}>
-                  {tabs}
-                </Carousel>
-              </Card>
+        <div className="sm:hidden">
+          <div data-tutorial-id="LHS"> {carousel} </div>
+          <div data-tutorial-id="RHS"> {searchResultsTable} </div>
+        </div>
+        <PanelGroup
+          direction="horizontal"
+          className="hidden sm:flex overflow-visible"
+        >
+          <Panel
+            ref={panelLRef}
+            minSize={40}
+            defaultSize={50}
+            data-tutorial-id="LHS"
+          >
+            {searchResultsTable}
+          </Panel>
+          <PanelResizeHandle
+            className="mt-4 p-1 mx-1 w-0.5 rounded-full opacity-25 data-[resize-handle-state=drag]:opacity-50 transition ease-in-out bg-transparent hover:bg-royal data-[resize-handle-state=drag]:bg-royal"
+            onDoubleClick={handleResizeDoubleClick}
+          />
+          <Panel
+            className="overflow-visible min-w-0"
+            ref={panelRRef}
+            minSize={30}
+            defaultSize={50}
+            data-tutorial-id="RHS"
+          >
+            <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto mt-4">
+              {carousel}
             </div>
-          </Grid>
-        </Grid>
+          </Panel>
+        </PanelGroup>
       </>
     );
   }
 
-  /* Final page */
-
   return (
     <>
       <Head>
-        <title>Results - UTD Trends</title>
+        <title>
+          {'Results - ' + buildPageTitle(courses, professors) + 'UTD TRENDS'}
+        </title>
         <link
           rel="canonical"
           href="https://trends.utdnebula.com/dashboard"
           key="canonical"
+        />
+        <meta
+          key="og:title"
+          property="og:title"
+          content={'Results - ' + pageTitle + 'UTD TRENDS'}
         />
         <meta
           property="og:url"
@@ -818,7 +940,10 @@ export const Dashboard: NextPage = () => {
         />
       </Head>
       <div className="w-full bg-light h-full">
-        <TopMenu />
+        <TopMenu
+          resultsLoading={results.state}
+          setResultsLoading={() => setResults({ state: 'loading' })}
+        />
         <main className="p-4">{contentComponent}</main>
       </div>
     </>

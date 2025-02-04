@@ -21,6 +21,7 @@ import SingleGradesInfo from '@/components/common/SingleGradesInfo/singleGradesI
 import SingleProfInfo from '@/components/common/SingleProfInfo/singleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
 import { useRainbowColors } from '@/modules/colors/colors';
+import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
 import {
   convertToProfOnly,
   type SearchQuery,
@@ -30,30 +31,13 @@ import {
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
-const gpaToLetterGrade = (gpa: number): string => {
-  if (gpa >= 4.0) return 'A';
-  if (gpa >= 3.67) return 'A-';
-  if (gpa >= 3.33) return 'B+';
-  if (gpa >= 3.0) return 'B';
-  if (gpa >= 2.67) return 'B-';
-  if (gpa >= 2.33) return 'C+';
-  if (gpa >= 2.0) return 'C';
-  if (gpa >= 1.67) return 'C-';
-  if (gpa >= 1.33) return 'D+';
-  if (gpa >= 1.0) return 'D';
-  if (gpa >= 0.67) return 'D-';
-  return 'F';
-};
-
 function LoadingRow() {
   return (
     <TableRow>
-      <TableCell>
-        <IconButton aria-label="expand row" size="small" disabled>
+      <TableCell className="flex gap-1">
+        <IconButton aria-label="expand row" size="medium" disabled>
           <KeyboardArrowIcon />
         </IconButton>
-      </TableCell>
-      <TableCell>
         <Checkbox disabled />
       </TableCell>
       <TableCell component="th" scope="row" className="w-full">
@@ -126,71 +110,90 @@ function Row({
       >
         <TableCell
           className="border-b-0"
-          data-tutorial-id={showTutorial && 'dropdown'}
+          data-tutorial-id={showTutorial && 'actions'}
         >
-          <Tooltip
-            title={open ? 'Minimize Result' : 'Expand Result'}
-            placement="top"
-          >
-            <IconButton
-              aria-label="expand row"
-              size="small"
-              onClick={() => setOpen(!open)}
-              className={'transition-transform' + (open ? ' rotate-90' : '')}
+          <div className="flex items-center gap-1">
+            <Tooltip
+              title={open ? 'Minimize Result' : 'Expand Result'}
+              placement="top"
             >
-              <KeyboardArrowIcon />
-            </IconButton>
-          </Tooltip>
-        </TableCell>
-        <TableCell
-          className="border-b-0"
-          data-tutorial-id={showTutorial && 'compare'}
-        >
-          <Tooltip
-            title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
-            placement="top"
-          >
-            <Checkbox
-              checked={inCompare}
-              onClick={(e) => {
-                e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
-                if (inCompare) {
-                  removeFromCompare(course);
-                } else {
-                  addToCompare(course);
+              <IconButton
+                aria-label="expand row"
+                size="medium"
+                onClick={(e) => {
+                  e.stopPropagation(); // prevents double opening/closing
+                  setOpen(!open);
+                }}
+                className={'transition-transform' + (open ? ' rotate-90' : '')}
+              >
+                <KeyboardArrowIcon fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
+              placement="top"
+            >
+              <Checkbox
+                checked={inCompare}
+                onClick={(e) => {
+                  e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
+                  if (inCompare) {
+                    removeFromCompare(course);
+                  } else {
+                    addToCompare(course);
+                  }
+                }}
+                disabled={
+                  (typeof grades !== 'undefined' &&
+                    grades.state === 'loading') ||
+                  (typeof rmp !== 'undefined' && rmp.state === 'loading')
                 }
-              }}
-              disabled={
-                (typeof grades !== 'undefined' && grades.state === 'loading') ||
-                (typeof rmp !== 'undefined' && rmp.state === 'loading')
-              }
-              sx={
-                color
-                  ? {
-                      '&.Mui-checked': {
-                        color: color,
-                      },
-                    }
-                  : undefined
-              } // Apply color if defined
-            />
-          </Tooltip>
+                sx={
+                  color
+                    ? {
+                        '&.Mui-checked': {
+                          color: color,
+                        },
+                      }
+                    : undefined
+                } // Apply color if defined
+              />
+            </Tooltip>
+          </div>
         </TableCell>
         <TableCell component="th" scope="row" className="w-full border-b-0">
-          <Typography
-            onClick={
-              (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
+          <Tooltip
+            title={
+              typeof course.profFirst !== 'undefined' &&
+              typeof course.profLast !== 'undefined' &&
+              (rmp !== undefined &&
+              rmp.state === 'done' &&
+              rmp.data.teacherRatingTags.length > 0
+                ? 'Tags: ' +
+                  rmp.data.teacherRatingTags
+                    .sort((a, b) => b.tagCount - a.tagCount)
+                    .slice(0, 3)
+                    .map((tag) => tag.tagName)
+                    .join(', ')
+                : 'No Tags Available')
             }
-            className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit"
+            placement="top"
           >
-            {searchQueryLabel(course) +
-              ((typeof course.profFirst === 'undefined' &&
-                typeof course.profLast === 'undefined') ||
-              (typeof course.prefix === 'undefined' &&
-                typeof course.number === 'undefined')
-                ? ' (Overall)'
-                : '')}
-          </Typography>
+            <Typography
+              onClick={
+                (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
+              }
+              className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit"
+            >
+              {searchQueryLabel(course) +
+                ((typeof course.profFirst === 'undefined' &&
+                  typeof course.profLast === 'undefined') ||
+                (typeof course.prefix === 'undefined' &&
+                  typeof course.number === 'undefined')
+                  ? ' (Overall)'
+                  : '')}
+            </Typography>
+          </Tooltip>
         </TableCell>
         <TableCell align="center" className="border-b-0">
           {((typeof grades === 'undefined' || grades.state === 'error') && (
@@ -453,8 +456,7 @@ const SearchResultsTable = ({
         <Table stickyHeader aria-label="collapsible table">
           <TableHead>
             <TableRow>
-              <TableCell />
-              <TableCell>Compare</TableCell>
+              <TableCell>Actions</TableCell>
               <TableCell>
                 <TableSortLabel
                   active={orderBy === 'name'}
@@ -468,7 +470,7 @@ const SearchResultsTable = ({
               </TableCell>
               <TableCell align="center">
                 <Tooltip
-                  title="Average GPA Across Course Sections"
+                  title="Average Letter Grade Across Course Sections"
                   placement="top"
                 >
                   <div>
