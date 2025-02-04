@@ -116,6 +116,17 @@ function Row({
     most_recent_semester_from_grades: string,
   ): string {
     let { season, yyyy } = getCurrentSemester();
+    console.log('hi', sections);
+    if (
+      typeof sections !== 'undefined' &&
+      sections.state === 'done' &&
+      typeof course.profFirst === 'undefined' &&
+      typeof course.profLast === 'undefined'
+    ) {
+      return sections.data.sort((a, b) =>
+        compareSemesters(b.academic_session.name, a.academic_session.name),
+      )[0].academic_session.name;
+    }
     if (
       typeof sections !== 'undefined' &&
       typeof professor !== 'undefined' &&
