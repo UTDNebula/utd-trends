@@ -1,4 +1,4 @@
-import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Skeleton } from '@mui/material';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 
@@ -26,7 +26,6 @@ type Props = {
 };
 
 function LineGraph({ gpaTrend, chartTitle, xAxisLabels, yAxisFormatter, tooltipFormatter, series }: Props): React.ReactNode {
-  const [chartType, setChartType] = useState<'line' | 'bar'>('line');
   const [chartData, setChartData] = useState<{
     options: {
       chart: {
@@ -178,20 +177,11 @@ function LineGraph({ gpaTrend, chartTitle, xAxisLabels, yAxisFormatter, tooltipF
       );
     }
   }
-
-  const handleChartToggle = (_event: React.MouseEvent<HTMLElement>, newChartType: 'line' | 'bar' | null) => {
-    if (newChartType) setChartType(newChartType);
-  };
+  const chartType = 'line'; // Define the chart type
 
   return (
-    <div className="p-2">
-      <ToggleButtonGroup value={chartType} exclusive onChange={handleChartToggle} className="mb-2">
-        <ToggleButton value="bar" />
-        <ToggleButton value="line" />
-      </ToggleButtonGroup>
-      <div className="h-64">
-        <Chart options={chartData.options} series={chartData.series} type={chartType} height={250} />
-      </div>
+    <div className="h-64">
+      <Chart options={chartData.options} series={chartData.series} type={chartType} height={250} />
     </div>
   );
 }

@@ -1,5 +1,5 @@
-import { Skeleton } from '@mui/material';
-import React from 'react';
+import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import React, { useState } from 'react';
 
 import BarGraph from '@/components/graph/BarGraph/barGraph';
 import LineGraph from '@/components/graph/LineGraph/lineGraph';
@@ -42,6 +42,16 @@ type Props = {
 };
 
 function SingleGradesInfo({ title, course, grades }: Props) {
+  const [chartType, setChartType] = useState<'line' | 'bar'>('line');
+
+  const handleChartToggle = (
+    event: React.MouseEvent<HTMLElement>,
+    newChartType: 'line' | 'bar'
+  ) => {
+    if (newChartType !== null) {
+      setChartType(newChartType);
+    }
+  };
   if (typeof grades === 'undefined' || grades.state === 'error') return null;
   if (grades.state === 'loading') {
     return (
@@ -59,6 +69,26 @@ function SingleGradesInfo({ title, course, grades }: Props) {
   const gpaValues = [4,4,3.67,3.33,3,2.67,2.33,2,1.67,1.33,1,0.67,0];
 
   return (
+    
+    <div>
+    {/* Toggle Button to switch chart type */}
+    <div className="flex justify-end mb-4 pr-2">
+    <ToggleButtonGroup
+      value={chartType}
+      exclusive
+      onChange={handleChartToggle}
+      size = "small"
+      orientation= "vertical"
+      aria-label="chart type">
+
+      <ToggleButton value="line" aria-label="line chart">
+        Line
+      </ToggleButton>
+      <ToggleButton value="bar" aria-label="bar chart">
+        Bar
+      </ToggleButton>
+    </ToggleButtonGroup>
+    </div>
     <div className="p-2">
       <div className="h-64">
         <BarGraph
@@ -83,7 +113,9 @@ function SingleGradesInfo({ title, course, grades }: Props) {
         />
       </div>
     </div>
+    </div>
   );
 }
+
 
 export default SingleGradesInfo;
