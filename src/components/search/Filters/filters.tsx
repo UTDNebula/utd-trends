@@ -254,7 +254,7 @@ const Filters = ({
                   setSemesters(() => academicSessions.concat(['select-all']));
                 } else {
                   addChosenSessions(() => recentSemesters);
-                  setSemesters(() => recentSessions.concat(['recent']));
+                  setSemesters(() => recentSemesters.concat(['recent']));
                 }
               } else {
                 addChosenSessions(() => value as string[]);
@@ -264,7 +264,7 @@ const Filters = ({
                   chosenSessions.length === recentSemesters.length &&
                   chosenSessions.every((el) => recentSemesters.includes(el))
                 ) {
-                  setSemesters(() => recentSessions.concat(['recent']));
+                  setSemesters(() => recentSemesters.concat(['recent']));
                 } else {
                   setSemesters(() => chosenSessions);
                 }
