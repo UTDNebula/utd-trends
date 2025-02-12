@@ -35,11 +35,10 @@ const Filters = ({
 }: FiltersProps) => {
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
-  const [semesters, setSemesters] = useState<string[]>([]);
+  const [semesters, setSemesters] = useState<string[]>(chosenSessions);
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
   academicSessions.sort((a, b) => compareSemesters(b, a)); // display the semesters in order of recency (most recent first)
-  setSemesters(chosenSessions);
   
   //set value from query
   const router = useRouter();
