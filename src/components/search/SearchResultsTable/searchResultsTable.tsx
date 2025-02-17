@@ -1,3 +1,4 @@
+import { ErrorOutline, EventAvailableOutlined } from '@mui/icons-material';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Checkbox,
@@ -27,6 +28,7 @@ import {
   getCurrentSemester,
   getLastLongSemester,
   getNextLongSemester,
+  getTooOldSemester,
 } from '@/components/search/Filters/filters';
 import { useRainbowColors } from '@/modules/colors/colors';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
@@ -168,14 +170,13 @@ function Row({
       sections.state === 'done' &&
       professor.state === 'done'
     ) {
-      const professorSections = sections.data.filter((section) =>
-        section.professors.includes(professor.data._id),
-      );
-      // if upcoming semester
+      console.log(professor.data.last_name + ' ' + professor.data.first_name);
       const upcomingSemester = (nextSemester.yyyy % 100) + nextSemester.season;
       if (
-        professorSections.filter(
-          (section) => section.academic_session.name == upcomingSemester,
+        sections.data.filter(
+          (section) =>
+            section.professors.includes(professor.data._id) &&
+            section.academic_session.name == upcomingSemester,
         ).length > 0
       ) {
         return upcomingSemester;
@@ -188,9 +189,19 @@ function Row({
     grades.state === 'done'
       ? getMostRecentSemester(grades.data.most_recent_semester)
       : '';
+  const too_old_semester = getTooOldSemester();
+  const taught_recently =
+    grades.state === 'done'
+      ? compareSemesters(
+          most_recent_semester,
+          (too_old_semester.yyyy % 100) + too_old_semester.season,
+        ) !== -1
+      : '';
 
   const teachingNextSemester =
-    grades.state === 'done' ? getTeachingNextSemester() : '';
+    grades.state === 'done' || grades.state === 'error'
+      ? getTeachingNextSemester()
+      : '';
 
   console.log(teachingNextSemester);
 
@@ -251,7 +262,7 @@ function Row({
           </div>
         </TableCell>
         <TableCell component="th" scope="row" className="w-full border-b-0">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 justify-between">
             <Tooltip
               title={
                 typeof course.profFirst !== 'undefined' &&
@@ -284,52 +295,36 @@ function Row({
                     : '')}
               </Typography>
             </Tooltip>
-            {((typeof grades === 'undefined' || grades.state === 'error') && (
+            {((typeof grades === 'undefined' || grades.state === 'loading') && (
               <></>
             )) ||
-              (grades.state === 'loading' && (
-                <Skeleton
-                  variant="rounded"
-                  className="rounded-full px-1 py-1 ml-1 w-8 block"
+              (grades.state === 'done' && !taught_recently ? (
+                <Tooltip
+                  title={
+                    'Last taught in: ' +
+                    displayAcademicSessionName(most_recent_semester, false)
+                  }
+                  placement="top"
                 >
-                  <Typography className="text-xs w-6">U25</Typography>
-                </Skeleton>
-              )) ||
-              (grades.state === 'done' && (
-                <>
-                  <Tooltip
-                    title={
-                      'Last taught in: ' +
-                      displayAcademicSessionName(most_recent_semester, false)
-                    }
-                    placement="top"
-                  >
-                    <Typography className="text-xs text-black text-center rounded-full px-1 py-1 ml-1 w-8 block bg-cornflower-50">
-                      {most_recent_semester}
-                    </Typography>
-                  </Tooltip>
-                  {teachingNextSemester && (
-                    <Tooltip
-                      title={
-                        'Also teaching in ' +
-                        displayAcademicSessionName(teachingNextSemester, false)
-                      }
-                      placement="top"
-                    >
-                      <Typography className="text-xs text-black text-center rounded-full px-1 py-1 ml-1 w-8 block bg-cornflower-400">
-                        {teachingNextSemester}
-                      </Typography>
-                    </Tooltip>
-                  )}
-                </>
-              )) ||
-              null}
+                  <ErrorOutline />
+                </Tooltip>
+              ) : teachingNextSemester ? (
+                <Tooltip
+                  title={
+                    'Also teaching in ' +
+                    displayAcademicSessionName(teachingNextSemester, false)
+                  }
+                  placement="top"
+                >
+                  <EventAvailableOutlined />
+                </Tooltip>
+              ) : null)}
           </div>
         </TableCell>
         <TableCell align="center" className="border-b-0">
-          {((typeof grades === 'undefined' || grades.state === 'error') && (
+          {typeof grades === 'undefined' || grades.state === 'error' ? (
             <></>
-          )) ||
+          ) : (
             (grades.state === 'loading' && (
               <Skeleton
                 variant="rounded"
@@ -351,7 +346,8 @@ function Row({
                 </Typography>
               </Tooltip>
             )) ||
-            null}
+            null
+          )}
         </TableCell>
         <TableCell align="center" className="border-b-0">
           {((typeof rmp === 'undefined' || rmp.state === 'error') && <></>) ||
