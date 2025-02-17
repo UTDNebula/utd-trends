@@ -59,7 +59,6 @@ module.exports = {
 
   propsParser: require('react-docgen-typescript').parse,
   require: [
-    path.resolve(__dirname, 'styleguide/setup.js'),
     path.join(__dirname, './src/styles/globals.css'),
   ],
   webpackConfig: {
@@ -80,33 +79,11 @@ module.exports = {
     ],
     module: {
       rules: [
+        // File Loaders that are needed for your components
         {
           test: /\.tsx?$/,
           exclude: /node_modules/,
           loader: 'babel-loader',
-        },
-        // Other loaders that are needed for your components
-        {
-          test: /\.css$/,
-          use: [
-            'style-loader',
-            'css-loader',
-            {
-              loader: 'postcss-loader',
-              options: {
-                postcssOptions: {
-                  plugins: [
-                    [
-                      'postcss-preset-env',
-                      {
-                        // Options
-                      },
-                    ],
-                  ],
-                },
-              },
-            },
-          ],
         },
         {
           test: /\.md$/,
@@ -120,10 +97,20 @@ module.exports = {
           ],
         },
         {
-          test: /\.(png|jpe?g|gif|svg|woff|woff2|eot|ttf|otf)$/,
+          test: /\.css$/,
+          use: [
+            'style-loader',
+            'css-loader',
+            {
+              loader: 'postcss-loader',
+            },
+          ],
+        },
+        {
+          test: /\.(png)$/,
           type: 'asset/resource',
           generator: {
-            filename: 'assets/[name][ext]', // Outputs assets into a specific folder
+            filename: 'assets/[name][ext]',
           },
         },
       ],
