@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const dotenv = require('dotenv').config({ path: __dirname + '/.env' });
+
 module.exports = {
   pagePerSection: true,
   title: 'UTD Trends Documentation',
@@ -58,9 +59,7 @@ module.exports = {
   ],
 
   propsParser: require('react-docgen-typescript').parse,
-  require: [
-    path.join(__dirname, './src/styles/globals.css'),
-  ],
+  require: [path.join(__dirname, './src/styles/globals.css')],
   webpackConfig: {
     resolve: {
       alias: {
