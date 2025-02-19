@@ -126,7 +126,7 @@ const Filters = ({
 }: FiltersProps) => {
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
-  // const [filterNextSem, setFilterNextSem] = useState("false");
+  const [filterNextSem, setFilterNextSem] = useState('false');
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
   academicSessions.sort((a, b) => compareSemesters(b, a)); // display the semesters in order of recency (most recent first)
@@ -142,9 +142,9 @@ const Filters = ({
         if (typeof router.query.minRating === 'string') {
           setMinRating(router.query.minRating);
         }
-        /*if (typeof router.query.availability === 'string') {
+        if (typeof router.query.availability === 'string') {
           setFilterNextSem(router.query.availability);
-        }*/
+        }
       }
     }
   }, [
@@ -275,7 +275,7 @@ const Filters = ({
       </Tooltip>
 
       {/* Teaching Next Semester dropdown*/}
-      {/*
+
       <Tooltip title={'Select Availability'} placement="top">
         <FormControl
           size="small"
@@ -303,7 +303,6 @@ const Filters = ({
           </Select>
         </FormControl>
       </Tooltip>
-      */}
 
       {/* semester dropdown */}
       <Tooltip

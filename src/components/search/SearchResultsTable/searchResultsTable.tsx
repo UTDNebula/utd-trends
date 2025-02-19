@@ -27,7 +27,6 @@ import {
   displayAcademicSessionName,
   getCurrentSemester,
   getLastLongSemester,
-  getNextLongSemester,
   getTooOldSemester,
 } from '@/components/search/Filters/filters';
 import { useRainbowColors } from '@/modules/colors/colors';
@@ -77,6 +76,7 @@ function LoadingRow() {
 type RowProps = {
   course: SearchQuery;
   sections: GenericFetchedData<SectionData[]>;
+  teachingNext: GenericFetchedData<string>;
   grades: GenericFetchedData<GradesType>;
   professor: GenericFetchedData<ProfessorInterface>;
   rmp: GenericFetchedData<RMPInterface>;
@@ -89,6 +89,7 @@ type RowProps = {
 function Row({
   course,
   sections,
+  teachingNext,
   grades,
   professor,
   rmp,
@@ -161,7 +162,7 @@ function Row({
     return most_recent_semester_from_grades;
   }
 
-  function getTeachingNextSemester() {
+  /*function getTeachingNextSemester() {
     const { season, yyyy } = getCurrentSemester();
     const nextSemester = getNextLongSemester(season, yyyy);
     if (
@@ -183,7 +184,7 @@ function Row({
       }
     }
     return null;
-  }
+  }*/
 
   const most_recent_semester =
     grades.state === 'done'
@@ -199,9 +200,7 @@ function Row({
       : '';
 
   const teachingNextSemester =
-    grades.state === 'done' || grades.state === 'error'
-      ? getTeachingNextSemester()
-      : '';
+    teachingNext && teachingNext.state === 'done' ? teachingNext.data : '';
 
   console.log(teachingNextSemester);
 
@@ -393,6 +392,7 @@ type SearchResultsTableProps = {
   resultsLoading: 'loading' | 'done';
   includedResults: SearchQuery[];
   sectionsDataForCourse: { [key: string]: GenericFetchedData<SectionData[]> };
+  teachingNextSem: { [key: string]: GenericFetchedData<string> };
   grades: { [key: string]: GenericFetchedData<GradesType> };
   professors: { [key: string]: GenericFetchedData<ProfessorInterface> };
   rmp: { [key: string]: GenericFetchedData<RMPInterface> };
@@ -406,6 +406,7 @@ const SearchResultsTable = ({
   resultsLoading,
   includedResults,
   sectionsDataForCourse,
+  teachingNextSem,
   grades,
   professors,
   rmp,
@@ -646,6 +647,7 @@ const SearchResultsTable = ({
                         searchQueryLabel(convertToCourseOnly(result))
                       ]
                     }
+                    teachingNext={teachingNextSem[searchQueryLabel(result)]}
                     grades={grades[searchQueryLabel(result)]}
                     professor={
                       professors[searchQueryLabel(convertToProfOnly(result))]

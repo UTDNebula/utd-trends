@@ -19,7 +19,11 @@ import CourseOverview from '@/components/overview/CourseOverview/courseOverview'
 import ProfessorOverview, {
   type ProfessorInterface,
 } from '@/components/overview/ProfessorOverview/professorOverview';
-import Filters, { compareSemesters } from '@/components/search/Filters/filters';
+import Filters, {
+  compareSemesters,
+  getCurrentSemester,
+  getNextLongSemester,
+} from '@/components/search/Filters/filters';
 import SearchResultsTable from '@/components/search/SearchResultsTable/searchResultsTable';
 import { compareColors } from '@/modules/colors/colors';
 import fetchWithCache, {
@@ -28,6 +32,7 @@ import fetchWithCache, {
   expireTime,
 } from '@/modules/fetchWithCache/fetchWithCache';
 import {
+  convertToCourseOnly,
   convertToProfOnly,
   decodeSearchQueryLabel,
   type SearchQuery,
@@ -745,6 +750,10 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
     });
   }
 
+  const [teachingNextSemester, setTeachingNextSemester] = useState<{
+    [key: string]: GenericFetchedData<string>;
+  }>({});
+
   //Call fetchGradesData and store response
   function fetchAndStoreGradesData(
     course: SearchQuery,
@@ -851,6 +860,58 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
     }
   }
 
+  function getTeachingNextSemester(result: SearchQuery) {
+    const courseSections =
+      sectionsForCourses[searchQueryLabel(convertToCourseOnly(result))];
+    const professor = profsData[searchQueryLabel(convertToProfOnly(result))];
+    const stringQuery = searchQueryLabel(result);
+
+    if (
+      typeof courseSections !== 'undefined' &&
+      courseSections.state === 'done'
+    ) {
+      const { season, yyyy } = getCurrentSemester();
+      const nextSemester = getNextLongSemester(season, yyyy);
+
+      // if upcoming semester
+      const upcomingSemester = (nextSemester.yyyy % 100) + nextSemester.season;
+      if (
+        typeof professor !== 'undefined' &&
+        professor.state === 'done' &&
+        courseSections.data.filter(
+          (section) =>
+            section.professors.includes(professor.data._id) &&
+            section.academic_session.name == upcomingSemester,
+        ).length > 0
+      ) {
+        setTeachingNextSemester((old) => {
+          return {
+            ...old,
+            [stringQuery]: { state: 'done', data: upcomingSemester },
+          };
+        });
+        return upcomingSemester;
+      } else if (!result.profFirst && courseSections.data.length > 0) {
+        setTeachingNextSemester((old) => {
+          return {
+            ...old,
+            [stringQuery]: { state: 'done', data: upcomingSemester },
+          };
+        });
+        return upcomingSemester;
+      } else {
+        setTeachingNextSemester((old) => {
+          return {
+            ...old,
+            [stringQuery]: { state: 'done', data: '' },
+          };
+        });
+        return '';
+      }
+    }
+    return '';
+  }
+
   //Filtered results
   let includedResults: SearchQuery[] = [];
 
@@ -890,6 +951,16 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
           courseRmp.state === 'done' &&
           courseRmp.data.avgDifficulty > parseFloat(router.query.maxDiff)
         ) {
+          return false;
+        }
+        const comboLabel = searchQueryLabel(result);
+        const comboNextSemester =
+          comboLabel in teachingNextSemester
+            ? teachingNextSemester[comboLabel].state === 'done'
+              ? teachingNextSemester[comboLabel].data
+              : ''
+            : getTeachingNextSemester(result);
+        if (router.query.availability === 'true' && comboNextSemester == '') {
           return false;
         }
         return true;
@@ -1028,6 +1099,7 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
         resultsLoading={results.state}
         includedResults={includedResults}
         sectionsDataForCourse={sectionsForCourses}
+        teachingNextSem={teachingNextSemester}
         grades={grades}
         professors={profsData}
         rmp={rmp}
