@@ -119,7 +119,10 @@ function SingleGradesInfo({ title, course, grades }: Props) {
                 yaxisFormatter={(value: number) =>
                   Number(value).toFixed(0).toLocaleString()
                 }
-                tooltipFormatter={(value: number, { dataPointIndex }: { dataPointIndex: number }) =>
+                tooltipFormatter={(
+                  value: number,
+                  { dataPointIndex }: { dataPointIndex: number },
+                ) =>
                   Number(value).toFixed(0).toLocaleString() +
                   ' (' +
                   percents[dataPointIndex].toFixed(2) +
