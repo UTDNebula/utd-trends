@@ -253,9 +253,16 @@ function Row({
               </Typography>
             </Tooltip>
             {((typeof grades === 'undefined' || grades.state === 'error') && (
-              <Typography className="text-xs text-black text-center rounded-full px-1 py-1 ml-1 w-24 block bg-gray-100">
-                New Professor!
-              </Typography>
+              <Tooltip
+                title={
+                  'The professor is teaching this course for the first time'
+                }
+                placement="top"
+              >
+                <Typography className="text-xs text-black text-center rounded-full px-1 py-1 ml-1 w-10 block bg-gray-100">
+                  New
+                </Typography>
+              </Tooltip>
             )) ||
               (grades.state === 'loading' && (
                 <Skeleton
@@ -274,7 +281,7 @@ function Row({
                   placement="top"
                 >
                   <Typography className="text-xs text-black text-center rounded-full px-1 py-1 ml-1 w-8 block bg-gray-100">
-                     {most_recent_semester}
+                    {most_recent_semester}
                   </Typography>
                 </Tooltip>
               )) ||
