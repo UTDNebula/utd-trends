@@ -20,7 +20,6 @@ import ProfessorOverview, {
   type ProfessorInterface,
 } from '@/components/overview/ProfessorOverview/professorOverview';
 import Filters from '@/components/search/Filters/filters';
-import { compareSemesters } from '@/modules/semesters/semesters';
 import SearchResultsTable from '@/components/search/SearchResultsTable/searchResultsTable';
 import { compareColors } from '@/modules/colors/colors';
 import fetchWithCache, {
@@ -35,6 +34,7 @@ import {
   searchQueryEqual,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
+import { compareSemesters } from '@/modules/semesters/semesters';
 import type { CourseData } from '@/pages/api/course';
 import type { GradesData } from '@/pages/api/grades';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
@@ -220,9 +220,7 @@ function fetchGradesData(
 }
 
 //Fetch courses from nebula api
-function fetchCourseData(
-  course: SearchQuery,
-): Promise<CourseData[]> {
+function fetchCourseData(course: SearchQuery): Promise<CourseData[]> {
   return fetchWithCache(
     '/api/course?prefix=' +
       encodeURIComponent(String(course.prefix)) +
@@ -250,9 +248,7 @@ function fetchCourseData(
 }
 
 //Fetch a section from nebula api
-function fetchSectionData(
-  sectionID: string,
-): Promise<SectionData> {
+function fetchSectionData(sectionID: string): Promise<SectionData> {
   return fetchWithCache(
     '/api/section?sectionID=' + sectionID,
     cacheIndexNebula,
@@ -275,17 +271,13 @@ function fetchSectionData(
 function fetchSectionsDataForCourse(
   course: SearchQuery,
 ): Promise<SectionData[]> {
-  return fetchCourseData(course).then(
-    (courseDatas: CourseData[]) => {
-      return Promise.all(
-        courseDatas.flatMap((courseData) =>
-          courseData.sections.map((sectionID) =>
-            fetchSectionData(sectionID),
-          ),
-        ),
-      );
-    },
-  );
+  return fetchCourseData(course).then((courseDatas: CourseData[]) => {
+    return Promise.all(
+      courseDatas.flatMap((courseData) =>
+        courseData.sections.map((sectionID) => fetchSectionData(sectionID)),
+      ),
+    );
+  });
 }
 
 //Fetch RMP data from RMP

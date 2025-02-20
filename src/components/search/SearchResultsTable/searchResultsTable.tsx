@@ -21,12 +21,6 @@ import SingleGradesInfo from '@/components/common/SingleGradesInfo/singleGradesI
 import SingleProfInfo from '@/components/common/SingleProfInfo/singleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
 import type { ProfessorInterface } from '@/components/overview/ProfessorOverview/professorOverview';
-import {
-  compareSemesters,
-  displayAcademicSessionName,
-  getCurrentSemester,
-  getLastLongSemester,
-} from '@/components/search/Filters/filters';
 import { useRainbowColors } from '@/modules/colors/colors';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
 import {
@@ -36,6 +30,12 @@ import {
   searchQueryEqual,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
+import {
+  compareSemesters,
+  displayAcademicSessionName,
+  getCurrentSemester,
+  getLastLongSemester,
+} from '@/modules/semesters/semesters';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import type { SectionData } from '@/pages/api/section';
 import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
