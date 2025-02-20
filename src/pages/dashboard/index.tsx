@@ -19,7 +19,8 @@ import CourseOverview from '@/components/overview/CourseOverview/courseOverview'
 import ProfessorOverview, {
   type ProfessorInterface,
 } from '@/components/overview/ProfessorOverview/professorOverview';
-import Filters, { compareSemesters } from '@/components/search/Filters/filters';
+import Filters from '@/components/search/Filters/filters';
+import { compareSemesters } from '@/modules/semesters/semesters';
 import SearchResultsTable from '@/components/search/SearchResultsTable/searchResultsTable';
 import { compareColors } from '@/modules/colors/colors';
 import fetchWithCache, {
@@ -221,7 +222,6 @@ function fetchGradesData(
 //Fetch courses from nebula api
 function fetchCourseData(
   course: SearchQuery,
-  controller: AbortController,
 ): Promise<CourseData[]> {
   return fetchWithCache(
     '/api/course?prefix=' +
@@ -247,14 +247,11 @@ function fetchCourseData(
       response.sort((a, b) => b.catalog_year - a.catalog_year); // sort by year descending, so index 0 has the most recent year
       return [response[0], response[1]] as CourseData[];
     });
-
-  controller.abort();
 }
 
 //Fetch a section from nebula api
 function fetchSectionData(
   sectionID: string,
-  controller: AbortController,
 ): Promise<SectionData> {
   return fetchWithCache(
     '/api/section?sectionID=' + sectionID,
@@ -272,20 +269,18 @@ function fetchSectionData(
     }
     return response.data as SectionData;
   });
-  controller.abort();
 }
 
 //Fetch all sections for a course from nebula api
 function fetchSectionsDataForCourse(
   course: SearchQuery,
-  controller: AbortController,
 ): Promise<SectionData[]> {
-  return fetchCourseData(course, controller).then(
+  return fetchCourseData(course).then(
     (courseDatas: CourseData[]) => {
       return Promise.all(
         courseDatas.flatMap((courseData) =>
           courseData.sections.map((sectionID) =>
-            fetchSectionData(sectionID, controller),
+            fetchSectionData(sectionID),
           ),
         ),
       );
@@ -500,7 +495,7 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
   useEffect(() => {
     const controller = new AbortController();
     courses.map((course) =>
-      fetchSectionsDataForCourse(course, controller) // returns an array of sections for a course
+      fetchSectionsDataForCourse(course) // returns an array of sections for a course
         .then((sections) => {
           setSectionsForCourses((old) => {
             const newVal = { ...old };
