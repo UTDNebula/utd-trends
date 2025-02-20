@@ -33,8 +33,8 @@ const Filters = ({
   chosenSessions,
   addChosenSessions,
 }: FiltersProps) => {
-  const [minGPA, setMinGPA] = useState<string>();
-  const [minRating, setMinRating] = useState<string>();
+  const [minGPA, setMinGPA] = useState('');
+  const [minRating, setMinRating] = useState('');
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
   academicSessions.sort((a, b) => compareSemesters(b, a)); // display the semesters in order of recency (most recent first)
@@ -53,9 +53,7 @@ const Filters = ({
       }
     }
   }, [
-    manageQuery,
     router.isReady,
-    router.query.searchTerms,
     router.query.minGPA,
     router.query.minRating,
   ]);
