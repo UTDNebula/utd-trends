@@ -95,62 +95,69 @@ function SingleGradesInfo({ title, course, grades }: Props) {
         </ToggleButtonGroup>
       </div>
       <div className="p-2">
-        <div className="h-64">
-          <BarGraph
-            title={title ?? '# of Students'}
-            xaxisLabels={[
-              'A+',
-              'A',
-              'A-',
-              'B+',
-              'B',
-              'B-',
-              'C+',
-              'C',
-              'C-',
-              'D+',
-              'D',
-              'D-',
-              'F',
-              'W',
-            ]}
-            yaxisFormatter={(value) =>
-              Number(value).toFixed(0).toLocaleString()
-            }
-            tooltipFormatter={(value, { dataPointIndex }) =>
-              Number(value).toFixed(0).toLocaleString() +
-              ' (' +
-              percents[dataPointIndex].toFixed(2) +
-              '%)'
-            }
-            series={[
-              {
-                name: searchQueryLabel(course),
-                data: grades.data.grade_distribution,
-              },
-            ]}
-          />
-        </div>
-        <div className="flex flex-wrap justify-around">
-          <p>
-            Grades: <b>{grades.data.total.toLocaleString()}</b>
-          </p>
-          <p>
-            GPA:{' '}
-            <b>
-              {grades.data.gpa === -1 ? 'None' : grades.data.gpa.toFixed(3)}
-            </b>
-          </p>
-        </div>
-        <div className="h-64">
-          <LineGraph
-            chartTitle="GPA Trend"
-            xAxisLabels={recentSemesters}
-            yAxisFormatter={(value: number) => value.toFixed(2)}
-            tooltipFormatter={(value: number) => value.toFixed(3)}
-            series={[{ name: searchQueryLabel(course), data: gpaValues }]}
-          />
-        </div>
+        {chartType === 'bar' && (
+          <>
+            <div className="h-64">
+              <BarGraph
+                title={title ?? '# of Students'}
+                xaxisLabels={[
+                  'A+',
+                  'A',
+                  'A-',
+                  'B+',
+                  'B',
+                  'B-',
+                  'C+',
+                  'C',
+                  'C-',
+                  'D+',
+                  'D',
+                  'D-',
+                  'F',
+                  'W',
+                ]}
+                yaxisFormatter={(value: number) =>
+                  Number(value).toFixed(0).toLocaleString()
+                }
+                tooltipFormatter={(value: number, { dataPointIndex }: { dataPointIndex: number }) =>
+                  Number(value).toFixed(0).toLocaleString() +
+                  ' (' +
+                  percents[dataPointIndex].toFixed(2) +
+                  '%)'
+                }
+                series={[
+                  {
+                    name: searchQueryLabel(course),
+                    data: grades.data.grade_distribution,
+                  },
+                ]}
+              />
+            </div>
+            <div className="flex flex-wrap justify-around">
+              <p>
+                Grades: <b>{grades.data.total.toLocaleString()}</b>
+              </p>
+              <p>
+                GPA:{' '}
+                <b>
+                  {grades.data.gpa === -1 ? 'None' : grades.data.gpa.toFixed(3)}
+                </b>
+              </p>
+            </div>
+          </>
+        )}
+
+        {chartType === 'line' && (
+          <div className="h-64">
+            <LineGraph
+              chartTitle="GPA Trend"
+              xAxisLabels={recentSemesters}
+              yAxisFormatter={(value: number) => value.toFixed(2)}
+              tooltipFormatter={(value: number) => value.toFixed(3)}
+              series={[{ name: searchQueryLabel(course), data: gpaValues }]}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
