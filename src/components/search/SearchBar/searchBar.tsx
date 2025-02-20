@@ -99,6 +99,7 @@ const SearchBar = ({
       router.query.searchTerms ==
       newValue.map((el) => searchQueryLabel(el)).join(',')
     )
+      // do not initiate a new search when the searchTerms haven't changed
       return;
     setErrorTooltip(!newValue.length);
     if (newValue.length && typeof setResultsLoading !== 'undefined') {
@@ -108,9 +109,7 @@ const SearchBar = ({
       onSelect(newValue);
     }
     if (newValue.length && manageQuery === 'onSelect') {
-      updateQueries(newValue).catch((error) => {
-        console.error('Failed to update query parameters:', error);
-      });
+      updateQueries(newValue);
     }
   }
 
@@ -125,17 +124,13 @@ const SearchBar = ({
       } else {
         delete newQuery.searchTerms;
       }
-      try {
-        await router.push(
-          {
-            query: router.query,
-          },
-          undefined,
-          { shallow: true },
-        );
-      } catch (error) {
-        console.error('Failed to update query parameters:', error);
-      }
+      router.push(
+        {
+          query: router.query,
+        },
+        undefined,
+        { shallow: true },
+      );
     }
   }
 
@@ -160,15 +155,23 @@ const SearchBar = ({
         if (data.message !== 'success') {
           throw new Error(data.message);
         }
+        //remove currently chosen values
         const filtered = data.data.filter(
           (item: SearchQuery) =>
             value.findIndex((el) => searchQueryEqual(el, item)) === -1,
         );
+        //add to chosen values if only one option and space
         const noSections = filtered.filter(
           (el: SearchQuery) => !('sectionNumber' in el),
         );
         if (
+          // if the returned options minus already selected values or those options minus sections is 1, then this
+          // means a space following should autocomplete the previous stuff to a chip
           (filtered.length === 1 || noSections.length === 1) &&
+          // if the next character the user typed was a space, then the chip should be autocompleted
+          // this looks at quickInputValue because it is always the most recent state of the field's string input,
+          // so requests that return later will still see that a space was typed after the text to be autocompleted,
+          // so it should autocomplete then when this is realized
           quickInputValue.current.charAt(newInputValue.length) === ' '
         ) {
           addValue(filtered.length === 1 ? filtered[0] : noSections[0]);
@@ -178,10 +181,12 @@ const SearchBar = ({
           setInputValue(rest);
           loadNewOptions(rest.trimEnd());
         } else if (quickInputValue.current === newInputValue) {
+          //still valid options
           setOptions(filtered);
         }
       })
       .catch((error) => {
+        // ignore aborts
         if (!(error instanceof DOMException)) {
           console.error('Autocomplete', error);
         }
