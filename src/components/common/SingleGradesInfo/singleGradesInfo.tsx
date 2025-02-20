@@ -46,7 +46,7 @@ function SingleGradesInfo({ title, course, grades }: Props) {
 
   const handleChartToggle = (
     event: React.MouseEvent<HTMLElement>,
-    newChartType: 'line' | 'bar'
+    newChartType: 'line' | 'bar',
   ) => {
     if (newChartType !== null) {
       setChartType(newChartType);
@@ -58,64 +58,102 @@ function SingleGradesInfo({ title, course, grades }: Props) {
       <div className="p-2">
         <Skeleton variant="rounded" className="w-full h-60 m-2" />
         <div className="flex flex-wrap justify-around">
-          <p>Grades: <Skeleton className="inline-block w-[5ch]" /></p>
-          <p>GPA: <Skeleton className="inline-block w-[5ch]" /></p>
+          <p>
+            Grades: <Skeleton className="inline-block w-[5ch]" />
+          </p>
+          <p>
+            GPA: <Skeleton className="inline-block w-[5ch]" />
+          </p>
         </div>
       </div>
     );
   }
   const percents = convertNumbersToPercents(grades.data);
   const recentSemesters = getRecentSemesters();
-  const gpaValues = [4,4,3.67,3.33,3,2.67,2.33,2,1.67,1.33,1,0.67,0];
+  const gpaValues = [
+    4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
+  ];
 
   return (
-    
     <div>
-    {/* Toggle Button to switch chart type */}
-    <div className="flex justify-end mb-4 pr-2">
-    <ToggleButtonGroup
-      value={chartType}
-      exclusive
-      onChange={handleChartToggle}
-      size = "small"
-      orientation= "vertical"
-      aria-label="chart type">
-
-      <ToggleButton value="line" aria-label="line chart">
-        Line
-      </ToggleButton>
-      <ToggleButton value="bar" aria-label="bar chart">
-        Bar
-      </ToggleButton>
-    </ToggleButtonGroup>
-    </div>
-    <div className="p-2">
-      <div className="h-64">
-        <BarGraph
-          title={title ?? '# of Students'}
-          xaxisLabels={['A+','A','A-','B+','B','B-','C+','C','C-','D+','D','D-','F','W']}
-          yaxisFormatter={value => Number(value).toFixed(0).toLocaleString()}
-          tooltipFormatter={(value,{ dataPointIndex }) => Number(value).toFixed(0).toLocaleString() + ' (' + percents[dataPointIndex].toFixed(2) + '%)'}
-          series={[{ name: searchQueryLabel(course), data: grades.data.grade_distribution }]}
-        />
+      {/* Toggle Button to switch chart type */}
+      <div className="flex justify-end mb-4 pr-2">
+        <ToggleButtonGroup
+          value={chartType}
+          exclusive
+          onChange={handleChartToggle}
+          size="small"
+          orientation="vertical"
+          aria-label="chart type"
+        >
+          <ToggleButton value="line" aria-label="line chart">
+            Line
+          </ToggleButton>
+          <ToggleButton value="bar" aria-label="bar chart">
+            Bar
+          </ToggleButton>
+        </ToggleButtonGroup>
       </div>
-      <div className="flex flex-wrap justify-around">
-        <p>Grades: <b>{grades.data.total.toLocaleString()}</b></p>
-        <p>GPA: <b>{grades.data.gpa === -1 ? 'None' : grades.data.gpa.toFixed(3)}</b></p>
+      <div className="p-2">
+        <div className="h-64">
+          <BarGraph
+            title={title ?? '# of Students'}
+            xaxisLabels={[
+              'A+',
+              'A',
+              'A-',
+              'B+',
+              'B',
+              'B-',
+              'C+',
+              'C',
+              'C-',
+              'D+',
+              'D',
+              'D-',
+              'F',
+              'W',
+            ]}
+            yaxisFormatter={(value) =>
+              Number(value).toFixed(0).toLocaleString()
+            }
+            tooltipFormatter={(value, { dataPointIndex }) =>
+              Number(value).toFixed(0).toLocaleString() +
+              ' (' +
+              percents[dataPointIndex].toFixed(2) +
+              '%)'
+            }
+            series={[
+              {
+                name: searchQueryLabel(course),
+                data: grades.data.grade_distribution,
+              },
+            ]}
+          />
+        </div>
+        <div className="flex flex-wrap justify-around">
+          <p>
+            Grades: <b>{grades.data.total.toLocaleString()}</b>
+          </p>
+          <p>
+            GPA:{' '}
+            <b>
+              {grades.data.gpa === -1 ? 'None' : grades.data.gpa.toFixed(3)}
+            </b>
+          </p>
+        </div>
+        <div className="h-64">
+          <LineGraph
+            chartTitle="GPA Trend"
+            xAxisLabels={recentSemesters}
+            yAxisFormatter={(value: number) => value.toFixed(2)}
+            tooltipFormatter={(value: number) => value.toFixed(3)}
+            series={[{ name: searchQueryLabel(course), data: gpaValues }]}
+          />
+        </div>
       </div>
-      <div className="h-64">
-        <LineGraph
-          chartTitle="GPA Trend"
-          xAxisLabels={recentSemesters}
-          yAxisFormatter={(value: number) => value.toFixed(2)}
-          tooltipFormatter={(value: number) => value.toFixed(3)}
-          series={[{ name: searchQueryLabel(course), data: gpaValues }]}
-        />
-      </div>
-    </div>
     </div>
   );
 }
-
 
 export default SingleGradesInfo;

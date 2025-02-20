@@ -95,14 +95,12 @@ const SearchBar = ({
 
   //update parent and queries
   function onSelect_internal(newValue: SearchQuery[]) {
-    // called by updateValue(), handleKeyDown(), and is assigned to the button onClick action
     if (
       router.query.searchTerms ==
       newValue.map((el) => searchQueryLabel(el)).join(',')
     )
-      // do not initiate a new search when the searchTerms haven't changed
       return;
-    setErrorTooltip(!newValue.length); //Check if tooltip needs to be displayed
+    setErrorTooltip(!newValue.length);
     if (newValue.length && typeof setResultsLoading !== 'undefined') {
       setResultsLoading();
     }
@@ -110,12 +108,14 @@ const SearchBar = ({
       onSelect(newValue);
     }
     if (newValue.length && manageQuery === 'onSelect') {
-      updateQueries(newValue);
+      updateQueries(newValue).catch((error) => {
+        console.error('Failed to update query parameters:', error);
+      });
     }
   }
 
   //update url with what's in value
-  function updateQueries(newValue: SearchQuery[]) {
+  async function updateQueries(newValue: SearchQuery[]) {
     if (typeof manageQuery !== 'undefined' && router.isReady) {
       const newQuery = router.query;
       if (newValue.length > 0) {
@@ -125,13 +125,17 @@ const SearchBar = ({
       } else {
         delete newQuery.searchTerms;
       }
-      router.push(
-        {
-          query: router.query,
-        },
-        undefined,
-        { shallow: true },
-      );
+      try {
+        await router.push(
+          {
+            query: router.query,
+          },
+          undefined,
+          { shallow: true },
+        );
+      } catch (error) {
+        console.error('Failed to update query parameters:', error);
+      }
     }
   }
 
@@ -156,23 +160,15 @@ const SearchBar = ({
         if (data.message !== 'success') {
           throw new Error(data.message);
         }
-        //remove currently chosen values
         const filtered = data.data.filter(
           (item: SearchQuery) =>
             value.findIndex((el) => searchQueryEqual(el, item)) === -1,
         );
-        //add to chosen values if only one option and space
         const noSections = filtered.filter(
           (el: SearchQuery) => !('sectionNumber' in el),
         );
         if (
-          // if the returned options minus already selected values or those options minus sections is 1, then this
-          // means a space following should autocomplete the previous stuff to a chip
           (filtered.length === 1 || noSections.length === 1) &&
-          // if the next character the user typed was a space, then the chip should be autocompleted
-          // this looks at quickInputValue because it is always the most recent state of the field's string input,
-          // so requests that return later will still see that a space was typed after the text to be autocompleted,
-          // so it should autocomplete then when this is realized
           quickInputValue.current.charAt(newInputValue.length) === ' '
         ) {
           addValue(filtered.length === 1 ? filtered[0] : noSections[0]);
@@ -181,28 +177,23 @@ const SearchBar = ({
             .trimStart();
           setInputValue(rest);
           loadNewOptions(rest.trimEnd());
-          setLoading(false);
         } else if (quickInputValue.current === newInputValue) {
-          //still valid options
           setOptions(filtered);
-          setLoading(false);
         }
       })
       .catch((error) => {
-        if (error instanceof DOMException) {
-          // ignore aborts
-        } else {
+        if (!(error instanceof DOMException)) {
           console.error('Autocomplete', error);
         }
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }
 
   //add value
   function addValue(newValue: SearchQuery) {
-    setValue((old) => {
-      const oldAndNew = [...old, newValue];
-      return oldAndNew;
-    });
+    setValue((old) => [...old, newValue]);
   }
 
   useEffect(() => {

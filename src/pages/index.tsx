@@ -18,9 +18,10 @@ import type { GenericFetchedData } from './dashboard';
  */
 const Home: NextPage = () => {
   const router = useRouter();
-  function searchOptionChosen(chosenOptions: SearchQuery[]) {
+
+  async function searchOptionChosen(chosenOptions: SearchQuery[]) {
     if (chosenOptions.length) {
-      router.push({
+      await router.push({
         pathname: '/dashboard',
         query: {
           searchTerms: chosenOptions
@@ -34,10 +35,13 @@ const Home: NextPage = () => {
   const [results, setResults] = useState<GenericFetchedData<SearchQuery[]>>({
     state: 'done',
     data: [],
-  }); // essentially a dummy state. Used only for the loading animation to start in homescreen before navigation to the dashboard
+  }); // essentially a dummy state. Used only for the loading animation to start in home screen before navigation to the dashboard
 
   useEffect(() => {
-    router.prefetch('/dashboard');
+    async function prefetchDashboard() {
+      await router.prefetch('/dashboard');
+    }
+    prefetchDashboard();
   }, [router]);
 
   return (

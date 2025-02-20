@@ -1,4 +1,5 @@
 import { Skeleton } from '@mui/material';
+import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 
@@ -13,86 +14,74 @@ export type GPATrendType = {
   gpa: number[];
 };
 
+type SeriesType = {
+  name: string;
+  data: number[];
+};
+
 type Props = {
   gpaTrend?: GenericFetchedData<GPATrendType>;
   chartTitle?: string;
   xAxisLabels?: string[];
   yAxisFormatter?: (value: number) => string;
   tooltipFormatter?: (value: number) => string;
-  series?: {
-    name: string;
-    data: number[];
-  }[];
+  series?: SeriesType[];
+  height?: number;
 };
 
-function LineGraph({ gpaTrend, chartTitle, xAxisLabels, yAxisFormatter, tooltipFormatter, series }: Props): React.ReactNode {
+const LineGraph = ({
+  gpaTrend,
+  chartTitle,
+  xAxisLabels,
+  yAxisFormatter,
+  tooltipFormatter,
+  series,
+  height = 250,
+}: Props): JSX.Element => {
   const [chartData, setChartData] = useState<{
-    options: {
-      chart: {
-        id: string;
-        animations: {
-          enabled: boolean;
-          easing: string;
-          speed: number;
-        };
-        toolbar: {
-          show: boolean;
-        };
-      };
-      xaxis: {
-        categories: string[];
-        labels: {
-          rotate: number;
-        };
-      };
-      yaxis: {
-        min: number;
-        max: number;
-        labels: {
-          formatter: (value: number) => string;
-        };
-      };
-      stroke: {
-        curve: 'smooth';
-      };
-      markers: {
-        size: number;
-      };
-      tooltip: {
-        y: {
-          formatter: (value: number) => string;
-        };
-      };
-    };
-    series: {
-      name: string;
-      data: number[];
-    }[];
+    options: ApexOptions;
+    series: SeriesType[];
   }>({
     options: {
       chart: {
         id: 'gpa-trend',
         animations: {
           enabled: true,
-          easing: 'easeinout',
           speed: 800,
         },
         toolbar: {
           show: false,
         },
+        zoom: {
+          enabled: true,
+        },
       },
       xaxis: {
-        categories: [],
-
+        categories: xAxisLabels || [],
         labels: {
           rotate: -45,
+        },
+        title: {
+          text: 'Semester',
+          style: {
+            fontSize: '12px',
+            fontWeight: '600',
+          },
         },
       },
       yaxis: {
         min: 1,
         max: 4,
+        title: {
+          text: 'GPA',
+          style: {
+            fontSize: '12px',
+            fontWeight: '600',
+          },
+        },
         labels: {
-          formatter: (value: number) => value.toFixed(2),
+          formatter: (value: number) =>
+            yAxisFormatter ? yAxisFormatter(value) : value.toFixed(2),
         },
       },
       stroke: {
@@ -103,13 +92,22 @@ function LineGraph({ gpaTrend, chartTitle, xAxisLabels, yAxisFormatter, tooltipF
       },
       tooltip: {
         y: {
-          formatter: (value: number) => value.toFixed(3),
+          formatter: (value: number) =>
+            tooltipFormatter ? tooltipFormatter(value) : value.toFixed(3),
         },
+        theme: 'dark',
+      },
+      legend: {
+        position: 'top',
+        horizontalAlign: 'right',
+        floating: true,
+        offsetY: -25,
+        offsetX: -5,
       },
     },
-    series: [
+    series: series || [
       {
-        name: '',
+        name: chartTitle || '',
         data: [],
       },
     ],
@@ -117,73 +115,44 @@ function LineGraph({ gpaTrend, chartTitle, xAxisLabels, yAxisFormatter, tooltipF
 
   useEffect(() => {
     if (gpaTrend && gpaTrend.state === 'done') {
-      setChartData(prev => ({
+      setChartData((prev) => ({
+        ...prev,
         options: {
           ...prev.options,
-
           xaxis: {
+            ...prev.options.xaxis,
             categories: gpaTrend.data.season,
-            labels: { rotate: -45 },
           },
         },
         series: [
           {
             name: chartTitle || '',
-
             data: gpaTrend.data.gpa,
           },
         ],
       }));
     } else if (series) {
-      setChartData(prev => ({
-        options: {
-          ...prev.options,
-
-          xaxis: {
-            categories: xAxisLabels || [],
-            labels: { rotate: -45 },
-          },
-
-          yaxis: {
-            ...prev.options.yaxis,
-            labels: {
-              formatter:
-                yAxisFormatter || ((value: number) => value.toFixed(2)),
-            },
-          },
-
-          tooltip: {
-            y: {
-              formatter:
-                tooltipFormatter || ((value: number) => value.toFixed(3)),
-            },
-          },
-        },
-
+      setChartData((prev) => ({
+        ...prev,
         series: series,
       }));
     }
-  }, [gpaTrend, series, xAxisLabels, yAxisFormatter, tooltipFormatter]);
+  }, [gpaTrend, series, chartTitle]);
 
-  if (gpaTrend) {
-    if (gpaTrend.state === 'error') {
-      return null;
-    }
-    if (gpaTrend.state === 'loading') {
-      return (
-        <div className="p-2">
-          <Skeleton variant="rounded" className="w-full h-60 m-2" />
-        </div>
-      );
-    }
+  if (gpaTrend && gpaTrend.state === 'loading') {
+    return <Skeleton variant="rounded" height={height} />;
   }
-  const chartType = 'line'; // Define the chart type
 
   return (
-    <div className="h-64">
-      <Chart options={chartData.options} series={chartData.series} type={chartType} height={250} />
+    <div>
+      <Chart
+        options={chartData.options}
+        series={chartData.series}
+        type="line"
+        height={height}
+      />
     </div>
   );
-}
+};
 
 export default LineGraph;
