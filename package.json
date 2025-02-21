@@ -13,9 +13,6 @@
     "lint:check": "next lint",
     "documentation": "styleguidist server"
   },
-  "engines": {
-    "node": "^18"
-  },
   "dependencies": {
     "@emotion/react": "^11.8.1",
     "@emotion/styled": "^11.6.0",
