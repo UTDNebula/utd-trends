@@ -92,7 +92,9 @@ function SingleGradesInfo({ title, course, grades }: Props) {
         line={
           <LineGraph
             title="GPA Trend"
-            series={[{ name: searchQueryLabel(course), data: grades.data.grades }]}
+            series={[
+              { name: searchQueryLabel(course), data: grades.data.grades },
+            ]}
           />
         }
       />

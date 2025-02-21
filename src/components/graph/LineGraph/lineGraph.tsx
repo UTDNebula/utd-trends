@@ -122,7 +122,9 @@ const LineGraph = (props: Props): JSX.Element => {
     }
   }
   // format series with gpas and semester places
-  const series = props.series.map((single) => getSemesterGPAs(single, allSemesters));
+  const series = props.series.map((single) =>
+    getSemesterGPAs(single, allSemesters),
+  );
 
   const options: ApexOptions = {
     chart: {
