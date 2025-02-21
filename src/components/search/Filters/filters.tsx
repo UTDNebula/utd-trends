@@ -52,11 +52,7 @@ const Filters = ({
         }
       }
     }
-  }, [
-    router.isReady,
-    router.query.minGPA,
-    router.query.minRating,
-  ]);
+  }, [router.isReady, router.query.minGPA, router.query.minRating]);
 
   function getRecentSemesters() {
     // get current month and year
