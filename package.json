@@ -10,7 +10,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "next lint --fix",
-    "lint:check": "next lint"
+    "lint:check": "next lint",
+    "documentation": "styleguidist server"
   },
   "engines": {
     "node": "^18"
