@@ -146,7 +146,10 @@ const LineGraph = (props: Props): JSX.Element => {
       },
       background: 'transparent',
       animations: {
-        enabled: !fullScreenOpen,
+        enabled:
+          !fullScreenOpen &&
+          // disable if only one data point cause it look weird
+          !series.every((single) => single.data.length === 1),
       },
     },
     legend: {
