@@ -1,10 +1,9 @@
 import { Rating as _Rating, styled } from '@mui/material';
 
-// Purple star color for rating
-const Rating = styled(_Rating)({
+const Rating = styled(_Rating)(({ theme }) => ({
   '& .MuiRating-iconFilled': {
-    color: '#e9d5fe', // Directly applying the hex color
+    color: theme.palette.primary.light,
   },
-});
+}));
 
 export default Rating;
