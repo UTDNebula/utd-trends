@@ -44,8 +44,6 @@ function colorMidpoint(
     ratio = 1 - ratio;
   }
 
-  /*const startColor = { r: 0xff, g: 0x57, b: 0x57 };
-  const endColor = { r: 0x79, g: 0xff, b: 0x57 };*/
   const startColor = {
     r: parseInt(startRainbowColor.slice(1, 3), 16),
     g: parseInt(startRainbowColor.slice(3, 5), 16),
