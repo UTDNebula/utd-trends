@@ -242,7 +242,7 @@ const Filters = ({
                   setSemesters(() => []);
                 } else {
                   addChosenSessions(() => academicSessions);
-                  setSemesters(() => academicSessions.concat(['select-all']));
+                  setSemesters(() => chosenSessions.concat(['select-all']));
                 }
               } else if (value.includes('recent')) {
                 if (
@@ -250,20 +250,20 @@ const Filters = ({
                   chosenSessions.every((el) => recentSemesters.includes(el))
                 ) {
                   addChosenSessions(() => academicSessions);
-                  setSemesters(() => academicSessions.concat(['select-all']));
+                  setSemesters(() => chosenSessions.concat(['select-all']));
                 } else {
                   addChosenSessions(() => recentSemesters);
-                  setSemesters(() => recentSemesters.concat(['recent']));
+                  setSemesters(() => chosenSessions.concat(['recent']));
                 }
               } else {
                 addChosenSessions(() => value as string[]);
                 if (chosenSessions.length === academicSessions.length) {
-                  setSemesters(() => academicSessions.concat(['select-all']));
+                  setSemesters(() => chosenSessions.concat(['select-all']));
                 } else if (
                   chosenSessions.length === recentSemesters.length &&
                   chosenSessions.every((el) => recentSemesters.includes(el))
                 ) {
-                  setSemesters(() => recentSemesters.concat(['recent']));
+                  setSemesters(() => chosenSessions.concat(['recent']));
                 } else {
                   setSemesters(() => chosenSessions);
                 }
@@ -272,8 +272,14 @@ const Filters = ({
             renderValue={(selected) => {
               if (chosenSessions.length === academicSessions.length) {
                 return 'All selected';
+              } else if (
+                chosenSessions.length === recentSemesters.length &&
+                chosenSessions.every((el) => recentSemesters.includes(el))
+              ) {
+                return 'Recent';
+              } else {
+                return selected.sort((a, b) => compareSemesters(a, b)).join(', ');
               }
-              return selected.sort((a, b) => compareSemesters(a, b)).join(', ');
             }}
             MenuProps={{ autoFocus: false }}
           >
