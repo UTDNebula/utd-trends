@@ -541,8 +541,7 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
           professor: isCourse ? old.professor : { [rhsKey]: rhsGradeFetched },
         }));
       })
-      .catch(() => {
-      });
+      .catch(() => {});
   }
 
   //Store rmp scores by profs
