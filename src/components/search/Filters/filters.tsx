@@ -27,7 +27,7 @@ interface FiltersProps {
 /** Returns the current semester based on today's month and year */
 export function getCurrentSemester() {
   // get current month and year
-  const today = new Date();
+  /*const today = new Date();
   const mm = today.getMonth() + 1; // January is 1
   const yyyy = today.getFullYear();
 
@@ -35,7 +35,7 @@ export function getCurrentSemester() {
   if (mm <= 5)
     // jan - may
     season = 'S';
-  else season = 'F';
+  else season = 'F';*/
 
   return {
     season: 'F',
