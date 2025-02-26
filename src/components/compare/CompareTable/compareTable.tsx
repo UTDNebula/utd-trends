@@ -14,12 +14,12 @@ import {
 import React, { useState } from 'react';
 
 import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
+import { useRainbowColors } from '@/modules/colors/colors';
 import {
   convertToProfOnly,
   type SearchQuery,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
-import { useRainbowColors } from '@/modules/colors/colors';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
