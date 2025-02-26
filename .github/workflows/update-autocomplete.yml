@@ -58,7 +58,7 @@ jobs:
             const pulls = await github.rest.pulls.list({
               owner: owner,
               repo: repo,
-              head: 'update-course-data',
+              head: '${owner}:update-course-data',
               base: 'develop',
               state: 'open',
             });
