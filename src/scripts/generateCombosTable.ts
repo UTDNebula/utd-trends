@@ -3,11 +3,11 @@ Build the combos table
 */
 import { writeFileSync } from 'fs';
 
-import aggregatedData from '@/data/aggregated_data.json';
+import aggregatedData from '../data/aggregated_data.json';
 import {
   type SearchQuery,
   searchQueryEqual,
-} from '@/modules/SearchQuery/SearchQuery';
+} from '../modules/SearchQuery/SearchQuery';
 
 export type TableType = { [key: string]: SearchQuery[] };
 
