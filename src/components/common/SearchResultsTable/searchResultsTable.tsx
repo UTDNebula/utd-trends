@@ -138,47 +138,50 @@ function Row({
             </IconButton>
           </Tooltip>
         </TableCell>
-        <TableCell>
-          {isSmallScreen && (
-            <Typography
-              className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
-              sx={{
-                whiteSpace: 'nowrap', // Prevents text from wrapping to a new line
-              }}
+        <TableRow>
+          <TableCell>
+            {isSmallScreen && (
+              <Typography
+                className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
+                sx={{
+                  whiteSpace: 'nowrap', // Prevents text from wrapping to a new line
+                }}
+              >
+                {searchQueryLabel(convertToProfOnly(course))}
+              </Typography>
+            )}
+            <Tooltip
+              title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
+              placement="top"
             >
-              {searchQueryLabel(convertToProfOnly(course))}
-            </Typography>
-          )}
-          <Tooltip
-            title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
-            placement="top"
-          >
-            <Checkbox
-              checked={inCompare}
-              onClick={(e) => {
-                e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
-                if (inCompare) {
-                  removeFromCompare(course);
-                } else {
-                  addToCompare(course);
+              <Checkbox
+                checked={inCompare}
+                onClick={(e) => {
+                  e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
+                  if (inCompare) {
+                    removeFromCompare(course);
+                  } else {
+                    addToCompare(course);
+                  }
+                }}
+                disabled={
+                  (typeof grades !== 'undefined' &&
+                    grades.state === 'loading') ||
+                  (typeof rmp !== 'undefined' && rmp.state === 'loading')
                 }
-              }}
-              disabled={
-                (typeof grades !== 'undefined' && grades.state === 'loading') ||
-                (typeof rmp !== 'undefined' && rmp.state === 'loading')
-              }
-              sx={
-                color
-                  ? {
-                      '&.Mui-checked': {
-                        color: color,
-                      },
-                    }
-                  : undefined
-              } // Apply color if defined
-            />
-          </Tooltip>
-        </TableCell>
+                sx={
+                  color
+                    ? {
+                        '&.Mui-checked': {
+                          color: color,
+                        },
+                      }
+                    : undefined
+                } // Apply color if defined
+              />
+            </Tooltip>
+          </TableCell>
+        </TableRow>
         {!isSmallScreen && (
           <TableCell component="th" scope="row">
             <Typography
@@ -455,7 +458,7 @@ const SearchResultsTable = ({
             <TableRow>
               <TableCell />
               <TableCell>Compare</TableCell>
-              <TableCell>
+              <TableCell className="hidden sm:table-cell">
                 <TableSortLabel
                   active={orderBy === 'name'}
                   direction={orderBy === 'name' ? order : 'asc'}
