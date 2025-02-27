@@ -38,6 +38,7 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     router.prefetch('/dashboard');
+    router.prefetch('/planner');
   }, [router]);
 
   return (

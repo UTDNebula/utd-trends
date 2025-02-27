@@ -1,5 +1,5 @@
 import { Share } from '@mui/icons-material';
-import { IconButton, Snackbar, Tooltip } from '@mui/material';
+import { Button, IconButton, Snackbar, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -14,15 +14,36 @@ import SearchBar from '@/components/search/SearchBar/searchBar';
 interface TopMenuProps {
   resultsLoading: 'loading' | 'done' | 'error';
   setResultsLoading: () => void;
+  isPlanner: boolean;
 }
 
 /**
  * This is a component to hold UTD Trends branding and basic navigation
  * @returns
  */
-export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
+export function TopMenu({
+  resultsLoading,
+  setResultsLoading,
+  isPlanner,
+}: TopMenuProps) {
   const router = useRouter();
   const [openCopied, setOpenCopied] = useState(false);
+
+  function switchPages() {
+    if (!isPlanner)
+      router.push({
+        pathname: '/planner',
+      });
+    else
+      router.push({
+        pathname: '/dashboard',
+      });
+  }
+
+  // useEffect(() => {
+  //   router.prefetch('/dashboard');
+  //   router.prefetch('/planner');
+  // }, [router]);
 
   function shareLink(url: string) {
     if (navigator.share) {
@@ -72,6 +93,9 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
           className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
           input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         />
+        <Button className="bg-cornflower-400" onClick={switchPages}>
+          {isPlanner ? 'Search Results' : 'My Planner'}
+        </Button>
         <Tooltip title="Share link to search" className="ml-auto">
           <IconButton
             className="aspect-square"

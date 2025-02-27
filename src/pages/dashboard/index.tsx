@@ -936,6 +936,7 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
         <TopMenu
           resultsLoading={results.state}
           setResultsLoading={() => setResults({ state: 'loading' })}
+          isPlanner={false}
         />
         <main className="p-4">{contentComponent}</main>
       </div>
