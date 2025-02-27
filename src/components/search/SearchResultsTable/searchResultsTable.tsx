@@ -21,7 +21,9 @@ import SingleGradesInfo from '@/components/common/SingleGradesInfo/singleGradesI
 import SingleProfInfo from '@/components/common/SingleProfInfo/singleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
 import { useRainbowColors } from '@/modules/colors/colors';
+import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
+import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   convertToProfOnly,
   type SearchQuery,
@@ -29,7 +31,6 @@ import {
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 function LoadingRow() {
   return (

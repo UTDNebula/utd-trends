@@ -25,6 +25,8 @@ import fetchWithCache, {
   cacheIndexRmp,
   expireTime,
 } from '@/modules/fetchWithCache/fetchWithCache';
+import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   convertToProfOnly,
   decodeSearchQueryLabel,
@@ -37,22 +39,6 @@ import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
 //Limit cached number of grades and rmp data entries
 const MAX_ENTRIES = 1000;
-
-type GenericFetchedDataError<T> = {
-  state: 'error';
-  data?: T;
-};
-type GenericFetchedDataLoading = {
-  state: 'loading';
-};
-type GenericFetchedDataDone<T> = {
-  state: 'done';
-  data: T;
-};
-export type GenericFetchedData<T> =
-  | GenericFetchedDataError<T>
-  | GenericFetchedDataLoading
-  | GenericFetchedDataDone<T>;
 
 function removeDuplicates(array: SearchQuery[]) {
   return array.filter(
@@ -166,12 +152,6 @@ function calculateGrades(grades: GradesData, academicSessions?: string[]) {
     grade_distribution: grade_distribution,
   };
 }
-export type GradesType = {
-  gpa: number;
-  total: number;
-  grade_distribution: number[];
-  grades: GradesData;
-};
 //Fetch grades by academic session from nebula api
 function fetchGradesData(
   course: SearchQuery,

@@ -6,12 +6,13 @@ import fetchWithCache, {
   cacheIndexNebula,
   expireTime,
 } from '@/modules/fetchWithCache/fetchWithCache';
+import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   type SearchQuery,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
 import type { CourseData } from '@/pages/api/course';
-import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 type CourseOverviewProps = {
   course: SearchQuery;

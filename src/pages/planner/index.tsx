@@ -13,29 +13,10 @@ import TopMenu from '@/components/navigation/topMenu/topMenu';
 import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/myPlannerEmpty';
 import MyPlannerError from '@/components/planner/MyPlannerError/myPlannerError';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/plannerCoursesTable';
+import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import { type SearchQuery } from '@/modules/SearchQuery/SearchQuery';
 
-type GenericFetchedDataError<T> = {
-  state: 'error';
-  data?: T;
-};
-type GenericFetchedDataLoading = {
-  state: 'loading';
-};
-type GenericFetchedDataDone<T> = {
-  state: 'done';
-  data: T;
-};
-export type GenericFetchedData<T> =
-  | GenericFetchedDataError<T>
-  | GenericFetchedDataLoading
-  | GenericFetchedDataDone<T>;
-
-export const MyPlanner: NextPage<{ pageTitle: string }> = ({
-  pageTitle,
-}: {
-  pageTitle: string;
-}): React.ReactNode => {
+export const MyPlanner: NextPage = (): React.ReactNode => {
   const router = useRouter();
 
   //List of course+prof combos, data on each still needs to be fetched
@@ -70,6 +51,10 @@ export const MyPlanner: NextPage<{ pageTitle: string }> = ({
 
     contentComponent = (
       <>
+        <div className="sm:hidden">
+          {}
+          {plannerCoursesTable}
+        </div>
         <PanelGroup
           direction="horizontal"
           className="hidden sm:flex overflow-visible"
@@ -99,7 +84,7 @@ export const MyPlanner: NextPage<{ pageTitle: string }> = ({
   return (
     <>
       <Head>
-        <title>{'My Planner - ' + 'UTD TRENDS'}</title>
+        <title>Planner - UTD TRENDS</title>
         <link
           rel="canonical"
           href="https://trends.utdnebula.com/planner"
@@ -108,7 +93,7 @@ export const MyPlanner: NextPage<{ pageTitle: string }> = ({
         <meta
           key="og:title"
           property="og:title"
-          content={'Results - ' + pageTitle + 'UTD TRENDS'}
+          content="Planner - UTD TRENDS"
         />
         <meta
           property="og:url"

@@ -2,12 +2,13 @@ import React from 'react';
 
 import CompareTable from '@/components/compare/CompareTable/compareTable';
 import BarGraph from '@/components/graph/BarGraph/barGraph';
+import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   type SearchQuery,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 type CompareProps = {
   courses: SearchQuery[];
