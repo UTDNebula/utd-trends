@@ -51,8 +51,8 @@ type PlannerCoursesTableProps = {
   prop?: string;
 };
 
-const PlannerCoursesTable = ({ prop }: PlannerCoursesTableProps) => {
-  console.log(prop ?? '');
+const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
+  console.log(props.prop ?? '');
   return (
     //TODO: sticky header
     <>

@@ -293,11 +293,14 @@ export async function getServerSideProps(
   };
 }
 
-export const Dashboard: NextPage<{ pageTitle: string }> = ({
-  pageTitle,
-}: {
+interface Props {
   pageTitle: string;
-}): React.ReactNode => {
+  planner: SearchQuery[];
+  addToPlanner: (value: SearchQuery) => void;
+  removeFromPlanner: (value: SearchQuery) => void;
+}
+
+export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
   const router = useRouter();
 
   //Searches seperated into courses and professors to create combos
@@ -382,6 +385,10 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
               console.error('Search Results', error);
             }
           });
+      } else {
+        setResults({
+          state: 'error',
+        });
       }
       return () => {
         controller.abort();
@@ -839,6 +846,9 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
         addToCompare={addToCompare}
         removeFromCompare={removeFromCompare}
         colorMap={colorMap}
+        planner={props.planner}
+        addToPlanner={props.addToPlanner}
+        removeFromPlanner={props.removeFromPlanner}
       />
     );
     const carousel = (
@@ -905,7 +915,7 @@ export const Dashboard: NextPage<{ pageTitle: string }> = ({
         <meta
           key="og:title"
           property="og:title"
-          content={'Results - ' + pageTitle + 'UTD TRENDS'}
+          content={'Results - ' + props.pageTitle + 'UTD TRENDS'}
         />
         <meta
           property="og:url"

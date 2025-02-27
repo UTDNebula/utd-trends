@@ -1,7 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import {
   type ImperativePanelHandle,
   Panel,
@@ -11,26 +10,27 @@ import {
 
 import TopMenu from '@/components/navigation/topMenu/topMenu';
 import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/myPlannerEmpty';
-import MyPlannerError from '@/components/planner/MyPlannerError/myPlannerError';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/plannerCoursesTable';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import { type SearchQuery } from '@/modules/SearchQuery/SearchQuery';
 
-export const MyPlanner: NextPage = (): React.ReactNode => {
-  const router = useRouter();
+interface Props {
+  planner: SearchQuery[];
+  addToPlanner: (value: SearchQuery) => void;
+  removeFromPlanner: (value: SearchQuery) => void;
+}
 
-  //List of course+prof combos, data on each still needs to be fetched
-  const [results, setResults] = useState<GenericFetchedData<SearchQuery[]>>({
+export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
+  let results: GenericFetchedData<SearchQuery[]> = {
     state: 'loading',
-  });
-
-  const x = [{ prefix: 'hi' }];
-  useEffect(() => {
-    setResults({
+  };
+  if (props.planner.length) {
+    results = {
       state: 'done',
-      data: x as SearchQuery[],
-    });
-  }, [router.isReady, router.query.searchTerms]);
+      data: props.planner,
+    };
+  }
+  console.log('COURSES IN PLANNER: ', results);
 
   const panelLRef = useRef<ImperativePanelHandle>(null);
   const panelRRef = useRef<ImperativePanelHandle>(null);
@@ -42,10 +42,8 @@ export const MyPlanner: NextPage = (): React.ReactNode => {
   //Main content: loading, error, or normal
   let contentComponent;
 
-  if (results.state === 'done' && !results.data) {
+  if (results.state === 'done' && !results.data.length) {
     contentComponent = <MyPlannerEmpty />;
-  } else if (results.state === 'error') {
-    contentComponent = <MyPlannerError />;
   } else {
     const plannerCoursesTable = <PlannerCoursesTable />;
 
@@ -103,7 +101,7 @@ export const MyPlanner: NextPage = (): React.ReactNode => {
       <div className="w-full bg-light h-full">
         <TopMenu
           resultsLoading={results.state}
-          setResultsLoading={() => setResults({ state: 'loading' })}
+          setResultsLoading={() => {}}
           isPlanner={true}
         />
         <main className="p-4">{contentComponent}</main>
