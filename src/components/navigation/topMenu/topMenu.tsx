@@ -40,11 +40,6 @@ export function TopMenu({
       });
   }
 
-  // useEffect(() => {
-  //   router.prefetch('/dashboard');
-  //   router.prefetch('/planner');
-  // }, [router]);
-
   function shareLink(url: string) {
     if (navigator.share) {
       navigator

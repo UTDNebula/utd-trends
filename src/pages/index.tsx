@@ -36,11 +36,6 @@ const Home: NextPage = () => {
     data: [],
   }); // essentially a dummy state. Used only for the loading animation to start in homescreen before navigation to the dashboard
 
-  useEffect(() => {
-    router.prefetch('/dashboard');
-    router.prefetch('/planner');
-  }, [router]);
-
   return (
     <>
       <Head>
