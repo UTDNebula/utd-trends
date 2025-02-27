@@ -190,9 +190,7 @@ function GradeOrRmpRow<T>({
                           : colorMidpoint(
                               goodValue,
                               badValue,
-                              name === 'GPA'
-                                ? getValue(value.data)
-                                : getValue(value.data),
+                              getValue(value.data),
                               rainbowColors[12],
                               rainbowColors[0],
                             ),
