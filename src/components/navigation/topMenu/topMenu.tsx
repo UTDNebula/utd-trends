@@ -1,5 +1,5 @@
 import { Share } from '@mui/icons-material';
-import { Button, IconButton, Snackbar, Tooltip } from '@mui/material';
+import { IconButton, Snackbar, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -28,17 +28,6 @@ export function TopMenu({
 }: TopMenuProps) {
   const router = useRouter();
   const [openCopied, setOpenCopied] = useState(false);
-
-  function switchPages() {
-    if (!isPlanner)
-      router.push({
-        pathname: '/planner',
-      });
-    else
-      router.push({
-        pathname: '/dashboard',
-      });
-  }
 
   function shareLink(url: string) {
     if (navigator.share) {
@@ -88,9 +77,9 @@ export function TopMenu({
           className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
           input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         />
-        <Button className="bg-cornflower-400" onClick={switchPages}>
+        <Link className="bg-cornflower-400" href={isPlanner ? '/dashboard' : '/planner'}>
           {isPlanner ? 'Search Results' : 'My Planner'}
-        </Button>
+        </Link>
         <Tooltip title="Share link to search" className="ml-auto">
           <IconButton
             className="aspect-square"
