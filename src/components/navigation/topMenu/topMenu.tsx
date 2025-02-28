@@ -20,10 +20,7 @@ interface TopMenuProps {
  * This is a component to hold UTD Trends branding and basic navigation
  * @returns
  */
-export function TopMenu({
-  resultsLoading,
-  setResultsLoading,
-}: TopMenuProps) {
+export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
   const router = useRouter();
   const [openCopied, setOpenCopied] = useState(false);
 
