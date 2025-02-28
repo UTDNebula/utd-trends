@@ -13,7 +13,6 @@ import {
   TableRow,
   Tooltip,
   Typography,
-  useMediaQuery,
 } from '@mui/material';
 import React, { useState } from 'react';
 
@@ -98,7 +97,6 @@ function Row({
   color,
 }: RowProps) {
   const [open, setOpen] = useState(false);
-  const isSmallScreen = useMediaQuery('(max-width:600px)');
 
   const rainbowColors = useRainbowColors();
   const gpaToColor = (gpa: number): string => {
@@ -138,18 +136,15 @@ function Row({
             </IconButton>
           </Tooltip>
         </TableCell>
-        <TableRow>
           <TableCell>
-            {isSmallScreen && (
               <Typography
-                className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
+                className=" sm:hidden leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
                 sx={{
-                  whiteSpace: 'nowrap', // Prevents text from wrapping to a new line
+                  whiteSpace: 'nowrap', 
                 }}
               >
                 {searchQueryLabel(convertToProfOnly(course))}
               </Typography>
-            )}
             <Tooltip
               title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
               placement="top"
@@ -181,9 +176,7 @@ function Row({
               />
             </Tooltip>
           </TableCell>
-        </TableRow>
-        {!isSmallScreen && (
-          <TableCell component="th" scope="row">
+          <TableCell component="th" scope="row" className="hidden sm:table-cell">
             <Typography
               onClick={(e) => e.stopPropagation()} // prevents opening/closing the card when clicking on the text
               className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
@@ -197,7 +190,6 @@ function Row({
                   : '')}
             </Typography>
           </TableCell>
-        )}
         <TableCell align="right">
           {((typeof grades === 'undefined' || grades.state === 'error') && (
             <></>
