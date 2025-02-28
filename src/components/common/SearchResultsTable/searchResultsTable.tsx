@@ -136,60 +136,59 @@ function Row({
             </IconButton>
           </Tooltip>
         </TableCell>
-          <TableCell>
-              <Typography
-                className=" sm:hidden leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
-                sx={{
-                  whiteSpace: 'nowrap', 
-                }}
-              >
-                {searchQueryLabel(convertToProfOnly(course))}
-              </Typography>
-            <Tooltip
-              title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
-              placement="top"
-            >
-              <Checkbox
-                checked={inCompare}
-                onClick={(e) => {
-                  e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
-                  if (inCompare) {
-                    removeFromCompare(course);
-                  } else {
-                    addToCompare(course);
-                  }
-                }}
-                disabled={
-                  (typeof grades !== 'undefined' &&
-                    grades.state === 'loading') ||
-                  (typeof rmp !== 'undefined' && rmp.state === 'loading')
+        <TableCell>
+          <Typography
+            className=" sm:hidden leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
+            sx={{
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {searchQueryLabel(convertToProfOnly(course))}
+          </Typography>
+          <Tooltip
+            title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
+            placement="top"
+          >
+            <Checkbox
+              checked={inCompare}
+              onClick={(e) => {
+                e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
+                if (inCompare) {
+                  removeFromCompare(course);
+                } else {
+                  addToCompare(course);
                 }
-                sx={
-                  color
-                    ? {
-                        '&.Mui-checked': {
-                          color: color,
-                        },
-                      }
-                    : undefined
-                } // Apply color if defined
-              />
-            </Tooltip>
-          </TableCell>
-          <TableCell component="th" scope="row" className="hidden sm:table-cell">
-            <Typography
-              onClick={(e) => e.stopPropagation()} // prevents opening/closing the card when clicking on the text
-              className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
-            >
-              {searchQueryLabel(course) +
-                ((typeof course.profFirst === 'undefined' &&
-                  typeof course.profLast === 'undefined') ||
-                (typeof course.prefix === 'undefined' &&
-                  typeof course.number === 'undefined')
-                  ? ' (Overall)'
-                  : '')}
-            </Typography>
-          </TableCell>
+              }}
+              disabled={
+                (typeof grades !== 'undefined' && grades.state === 'loading') ||
+                (typeof rmp !== 'undefined' && rmp.state === 'loading')
+              }
+              sx={
+                color
+                  ? {
+                      '&.Mui-checked': {
+                        color: color,
+                      },
+                    }
+                  : undefined
+              } // Apply color if defined
+            />
+          </Tooltip>
+        </TableCell>
+        <TableCell component="th" scope="row" className="hidden sm:table-cell">
+          <Typography
+            onClick={(e) => e.stopPropagation()} // prevents opening/closing the card when clicking on the text
+            className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
+          >
+            {searchQueryLabel(course) +
+              ((typeof course.profFirst === 'undefined' &&
+                typeof course.profLast === 'undefined') ||
+              (typeof course.prefix === 'undefined' &&
+                typeof course.number === 'undefined')
+                ? ' (Overall)'
+                : '')}
+          </Typography>
+        </TableCell>
         <TableCell align="right">
           {((typeof grades === 'undefined' || grades.state === 'error') && (
             <></>
