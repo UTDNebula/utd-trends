@@ -84,7 +84,7 @@ export default function useRmpStore(): [
           data: res,
         });
       })
-      .catch((error) => {
+      .catch(() => {
         //Set loading status to error
         addToRmp(searchQueryLabel(professor), { state: 'error' });
       });

@@ -20,8 +20,8 @@ import Rating from '@/components/common/Rating/rating';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/singleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/singleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import { gpaToColor, useRainbowColors } from '@/modules/colors/colors';
+import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {

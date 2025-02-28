@@ -147,7 +147,7 @@ export default function useGradeStore(): [
         });
         return res;
       })
-      .catch((error) => {
+      .catch(() => {
         //Set loading status to error
         addToGrades(searchQueryLabel(course), { state: 'error' });
         return null;

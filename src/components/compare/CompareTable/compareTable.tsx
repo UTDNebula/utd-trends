@@ -14,9 +14,9 @@ import {
 import React, { useState } from 'react';
 
 import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
+import { gpaToColor, useRainbowColors } from '@/modules/colors/colors';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
-import { gpaToColor, useRainbowColors } from '@/modules/colors/colors';
 import {
   convertToProfOnly,
   type SearchQuery,

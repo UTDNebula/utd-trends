@@ -2,10 +2,10 @@ import React from 'react';
 
 import CompareTable from '@/components/compare/CompareTable/compareTable';
 import BarGraph from '@/components/graph/BarGraph/barGraph';
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import type { GradesType } from '@/modules/GradesType/GradesType';
 import LineGraph from '@/components/graph/LineGraph/lineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/graphToggle';
+import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   type SearchQuery,
   searchQueryLabel,
