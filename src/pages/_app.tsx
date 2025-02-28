@@ -21,6 +21,7 @@ const inter = Inter({
 });
 const kallisto = localFont({
   src: [
+    /*
     {
       path: '../fonts/Kallisto/Kallisto Thin.otf',
       weight: '100',
@@ -51,26 +52,31 @@ const kallisto = localFont({
       weight: '500',
       style: 'italic',
     },
+    */
     {
       path: '../fonts/Kallisto/Kallisto Bold.otf',
       weight: '700',
       style: 'normal',
     },
+    /*
     {
       path: '../fonts/Kallisto/Kallisto Bold Italic.otf',
       weight: '700',
       style: 'italic',
     },
+    */
     {
       path: '../fonts/Kallisto/Kallisto Heavy.otf',
       weight: '900',
       style: 'normal',
     },
+    /*
     {
       path: '../fonts/Kallisto/Kallisto Heavy Italic.otf',
       weight: '900',
       style: 'italic',
     },
+    */
   ],
   variable: '--font-kallisto',
 });

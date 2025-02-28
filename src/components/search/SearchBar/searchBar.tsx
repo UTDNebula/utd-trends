@@ -206,7 +206,7 @@ const SearchBar = ({
   }
 
   useEffect(() => {
-    fetch('/api/autocomplete');
+    fetch('/api/autocomplete?input=someSearchTerm');
   }, []);
 
   return (
