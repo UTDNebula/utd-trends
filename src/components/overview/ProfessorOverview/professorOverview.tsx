@@ -166,6 +166,7 @@ const ProfessorOverview = ({
         title="# of Students (Overall)"
         course={professor}
         grades={grades}
+        gradesToUse="unfiltered"
       />
       <SingleProfInfo rmp={rmp} />
     </div>

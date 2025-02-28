@@ -18,7 +18,9 @@ import {
   type SearchQuery,
   searchQueryEqual,
 } from '@/modules/SearchQuery/SearchQuery';
+import useGradeStore from '@/modules/useGradeStore/useGradeStore';
 import usePersistantState from '@/modules/usePersistantState/usePersistantState';
+import useRmpStore from '@/modules/useRmpStore/useRmpStore';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -122,6 +124,13 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   const router = useRouter();
 
+  //Store grades by course+prof combo
+  const [grades, , fetchAndStoreGradesData, recalcGrades, recalcAllGrades] =
+    useGradeStore();
+
+  //Store rmp scores by profs
+  const [rmp, , fetchAndStoreRmpData] = useRmpStore();
+
   //Store course+prof combos in planner
   const [planner, setPlanner] = usePersistantState<SearchQuery[]>(
     'planner',
@@ -186,6 +195,12 @@ function MyApp({ Component, pageProps }: AppProps) {
             planner={planner}
             addToPlanner={addToPlanner}
             removeFromPlanner={removeFromPlanner}
+            grades={grades}
+            fetchAndStoreGradesData={fetchAndStoreGradesData}
+            recalcGrades={recalcGrades}
+            recalcAllGrades={recalcAllGrades}
+            rmp={rmp}
+            fetchAndStoreRmpData={fetchAndStoreRmpData}
           />
           <FeedbackPopup />
           <GitHubButton />

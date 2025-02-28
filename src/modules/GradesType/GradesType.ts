@@ -1,8 +1,13 @@
 import type { GradesData } from '@/pages/api/grades';
 
-export type GradesType = {
+type GradesSummary = {
   gpa: number;
   total: number;
   grade_distribution: number[];
+};
+
+export type GradesType = {
+  filtered: GradesSummary;
+  unfiltered: GradesSummary;
   grades: GradesData;
 };

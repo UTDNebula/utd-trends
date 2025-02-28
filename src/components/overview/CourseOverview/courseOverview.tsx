@@ -323,6 +323,7 @@ const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
         title="# of Students (Overall)"
         course={course}
         grades={grades}
+        gradesToUse="unfiltered"
       />
     </div>
   );

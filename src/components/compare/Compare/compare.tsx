@@ -19,8 +19,8 @@ type CompareProps = {
 };
 
 function convertNumbersToPercents(distribution: GradesType): number[] {
-  const total = distribution.total;
-  return distribution.grade_distribution.map(
+  const total = distribution.filtered.total;
+  return distribution.filtered.grade_distribution.map(
     (frequencyOfLetterGrade) => (frequencyOfLetterGrade / total) * 100,
   );
 }
@@ -66,7 +66,7 @@ const Compare = ({
             if (grade.state === 'done') {
               response +=
                 ' (' +
-                grade.data.grade_distribution[dataPointIndex]
+                grade.data.filtered.grade_distribution[dataPointIndex]
                   .toFixed(0)
                   .toLocaleString() +
                 ')';

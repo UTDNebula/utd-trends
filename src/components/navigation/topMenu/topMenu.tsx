@@ -77,7 +77,10 @@ export function TopMenu({
           className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
           input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         />
-        <Link className="bg-cornflower-400" href={isPlanner ? '/dashboard' : '/planner'}>
+        <Link
+          className="bg-cornflower-400"
+          href={isPlanner ? '/dashboard' : '/planner'}
+        >
           {isPlanner ? 'Search Results' : 'My Planner'}
         </Link>
         <Tooltip title="Share link to search" className="ml-auto">

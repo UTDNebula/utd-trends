@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   type ImperativePanelHandle,
   Panel,
@@ -12,22 +12,94 @@ import TopMenu from '@/components/navigation/topMenu/topMenu';
 import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/myPlannerEmpty';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/plannerCoursesTable';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import { type SearchQuery } from '@/modules/SearchQuery/SearchQuery';
+import type { GradesType } from '@/modules/GradesType/GradesType';
+import {
+  convertToProfOnly,
+  type SearchQuery,
+  searchQueryEqual,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+
+function removeDuplicates(array: SearchQuery[]) {
+  return array.filter(
+    (obj1, index, self) =>
+      index === self.findIndex((obj2) => searchQueryEqual(obj1, obj2)),
+  );
+}
 
 interface Props {
   planner: SearchQuery[];
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
+  grades: {
+    [key: string]: GenericFetchedData<GradesType>;
+  };
+  fetchAndStoreGradesData: (
+    course: SearchQuery,
+    controller: AbortController,
+  ) => Promise<GradesType | null>;
+  recalcGrades: (course: SearchQuery) => void;
+  recalcAllGrades: (results: SearchQuery[], academicSessions: string[]) => void;
+  rmp: {
+    [key: string]: GenericFetchedData<RMPInterface>;
+  };
+  fetchAndStoreRmpData: (
+    course: SearchQuery,
+    controller: AbortController,
+  ) => void;
 }
 
 export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
+  const planner = props.planner;
+  useEffect(() => {
+    if (planner.length) {
+      //To cancel on rerender
+      const controller = new AbortController();
+
+      //Grade data
+      //Fetch each result
+      for (const result of planner) {
+        const entry = props.grades[searchQueryLabel(result)];
+        //Not already loading
+        if (typeof entry === 'undefined' || entry.state === 'error') {
+          props.fetchAndStoreGradesData(result, controller);
+        }
+      }
+
+      //RMP data
+      //Get list of profs from results
+      //Remove duplicates so as not to fetch multiple times
+      const professorsInResults = removeDuplicates(
+        planner
+          //Remove course data from each
+          .map((result) => convertToProfOnly(result))
+          //Remove empty objects (used to be only course data)
+          .filter((obj) => Object.keys(obj).length !== 0) as SearchQuery[],
+      );
+      //Fetch each professor
+      for (const professor of professorsInResults) {
+        const entry = props.rmp[searchQueryLabel(professor)];
+        //Not already loading
+        if (typeof entry === 'undefined' || entry.state === 'error') {
+          props.fetchAndStoreRmpData(professor, controller);
+        }
+      }
+
+      return () => {
+        controller.abort();
+      };
+    }
+  }, [planner]);
+  console.log(props.grades, props.rmp);
+
   let results: GenericFetchedData<SearchQuery[]> = {
     state: 'loading',
   };
-  if (props.planner.length) {
+  if (planner.length) {
     results = {
       state: 'done',
-      data: props.planner,
+      data: planner,
     };
   }
   console.log('COURSES IN PLANNER: ', results);
