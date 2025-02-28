@@ -14,6 +14,7 @@ import {
 import React, { useState } from 'react';
 
 import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
+import { gpaToColor, useRainbowColors } from '@/modules/colors/colors';
 import {
   convertToProfOnly,
   type SearchQuery,
@@ -23,7 +24,13 @@ import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 //Find the color corresponding to a number in a range
-function colorMidpoint(good: number, bad: number, value: number) {
+function colorMidpoint(
+  good: number,
+  bad: number,
+  value: number,
+  startRainbowColor: string,
+  endRainbowColor: string,
+) {
   const min = bad < good ? bad : good;
   const max = bad > good ? bad : good;
 
@@ -37,8 +44,17 @@ function colorMidpoint(good: number, bad: number, value: number) {
     ratio = 1 - ratio;
   }
 
-  const startColor = { r: 0xff, g: 0x57, b: 0x57 };
-  const endColor = { r: 0x79, g: 0xff, b: 0x57 };
+  const startColor = {
+    r: parseInt(startRainbowColor.slice(1, 3), 16),
+    g: parseInt(startRainbowColor.slice(3, 5), 16),
+    b: parseInt(startRainbowColor.slice(5, 7), 16),
+  };
+
+  const endColor = {
+    r: parseInt(endRainbowColor.slice(1, 3), 16),
+    g: parseInt(endRainbowColor.slice(3, 5), 16),
+    b: parseInt(endRainbowColor.slice(5, 7), 16),
+  };
 
   const r = Math.round(startColor.r + ratio * (endColor.r - startColor.r));
   const g = Math.round(startColor.g + ratio * (endColor.g - startColor.g));
@@ -63,6 +79,7 @@ type GradeOrRmpRowProps<T> = {
   order: 'asc' | 'desc';
   handleClick: (arg0: string) => void;
   defaultAscSort?: boolean;
+  rainbowColors: string[];
 };
 // This is for grade or rmp related rows in the compare table, it displays grade or rmp data for each course
 function GradeOrRmpRow<T>({
@@ -79,6 +96,7 @@ function GradeOrRmpRow<T>({
   order,
   handleClick,
   defaultAscSort,
+  rainbowColors,
 }: GradeOrRmpRowProps<T>) {
   const tooltipTitles: { [key: string]: string } = {
     GPA: 'Sort by GPA',
@@ -152,11 +170,16 @@ function GradeOrRmpRow<T>({
                   <Typography
                     className="text-base inline rounded-full px-5 py-2 text-black"
                     style={{
-                      backgroundColor: colorMidpoint(
-                        goodValue,
-                        badValue,
-                        getValue(value.data),
-                      ),
+                      backgroundColor:
+                        name === 'GPA'
+                          ? gpaToColor(rainbowColors, getValue(value.data))
+                          : colorMidpoint(
+                              goodValue,
+                              badValue,
+                              getValue(value.data),
+                              rainbowColors[12],
+                              rainbowColors[0],
+                            ),
                     }}
                   >
                     {/*value.data is all the data past the state of loading, done, or error.
@@ -381,6 +404,9 @@ const CompareTable = ({
   //Table sorting direction
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   //Cycle through sorting
+
+  const rainbowColors = useRainbowColors();
+
   function handleClick(col: string) {
     if (orderBy !== col) {
       setOrderBy(col);
@@ -517,6 +543,7 @@ const CompareTable = ({
               orderBy={orderBy}
               order={order}
               handleClick={handleClick}
+              rainbowColors={rainbowColors}
             />
 
             <GradeOrRmpRow<RMPInterface>
@@ -534,6 +561,7 @@ const CompareTable = ({
               orderBy={orderBy}
               order={order}
               handleClick={handleClick}
+              rainbowColors={rainbowColors}
             />
             <GradeOrRmpRow<RMPInterface>
               name="Would Take Again"
@@ -550,6 +578,7 @@ const CompareTable = ({
               orderBy={orderBy}
               order={order}
               handleClick={handleClick}
+              rainbowColors={rainbowColors}
             />
             <GradeOrRmpRow<RMPInterface>
               name="Difficulty"
@@ -567,6 +596,7 @@ const CompareTable = ({
               order={order}
               handleClick={handleClick}
               defaultAscSort
+              rainbowColors={rainbowColors}
             />
             <GradeAndRmpRow
               name="# of Grades / Ratings"
