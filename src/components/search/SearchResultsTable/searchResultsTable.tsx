@@ -164,7 +164,7 @@ function Row({
               />
             </Tooltip>
             <Tooltip
-              title={inPlanner ? 'Remove from Compare' : 'Add to Compare'}
+              title={inPlanner ? 'Remove from Planner' : 'Add to Planner'}
               placement="top"
             >
               <Checkbox
