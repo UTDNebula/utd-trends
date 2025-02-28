@@ -14,12 +14,7 @@ import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config.js';
 import FeedbackPopup from '@/components/common/FeedbackPopup/feedbackPopup';
 import GitHubButton from '@/components/common/GitHubButton/gitHubButton';
-import {
-  type SearchQuery,
-  searchQueryEqual,
-} from '@/modules/SearchQuery/SearchQuery';
 import useGradeStore from '@/modules/useGradeStore/useGradeStore';
-import usePersistantState from '@/modules/usePersistantState/usePersistantState';
 import useRmpStore from '@/modules/useRmpStore/useRmpStore';
 
 const inter = Inter({
@@ -131,30 +126,6 @@ function MyApp({ Component, pageProps }: AppProps) {
   //Store rmp scores by profs
   const [rmp, , fetchAndStoreRmpData] = useRmpStore();
 
-  //Store course+prof combos in planner
-  const [planner, setPlanner] = usePersistantState<SearchQuery[]>(
-    'planner',
-    [],
-  );
-
-  //Add a course+prof combo to planner (happens from search results)
-  function addToPlanner(searchQuery: SearchQuery) {
-    //If not already there
-    if (planner.findIndex((obj) => searchQueryEqual(obj, searchQuery)) === -1) {
-      //Add to list
-      setPlanner(planner.concat([searchQuery]));
-    }
-  }
-
-  //Remove a course+prof combo from compare
-  function removeFromPlanner(searchQuery: SearchQuery) {
-    //If already there
-    if (planner.findIndex((obj) => searchQueryEqual(obj, searchQuery)) !== -1) {
-      //Remove from list
-      setPlanner(planner.filter((el) => !searchQueryEqual(el, searchQuery)));
-    }
-  }
-
   return (
     <>
       <GoogleAnalytics gaId="G-CC86XR1562" />
@@ -192,9 +163,6 @@ function MyApp({ Component, pageProps }: AppProps) {
         >
           <Component
             {...pageProps}
-            planner={planner}
-            addToPlanner={addToPlanner}
-            removeFromPlanner={removeFromPlanner}
             grades={grades}
             fetchAndStoreGradesData={fetchAndStoreGradesData}
             recalcGrades={recalcGrades}
