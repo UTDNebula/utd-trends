@@ -150,9 +150,6 @@ export default function useGradeStore(): [
       .catch((error) => {
         //Set loading status to error
         addToGrades(searchQueryLabel(course), { state: 'error' });
-        if (!(error instanceof DOMException && error.name == 'AbortError')) {
-          console.error('Grades data for ' + searchQueryLabel(course), error);
-        }
         return null;
       });
   }
