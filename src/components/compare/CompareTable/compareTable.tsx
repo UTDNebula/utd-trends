@@ -14,7 +14,7 @@ import {
 import React, { useState } from 'react';
 
 import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
-import { useRainbowColors } from '@/modules/colors/colors';
+import { gpaToColor, useRainbowColors } from '@/modules/colors/colors';
 import {
   convertToProfOnly,
   type SearchQuery,
@@ -104,20 +104,6 @@ function GradeOrRmpRow<T>({
     'Would Take Again': 'Sort by Would Take Again %',
     Difficulty: 'Sort by Difficulty',
   };
-  const gpaToColor = (gpa: number): string => {
-    if (gpa >= 4.0) return rainbowColors[1];
-    if (gpa >= 3.67) return rainbowColors[2];
-    if (gpa >= 3.33) return rainbowColors[3];
-    if (gpa >= 3.0) return rainbowColors[4];
-    if (gpa >= 2.67) return rainbowColors[5];
-    if (gpa >= 2.33) return rainbowColors[6];
-    if (gpa >= 2.0) return rainbowColors[7];
-    if (gpa >= 1.67) return rainbowColors[8];
-    if (gpa >= 1.33) return rainbowColors[9];
-    if (gpa >= 1.0) return rainbowColors[10];
-    if (gpa >= 0.67) return rainbowColors[11];
-    return rainbowColors[12];
-  };
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
       <TableCell align="right" className="pl-0">
@@ -186,7 +172,7 @@ function GradeOrRmpRow<T>({
                     style={{
                       backgroundColor:
                         name === 'GPA'
-                          ? gpaToColor(getValue(value.data))
+                          ? gpaToColor(rainbowColors, getValue(value.data))
                           : colorMidpoint(
                               goodValue,
                               badValue,

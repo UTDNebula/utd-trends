@@ -20,7 +20,7 @@ import Rating from '@/components/common/Rating/rating';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/singleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/singleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
-import { useRainbowColors } from '@/modules/colors/colors';
+import { gpaToColor, useRainbowColors } from '@/modules/colors/colors';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
 import {
   convertToProfOnly,
@@ -84,20 +84,6 @@ function Row({
   const [open, setOpen] = useState(false);
 
   const rainbowColors = useRainbowColors();
-  const gpaToColor = (gpa: number): string => {
-    if (gpa >= 4.0) return rainbowColors[1];
-    if (gpa >= 3.67) return rainbowColors[2];
-    if (gpa >= 3.33) return rainbowColors[3];
-    if (gpa >= 3.0) return rainbowColors[4];
-    if (gpa >= 2.67) return rainbowColors[5];
-    if (gpa >= 2.33) return rainbowColors[6];
-    if (gpa >= 2.0) return rainbowColors[7];
-    if (gpa >= 1.67) return rainbowColors[8];
-    if (gpa >= 1.33) return rainbowColors[9];
-    if (gpa >= 1.0) return rainbowColors[10];
-    if (gpa >= 0.67) return rainbowColors[11];
-    return rainbowColors[12];
-  };
 
   return (
     <>
@@ -208,7 +194,7 @@ function Row({
               >
                 <Typography
                   className="text-base text-black text-center rounded-full px-5 py-2 w-16 block mx-auto"
-                  sx={{ backgroundColor: gpaToColor(grades.data.gpa) }}
+                  sx={{ backgroundColor: gpaToColor(rainbowColors, grades.data.gpa) }}
                 >
                   {gpaToLetterGrade(grades.data.gpa)}
                 </Typography>
