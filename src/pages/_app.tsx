@@ -91,6 +91,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       //copied from tailwind.config.js
       primary: {
         main: colors.royal as string,
+        light: colors.stars as string,
       },
       secondary: {
         main: colors.royal as string,

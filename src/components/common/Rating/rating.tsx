@@ -1,9 +1,11 @@
 import { Rating as _Rating, styled } from '@mui/material';
 
-// for star color for rating
 const Rating = styled(_Rating)(({ theme }) => ({
   '& .MuiRating-iconFilled': {
-    color: theme.palette.primary.main,
+    color:
+      theme.palette.mode === 'light'
+        ? theme.palette.primary.main // Use primary.main in light mode
+        : theme.palette.primary.light, // Use primary.light in dark mode
   },
 }));
 
