@@ -1,3 +1,5 @@
+import BookIcon from '@mui/icons-material/Book';
+import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Checkbox,
@@ -21,7 +23,9 @@ import SingleGradesInfo from '@/components/common/SingleGradesInfo/singleGradesI
 import SingleProfInfo from '@/components/common/SingleProfInfo/singleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
 import { useRainbowColors } from '@/modules/colors/colors';
+import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
+import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   convertToProfOnly,
   type SearchQuery,
@@ -29,16 +33,16 @@ import {
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 function LoadingRow() {
   return (
     <TableRow>
-      <TableCell className="flex gap-1">
+      <TableCell className="flex">
         <IconButton aria-label="expand row" size="medium" disabled>
           <KeyboardArrowIcon />
         </IconButton>
         <Checkbox disabled />
+        <Checkbox disabled icon={<BookOutlinedIcon />} />
       </TableCell>
       <TableCell component="th" scope="row" className="w-full">
         <Typography className="w-full leading-tight text-lg">
@@ -70,6 +74,9 @@ type RowProps = {
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
   color?: string;
+  inPlanner: boolean;
+  addToPlanner: (value: SearchQuery) => void;
+  removeFromPlanner: (value: SearchQuery) => void;
 };
 
 function Row({
@@ -80,6 +87,9 @@ function Row({
   addToCompare,
   removeFromCompare,
   color,
+  inPlanner,
+  addToPlanner,
+  removeFromPlanner,
 }: RowProps) {
   const [open, setOpen] = useState(false);
 
@@ -106,7 +116,7 @@ function Row({
         className="cursor-pointer"
       >
         <TableCell className="border-b-0">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center">
             <Tooltip
               title={open ? 'Minimize Result' : 'Expand Result'}
               placement="top"
@@ -151,6 +161,24 @@ function Row({
                       }
                     : undefined
                 } // Apply color if defined
+              />
+            </Tooltip>
+            <Tooltip
+              title={inPlanner ? 'Remove from Planner' : 'Add to Planner'}
+              placement="top"
+            >
+              <Checkbox
+                checked={inPlanner}
+                onClick={(e) => {
+                  e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
+                  if (inPlanner) {
+                    removeFromPlanner(course);
+                  } else {
+                    addToPlanner(course);
+                  }
+                }}
+                icon={<BookOutlinedIcon />}
+                checkedIcon={<BookIcon />}
               />
             </Tooltip>
           </div>
@@ -203,14 +231,14 @@ function Row({
             )) ||
             (grades.state === 'done' && (
               <Tooltip
-                title={'GPA: ' + grades.data.gpa.toFixed(2)}
+                title={'GPA: ' + grades.data.filtered.gpa.toFixed(2)}
                 placement="top"
               >
                 <Typography
                   className="text-base text-black text-center rounded-full px-5 py-2 w-16 block mx-auto"
-                  sx={{ backgroundColor: gpaToColor(grades.data.gpa) }}
+                  sx={{ backgroundColor: gpaToColor(grades.data.filtered.gpa) }}
                 >
-                  {gpaToLetterGrade(grades.data.gpa)}
+                  {gpaToLetterGrade(grades.data.filtered.gpa)}
                 </Typography>
               </Tooltip>
             )) ||
@@ -246,7 +274,11 @@ function Row({
         <TableCell className="p-0" colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <div className="p-2 md:p-4 flex flex-col gap-2">
-              <SingleGradesInfo course={course} grades={grades} />
+              <SingleGradesInfo
+                course={course}
+                grades={grades}
+                gradesToUse="filtered"
+              />
               <SingleProfInfo rmp={rmp} />
             </div>
           </Collapse>
@@ -265,6 +297,9 @@ type SearchResultsTableProps = {
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
   colorMap: { [key: string]: string };
+  planner: SearchQuery[];
+  addToPlanner: (value: SearchQuery) => void;
+  removeFromPlanner: (value: SearchQuery) => void;
 };
 
 const SearchResultsTable = ({
@@ -276,6 +311,9 @@ const SearchResultsTable = ({
   addToCompare,
   removeFromCompare,
   colorMap,
+  planner,
+  addToPlanner,
+  removeFromPlanner,
 }: SearchResultsTableProps) => {
   //Table sorting category
   const [orderBy, setOrderBy] = useState<'name' | 'gpa' | 'rating'>('name');
@@ -407,9 +445,9 @@ const SearchResultsTable = ({
       }
 
       if (order === 'asc') {
-        return aGrades.data.gpa - bGrades.data.gpa;
+        return aGrades.data.filtered.gpa - bGrades.data.filtered.gpa;
       }
-      return bGrades.data.gpa - aGrades.data.gpa;
+      return bGrades.data.filtered.gpa - aGrades.data.filtered.gpa;
     }
     if (orderBy === 'rating') {
       const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
@@ -514,6 +552,13 @@ const SearchResultsTable = ({
                     addToCompare={addToCompare}
                     removeFromCompare={removeFromCompare}
                     color={colorMap[searchQueryLabel(result)]}
+                    inPlanner={
+                      planner.findIndex((obj) =>
+                        searchQueryEqual(obj, result),
+                      ) !== -1
+                    }
+                    addToPlanner={addToPlanner}
+                    removeFromPlanner={removeFromPlanner}
                   />
                 ))
               : Array(10)

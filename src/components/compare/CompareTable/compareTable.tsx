@@ -14,13 +14,14 @@ import {
 import React, { useState } from 'react';
 
 import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
+import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   convertToProfOnly,
   type SearchQuery,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(good: number, bad: number, value: number) {
@@ -417,9 +418,9 @@ const CompareTable = ({
         return -9999;
       }
       if (order === 'asc') {
-        return aGrades.data.gpa - bGrades.data.gpa;
+        return aGrades.data.filtered.gpa - bGrades.data.filtered.gpa;
       }
-      return bGrades.data.gpa - aGrades.data.gpa;
+      return bGrades.data.filtered.gpa - aGrades.data.filtered.gpa;
     }
     if (
       orderBy === 'Rating' ||
@@ -507,7 +508,7 @@ const CompareTable = ({
               values={sortedResults.map(
                 (result) => grades[searchQueryLabel(result)],
               )}
-              getValue={(data: GradesType) => data.gpa}
+              getValue={(data: GradesType) => data.filtered.gpa}
               formatValue={(value: number) => value.toFixed(2)}
               goodValue={4}
               badValue={0}
@@ -576,7 +577,7 @@ const CompareTable = ({
               rmpValues={sortedResults.map(
                 (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
               )}
-              getGradeValue={(data: GradesType) => data.total}
+              getGradeValue={(data: GradesType) => data.filtered.total}
               getRmpValue={(data: RMPInterface) => data.numRatings}
               loadingFiller="100"
               cell_className="pt-3 pb-2 border-x-2"
