@@ -177,15 +177,6 @@ function Row({
                     addToPlanner(course);
                   }
                 }}
-                sx={
-                  color
-                    ? {
-                        '&.Mui-checked': {
-                          color: color,
-                        },
-                      }
-                    : undefined
-                } // Apply color if defined
                 icon={<BookOutlinedIcon />}
                 checkedIcon={<BookIcon />}
               />
