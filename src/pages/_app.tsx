@@ -1,9 +1,7 @@
-import '../styles/globals.css';
+import '@/styles/globals.css';
 
-import { useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { GoogleAnalytics } from '@next/third-parties/google';
-import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
@@ -11,10 +9,13 @@ import localFont from 'next/font/local';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
+import resolveConfig from 'tailwindcss/resolveConfig';
 
-import tailwindConfig from '../../tailwind.config.js';
-import FeedbackPopup from '../components/common/FeedbackPopup/feedbackPopup';
-import GitHubButton from '../components/common/GitHubButton/gitHubButton';
+import tailwindConfig from '@/../tailwind.config.js';
+import FeedbackPopup from '@/components/common/FeedbackPopup/feedbackPopup';
+import GitHubButton from '@/components/common/GitHubButton/gitHubButton';
+import useGradeStore from '@/modules/useGradeStore/useGradeStore';
+import useRmpStore from '@/modules/useRmpStore/useRmpStore';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -22,6 +23,7 @@ const inter = Inter({
 });
 const kallisto = localFont({
   src: [
+    /*
     {
       path: '../fonts/Kallisto/Kallisto Thin.otf',
       weight: '100',
@@ -52,59 +54,90 @@ const kallisto = localFont({
       weight: '500',
       style: 'italic',
     },
+    */
     {
       path: '../fonts/Kallisto/Kallisto Bold.otf',
       weight: '700',
       style: 'normal',
     },
+    /*
     {
       path: '../fonts/Kallisto/Kallisto Bold Italic.otf',
       weight: '700',
       style: 'italic',
     },
+    */
     {
       path: '../fonts/Kallisto/Kallisto Heavy.otf',
       weight: '900',
       style: 'normal',
     },
+    /*
     {
       path: '../fonts/Kallisto/Kallisto Heavy Italic.otf',
       weight: '900',
       style: 'italic',
     },
+    */
   ],
   variable: '--font-kallisto',
 });
 
+const fullTailwindConfig = resolveConfig(tailwindConfig);
+
 function MyApp({ Component, pageProps }: AppProps) {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const muiTheme = createTheme({
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  const colors = fullTailwindConfig.theme.colors as any;
+  const palette = {
     palette: {
-      mode: prefersDarkMode ? 'dark' : 'light',
       //copied from tailwind.config.js
       primary: {
-        main: tailwindConfig.theme.extend.colors.royal,
+        main: colors.royal as string,
       },
       secondary: {
-        main: tailwindConfig.theme.extend.colors.royal,
-        light: tailwindConfig.theme.extend.colors.periwinkle,
+        main: colors.royal as string,
+        light: colors.periwinkle as string,
       },
       error: {
-        main: tailwindConfig.theme.extend.colors.persimmon['500'],
+        main: colors.persimmon['500'] as string,
       },
+    },
+  };
+  const muiTheme = createTheme({
+    cssVariables: true,
+    colorSchemes: {
+      light: palette,
+      dark: palette,
     },
     typography: {
       fontFamily: 'inherit',
+    },
+    breakpoints: {
+      values: {
+        xs: 0,
+        sm: parseInt(fullTailwindConfig.theme.screens.sm),
+        md: parseInt(fullTailwindConfig.theme.screens.md),
+        lg: parseInt(fullTailwindConfig.theme.screens.lg),
+        xl: parseInt(fullTailwindConfig.theme.screens.xl),
+      },
     },
   });
 
   const router = useRouter();
 
+  //Store grades by course+prof combo
+  const [grades, , fetchAndStoreGradesData, recalcGrades, recalcAllGrades] =
+    useGradeStore();
+
+  //Store rmp scores by profs
+  const [rmp, , fetchAndStoreRmpData] = useRmpStore();
+
   return (
     <>
       <GoogleAnalytics gaId="G-CC86XR1562" />
       <Head>
-        <title>UTD Trends</title>
+        <title>UTD TRENDS</title>
+        <meta key="og:title" property="og:title" content="UTD TRENDS" />
         <link
           rel="icon"
           type="image/png"
@@ -134,12 +167,19 @@ function MyApp({ Component, pageProps }: AppProps) {
             ' h-full text-haiti dark:text-white'
           }
         >
-          <Component {...pageProps} />
+          <Component
+            {...pageProps}
+            grades={grades}
+            fetchAndStoreGradesData={fetchAndStoreGradesData}
+            recalcGrades={recalcGrades}
+            recalcAllGrades={recalcAllGrades}
+            rmp={rmp}
+            fetchAndStoreRmpData={fetchAndStoreRmpData}
+          />
           <FeedbackPopup />
           <GitHubButton />
         </div>
       </ThemeProvider>
-      <Analytics />
       <SpeedInsights route={router.pathname} />
     </>
   );

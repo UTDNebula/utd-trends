@@ -1,18 +1,26 @@
 import { Share } from '@mui/icons-material';
-import { IconButton, Snackbar, Tooltip, useMediaQuery } from '@mui/material';
+import { IconButton, Snackbar, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
-import Background from '../../../../public/background.png';
-import SearchBar from '../../common/SearchBar/searchBar';
+import Background from '@/../public/background.png';
+import SearchBar from '@/components/search/SearchBar/searchBar';
+
+/**
+ * Props type used by the TopMenu component
+ */
+interface TopMenuProps {
+  resultsLoading: 'loading' | 'done' | 'error';
+  setResultsLoading: () => void;
+}
 
 /**
  * This is a component to hold UTD Trends branding and basic navigation
  * @returns
  */
-export function TopMenu() {
+export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
   const router = useRouter();
   const [openCopied, setOpenCopied] = useState(false);
 
@@ -42,28 +50,15 @@ export function TopMenu() {
     alert(url);
   }
 
-  const matches = useMediaQuery('(min-width: 640px)');
-  const searchBar = (
-    <SearchBar
-      manageQuery="onSelect"
-      className={'shrink ' + (matches ? 'basis-[32rem]' : 'basis-full')}
-      input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
-    />
-  );
-
   return (
     <>
-      <div
-        className={
-          'relative overflow-hidden flex items-center gap-y-0 gap-x-4 md:gap-x-8 lg:gap-x-16 py-1 md:py-2 px-4 md:px-8 lg:px-16 bg-lighten dark:bg-darken' +
-          (matches ? '' : ' flex-wrap')
-        }
-      >
+      <div className="relative overflow-hidden flex items-center gap-y-0 gap-x-4 md:gap-x-8 lg:gap-x-16 py-1 md:py-2 px-4 md:px-8 lg:px-16 bg-lighten dark:bg-darken flex-wrap sm:flex-nowrap">
         <Image
           src={Background}
           alt="gradient background"
           fill
           className="object-cover -z-20"
+          priority
         />
         <Link
           href="/"
@@ -71,7 +66,13 @@ export function TopMenu() {
         >
           UTD TRENDS
         </Link>
-        {matches && searchBar}
+        <SearchBar
+          manageQuery="onSelect"
+          resultsLoading={resultsLoading}
+          setResultsLoading={setResultsLoading}
+          className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
+          input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+        />
         <Tooltip title="Share link to search" className="ml-auto">
           <IconButton
             className="aspect-square"
@@ -91,7 +92,6 @@ export function TopMenu() {
             <Share className="text-3xl mr-1" />
           </IconButton>
         </Tooltip>
-        {!matches && searchBar}
       </div>
       <Snackbar
         open={openCopied}
