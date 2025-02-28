@@ -194,7 +194,9 @@ function Row({
               >
                 <Typography
                   className="text-base text-black text-center rounded-full px-5 py-2 w-16 block mx-auto"
-                  sx={{ backgroundColor: gpaToColor(rainbowColors, grades.data.gpa) }}
+                  sx={{
+                    backgroundColor: gpaToColor(rainbowColors, grades.data.gpa),
+                  }}
                 >
                   {gpaToLetterGrade(grades.data.gpa)}
                 </Typography>
