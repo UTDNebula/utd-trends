@@ -273,7 +273,6 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
               !(error instanceof DOMException && error.name == 'AbortError')
             ) {
               setResults({ state: 'error', data: [] });
-              console.error('Search Results', error);
             }
           });
       } else {

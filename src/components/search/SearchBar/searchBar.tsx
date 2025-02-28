@@ -95,14 +95,13 @@ const SearchBar = ({
 
   //update parent and queries
   function onSelect_internal(newValue: SearchQuery[]) {
-    // called by updateValue(), handleKeyDown(), and is assigned to the button onClick action
     if (
       router.query.searchTerms ==
       newValue.map((el) => searchQueryLabel(el)).join(',')
     )
       // do not initiate a new search when the searchTerms haven't changed
       return;
-    setErrorTooltip(!newValue.length); //Check if tooltip needs to be displayed
+    setErrorTooltip(!newValue.length);
     if (newValue.length && typeof setResultsLoading !== 'undefined') {
       setResultsLoading();
     }
@@ -115,7 +114,7 @@ const SearchBar = ({
   }
 
   //update url with what's in value
-  function updateQueries(newValue: SearchQuery[]) {
+  async function updateQueries(newValue: SearchQuery[]) {
     if (typeof manageQuery !== 'undefined' && router.isReady) {
       const newQuery = router.query;
       if (newValue.length > 0) {
@@ -181,32 +180,29 @@ const SearchBar = ({
             .trimStart();
           setInputValue(rest);
           loadNewOptions(rest.trimEnd());
-          setLoading(false);
         } else if (quickInputValue.current === newInputValue) {
           //still valid options
           setOptions(filtered);
-          setLoading(false);
         }
       })
       .catch((error) => {
-        if (error instanceof DOMException) {
-          // ignore aborts
-        } else {
+        // ignore aborts
+        if (!(error instanceof DOMException)) {
           console.error('Autocomplete', error);
         }
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }
 
   //add value
   function addValue(newValue: SearchQuery) {
-    setValue((old) => {
-      const oldAndNew = [...old, newValue];
-      return oldAndNew;
-    });
+    setValue((old) => [...old, newValue]);
   }
 
   useEffect(() => {
-    fetch('/api/autocomplete');
+    fetch('/api/autocomplete?input=someSearchTerm');
   }, []);
 
   return (
