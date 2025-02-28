@@ -14,6 +14,8 @@ import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config.js';
 import FeedbackPopup from '@/components/common/FeedbackPopup/feedbackPopup';
 import GitHubButton from '@/components/common/GitHubButton/gitHubButton';
+import useGradeStore from '@/modules/useGradeStore/useGradeStore';
+import useRmpStore from '@/modules/useRmpStore/useRmpStore';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -123,6 +125,13 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   const router = useRouter();
 
+  //Store grades by course+prof combo
+  const [grades, , fetchAndStoreGradesData, recalcGrades, recalcAllGrades] =
+    useGradeStore();
+
+  //Store rmp scores by profs
+  const [rmp, , fetchAndStoreRmpData] = useRmpStore();
+
   return (
     <>
       <GoogleAnalytics gaId="G-CC86XR1562" />
@@ -158,7 +167,15 @@ function MyApp({ Component, pageProps }: AppProps) {
             ' h-full text-haiti dark:text-white'
           }
         >
-          <Component {...pageProps} />
+          <Component
+            {...pageProps}
+            grades={grades}
+            fetchAndStoreGradesData={fetchAndStoreGradesData}
+            recalcGrades={recalcGrades}
+            recalcAllGrades={recalcAllGrades}
+            rmp={rmp}
+            fetchAndStoreRmpData={fetchAndStoreRmpData}
+          />
           <FeedbackPopup />
           <GitHubButton />
         </div>

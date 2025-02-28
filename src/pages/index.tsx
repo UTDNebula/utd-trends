@@ -2,16 +2,15 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import Background from '@/../public/background.png';
 import SearchBar from '@/components/search/SearchBar/searchBar';
+import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import {
   type SearchQuery,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
-
-import type { GenericFetchedData } from './dashboard';
 
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
@@ -36,13 +35,6 @@ const Home: NextPage = () => {
     state: 'done',
     data: [],
   }); // essentially a dummy state. Used only for the loading animation to start in home screen before navigation to the dashboard
-
-  useEffect(() => {
-    async function prefetchDashboard() {
-      await router.prefetch('/dashboard');
-    }
-    prefetchDashboard();
-  }, [router]);
 
   return (
     <>

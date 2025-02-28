@@ -21,7 +21,9 @@ import SingleGradesInfo from '@/components/common/SingleGradesInfo/singleGradesI
 import SingleProfInfo from '@/components/common/SingleProfInfo/singleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors/colors';
+import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
+import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   convertToProfOnly,
   type SearchQuery,
@@ -29,12 +31,11 @@ import {
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 function LoadingRow() {
   return (
     <TableRow>
-      <TableCell className="flex gap-1">
+      <TableCell className="flex">
         <IconButton aria-label="expand row" size="medium" disabled>
           <KeyboardArrowIcon />
         </IconButton>
@@ -189,16 +190,19 @@ function Row({
             )) ||
             (grades.state === 'done' && (
               <Tooltip
-                title={'GPA: ' + grades.data.gpa.toFixed(2)}
+                title={'GPA: ' + grades.data.filtered.gpa.toFixed(2)}
                 placement="top"
               >
                 <Typography
                   className="text-base text-black text-center rounded-full px-5 py-2 w-16 block mx-auto"
                   sx={{
-                    backgroundColor: gpaToColor(rainbowColors, grades.data.gpa),
+                    backgroundColor: gpaToColor(
+                      rainbowColors,
+                      grades.data.filtered.gpa,
+                    ),
                   }}
                 >
-                  {gpaToLetterGrade(grades.data.gpa)}
+                  {gpaToLetterGrade(grades.data.filtered.gpa)}
                 </Typography>
               </Tooltip>
             )) ||
@@ -234,7 +238,11 @@ function Row({
         <TableCell className="p-0" colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <div className="p-2 md:p-4 flex flex-col gap-2">
-              <SingleGradesInfo course={course} grades={grades} />
+              <SingleGradesInfo
+                course={course}
+                grades={grades}
+                gradesToUse="filtered"
+              />
               <SingleProfInfo rmp={rmp} />
             </div>
           </Collapse>
@@ -395,9 +403,9 @@ const SearchResultsTable = ({
       }
 
       if (order === 'asc') {
-        return aGrades.data.gpa - bGrades.data.gpa;
+        return aGrades.data.filtered.gpa - bGrades.data.filtered.gpa;
       }
-      return bGrades.data.gpa - aGrades.data.gpa;
+      return bGrades.data.filtered.gpa - aGrades.data.filtered.gpa;
     }
     if (orderBy === 'rating') {
       const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];

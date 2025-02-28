@@ -4,12 +4,13 @@ import CompareTable from '@/components/compare/CompareTable/compareTable';
 import BarGraph from '@/components/graph/BarGraph/barGraph';
 import LineGraph from '@/components/graph/LineGraph/lineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/graphToggle';
+import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   type SearchQuery,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import type { GenericFetchedData, GradesType } from '@/pages/dashboard/index';
 
 type CompareProps = {
   courses: SearchQuery[];
@@ -20,8 +21,8 @@ type CompareProps = {
 };
 
 function convertNumbersToPercents(distribution: GradesType): number[] {
-  const total = distribution.total;
-  return distribution.grade_distribution.map(
+  const total = distribution.filtered.total;
+  return distribution.filtered.grade_distribution.map(
     (frequencyOfLetterGrade) => (frequencyOfLetterGrade / total) * 100,
   );
 }
@@ -69,7 +70,7 @@ const Compare = ({
               if (grade.state === 'done') {
                 response +=
                   ' (' +
-                  grade.data.grade_distribution[dataPointIndex]
+                  grade.data.filtered.grade_distribution[dataPointIndex]
                     .toFixed(0)
                     .toLocaleString() +
                   ')';
