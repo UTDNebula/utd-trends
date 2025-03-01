@@ -86,8 +86,53 @@ function Row({
 
   const rainbowColors = useRainbowColors();
 
+  const nameCell = (
+    <Tooltip
+      title={
+        typeof course.profFirst !== 'undefined' &&
+        typeof course.profLast !== 'undefined' &&
+        (rmp !== undefined &&
+        rmp.state === 'done' &&
+        rmp.data.teacherRatingTags.length > 0
+          ? 'Tags: ' +
+            rmp.data.teacherRatingTags
+              .sort((a, b) => b.tagCount - a.tagCount)
+              .slice(0, 3)
+              .map((tag) => tag.tagName)
+              .join(', ')
+          : 'No Tags Available')
+      }
+      placement="top"
+    >
+      <Typography
+        onClick={
+          (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
+        }
+        className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit"
+      >
+        {searchQueryLabel(course) +
+          ((typeof course.profFirst === 'undefined' &&
+            typeof course.profLast === 'undefined') ||
+          (typeof course.prefix === 'undefined' &&
+            typeof course.number === 'undefined')
+            ? ' (Overall)'
+            : '')}
+      </Typography>
+    </Tooltip>
+  );
+
   return (
     <>
+      <TableRow onClick={() => setOpen(!open)} className="table-row sm:hidden">
+        <TableCell
+          component="th"
+          scope="row"
+          className="w-full border-b-0 pb-0"
+          colSpan={3}
+        >
+          {nameCell}
+        </TableCell>
+      </TableRow>
       <TableRow
         onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
         className="cursor-pointer"
@@ -142,63 +187,14 @@ function Row({
             </Tooltip>
           </div>
         </TableCell>
-        <TableCell>
-          <Typography
-            className=" sm:hidden leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
-            sx={{
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {searchQueryLabel(convertToProfOnly(course))}
-          </Typography>
-          <Tooltip
-            title={
-              typeof course.profFirst !== 'undefined' &&
-              typeof course.profLast !== 'undefined' &&
-              (rmp !== undefined &&
-              rmp.state === 'done' &&
-              rmp.data.teacherRatingTags.length > 0
-                ? 'Tags: ' +
-                  rmp.data.teacherRatingTags
-                    .sort((a, b) => b.tagCount - a.tagCount)
-                    .slice(0, 3)
-                    .map((tag) => tag.tagName)
-                    .join(', ')
-                : 'No Tags Available')
-            }
-            placement="top"
-          >
-            <Typography
-              onClick={
-                (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
-              }
-              className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit"
-            >
-              {searchQueryLabel(course) +
-                ((typeof course.profFirst === 'undefined' &&
-                  typeof course.profLast === 'undefined') ||
-                (typeof course.prefix === 'undefined' &&
-                  typeof course.number === 'undefined')
-                  ? ' (Overall)'
-                  : '')}
-            </Typography>
-          </Tooltip>
+        <TableCell
+          component="th"
+          scope="row"
+          className="w-full border-b-0 hidden sm:table-cell"
+        >
+          {nameCell}
         </TableCell>
-        <TableCell component="th" scope="row" className="hidden sm:table-cell">
-          <Typography
-            onClick={(e) => e.stopPropagation()} // prevents opening/closing the card when clicking on the text
-            className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text"
-          >
-            {searchQueryLabel(course) +
-              ((typeof course.profFirst === 'undefined' &&
-                typeof course.profLast === 'undefined') ||
-              (typeof course.prefix === 'undefined' &&
-                typeof course.number === 'undefined')
-                ? ' (Overall)'
-                : '')}
-          </Typography>
-        </TableCell>
-        <TableCell align="right">
+        <TableCell align="center" className="border-b-0">
           {((typeof grades === 'undefined' || grades.state === 'error') && (
             <></>
           )) ||
@@ -466,9 +462,8 @@ const SearchResultsTable = ({
         <Table stickyHeader aria-label="collapsible table">
           <TableHead>
             <TableRow>
-              <TableCell />
-              <TableCell>Actions</TableCell>
-              <TableCell className="hidden sm:table-cell">
+              <TableCell className="hidden sm:table-cell">Actions</TableCell>
+              <TableCell>
                 <TableSortLabel
                   active={orderBy === 'name'}
                   direction={orderBy === 'name' ? order : 'asc'}
