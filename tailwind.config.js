@@ -37,7 +37,6 @@ module.exports = {
         },
         periwinkle: '#c2c8ff', // brand secondary (light)
         shade: '#101828', // drop shadow color from shipfaster ui
-        stars: '#e9d5fe', // Rating stars light purple color
       },
       fontSize: {
         headline1: [

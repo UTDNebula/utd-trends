@@ -80,12 +80,26 @@ const fullTailwindConfig = resolveConfig(tailwindConfig);
 function MyApp({ Component, pageProps }: AppProps) {
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   const colors = fullTailwindConfig.theme.colors as any;
-  const palette = {
+  const lightPalette = {
     palette: {
       //copied from tailwind.config.js
       primary: {
         main: colors.royal as string,
-        light: colors.stars as string,
+      },
+      secondary: {
+        main: colors.royal as string,
+        light: colors.periwinkle as string,
+      },
+      error: {
+        main: colors.persimmon['500'] as string,
+      },
+    },
+  };
+  const darkPalette = {
+    palette: {
+      //copied from tailwind.config.js
+      primary: {
+        main: colors.cornflower['300'] as string,
       },
       secondary: {
         main: colors.royal as string,
@@ -99,8 +113,8 @@ function MyApp({ Component, pageProps }: AppProps) {
   const muiTheme = createTheme({
     cssVariables: true,
     colorSchemes: {
-      light: palette,
-      dark: palette,
+      light: lightPalette,
+      dark: darkPalette,
     },
     typography: {
       fontFamily: 'inherit',
