@@ -20,6 +20,7 @@ import {
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { SectionData } from '@/pages/api/sections';
 
 function removeDuplicates(array: SearchQuery[]) {
   return array.filter(
@@ -46,6 +47,13 @@ interface Props {
   };
   fetchAndStoreRmpData: (
     course: SearchQuery,
+    controller: AbortController,
+  ) => void;
+  sections: {
+    [key: string]: GenericFetchedData<SectionData>;
+  };
+  fetchAndStoreSectionsData: (
+    combo: SearchQuery,
     controller: AbortController,
   ) => void;
 }
@@ -86,12 +94,21 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
         }
       }
 
+      //Section data
+      for (const result of planner) {
+        const entry = props.sections[searchQueryLabel(result)];
+        //Not already loading
+        if (typeof entry === 'undefined' || entry.state === 'error') {
+          props.fetchAndStoreSectionsData(result, controller);
+        }
+      }
+
       return () => {
         controller.abort();
       };
     }
   }, [planner]);
-  console.log(props.grades, props.rmp);
+  console.log(props.grades, props.rmp, props.sections);
 
   let results: GenericFetchedData<SearchQuery[]> = {
     state: 'loading',

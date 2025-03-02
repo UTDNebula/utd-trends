@@ -21,6 +21,7 @@ import {
 import useGradeStore from '@/modules/useGradeStore/useGradeStore';
 import usePersistantState from '@/modules/usePersistantState/usePersistantState';
 import useRmpStore from '@/modules/useRmpStore/useRmpStore';
+import useSectionsStore from '@/modules/useSectionsStore/useSectionsStore';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -155,6 +156,9 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   }
 
+  //Store sections by course+prof combo
+  const [sections, , fetchAndStoreSectionsData] = useSectionsStore();
+
   return (
     <>
       <GoogleAnalytics gaId="G-CC86XR1562" />
@@ -201,6 +205,8 @@ function MyApp({ Component, pageProps }: AppProps) {
             recalcAllGrades={recalcAllGrades}
             rmp={rmp}
             fetchAndStoreRmpData={fetchAndStoreRmpData}
+            sections={sections}
+            fetchAndStoreSectionsData={fetchAndStoreSectionsData}
           />
           <FeedbackPopup />
           <GitHubButton />
