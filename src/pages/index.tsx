@@ -2,25 +2,25 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import Background from '@/../public/background.png';
 import SearchBar from '@/components/search/SearchBar/SearchBar';
+import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import {
   type SearchQuery,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
-
-import type { GenericFetchedData } from './dashboard';
 
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
 const Home: NextPage = () => {
   const router = useRouter();
-  function searchOptionChosen(chosenOptions: SearchQuery[]) {
+
+  async function searchOptionChosen(chosenOptions: SearchQuery[]) {
     if (chosenOptions.length) {
-      router.push({
+      await router.push({
         pathname: '/dashboard',
         query: {
           searchTerms: chosenOptions
@@ -34,11 +34,7 @@ const Home: NextPage = () => {
   const [results, setResults] = useState<GenericFetchedData<SearchQuery[]>>({
     state: 'done',
     data: [],
-  }); // essentially a dummy state. Used only for the loading animation to start in homescreen before navigation to the dashboard
-
-  useEffect(() => {
-    router.prefetch('/dashboard');
-  }, [router]);
+  }); // essentially a dummy state. Used only for the loading animation to start in home screen before navigation to the dashboard
 
   return (
     <>

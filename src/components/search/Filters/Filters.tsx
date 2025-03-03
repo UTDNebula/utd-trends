@@ -52,10 +52,9 @@ const Filters = ({
         }
       }
     }
-  }, [router.isReady, router.query.minGPA, router.query.minRating]); // useEffect is called on query update (so on back navigation, the filters selected are set based on the url)
+  }, [router.isReady, router.query.minGPA, router.query.minRating]);
 
   function getRecentSemesters() {
-    let recentSemesters: string[] = [];
     // get current month and year
     const today = new Date();
     const mm = today.getMonth() + 1; // January is 1
@@ -68,38 +67,38 @@ const Filters = ({
     else season = 'F';
 
     // generate recent semesters dynamically from the current day
+    const recentSemesters: string[] = [];
     for (let i = MAX_NUM_RECENT_SEMESTERS; i >= 1; i--) {
       if (season === 'S') {
         // then the previous semester is last year's Fall
         yyyy = yyyy - 1;
         season = 'F';
-      } // then the previous long-semester is this year's Spring
-      else season = 'S';
+      } else {
+        // then the previous long-semester is this year's Spring
+        season = 'S';
+      }
 
       recentSemesters.push(yyyy.toString().substring(2) + season);
     }
 
-    recentSemesters = recentSemesters.filter((value) =>
-      academicSessions.includes(value),
-    ); // recent semesters has up-to
-    return recentSemesters;
+    return recentSemesters.filter((value) => academicSessions.includes(value));
   }
 
   //Update URL, state, and parent
-  function onChange(
+  async function onChange(
     newValue: string,
     toSet: 'minGPA' | 'minRating',
     setter: (value: string) => void,
   ) {
     setter(newValue);
     if (manageQuery && router.isReady) {
-      const newQuery = router.query;
+      const newQuery = { ...router.query };
       if (newValue !== '') {
         newQuery[toSet] = newValue;
       } else {
         delete newQuery[toSet];
       }
-      router.replace(
+      await router.replace(
         {
           query: newQuery,
         },
@@ -149,8 +148,8 @@ const Filters = ({
             label="Min Letter Grade"
             labelId="minGPA"
             value={minGPA}
-            onChange={(event: SelectChangeEvent) => {
-              onChange(event.target.value, 'minGPA', setMinGPA);
+            onChange={async (event: SelectChangeEvent) => {
+              await onChange(event.target.value, 'minGPA', setMinGPA);
             }}
           >
             <MenuItem className="h-10" value="">
@@ -181,8 +180,8 @@ const Filters = ({
             label="Min Rating"
             labelId="minRating"
             value={minRating}
-            onChange={(event: SelectChangeEvent) => {
-              onChange(event.target.value, 'minRating', setMinRating);
+            onChange={async (event: SelectChangeEvent) => {
+              await onChange(event.target.value, 'minRating', setMinRating);
             }}
             renderValue={(value) => (
               <Rating
@@ -301,7 +300,7 @@ const Filters = ({
               />
             </MenuItem>
 
-            {/* indiv options */}
+            {/* individual options */}
             {academicSessions.map((session) => (
               <MenuItem
                 className="h-10 items-center"

@@ -58,6 +58,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
           alt="gradient background"
           fill
           className="object-cover -z-20"
+          priority
         />
         <Link
           href="/"
