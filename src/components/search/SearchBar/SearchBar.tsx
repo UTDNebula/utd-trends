@@ -74,7 +74,7 @@ const SearchBar = ({
     }
   }, [router.isReady, router.query.searchTerms]); // useEffect is called every time the query changes
 
-  // updateValue -> onSelect_internal -> updateQueries - clicking enter on an autocomplete suggestion in topMenu Searchbar
+  // updateValue -> onSelect_internal -> updateQueries - clicking enter on an autocomplete suggestion in TopMenu Searchbar
   // updateValue -> onSelect_internal -> onSelect (custom function) - clicking enter on an autocomplete suggestion in home page SearchBar
   // params.inputProps.onKeyDown -> handleKeyDown -> onSelect_internal -> updateQueries/onSelect - clicking enter in the SearchBar
   // Button onClick -> onSelect_internal -> updateQueries/onSelect - Pressing the "Search" Button
