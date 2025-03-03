@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import fetchWithCache, {
   cacheIndexNebula,
@@ -11,6 +11,7 @@ import {
   type SearchQuery,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
+import { compareSemesters } from '@/modules/semesters/semesters';
 import type { SectionData } from '@/pages/api/sections';
 
 //Fetch section data from nebula api
@@ -45,6 +46,18 @@ function fetchSectionsData(
   });
 }
 
+// Finding the most recent semester in the database by the newest GOVT 2306 semester (don't judge me)
+function checkLatestSemester() {
+  return fetchSectionsData(
+    { prefix: 'GOVT', number: '2306' },
+    new AbortController(),
+  ).then((res: SectionData) => {
+    return res.sort((a, b) =>
+      compareSemesters(b.academic_session.name, a.academic_session.name),
+    )[0].academic_session.name;
+  });
+}
+
 //Limit cached number of data entries
 const MAX_ENTRIES = 1000;
 
@@ -58,6 +71,12 @@ export default function useSectionsStore(): [
   (combo: SearchQuery, controller: AbortController) => void,
 ] {
   const [sections, setSections] = useState<Sections>({});
+  const latestSemester = useRef('');
+  useEffect(() => {
+    checkLatestSemester().then((result: string) => {
+      latestSemester.current = result;
+    });
+  }, []);
 
   function addToSections(key: string, value: GenericFetchedData<SectionData>) {
     setSections((old) => {
@@ -82,12 +101,19 @@ export default function useSectionsStore(): [
     controller: AbortController,
   ) {
     addToSections(searchQueryLabel(combo), { state: 'loading' });
+    //Wait for latestSemester to be found
+    if (latestSemester.current === '') {
+      setTimeout(() => fetchAndStoreSectionsData(combo, controller), 100);
+      return;
+    }
+    //Seperate to course and prof for seperate calls
     const seperatedCombo = [
       convertToCourseOnly(combo),
       convertToProfOnly(combo),
     ]
       //Remove empty objects (for non combos)
       .filter((obj) => Object.keys(obj).length !== 0);
+    //Call each
     Promise.all(
       seperatedCombo.map((query) => fetchSectionsData(query, controller)),
     )
@@ -101,6 +127,10 @@ export default function useSectionsStore(): [
             (value) => res[1].findIndex((val) => val._id === value._id) !== -1,
           );
         }
+        //Filter to only latestSemester
+        intersection = intersection.filter(
+          (section) => section.academic_session.name === latestSemester.current,
+        );
         //Add to storage
         //Set loading status to done
         addToSections(searchQueryLabel(combo), {
