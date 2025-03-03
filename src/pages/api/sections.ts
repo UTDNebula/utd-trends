@@ -76,8 +76,11 @@ export default function handler(
     Accept: 'application/json',
   };
 
-  return new Promise<void>((resolve) => {
-    fetch(url.href, {
+  function recursiveFetch(url: URL, offset: number): Promise<SectionData> {
+    const offsetUrl = new URL(url);
+    offsetUrl.searchParams.append('latter_offset', offset.toString());
+
+    return fetch(offsetUrl.href, {
       method: 'GET',
       headers: headers,
     })
@@ -86,9 +89,21 @@ export default function handler(
         if (data.message !== 'success') {
           throw new Error(data.message);
         }
+        if (data.data === null) {
+          return [];
+        }
+        return recursiveFetch(url, offset + 20).then((nextData) =>
+          data.data.concat(nextData),
+        );
+      });
+  }
+
+  return new Promise<void>((resolve) => {
+    recursiveFetch(url, 0)
+      .then((data) => {
         res.status(200).json({
           message: 'success',
-          data: data.data,
+          data: data,
         });
         resolve();
       })
