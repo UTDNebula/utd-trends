@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import Background from '@/../public/background.png';
-import SearchBar from '@/components/search/SearchBar/searchBar';
+import SearchBar from '@/components/search/SearchBar/SearchBar';
 import {
   type SearchQuery,
   searchQueryLabel,

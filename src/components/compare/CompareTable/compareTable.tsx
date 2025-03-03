@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
-import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
+import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import {
   convertToProfOnly,
   type SearchQuery,

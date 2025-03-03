@@ -1,7 +1,7 @@
 import { Skeleton } from '@mui/material';
 import React from 'react';
 
-import BarGraph from '@/components/graph/BarGraph/barGraph';
+import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import {
   type SearchQuery,
   searchQueryLabel,

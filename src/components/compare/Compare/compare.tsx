@@ -1,7 +1,7 @@
 import React from 'react';
 
-import CompareTable from '@/components/compare/CompareTable/compareTable';
-import BarGraph from '@/components/graph/BarGraph/barGraph';
+import CompareTable from '@/components/compare/CompareTable/CompareTable';
+import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import {
   type SearchQuery,
   searchQueryLabel,
