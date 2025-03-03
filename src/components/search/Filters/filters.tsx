@@ -55,6 +55,19 @@ const Filters = ({
     }
   }, [router.isReady, router.query.minGPA, router.query.minRating]); // useEffect is called on query update (so on back navigation, the filters selected are set based on the url)
 
+  useEffect(() => {
+    if (chosenSessions.length === academicSessions.length) {
+      setSemesters(() => chosenSessions.concat(['select-all']));
+    } else if (
+      chosenSessions.length === recentSemesters.length &&
+      chosenSessions.every((el) => recentSemesters.includes(el))
+    ) {
+      setSemesters(() => chosenSessions.concat(['recent']));
+    } else {
+      setSemesters(() => chosenSessions);
+    }
+  }, [chosenSessions]);
+  
   function getRecentSemesters() {
     let recentSemesters: string[] = [];
     // get current month and year
@@ -239,10 +252,8 @@ const Filters = ({
               if (value.includes('select-all')) {
                 if (chosenSessions.length === academicSessions.length) {
                   addChosenSessions(() => []);
-                  setSemesters(() => []);
                 } else {
                   addChosenSessions(() => academicSessions);
-                  setSemesters(() => chosenSessions.concat(['select-all']));
                 }
               } else if (value.includes('recent')) {
                 if (
@@ -250,23 +261,11 @@ const Filters = ({
                   chosenSessions.every((el) => recentSemesters.includes(el))
                 ) {
                   addChosenSessions(() => academicSessions);
-                  setSemesters(() => chosenSessions.concat(['select-all']));
                 } else {
                   addChosenSessions(() => recentSemesters);
-                  setSemesters(() => chosenSessions.concat(['recent']));
                 }
               } else {
                 addChosenSessions(() => value as string[]);
-                if (chosenSessions.length === academicSessions.length) {
-                  setSemesters(() => chosenSessions.concat(['select-all']));
-                } else if (
-                  chosenSessions.length === recentSemesters.length &&
-                  chosenSessions.every((el) => recentSemesters.includes(el))
-                ) {
-                  setSemesters(() => chosenSessions.concat(['recent']));
-                } else {
-                  setSemesters(() => chosenSessions);
-                }
               }
             }}
             renderValue={(selected) => {
