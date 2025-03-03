@@ -83,13 +83,15 @@ function Row({
   color,
 }: RowProps) {
   const [open, setOpen] = useState(false);
-
+  const canOpen = 
+  !(typeof grades === 'undefined' || grades.state === 'error') ||
+  !(typeof rmp === 'undefined' || rmp.state === 'error');
   const rainbowColors = useRainbowColors();
 
   return (
     <>
       <TableRow
-        onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
+        onClick={() => {if(canOpen) setOpen(!open)}} // opens/closes the card by clicking anywhere on the row
         className="cursor-pointer"
       >
         <TableCell className="border-b-0">
@@ -101,9 +103,10 @@ function Row({
               <IconButton
                 aria-label="expand row"
                 size="medium"
+                disabled={!canOpen}
                 onClick={(e) => {
                   e.stopPropagation(); // prevents double opening/closing
-                  setOpen(!open);
+                  if(canOpen) setOpen(!open);
                 }}
                 className={'transition-transform' + (open ? ' rotate-90' : '')}
               >
