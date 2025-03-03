@@ -1,16 +1,13 @@
 import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
-import resolveConfig from 'tailwindcss/resolveConfig';
 
-import tailwindConfig from '@/../tailwind.config.js';
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
 import { compareColors } from '@/modules/colors/colors';
 import type { GradesData } from '@/pages/api/grades';
-
-const fullTailwindConfig = resolveConfig(tailwindConfig);
 
 function sortSemesters(a: string, b: string) {
   let aNum = parseInt(a);
@@ -126,6 +123,8 @@ const LineGraph = (props: Props): JSX.Element => {
     getSemesterGPAs(single, allSemesters),
   );
 
+  const theme = useTheme();
+
   const options: ApexOptions = {
     chart: {
       zoom: {
@@ -167,8 +166,7 @@ const LineGraph = (props: Props): JSX.Element => {
     },
     colors:
       series.length === 1
-        ? // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-          [(fullTailwindConfig.theme.colors as any).royal as string]
+        ? [theme.palette.primary.main]
         : compareColors.filter(
             (searchQuery, i) => props.includedColors?.[i] ?? 1,
           ),
