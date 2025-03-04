@@ -108,11 +108,15 @@ const HourRow = (props: HourRowProps) => {
       className={`grid row-span-1 row-start-[var(--row-start-row)] col-span-full grid-rows-subgrid grid-cols-subgrid`}
     >
       <p
-        className={`text-sm col-span-1 col-start-1 bg-cornflower-500 border-t px-1 text-right`}
+        className={`text-sm col-span-1 col-start-1 bg-cornflower-300 border-t px-1 text-right`}
       >
         {props.hour}:00
       </p>
-      <div className="col-start-2 col-span-full bg-white border-t"></div>
+      <div className="col-start-2 col-span-full bg-white border-t border-gray-300">
+        <div className="relative top-1/4 col-span-full border-t border-gray-100"></div>
+        <div className="relative top-1/2 col-span-full border-t border-gray-200"></div>
+        <div className="relative top-3/4 col-span-full border-t border-gray-100"></div>
+      </div>
     </div>
   );
 };
