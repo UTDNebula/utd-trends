@@ -59,6 +59,7 @@ const Filters = ({
     if (chosenSessions.length === academicSessions.length) {
       setSemesters(() => chosenSessions.concat(['select-all']));
     } else if (
+      recentSemesters.length > 0 &&
       chosenSessions.length === recentSemesters.length &&
       chosenSessions.every((el) => recentSemesters.includes(el))
     ) {
@@ -280,6 +281,7 @@ const Filters = ({
               if (chosenSessions.length === academicSessions.length) {
                 setSemesters(() => chosenSessions.concat(['select-all']));
               } else if (
+                recentSemesters.length > 0 &&
                 chosenSessions.length === recentSemesters.length &&
                 chosenSessions.every((el) => recentSemesters.includes(el))
               ) {
@@ -291,14 +293,8 @@ const Filters = ({
             renderValue={(selected) => {
               if (chosenSessions.length === academicSessions.length) {
                 return 'All selected';
-              } else if (
-                chosenSessions.length === recentSemesters.length &&
-                chosenSessions.every((el) => recentSemesters.includes(el))
-              ) {
-                return 'Recent';
-              } else {
-                return selected.sort((a, b) => compareSemesters(a, b)).join(', ');
               }
+              return chosenSessions.sort((a, b) => compareSemesters(a, b)).join(', ');
             }}
             MenuProps={{ autoFocus: false }}
           >
