@@ -11,14 +11,15 @@ import {
   type SearchQuery,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
+import type { SectionsType } from '@/modules/SectionsType/SectionsType';
 import { compareSemesters } from '@/modules/semesters/semesters';
-import type { SectionData } from '@/pages/api/sections';
+import type { SectionsData } from '@/pages/api/sections';
 
 //Fetch section data from nebula api
 function fetchSectionsData(
   query: SearchQuery,
   controller: AbortController,
-): Promise<SectionData> {
+): Promise<SectionsData> {
   return fetchWithCache(
     '/api/sections?' +
       Object.keys(query)
@@ -51,7 +52,7 @@ function checkLatestSemester() {
   return fetchSectionsData(
     { prefix: 'GOVT', number: '2306' },
     new AbortController(),
-  ).then((res: SectionData) => {
+  ).then((res: SectionsData) => {
     return res.sort((a, b) =>
       compareSemesters(b.academic_session.name, a.academic_session.name),
     )[0].academic_session.name;
@@ -62,7 +63,7 @@ function checkLatestSemester() {
 const MAX_ENTRIES = 1000;
 
 interface Sections {
-  [key: string]: GenericFetchedData<SectionData>;
+  [key: string]: GenericFetchedData<SectionsType>;
 }
 
 export default function useSectionsStore(): [
@@ -78,7 +79,7 @@ export default function useSectionsStore(): [
     });
   }, []);
 
-  function addToSections(key: string, value: GenericFetchedData<SectionData>) {
+  function addToSections(key: string, value: GenericFetchedData<SectionsType>) {
     setSections((old) => {
       const newVal = { ...old };
       if (typeof newVal[key] !== 'undefined') {
@@ -117,9 +118,9 @@ export default function useSectionsStore(): [
     Promise.all(
       seperatedCombo.map((query) => fetchSectionsData(query, controller)),
     )
-      .then((res: SectionData[]) => {
+      .then((res: SectionsData[]) => {
         //Find intersection of all course sections and all professor sections
-        let intersection: SectionData = [];
+        let intersection: SectionsData = [];
         if (res.length === 1) {
           intersection = res[0];
         } else if (res.length === 2) {
@@ -128,14 +129,17 @@ export default function useSectionsStore(): [
           );
         }
         //Filter to only latestSemester
-        intersection = intersection.filter(
+        const latest = intersection.filter(
           (section) => section.academic_session.name === latestSemester.current,
         );
         //Add to storage
         //Set loading status to done
         addToSections(searchQueryLabel(combo), {
           state: 'done',
-          data: intersection,
+          data: {
+            all: intersection,
+            latest: latest,
+          },
         });
       })
       .catch(() => {

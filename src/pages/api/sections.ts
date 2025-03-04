@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-export type SectionData = {
+export type SectionsData = {
   _id: string;
   section_number: string;
   course_reference: string;
@@ -41,7 +41,7 @@ export type SectionData = {
 
 type Data = {
   message: string;
-  data?: SectionData;
+  data?: SectionsData;
 };
 
 export default function handler(
@@ -76,7 +76,7 @@ export default function handler(
     Accept: 'application/json',
   };
 
-  function recursiveFetch(url: URL, offset: number): Promise<SectionData> {
+  function recursiveFetch(url: URL, offset: number): Promise<SectionsData> {
     const offsetUrl = new URL(url);
     offsetUrl.searchParams.append('latter_offset', offset.toString());
 

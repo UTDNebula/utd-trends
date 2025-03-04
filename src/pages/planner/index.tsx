@@ -19,8 +19,8 @@ import {
   searchQueryEqual,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
+import type { SectionsType } from '@/modules/SectionsType/SectionsType';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import type { SectionData } from '@/pages/api/sections';
 
 function removeDuplicates(array: SearchQuery[]) {
   return array.filter(
@@ -50,7 +50,7 @@ interface Props {
     controller: AbortController,
   ) => void;
   sections: {
-    [key: string]: GenericFetchedData<SectionData>;
+    [key: string]: GenericFetchedData<SectionsType>;
   };
   fetchAndStoreSectionsData: (
     combo: SearchQuery,
