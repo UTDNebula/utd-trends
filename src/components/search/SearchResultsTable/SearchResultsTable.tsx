@@ -104,12 +104,7 @@ function Row({
       }
       placement="top"
     >
-      <Typography
-        onClick={
-          (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
-        }
-        className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit"
-      >
+      <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit">
         {searchQueryLabel(course) +
           ((typeof course.profFirst === 'undefined' &&
             typeof course.profLast === 'undefined') ||
@@ -123,7 +118,10 @@ function Row({
 
   return (
     <>
-      <TableRow onClick={() => setOpen(!open)} className="table-row sm:hidden">
+      <TableRow
+        onClick={() => setOpen(!open)}
+        className="cursor-pointer table-row sm:hidden"
+      >
         <TableCell
           component="th"
           scope="row"
