@@ -253,7 +253,7 @@ const Filters = ({
                 if (value.includes('recent')) {
                   addChosenSessions(() => recentSemesters);
                 } else if (value.includes('select-all')){
-                  addChosenSessions(() => value.filter(e => e !== 'select-all'));
+                  addChosenSessions(() => (value as string[]).filter(e => e !== 'select-all'));
                 } else {
                   addChosenSessions(() => []);
                 }
@@ -264,7 +264,7 @@ const Filters = ({
                 if (value.includes('select-all')) {
                   addChosenSessions(() => academicSessions);
                 } else if (value.includes('recent')) {
-                  addChosenSessions(() => value.filter(e => e !== 'recent'));
+                  addChosenSessions(() => (value as string[]).filter(e => e !== 'recent'));
                 } else {
                   addChosenSessions(() => academicSessions);
                 }
