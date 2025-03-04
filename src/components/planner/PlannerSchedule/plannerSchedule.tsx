@@ -80,6 +80,10 @@ const START_HOUR = 8;
 const END_HOUR = 21;
 // days shown (0 = sunday -> 6 = Saturday)
 // don't change this rn (grid has 5 columns)
+const START_DAY = 1;
+const END_DAY = 5;
+const numHours = END_HOUR - START_HOUR;
+const numDays = END_DAY - START_DAY;
 const DAYS = [
   'Sunday',
   'Monday',
@@ -89,10 +93,6 @@ const DAYS = [
   'Friday',
   'Saturday',
 ];
-const START_DAY = 1;
-const END_DAY = 5;
-const numHours = END_HOUR - START_HOUR;
-const numDays = END_DAY - START_DAY;
 
 type PlannerScheduleProps = {
   selectedSections: SectionData[];
@@ -109,7 +109,7 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
         for (const meeting_day of meeting.meeting_days) {
           const col = DAYS.indexOf(meeting_day) + 1;
           const splitStartTime = meeting.start_time.split(':');
-          let startRow = Number(splitStartTime[0]) - START_HOUR;
+          let startRow = Number(splitStartTime[0]) - START_HOUR + 2;
           // let endTime = Number(meeting.end_time.slice(0, splitStartTime[1].length - 2)) - START_HOUR;
           if (meeting.start_time.includes('pm')) {
             startRow += 12;
@@ -119,7 +119,6 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
             Number(splitStartTime[1].slice(0, splitStartTime[1].length - 2)) /
             60;
           const offsetTotalPercent = offset * 100;
-          console.log(offsetTotalPercent);
           tempMeetings.push([
             col.toString(),
             startRow.toString(),
@@ -130,11 +129,13 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
       }
     }
     setMeetings(tempMeetings);
+    console.log(numDays + 2);
   }, [props.selectedSections]);
 
   return (
     <div
-      className={`w-full h-[calc(100vh-2rem)] grid grid-cols-[max-content_repeat(${numDays + 1},minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[min-content] auto-rows-fr`}
+      style={{ '--num-rows': numDays + 1 } as React.CSSProperties}
+      className={`w-full h-[calc(100vh-2rem)] grid grid-cols-[max-content_repeat(5,minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[min-content] auto-rows-fr`}
     >
       {/*Weekday Headers*/}
       <div className="grid col-span-full grid-flow-row bg-cornflower-500 grid-cols-subgrid">
@@ -152,7 +153,15 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
       {meetings.map((x, i) => (
         <div
           key={i}
-          className={`col-start-${x[0]} col-span-1 row-start-${x[1]} row-span-1 relative top-[${x[3]}%] h-[${x[2]}%] overflow-visible rounded-lg bg-cornflower-500`}
+          style={
+            {
+              '--start-col': x[0],
+              '--start-row': x[1],
+              '--offset': x[3] + '%',
+              '--height': x[2] + '%',
+            } as React.CSSProperties
+          }
+          className={`col-start-[var(--start-col)] col-span-1 row-start-[var(--start-row)] row-span-1 relative top-[var(--offset)] h-[var(--height)] overflow-visible rounded-lg bg-cornflower-500`}
         >
           Section
         </div>
@@ -169,8 +178,12 @@ type HourRowProps = {
 const HourRow = (props: HourRowProps) => {
   return (
     <div
-      key={props.key}
-      className={`grid row-span-1 row-start-${props.hour + 2 - START_HOUR} col-span-full grid-rows-subgrid grid-cols-subgrid`}
+      style={
+        {
+          '--row-start-row': props.hour + 2 - START_HOUR,
+        } as React.CSSProperties
+      }
+      className={`grid row-span-1 row-start-[(var(--row-start-row))] col-span-full grid-rows-subgrid grid-cols-subgrid`}
     >
       <p
         className={`text-sm col-span-1 col-start-1 bg-cornflower-500 border-t px-1 text-right`}
