@@ -1,5 +1,0 @@
-### TopMenu Example
-
-```ts
-<TopMenu />
-```
