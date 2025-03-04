@@ -250,7 +250,7 @@ const Filters = ({
                 target: { value },
               } = event;
               if (chosenSessions.length === academicSessions.length) {
-                if (value.includes('recent') {
+                if (value.includes('recent')) {
                   addChosenSessions(() => recentSemesters);
                 } else if (value.includes('select-all')){
                   addChosenSessions(() => value.filter(e => e !== 'select-all'));
@@ -261,7 +261,7 @@ const Filters = ({
                 chosenSessions.length === recentSemesters.length &&
                 chosenSessions.every((el) => recentSemesters.includes(el))
               ) {
-                if (value.includes('select-all') {
+                if (value.includes('select-all')) {
                   addChosenSessions(() => academicSessions);
                 } else if (value.includes('recent')) {
                   addChosenSessions(() => value.filter(e => e !== 'recent'));
@@ -269,7 +269,7 @@ const Filters = ({
                   addChosenSessions(() => academicSessions);
                 }
               } else {
-                if (value.includes('select-all') {
+                if (value.includes('select-all')) {
                   addChosenSessions(() => academicSessions);
                 } else if (value.includes('recent')) {
                   addChosenSessions(() => recentSemesters);
