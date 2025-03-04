@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
-import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
+import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors/colors';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';

@@ -12,8 +12,8 @@ import React from 'react';
 import resolveConfig from 'tailwindcss/resolveConfig';
 
 import tailwindConfig from '@/../tailwind.config.js';
-import FeedbackPopup from '@/components/common/FeedbackPopup/feedbackPopup';
-import GitHubButton from '@/components/common/GitHubButton/gitHubButton';
+import FeedbackPopup from '@/components/common/FeedbackPopup/FeedbackPopup';
+import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
 import useGradeStore from '@/modules/useGradeStore/useGradeStore';
 import useRmpStore from '@/modules/useRmpStore/useRmpStore';
 

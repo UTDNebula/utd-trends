@@ -1,5 +1,5 @@
 ### TopMenu Example
 
-```ts
-<TopMenu />
+```tsx
+
 ```
