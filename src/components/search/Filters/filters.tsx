@@ -290,7 +290,7 @@ const Filters = ({
                 setSemesters(() => chosenSessions);
               }
             }}
-            renderValue={(selected) => {
+            renderValue={() => {
               if (chosenSessions.length === academicSessions.length) {
                 return 'All selected';
               }
