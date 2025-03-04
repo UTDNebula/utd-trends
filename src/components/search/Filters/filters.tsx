@@ -249,23 +249,33 @@ const Filters = ({
               const {
                 target: { value },
               } = event;
-              if (value.includes('select-all')) {
-                if (chosenSessions.length === academicSessions.length) {
-                  addChosenSessions(() => []);
-                } else {
-                  addChosenSessions(() => academicSessions);
-                }
-              } else if (value.includes('recent')) {
-                if (
-                  chosenSessions.length === recentSemesters.length &&
-                  chosenSessions.every((el) => recentSemesters.includes(el))
-                ) {
-                  addChosenSessions(() => academicSessions);
-                } else {
+              if (chosenSessions.length === academicSessions.length) {
+                if (value.includes('recent') {
                   addChosenSessions(() => recentSemesters);
+                } else if (value.includes('select-all')){
+                  addChosenSessions(() => value.filter(e => e !== 'select-all'));
+                } else {
+                  addChosenSessions(() => []);
+                }
+              } else if (
+                chosenSessions.length === recentSemesters.length &&
+                chosenSessions.every((el) => recentSemesters.includes(el))
+              ) {
+                if (value.includes('select-all') {
+                  addChosenSessions(() => academicSessions);
+                } else if (value.includes('recent')) {
+                  addChosenSessions(() => value.filter(e => e !== 'recent'));
+                } else {
+                  addChosenSessions(() => academicSessions);
                 }
               } else {
-                addChosenSessions(() => value as string[]);
+                if (value.includes('select-all') {
+                  addChosenSessions(() => academicSessions);
+                } else if (value.includes('recent')) {
+                  addChosenSessions(() => recentSemesters);
+                } else {
+                  addChosenSessions(() => value as string[]);
+                }
               }
             }}
             renderValue={(selected) => {
