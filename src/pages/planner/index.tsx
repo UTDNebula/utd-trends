@@ -51,7 +51,7 @@ const sampleSectionData: SectionData[] = [
         start_date: '2019-05-23T05:00:00Z',
         end_date: '2019-08-05T05:00:00Z',
         meeting_days: ['Tuesday', 'Thursday'],
-        start_time: '3:00pm',
+        start_time: '3:45pm',
         end_time: '5:15pm',
         modality: '',
         location: {
