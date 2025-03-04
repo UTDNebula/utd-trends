@@ -55,7 +55,7 @@ const Filters = ({
     }
   }, [router.isReady, router.query.minGPA, router.query.minRating]); // useEffect is called on query update (so on back navigation, the filters selected are set based on the url)
 
-  /*useEffect(() => {
+  useEffect(() => {
     if (chosenSessions.length === academicSessions.length) {
       setSemesters(() => chosenSessions.concat(['select-all']));
     } else if (
@@ -66,7 +66,7 @@ const Filters = ({
     } else {
       setSemesters(() => chosenSessions);
     }
-  }, [chosenSessions]);*/
+  }, [chosenSessions]);
   
   function getRecentSemesters() {
     let recentSemesters: string[] = [];
