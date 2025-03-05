@@ -117,7 +117,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
   if (results.state === 'done' && !results.data.length) {
     contentComponent = <MyPlannerEmpty />;
   } else {
-    const plannerCoursesTable = <PlannerCoursesTable />;
+    const plannerCoursesTable = <PlannerCoursesTable courses={results.data} />;
 
     contentComponent = (
       <>

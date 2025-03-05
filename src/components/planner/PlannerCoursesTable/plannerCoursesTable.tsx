@@ -11,9 +11,10 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Stack,
 } from '@mui/material';
 import React from 'react';
-
+import PlannerCard from './PlannerCard/plannerCard';
 import Rating from '@/components/common/Rating/rating';
 
 function LoadingRow() {
@@ -49,35 +50,41 @@ function LoadingRow() {
 
 type PlannerCoursesTableProps = {
   prop?: string;
+  courses?: {
+    prefix: string;
+    number: string;
+    profFirst: string;
+    profLast: string;
+  }[];
 };
 
 const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
-  console.log(props.prop ?? '');
+  console.log(props.courses ? 'courses exist' : "courses don't exist");
   return (
     //TODO: sticky header
     <>
       <Typography className="leading-tight text-3xl font-bold p-4">
         My Planner
       </Typography>
-      <TableContainer component={Paper}>
-        <Table stickyHeader aria-label="collapsible table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Actions</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell align="center">Grades</TableCell>
-              <TableCell align="center">Rating</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Array(10)
-              .fill(0)
-              .map((_, index) => (
-                <LoadingRow key={index} />
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Stack spacing={2}>
+        {props.courses ? (
+          props.courses.map((course, index) => {
+            return (
+              <>
+                <PlannerCard
+                  key={index}
+                  prefix={course.prefix}
+                  number={course.number}
+                  profFirst={course.profFirst}
+                  profLast={course.profLast}
+                />
+              </>
+            );
+          })
+        ) : (
+          <div>empty</div>
+        )}
+      </Stack>
     </>
   );
 };
