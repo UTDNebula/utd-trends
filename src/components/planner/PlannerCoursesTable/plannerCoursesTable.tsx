@@ -77,6 +77,7 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                   number={course.number}
                   profFirst={course.profFirst}
                   profLast={course.profLast}
+                  numSections={3}
                 />
               </>
             );

@@ -120,6 +120,7 @@ type PlannerCardProps = {
   number: string;
   profFirst: string;
   profLast: string;
+  numSections: number;
 };
 
 const PlannerCard = ({
@@ -127,6 +128,7 @@ const PlannerCard = ({
   number,
   profFirst,
   profLast,
+  numSections,
 }: PlannerCardProps) => {
   const [open, setOpen] = useState(false);
 
@@ -134,7 +136,7 @@ const PlannerCard = ({
     <Box
       sx={{
         width: 550,
-        height: open ? 80 + 2 * 80 : 80,
+        height: open ? 80 + numSections * 90 : 80,
         border: 2,
         borderRadius: 6,
         bgcolor: '#f9f9f9',
@@ -146,7 +148,12 @@ const PlannerCard = ({
       }}
       onClick={() => setOpen(!open)}
     >
-      <Grid2 container spacing={1} alignItems="center" sx={{ width: '100%' }}>
+      <Grid2
+        container
+        spacing={1}
+        alignItems="center"
+        sx={{ width: '100%', pt: open ? 2 : 0 }}
+      >
         <Grid2 sx={{ pl: 2 }}>
           <IconButton
             size="medium"
@@ -161,6 +168,7 @@ const PlannerCard = ({
 
         <Grid2>
           <Checkbox
+            defaultChecked
             onClick={(e) => {
               e.stopPropagation();
             }}
@@ -182,8 +190,11 @@ const PlannerCard = ({
                 <ExpandedTableHead />
               </TableHead>
               <TableBody>
-                <ExpandedTableRows />
-                <ExpandedTableRows />
+                {Array(numSections)
+                  .fill(0)
+                  .map((_, index) => {
+                    return <ExpandedTableRows key={index} />;
+                  })}
               </TableBody>
             </Table>
           </TableContainer>
