@@ -136,7 +136,9 @@ function Row({
         </TableCell>
       </TableRow>
       <TableRow
-        onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
+        onClick={() => {
+          if (canOpen) setOpen(!open);
+        }} // opens/closes the card by clicking anywhere on the row
         className="cursor-pointer"
       >
         <TableCell className="border-b-0">
