@@ -1,3 +1,5 @@
+import BookIcon from '@mui/icons-material/Book';
+import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Checkbox,
@@ -40,6 +42,7 @@ function LoadingRow() {
           <KeyboardArrowIcon />
         </IconButton>
         <Checkbox disabled />
+        <Checkbox disabled icon={<BookOutlinedIcon />} />
       </TableCell>
       <TableCell component="th" scope="row" className="w-full">
         <Typography className="w-full leading-tight text-lg">
@@ -71,6 +74,9 @@ type RowProps = {
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
   color?: string;
+  inPlanner: boolean;
+  addToPlanner: (value: SearchQuery) => void;
+  removeFromPlanner: (value: SearchQuery) => void;
 };
 
 function Row({
@@ -81,6 +87,9 @@ function Row({
   addToCompare,
   removeFromCompare,
   color,
+  inPlanner,
+  addToPlanner,
+  removeFromPlanner,
 }: RowProps) {
   const [open, setOpen] = useState(false);
 
@@ -183,6 +192,24 @@ function Row({
                 } // Apply color if defined
               />
             </Tooltip>
+            <Tooltip
+              title={inPlanner ? 'Remove from Planner' : 'Add to Planner'}
+              placement="top"
+            >
+              <Checkbox
+                checked={inPlanner}
+                onClick={(e) => {
+                  e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
+                  if (inPlanner) {
+                    removeFromPlanner(course);
+                  } else {
+                    addToPlanner(course);
+                  }
+                }}
+                icon={<BookOutlinedIcon />}
+                checkedIcon={<BookIcon />}
+              />
+            </Tooltip>
           </div>
         </TableCell>
         <TableCell
@@ -277,6 +304,9 @@ type SearchResultsTableProps = {
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
   colorMap: { [key: string]: string };
+  planner: SearchQuery[];
+  addToPlanner: (value: SearchQuery) => void;
+  removeFromPlanner: (value: SearchQuery) => void;
 };
 
 const SearchResultsTable = ({
@@ -288,6 +318,9 @@ const SearchResultsTable = ({
   addToCompare,
   removeFromCompare,
   colorMap,
+  planner,
+  addToPlanner,
+  removeFromPlanner,
 }: SearchResultsTableProps) => {
   //Table sorting category
   const [orderBy, setOrderBy] = useState<'name' | 'gpa' | 'rating'>('name');
@@ -526,6 +559,13 @@ const SearchResultsTable = ({
                     addToCompare={addToCompare}
                     removeFromCompare={removeFromCompare}
                     color={colorMap[searchQueryLabel(result)]}
+                    inPlanner={
+                      planner.findIndex((obj) =>
+                        searchQueryEqual(obj, result),
+                      ) !== -1
+                    }
+                    addToPlanner={addToPlanner}
+                    removeFromPlanner={removeFromPlanner}
                   />
                 ))
               : Array(10)
