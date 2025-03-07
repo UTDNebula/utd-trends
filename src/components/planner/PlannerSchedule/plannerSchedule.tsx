@@ -18,7 +18,7 @@ export type SectionData = {
     last_name: string;
     role: string;
     email: string;
-  };
+  }[];
   internal_class_number: string;
   instruction_mode: string;
   meetings: {
@@ -44,9 +44,10 @@ export type SectionData = {
 export const START_HOUR = 8;
 export const END_HOUR = 21;
 // days shown (0 = sunday -> 6 = Saturday)
-// don't change this rn (grid has 5 columns)
+// NOTE: IF YOU CHANGE THESE PLEASE ALSO CHANGE THE REPEAT NUMBERS (5 and 13)
+//        IN THE TAILWIND CSS GRID SPECIFICATION (outer div in PlannerSchedule)
 export const START_DAY = 1;
-export const END_DAY = 5;
+export const END_DAY = 6;
 export const numHours = END_HOUR - START_HOUR;
 export const numDays = END_DAY - START_DAY;
 export const DAYS = [
@@ -68,14 +69,13 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
 
   return (
     <div
-      style={{ '--num-rows': numHours + 2 } as React.CSSProperties}
-      className={`w-full h-[calc(100vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(5,minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[max-content_repeat(13,minmax(0,1fr))]`}
+      className={`w-full h-[calc(100vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[max-content_repeat(13,minmax(0,1fr))]`}
     >
       {/*Weekday Headers*/}
       <div className="grid col-span-full grid-flow-row bg-cornflower-500 grid-cols-subgrid grid-rows-subgrid">
         <div className="col-span-1 h-min"></div>
         {DAYS.slice(START_DAY, END_DAY + 1).map((x, i) => (
-          <p key={i} className="text-sm col-span-1 border-l text-center h-min">
+          <p key={i} className="text-sm col-span-1 border-l text-center h-min overflow-hidden">
             {x}
           </p>
         ))}
@@ -112,10 +112,10 @@ const HourRow = (props: HourRowProps) => {
       >
         {props.hour}:00
       </p>
-      <div className="col-start-2 col-span-full bg-white border-t border-gray-300">
-        <div className="relative top-1/4 col-span-full border-t border-gray-100"></div>
-        <div className="relative top-1/2 col-span-full border-t border-gray-200"></div>
-        <div className="relative top-3/4 col-span-full border-t border-gray-100"></div>
+      <div className="col-start-2 col-span-full bg-white dark:bg-black border-t border-gray-300 dark:border-gray-600">
+        <div className="relative top-1/4 col-span-full border-t border-gray-100 dark:border-gray-800"></div>
+        <div className="relative top-1/2 col-span-full border-t border-gray-200 dark:border-gray-700"></div>
+        <div className="relative top-3/4 col-span-full border-t border-gray-100 dark:border-gray-800"></div>
       </div>
     </div>
   );
