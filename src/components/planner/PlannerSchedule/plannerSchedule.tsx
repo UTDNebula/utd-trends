@@ -38,7 +38,7 @@ export type SectionData = {
   syllabus_uri: string;
   grade_distribution: number[];
   attributes: unknown;
-}[];
+};
 
 // hours shown (24-hour time)
 export const START_HOUR = 8;
