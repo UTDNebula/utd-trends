@@ -83,6 +83,9 @@ function Row({
   color,
 }: RowProps) {
   const [open, setOpen] = useState(false);
+  const canOpen =
+    !(typeof grades === 'undefined' || grades.state === 'error') ||
+    !(typeof rmp === 'undefined' || rmp.state === 'error');
 
   const rainbowColors = useRainbowColors();
 
@@ -119,8 +122,10 @@ function Row({
   return (
     <>
       <TableRow
-        onClick={() => setOpen(!open)}
-        className="cursor-pointer table-row sm:hidden"
+        onClick={() => {
+          if (canOpen) setOpen(!open);
+        }}
+        className={'table-row sm:hidden' + (canOpen ? ' cursor-pointer' : '')}
       >
         <TableCell
           component="th"
@@ -132,8 +137,10 @@ function Row({
         </TableCell>
       </TableRow>
       <TableRow
-        onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
-        className="cursor-pointer"
+        onClick={() => {
+          if (canOpen) setOpen(!open);
+        }} // opens/closes the card by clicking anywhere on the row
+        className={canOpen ? 'cursor-pointer' : ''}
       >
         <TableCell className="border-b-0">
           <div className="flex items-center gap-1">
@@ -144,9 +151,10 @@ function Row({
               <IconButton
                 aria-label="expand row"
                 size="medium"
+                disabled={!canOpen}
                 onClick={(e) => {
                   e.stopPropagation(); // prevents double opening/closing
-                  setOpen(!open);
+                  if (canOpen) setOpen(!open);
                 }}
                 className={'transition-transform' + (open ? ' rotate-90' : '')}
               >
