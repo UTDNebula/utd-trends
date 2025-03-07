@@ -136,7 +136,7 @@ const PlannerCard = ({
     <Box
       sx={{
         width: 550,
-        height: open ? 80 + numSections * 90 : 80,
+        height: open ? 80 + numSections * 85 : 80,
         border: 2,
         borderRadius: 6,
         bgcolor: '#f9f9f9',
