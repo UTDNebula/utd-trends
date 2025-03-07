@@ -75,7 +75,10 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
       <div className="grid col-span-full grid-flow-row bg-cornflower-500 grid-cols-subgrid grid-rows-subgrid">
         <div className="col-span-1 h-min"></div>
         {DAYS.slice(START_DAY, END_DAY + 1).map((x, i) => (
-          <p key={i} className="text-sm col-span-1 border-l text-center h-min overflow-hidden">
+          <p
+            key={i}
+            className="text-sm col-span-1 border-l text-center h-min overflow-hidden"
+          >
             {x}
           </p>
         ))}
