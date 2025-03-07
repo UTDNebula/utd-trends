@@ -15,8 +15,7 @@ import {
 } from '@mui/material';
 import React from 'react';
 import { useState, useEffect } from 'react';
-import Rating from '@/components/common/Rating/rating';
-
+import Rating from '@/components/common/Rating/Rating';
 import PlannerCard from './PlannerCard/plannerCard';
 import {
   searchQueryEqual,

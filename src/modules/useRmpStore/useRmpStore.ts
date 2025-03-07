@@ -84,12 +84,9 @@ export default function useRmpStore(): [
           data: res,
         });
       })
-      .catch((error) => {
+      .catch(() => {
         //Set loading status to error
         addToRmp(searchQueryLabel(professor), { state: 'error' });
-        if (!(error instanceof DOMException && error.name == 'AbortError')) {
-          console.error('RMP data for ' + searchQueryLabel(professor), error);
-        }
       });
   }
 

@@ -8,9 +8,9 @@ import {
   PanelResizeHandle,
 } from 'react-resizable-panels';
 
-import TopMenu from '@/components/navigation/topMenu/topMenu';
-import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/myPlannerEmpty';
-import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/plannerCoursesTable';
+import TopMenu from '@/components/navigation/TopMenu/TopMenu';
+import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/MyPlannerEmpty';
+import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
@@ -19,6 +19,7 @@ import {
   searchQueryEqual,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
+import type { SectionsType } from '@/modules/SectionsType/SectionsType';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
 function removeDuplicates(array: SearchQuery[]) {
@@ -46,6 +47,13 @@ interface Props {
   };
   fetchAndStoreRmpData: (
     course: SearchQuery,
+    controller: AbortController,
+  ) => void;
+  sections: {
+    [key: string]: GenericFetchedData<SectionsType>;
+  };
+  fetchAndStoreSectionsData: (
+    combo: SearchQuery,
     controller: AbortController,
   ) => void;
 }
@@ -86,12 +94,21 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
         }
       }
 
+      //Section data
+      for (const result of planner) {
+        const entry = props.sections[searchQueryLabel(result)];
+        //Not already loading
+        if (typeof entry === 'undefined' || entry.state === 'error') {
+          props.fetchAndStoreSectionsData(result, controller);
+        }
+      }
+
       return () => {
         controller.abort();
       };
     }
   }, [planner]);
-  console.log(props.grades, props.rmp);
+  console.log(props.grades, props.rmp, props.sections);
 
   let results: GenericFetchedData<SearchQuery[]> = {
     state: 'loading',
@@ -120,6 +137,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
     const plannerCoursesTable = (
       <PlannerCoursesTable
         courses={results.data}
+        addToPlanner={props.addToPlanner}
         removeFromPlanner={props.removeFromPlanner}
       />
     );

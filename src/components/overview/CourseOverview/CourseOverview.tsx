@@ -1,7 +1,7 @@
 import { Skeleton } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
-import SingleGradesInfo from '@/components/common/SingleGradesInfo/singleGradesInfo';
+import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import fetchWithCache, {
   cacheIndexNebula,
   expireTime,

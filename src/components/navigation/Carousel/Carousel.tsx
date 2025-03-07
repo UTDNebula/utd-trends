@@ -3,7 +3,7 @@ import { Collapse, useMediaQuery } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 
-import { TabNavMenu } from '@/components/navigation/tabNavMenu/tabNavMenu';
+import { TabNavMenu } from '@/components/navigation/TabNavMenu/TabNavMenu';
 
 interface CarouselProps {
   names: string[] | string;
@@ -14,6 +14,7 @@ interface CarouselProps {
 /**
  * Variants represent the different keyframes that the children are in during the animation
  * On enter, On Center, and On Exit
+ *
  */
 const variants = {
   enter: (dir: number) => {
