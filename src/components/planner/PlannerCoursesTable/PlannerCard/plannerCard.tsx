@@ -120,6 +120,7 @@ type PlannerCardProps = {
   profFirst: string;
   profLast: string;
   numSections: number;
+  onBookmarkClick: () => void;
 };
 
 const PlannerCard = ({
@@ -128,6 +129,7 @@ const PlannerCard = ({
   profFirst,
   profLast,
   numSections,
+  onBookmarkClick,
 }: PlannerCardProps) => {
   const [open, setOpen] = useState(false);
 
@@ -170,8 +172,11 @@ const PlannerCard = ({
             defaultChecked
             onClick={(e) => {
               e.stopPropagation();
+              onBookmarkClick();
             }}
-            icon={<BookMarkIcon fontSize="medium" />}
+            icon={
+              <BookMarkIcon style={{ color: '#553dff' }} fontSize="medium" />
+            }
             checkedIcon={<BookMarkIcon fontSize="medium" />}
           />
         </Grid2>

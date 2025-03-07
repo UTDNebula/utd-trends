@@ -14,10 +14,14 @@ import {
   Typography,
 } from '@mui/material';
 import React from 'react';
-
+import { useState, useEffect } from 'react';
 import Rating from '@/components/common/Rating/rating';
 
 import PlannerCard from './PlannerCard/plannerCard';
+import {
+  searchQueryEqual,
+  type SearchQuery,
+} from '@/modules/SearchQuery/SearchQuery';
 
 function LoadingRow() {
   return (
@@ -58,10 +62,15 @@ type PlannerCoursesTableProps = {
     profFirst: string;
     profLast: string;
   }[];
+  addToPlanner: (value: SearchQuery) => void;
+  removeFromPlanner: (value: SearchQuery) => void;
 };
 
 const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
-  console.log(props.courses ? 'courses exist' : "courses don't exist");
+  const [courses, setCourses] = useState([]);
+  useEffect(() => {
+    setCourses(props.courses);
+  }, []);
   return (
     //TODO: sticky header
     <>
@@ -70,7 +79,7 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
       </Typography>
       <Stack spacing={2}>
         {props.courses ? (
-          props.courses.map((course, index) => {
+          courses.map((course, index) => {
             return (
               <>
                 <PlannerCard
@@ -80,6 +89,16 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                   profFirst={course.profFirst}
                   profLast={course.profLast}
                   numSections={3}
+                  onBookmarkClick={() => {
+                    props.removeFromPlanner(course);
+                    setCourses((prevCourses) => {
+                      return prevCourses.filter((prevCourse) => {
+                        return (
+                          JSON.stringify(prevCourse) !== JSON.stringify(course)
+                        );
+                      });
+                    });
+                  }}
                 />
               </>
             );
