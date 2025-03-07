@@ -8,9 +8,9 @@ import {
   PanelResizeHandle,
 } from 'react-resizable-panels';
 
-import TopMenu from '@/components/navigation/topMenu/topMenu';
-import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/myPlannerEmpty';
-import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/plannerCoursesTable';
+import TopMenu from '@/components/navigation/TopMenu/TopMenu';
+import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/MyPlannerEmpty';
+import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
