@@ -188,9 +188,6 @@ export async function getServerSideProps(
 
 interface Props {
   pageTitle: string;
-  planner: SearchQuery[];
-  addToPlanner: (value: SearchQuery) => void;
-  removeFromPlanner: (value: SearchQuery) => void;
   grades: {
     [key: string]: GenericFetchedData<GradesType>;
   };
@@ -595,9 +592,6 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         addToCompare={addToCompare}
         removeFromCompare={removeFromCompare}
         colorMap={colorMap}
-        planner={props.planner}
-        addToPlanner={props.addToPlanner}
-        removeFromPlanner={props.removeFromPlanner}
       />
     );
     const carousel = (
@@ -675,7 +669,6 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         <TopMenu
           resultsLoading={results.state}
           setResultsLoading={() => setResults({ state: 'loading' })}
-          isPlanner={false}
         />
         <main className="p-4">{contentComponent}</main>
       </div>
