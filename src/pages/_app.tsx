@@ -16,6 +16,7 @@ import FeedbackPopup from '@/components/common/FeedbackPopup/FeedbackPopup';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
 import useGradeStore from '@/modules/useGradeStore/useGradeStore';
 import useRmpStore from '@/modules/useRmpStore/useRmpStore';
+import useSectionsStore from '@/modules/useSectionsStore/useSectionsStore';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -147,6 +148,9 @@ function MyApp({ Component, pageProps }: AppProps) {
   //Store rmp scores by profs
   const [rmp, , fetchAndStoreRmpData] = useRmpStore();
 
+  //Store sections by course+prof combo
+  const [sections, , fetchAndStoreSectionsData] = useSectionsStore();
+
   return (
     <>
       <GoogleAnalytics gaId="G-CC86XR1562" />
@@ -190,6 +194,8 @@ function MyApp({ Component, pageProps }: AppProps) {
             recalcAllGrades={recalcAllGrades}
             rmp={rmp}
             fetchAndStoreRmpData={fetchAndStoreRmpData}
+            sections={sections}
+            fetchAndStoreSectionsData={fetchAndStoreSectionsData}
           />
           <FeedbackPopup />
           <GitHubButton />
