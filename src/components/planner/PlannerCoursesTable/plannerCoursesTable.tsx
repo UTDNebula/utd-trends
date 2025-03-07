@@ -4,6 +4,7 @@ import {
   IconButton,
   Paper,
   Skeleton,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -11,11 +12,12 @@ import {
   TableHead,
   TableRow,
   Typography,
-  Stack,
 } from '@mui/material';
 import React from 'react';
-import PlannerCard from './PlannerCard/plannerCard';
+
 import Rating from '@/components/common/Rating/rating';
+
+import PlannerCard from './PlannerCard/plannerCard';
 
 function LoadingRow() {
   return (

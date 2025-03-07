@@ -1,23 +1,23 @@
-import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import BookMarkIcon from '@mui/icons-material/Bookmark';
 import CollectionsBookMarkIcon from '@mui/icons-material/CollectionsBookmark';
+import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Box,
-  Typography,
+  Checkbox,
+  Collapse,
   Grid2,
   IconButton,
-  Collapse,
   Item,
-  Checkbox,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
 } from '@mui/material';
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
+
 
 function ExpandedTableHead() {
   return (
