@@ -18,7 +18,6 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
-
 function ExpandedTableHead() {
   return (
     <TableRow
@@ -187,7 +186,7 @@ const PlannerCard = ({
           <TableContainer>
             <Table>
               <TableHead sx={{ height: 15 }}>
-                <ExpandedTableHead />
+                {numSections !== 0 ? <ExpandedTableHead /> : <></>}
               </TableHead>
               <TableBody>
                 {Array(numSections)
