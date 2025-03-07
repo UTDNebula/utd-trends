@@ -86,6 +86,7 @@ function Row({
   const canOpen =
     !(typeof grades === 'undefined' || grades.state === 'error') ||
     !(typeof rmp === 'undefined' || rmp.state === 'error');
+
   const rainbowColors = useRainbowColors();
 
   const nameCell = (
@@ -124,7 +125,7 @@ function Row({
         onClick={() => {
           if (canOpen) setOpen(!open);
         }}
-        className="cursor-pointer table-row sm:hidden"
+        className={'table-row sm:hidden' + (canOpen ? ' cursor-pointer' : '')}
       >
         <TableCell
           component="th"
@@ -139,7 +140,7 @@ function Row({
         onClick={() => {
           if (canOpen) setOpen(!open);
         }} // opens/closes the card by clicking anywhere on the row
-        className="cursor-pointer"
+        className={canOpen ? 'cursor-pointer' : ''}
       >
         <TableCell className="border-b-0">
           <div className="flex items-center gap-1">
