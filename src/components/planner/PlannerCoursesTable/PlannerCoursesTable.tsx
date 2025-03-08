@@ -13,16 +13,17 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+
 import Rating from '@/components/common/Rating/Rating';
-import PlannerCard from './PlannerCard/plannerCard';
-import {
-  searchQueryEqual,
-  type SearchQuery,
-} from '@/modules/SearchQuery/SearchQuery';
 import { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import {
+  type SearchQuery,
+  searchQueryEqual,
+} from '@/modules/SearchQuery/SearchQuery';
 import { SectionsType } from '@/modules/SectionsType/SectionsType';
+
+import PlannerCard from './PlannerCard/plannerCard';
 
 function LoadingRow() {
   return (

@@ -17,6 +17,7 @@ import {
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
+
 import { SectionsData } from '@/pages/api/sections';
 
 function ExpandedTableHead() {
