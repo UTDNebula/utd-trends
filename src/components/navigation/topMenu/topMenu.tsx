@@ -3,15 +3,13 @@ import { IconButton, Snackbar, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef,useState } from 'react';
 import resolveConfig from 'tailwindcss/resolveConfig';
 
-import tailwindConfig from '@/../tailwind.config.js';
 import Background from '@/../public/background.png';
+import tailwindConfig from '@/../tailwind.config.js';
 import SearchBar from '@/components/search/SearchBar/searchBar';
 
-// Get the royal color from tailwind config
-const fullTailwindConfig = resolveConfig(tailwindConfig);
 
 /**
  * Props type used by the TopMenu component
@@ -19,6 +17,20 @@ const fullTailwindConfig = resolveConfig(tailwindConfig);
 interface TopMenuProps {
   resultsLoading: 'loading' | 'done' | 'error';
   setResultsLoading: () => void;
+}
+
+interface ReleaseData {
+  id: number;
+  body: string;
+  html_url: string;
+}
+
+interface Feature {
+  id: string;
+  content: string;
+  read: boolean;
+  releaseUrl: string;
+  releaseId: string;
 }
 
 /**
@@ -73,6 +85,42 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
     }
   }, [whatsNewOpen]);
 
+  // Extract features from GitHub release content
+  const extractFeaturesFromRelease = (releaseBody: string): string[] => {
+    const lines = releaseBody.split('\n');
+    const features: string[] = [];
+    
+    let inOverviewSection = true;
+    
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      
+      if (trimmedLine.startsWith('## ')) {
+        inOverviewSection = false;
+        continue;
+      }
+      
+      if (inOverviewSection && (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* '))) {
+        const featureContent = trimmedLine.replace(/^[-*]\s+/, '').trim();
+        if (featureContent) {
+          features.push(featureContent);
+        }
+      }
+    }
+    
+    if (features.length === 0) {
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed && !trimmed.startsWith('#')) {
+          features.push(trimmed);
+          break;
+        }
+      }
+    }
+    
+    return features;
+  };
+
   // Function to fetch the recent releases
   const fetchReleases = async () => {
     if (loading) return;
@@ -86,7 +134,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
         throw new Error(`GitHub API responded with status: ${response.status}`);
       }
       
-      const releases = await response.json();
+      const releases = await response.json() as ReleaseData[];
       
       if (!Array.isArray(releases) || releases.length === 0) {
         return;
@@ -94,7 +142,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
       
       const allFeatures: Feature[] = [];
       
-      releases.forEach((release: any) => {
+      releases.forEach((release: ReleaseData) => {
         if (release && release.body) {
           const extractedFeatures = extractFeaturesFromRelease(release.body);
           
@@ -171,40 +219,12 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
     window.open(feature.releaseUrl, '_blank');
   };
 
-  // Extract features from GitHub release content
-  const extractFeaturesFromRelease = (releaseBody: string): string[] => {
-    const lines = releaseBody.split('\n');
-    const features: string[] = [];
-    
-    let inOverviewSection = true;
-    
-    for (const line of lines) {
-      const trimmedLine = line.trim();
-      
-      if (trimmedLine.startsWith('## ')) {
-        inOverviewSection = false;
-        continue;
-      }
-      
-      if (inOverviewSection && (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* '))) {
-        const featureContent = trimmedLine.replace(/^[-*]\s+/, '').trim();
-        if (featureContent) {
-          features.push(featureContent);
-        }
-      }
+  // Handle keyboard events for accessibility
+  const handleKeyPress = (e: React.KeyboardEvent, callback: () => void) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      callback();
     }
-    
-    if (features.length === 0) {
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (trimmed && !trimmed.startsWith('#')) {
-          features.push(trimmed);
-          break;
-        }
-      }
-    }
-    
-    return features;
   };
 
   function shareLink(url: string) {
@@ -283,6 +303,10 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
               <div 
                 className="fixed inset-0 z-[999]"
                 onClick={closeDropdown}
+                onKeyDown={(e) => handleKeyPress(e, closeDropdown)}
+                role="button"
+                tabIndex={0}
+                aria-label="Close dropdown overlay"
               ></div>
               
               <div 
@@ -296,9 +320,12 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
                   overflowY: 'auto'
                 }}
                 onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-label="What&apos;s New dialog"
               >
                 <div className="p-4">
-                  <h3 className="font-bold mb-3 text-base text-center">What's New?</h3>
+                  <h3 className="font-bold mb-3 text-base text-center">What&apos;s New?</h3>
                   {loading ? (
                     <div className="flex justify-center py-4">
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-royal"></div>
@@ -310,6 +337,9 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
                           key={feature.id} 
                           className="flex items-start group cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded-md transition-colors"
                           onClick={(e) => navigateToRelease(feature, e)}
+                          onKeyDown={(e) => handleKeyPress(e, () => navigateToRelease(feature, e as unknown as React.MouseEvent))}
+                          role="button"
+                          tabIndex={0}
                           title="Click to view release details"
                         >
                           <div className="w-4 flex-shrink-0 inline-block">
@@ -358,14 +388,6 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
       />
     </>
   );
-}
-
-interface Feature {
-  id: string;
-  content: string;
-  read: boolean;
-  releaseUrl: string;
-  releaseId: string;
 }
 
 export default TopMenu;
