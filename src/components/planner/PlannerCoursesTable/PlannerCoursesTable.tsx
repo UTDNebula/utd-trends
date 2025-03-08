@@ -74,7 +74,7 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
   const [courses, setCourses] = useState([]);
   useEffect(() => {
     setCourses(props.courses);
-  }, [props.courses]);
+  }, []);
   console.log(courses);
   return (
     //TODO: sticky header
