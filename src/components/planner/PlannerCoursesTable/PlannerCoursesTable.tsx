@@ -21,6 +21,8 @@ import {
   searchQueryEqual,
   type SearchQuery,
 } from '@/modules/SearchQuery/SearchQuery';
+import { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import { SectionsType } from '@/modules/SectionsType/SectionsType';
 
 function LoadingRow() {
   return (
@@ -63,13 +65,17 @@ type PlannerCoursesTableProps = {
   }[];
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
+  sections: {
+    [key: string]: GenericFetchedData<SectionsType>;
+  };
 };
 
 const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
   const [courses, setCourses] = useState([]);
   useEffect(() => {
     setCourses(props.courses);
-  }, []);
+  }, [props.courses]);
+  console.log(courses);
   return (
     //TODO: sticky header
     <>
@@ -79,28 +85,34 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
       <Stack spacing={2}>
         {props.courses ? (
           courses.map((course, index) => {
-            return (
-              <>
-                <PlannerCard
-                  key={index}
-                  prefix={course.prefix}
-                  number={course.number}
-                  profFirst={course.profFirst}
-                  profLast={course.profLast}
-                  numSections={3}
-                  onBookmarkClick={() => {
-                    props.removeFromPlanner(course);
-                    setCourses((prevCourses) => {
-                      return prevCourses.filter((prevCourse) => {
-                        return (
-                          JSON.stringify(prevCourse) !== JSON.stringify(course)
-                        );
+            const sectionKey = `${course.prefix} ${course.number} ${course.profFirst} ${course.profLast}`;
+            const sectionData = props.sections[sectionKey];
+
+            if (sectionData.state === 'done') {
+              return (
+                <>
+                  <PlannerCard
+                    key={index}
+                    prefix={course.prefix}
+                    number={course.number}
+                    profFirst={course.profFirst}
+                    profLast={course.profLast}
+                    latestSections={sectionData.data.latest}
+                    onBookmarkClick={() => {
+                      props.removeFromPlanner(course);
+                      setCourses((prevCourses) => {
+                        return prevCourses.filter((prevCourse) => {
+                          return (
+                            JSON.stringify(prevCourse) !==
+                            JSON.stringify(course)
+                          );
+                        });
                       });
-                    });
-                  }}
-                />
-              </>
-            );
+                    }}
+                  />
+                </>
+              );
+            }
           })
         ) : (
           <div>empty</div>

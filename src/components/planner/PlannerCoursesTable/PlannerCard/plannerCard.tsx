@@ -17,6 +17,7 @@ import {
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
+import { SectionsData } from '@/pages/api/sections';
 
 function ExpandedTableHead() {
   return (
@@ -83,7 +84,57 @@ function ExpandedTableHead() {
   );
 }
 
-function ExpandedTableRows() {
+type ExpandedTableRowsProps = {
+  prefix: string;
+  number: string;
+  classNumber: string;
+  section: string;
+  meetingDays: string[];
+  startTime: string;
+  endTime: string;
+  location: {
+    building: string;
+    room: string;
+  };
+};
+
+function ExpandedTableRows({
+  prefix,
+  number,
+  classNumber,
+  section,
+  meetingDays,
+  startTime,
+  endTime,
+  location,
+}: ExpandedTableRowsProps) {
+  console.log(
+    `prefix ${prefix} number ${number} classNumber ${classNumber} section ${section} meetingDays ${meetingDays} startTime ${startTime} endTime ${endTime} location ${location}`,
+  );
+  function daySlice(day: string): string {
+    if (day.slice(0, 1) === 'S') {
+      return day.slice(0, 2);
+    }
+
+    if (day.slice(0, 2) === 'Th') {
+      return day.slice(0, 2);
+    }
+
+    return day.slice(0, 1);
+  }
+
+  function classTime(startTime: string, endTime: string): string {
+    const meridian = startTime.slice(-2);
+
+    return `${startTime.replace(meridian, '')}-${endTime}`;
+  }
+
+  let days: string = '';
+  const time: string = classTime(startTime, endTime);
+  meetingDays.forEach((day) => {
+    days += daySlice(day);
+  });
+
   return (
     <TableRow>
       <TableCell>
@@ -96,19 +147,22 @@ function ExpandedTableRows() {
         />
       </TableCell>
       <TableCell>
-        <Typography variant="body1">23429</Typography>
+        <Typography variant="body1">{classNumber}</Typography>
       </TableCell>
       <TableCell>
-        <Typography variant="body1">CS</Typography>
+        <Typography variant="body1">{prefix}</Typography>
       </TableCell>
       <TableCell>
-        <Typography variant="body1">1200</Typography>
+        <Typography variant="body1">{number}</Typography>
       </TableCell>
       <TableCell>
-        <Typography variant="body1">007</Typography>
+        <Typography variant="body1">{section}</Typography>
       </TableCell>
       <TableCell>
-        <Typography variant="body1">MW 4:00-5:15pm ECSS 2.412</Typography>
+        <Typography variant="body1" sx={{ fontSize: '0.90rem' }}>
+          {days} {time} <br />
+          {location.building} {location.room}
+        </Typography>
       </TableCell>
     </TableRow>
   );
@@ -121,6 +175,7 @@ type PlannerCardProps = {
   profLast: string;
   numSections: number;
   onBookmarkClick: () => void;
+  latestSections: SectionsData[];
 };
 
 const PlannerCard = ({
@@ -130,6 +185,7 @@ const PlannerCard = ({
   profLast,
   numSections,
   onBookmarkClick,
+  latestSections,
 }: PlannerCardProps) => {
   const [open, setOpen] = useState(false);
 
@@ -137,7 +193,9 @@ const PlannerCard = ({
     <Box
       sx={{
         width: 550,
-        height: open ? 80 + numSections * 85 : 80,
+        height: open
+          ? 80 + (latestSections.length > 0 ? latestSections.length * 85 : 35)
+          : 80,
         border: 2,
         borderRadius: 6,
         bgcolor: '#f9f9f9',
@@ -183,7 +241,7 @@ const PlannerCard = ({
 
         <Grid2>
           <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit">
-            {`${prefix} ${number} ${profFirst} ${profLast}`}
+            {`${prefix} ${number} ${profFirst ? profFirst : ''} ${profLast ? profLast : ''} `}
           </Typography>
         </Grid2>
 
@@ -191,14 +249,32 @@ const PlannerCard = ({
           <TableContainer>
             <Table>
               <TableHead sx={{ height: 15 }}>
-                {numSections !== 0 ? <ExpandedTableHead /> : <></>}
+                {latestSections.length !== 0 ? (
+                  <ExpandedTableHead />
+                ) : (
+                  <Typography sx={{ textAlign: 'center' }}>
+                    No Upcoming Sections
+                  </Typography>
+                )}
               </TableHead>
               <TableBody>
-                {Array(numSections)
-                  .fill(0)
-                  .map((_, index) => {
-                    return <ExpandedTableRows key={index} />;
-                  })}
+                {latestSections.map((section, index) => {
+                  if (latestSections.length !== 0) {
+                    return (
+                      <ExpandedTableRows
+                        key={index}
+                        prefix={prefix}
+                        number={number}
+                        classNumber={section.internal_class_number}
+                        section={section.section_number}
+                        meetingDays={section.meetings[0].meeting_days}
+                        startTime={section.meetings[0].start_time}
+                        endTime={section.meetings[0].end_time}
+                        location={section.meetings[0].location}
+                      />
+                    );
+                  }
+                })}
               </TableBody>
             </Table>
           </TableContainer>
