@@ -24,59 +24,50 @@ function ExpandedTableHead() {
   return (
     <TableRow
       sx={{
-        width: '100%',
-        height: '20px',
         '& .MuiTableCell-root': {
           padding: '8px', // Reduce cell padding
-          height: '10px', // Ensure cells match row height
         },
       }}
-      className="bg-[#9986e3]"
+      className="bg-cornflower-600 p-2"
     >
       <TableCell>
         <Typography
-          variant="body2"
-          sx={{ fontSize: '0.70rem', color: 'white', lineHeight: 1, pl: 2 }}
+          className='text-white text-xs text-center'
         >
           Add
         </Typography>
       </TableCell>
       <TableCell>
         <Typography
-          variant="body2"
-          sx={{ fontSize: '0.70rem', color: 'white', lineHeight: 1, pl: 2 }}
+          className='text-white text-xs text-center'
         >
           Class #
         </Typography>
       </TableCell>
       <TableCell>
         <Typography
-          variant="body2"
-          sx={{ fontSize: '0.70rem', color: 'white', lineHeight: 1 }}
+          className='text-white text-xs text-center'
         >
           Subject
         </Typography>
       </TableCell>
       <TableCell>
         <Typography
-          variant="body2"
-          sx={{ fontSize: '0.70rem', color: 'white', lineHeight: 1, pl: 1 }}
+          className='text-white text-xs text-center'
         >
           Course #
         </Typography>
       </TableCell>
       <TableCell>
         <Typography
-          variant="body2"
-          sx={{ fontSize: '0.70rem', color: 'white', lineHeight: 1 }}
+          className='text-white text-xs text-center'
         >
           Section #
         </Typography>
       </TableCell>
       <TableCell sx={{ width: '30%' }}>
         <Typography
-          variant="body2"
-          sx={{ fontSize: '0.70rem', color: 'white', lineHeight: 1, pl: 2 }}
+          className='text-white text-xs text-center'
         >
           Schedule & Location
         </Typography>
@@ -148,19 +139,19 @@ function ExpandedTableRows({
         />
       </TableCell>
       <TableCell>
-        <Typography variant="body1">{classNumber}</Typography>
+        <Typography >{classNumber}</Typography>
       </TableCell>
       <TableCell>
-        <Typography variant="body1">{prefix}</Typography>
+        <Typography>{prefix}</Typography>
       </TableCell>
       <TableCell>
-        <Typography variant="body1">{number}</Typography>
+        <Typography>{number}</Typography>
       </TableCell>
       <TableCell>
-        <Typography variant="body1">{section}</Typography>
+        <Typography>{section}</Typography>
       </TableCell>
       <TableCell>
-        <Typography variant="body1" sx={{ fontSize: '0.90rem' }}>
+        <Typography className='text-sm'>
           {days} {time} <br />
           {location.building} {location.room}
         </Typography>
@@ -249,7 +240,7 @@ const PlannerCard = ({
         <Collapse in={open} timeout="auto" unmountOnExit sx={{ width: '100%' }}>
           <TableContainer>
             <Table>
-              <TableHead sx={{ height: 15 }}>
+              <TableHead>
                 {latestSections.length !== 0 ? (
                   <ExpandedTableHead />
                 ) : (
