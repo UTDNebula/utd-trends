@@ -136,7 +136,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
   } else {
     const plannerCoursesTable = (
       <PlannerCoursesTable
-        courses={results.data}
+        courses={results.state === 'done' ? results.data : []}
         addToPlanner={props.addToPlanner}
         removeFromPlanner={props.removeFromPlanner}
         sections={props.sections}
