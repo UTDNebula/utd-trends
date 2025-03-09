@@ -1,16 +1,13 @@
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
-  Box,
   Checkbox,
   IconButton,
   Paper,
   Skeleton,
-  Stack,
   Table,
   TableBody,
   TableCell,
   TableContainer,
-  TableHead,
   TableRow,
   Typography,
 } from '@mui/material';
@@ -18,10 +15,7 @@ import React, { useEffect, useState } from 'react';
 
 import Rating from '@/components/common/Rating/Rating';
 import { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import {
-  type SearchQuery,
-  searchQueryEqual,
-} from '@/modules/SearchQuery/SearchQuery';
+import { type SearchQuery } from '@/modules/SearchQuery/SearchQuery';
 import { SectionsType } from '@/modules/SectionsType/SectionsType';
 
 import PlannerCard from './PlannerCard/plannerCard';
@@ -86,39 +80,39 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
       </Typography>
       <TableContainer component={Paper}>
         <Table stickyHeader aria-label="collapsible table">
-          <TableBody >
-            {props.courses ? (
-              courses.map((course, index) => {
-                const sectionKey = `${course.prefix} ${course.number} ${course.profFirst} ${course.profLast}`;
-                const sectionData = props.sections[sectionKey];
+          <TableBody>
+            {props.courses
+              ? courses.map((course, index) => {
+                  const sectionKey = `${course.prefix} ${course.number} ${course.profFirst} ${course.profLast}`;
+                  const sectionData = props.sections[sectionKey];
 
-                if (sectionData.state === 'done') {
-                  return (
-                    <PlannerCard
-                      key={index}
-                      prefix={course.prefix}
-                      number={course.number}
-                      profFirst={course.profFirst}
-                      profLast={course.profLast}
-                      latestSections={sectionData.data.latest}
-                      onBookmarkClick={() => {
-                        props.removeFromPlanner(course);
-                        setCourses((prevCourses) => {
-                          return prevCourses.filter((prevCourse) => {
-                            return (
-                              JSON.stringify(prevCourse) !==
-                              JSON.stringify(course)
-                            );
+                  if (sectionData.state === 'done') {
+                    return (
+                      <PlannerCard
+                        key={index}
+                        prefix={course.prefix}
+                        number={course.number}
+                        profFirst={course.profFirst}
+                        profLast={course.profLast}
+                        latestSections={sectionData.data.latest}
+                        onBookmarkClick={() => {
+                          props.removeFromPlanner(course);
+                          setCourses((prevCourses) => {
+                            return prevCourses.filter((prevCourse) => {
+                              return (
+                                JSON.stringify(prevCourse) !==
+                                JSON.stringify(course)
+                              );
+                            });
                           });
-                        });
-                      }}
-                    />
-                  );
-                }
-              })
-            ) : (
-              <div>empty</div>
-            )}
+                        }}
+                      />
+                    );
+                  }
+                })
+              : Array(10)
+                  .fill(0)
+                  .map((_, index) => <LoadingRow key={index} />)}
           </TableBody>
         </Table>
       </TableContainer>

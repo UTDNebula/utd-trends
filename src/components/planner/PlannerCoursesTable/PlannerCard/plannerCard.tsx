@@ -1,15 +1,11 @@
 import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
-import BookMarkIcon from '@mui/icons-material/Bookmark';
 import CollectionsBookMarkIcon from '@mui/icons-material/CollectionsBookmark';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
-  Box,
   Checkbox,
   Collapse,
-  Grid2,
   IconButton,
-  Item,
   Table,
   TableBody,
   TableCell,
@@ -23,7 +19,7 @@ import React, { useState } from 'react';
 
 import { SectionsData } from '@/pages/api/sections';
 
-function ExpandedTableHead() {
+function SectionTableHead() {
   return (
     <TableRow
       sx={{
@@ -34,44 +30,30 @@ function ExpandedTableHead() {
       className="bg-cornflower-600 p-2"
     >
       <TableCell>
-        <Typography
-          className='text-white text-xs text-center'
-        >
-          Add
-        </Typography>
+        <Typography className="text-white text-xs text-center">Add</Typography>
       </TableCell>
       <TableCell>
-        <Typography
-          className='text-white text-xs text-center'
-        >
+        <Typography className="text-white text-xs text-center">
           Class #
         </Typography>
       </TableCell>
       <TableCell>
-        <Typography
-          className='text-white text-xs text-center'
-        >
+        <Typography className="text-white text-xs text-center">
           Subject
         </Typography>
       </TableCell>
       <TableCell>
-        <Typography
-          className='text-white text-xs text-center'
-        >
+        <Typography className="text-white text-xs text-center">
           Course #
         </Typography>
       </TableCell>
       <TableCell>
-        <Typography
-          className='text-white text-xs text-center'
-        >
+        <Typography className="text-white text-xs text-center">
           Section #
         </Typography>
       </TableCell>
       <TableCell sx={{ width: '30%' }}>
-        <Typography
-          className='text-white text-xs text-center'
-        >
+        <Typography className="text-white text-xs text-center">
           Schedule & Location
         </Typography>
       </TableCell>
@@ -79,7 +61,7 @@ function ExpandedTableHead() {
   );
 }
 
-type ExpandedTableRowsProps = {
+type SectionTableRowProps = {
   prefix: string;
   number: string;
   classNumber: string;
@@ -93,7 +75,7 @@ type ExpandedTableRowsProps = {
   };
 };
 
-function ExpandedTableRows({
+function SectionTableRows({
   prefix,
   number,
   classNumber,
@@ -102,7 +84,7 @@ function ExpandedTableRows({
   startTime,
   endTime,
   location,
-}: ExpandedTableRowsProps) {
+}: SectionTableRowProps) {
   console.log(
     `prefix ${prefix} number ${number} classNumber ${classNumber} section ${section} meetingDays ${meetingDays} startTime ${startTime} endTime ${endTime} location ${location}`,
   );
@@ -142,7 +124,7 @@ function ExpandedTableRows({
         />
       </TableCell>
       <TableCell>
-        <Typography >{classNumber}</Typography>
+        <Typography>{classNumber}</Typography>
       </TableCell>
       <TableCell>
         <Typography>{prefix}</Typography>
@@ -154,7 +136,7 @@ function ExpandedTableRows({
         <Typography>{section}</Typography>
       </TableCell>
       <TableCell>
-        <Typography className='text-sm'>
+        <Typography className="text-sm">
           {days} {time} <br />
           {location.building} {location.room}
         </Typography>
@@ -183,6 +165,10 @@ const PlannerCard = ({
   latestSections,
 }: PlannerCardProps) => {
   const [open, setOpen] = useState(false);
+  console.log(
+    `${prefix} ${number} ${profFirst} ${profLast}`,
+    `${numSections} sections`,
+  );
 
   return (
     <>
@@ -208,10 +194,7 @@ const PlannerCard = ({
                 <KeyboardArrowIcon fontSize="inherit" />
               </IconButton>
             </Tooltip>
-            <Tooltip
-              title={true ? 'Remove from Planner' : 'Add to Planner'}
-              placement="top"
-            >
+            <Tooltip title={'Remove from Planner'} placement="top">
               <Checkbox
                 checked={true /*inPlanner?*/}
                 onClick={(e) => {
@@ -237,7 +220,7 @@ const PlannerCard = ({
               <Table>
                 <TableHead>
                   {latestSections.length !== 0 ? (
-                    <ExpandedTableHead />
+                    <SectionTableHead />
                   ) : (
                     <Typography sx={{ textAlign: 'center' }}>
                       No Upcoming Sections
@@ -248,7 +231,7 @@ const PlannerCard = ({
                   {latestSections.map((section, index) => {
                     if (latestSections.length !== 0) {
                       return (
-                        <ExpandedTableRows
+                        <SectionTableRows
                           key={index}
                           prefix={prefix}
                           number={number}
