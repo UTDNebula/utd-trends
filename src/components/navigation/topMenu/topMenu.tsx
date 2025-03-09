@@ -3,13 +3,10 @@ import { IconButton, Snackbar, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef,useState } from 'react';
-import resolveConfig from 'tailwindcss/resolveConfig';
+import React, { useEffect, useRef, useState } from 'react';
 
 import Background from '@/../public/background.png';
-import tailwindConfig from '@/../tailwind.config.js';
 import SearchBar from '@/components/search/SearchBar/searchBar';
-
 
 /**
  * Props type used by the TopMenu component
@@ -67,6 +64,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
   // Fetch releases on component mount
   useEffect(() => {
     fetchReleases();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Position the dropdown centered under the icon
@@ -300,14 +298,12 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
           
           {whatsNewOpen && (
             <>
-              <div 
-                className="fixed inset-0 z-[999]"
+              <button 
+                className="fixed inset-0 z-[999] w-full h-full cursor-default"
                 onClick={closeDropdown}
                 onKeyDown={(e) => handleKeyPress(e, closeDropdown)}
-                role="button"
-                tabIndex={0}
                 aria-label="Close dropdown overlay"
-              ></div>
+              ></button>
               
               <div 
                 ref={dropdownRef}
@@ -319,10 +315,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
                   maxHeight: '80vh',
                   overflowY: 'auto'
                 }}
-                onClick={(e) => e.stopPropagation()}
-                onKeyDown={(e) => e.stopPropagation()}
-                role="dialog"
-                aria-label="What&apos;s New dialog"
+                aria-label="What's New dialog"
               >
                 <div className="p-4">
                   <h3 className="font-bold mb-3 text-base text-center">What&apos;s New?</h3>
@@ -331,15 +324,12 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-royal"></div>
                     </div>
                   ) : features.length > 0 ? (
-                    <ul className="space-y-3">
+                    <div className="space-y-3">
                       {features.map((feature) => (
-                        <li 
+                        <button 
                           key={feature.id} 
-                          className="flex items-start group cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded-md transition-colors"
-                          onClick={(e) => navigateToRelease(feature, e)}
-                          onKeyDown={(e) => handleKeyPress(e, () => navigateToRelease(feature, e as unknown as React.MouseEvent))}
-                          role="button"
-                          tabIndex={0}
+                          className="flex items-start group w-full text-left hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded-md transition-colors"
+                          onClick={(e) => navigateToRelease(feature, e as React.MouseEvent)}
                           title="Click to view release details"
                         >
                           <div className="w-4 flex-shrink-0 inline-block">
@@ -348,9 +338,9 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
                             )}
                           </div>
                           <span className="text-sm">{feature.content}</span>
-                        </li>
+                        </button>
                       ))}
-                    </ul>
+                    </div>
                   ) : (
                     <p className="text-sm text-gray-600 dark:text-gray-400">No updates available</p>
                   )}
