@@ -1,5 +1,6 @@
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
+  Box,
   Checkbox,
   IconButton,
   Paper,
@@ -83,42 +84,44 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
       <Typography className="leading-tight text-3xl font-bold p-4">
         My Planner
       </Typography>
-      <Stack spacing={2}>
-        {props.courses ? (
-          courses.map((course, index) => {
-            const sectionKey = `${course.prefix} ${course.number} ${course.profFirst} ${course.profLast}`;
-            const sectionData = props.sections[sectionKey];
+      <TableContainer component={Paper}>
+        <Table stickyHeader aria-label="collapsible table">
+          <TableBody >
+            {props.courses ? (
+              courses.map((course, index) => {
+                const sectionKey = `${course.prefix} ${course.number} ${course.profFirst} ${course.profLast}`;
+                const sectionData = props.sections[sectionKey];
 
-            if (sectionData.state === 'done') {
-              return (
-                <>
-                  <PlannerCard
-                    key={index}
-                    prefix={course.prefix}
-                    number={course.number}
-                    profFirst={course.profFirst}
-                    profLast={course.profLast}
-                    latestSections={sectionData.data.latest}
-                    onBookmarkClick={() => {
-                      props.removeFromPlanner(course);
-                      setCourses((prevCourses) => {
-                        return prevCourses.filter((prevCourse) => {
-                          return (
-                            JSON.stringify(prevCourse) !==
-                            JSON.stringify(course)
-                          );
+                if (sectionData.state === 'done') {
+                  return (
+                    <PlannerCard
+                      key={index}
+                      prefix={course.prefix}
+                      number={course.number}
+                      profFirst={course.profFirst}
+                      profLast={course.profLast}
+                      latestSections={sectionData.data.latest}
+                      onBookmarkClick={() => {
+                        props.removeFromPlanner(course);
+                        setCourses((prevCourses) => {
+                          return prevCourses.filter((prevCourse) => {
+                            return (
+                              JSON.stringify(prevCourse) !==
+                              JSON.stringify(course)
+                            );
+                          });
                         });
-                      });
-                    }}
-                  />
-                </>
-              );
-            }
-          })
-        ) : (
-          <div>empty</div>
-        )}
-      </Stack>
+                      }}
+                    />
+                  );
+                }
+              })
+            ) : (
+              <div>empty</div>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </>
   );
 };

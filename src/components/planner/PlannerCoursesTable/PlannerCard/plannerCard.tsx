@@ -1,3 +1,5 @@
+import BookIcon from '@mui/icons-material/Book';
+import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import BookMarkIcon from '@mui/icons-material/Bookmark';
 import CollectionsBookMarkIcon from '@mui/icons-material/CollectionsBookmark';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -14,6 +16,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
@@ -182,97 +185,90 @@ const PlannerCard = ({
   const [open, setOpen] = useState(false);
 
   return (
-    <Box
-      sx={{
-        width: 550,
-        height: open
-          ? 80 + (latestSections.length > 0 ? latestSections.length * 85 : 35)
-          : 80,
-        border: 2,
-        borderRadius: 6,
-        bgcolor: '#f9f9f9',
-        borderColor: '#5f3fd3',
-        display: 'flex',
-        alignItems: 'center',
-
-        overflow: 'hidden',
-      }}
-      onClick={() => setOpen(!open)}
-    >
-      <Grid2
-        container
-        spacing={1}
-        alignItems="center"
-        sx={{ width: '100%', pt: open ? 2 : 0 }}
+    <>
+      <TableRow
+        onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
+        className="cursor-pointer"
       >
-        <Grid2 sx={{ pl: 2 }}>
-          <IconButton
-            size="medium"
-            sx={{
-              transform: open ? 'rotate(90deg)' : 'rotate(0deg)',
-              transition: 'transform 0.3s ease',
-            }}
-          >
-            <KeyboardArrowIcon fontSize="inherit" />
-          </IconButton>
-        </Grid2>
-
-        <Grid2>
-          <Checkbox
-            defaultChecked
-            onClick={(e) => {
-              e.stopPropagation();
-              onBookmarkClick();
-            }}
-            icon={
-              <BookMarkIcon style={{ color: '#553dff' }} fontSize="medium" />
-            }
-            checkedIcon={<BookMarkIcon fontSize="medium" />}
-          />
-        </Grid2>
-
-        <Grid2>
-          <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit">
+        <TableCell className="border-b-0">
+          <div className="flex items-center">
+            <Tooltip
+              title={open ? 'Minimize Result' : 'Expand Result'}
+              placement="top"
+            >
+              <IconButton
+                aria-label="expand row"
+                size="medium"
+                onClick={(e) => {
+                  e.stopPropagation(); // prevents double opening/closing
+                  setOpen(!open);
+                }}
+                className={'transition-transform' + (open ? ' rotate-90' : '')}
+              >
+                <KeyboardArrowIcon fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              title={true ? 'Remove from Planner' : 'Add to Planner'}
+              placement="top"
+            >
+              <Checkbox
+                checked={true /*inPlanner?*/}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onBookmarkClick();
+                }}
+                icon={<BookOutlinedIcon />}
+                checkedIcon={<BookIcon />}
+              />
+            </Tooltip>
+          </div>
+        </TableCell>
+        <TableCell className="border-b-0">
+          <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit">
             {`${prefix} ${number} ${profFirst ? profFirst : ''} ${profLast ? profLast : ''} `}
           </Typography>
-        </Grid2>
-
-        <Collapse in={open} timeout="auto" unmountOnExit sx={{ width: '100%' }}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                {latestSections.length !== 0 ? (
-                  <ExpandedTableHead />
-                ) : (
-                  <Typography sx={{ textAlign: 'center' }}>
-                    No Upcoming Sections
-                  </Typography>
-                )}
-              </TableHead>
-              <TableBody>
-                {latestSections.map((section, index) => {
-                  if (latestSections.length !== 0) {
-                    return (
-                      <ExpandedTableRows
-                        key={index}
-                        prefix={prefix}
-                        number={number}
-                        classNumber={section.internal_class_number}
-                        section={section.section_number}
-                        meetingDays={section.meetings[0].meeting_days}
-                        startTime={section.meetings[0].start_time}
-                        endTime={section.meetings[0].end_time}
-                        location={section.meetings[0].location}
-                      />
-                    );
-                  }
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Collapse>
-      </Grid2>
-    </Box>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell className="p-0" colSpan={6}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  {latestSections.length !== 0 ? (
+                    <ExpandedTableHead />
+                  ) : (
+                    <Typography sx={{ textAlign: 'center' }}>
+                      No Upcoming Sections
+                    </Typography>
+                  )}
+                </TableHead>
+                <TableBody>
+                  {latestSections.map((section, index) => {
+                    if (latestSections.length !== 0) {
+                      return (
+                        <ExpandedTableRows
+                          key={index}
+                          prefix={prefix}
+                          number={number}
+                          classNumber={section.internal_class_number}
+                          section={section.section_number}
+                          meetingDays={section.meetings[0].meeting_days}
+                          startTime={section.meetings[0].start_time}
+                          endTime={section.meetings[0].end_time}
+                          location={section.meetings[0].location}
+                        />
+                      );
+                    }
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </>
   );
 };
 
