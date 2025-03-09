@@ -65,7 +65,7 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
   const [courses, setCourses] = useState<SearchQuery[]>([]);
   useEffect(() => {
     setCourses(props.courses ?? []);
-  }, []);
+  }, [courses]);
   console.log(courses);
   return (
     //TODO: sticky header
