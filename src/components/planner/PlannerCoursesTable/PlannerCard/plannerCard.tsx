@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
-import { SectionsData } from '@/pages/api/sections';
+import { type SectionsData } from '@/pages/api/sections';
 
 function SectionTableHead() {
   return (
@@ -152,7 +152,7 @@ type PlannerCardProps = {
   profLast: string;
   numSections: number;
   onBookmarkClick: () => void;
-  latestSections: SectionsData[];
+  latestSections: SectionsData;
 };
 
 const PlannerCard = ({

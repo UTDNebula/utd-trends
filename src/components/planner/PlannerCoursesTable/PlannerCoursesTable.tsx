@@ -14,9 +14,9 @@ import {
 import React, { useEffect, useState } from 'react';
 
 import Rating from '@/components/common/Rating/Rating';
-import { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import { type GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import { type SearchQuery } from '@/modules/SearchQuery/SearchQuery';
-import { SectionsType } from '@/modules/SectionsType/SectionsType';
+import { type SectionsType } from '@/modules/SectionsType/SectionsType';
 
 import PlannerCard from './PlannerCard/plannerCard';
 
@@ -53,12 +53,7 @@ function LoadingRow() {
 
 type PlannerCoursesTableProps = {
   prop?: string;
-  courses?: {
-    prefix: string;
-    number: string;
-    profFirst: string;
-    profLast: string;
-  }[];
+  courses?: SearchQuery[];
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
   sections: {
@@ -67,9 +62,9 @@ type PlannerCoursesTableProps = {
 };
 
 const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
-  const [courses, setCourses] = useState([]);
+  const [courses, setCourses] = useState<SearchQuery[]>([]);
   useEffect(() => {
-    setCourses(props.courses);
+    setCourses(props.courses ?? []);
   }, []);
   console.log(courses);
   return (
@@ -86,7 +81,13 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                   const sectionKey = `${course.prefix} ${course.number} ${course.profFirst} ${course.profLast}`;
                   const sectionData = props.sections[sectionKey];
 
-                  if (sectionData.state === 'done') {
+                  if (
+                    sectionData.state === 'done' &&
+                    course.prefix !== undefined &&
+                    course.number !== undefined &&
+                    course.profFirst !== undefined &&
+                    course.profLast !== undefined
+                  ) {
                     return (
                       <PlannerCard
                         key={index}
@@ -94,6 +95,7 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                         number={course.number}
                         profFirst={course.profFirst}
                         profLast={course.profLast}
+                        numSections={sectionData.data.latest.length}
                         latestSections={sectionData.data.latest}
                         onBookmarkClick={() => {
                           props.removeFromPlanner(course);
