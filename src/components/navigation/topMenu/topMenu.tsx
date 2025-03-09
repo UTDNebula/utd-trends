@@ -44,7 +44,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
   const iconRef = useRef<HTMLButtonElement>(null);
 
   // Count unread features for notification badge
-  const unreadCount = features.filter(feature => !feature.read).length;
+  const unreadCount = features.filter((feature) => !feature.read).length;
 
   // Load features from localStorage on initial render
   useEffect(() => {
@@ -74,11 +74,14 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
       const dropdownWidth = dropdownRef.current.offsetWidth;
       const iconCenter = iconRect.left + iconRect.width / 2;
       const leftPosition = iconCenter - dropdownWidth / 2;
-      
+
       // Ensure the dropdown doesn't go off-screen
       const windowWidth = window.innerWidth;
-      const finalLeft = Math.max(4, Math.min(windowWidth - dropdownWidth - 4, leftPosition));
-      
+      const finalLeft = Math.max(
+        4,
+        Math.min(windowWidth - dropdownWidth - 4, leftPosition),
+      );
+
       dropdownRef.current.style.left = `${finalLeft}px`;
     }
   }, [whatsNewOpen]);
@@ -87,25 +90,28 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
   const extractFeaturesFromRelease = (releaseBody: string): string[] => {
     const lines = releaseBody.split('\n');
     const features: string[] = [];
-    
+
     let inOverviewSection = true;
-    
+
     for (const line of lines) {
       const trimmedLine = line.trim();
-      
+
       if (trimmedLine.startsWith('## ')) {
         inOverviewSection = false;
         continue;
       }
-      
-      if (inOverviewSection && (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* '))) {
+
+      if (
+        inOverviewSection &&
+        (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* '))
+      ) {
         const featureContent = trimmedLine.replace(/^[-*]\s+/, '').trim();
         if (featureContent) {
           features.push(featureContent);
         }
       }
     }
-    
+
     if (features.length === 0) {
       for (const line of lines) {
         const trimmed = line.trim();
@@ -115,52 +121,53 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
         }
       }
     }
-    
+
     return features;
   };
 
   // Function to fetch the recent releases
   const fetchReleases = async () => {
     if (loading) return;
-    
+
     setLoading(true);
-    
+
     try {
-      const response = await fetch('https://api.github.com/repos/UTDNebula/utd-trends/releases?per_page=4');
-      
+      const response = await fetch(
+        'https://api.github.com/repos/UTDNebula/utd-trends/releases?per_page=4',
+      );
+
       if (!response.ok) {
         throw new Error(`GitHub API responded with status: ${response.status}`);
       }
-      
-      const releases = await response.json() as ReleaseData[];
-      
+
+      const releases = (await response.json()) as ReleaseData[];
+
       if (!Array.isArray(releases) || releases.length === 0) {
         return;
       }
-      
+
       const allFeatures: Feature[] = [];
-      
+
       releases.forEach((release: ReleaseData) => {
         if (release && release.body) {
           const extractedFeatures = extractFeaturesFromRelease(release.body);
-          
-          extractedFeatures.forEach(content => {
+
+          extractedFeatures.forEach((content) => {
             const id = `${release.id}-${allFeatures.length}`;
             allFeatures.push({
               id,
               content,
               read: false,
               releaseUrl: release.html_url,
-              releaseId: release.id.toString()
+              releaseId: release.id.toString(),
             });
           });
         }
       });
-      
+
       if (allFeatures.length > 0) {
         setFeatures(allFeatures);
       }
-      
     } catch (error) {
       console.error('Error fetching release data:', error);
     } finally {
@@ -182,31 +189,30 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
   // Toggle the What's New dropdown
   const toggleWhatsNew = () => {
     const newState = !whatsNewOpen;
-    
+
     if (newState) {
       setWasOpened(true);
-    } 
-    else if (wasOpened) {
+    } else if (wasOpened) {
       markAllAsRead();
       setWasOpened(false);
     }
-    
+
     setWhatsNewOpen(newState);
   };
 
   // Mark a feature as read
   const markFeatureAsRead = (featureId: string) => {
-    setFeatures(prevFeatures => 
-      prevFeatures.map(feature => 
-        feature.id === featureId ? {...feature, read: true} : feature
-      )
+    setFeatures((prevFeatures) =>
+      prevFeatures.map((feature) =>
+        feature.id === featureId ? { ...feature, read: true } : feature,
+      ),
     );
   };
 
   // Mark all features as read
   const markAllAsRead = () => {
-    setFeatures(prevFeatures => 
-      prevFeatures.map(feature => ({...feature, read: true}))
+    setFeatures((prevFeatures) =>
+      prevFeatures.map((feature) => ({ ...feature, read: true })),
     );
   };
 
@@ -295,30 +301,33 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
               )}
             </IconButton>
           </Tooltip>
-          
+
           {whatsNewOpen && (
             <>
-              <button 
+              <button
                 className="fixed inset-0 z-[999] w-full h-full cursor-default"
                 onClick={closeDropdown}
                 onKeyDown={(e) => handleKeyPress(e, closeDropdown)}
                 aria-label="Close dropdown overlay"
               ></button>
-              
-              <div 
+
+              <div
                 ref={dropdownRef}
                 className="fixed mt-2 w-64 bg-white dark:bg-gray-800 rounded-md shadow-lg z-[1000]"
                 style={{
                   border: '1px solid #e2e8f0',
-                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                  boxShadow:
+                    '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
                   top: '4rem',
                   maxHeight: '80vh',
-                  overflowY: 'auto'
+                  overflowY: 'auto',
                 }}
                 aria-label="What's New dialog"
               >
                 <div className="p-4">
-                  <h3 className="font-bold mb-3 text-base text-center">What&apos;s New?</h3>
+                  <h3 className="font-bold mb-3 text-base text-center">
+                    What&apos;s New?
+                  </h3>
                   {loading ? (
                     <div className="flex justify-center py-4">
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-royal"></div>
@@ -326,10 +335,12 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
                   ) : features.length > 0 ? (
                     <div className="space-y-3">
                       {features.map((feature) => (
-                        <button 
-                          key={feature.id} 
+                        <button
+                          key={feature.id}
                           className="flex items-start group w-full text-left hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded-md transition-colors"
-                          onClick={(e) => navigateToRelease(feature, e as React.MouseEvent)}
+                          onClick={(e) =>
+                            navigateToRelease(feature, e as React.MouseEvent)
+                          }
                           title="Click to view release details"
                         >
                           <div className="w-4 flex-shrink-0 inline-block">
@@ -342,7 +353,9 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-600 dark:text-gray-400">No updates available</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      No updates available
+                    </p>
                   )}
                 </div>
               </div>
