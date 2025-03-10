@@ -37,34 +37,36 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
   const router = useRouter();
   const [openCopied, setOpenCopied] = useState(false);
   const [whatsNewOpen, setWhatsNewOpen] = useState(false);
-  const [features, setFeatures] = useState<Feature[]>([]);
+  const [latestFeature, setLatestFeature] = useState<Feature | null>(null);
   const [loading, setLoading] = useState(false);
   const [wasOpened, setWasOpened] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const iconRef = useRef<HTMLButtonElement>(null);
 
-  // Count unread features for notification badge
-  const unreadCount = features.filter((feature) => !feature.read).length;
+  // Check if the latest feature is unread
+  const hasUnreadFeature = latestFeature && !latestFeature.read;
 
-  // Load features from localStorage on initial render
+  // Load feature from localStorage
   useEffect(() => {
-    const savedFeatures = localStorage.getItem('utdTrendsFeatures');
-    if (savedFeatures) {
-      setFeatures(JSON.parse(savedFeatures));
+    const savedFeature = localStorage.getItem('utdTrendsLatestFeature');
+    if (savedFeature) {
+      setLatestFeature(JSON.parse(savedFeature));
     }
   }, []);
 
-  // Save features to localStorage whenever they change
+  // Save feature to localStorage whenever it changes
   useEffect(() => {
-    if (features.length > 0) {
-      localStorage.setItem('utdTrendsFeatures', JSON.stringify(features));
+    if (latestFeature) {
+      localStorage.setItem(
+        'utdTrendsLatestFeature',
+        JSON.stringify(latestFeature),
+      );
     }
-  }, [features]);
+  }, [latestFeature]);
 
-  // Fetch releases on component mount
+  // Fetch releases
   useEffect(() => {
     fetchReleases();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Position the dropdown centered under the icon
@@ -125,7 +127,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
     return features;
   };
 
-  // Function to fetch the recent releases
+  // Function to fetch only the most recent release
   const fetchReleases = async () => {
     if (loading) return;
 
@@ -133,7 +135,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
 
     try {
       const response = await fetch(
-        'https://api.github.com/repos/UTDNebula/utd-trends/releases?per_page=4',
+        'https://api.github.com/repos/UTDNebula/utd-trends/releases?per_page=1',
       );
 
       if (!response.ok) {
@@ -146,27 +148,37 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
         return;
       }
 
-      const allFeatures: Feature[] = [];
+      const release = releases[0]; // Get only the most recent release
 
-      releases.forEach((release: ReleaseData) => {
-        if (release && release.body) {
-          const extractedFeatures = extractFeaturesFromRelease(release.body);
+      if (release && release.body) {
+        const extractedFeatures = extractFeaturesFromRelease(release.body);
 
-          extractedFeatures.forEach((content) => {
-            const id = `${release.id}-${allFeatures.length}`;
-            allFeatures.push({
-              id,
-              content,
-              read: false,
-              releaseUrl: release.html_url,
-              releaseId: release.id.toString(),
-            });
-          });
+        if (extractedFeatures.length > 0) {
+          // Get only the first feature from the latest release
+          const featureContent = extractedFeatures[0];
+          const id = `${release.id}-0`;
+
+          const newFeature = {
+            id,
+            content: featureContent,
+            read: false,
+            releaseUrl: release.html_url,
+            releaseId: release.id.toString(),
+          };
+
+          // Check if we already have this feature stored
+          const savedFeature = localStorage.getItem('utdTrendsLatestFeature');
+          if (savedFeature) {
+            const parsedFeature = JSON.parse(savedFeature) as Feature;
+
+            // If it's the same feature, keep the read status
+            if (parsedFeature.id === id) {
+              newFeature.read = parsedFeature.read;
+            }
+          }
+
+          setLatestFeature(newFeature);
         }
-      });
-
-      if (allFeatures.length > 0) {
-        setFeatures(allFeatures);
       }
     } catch (error) {
       console.error('Error fetching release data:', error);
@@ -175,11 +187,11 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
     }
   };
 
-  // Close the dropdown and mark features as read
+  // Close the dropdown and mark feature as read
   const closeDropdown = () => {
     if (whatsNewOpen) {
-      if (wasOpened) {
-        markAllAsRead();
+      if (wasOpened && latestFeature) {
+        markFeatureAsRead();
         setWasOpened(false);
       }
       setWhatsNewOpen(false);
@@ -192,42 +204,30 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
 
     if (newState) {
       setWasOpened(true);
-    } else if (wasOpened) {
-      markAllAsRead();
+    } else if (wasOpened && latestFeature) {
+      markFeatureAsRead();
       setWasOpened(false);
     }
 
     setWhatsNewOpen(newState);
   };
 
-  // Mark a feature as read
-  const markFeatureAsRead = (featureId: string) => {
-    setFeatures((prevFeatures) =>
-      prevFeatures.map((feature) =>
-        feature.id === featureId ? { ...feature, read: true } : feature,
-      ),
-    );
-  };
-
-  // Mark all features as read
-  const markAllAsRead = () => {
-    setFeatures((prevFeatures) =>
-      prevFeatures.map((feature) => ({ ...feature, read: true })),
-    );
+  // Mark the feature as read
+  const markFeatureAsRead = () => {
+    if (latestFeature) {
+      setLatestFeature({
+        ...latestFeature,
+        read: true,
+      });
+    }
   };
 
   // Navigate to the release page
-  const navigateToRelease = (feature: Feature, e: React.MouseEvent) => {
+  const navigateToRelease = (e: React.MouseEvent) => {
     e.stopPropagation();
-    markFeatureAsRead(feature.id);
-    window.open(feature.releaseUrl, '_blank');
-  };
-
-  // Handle keyboard events for accessibility
-  const handleKeyPress = (e: React.KeyboardEvent, callback: () => void) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      callback();
+    if (latestFeature) {
+      markFeatureAsRead();
+      window.open(latestFeature.releaseUrl, '_blank');
     }
   };
 
@@ -294,10 +294,8 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
               aria-haspopup="true"
             >
               <Campaign className="text-4xl mr-1" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-royal text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {unreadCount}
-                </span>
+              {hasUnreadFeature && (
+                <span className="absolute -top-1 -right-1 bg-royal rounded-full h-3 w-3"></span>
               )}
             </IconButton>
           </Tooltip>
@@ -307,7 +305,6 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
               <button
                 className="fixed inset-0 z-[999] w-full h-full cursor-default"
                 onClick={closeDropdown}
-                onKeyDown={(e) => handleKeyPress(e, closeDropdown)}
                 aria-label="Close dropdown overlay"
               ></button>
 
@@ -332,25 +329,20 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
                     <div className="flex justify-center py-4">
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-royal"></div>
                     </div>
-                  ) : features.length > 0 ? (
+                  ) : latestFeature ? (
                     <div className="space-y-3">
-                      {features.map((feature) => (
-                        <button
-                          key={feature.id}
-                          className="flex items-start group w-full text-left hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded-md transition-colors"
-                          onClick={(e) =>
-                            navigateToRelease(feature, e as React.MouseEvent)
-                          }
-                          title="Click to view release details"
-                        >
-                          <div className="w-4 flex-shrink-0 inline-block">
-                            {!feature.read && (
-                              <div className="mt-1 h-3 w-3 rounded-full bg-royal"></div>
-                            )}
-                          </div>
-                          <span className="text-sm">{feature.content}</span>
-                        </button>
-                      ))}
+                      <button
+                        className="flex items-start group w-full text-left hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded-md transition-colors"
+                        onClick={navigateToRelease}
+                        title="Click to view release details"
+                      >
+                        <div className="w-4 flex-shrink-0 inline-block">
+                          {!latestFeature.read && (
+                            <div className="mt-1 h-3 w-3 rounded-full bg-royal"></div>
+                          )}
+                        </div>
+                        <span className="text-sm">{latestFeature.content}</span>
+                      </button>
                     </div>
                   ) : (
                     <p className="text-sm text-gray-600 dark:text-gray-400">
