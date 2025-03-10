@@ -1,7 +1,7 @@
 import type { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
 import { Collapse, useMediaQuery } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { TabNavMenu } from '@/components/navigation/TabNavMenu/TabNavMenu';
 
@@ -46,6 +46,7 @@ const Carousel = ({ names, children, compareLength }: CarouselProps) => {
   const [currentCard, setCurrentCard] = useState(0);
   // The Direction that the card is moving in
   const [direction, setDirection] = useState(0);
+  const lastCompareLength = useRef(compareLength);
 
   /**
    * On each re-render, ensure currentCard is within valid bounds
@@ -75,8 +76,11 @@ const Carousel = ({ names, children, compareLength }: CarouselProps) => {
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(!isSmallScreen), [isSmallScreen]);
   useEffect(() => {
-    setDirection(1);
-    setCurrentCard(Array.isArray(children) ? children.length - 1 : 0);
+    if (lastCompareLength.current <= compareLength) {
+      setDirection(1);
+      setCurrentCard(Array.isArray(children) ? children.length - 1 : 0);
+      lastCompareLength.current = compareLength;
+    }
   }, [compareLength]);
 
   return (
