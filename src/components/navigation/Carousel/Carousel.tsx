@@ -74,6 +74,10 @@ const Carousel = ({ names, children, compareLength }: CarouselProps) => {
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(!isSmallScreen), [isSmallScreen]);
+  useEffect(() => {
+    console.log('heya');
+    setCurrentCard(Array.isArray(children) ? children.length - 1 : 0);
+  }, [compareLength]);
 
   return (
     <>
