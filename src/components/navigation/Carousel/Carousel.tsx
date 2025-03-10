@@ -75,7 +75,7 @@ const Carousel = ({ names, children, compareLength }: CarouselProps) => {
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(!isSmallScreen), [isSmallScreen]);
   useEffect(() => {
-    console.log('heya');
+    setDirection(1);
     setCurrentCard(Array.isArray(children) ? children.length - 1 : 0);
   }, [compareLength]);
 
