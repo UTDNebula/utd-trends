@@ -79,8 +79,8 @@ const Carousel = ({ names, children, compareLength }: CarouselProps) => {
     if (lastCompareLength.current <= compareLength) {
       setDirection(1);
       setCurrentCard(Array.isArray(children) ? children.length - 1 : 0);
-      lastCompareLength.current = compareLength;
     }
+    lastCompareLength.current = compareLength;
   }, [compareLength]);
 
   return (
