@@ -24,24 +24,28 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
         }
 
         /**  TODO: what if no start/endtime **/
-        const s_h = Number(meeting.start_time.split(':')[0]) + (meeting.start_time.includes('pm') ? 12 : 0)
-        const s_m = Number(meeting.start_time.split(':')[1].slice(0,2))
-        let e_h = Number(meeting.end_time.split(':')[0]) + (meeting.end_time.includes('pm') ? 12 : 0)
-        const e_m = Number(meeting.end_time.split(':')[1].slice(0,2))
+        const s_h =
+          Number(meeting.start_time.split(':')[0]) +
+          (meeting.start_time.includes('pm') ? 12 : 0);
+        const s_m = Number(meeting.start_time.split(':')[1].slice(0, 2));
+        let e_h =
+          Number(meeting.end_time.split(':')[0]) +
+          (meeting.end_time.includes('pm') ? 12 : 0);
+        const e_m = Number(meeting.end_time.split(':')[1].slice(0, 2));
 
         let d_h = 0;
         let d_m = 0;
-        if (e_m < s_m) { // lmao i'm doing elementary carry subtraction
+        if (e_m < s_m) {
+          // lmao i'm doing elementary carry subtraction
           e_h--;
-          d_m = (e_m + 60) - s_m
-        }
-        else
-          d_m = e_m - s_m;
+          d_m = e_m + 60 - s_m;
+        } else d_m = e_m - s_m;
         d_h = e_h - s_h;
-          
-        const lengthPercentHour = (d_h*60 + d_m) * 125/90;
 
-        const offset = Number(splitStartTime[1].slice(0, splitStartTime[1].length - 2)) / 60;
+        const lengthPercentHour = ((d_h * 60 + d_m) * 125) / 90;
+
+        const offset =
+          Number(splitStartTime[1].slice(0, splitStartTime[1].length - 2)) / 60;
         const offsetTotalPercent = offset * 100;
         tempMeetings.push([
           col.toString(),

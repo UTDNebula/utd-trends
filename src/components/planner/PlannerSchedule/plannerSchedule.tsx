@@ -67,7 +67,7 @@ type PlannerScheduleProps = {
 const PlannerSchedule = (props: PlannerScheduleProps) => {
   //const PlannerCoursesTable = () => {
 
-  console.log(props.selectedSections)
+  console.log(props.selectedSections);
 
   return (
     <div
