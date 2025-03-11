@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Section from './Section';
+import Section from './PlannerSection';
 
 export type SectionData = {
   _id: string;
@@ -66,6 +66,8 @@ type PlannerScheduleProps = {
 
 const PlannerSchedule = (props: PlannerScheduleProps) => {
   //const PlannerCoursesTable = () => {
+
+  console.log(props.selectedSections);
 
   return (
     <div
