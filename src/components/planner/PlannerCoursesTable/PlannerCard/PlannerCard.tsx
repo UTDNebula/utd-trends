@@ -1,6 +1,6 @@
+import BarChartIcon from '@mui/icons-material/BarChart';
 import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
-import GradeIcon from '@mui/icons-material/Grade';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Box,
@@ -21,10 +21,15 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
+import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
+import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
+import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   type SearchQuery,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import { type SectionsData } from '@/pages/api/sections';
 
 export function LoadingRow() {
@@ -138,12 +143,26 @@ function SectionTableRows(props: SectionTableRowProps) {
 type PlannerCardProps = {
   query: SearchQuery;
   sections: SectionsData;
+  grades: GenericFetchedData<GradesType>;
+  rmp: GenericFetchedData<RMPInterface>;
   removeFromPlanner: () => void;
 };
 
 const PlannerCard = (props: PlannerCardProps) => {
-  const [open, setOpen] = useState(false);
-  const canOpen = props.sections.length !== 0;
+  const [open, setOpen] = useState<'false' | 'sections' | 'grades'>('false');
+  const canOpenSections = props.sections.length !== 0;
+  const canOpenGrades =
+    !(typeof props.grades === 'undefined' || props.grades.state === 'error') ||
+    !(typeof props.rmp === 'undefined' || props.rmp.state === 'error');
+  function handleOpen(from: 'sections' | 'grades') {
+    if (open !== 'sections' && from === 'sections' && canOpenSections) {
+      setOpen('sections');
+    } else if (open !== 'grades' && from === 'grades' && canOpenGrades) {
+      setOpen('grades');
+    } else {
+      setOpen('false');
+    }
+  }
 
   return (
     <Box
@@ -151,16 +170,15 @@ const PlannerCard = (props: PlannerCardProps) => {
       className="border border-royal dark:border-cornflower-300 rounded-lg"
     >
       <div
-        onClick={() => {
-          if (canOpen) setOpen(!open);
-        }} // opens/closes the card by clicking anywhere on the row
+        onClick={() => handleOpen('sections')} // opens/closes the card by clicking anywhere on the row
         className={
-          'p-4 flex items-center gap-4' + (canOpen ? ' cursor-pointer' : '')
+          'p-4 flex items-center gap-4' +
+          (canOpenSections ? ' cursor-pointer' : '')
         }
       >
         <div className="flex items-center">
           <Tooltip
-            title={open ? 'Minimize Result' : 'Expand Result'}
+            title={open === 'secions' ? 'Minimize Result' : 'Expand Result'}
             placement="top"
           >
             <IconButton
@@ -168,10 +186,13 @@ const PlannerCard = (props: PlannerCardProps) => {
               size="medium"
               onClick={(e) => {
                 e.stopPropagation(); // prevents double opening/closing
-                setOpen(!open);
+                handleOpen('sections');
               }}
-              disabled={!canOpen}
-              className={'transition-transform' + (open ? ' rotate-90' : '')}
+              disabled={!canOpenSections}
+              className={
+                'transition-transform' +
+                (open === 'sections' ? ' rotate-90' : '')
+              }
             >
               <KeyboardArrowIcon fontSize="inherit" />
             </IconButton>
@@ -187,16 +208,19 @@ const PlannerCard = (props: PlannerCardProps) => {
               checkedIcon={<BookIcon />}
             />
           </Tooltip>
-          <Tooltip title={'Remove from Planner'} placement="top">
+          <Tooltip
+            title={open === 'grades' ? 'Minimize Grades' : 'Expand Grades'}
+            placement="top"
+          >
             <IconButton
               size="medium"
               onClick={(e) => {
                 e.stopPropagation(); // prevents double opening/closing
-                setOpen(!open);
+                handleOpen('grades');
               }}
-              disabled={!canOpen}
+              disabled={!canOpenGrades}
             >
-              <GradeIcon />
+              <BarChartIcon />
             </IconButton>
           </Tooltip>
         </div>
@@ -204,8 +228,8 @@ const PlannerCard = (props: PlannerCardProps) => {
           {searchQueryLabel(props.query)}
         </Typography>
       </div>
-      {props.sections.length !== 0 && (
-        <Collapse in={open}>
+      {canOpenSections && (
+        <Collapse in={open === 'sections'} timeout="auto" unmountOnExit>
           <TableContainer className="rounded-t-none">
             <Table>
               <TableHead>
@@ -222,6 +246,18 @@ const PlannerCard = (props: PlannerCardProps) => {
               </TableBody>
             </Table>
           </TableContainer>
+        </Collapse>
+      )}
+      {canOpenGrades && (
+        <Collapse in={open === 'grades'} timeout="auto" unmountOnExit>
+          <div className="p-2 md:p-4 flex flex-col gap-2">
+            <SingleGradesInfo
+              course={props.query}
+              grades={props.grades}
+              gradesToUse="unfiltered"
+            />
+            <SingleProfInfo rmp={props.rmp} />
+          </div>
         </Collapse>
       )}
     </Box>

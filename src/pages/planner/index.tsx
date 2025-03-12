@@ -140,6 +140,8 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
         addToPlanner={props.addToPlanner}
         removeFromPlanner={props.removeFromPlanner}
         sections={props.sections}
+        grades={props.grades}
+        rmp={props.rmp}
       />
     );
 

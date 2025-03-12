@@ -5,11 +5,14 @@ import PlannerCard, {
   LoadingRow,
 } from '@/components/planner/PlannerCoursesTable/PlannerCard/PlannerCard';
 import { type GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
+  convertToProfOnly,
   type SearchQuery,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
 import { type SectionsType } from '@/modules/SectionsType/SectionsType';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
 type PlannerCoursesTableProps = {
   courses?: SearchQuery[];
@@ -18,6 +21,8 @@ type PlannerCoursesTableProps = {
   sections: {
     [key: string]: GenericFetchedData<SectionsType>;
   };
+  grades: { [key: string]: GenericFetchedData<GradesType> };
+  rmp: { [key: string]: GenericFetchedData<RMPInterface> };
 };
 
 const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
@@ -44,6 +49,8 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                     key={index}
                     query={course}
                     sections={sectionData.data.latest}
+                    grades={props.grades[searchQueryLabel(course)]}
+                    rmp={props.rmp[searchQueryLabel(convertToProfOnly(course))]}
                     removeFromPlanner={() => {
                       props.removeFromPlanner(course);
                     }}
