@@ -45,6 +45,9 @@ export function LoadingRow() {
             <KeyboardArrowIcon />
           </IconButton>
           <Checkbox checked={true} checkedIcon={<BookIcon />} disabled />
+          <IconButton size="medium" disabled>
+            <BarChartIcon />
+          </IconButton>
         </div>
         <Typography className="w-1/2 leading-tight text-lg">
           <Skeleton />
@@ -134,7 +137,7 @@ function SectionTableRows(props: SectionTableRowProps) {
           .map(parseMeeting)
           .map(([schedule, location, link]) => (
             <>
-              {schedule !== '-' && (
+              {schedule !== ' -' && (
                 <Typography className="text-sm">{schedule}</Typography>
               )}
               {location !== ' ' && (
