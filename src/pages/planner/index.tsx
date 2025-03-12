@@ -123,9 +123,9 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
 
   const panelLRef = useRef<ImperativePanelHandle>(null);
   const panelRRef = useRef<ImperativePanelHandle>(null);
-  // Resets RHS & LHS to 50/50 when double clicking handle
+  // Resets RHS & LHS to 30/70 when double clicking handle
   const handleResizeDoubleClick = () => {
-    panelLRef.current?.resize(50);
+    panelLRef.current?.resize(30);
   };
 
   //Main content: loading, error, or normal
