@@ -19,6 +19,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import Link from 'next/link';
 import React, { useState } from 'react';
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
@@ -104,7 +105,7 @@ function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
   const schedule = `${days} ${time}`;
   const location = `${meeting.location.building} ${meeting.location.room}`;
 
-  return [schedule, location];
+  return [schedule, location, meeting.location.map_uri];
 }
 
 type SectionTableRowProps = {
@@ -129,12 +130,30 @@ function SectionTableRows(props: SectionTableRowProps) {
         <Typography>{props.data.internal_class_number}</Typography>
       </TableCell>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-        {props.data.meetings.map(parseMeeting).map(([schedule, location]) => (
-          <>
-            <Typography className="text-sm">{schedule}</Typography>
-            <Typography className="text-sm">{location}</Typography>
-          </>
-        ))}
+        {props.data.meetings
+          .map(parseMeeting)
+          .map(([schedule, location, link]) => (
+            <>
+              {schedule !== '-' && (
+                <Typography className="text-sm">{schedule}</Typography>
+              )}
+              {location !== ' ' && (
+                <Typography className="text-sm">
+                  {link === '' ? (
+                    location
+                  ) : (
+                    <Link
+                      href={link}
+                      target="_blank"
+                      className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                    >
+                      {location}
+                    </Link>
+                  )}
+                </Typography>
+              )}
+            </>
+          ))}
       </TableCell>
     </TableRow>
   );
