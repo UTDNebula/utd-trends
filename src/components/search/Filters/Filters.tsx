@@ -156,7 +156,6 @@ const Filters = ({
       return 0;
     } else return x;
   }
-  const [trigger, setTrigger] = useState(0);
 
   return (
     <div className="flex gap-2">
@@ -348,7 +347,7 @@ const Filters = ({
         <FormControl
           size="small"
           className={`w-full ${
-            chosenSessions.length !== academicSessions.length
+            chosenSessions.length !== courseType.length
               ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
               : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
           }`}
@@ -360,11 +359,9 @@ const Filters = ({
             multiple
             value={chosenCourseType}
             onChange={(event: SelectChangeEvent<string[]>) => {
-              setTrigger(trigger + 1);
               const {
                 target: { value },
               } = event;
-              //console.log('Selected values:', value);
               if (value.includes('select-all')) {
                 if (chosenCourseType.length === courseType.length) {
                   addChosenCourseType(() => []);
@@ -374,10 +371,8 @@ const Filters = ({
               } else {
                 addChosenCourseType(() => value as string[]);
               }
-              //console.log('Chosen course types:', chosenCourseType);
             }}
             renderValue={(selected) => {
-              //console.log('Render value selected:', selected);
               if (chosenCourseType.length === courseType.length) {
                 return 'All selected';
               }

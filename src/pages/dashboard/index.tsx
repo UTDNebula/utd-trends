@@ -196,7 +196,11 @@ interface Props {
     controller: AbortController,
   ) => Promise<GradesType | null>;
   recalcGrades: (course: SearchQuery) => void;
-  recalcAllGrades: (results: SearchQuery[], academicSessions: string[]) => void;
+  recalcAllGrades: (
+    results: SearchQuery[],
+    academicSessions: string[],
+    courseType: string[],
+  ) => void;
   rmp: {
     [key: string]: GenericFetchedData<RMPInterface>;
   };
@@ -235,6 +239,8 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         if (compareGrade.state === 'done') {
           addAcademicSessions(
             compareGrade.data.grades.map((session) => session._id),
+          );
+          addCourseTypes(
             compareGrade.data.grades.flatMap((session) =>
               session.data.map((entry) => entry.type),
             ),
@@ -308,6 +314,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         props.recalcAllGrades(
           [...(results.state === 'done' ? results.data : [])],
           newVal,
+          chosenCourseType,
         );
       }
       recalcAllCompareGrades(compare, newVal);
@@ -322,16 +329,36 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
       if (results.state === 'done') {
         props.recalcAllGrades(
           [...(results.state === 'done' ? results.data : [])],
+          chosenSessions,
           newVal,
         );
       }
       recalcAllCompareGrades(compare, newVal);
+
       return newVal;
     });
   }
 
+  // same as addacademicSessions, adds course types to a list, removind duplicates
+  function addCourseTypes(courseTypes: string[]) {
+    setCourseType((oldCourseTypes) => {
+      // combine old and new course Types
+      oldCourseTypes = oldCourseTypes.concat(courseTypes);
+      // remove duplicates
+      oldCourseTypes = Array.from(new Set(oldCourseTypes));
+
+      return oldCourseTypes;
+    });
+
+    addChosenCourseType((oldCourseTypes) => {
+      oldCourseTypes = oldCourseTypes.concat(courseTypes);
+
+      oldCourseTypes = Array.from(new Set(oldCourseTypes));
+      return oldCourseTypes;
+    });
+  }
   //Add a set of sessions to the compiled list, removing duplicates and keeping a sorted order
-  function addAcademicSessions(sessions: string[], courseTypes: string[]) {
+  function addAcademicSessions(sessions: string[]) {
     setAcademicSessions((oldSessions) => {
       oldSessions = oldSessions.concat(sessions);
       //Remove duplicates
@@ -372,22 +399,6 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
       //No need to sort as this does not display to the user
       return oldSessions;
     });
-
-    setCourseType((oldCourseTypes) => {
-      // combine old and new course Types
-      oldCourseTypes = oldCourseTypes.concat(courseTypes);
-      // remove duplicates
-      oldCourseTypes = Array.from(new Set(oldCourseTypes));
-
-      return oldCourseTypes;
-    });
-
-    addChosenCourseType((oldCourseTypes) => {
-      oldCourseTypes = oldCourseTypes.concat(courseTypes);
-
-      oldCourseTypes = Array.from(new Set(oldCourseTypes));
-      return oldCourseTypes;
-    });
   }
 
   //On change to results, load new data
@@ -403,8 +414,8 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
           .then((res: GradesType | null | undefined) => {
             //Add any more academic sessions and courseTypes to list
             if (res) {
-              addAcademicSessions(
-                res.grades.map((session) => session._id),
+              addAcademicSessions(res.grades.map((session) => session._id));
+              addCourseTypes(
                 res.grades.flatMap((session) =>
                   session.data.map((entry) => entry.type),
                 ),
@@ -415,8 +426,8 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         //Recalc gpa and such from past stored data for new page
         props.recalcGrades(result);
         //Readd academic sessions and course Types
-        addAcademicSessions(
-          entry.data.grades.map((session) => session._id),
+        addAcademicSessions(entry.data.grades.map((session) => session._id));
+        addCourseTypes(
           entry.data.grades.flatMap((session) =>
             session.data.map((entries) => entries.type),
           ),

@@ -36,7 +36,7 @@ export function calculateGrades(
       }
     }
   }
-  //console.log("data: ",JSON.stringify(grade_distribution, null,2))
+  //console.log("sectionType: ",academicSessions)
   const total: number = grade_distribution.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0,
@@ -172,7 +172,11 @@ export default function useGradeStore(): [
     });
   }
 
-  function recalcAllGrades(results: SearchQuery[], academicSessions: string[]) {
+  function recalcAllGrades(
+    results: SearchQuery[],
+    academicSessions: string[],
+    courseType?: string[],
+  ) {
     setGrades((oldGrades) => {
       const grades = { ...oldGrades };
       //Relavent keys
@@ -182,6 +186,7 @@ export default function useGradeStore(): [
           entry.data.filtered = calculateGrades(
             entry.data.grades,
             academicSessions,
+            courseType,
           );
         }
       }
