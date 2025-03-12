@@ -234,7 +234,10 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
       Object.values(compareGrades).forEach((compareGrade) => {
         if (compareGrade.state === 'done') {
           addAcademicSessions(
-            compareGrade.data.grades.map((session) => session._id), compareGrade.data.grades.flatMap((session) => session.data.map((entry) => entry.type))
+            compareGrade.data.grades.map((session) => session._id),
+            compareGrade.data.grades.flatMap((session) =>
+              session.data.map((entry) => entry.type),
+            ),
           );
         }
       });
@@ -313,18 +316,18 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
   }
   //A wrapper on the setter function for chosenCourse Type that also recalculates GPA and such data for saved grade data based on the new set of chosen courses types
 
-  function addChosenCourseType(func: (arg0: string[]) => string[]){
+  function addChosenCourseType(func: (arg0: string[]) => string[]) {
     setChosenCourseType((old) => {
       const newVal = func(old);
-      if(results.state === 'done'){
+      if (results.state === 'done') {
         props.recalcAllGrades(
           [...(results.state === 'done' ? results.data : [])],
           newVal,
-        )
+        );
       }
       recalcAllCompareGrades(compare, newVal);
       return newVal;
-    })
+    });
   }
 
   //Add a set of sessions to the compiled list, removing duplicates and keeping a sorted order
@@ -358,7 +361,6 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
       //console.log("oldsessions : ", oldSessions)
       return oldSessions;
     });
-    
 
     //Have new sessions be automatically checked
     addChosenSessions((oldSessions) => {
@@ -373,22 +375,19 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
 
     setCourseType((oldCourseTypes) => {
       // combine old and new course Types
-      oldCourseTypes = oldCourseTypes.concat(courseTypes)
+      oldCourseTypes = oldCourseTypes.concat(courseTypes);
       // remove duplicates
       oldCourseTypes = Array.from(new Set(oldCourseTypes));
 
-      return oldCourseTypes
-    })
-    
+      return oldCourseTypes;
+    });
+
     addChosenCourseType((oldCourseTypes) => {
-      oldCourseTypes = oldCourseTypes.concat(courseTypes)
+      oldCourseTypes = oldCourseTypes.concat(courseTypes);
 
       oldCourseTypes = Array.from(new Set(oldCourseTypes));
       return oldCourseTypes;
-    })
-
-
-
+    });
   }
 
   //On change to results, load new data

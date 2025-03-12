@@ -17,7 +17,6 @@ import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
 
-
 interface FiltersProps {
   manageQuery?: boolean;
   academicSessions: string[];
@@ -25,7 +24,7 @@ interface FiltersProps {
   addChosenSessions: (arg0: (arg0: string[]) => string[]) => void;
   courseType: string[];
   addChosenCourseType: (arg0: (arg0: string[]) => string[]) => void;
-  chosenCourseType: string[]
+  chosenCourseType: string[];
 }
 
 /**
@@ -38,7 +37,7 @@ const Filters = ({
   addChosenSessions,
   courseType,
   addChosenCourseType,
-  chosenCourseType
+  chosenCourseType,
 }: FiltersProps) => {
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
@@ -137,14 +136,12 @@ const Filters = ({
       '5xx': 'Night lecture (past 5 PM)',
       '6xx': 'Lab night section (past 7 PM)',
       '7xx': 'Exam section',
-      'HNx': 'Honors-only',
-      'HON': 'Honors-only',
+      HNx: 'Honors-only',
+      HON: 'Honors-only',
     };
-  
-  
+
     return courseTypeMap[id] || id; // Default to ID if no mapping exists
   }
-  
 
   function compareSemesters(a: string, b: string) {
     const x = a.substring(0, 2).localeCompare(b.substring(0, 2));
@@ -162,7 +159,6 @@ const Filters = ({
   const [trigger, setTrigger] = useState(0);
 
   return (
-    
     <div className="flex gap-2">
       {/* min letter grade dropdown*/}
       <Tooltip title={'Select Minimum Letter Grade Average'} placement="top">
@@ -265,7 +261,7 @@ const Filters = ({
               const {
                 target: { value },
               } = event;
-              console.log("semester value: " , value)
+              console.log('semester value: ', value);
               if (value.includes('select-all')) {
                 if (chosenSessions.length === academicSessions.length) {
                   addChosenSessions(() => []);
@@ -339,7 +335,6 @@ const Filters = ({
                 key={session}
                 value={session}
               >
-                
                 <Checkbox checked={chosenSessions.includes(session)} />
                 <ListItemText primary={displayAcademicSessionName(session)} />
               </MenuItem>
@@ -349,10 +344,7 @@ const Filters = ({
       </Tooltip>
       {/* Course Type dropdown */}
 
-      <Tooltip
-        title={'Select Course Type to choose from'}
-        placement="top"
-      >
+      <Tooltip title={'Select Course Type to choose from'} placement="top">
         <FormControl
           size="small"
           className={`w-full ${
@@ -383,7 +375,6 @@ const Filters = ({
                 addChosenCourseType(() => value as string[]);
               }
               //console.log('Chosen course types:', chosenCourseType);
-
             }}
             renderValue={(selected) => {
               //console.log('Render value selected:', selected);
@@ -402,9 +393,9 @@ const Filters = ({
                   chosenCourseType.length === courseType.length
                 }
                 indeterminate={
-                  chosenCourseType.length !== courseType.length && chosenCourseType.length !== 0
+                  chosenCourseType.length !== courseType.length &&
+                  chosenCourseType.length !== 0
                 }
-                
                 disabled={courseType.length == 0}
               />
               <ListItemText
@@ -414,11 +405,7 @@ const Filters = ({
             </MenuItem>
             {/* individual options */}
             {courseType.map((type) => (
-              <MenuItem
-                className="h-10 items-center"
-                key={type}
-                value={type}
-              >
+              <MenuItem className="h-10 items-center" key={type} value={type}>
                 <Checkbox checked={chosenCourseType.includes(type)} />
                 <ListItemText primary={displayCourseTypeName(type)} />
               </MenuItem>
