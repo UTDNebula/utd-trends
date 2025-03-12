@@ -37,8 +37,12 @@ function getSemesterGPAs(
   allSemesters: string[],
 ) {
   const semesters = data.data
-    //remove summer
-    .filter((semester) => !semester._id.includes('U'))
+    //remove summer and attach _id since we need the grade_distritubtion which us inside data in Gradesdata
+    .flatMap((item) =>
+      item.data.map((semester) => ({ ...semester, _id: item._id })),
+    ) // Attach _id from item
+    .filter((semester) => !semester._id.includes('U')) // Now _id exists on semester
+
     .toSorted((a, b) => sortSemesters(a._id, b._id))
     //get gpa and place in allSemesters
     .map((semester) => {
