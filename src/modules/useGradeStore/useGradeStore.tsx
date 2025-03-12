@@ -91,6 +91,9 @@ function fetchGradesData(
     if (response.message !== 'success') {
       throw new Error(response.message);
     }
+    if (response.data == null) {
+      throw new Error('null data');
+    }
 
     const calculated = calculateGrades(response.data.grade_data);
     return {
