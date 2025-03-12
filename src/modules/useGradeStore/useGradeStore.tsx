@@ -36,7 +36,6 @@ export function calculateGrades(
       }
     }
   }
-  //console.log("sectionType: ",academicSessions)
   const total: number = grade_distribution.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0,

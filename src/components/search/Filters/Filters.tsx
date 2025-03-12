@@ -260,7 +260,6 @@ const Filters = ({
               const {
                 target: { value },
               } = event;
-              console.log('semester value: ', value);
               if (value.includes('select-all')) {
                 if (chosenSessions.length === academicSessions.length) {
                   addChosenSessions(() => []);
