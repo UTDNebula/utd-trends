@@ -321,7 +321,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
       return newVal;
     });
   }
-  
+
   //A wrapper on the setter function for chosenCourse Type that also recalculates GPA and such data for saved grade data based on the new set of chosen courses types
   function addChosenCourseType(func: (arg0: string[]) => string[]) {
     setChosenCourseType((old) => {
