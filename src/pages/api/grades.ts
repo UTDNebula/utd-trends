@@ -3,7 +3,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 export type GradesData = {
   _id: string;
-  grade_distribution: number[];
+  data: {
+    type: string;
+    grade_distribution: number[];
+  }[];
 }[];
 
 type Data = {
@@ -39,7 +42,7 @@ export default function handler(
     'x-api-key': API_KEY,
     Accept: 'application/json',
   };
-  const url = new URL('https://api.utdnebula.com/grades/semester');
+  const url = new URL('https://api.utdnebula.com/grades/semester/sectionType');
   if (typeof prefix === 'string') {
     url.searchParams.append('prefix', prefix);
   }
@@ -60,13 +63,12 @@ export default function handler(
     })
       .then((response) => response.json())
       .then((data) => {
-        //console.log('data', data, data.message);
         if (data.message !== 'success') {
           throw new Error(data.message);
         }
         res.status(200).json({
           message: 'success',
-          data: data.data,
+          data: data,
         });
         resolve();
       })

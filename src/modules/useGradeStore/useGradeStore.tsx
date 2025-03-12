@@ -16,6 +16,7 @@ import type { GradesData } from '@/pages/api/grades';
 export function calculateGrades(
   grades: GradesData,
   academicSessions?: string[],
+  sectionType?: string[],
 ) {
   let grade_distribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   for (const session of grades) {
@@ -23,12 +24,19 @@ export function calculateGrades(
       typeof academicSessions === 'undefined' ||
       academicSessions.includes(session._id)
     ) {
-      grade_distribution = grade_distribution.map(
-        (item, i) => item + session.grade_distribution[i],
-      );
+      for (const entry of session.data) {
+        if (
+          typeof sectionType === 'undefined' ||
+          sectionType.includes(entry.type)
+        ) {
+          grade_distribution = grade_distribution.map(
+            (item, i) => item + entry.grade_distribution[i],
+          );
+        }
+      }
     }
   }
-
+  //console.log("data: ",JSON.stringify(grade_distribution, null,2))
   const total: number = grade_distribution.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0,
@@ -83,14 +91,12 @@ function fetchGradesData(
     if (response.message !== 'success') {
       throw new Error(response.message);
     }
-    if (response.data == null) {
-      throw new Error('null data');
-    }
-    const calculated = calculateGrades(response.data);
+
+    const calculated = calculateGrades(response.data.grade_data);
     return {
       filtered: calculated,
       unfiltered: calculated,
-      grades: response.data, //type GradesData
+      grades: response.data.grade_data, //type GradesData
     };
   });
 }

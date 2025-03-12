@@ -234,7 +234,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
       Object.values(compareGrades).forEach((compareGrade) => {
         if (compareGrade.state === 'done') {
           addAcademicSessions(
-            compareGrade.data.grades.map((session) => session._id),
+            compareGrade.data.grades.map((session) => session._id), compareGrade.data.grades.flatMap((session) => session.data.map((entry) => entry.type))
           );
         }
       });
@@ -291,6 +291,12 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
   //Selected sessions to perform calculations with, starts as all of them
   const [chosenSessions, setChosenSessions] = useState<string[]>([]);
 
+  // list of all course types for each semester?
+  const [courseType, setCourseType] = useState<string[]>([]);
+
+  // selected courseType
+  const [chosenCourseType, setChosenCourseType] = useState<string[]>([]);
+
   //A wrapper on the setter function for chosenSessions that also recalculates GPA and such data for saved grade data based on the new set of chosen sessions
   function addChosenSessions(func: (arg0: string[]) => string[]) {
     setChosenSessions((old) => {
@@ -305,9 +311,24 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
       return newVal;
     });
   }
+  //A wrapper on the setter function for chosenCourse Type that also recalculates GPA and such data for saved grade data based on the new set of chosen courses types
+
+  function addChosenCourseType(func: (arg0: string[]) => string[]){
+    setChosenCourseType((old) => {
+      const newVal = func(old);
+      if(results.state === 'done'){
+        props.recalcAllGrades(
+          [...(results.state === 'done' ? results.data : [])],
+          newVal,
+        )
+      }
+      recalcAllCompareGrades(compare, newVal);
+      return newVal;
+    })
+  }
 
   //Add a set of sessions to the compiled list, removing duplicates and keeping a sorted order
-  function addAcademicSessions(sessions: string[]) {
+  function addAcademicSessions(sessions: string[], courseTypes: string[]) {
     setAcademicSessions((oldSessions) => {
       oldSessions = oldSessions.concat(sessions);
       //Remove duplicates
@@ -334,8 +355,11 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         }
         return aNum - bNum;
       });
+      //console.log("oldsessions : ", oldSessions)
       return oldSessions;
     });
+    
+
     //Have new sessions be automatically checked
     addChosenSessions((oldSessions) => {
       oldSessions = oldSessions.concat(sessions);
@@ -346,6 +370,25 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
       //No need to sort as this does not display to the user
       return oldSessions;
     });
+
+    setCourseType((oldCourseTypes) => {
+      // combine old and new course Types
+      oldCourseTypes = oldCourseTypes.concat(courseTypes)
+      // remove duplicates
+      oldCourseTypes = Array.from(new Set(oldCourseTypes));
+
+      return oldCourseTypes
+    })
+    
+    addChosenCourseType((oldCourseTypes) => {
+      oldCourseTypes = oldCourseTypes.concat(courseTypes)
+
+      oldCourseTypes = Array.from(new Set(oldCourseTypes));
+      return oldCourseTypes;
+    })
+
+
+
   }
 
   //On change to results, load new data
@@ -359,16 +402,26 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         props
           .fetchAndStoreGradesData(result, controller)
           .then((res: GradesType | null | undefined) => {
-            //Add any more academic sessions to list
+            //Add any more academic sessions and courseTypes to list
             if (res) {
-              addAcademicSessions(res.grades.map((session) => session._id));
+              addAcademicSessions(
+                res.grades.map((session) => session._id),
+                res.grades.flatMap((session) =>
+                  session.data.map((entry) => entry.type),
+                ),
+              );
             }
           });
       } else if (entry.state === 'done') {
         //Recalc gpa and such from past stored data for new page
         props.recalcGrades(result);
-        //Readd academic sessions
-        addAcademicSessions(entry.data.grades.map((session) => session._id));
+        //Readd academic sessions and course Types
+        addAcademicSessions(
+          entry.data.grades.map((session) => session._id),
+          entry.data.grades.flatMap((session) =>
+            session.data.map((entries) => entries.type),
+          ),
+        );
       }
     }
 
@@ -610,6 +663,9 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
               academicSessions={academicSessions}
               chosenSessions={chosenSessions}
               addChosenSessions={addChosenSessions}
+              courseType={courseType}
+              chosenCourseType={chosenCourseType}
+              addChosenCourseType={addChosenCourseType}
             />
           </Grid>
           <Grid size={{ xs: false, sm: 6, md: 6 }}></Grid>
