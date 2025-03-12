@@ -154,8 +154,14 @@ const PlannerCard = (props: PlannerCardProps) => {
   const canOpenGrades =
     !(typeof props.grades === 'undefined' || props.grades.state === 'error') ||
     !(typeof props.rmp === 'undefined' || props.rmp.state === 'error');
-  function handleOpen(from: 'sections' | 'grades') {
-    if (open !== 'sections' && from === 'sections' && canOpenSections) {
+  function handleOpen(from: 'row' | 'sections' | 'grades') {
+    if (from === 'row' && open !== 'false') {
+      setOpen('false');
+    } else if (
+      open !== 'sections' &&
+      (from === 'sections' || from === 'row') &&
+      canOpenSections
+    ) {
       setOpen('sections');
     } else if (open !== 'grades' && from === 'grades' && canOpenGrades) {
       setOpen('grades');
@@ -170,7 +176,14 @@ const PlannerCard = (props: PlannerCardProps) => {
       className="border border-royal dark:border-cornflower-300 rounded-lg"
     >
       <div
-        onClick={() => handleOpen('sections')} // opens/closes the card by clicking anywhere on the row
+        role="button"
+        tabIndex={0}
+        onClick={() => handleOpen('row')} // opens/closes the card by clicking anywhere on the row
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            handleOpen('row');
+          }
+        }}
         className={
           'p-4 flex items-center gap-4' +
           (canOpenSections ? ' cursor-pointer' : '')
@@ -178,7 +191,7 @@ const PlannerCard = (props: PlannerCardProps) => {
       >
         <div className="flex items-center">
           <Tooltip
-            title={open === 'secions' ? 'Minimize Result' : 'Expand Result'}
+            title={open === 'sections' ? 'Minimize Result' : 'Expand Result'}
             placement="top"
           >
             <IconButton
