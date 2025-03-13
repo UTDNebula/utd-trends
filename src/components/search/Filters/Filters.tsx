@@ -139,6 +139,7 @@ const Filters = ({
       xUx: 'Summer class',
       HNx: 'Honors-only',
       HON: 'Honors-only',
+      xUx: 'Summer Class',
     };
 
     return courseTypesMap[id] || id; // Default to ID if no mapping exists
