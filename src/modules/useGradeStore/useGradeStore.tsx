@@ -16,7 +16,7 @@ import type { GradesData } from '@/pages/api/grades';
 export function calculateGrades(
   grades: GradesData,
   academicSessions?: string[],
-  sectionType?: string[],
+  sectionTypes?: string[],
 ) {
   let grade_distribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   for (const session of grades) {
@@ -26,8 +26,8 @@ export function calculateGrades(
     ) {
       for (const entry of session.data) {
         if (
-          typeof sectionType === 'undefined' ||
-          sectionType.includes(entry.type)
+          typeof sectionTypes === 'undefined' ||
+          sectionTypes.includes(entry.type)
         ) {
           grade_distribution = grade_distribution.map(
             (item, i) => item + entry.grade_distribution[i],
@@ -117,8 +117,16 @@ export default function useGradeStore(): [
     course: SearchQuery,
     controller: AbortController,
   ) => Promise<GradesType | null>,
-  (course: SearchQuery) => void,
-  (results: SearchQuery[], academicSessions: string[]) => void,
+  (
+    course: SearchQuery,
+    academicSessions?: string[],
+    courseTypes?: string[],
+  ) => void,
+  (
+    results: SearchQuery[],
+    academicSessions?: string[],
+    courseTypes?: string[],
+  ) => void,
 ] {
   const [grades, setGrades] = useState<Grades>({});
 
@@ -162,13 +170,21 @@ export default function useGradeStore(): [
       });
   }
 
-  function recalcGrades(course: SearchQuery) {
+  function recalcGrades(
+    course: SearchQuery,
+    academicSessions?: string[],
+    courseTypes?: string[],
+  ) {
     //Recalc gpa and such from past stored data for new page
     setGrades((oldGrades) => {
       const grades = { ...oldGrades };
       const entry = grades[searchQueryLabel(course)];
       if (entry && entry.state === 'done') {
-        entry.data.unfiltered = calculateGrades(entry.data.grades);
+        entry.data.filtered = calculateGrades(
+          entry.data.grades,
+          academicSessions,
+          courseTypes,
+        );
       }
       return grades;
     });
@@ -176,8 +192,8 @@ export default function useGradeStore(): [
 
   function recalcAllGrades(
     results: SearchQuery[],
-    academicSessions: string[],
-    courseType?: string[],
+    academicSessions?: string[],
+    courseTypes?: string[],
   ) {
     setGrades((oldGrades) => {
       const grades = { ...oldGrades };
@@ -188,7 +204,7 @@ export default function useGradeStore(): [
           entry.data.filtered = calculateGrades(
             entry.data.grades,
             academicSessions,
-            courseType,
+            courseTypes,
           );
         }
       }

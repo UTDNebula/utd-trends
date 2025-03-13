@@ -22,9 +22,9 @@ interface FiltersProps {
   academicSessions: string[];
   chosenSessions: string[];
   addChosenSessions: (arg0: (arg0: string[]) => string[]) => void;
-  courseType: string[];
-  addChosenCourseType: (arg0: (arg0: string[]) => string[]) => void;
-  chosenCourseType: string[];
+  courseTypes: string[];
+  chosenCourseTypes: string[];
+  addChosenCourseTypes: (arg0: (arg0: string[]) => string[]) => void;
 }
 
 /**
@@ -35,9 +35,9 @@ const Filters = ({
   academicSessions,
   chosenSessions,
   addChosenSessions,
-  courseType,
-  addChosenCourseType,
-  chosenCourseType,
+  courseTypes,
+  chosenCourseTypes,
+  addChosenCourseTypes,
 }: FiltersProps) => {
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
@@ -124,7 +124,7 @@ const Filters = ({
   }
 
   function displayCourseTypeName(id: string): string {
-    const courseTypeMap: Record<string, string> = {
+    const courseTypesMap: Record<string, string> = {
       '0xx': 'Normal day lecture',
       '0Wx': 'Online class',
       '0Hx': 'Hybrid day class (online + face-to-face)',
@@ -136,12 +136,12 @@ const Filters = ({
       '5xx': 'Night lecture (past 5 PM)',
       '6xx': 'Lab night section (past 7 PM)',
       '7xx': 'Exam section',
-      'xUx': 'Summer class',
+      xUx: 'Summer class',
       HNx: 'Honors-only',
       HON: 'Honors-only',
     };
 
-    return courseTypeMap[id] || id; // Default to ID if no mapping exists
+    return courseTypesMap[id] || id; // Default to ID if no mapping exists
   }
 
   function compareSemesters(a: string, b: string) {
@@ -341,39 +341,42 @@ const Filters = ({
           </Select>
         </FormControl>
       </Tooltip>
-      {/* Course Type dropdown */}
 
-      <Tooltip title={'Select Course Type to choose from'} placement="top">
+      {/* Course Type dropdown */}
+      <Tooltip
+        title={'Select Course Type to Include Grades from'}
+        placement="top"
+      >
         <FormControl
           size="small"
           className={`w-full ${
-            chosenCourseType.length !== courseType.length
+            chosenCourseTypes.length !== courseTypes.length
               ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
               : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
           }`}
         >
-          <InputLabel id="Semesters">CourseType</InputLabel>
+          <InputLabel id="Course Type">Course Type</InputLabel>
           <Select
-            label="Semesters"
-            labelId="Semesters"
+            label="Course Type"
+            labelId="Course Type"
             multiple
-            value={chosenCourseType}
+            value={chosenCourseTypes}
             onChange={(event: SelectChangeEvent<string[]>) => {
               const {
                 target: { value },
               } = event;
               if (value.includes('select-all')) {
-                if (chosenCourseType.length === courseType.length) {
-                  addChosenCourseType(() => []);
+                if (chosenCourseTypes.length === courseTypes.length) {
+                  addChosenCourseTypes(() => []);
                 } else {
-                  addChosenCourseType(() => courseType);
+                  addChosenCourseTypes(() => courseTypes);
                 }
               } else {
-                addChosenCourseType(() => value as string[]);
+                addChosenCourseTypes(() => value as string[]);
               }
             }}
             renderValue={(selected) => {
-              if (chosenCourseType.length === courseType.length) {
+              if (chosenCourseTypes.length === courseTypes.length) {
                 return 'All selected';
               }
               return selected.join(', ');
@@ -384,25 +387,29 @@ const Filters = ({
             <MenuItem className="h-10 items-center" value="select-all">
               <Checkbox
                 checked={
-                  courseType.length > 0 &&
-                  chosenCourseType.length === courseType.length
+                  courseTypes.length > 0 &&
+                  chosenCourseTypes.length === courseTypes.length
                 }
                 indeterminate={
-                  chosenCourseType.length !== courseType.length &&
-                  chosenCourseType.length !== 0
+                  chosenCourseTypes.length !== courseTypes.length &&
+                  chosenCourseTypes.length !== 0
                 }
-                disabled={courseType.length == 0}
+                disabled={courseTypes.length == 0}
               />
               <ListItemText
-                className={courseType.length > 0 ? '' : 'text-gray-400'}
+                className={courseTypes.length > 0 ? '' : 'text-gray-400'}
                 primary="Select All"
               />
             </MenuItem>
             {/* individual options */}
-            {courseType.map((type) => (
-              <MenuItem className="h-10 items-center" key={type} value={type}>
-                <Checkbox checked={chosenCourseType.includes(type)} />
-                <ListItemText primary={displayCourseTypeName(type)} />
+            {courseTypes.map((courseType) => (
+              <MenuItem
+                className="h-10 items-center"
+                key={courseType}
+                value={courseType}
+              >
+                <Checkbox checked={chosenCourseTypes.includes(courseType)} />
+                <ListItemText primary={displayCourseTypeName(courseType)} />
               </MenuItem>
             ))}
           </Select>
