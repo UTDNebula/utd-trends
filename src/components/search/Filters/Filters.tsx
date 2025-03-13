@@ -136,6 +136,7 @@ const Filters = ({
       '5xx': 'Night lecture (past 5 PM)',
       '6xx': 'Lab night section (past 7 PM)',
       '7xx': 'Exam section',
+      'xUx': 'Summer class',
       HNx: 'Honors-only',
       HON: 'Honors-only',
     };
