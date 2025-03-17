@@ -2,6 +2,7 @@ import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
 import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
+import { useTheme } from '@mui/material/styles';
 
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
@@ -33,6 +34,7 @@ type Props = {
  */
 function BarGraph(props: Props) {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
+  const theme = useTheme();
 
   const icon =
     '<div class="apexcharts-menu-icon">' +
@@ -72,6 +74,7 @@ function BarGraph(props: Props) {
         },
       },
       background: 'transparent',
+      foreColor: theme.palette.mode === 'dark' ? '#fff' : '#373d3f',
       animations: {
         enabled: !fullScreenOpen,
       },
@@ -124,12 +127,13 @@ function BarGraph(props: Props) {
       },
     },
     theme: {
-      mode: useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light',
+      mode: theme.palette.mode,
     },
     tooltip: {
       y: {
         formatter: props.tooltipFormatter ?? props.yaxisFormatter,
       },
+      theme: theme.palette.mode,
     },
     states: {
       active: {

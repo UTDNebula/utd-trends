@@ -144,6 +144,7 @@ const LineGraph = (props: Props): JSX.Element => {
         },
       },
       background: 'transparent',
+      foreColor: theme.palette.mode === 'dark' ? '#fff' : '#373d3f',
       animations: {
         enabled:
           !fullScreenOpen &&
@@ -192,7 +193,13 @@ const LineGraph = (props: Props): JSX.Element => {
       },
     },
     theme: {
-      mode: useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light',
+      mode: theme.palette.mode,
+    },
+    tooltip: {
+      theme: theme.palette.mode,
+    },
+    grid: {
+      borderColor: theme.palette.mode === 'dark' ? '#404040' : '#e0e0e0',
     },
     markers: {
       size: 4,
@@ -214,7 +221,9 @@ const LineGraph = (props: Props): JSX.Element => {
         className="flex justify-stretch align-stretch"
       >
         <Fade in={fullScreenOpen}>
-          <Card className="p-4 m-12 flex-auto">{graph}</Card>
+          <Card className="p-4 m-12 flex-auto dark:bg-gray-800">
+            {graph}
+          </Card>
         </Fade>
       </Modal>
     </>

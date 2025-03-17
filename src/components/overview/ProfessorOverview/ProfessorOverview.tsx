@@ -87,7 +87,7 @@ const ProfessorOverview = ({
   }, [professor]);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-4 text-gray-900 dark:text-gray-100">
       {profData.state === 'loading' ? (
         <Skeleton variant="circular" className="w-32 h-32 self-center" />
       ) : (
@@ -96,7 +96,7 @@ const ProfessorOverview = ({
           alt="Headshot"
           height={280}
           width={280}
-          className="w-32 h-32 rounded-full self-center"
+          className="w-32 h-32 rounded-full self-center dark:opacity-90"
           onLoadingComplete={(result) => {
             if (result.naturalWidth === 0) {
               // Broken image
@@ -167,8 +167,12 @@ const ProfessorOverview = ({
         course={professor}
         grades={grades}
         gradesToUse="unfiltered"
+        className="bg-white dark:bg-gray-800"
       />
-      <SingleProfInfo rmp={rmp} />
+      <SingleProfInfo 
+        rmp={rmp}
+        className="bg-white dark:bg-gray-800"
+      />
     </div>
   );
 };

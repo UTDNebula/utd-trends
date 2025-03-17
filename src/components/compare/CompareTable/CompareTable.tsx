@@ -505,9 +505,9 @@ const CompareTable = ({
       <TableContainer className="w-fit mb-4">
         <Table size="small" className="border-spacing-x-2 border-separate">
           <TableHead>
-            <TableRow>
+            <TableRow className="bg-gray-50 dark:bg-gray-900">
               <TableCell
-                className="font-bold px-0 text-center"
+                className="font-bold px-0 text-center text-gray-900 dark:text-gray-100"
                 sx={{ borderBottom: 'none' }}
               >
                 Compare
@@ -516,7 +516,7 @@ const CompareTable = ({
               {sortedResults.map((result, index) => (
                 <TableCell
                   key={searchQueryLabel(result)}
-                  className="text-center py-3 border-x-2 border-t-2 rounded-t-lg w-min"
+                  className="text-center py-3 border-x-2 border-t-2 rounded-t-lg w-min text-gray-900 dark:text-gray-100"
                   sx={{ borderBottom: 'none' }}
                   style={{
                     borderColor: mappedColors[index],
@@ -528,7 +528,7 @@ const CompareTable = ({
               ))}
             </TableRow>
           </TableHead>
-          <TableBody>
+          <TableBody className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
             <GradeOrRmpRow<GradesType>
               name="GPA"
               values={sortedResults.map(

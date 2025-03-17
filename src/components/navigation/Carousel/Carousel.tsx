@@ -84,10 +84,11 @@ const Carousel = ({ names, children, compareLength }: CarouselProps) => {
         compareLength={compareLength}
         open={open}
         setOpen={setOpen}
+        className="bg-white dark:bg-gray-800 border-b dark:border-gray-700"
       />
       <Collapse in={open}>
         <AnimatePresence>
-          <div className="p-4 lg:p-6">
+          <div className="p-4 lg:p-6 bg-white dark:bg-gray-800">
             <motion.div
               key={currentCard}
               custom={direction}
@@ -99,6 +100,7 @@ const Carousel = ({ names, children, compareLength }: CarouselProps) => {
                 x: { type: 'spring', stiffness: 300, damping: 30 },
                 opacity: { duration: 0.2 },
               }}
+              className="transition-colors"
             >
               {Array.isArray(children)
                 ? children.map((child, index) => (

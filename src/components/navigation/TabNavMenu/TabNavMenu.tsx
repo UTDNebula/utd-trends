@@ -28,10 +28,8 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
         aria-label="open overview"
         onClick={() => props.setOpen(!props.open)}
         size="medium"
-        className={
-          'sm:hidden ml-2 transition-transform' +
-          (props.open ? ' rotate-90' : '')
-        }
+        className={`sm:hidden ml-2 transition-transform text-gray-700 dark:text-gray-300
+          ${props.open ? ' rotate-90' : ''}`}
       >
         <KeyboardArrowIcon fontSize="inherit" />
       </IconButton>
@@ -40,8 +38,18 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
           value={props.value}
           onChange={(event, newValue) => props.turner(newValue - props.value)}
           aria-label="Tab switcher"
-          className="shadow dark:shadow-lg"
+          className="shadow dark:shadow-lg bg-white dark:bg-gray-800"
           variant="scrollable"
+          sx={{
+            '& .MuiTab-root': {
+              color: (theme) =>
+                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : undefined,
+              '&.Mui-selected': {
+                color: (theme) =>
+                  theme.palette.mode === 'dark' ? '#fff' : undefined,
+              },
+            },
+          }}
         >
           {props.options.map((option, index) => (
             <Tab

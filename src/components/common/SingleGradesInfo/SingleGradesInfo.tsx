@@ -35,14 +35,14 @@ function SingleGradesInfo({ title, course, grades, gradesToUse }: Props) {
 
   if (grades.state === 'loading') {
     return (
-      <div className="p-2">
+      <div className="p-2 bg-white dark:bg-gray-800">
         <GraphToggle state="loading" />
-        <div className="flex flex-wrap justify-around">
+        <div className="flex flex-wrap justify-around text-gray-900 dark:text-gray-100">
           <p>
-            Grades: <Skeleton className="inline-block w-[5ch]" />
+            Grades: <Skeleton className="inline-block w-[5ch] dark:bg-gray-700" />
           </p>
           <p>
-            GPA: <Skeleton className="inline-block w-[5ch]" />
+            GPA: <Skeleton className="inline-block w-[5ch] dark:bg-gray-700" />
           </p>
         </div>
       </div>
@@ -52,7 +52,7 @@ function SingleGradesInfo({ title, course, grades, gradesToUse }: Props) {
   const percents = convertNumbersToPercents(grades.data, gradesToUse);
 
   return (
-    <div className="p-2">
+    <div className="p-2 bg-white dark:bg-gray-800">
       <GraphToggle
         state="done"
         bar={
@@ -103,7 +103,7 @@ function SingleGradesInfo({ title, course, grades, gradesToUse }: Props) {
           />
         }
       />
-      <div className="flex flex-wrap justify-around">
+      <div className="flex flex-wrap justify-around text-gray-900 dark:text-gray-100">
         <p>
           Grades: <b>{grades.data[gradesToUse].total.toLocaleString()}</b>
         </p>

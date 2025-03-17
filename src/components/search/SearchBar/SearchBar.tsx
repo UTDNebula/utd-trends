@@ -9,6 +9,7 @@ import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import { useRouter } from 'next/router';
 import React, { type Key, useEffect, useRef, useState } from 'react';
+import { useTheme } from '@mui/material/styles';
 
 import {
   decodeSearchQueryLabel,
@@ -205,8 +206,10 @@ const SearchBar = ({
     fetch('/api/autocomplete?input=someSearchTerm');
   }, []);
 
+  const theme = useTheme();
+
   return (
-    <div className={'flex items-center gap-2 ' + (className ?? '')}>
+    <div className={`${className} flex gap-2`}>
       <Autocomplete
         multiple
         freeSolo
@@ -214,7 +217,19 @@ const SearchBar = ({
         //highlight first option to add with enter
         autoHighlight={true}
         clearOnBlur={false}
-        className="grow"
+        className={`flex-grow ${input_className}`}
+        sx={{
+          '& .MuiInputBase-root': {
+            backgroundColor: (theme) => 
+              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'white',
+            color: (theme) =>
+              theme.palette.mode === 'dark' ? 'white' : 'inherit',
+          },
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)',
+          },
+        }}
         getOptionLabel={(option) => {
           if (typeof option === 'string') {
             return option;
@@ -258,7 +273,6 @@ const SearchBar = ({
             <TextField
               {...params}
               variant="outlined"
-              className={input_className}
               placeholder="ex. GOVT 2306"
               //eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus={autoFocus}
@@ -338,17 +352,15 @@ const SearchBar = ({
         disableTouchListener
       >
         <Button
-          variant="contained"
-          disableElevation
-          size="large"
-          className={
-            'h-11 w-[5.5rem] shrink-0 normal-case bg-royal hover:bg-royalDark' +
-            (value.length == 0 ? ' text-cornflower-200' : '')
-          } //darkens the text when no valid search terms are entered (pseudo-disables the search button)
+          className={`px-4 py-2 bg-cornflower-600 hover:bg-cornflower-700 text-white
+            dark:bg-cornflower-800 dark:hover:bg-cornflower-700
+            ${value.length == 0 ? 'opacity-50 dark:opacity-30' : ''}`}
           onClick={() => onSelect_internal(value)}
         >
           {resultsLoading === 'loading' ? (
-            <CircularProgress className="h-6 w-6 text-cornflower-50" />
+            <CircularProgress 
+              className="h-6 w-6 text-white dark:text-cornflower-50" 
+            />
           ) : (
             'Search'
           )}

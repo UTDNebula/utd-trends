@@ -32,28 +32,28 @@ function SingleProfInfo({ rmp }: Props) {
       'Clear grading criteria (9)',
     ];
     return (
-      <Grid container spacing={2} className="p-4">
+      <Grid container spacing={2} className="p-4 text-gray-900 dark:text-gray-100">
         {/* Loading skeletons for each metric */}
         <Grid size={6}>
-          <Skeleton variant="rounded">
+          <Skeleton variant="rounded" className="dark:bg-gray-700">
             <p className="text-xl font-bold">5.0</p>
           </Skeleton>
           <p>Professor rating</p>
         </Grid>
         <Grid size={6}>
-          <Skeleton variant="rounded">
+          <Skeleton variant="rounded" className="dark:bg-gray-700">
             <p className="text-xl font-bold">5.0</p>
           </Skeleton>
           <p>Difficulty</p>
         </Grid>
         <Grid size={6}>
-          <Skeleton variant="rounded">
+          <Skeleton variant="rounded" className="dark:bg-gray-700">
             <p className="text-xl font-bold">1,000</p>
           </Skeleton>
           <p>Ratings given</p>
         </Grid>
         <Grid size={6}>
-          <Skeleton variant="rounded">
+          <Skeleton variant="rounded" className="dark:bg-gray-700">
             <p className="text-xl font-bold">99%</p>
           </Skeleton>
           <p>Would take again</p>
@@ -85,7 +85,7 @@ function SingleProfInfo({ rmp }: Props) {
 
   if (rmp.data.numRatings == 0) {
     return (
-      <Grid container spacing={2} className="p-4">
+      <Grid container spacing={2} className="p-4 text-gray-900 dark:text-gray-100">
         <Grid size={6}>
           <p className="text-xl font-bold">
             {rmp.data.numRatings.toLocaleString()}
@@ -98,7 +98,8 @@ function SingleProfInfo({ rmp }: Props) {
               'https://www.ratemyprofessors.com/professor/' + rmp.data.legacyId
             }
             target="_blank"
-            className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+            className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600
+              dark:text-blue-400 dark:hover:text-blue-300 dark:visited:text-purple-400"
           >
             Visit Rate My Professors
           </Link>
@@ -114,7 +115,7 @@ function SingleProfInfo({ rmp }: Props) {
   const next5 = topTags.slice(5, 10);
 
   return (
-    <Grid container spacing={2} className="p-4">
+    <Grid container spacing={2} className="p-4 text-gray-900 dark:text-gray-100">
       <Grid size={6}>
         <p className="text-xl font-bold">
           {rmp.data.avgRating > 0 ? rmp.data.avgRating : 'N/A'}
@@ -187,7 +188,8 @@ function SingleProfInfo({ rmp }: Props) {
             'https://www.ratemyprofessors.com/professor/' + rmp.data.legacyId
           }
           target="_blank"
-          className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+          className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600
+            dark:text-blue-400 dark:hover:text-blue-300 dark:visited:text-purple-400"
         >
           Visit Rate My Professors
         </Link>

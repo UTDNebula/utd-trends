@@ -2,7 +2,7 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Background from '@/../public/background.png';
 import SearchBar from '@/components/search/SearchBar/SearchBar';
@@ -17,6 +17,23 @@ import {
  */
 const Home: NextPage = () => {
   const router = useRouter();
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      setTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.classList.toggle('dark');
+  };
 
   async function searchOptionChosen(chosenOptions: SearchQuery[]) {
     if (chosenOptions.length) {

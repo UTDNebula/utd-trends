@@ -3,6 +3,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import React, { useState } from 'react';
+import { useTheme } from '@mui/material/styles';
 
 type Props = {
   state: string;
@@ -12,6 +13,7 @@ type Props = {
 
 function GraphToggle(props: Props) {
   const [chartType, setChartType] = useState<'line' | 'bar'>('bar');
+  const theme = useTheme();
 
   const handleChartToggle = (
     event: React.MouseEvent<HTMLElement>,
@@ -42,6 +44,18 @@ function GraphToggle(props: Props) {
         size="small"
         orientation="vertical"
         aria-label="chart type"
+        sx={{
+          '& .MuiToggleButton-root': {
+            color: (theme) => 
+              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : undefined,
+            '&.Mui-selected': {
+              color: (theme) =>
+                theme.palette.mode === 'dark' ? '#fff' : undefined,
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : undefined,
+            },
+          },
+        }}
       >
         <ToggleButton value="bar" aria-label="line chart">
           <BarChartIcon />

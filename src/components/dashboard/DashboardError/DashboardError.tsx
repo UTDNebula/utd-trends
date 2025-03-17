@@ -10,11 +10,16 @@ function DashboardError() {
       <Typography
         variant="h2"
         gutterBottom
-        className="text-gray-600 font-semibold"
+        className="text-gray-600 dark:text-gray-400 font-semibold"
       >
         Error fetching results
       </Typography>
-      <Button variant="outlined" onClick={() => router.reload()}>
+      <Button 
+        variant="outlined"
+        className="text-royal dark:text-cornflower-300 border-royal dark:border-cornflower-300
+          hover:bg-royal/10 dark:hover:bg-cornflower-300/10"
+        onClick={() => router.reload()}
+      >
         Reload the page
       </Button>
     </div>

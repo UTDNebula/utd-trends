@@ -34,12 +34,12 @@ import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
 function LoadingRow() {
   return (
-    <TableRow>
-      <TableCell className="flex">
-        <IconButton aria-label="expand row" size="medium" disabled>
+    <TableRow className="animate-pulse bg-white dark:bg-gray-800">
+      <TableCell className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700">
+        <IconButton aria-label="expand row" size="medium" disabled className="text-gray-400">
           <KeyboardArrowIcon />
         </IconButton>
-        <Checkbox disabled />
+        <Checkbox disabled className="text-gray-400" />
       </TableCell>
       <TableCell component="th" scope="row" className="w-full">
         <Typography className="w-full leading-tight text-lg">
@@ -123,69 +123,40 @@ function Row({
 
   return (
     <>
-      <TableRow onClick={() => setOpen(!open)} className="table-row sm:hidden">
-        <TableCell
-          component="th"
-          scope="row"
-          className="w-full border-b-0 pb-0"
-          colSpan={3}
-        >
-          {nameCell}
-        </TableCell>
-      </TableRow>
-      <TableRow
-        onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
-        className="cursor-pointer"
+      <TableRow 
+        onClick={() => setOpen(!open)} 
+        className="cursor-pointer bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700"
       >
-        <TableCell className="border-b-0">
-          <div className="flex items-center gap-1">
-            <Tooltip
-              title={open ? 'Minimize Result' : 'Expand Result'}
-              placement="top"
-            >
-              <IconButton
-                aria-label="expand row"
-                size="medium"
-                onClick={(e) => {
-                  e.stopPropagation(); // prevents double opening/closing
-                  setOpen(!open);
-                }}
-                className={'transition-transform' + (open ? ' rotate-90' : '')}
-              >
-                <KeyboardArrowIcon fontSize="inherit" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip
-              title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
-              placement="top"
-            >
-              <Checkbox
-                checked={inCompare}
-                onClick={(e) => {
-                  e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
-                  if (inCompare) {
-                    removeFromCompare(course);
-                  } else {
-                    addToCompare(course);
-                  }
-                }}
-                disabled={
-                  (typeof grades !== 'undefined' &&
-                    grades.state === 'loading') ||
-                  (typeof rmp !== 'undefined' && rmp.state === 'loading')
-                }
-                sx={
-                  color
-                    ? {
-                        '&.Mui-checked': {
-                          color: color,
-                        },
-                      }
-                    : undefined
-                } // Apply color if defined
-              />
-            </Tooltip>
-          </div>
+        <TableCell className="flex items-center gap-1">
+          <IconButton
+            aria-label="expand row"
+            size="medium"
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpen(!open);
+            }}
+            className={`transition-transform text-gray-600 dark:text-gray-300 ${open ? 'rotate-90' : ''}`}
+          >
+            <KeyboardArrowIcon />
+          </IconButton>
+          <Checkbox
+            checked={inCompare}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (inCompare) {
+                removeFromCompare(course);
+              } else {
+                addToCompare(course);
+              }
+            }}
+            className="text-blue-500 dark:text-blue-400"
+            sx={{
+              color: 'rgb(156 163 175)',
+              '&.Mui-checked': {
+                color: color || '#3B82F6',
+              },
+            }}
+          />
         </TableCell>
         <TableCell
           component="th"
@@ -453,90 +424,86 @@ const SearchResultsTable = ({
   });
 
   return (
-    //TODO: sticky header
-    <>
-      <Typography className="leading-tight text-3xl font-bold p-4">
-        Search Results
-      </Typography>
-      <TableContainer component={Paper}>
-        <Table stickyHeader aria-label="collapsible table">
-          <TableHead>
-            <TableRow>
-              <TableCell className="hidden sm:table-cell">Actions</TableCell>
-              <TableCell>
+    <TableContainer component={Paper} className="bg-white dark:bg-gray-800 shadow-md">
+      <Table aria-label="collapsible table">
+        <TableHead>
+          <TableRow className="bg-gray-50 dark:bg-gray-900">
+            <TableCell className="border-b border-gray-200 dark:border-gray-700">
+              <span className="text-gray-900 dark:text-gray-100 font-medium">Actions</span>
+            </TableCell>
+            <TableCell className="border-b border-gray-200 dark:border-gray-700">
+              <TableSortLabel
+                active={orderBy === 'name'}
+                direction={orderBy === 'name' ? order : 'asc'}
+                onClick={() => handleClick('name')}
+                className="text-gray-900 dark:text-gray-100 hover:text-gray-700"
+                sx={{
+                  '& .MuiTableSortLabel-icon': {
+                    color: 'inherit !important',
+                  },
+                }}
+              >
+                <span className="text-gray-900 dark:text-gray-100 font-medium">Name</span>
+              </TableSortLabel>
+            </TableCell>
+            <TableCell align="center" className="border-b border-gray-200 dark:border-gray-700">
+              <Tooltip title="Average Letter Grade Across Course Sections" placement="top">
                 <TableSortLabel
-                  active={orderBy === 'name'}
-                  direction={orderBy === 'name' ? order : 'asc'}
-                  onClick={() => {
-                    handleClick('name');
+                  active={orderBy === 'gpa'}
+                  direction={orderBy === 'gpa' ? order : 'desc'}
+                  onClick={() => handleClick('gpa')}
+                  className="text-gray-900 dark:text-gray-100 hover:text-gray-700"
+                  sx={{
+                    '& .MuiTableSortLabel-icon': {
+                      color: 'inherit !important',
+                    },
                   }}
                 >
-                  Name
+                  <span className="text-gray-900 dark:text-gray-100 font-medium">Grades</span>
                 </TableSortLabel>
-              </TableCell>
-              <TableCell align="center">
-                <Tooltip
-                  title="Average Letter Grade Across Course Sections"
-                  placement="top"
+              </Tooltip>
+            </TableCell>
+            <TableCell align="center" className="border-b border-gray-200 dark:border-gray-700">
+              <Tooltip title="Average Professor Rating from Rate My Professors" placement="top">
+                <TableSortLabel
+                  active={orderBy === 'rating'}
+                  direction={orderBy === 'rating' ? order : 'desc'}
+                  onClick={() => handleClick('rating')}
+                  className="text-gray-900 dark:text-gray-100 hover:text-gray-700"
+                  sx={{
+                    '& .MuiTableSortLabel-icon': {
+                      color: 'inherit !important',
+                    },
+                  }}
                 >
-                  <div>
-                    <TableSortLabel
-                      active={orderBy === 'gpa'}
-                      direction={orderBy === 'gpa' ? order : 'desc'}
-                      onClick={() => {
-                        handleClick('gpa');
-                      }}
-                    >
-                      Grades
-                    </TableSortLabel>
-                  </div>
-                </Tooltip>
-              </TableCell>
-              <TableCell align="center">
-                <Tooltip
-                  title="Average Professor Rating from Rate My Professors"
-                  placement="top"
-                >
-                  <div>
-                    <TableSortLabel
-                      active={orderBy === 'rating'}
-                      direction={orderBy === 'rating' ? order : 'desc'}
-                      onClick={() => {
-                        handleClick('rating');
-                      }}
-                    >
-                      Rating
-                    </TableSortLabel>
-                  </div>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {resultsLoading === 'done'
-              ? sortedResults.map((result) => (
-                  <Row
-                    key={searchQueryLabel(result)}
-                    course={result}
-                    grades={grades[searchQueryLabel(result)]}
-                    rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
-                    inCompare={
-                      compare.findIndex((obj) =>
-                        searchQueryEqual(obj, result),
-                      ) !== -1
-                    }
-                    addToCompare={addToCompare}
-                    removeFromCompare={removeFromCompare}
-                    color={colorMap[searchQueryLabel(result)]}
-                  />
-                ))
-              : Array(10)
-                  .fill(0)
-                  .map((_, index) => <LoadingRow key={index} />)}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </>
+                  <span className="text-gray-900 dark:text-gray-100 font-medium">Rating</span>
+                </TableSortLabel>
+              </Tooltip>
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {resultsLoading === 'done' ? (
+            sortedResults.map((result) => (
+              <Row
+                key={searchQueryLabel(result)}
+                course={result}
+                grades={grades[searchQueryLabel(result)]}
+                rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
+                inCompare={compare.findIndex((obj) => searchQueryEqual(obj, result)) !== -1}
+                addToCompare={addToCompare}
+                removeFromCompare={removeFromCompare}
+                color={colorMap[searchQueryLabel(result)]}
+              />
+            ))
+          ) : (
+            Array(10)
+              .fill(0)
+              .map((_, index) => <LoadingRow key={index} />)
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 

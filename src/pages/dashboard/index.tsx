@@ -615,18 +615,26 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
           <Grid size={{ xs: false, sm: 6, md: 6 }}></Grid>
         </Grid>
         <div className="sm:hidden">
-          {carousel}
-          {searchResultsTable}
+          <Card className="bg-white dark:bg-gray-800">
+            <Carousel names={names} compareLength={compare.length}>
+              {tabs}
+            </Carousel>
+          </Card>
+          <div className="mt-4 bg-white dark:bg-gray-800 rounded-lg">
+            {searchResultsTable}
+          </div>
         </div>
         <PanelGroup
           direction="horizontal"
           className="hidden sm:flex overflow-visible"
         >
           <Panel ref={panelLRef} minSize={40} defaultSize={50}>
-            {searchResultsTable}
+            <div className="bg-white dark:bg-gray-800 rounded-lg">
+              {searchResultsTable}
+            </div>
           </Panel>
           <PanelResizeHandle
-            className="mt-4 p-1 mx-1 w-0.5 rounded-full opacity-25 data-[resize-handle-state=drag]:opacity-50 transition ease-in-out bg-transparent hover:bg-royal data-[resize-handle-state=drag]:bg-royal"
+            className="mt-4 p-1 mx-1 w-0.5 rounded-full opacity-25 data-[resize-handle-state=drag]:opacity-50 transition ease-in-out bg-transparent hover:bg-royal dark:hover:bg-cornflower-300 data-[resize-handle-state=drag]:bg-royal dark:data-[resize-handle-state=drag]:bg-cornflower-300"
             onDoubleClick={handleResizeDoubleClick}
           />
           <Panel
@@ -636,7 +644,11 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
             defaultSize={50}
           >
             <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto mt-4">
-              {carousel}
+              <Card className="bg-white dark:bg-gray-800">
+                <Carousel names={names} compareLength={compare.length}>
+                  {tabs}
+                </Carousel>
+              </Card>
             </div>
           </Panel>
         </PanelGroup>
@@ -665,7 +677,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
           content="https://trends.utdnebula.com/dashboard"
         />
       </Head>
-      <div className="w-full bg-light h-full">
+      <div className="w-full bg-light dark:bg-gray-900 min-h-screen transition-colors">
         <TopMenu
           resultsLoading={results.state}
           setResultsLoading={() => setResults({ state: 'loading' })}

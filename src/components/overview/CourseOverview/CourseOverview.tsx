@@ -317,13 +317,14 @@ const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
     );
   }
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 text-gray-900 dark:text-gray-100">
       {courseComponent}
       <SingleGradesInfo
         title="# of Students (Overall)"
         course={course}
         grades={grades}
         gradesToUse="unfiltered"
+        className="bg-white dark:bg-gray-800"
       />
     </div>
   );

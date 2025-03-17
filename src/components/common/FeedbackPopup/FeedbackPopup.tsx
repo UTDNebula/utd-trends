@@ -106,7 +106,7 @@ export default function FeedbackPopup() {
     <>
       <Snackbar open={feedbackOpen}>
         <SnackbarContent
-          className="bg-white dark:bg-haiti text-haiti dark:text-white"
+          className="bg-white text-haiti"
           sx={{
             '& .MuiSnackbarContent-message ': {
               width: '100%',

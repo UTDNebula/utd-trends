@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   important: true,
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx}',
@@ -8,7 +9,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        haiti: '#090b2c', // brand black
+        haiti: '#120B29', // brand black
         persimmon: {
           50: '#ffe5de',
           100: '#ffcabd',

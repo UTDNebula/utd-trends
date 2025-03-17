@@ -28,3 +28,56 @@ body,
     background-color: rgba(0, 0, 0, 0.6);
   }
 }
+
+/* Add these new styles */
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 255, 255, 255;
+}
+
+.dark {
+  --foreground-rgb: 255, 255, 255;
+  --background-rgb: 0, 0, 0;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+  transition: background-color 0.3s ease;
+}
+
+/* Add these global dark mode styles */
+@layer base {
+  body {
+    @apply text-haiti dark:text-white;
+    @apply bg-white dark:bg-[#121212];
+  }
+
+  /* Target all text elements globally */
+  h1, h2, h3, h4, h5, h6, p, span, div, td, th, li, a {
+    @apply text-haiti dark:text-white transition-colors;
+  }
+
+  /* Specific styles for your search results */
+  .search-results-row {
+    @apply text-haiti dark:text-gray-200;
+  }
+
+  /* Table styles */
+  table {
+    @apply text-haiti dark:text-white;
+  }
+}
+
+/* Add specific component overrides if needed */
+.course-info {
+  @apply dark:text-white;
+}
+
+.rating-text {
+  @apply dark:text-white;
+}
+
+.professor-name {
+  @apply dark:text-white;
+}

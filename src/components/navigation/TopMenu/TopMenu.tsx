@@ -57,12 +57,12 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
           src={Background}
           alt="gradient background"
           fill
-          className="object-cover -z-20"
+          className="object-cover -z-20 dark:opacity-50"
           priority
         />
         <Link
           href="/"
-          className="lext-lg md:text-xl font-kallisto font-medium md:font-bold"
+          className="lext-lg md:text-xl font-kallisto font-medium md:font-bold dark:text-white"
         >
           UTD TRENDS
         </Link>
@@ -71,11 +71,11 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
           resultsLoading={resultsLoading}
           setResultsLoading={setResultsLoading}
           className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
-          input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+          input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-gray-800 [&>.MuiInputBase-root]:dark:text-white"
         />
         <Tooltip title="Share link to search" className="ml-auto">
           <IconButton
-            className="aspect-square"
+            className="aspect-square dark:text-white hover:dark:bg-gray-700"
             size="medium"
             onClick={() => {
               let url = window.location.href;
@@ -98,6 +98,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
         autoHideDuration={6000}
         onClose={() => setOpenCopied(false)}
         message="Copied!"
+        className="dark:text-white"
       />
     </>
   );

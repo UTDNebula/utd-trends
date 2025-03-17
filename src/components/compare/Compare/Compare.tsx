@@ -122,6 +122,7 @@ const Compare = ({
         rmp={rmp}
         removeFromCompare={removeFromCompare}
         colorMap={colorMap}
+        className="bg-white dark:bg-gray-800"
       />
     </div>
   );

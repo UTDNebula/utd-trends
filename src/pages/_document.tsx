@@ -8,7 +8,7 @@ const fullTailwindConfig = resolveConfig(tailwindConfig);
 
 function Document() {
   return (
-    <Html lang="en">
+    <Html lang="en" className="dark:bg-gray-900">
       <Head prefix="og: http://ogp.me/ns#">
         <meta
           name="description"
@@ -16,8 +16,14 @@ function Document() {
         />
         <meta
           name="theme-color"
+          media="(prefers-color-scheme: light)"
           // eslint-disable-next-line  @typescript-eslint/no-explicit-any
           content={(fullTailwindConfig.theme.colors as any).royal as string}
+        />
+        <meta
+          name="theme-color"
+          media="(prefers-color-scheme: dark)"
+          content="#1a1a1a" // Dark mode background color
         />
         <meta
           property="og:description"
@@ -36,7 +42,7 @@ function Document() {
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:domain" content="trends.utdnebula.com" />
       </Head>
-      <body className="font-inter bg-white dark:bg-black">
+      <body className="font-inter bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
         <Main />
         <NextScript />
       </body>

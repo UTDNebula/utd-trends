@@ -27,12 +27,12 @@ interface FiltersProps {
 /**
  * This component returns a set of filters with which to sort results.
  */
-const Filters = ({
+const Filters: React.FC<FiltersProps> = ({
   manageQuery,
   academicSessions,
   chosenSessions,
   addChosenSessions,
-}: FiltersProps) => {
+}) => {
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
@@ -137,11 +137,17 @@ const Filters = ({
       <Tooltip title={'Select Minimum Letter Grade Average'} placement="top">
         <FormControl
           size="small"
-          className={`w-full ${
+          className={`w-full transition-colors duration-200 ${
             minGPA
-              ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
-              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
-          }`}
+              ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-gray-800'
+              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-gray-800'
+          } 
+            [&>.MuiInputLabel-root]:text-gray-700 [&>.MuiInputLabel-root]:dark:text-white 
+            [&>.MuiInputBase-root]:text-gray-900 [&>.MuiInputBase-root]:dark:text-white 
+            [&>.MuiOutlinedInput-notchedOutline]:border-gray-300 [&>.MuiOutlinedInput-notchedOutline]:dark:border-gray-600
+            [&>.MuiInputBase-root:hover_.MuiOutlinedInput-notchedOutline]:border-gray-400 [&>.MuiInputBase-root:hover_.MuiOutlinedInput-notchedOutline]:dark:border-gray-400
+            [&>.MuiInputBase-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-blue-500 [&>.MuiInputBase-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:dark:border-blue-400
+            shadow-sm`}
         >
           <InputLabel id="minGPA">Min Letter Grade</InputLabel>
           <Select
@@ -151,13 +157,36 @@ const Filters = ({
             onChange={async (event: SelectChangeEvent) => {
               await onChange(event.target.value, 'minGPA', setMinGPA);
             }}
+            MenuProps={{
+              PaperProps: {
+                className: 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white [&_.MuiMenuItem-root:hover]:bg-gray-100 [&_.MuiMenuItem-root:hover]:dark:bg-gray-700 shadow-lg',
+                sx: {
+                  '& .MuiMenuItem-root': {
+                    '&.Mui-selected': {
+                      backgroundColor: 'rgb(243 244 246)',
+                      '&.Mui-focusVisible': { background: 'rgb(243 244 246)' },
+                      '&:hover': { backgroundColor: 'rgb(229 231 235)' },
+                      '&.dark': {
+                        backgroundColor: 'rgb(55 65 81)',
+                        '&.Mui-focusVisible': { background: 'rgb(55 65 81)' },
+                        '&:hover': { backgroundColor: 'rgb(75 85 99)' }
+                      }
+                    }
+                  }
+                }
+              }
+            }}
+            className="bg-white dark:bg-gray-800"
           >
-            <MenuItem className="h-10" value="">
+            <MenuItem className="h-10 text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" value="">
               <em>None</em>
             </MenuItem>
-            {/* dropdown options*/}
             {minGPAs.map((value) => (
-              <MenuItem className="h-10" key={value} value={value}>
+              <MenuItem 
+                className="h-10 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 transition-colors duration-150" 
+                key={value} 
+                value={value}
+              >
                 {gpaToLetterGrade(Number(value))}
               </MenuItem>
             ))}
@@ -169,11 +198,17 @@ const Filters = ({
       <Tooltip title={'Select Minimum Professor Rating'} placement="top">
         <FormControl
           size="small"
-          className={`w-full ${
+          className={`w-full transition-colors duration-200 ${
             minRating
-              ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
-              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
-          }`}
+              ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-gray-800'
+              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-gray-800'
+          } 
+            [&>.MuiInputLabel-root]:text-gray-700 [&>.MuiInputLabel-root]:dark:text-white 
+            [&>.MuiInputBase-root]:text-gray-900 [&>.MuiInputBase-root]:dark:text-white 
+            [&>.MuiOutlinedInput-notchedOutline]:border-gray-300 [&>.MuiOutlinedInput-notchedOutline]:dark:border-gray-600
+            [&>.MuiInputBase-root:hover_.MuiOutlinedInput-notchedOutline]:border-gray-400 [&>.MuiInputBase-root:hover_.MuiOutlinedInput-notchedOutline]:dark:border-gray-400
+            [&>.MuiInputBase-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-blue-500 [&>.MuiInputBase-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:dark:border-blue-400
+            shadow-sm`}
         >
           <InputLabel id="minRating">Min Rating</InputLabel>
           <Select
@@ -183,26 +218,64 @@ const Filters = ({
             onChange={async (event: SelectChangeEvent) => {
               await onChange(event.target.value, 'minRating', setMinRating);
             }}
+            MenuProps={{
+              PaperProps: {
+                className: 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white [&_.MuiMenuItem-root:hover]:bg-gray-100 [&_.MuiMenuItem-root:hover]:dark:bg-gray-700 shadow-lg',
+                sx: {
+                  '& .MuiMenuItem-root': {
+                    '&.Mui-selected': {
+                      backgroundColor: 'rgb(243 244 246)',
+                      '&.Mui-focusVisible': { background: 'rgb(243 244 246)' },
+                      '&:hover': { backgroundColor: 'rgb(229 231 235)' },
+                      '&.dark': {
+                        backgroundColor: 'rgb(55 65 81)',
+                        '&.Mui-focusVisible': { background: 'rgb(55 65 81)' },
+                        '&:hover': { backgroundColor: 'rgb(75 85 99)' }
+                      }
+                    }
+                  }
+                }
+              }
+            }}
             renderValue={(value) => (
               <Rating
                 key={value}
                 defaultValue={Number(value)}
                 precision={0.5}
-                sx={{ fontSize: 18 }}
+                sx={{ 
+                  fontSize: 18,
+                  '& .MuiRating-iconFilled': {
+                    color: 'rgb(250 204 21)',
+                  },
+                  '& .MuiRating-iconEmpty': {
+                    color: 'rgb(156 163 175)',
+                  }
+                }}
                 readOnly
               />
             )}
           >
-            <MenuItem className="h-10" value="">
+            <MenuItem className="h-10 text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" value="">
               <em>None</em>
             </MenuItem>
-            {/* dropdown options*/}
             {minRatings.map((value) => (
-              <MenuItem className="h-10" key={value} value={value}>
+              <MenuItem 
+                className="h-10 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" 
+                key={value} 
+                value={value}
+              >
                 <Rating
                   defaultValue={Number(value)}
                   precision={0.5}
-                  sx={{ fontSize: 25 }}
+                  sx={{ 
+                    fontSize: 25,
+                    '& .MuiRating-iconFilled': {
+                      color: 'rgb(250 204 21)',
+                    },
+                    '& .MuiRating-iconEmpty': {
+                      color: 'rgb(156 163 175)',
+                    }
+                  }}
                   readOnly
                 />
               </MenuItem>
@@ -218,11 +291,17 @@ const Filters = ({
       >
         <FormControl
           size="small"
-          className={`w-full ${
+          className={`w-full transition-colors duration-200 ${
             chosenSessions.length !== academicSessions.length
-              ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
-              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
-          }`}
+              ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-gray-800'
+              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-gray-800'
+          } 
+            [&>.MuiInputLabel-root]:text-gray-700 [&>.MuiInputLabel-root]:dark:text-white 
+            [&>.MuiInputBase-root]:text-gray-900 [&>.MuiInputBase-root]:dark:text-white 
+            [&>.MuiOutlinedInput-notchedOutline]:border-gray-300 [&>.MuiOutlinedInput-notchedOutline]:dark:border-gray-600
+            [&>.MuiInputBase-root:hover_.MuiOutlinedInput-notchedOutline]:border-gray-400 [&>.MuiInputBase-root:hover_.MuiOutlinedInput-notchedOutline]:dark:border-gray-400
+            [&>.MuiInputBase-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-blue-500 [&>.MuiInputBase-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:dark:border-blue-400
+            shadow-sm`}
         >
           <InputLabel id="Semesters">Semesters</InputLabel>
           <Select
@@ -253,62 +332,125 @@ const Filters = ({
                 addChosenSessions(() => value as string[]);
               }
             }}
+            MenuProps={{
+              PaperProps: {
+                className: 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white [&_.MuiMenuItem-root:hover]:bg-gray-100 [&_.MuiMenuItem-root:hover]:dark:bg-gray-700 shadow-lg',
+                sx: {
+                  '& .MuiMenuItem-root': {
+                    '&.Mui-selected': {
+                      backgroundColor: 'rgb(243 244 246)',
+                      '&.Mui-focusVisible': { background: 'rgb(243 244 246)' },
+                      '&:hover': { backgroundColor: 'rgb(229 231 235)' },
+                      '&.dark': {
+                        backgroundColor: 'rgb(55 65 81)',
+                        '&.Mui-focusVisible': { background: 'rgb(55 65 81)' },
+                        '&:hover': { backgroundColor: 'rgb(75 85 99)' }
+                      }
+                    }
+                  }
+                }
+              }
+            }}
+            className="bg-white dark:bg-gray-800"
             renderValue={(selected) => {
               if (chosenSessions.length === academicSessions.length) {
                 return 'All selected';
               }
               return selected.sort((a, b) => compareSemesters(a, b)).join(', ');
             }}
-            MenuProps={{ autoFocus: false }}
           >
-            {/* select all sessions */}
-            <MenuItem className="h-10 items-center" value="select-all">
-              <Checkbox
-                checked={
-                  academicSessions.length > 0 &&
-                  chosenSessions.length === academicSessions.length
-                }
+            <MenuItem 
+              className="h-10 items-center text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" 
+              value="select-all"
+            >
+              <Checkbox 
+                checked={academicSessions.length > 0 && chosenSessions.length === academicSessions.length}
                 indeterminate={
                   chosenSessions.length !== academicSessions.length &&
                   chosenSessions.length !== 0 &&
                   !(
                     chosenSessions.length === recentSemesters.length &&
                     chosenSessions.every((el) => recentSemesters.includes(el))
-                  ) // select-all is not indeterminate when recent is checked
+                  )
                 }
-                disabled={academicSessions.length == 0}
+                disabled={academicSessions.length === 0}
+                sx={{
+                  padding: '9px',
+                  color: 'rgb(156 163 175)',
+                  '&.Mui-checked': {
+                    color: '#3B82F6',
+                  },
+                  '&.MuiCheckbox-indeterminate': {
+                    color: '#3B82F6',
+                  },
+                  '&.Mui-disabled': {
+                    color: 'rgb(209 213 219)',
+                  },
+                  '& .MuiSvgIcon-root': {
+                    fontSize: '1.25rem',
+                  }
+                }}
               />
               <ListItemText
-                className={academicSessions.length > 0 ? '' : 'text-gray-400'}
                 primary="Select All"
+                className={`ml-2 ${academicSessions.length > 0 ? 'text-gray-900' : 'text-gray-400'} dark:text-white`}
               />
             </MenuItem>
 
-            {/* recent sessions -- last <recentSemesters.length> long-semesters from current semester*/}
-            <MenuItem className="h-10 items-center" value="recent">
-              <Checkbox
+            <MenuItem 
+              className="h-10 items-center text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" 
+              value="recent"
+            >
+              <Checkbox 
                 checked={
                   recentSemesters.length > 0 &&
                   chosenSessions.length === recentSemesters.length &&
                   chosenSessions.every((el) => recentSemesters.includes(el))
                 }
-                disabled={recentSemesters.length == 0}
+                disabled={recentSemesters.length === 0}
+                sx={{
+                  padding: '9px',
+                  color: 'rgb(156 163 175)',
+                  '&.Mui-checked': {
+                    color: '#3B82F6',
+                  },
+                  '&.Mui-disabled': {
+                    color: 'rgb(209 213 219)',
+                  },
+                  '& .MuiSvgIcon-root': {
+                    fontSize: '1.25rem',
+                  }
+                }}
               />
               <ListItemText
-                className={recentSemesters.length > 0 ? '' : 'text-gray-400'}
                 primary="Recent"
+                className={`ml-2 ${recentSemesters.length > 0 ? 'text-gray-900' : 'text-gray-400'} dark:text-white`}
               />
             </MenuItem>
 
-            {/* individual options */}
             {academicSessions.map((session) => (
               <MenuItem
-                className="h-10 items-center"
+                className="h-10 items-center text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
                 key={session}
                 value={session}
               >
-                <Checkbox checked={chosenSessions.includes(session)} />
-                <ListItemText primary={displayAcademicSessionName(session)} />
+                <Checkbox 
+                  checked={chosenSessions.includes(session)}
+                  sx={{
+                    padding: '9px',
+                    color: 'rgb(156 163 175)',
+                    '&.Mui-checked': {
+                      color: '#3B82F6',
+                    },
+                    '& .MuiSvgIcon-root': {
+                      fontSize: '1.25rem',
+                    }
+                  }}
+                />
+                <ListItemText 
+                  primary={displayAcademicSessionName(session)}
+                  className="ml-2 text-gray-900 dark:text-white"
+                />
               </MenuItem>
             ))}
           </Select>

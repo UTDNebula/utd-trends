@@ -16,6 +16,8 @@ import FeedbackPopup from '@/components/common/FeedbackPopup/FeedbackPopup';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
 import useGradeStore from '@/modules/useGradeStore/useGradeStore';
 import useRmpStore from '@/modules/useRmpStore/useRmpStore';
+import { ThemeProvider as CustomThemeProvider } from '@/context/ThemeContext';
+import ThemeToggle from '@/components/common/ThemeToggle/ThemeToggle';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -173,28 +175,31 @@ function MyApp({ Component, pageProps }: AppProps) {
         />
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
-      <ThemeProvider theme={muiTheme}>
-        <div
-          className={
-            inter.variable +
-            ' ' +
-            kallisto.variable +
-            ' h-full text-haiti dark:text-white'
-          }
-        >
-          <Component
-            {...pageProps}
-            grades={grades}
-            fetchAndStoreGradesData={fetchAndStoreGradesData}
-            recalcGrades={recalcGrades}
-            recalcAllGrades={recalcAllGrades}
-            rmp={rmp}
-            fetchAndStoreRmpData={fetchAndStoreRmpData}
-          />
-          <FeedbackPopup />
-          <GitHubButton />
-        </div>
-      </ThemeProvider>
+      <CustomThemeProvider>
+        <ThemeProvider theme={muiTheme}>
+          <div
+            className={
+              inter.variable +
+              ' ' +
+              kallisto.variable +
+              ' h-full text-haiti dark:text-white'
+            }
+          >
+            <Component
+              {...pageProps}
+              grades={grades}
+              fetchAndStoreGradesData={fetchAndStoreGradesData}
+              recalcGrades={recalcGrades}
+              recalcAllGrades={recalcAllGrades}
+              rmp={rmp}
+              fetchAndStoreRmpData={fetchAndStoreRmpData}
+            />
+            <FeedbackPopup />
+            <GitHubButton />
+            <ThemeToggle />
+          </div>
+        </ThemeProvider>
+      </CustomThemeProvider>
       <SpeedInsights route={router.pathname} />
     </>
   );
