@@ -83,7 +83,7 @@ function Row({
   color,
 }: RowProps) {
   const [open, setOpen] = useState(false);
-
+  const canOpen = (grades?.state === 'done' || rmp?.state === 'done');
   const rainbowColors = useRainbowColors();
 
   const nameCell = (
@@ -105,9 +105,7 @@ function Row({
       placement="top"
     >
       <Typography
-        onClick={
-          (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
-        }
+        onClick={(e) => e.stopPropagation()}
         className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit"
       >
         {searchQueryLabel(course) +
@@ -123,40 +121,75 @@ function Row({
 
   return (
     <>
-      <TableRow 
-        onClick={() => setOpen(!open)} 
-        className="cursor-pointer bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700"
+      {/* Mobile row */}
+      <TableRow
+        onClick={() => {
+          if (canOpen) setOpen(!open);
+        }}
+        className={'table-row sm:hidden' + (canOpen ? ' cursor-pointer' : '')}
+      >
+        <TableCell
+          component="th"
+          scope="row"
+          className="w-full border-b-0 pb-0"
+          colSpan={3}
+        >
+          {nameCell}
+        </TableCell>
+      </TableRow>
+
+      {/* Desktop row */}
+      <TableRow
+        onClick={() => {
+          if (canOpen) setOpen(!open);
+        }}
+        className={`cursor-pointer bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 ${!canOpen ? 'cursor-default' : ''}`}
       >
         <TableCell className="flex items-center gap-1">
-          <IconButton
-            aria-label="expand row"
-            size="medium"
-            onClick={(e) => {
-              e.stopPropagation();
-              setOpen(!open);
-            }}
-            className={`transition-transform text-gray-600 dark:text-gray-300 ${open ? 'rotate-90' : ''}`}
+          <Tooltip
+            title={open ? 'Minimize Result' : 'Expand Result'}
+            placement="top"
           >
-            <KeyboardArrowIcon />
-          </IconButton>
-          <Checkbox
-            checked={inCompare}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (inCompare) {
-                removeFromCompare(course);
-              } else {
-                addToCompare(course);
+            <IconButton
+              aria-label="expand row"
+              size="medium"
+              disabled={!canOpen}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (canOpen) setOpen(!open);
+              }}
+              className={`transition-transform text-gray-600 dark:text-gray-300 ${open ? 'rotate-90' : ''}`}
+            >
+              <KeyboardArrowIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip
+            title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
+            placement="top"
+          >
+            <Checkbox
+              checked={inCompare}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (inCompare) {
+                  removeFromCompare(course);
+                } else {
+                  addToCompare(course);
+                }
+              }}
+              disabled={
+                (typeof grades !== 'undefined' && grades.state === 'loading') ||
+                (typeof rmp !== 'undefined' && rmp.state === 'loading')
               }
-            }}
-            className="text-blue-500 dark:text-blue-400"
-            sx={{
-              color: 'rgb(156 163 175)',
-              '&.Mui-checked': {
-                color: color || '#3B82F6',
-              },
-            }}
-          />
+              className="text-blue-500 dark:text-blue-400"
+              sx={{
+                color: 'rgb(156 163 175)',
+                '&.Mui-checked': {
+                  color: color || '#3B82F6',
+                },
+              }}
+            />
+          </Tooltip>
         </TableCell>
         <TableCell
           component="th"

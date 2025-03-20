@@ -14,10 +14,11 @@ import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config.js';
 import FeedbackPopup from '@/components/common/FeedbackPopup/FeedbackPopup';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
+import ThemeToggle from '@/components/common/ThemeToggle/ThemeToggle';
+import { ThemeProvider as CustomThemeProvider } from '@/context/ThemeContext';
 import useGradeStore from '@/modules/useGradeStore/useGradeStore';
 import useRmpStore from '@/modules/useRmpStore/useRmpStore';
-import { ThemeProvider as CustomThemeProvider } from '@/context/ThemeContext';
-import ThemeToggle from '@/components/common/ThemeToggle/ThemeToggle';
+import useSectionsStore from '@/modules/useSectionsStore/useSectionsStore';
 
 const inter = Inter({
   subsets: ['latin'],

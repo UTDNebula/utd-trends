@@ -345,21 +345,24 @@ const SearchBar = ({
         title="Select a course or professor before searching"
         placement="top"
         open={openErrorTooltip}
-        onOpen={() => setErrorTooltip(true)}
         onClose={() => setErrorTooltip(false)}
         disableFocusListener
         disableHoverListener
         disableTouchListener
       >
         <Button
-          className={`px-4 py-2 bg-cornflower-600 hover:bg-cornflower-700 text-white
+          variant="contained"
+          disableElevation
+          size="large"
+          className={`h-11 w-[5.5rem] shrink-0 normal-case bg-cornflower-600 hover:bg-cornflower-700 text-white
             dark:bg-cornflower-800 dark:hover:bg-cornflower-700
-            ${value.length == 0 ? 'opacity-50 dark:opacity-30' : ''}`}
+            ${value.length === 0 ? 'opacity-50 dark:opacity-30' : ''}`}
           onClick={() => onSelect_internal(value)}
         >
           {resultsLoading === 'loading' ? (
             <CircularProgress 
-              className="h-6 w-6 text-white dark:text-cornflower-50" 
+              size={24}
+              className="text-white dark:text-cornflower-50" 
             />
           ) : (
             'Search'
