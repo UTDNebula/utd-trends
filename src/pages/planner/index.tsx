@@ -108,7 +108,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
       };
     }
   }, [planner]);
-  console.log(props.grades, props.rmp, props.sections);
+  console.log(/*props.grades, props.rmp, */ props.sections);
 
   let results: GenericFetchedData<SearchQuery[]> = {
     state: 'loading',
@@ -123,9 +123,9 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
 
   const panelLRef = useRef<ImperativePanelHandle>(null);
   const panelRRef = useRef<ImperativePanelHandle>(null);
-  // Resets RHS & LHS to 50/50 when double clicking handle
+  // Resets RHS & LHS to 30/70 when double clicking handle
   const handleResizeDoubleClick = () => {
-    panelLRef.current?.resize(50);
+    panelLRef.current?.resize(30);
   };
 
   //Main content: loading, error, or normal
@@ -134,7 +134,16 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
   if (results.state === 'done' && !results.data.length) {
     contentComponent = <MyPlannerEmpty />;
   } else {
-    const plannerCoursesTable = <PlannerCoursesTable />;
+    const plannerCoursesTable = (
+      <PlannerCoursesTable
+        courses={results.state === 'done' ? results.data : []}
+        addToPlanner={props.addToPlanner}
+        removeFromPlanner={props.removeFromPlanner}
+        sections={props.sections}
+        grades={props.grades}
+        rmp={props.rmp}
+      />
+    );
 
     contentComponent = (
       <>
