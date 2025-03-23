@@ -12,7 +12,6 @@ import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/MyPlannerEmpty';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
 import PlannerSchedule from '@/components/planner/PlannerSchedule/plannerSchedule';
-import type { SectionsData } from '@/pages/api/sections';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
@@ -23,6 +22,7 @@ import {
 } from '@/modules/SearchQuery/SearchQuery';
 import type { SectionsType } from '@/modules/SectionsType/SectionsType';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { SectionsData } from '@/pages/api/sections';
 
 function removeDuplicates(array: SearchQuery[]) {
   return array.filter(

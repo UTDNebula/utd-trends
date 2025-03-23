@@ -1,7 +1,8 @@
 import React from 'react';
 
-import Section from './PlannerSection';
 import type { SectionsData } from '@/pages/api/sections';
+
+import Section from './PlannerSection';
 
 // hours shown (24-hour time)
 export const START_HOUR = 8;
