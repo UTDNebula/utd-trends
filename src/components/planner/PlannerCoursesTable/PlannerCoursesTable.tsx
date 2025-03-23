@@ -1,123 +1,67 @@
-import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
-import {
-  Checkbox,
-  IconButton,
-  Paper,
-  Skeleton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-  Typography,
-} from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { Typography } from '@mui/material';
+import React from 'react';
 
-import Rating from '@/components/common/Rating/Rating';
+import PlannerCard, {
+  LoadingRow,
+} from '@/components/planner/PlannerCoursesTable/PlannerCard/PlannerCard';
 import { type GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import { type SearchQuery } from '@/modules/SearchQuery/SearchQuery';
+import type { GradesType } from '@/modules/GradesType/GradesType';
+import {
+  convertToProfOnly,
+  type SearchQuery,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
 import { type SectionsType } from '@/modules/SectionsType/SectionsType';
-
-import PlannerCard from './PlannerCard/plannerCard';
-
-function LoadingRow() {
-  return (
-    <TableRow>
-      <TableCell className="flex gap-1">
-        <IconButton aria-label="expand row" size="medium" disabled>
-          <KeyboardArrowIcon />
-        </IconButton>
-        <Checkbox disabled />
-      </TableCell>
-      <TableCell component="th" scope="row" className="w-full">
-        <Typography className="w-full leading-tight text-lg">
-          <Skeleton />
-        </Typography>
-      </TableCell>
-      <TableCell align="center">
-        <Skeleton
-          variant="rounded"
-          className="rounded-full px-5 py-2 min-w-16 block mx-auto"
-        >
-          <Typography className="text-base">A+</Typography>
-        </Skeleton>
-      </TableCell>
-      <TableCell align="center">
-        <Skeleton variant="rounded" className="rounded-full mx-auto">
-          <Rating sx={{ fontSize: 25 }} readOnly />
-        </Skeleton>
-      </TableCell>
-    </TableRow>
-  );
-}
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
 type PlannerCoursesTableProps = {
-  prop?: string;
   courses?: SearchQuery[];
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
   sections: {
     [key: string]: GenericFetchedData<SectionsType>;
   };
+  grades: { [key: string]: GenericFetchedData<GradesType> };
+  rmp: { [key: string]: GenericFetchedData<RMPInterface> };
 };
 
 const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
-  const [courses, setCourses] = useState<SearchQuery[]>([]);
-  useEffect(() => {
-    setCourses(props.courses ?? []);
-  }, [courses]);
-  console.log(courses);
   return (
-    //TODO: sticky header
     <>
       <Typography className="leading-tight text-3xl font-bold p-4">
         My Planner
       </Typography>
-      <TableContainer component={Paper}>
-        <Table stickyHeader aria-label="collapsible table">
-          <TableBody>
-            {props.courses
-              ? courses.map((course, index) => {
-                  const sectionKey = `${course.prefix} ${course.number} ${course.profFirst} ${course.profLast}`;
-                  const sectionData = props.sections[sectionKey];
+      <div className="flex flex-col gap-4">
+        {props.courses
+          ? props.courses.map((course, index) => {
+              const sectionData = props.sections[searchQueryLabel(course)];
 
-                  if (
-                    sectionData.state === 'done' &&
-                    course.prefix !== undefined &&
-                    course.number !== undefined &&
-                    course.profFirst !== undefined &&
-                    course.profLast !== undefined
-                  ) {
-                    return (
-                      <PlannerCard
-                        key={index}
-                        prefix={course.prefix}
-                        number={course.number}
-                        profFirst={course.profFirst}
-                        profLast={course.profLast}
-                        numSections={sectionData.data.latest.length}
-                        latestSections={sectionData.data.latest}
-                        onBookmarkClick={() => {
-                          props.removeFromPlanner(course);
-                          setCourses((prevCourses) => {
-                            return prevCourses.filter((prevCourse) => {
-                              return (
-                                JSON.stringify(prevCourse) !==
-                                JSON.stringify(course)
-                              );
-                            });
-                          });
-                        }}
-                      />
-                    );
-                  }
-                })
-              : Array(10)
-                  .fill(0)
-                  .map((_, index) => <LoadingRow key={index} />)}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              if (typeof sectionData !== 'undefined') {
+                if (sectionData.state === 'error') {
+                  props.removeFromPlanner(course);
+                  return null;
+                }
+                if (sectionData.state === 'loading') {
+                  return <LoadingRow key={index} />;
+                }
+                return (
+                  <PlannerCard
+                    key={index}
+                    query={course}
+                    sections={sectionData.data.latest}
+                    grades={props.grades[searchQueryLabel(course)]}
+                    rmp={props.rmp[searchQueryLabel(convertToProfOnly(course))]}
+                    removeFromPlanner={() => {
+                      props.removeFromPlanner(course);
+                    }}
+                  />
+                );
+              }
+            })
+          : Array(5)
+              .fill(0)
+              .map((_, index) => <LoadingRow key={index} />)}
+      </div>
     </>
   );
 };
