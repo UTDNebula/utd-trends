@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
 import Background from '@/../public/background.png';
-import SearchBar from '@/components/search/SearchBar/searchBar';
+import SearchBar from '@/components/search/SearchBar/SearchBar';
 
 /**
  * Props type used by the TopMenu component
@@ -63,6 +63,7 @@ export function TopMenu({
           alt="gradient background"
           fill
           className="object-cover -z-20"
+          priority
         />
         <Link
           href="/"
