@@ -8,12 +8,12 @@ import {
   PanelResizeHandle,
 } from 'react-resizable-panels';
 
-import TopMenu from '@/components/navigation/TopMenu/TopMenu';
-import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/myPlannerEmpty';
-import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/plannerCoursesTable';
+import TopMenu from '@/components/navigation/topMenu/TopMenu';
+import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/MyPlannerEmpty';
+import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
 import PlannerSchedule, {
   type SectionData,
-} from '@/components/planner/PlannerSchedule/plannerSchedule';
+} from '@/components/planner/PlannerSchedule/PlannerSchedule';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
