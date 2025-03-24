@@ -2,44 +2,6 @@ import React from 'react';
 
 import Section from './PlannerSection';
 
-export type SectionData = {
-  _id: string;
-  section_number: string;
-  course_reference: string;
-  section_corequisites: null;
-  academic_session: {
-    name: string;
-    start_date: string;
-    end_date: string;
-  };
-  professors: string[];
-  teaching_assistants: {
-    first_name: string;
-    last_name: string;
-    role: string;
-    email: string;
-  }[];
-  internal_class_number: string;
-  instruction_mode: string;
-  meetings: {
-    start_date: string;
-    end_date: string;
-    meeting_days: string[];
-    start_time: string;
-    end_time: string;
-    modality: string;
-    location: {
-      building: string;
-      room: string;
-      map_uri: string;
-    };
-  }[];
-  core_flags: string[];
-  syllabus_uri: string;
-  grade_distribution: number[];
-  attributes: unknown;
-};
-
 // hours shown (24-hour time)
 export const START_HOUR = 8;
 export const END_HOUR = 21;
@@ -61,7 +23,7 @@ export const DAYS = [
 ];
 
 type PlannerScheduleProps = {
-  selectedSections: SectionData[];
+  selectedSections: SectionsData;
 };
 
 const PlannerSchedule = (props: PlannerScheduleProps) => {

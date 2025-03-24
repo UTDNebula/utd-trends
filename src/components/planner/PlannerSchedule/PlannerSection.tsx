@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 
-import { DAYS, numDays, type SectionData, START_HOUR } from './plannerSchedule';
+import { DAYS, numDays, START_HOUR } from './PlannerSchedule';
+import type { SectionsData } from '@/pages/api/sections';
 
 type PlannerSectionComponentProps = {
-  selectedSection: SectionData;
+  selectedSection: SectionsData[number];
   key: number;
 };
 
