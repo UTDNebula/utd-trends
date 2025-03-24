@@ -8,7 +8,7 @@ import {
   PanelResizeHandle,
 } from 'react-resizable-panels';
 
-import TopMenu from '@/components/navigation/topMenu/TopMenu';
+import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/MyPlannerEmpty';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
 import PlannerSchedule, {

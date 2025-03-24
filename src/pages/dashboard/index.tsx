@@ -14,7 +14,7 @@ import Compare from '@/components/compare/Compare/Compare';
 import DashboardEmpty from '@/components/dashboard/DashboardEmpty/DashboardEmpty';
 import DashboardError from '@/components/dashboard/DashboardError/DashboardError';
 import Carousel from '@/components/navigation/Carousel/Carousel';
-import TopMenu from '@/components/navigation/topMenu/TopMenu';
+import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import CourseOverview from '@/components/overview/CourseOverview/CourseOverview';
 import ProfessorOverview from '@/components/overview/ProfessorOverview/ProfessorOverview';
 import Filters from '@/components/search/Filters/Filters';
