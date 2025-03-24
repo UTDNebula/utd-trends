@@ -3,7 +3,7 @@ import { Collapse, useMediaQuery } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 
-import { TabNavMenu } from '@/components/navigation/tabNavMenu/TabNavMenu';
+import { TabNavMenu } from '@/components/navigation/TabNavMenu/TabNavMenu';
 
 interface CarouselProps {
   names: string[] | string;
