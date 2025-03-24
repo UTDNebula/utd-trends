@@ -1,5 +1,7 @@
 import React from 'react';
 
+import type { SectionsData } from '@/pages/api/sections';
+
 import Section from './PlannerSection';
 
 // hours shown (24-hour time)
