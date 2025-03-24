@@ -11,7 +11,7 @@ import {
 import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/MyPlannerEmpty';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
-import PlannerSchedule from '@/components/planner/PlannerSchedule/plannerSchedule';
+import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedule';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
