@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-import { DAYS, numDays, START_HOUR } from './PlannerSchedule';
 import type { SectionsData } from '@/pages/api/sections';
+
+import { DAYS, numDays, START_HOUR } from './PlannerSchedule';
 
 type PlannerSectionComponentProps = {
   selectedSection: SectionsData[number];
