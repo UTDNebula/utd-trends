@@ -1,6 +1,6 @@
 ### Bar Graph Example
 
-```ts
+```tsx
 const axisLabel = ['A', 'B', 'C', 'D', 'F'];
 const startData = [
   { name: 'Smith', data: [1, 2, 3, 4, 1] },
@@ -40,13 +40,13 @@ const resetGraph = () => {
 };
 const name = 'Bar Graph Example';
 <div style={{ width: '100%', height: '300px' }}>
-  <VerticalBarGraph
+  <BarGraph
     xaxisLabels={currentAxisLabel}
     series={currentData}
     title={name}
-  ></VerticalBarGraph>
+  ></BarGraph>
   <div style={{ margin: '1.5rem', marginTop: '2.5rem' }}>
-    Current props being passed to the <code>VerticalBarGraph</code> component:
+    Current props being passed to the <code>BarGraph</code> component:
     <div
       style={{
         border: '1px solid black',
@@ -55,9 +55,7 @@ const name = 'Bar Graph Example';
       }}
     >
       <code>
-        <div style={{ magin: '0.5rem', padding: '0.25rem' }}>
-          &lt;VerticalBarGraph
-        </div>
+        <div style={{ margin: '0.5rem', padding: '0.25rem' }}>&lt;BarGraph</div>
         <div
           style={{ magin: '0.5rem', padding: '0.25rem', marginLeft: '2rem' }}
         >
@@ -76,7 +74,7 @@ const name = 'Bar Graph Example';
           <strong>title</strong> = "{name}"
         </div>
         <div style={{ magin: '0.5rem', padding: '0.25rem' }}>
-          &gt;&lt;/VerticalBarGraph&gt;
+          &gt;&lt;/BarGraph&gt;
         </div>
       </code>
     </div>

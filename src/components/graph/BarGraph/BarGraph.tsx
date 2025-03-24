@@ -7,9 +7,10 @@ import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/full
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
 import { compareColors, useRainbowColors } from '@/modules/colors/colors';
 
+// Dynamically import react-apexcharts with SSR disabled.
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-type GraphProps = {
+type Props = {
   xaxisLabels?: string[];
   yaxisFormatter?: (val: number) => string;
   tooltipFormatter?: (
@@ -30,7 +31,7 @@ type GraphProps = {
  * @param props
  * @returns vertical bar graph
  */
-function BarGraph(props: GraphProps) {
+function BarGraph(props: Props) {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
@@ -54,7 +55,6 @@ function BarGraph(props: GraphProps) {
 
   const options: ApexOptions = {
     chart: {
-      id: 'line-chart',
       zoom: {
         enabled: false,
       },
@@ -104,7 +104,6 @@ function BarGraph(props: GraphProps) {
           ),
     stroke: {
       width: 2,
-      curve: 'smooth',
     },
     title: {
       text: props.title,
