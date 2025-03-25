@@ -114,6 +114,8 @@ function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
 type SectionTableRowProps = {
   data: SectionsData[number];
   lastRow: boolean;
+  sectionsInSchedule: SectionsData;
+  addSectionToSchedule: (section: SectionsData[number]) => void;
 };
 
 function SectionTableRows(props: SectionTableRowProps) {
@@ -122,7 +124,9 @@ function SectionTableRows(props: SectionTableRowProps) {
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
         <Radio
           onClick={() => {
-            console.log('clicked');
+            console.log('clisscked');
+            props.addSectionToSchedule(props.data);
+            console.log('aaaa');
           }}
         />
       </TableCell>
@@ -165,6 +169,8 @@ function SectionTableRows(props: SectionTableRowProps) {
 type PlannerCardProps = {
   query: SearchQuery;
   sections: SectionsData;
+  sectionsInSchedule: SectionsData;
+  addSectionToSchedule: (section: SectionsData[number]) => void;
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RMPInterface>;
   removeFromPlanner: () => void;
@@ -276,6 +282,8 @@ const PlannerCard = (props: PlannerCardProps) => {
                     key={index}
                     data={section}
                     lastRow={index === props.sections.length - 1}
+                    sectionsInSchedule={props.sectionsInSchedule}
+                    addSectionToSchedule={props.addSectionToSchedule}
                   />
                 ))}
               </TableBody>

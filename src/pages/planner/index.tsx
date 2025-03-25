@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   type ImperativePanelHandle,
   Panel,
@@ -167,6 +167,26 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
     panelLRef.current?.resize(30);
   };
 
+  const [sectionsInSchedule, setSectionsInSchedule] = useState<SectionsData>(
+    [],
+  );
+
+  function addSectionToSchedule(section: SectionsData[number]) {
+    console.log('adding', section._id);
+    setSectionsInSchedule((prev) => {
+      if (!prev.some((s) => s._id === section._id)) {
+        // prevent duplicate section
+        return [...prev, section];
+      }
+      return prev;
+    });
+  }
+
+  // function removeSectionFromSchedule(section : SectionsData[number])
+  // {
+
+  // }
+
   //Main content: loading, error, or normal
   let contentComponent;
 
@@ -179,6 +199,8 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
         addToPlanner={props.addToPlanner}
         removeFromPlanner={props.removeFromPlanner}
         sections={props.sections}
+        sectionsInSchedule={sectionsInSchedule}
+        addSectionToSchedule={addSectionToSchedule}
         grades={props.grades}
         rmp={props.rmp}
       />
