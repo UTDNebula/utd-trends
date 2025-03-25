@@ -55,7 +55,7 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
       ))}
 
       {props.selectedSections.map((x, i) => (
-        <PlannerSection selectedSection={x} />
+        <PlannerSection key={i} selectedSection={x} />
       ))}
     </div>
   );
