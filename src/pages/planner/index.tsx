@@ -11,9 +11,7 @@ import {
 import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/MyPlannerEmpty';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
-import PlannerSchedule, {
-  type SectionData,
-} from '@/components/planner/PlannerSchedule/PlannerSchedule';
+import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedule';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
@@ -24,6 +22,7 @@ import {
 } from '@/modules/SearchQuery/SearchQuery';
 import type { SectionsType } from '@/modules/SectionsType/SectionsType';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { SectionsData } from '@/pages/api/sections';
 
 function removeDuplicates(array: SearchQuery[]) {
   return array.filter(
@@ -32,7 +31,7 @@ function removeDuplicates(array: SearchQuery[]) {
   );
 }
 
-const sampleSectionData: SectionData[] = [
+const sampleSectionData: SectionsData = [
   {
     _id: '672f168a3e61da2b1e596bf2',
     section_number: '0U1',
@@ -210,7 +209,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
           >
             <div className="sticky top-4 mt-4">
               <PlannerSchedule
-                selectedSections={sampleSectionData as SectionData[]}
+                selectedSections={sampleSectionData as SectionsData}
               />
             </div>
           </Panel>
