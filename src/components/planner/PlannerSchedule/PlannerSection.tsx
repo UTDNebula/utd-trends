@@ -10,6 +10,7 @@ type PlannerSectionComponentProps = {
 
 const PlannerSection = (props: PlannerSectionComponentProps) => {
   //const SectionComponent = () => {
+  console.log(props.selectedSection);
   const [meetings, setMeetings] = useState<string[][]>([]);
   useEffect(() => {
     const tempMeetings = [];

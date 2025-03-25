@@ -31,42 +31,76 @@ function removeDuplicates(array: SearchQuery[]) {
   );
 }
 
-const sampleSectionData: SectionsData = [
-  {
-    _id: '672f168a3e61da2b1e596bf2',
-    section_number: '0U1',
-    course_reference: '672f16483e61da2b1e59243c',
-    section_corequisites: null,
-    academic_session: {
-      name: '19U',
-      start_date: '2019-05-23T05:00:00Z',
-      end_date: '2019-08-07T05:00:00Z',
-    },
-    professors: ['672f167f3e61da2b1e5960c0'],
-    teaching_assistants: [],
-    internal_class_number: '52738',
-    instruction_mode: 'Face-to-Face',
-    meetings: [
-      {
-        start_date: '2019-05-23T05:00:00Z',
-        end_date: '2019-08-05T05:00:00Z',
-        meeting_days: ['Tuesday', 'Thursday'],
-        start_time: '3:45pm',
-        end_time: '5:15pm',
-        modality: '',
-        location: {
-          building: 'JSOM',
-          room: '12.202',
-          map_uri: 'https://locator.utdallas.edu/JSOM_12.202',
-        },
-      },
-    ],
-    core_flags: ['070'],
-    syllabus_uri: 'https://dox.utdallas.edu/syl82961',
-    grade_distribution: [2, 7, 7, 5, 3, 9, 2, 4, 1, 1, 0, 0, 2, 0],
-    attributes: null,
-  },
-];
+// const sampleSectionData: SectionsData = [
+//   {
+//     _id: '672f168a3e61da2b1e596bf2',
+//     section_number: '0U1',
+//     course_reference: '672f16483e61da2b1e59243c',
+//     section_corequisites: null,
+//     academic_session: {
+//       name: '19U',
+//       start_date: '2019-05-23T05:00:00Z',
+//       end_date: '2019-08-07T05:00:00Z',
+//     },
+//     professors: ['672f167f3e61da2b1e5960c0'],
+//     teaching_assistants: [],
+//     internal_class_number: '52738',
+//     instruction_mode: 'Face-to-Face',
+//     meetings: [
+//       {
+//         start_date: '2019-05-23T05:00:00Z',
+//         end_date: '2019-08-05T05:00:00Z',
+//         meeting_days: ['Tuesday', 'Thursday'],
+//         start_time: '3:45pm',
+//         end_time: '5:15pm',
+//         modality: '',
+//         location: {
+//           building: 'JSOM',
+//           room: '12.202',
+//           map_uri: 'https://locator.utdallas.edu/JSOM_12.202',
+//         },
+//       },
+//     ],
+//     core_flags: ['070'],
+//     syllabus_uri: 'https://dox.utdallas.edu/syl82961',
+//     grade_distribution: [2, 7, 7, 5, 3, 9, 2, 4, 1, 1, 0, 0, 2, 0],
+//     attributes: null,
+//   },
+//   {
+//     _id: '672f168a3e61da2b1e596bf2',
+//     section_number: '0U1',
+//     course_reference: '672f16483e61da2b1e59243c',
+//     section_corequisites: null,
+//     academic_session: {
+//       name: '19U',
+//       start_date: '2019-05-23T05:00:00Z',
+//       end_date: '2019-08-07T05:00:00Z',
+//     },
+//     professors: ['672f167f3e61da2b1e5960c0'],
+//     teaching_assistants: [],
+//     internal_class_number: '52738',
+//     instruction_mode: 'Face-to-Face',
+//     meetings: [
+//       {
+//         start_date: '2019-05-23T05:00:00Z',
+//         end_date: '2019-08-05T05:00:00Z',
+//         meeting_days: ['Monday', 'Wednesday'],
+//         start_time: '3:45pm',
+//         end_time: '5:15pm',
+//         modality: '',
+//         location: {
+//           building: 'JSOM',
+//           room: '12.202',
+//           map_uri: 'https://locator.utdallas.edu/JSOM_12.202',
+//         },
+//       },
+//     ],
+//     core_flags: ['070'],
+//     syllabus_uri: 'https://dox.utdallas.edu/syl82961',
+//     grade_distribution: [2, 7, 7, 5, 3, 9, 2, 4, 1, 1, 0, 0, 2, 0],
+//     attributes: null,
+//   },
+// ];
 
 interface Props {
   planner: SearchQuery[];
@@ -231,7 +265,28 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
           >
             <div className="sticky top-4 mt-4">
               <PlannerSchedule
-                selectedSections={sampleSectionData as SectionsData}
+                selectedSections={
+                  results.state === 'done'
+                    ? results.data
+                        .map((course) => {
+                          const sectionData =
+                            props.sections[searchQueryLabel(course)];
+                          if (
+                            typeof sectionData !== 'undefined' &&
+                            sectionData.state === 'done'
+                          ) {
+                            const chosenSectionForCourse =
+                              sectionData.data.latest.find(
+                                (section) =>
+                                  section.section_number ===
+                                  course.sectionNumber,
+                              );
+                            return chosenSectionForCourse as SectionsData[number];
+                          }
+                        })
+                        .filter((section) => typeof section !== 'undefined')
+                    : []
+                }
               />
             </div>
           </Panel>
