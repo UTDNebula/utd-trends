@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { SectionsData } from '@/pages/api/sections';
 
-import Section from './PlannerSection';
+import PlannerSection from './PlannerSection';
 
 // hours shown (24-hour time)
 export const START_HOUR = 8;
@@ -55,7 +55,7 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
       ))}
 
       {props.selectedSections.map((x, i) => (
-        <Section key={i} selectedSection={x} />
+        <PlannerSection selectedSection={x} />
       ))}
     </div>
   );

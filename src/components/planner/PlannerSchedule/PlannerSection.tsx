@@ -6,7 +6,6 @@ import { DAYS, numDays, START_HOUR } from './PlannerSchedule';
 
 type PlannerSectionComponentProps = {
   selectedSection: SectionsData[number];
-  key: number;
 };
 
 const PlannerSection = (props: PlannerSectionComponentProps) => {
@@ -63,7 +62,7 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
 
   return meetings.map((x: string[], i: number) => (
     <div
-      key={props.key + i}
+      key={props.selectedSection._id + i}
       style={
         {
           '--start-col': x[0],
