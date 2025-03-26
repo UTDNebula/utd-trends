@@ -74,7 +74,7 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
       }
       className={`col-start-[var(--start-col)] col-span-1 row-start-[var(--start-row)] row-span-1 relative top-[var(--offset)] h-[var(--height)] overflow-visible rounded-lg bg-cornflower-500`}
     >
-      <div>{}</div>
+      <div>{props.selectedSection.section_number}</div>
     </div>
   ));
 };

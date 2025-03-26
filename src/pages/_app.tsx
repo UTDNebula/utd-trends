@@ -177,6 +177,30 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   }
 
+  function setPlannerSection(
+    searchQuery: SearchQuery,
+    section: string,
+  ): boolean {
+    // get the index of the course in planner
+    const index = planner.findIndex((course) => {
+      searchQuery.sectionNumber = course.sectionNumber; // searchQuery comes from result which won't have a sectionNumber
+      console.log(searchQuery, course);
+      return searchQueryEqual(course, searchQuery);
+    });
+    const course = planner[index];
+    if (
+      typeof course.sectionNumber === 'undefined' ||
+      course.sectionNumber === ''
+    ) {
+      setPlanner(
+        planner.map((course, i) =>
+          i === index ? { ...course, sectionNumber: section } : course,
+        ),
+      );
+      return true;
+    } else return false;
+  }
+
   //Store sections by course+prof combo
   const [sections, , fetchAndStoreSectionsData] = useSectionsStore();
 
@@ -220,6 +244,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             planner={planner}
             addToPlanner={addToPlanner}
             removeFromPlanner={removeFromPlanner}
+            setPlannerSection={setPlannerSection}
             grades={grades}
             fetchAndStoreGradesData={fetchAndStoreGradesData}
             recalcGrades={recalcGrades}

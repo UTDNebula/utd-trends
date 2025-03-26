@@ -13,17 +13,15 @@ import {
 } from '@/modules/SearchQuery/SearchQuery';
 import { type SectionsType } from '@/modules/SectionsType/SectionsType';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import type { SectionsData } from '@/pages/api/sections';
 
 type PlannerCoursesTableProps = {
   courses?: SearchQuery[];
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
+  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
   sections: {
     [key: string]: GenericFetchedData<SectionsType>;
   };
-  sectionsInSchedule: SectionsData;
-  addSectionToSchedule: (section: SectionsData[number]) => void;
   grades: { [key: string]: GenericFetchedData<GradesType> };
   rmp: { [key: string]: GenericFetchedData<RMPInterface> };
 };
@@ -52,8 +50,7 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                     key={index}
                     query={course}
                     sections={sectionData.data.latest}
-                    sectionsInSchedule={props.sectionsInSchedule}
-                    addSectionToSchedule={props.addSectionToSchedule}
+                    setPlannerSection={props.setPlannerSection}
                     grades={props.grades[searchQueryLabel(course)]}
                     rmp={props.rmp[searchQueryLabel(convertToProfOnly(course))]}
                     removeFromPlanner={() => {

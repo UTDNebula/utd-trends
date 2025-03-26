@@ -113,9 +113,9 @@ function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
 
 type SectionTableRowProps = {
   data: SectionsData[number];
+  course: SearchQuery;
   lastRow: boolean;
-  sectionsInSchedule: SectionsData;
-  addSectionToSchedule: (section: SectionsData[number]) => void;
+  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
 };
 
 function SectionTableRows(props: SectionTableRowProps) {
@@ -124,9 +124,16 @@ function SectionTableRows(props: SectionTableRowProps) {
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
         <Radio
           onClick={() => {
-            console.log('clisscked');
-            props.addSectionToSchedule(props.data);
-            console.log('aaaa');
+            console.log('clisscked ' + searchQueryLabel(props.course));
+            const x = props.setPlannerSection(
+              props.course,
+              props.data.section_number,
+            );
+            console.log(
+              x
+                ? 'set section to '
+                : 'could not set section to ' + props.data.section_number,
+            );
           }}
         />
       </TableCell>
@@ -169,8 +176,7 @@ function SectionTableRows(props: SectionTableRowProps) {
 type PlannerCardProps = {
   query: SearchQuery;
   sections: SectionsData;
-  sectionsInSchedule: SectionsData;
-  addSectionToSchedule: (section: SectionsData[number]) => void;
+  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RMPInterface>;
   removeFromPlanner: () => void;
@@ -281,9 +287,9 @@ const PlannerCard = (props: PlannerCardProps) => {
                   <SectionTableRows
                     key={index}
                     data={section}
+                    course={props.query}
                     lastRow={index === props.sections.length - 1}
-                    sectionsInSchedule={props.sectionsInSchedule}
-                    addSectionToSchedule={props.addSectionToSchedule}
+                    setPlannerSection={props.setPlannerSection}
                   />
                 ))}
               </TableBody>
