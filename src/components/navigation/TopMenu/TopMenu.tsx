@@ -11,21 +11,21 @@ import SearchBar from '@/components/search/SearchBar/SearchBar';
 /**
  * Props type used by the TopMenu component
  */
-interface TopMenuProps {
+type DashboardTopMenuProps = {
   resultsLoading: 'loading' | 'done' | 'error';
   setResultsLoading: () => void;
-  isPlanner: boolean;
-}
+  isPlanner: false;
+};
+type PlannerTopMenuProps = {
+  isPlanner: true;
+};
+type TopMenuProps = DashboardTopMenuProps | PlannerTopMenuProps;
 
 /**
  * This is a component to hold UTD Trends branding and basic navigation
  * @returns
  */
-export function TopMenu({
-  resultsLoading,
-  setResultsLoading,
-  isPlanner,
-}: TopMenuProps) {
+export function TopMenu(props: TopMenuProps) {
   const router = useRouter();
   const [openCopied, setOpenCopied] = useState(false);
 
@@ -71,20 +71,22 @@ export function TopMenu({
         >
           UTD TRENDS
         </Link>
-        <SearchBar
-          manageQuery="onSelect"
-          resultsLoading={resultsLoading}
-          setResultsLoading={setResultsLoading}
-          className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
-          input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
-        />
+        {!props.isPlanner && (
+          <SearchBar
+            manageQuery="onSelect"
+            resultsLoading={props.resultsLoading}
+            setResultsLoading={props.setResultsLoading}
+            className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
+            input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+          />
+        )}
         <Link
-          className="bg-cornflower-400"
-          href={isPlanner ? '/dashboard' : '/planner'}
+          className="bg-cornflower-400 ml-auto"
+          href={props.isPlanner ? '/dashboard' : '/planner'}
         >
-          {isPlanner ? 'Search Results' : 'My Planner'}
+          {props.isPlanner ? 'Search Results' : 'My Planner'}
         </Link>
-        <Tooltip title="Share link to search" className="ml-auto">
+        <Tooltip title="Share link to search">
           <IconButton
             className="aspect-square"
             size="medium"

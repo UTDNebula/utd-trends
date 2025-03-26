@@ -238,11 +238,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
         />
       </Head>
       <div className="w-full bg-light h-full">
-        <TopMenu
-          resultsLoading={results.state}
-          setResultsLoading={() => {}}
-          isPlanner={true}
-        />
+        <TopMenu isPlanner />
         <main className="p-4">{contentComponent}</main>
       </div>
     </>
