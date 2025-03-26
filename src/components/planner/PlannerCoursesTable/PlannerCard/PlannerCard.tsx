@@ -53,10 +53,10 @@ export function LoadingRow() {
             aria-label="dropdown switch"
             className="ml-2"
           >
-            <ToggleButton aria-label="sections" disabled>
+            <ToggleButton value="" aria-label="sections" disabled>
               <EventIcon />
             </ToggleButton>
-            <ToggleButton aria-label="grades and rmp" disabled>
+            <ToggleButton value="" aria-label="grades and rmp" disabled>
               <BarChartIcon />
             </ToggleButton>
           </ToggleButtonGroup>
@@ -188,7 +188,7 @@ const PlannerCard = (props: PlannerCardProps) => {
   const canOpenGrades =
     !(typeof props.grades === 'undefined' || props.grades.state === 'error') ||
     !(typeof props.rmp === 'undefined' || props.rmp.state === 'error');
-  const [whichOpen, setWhichOpen] = useState<'sections' | 'grades'>(
+  const [whichOpen, setWhichOpen] = useState<'sections' | 'grades' | null>(
     canOpenSections ? 'sections' : canOpenGrades ? 'grades' : null,
   );
   function handleOpen() {
