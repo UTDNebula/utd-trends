@@ -164,7 +164,7 @@ function SectionTableRows(props: SectionTableRowProps) {
 
 type PlannerCardProps = {
   query: SearchQuery;
-  sections: SectionsData;
+  sections?: SectionsData;
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RMPInterface>;
   removeFromPlanner: () => void;
@@ -172,7 +172,8 @@ type PlannerCardProps = {
 
 const PlannerCard = (props: PlannerCardProps) => {
   const [open, setOpen] = useState<'false' | 'sections' | 'grades'>('false');
-  const canOpenSections = props.sections.length !== 0;
+  const canOpenSections =
+    typeof props.sections !== 'undefined' && props.sections.length !== 0;
   const canOpenGrades =
     !(typeof props.grades === 'undefined' || props.grades.state === 'error') ||
     !(typeof props.rmp === 'undefined' || props.rmp.state === 'error');
@@ -216,21 +217,23 @@ const PlannerCard = (props: PlannerCardProps) => {
             title={open === 'sections' ? 'Minimize Result' : 'Expand Result'}
             placement="top"
           >
-            <IconButton
-              aria-label="expand row"
-              size="medium"
-              onClick={(e) => {
-                e.stopPropagation(); // prevents double opening/closing
-                handleOpen('sections');
-              }}
-              disabled={!canOpenSections}
-              className={
-                'transition-transform' +
-                (open === 'sections' ? ' rotate-90' : '')
-              }
-            >
-              <KeyboardArrowIcon fontSize="inherit" />
-            </IconButton>
+            <span>
+              <IconButton
+                aria-label="expand row"
+                size="medium"
+                onClick={(e) => {
+                  e.stopPropagation(); // prevents double opening/closing
+                  handleOpen('sections');
+                }}
+                disabled={!canOpenSections}
+                className={
+                  'transition-transform' +
+                  (open === 'sections' ? ' rotate-90' : '')
+                }
+              >
+                <KeyboardArrowIcon fontSize="inherit" />
+              </IconButton>
+            </span>
           </Tooltip>
           <Tooltip title={'Remove from Planner'} placement="top">
             <Checkbox
@@ -247,16 +250,18 @@ const PlannerCard = (props: PlannerCardProps) => {
             title={open === 'grades' ? 'Minimize Grades' : 'Expand Grades'}
             placement="top"
           >
-            <IconButton
-              size="medium"
-              onClick={(e) => {
-                e.stopPropagation(); // prevents double opening/closing
-                handleOpen('grades');
-              }}
-              disabled={!canOpenGrades}
-            >
-              <BarChartIcon />
-            </IconButton>
+            <span>
+              <IconButton
+                size="medium"
+                onClick={(e) => {
+                  e.stopPropagation(); // prevents double opening/closing
+                  handleOpen('grades');
+                }}
+                disabled={!canOpenGrades}
+              >
+                <BarChartIcon />
+              </IconButton>
+            </span>
           </Tooltip>
         </div>
         <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit">
