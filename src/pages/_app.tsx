@@ -189,6 +189,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     });
     const course = planner[index];
     if (
+      section === '' ||
       typeof course.sectionNumber === 'undefined' ||
       course.sectionNumber === ''
     ) {

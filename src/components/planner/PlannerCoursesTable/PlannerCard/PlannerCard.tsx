@@ -119,21 +119,35 @@ type SectionTableRowProps = {
 };
 
 function SectionTableRows(props: SectionTableRowProps) {
+  const [isSelected, setIsSelected] = useState<boolean>(false);
   return (
     <TableRow>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
         <Radio
+          checked={isSelected}
           onClick={() => {
-            console.log('clisscked ' + searchQueryLabel(props.course));
-            const x = props.setPlannerSection(
-              props.course,
-              props.data.section_number,
-            );
-            console.log(
-              x
-                ? 'set section to '
-                : 'could not set section to ' + props.data.section_number,
-            );
+            if (!isSelected) {
+              console.log('clisscked ' + searchQueryLabel(props.course));
+              const x = props.setPlannerSection(
+                props.course,
+                props.data.section_number,
+              );
+              console.log(
+                x
+                  ? 'set section to '
+                  : 'could not set section to ' + props.data.section_number,
+              );
+              setIsSelected(!isSelected);
+            } else {
+              console.log('un-clisscked ' + searchQueryLabel(props.course));
+              const x = props.setPlannerSection(props.course, '');
+              console.log(
+                x
+                  ? 'set section to '
+                  : 'could not set section to ' + props.data.section_number,
+              );
+              setIsSelected(!isSelected);
+            }
           }}
         />
       </TableCell>
