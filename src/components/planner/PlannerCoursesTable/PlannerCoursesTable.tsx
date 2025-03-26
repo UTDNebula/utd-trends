@@ -38,27 +38,28 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
               const sectionData = props.sections[searchQueryLabel(course)];
 
               if (typeof sectionData !== 'undefined') {
-                if (sectionData.state === 'error') {
-                  props.removeFromPlanner(course);
-                  return null;
-                }
                 if (sectionData.state === 'loading') {
                   return <LoadingRow key={index} />;
                 }
-                return (
-                  <PlannerCard
-                    key={index}
-                    query={course}
-                    sections={sectionData.data.latest}
-                    setPlannerSection={props.setPlannerSection}
-                    grades={props.grades[searchQueryLabel(course)]}
-                    rmp={props.rmp[searchQueryLabel(convertToProfOnly(course))]}
-                    removeFromPlanner={() => {
-                      props.removeFromPlanner(course);
-                    }}
-                  />
-                );
               }
+              return (
+                <PlannerCard
+                  key={index}
+                  query={course}
+                  sections={
+                    typeof sectionData === 'undefined' ||
+                    sectionData.state === 'error'
+                      ? undefined
+                      : sectionData.data.latest
+                  }
+                  setPlannerSection={props.setPlannerSection}
+                  grades={props.grades[searchQueryLabel(course)]}
+                  rmp={props.rmp[searchQueryLabel(convertToProfOnly(course))]}
+                  removeFromPlanner={() => {
+                    props.removeFromPlanner(course);
+                  }}
+                />
+              );
             })
           : Array(5)
               .fill(0)
