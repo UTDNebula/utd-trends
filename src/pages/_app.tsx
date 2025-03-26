@@ -15,6 +15,7 @@ import tailwindConfig from '@/../tailwind.config.js';
 import FeedbackPopup from '@/components/common/FeedbackPopup/FeedbackPopup';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
 import {
+  removeSection,
   type SearchQuery,
   searchQueryEqual,
 } from '@/modules/SearchQuery/SearchQuery';
@@ -177,29 +178,17 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   }
 
-  function setPlannerSection(
-    searchQuery: SearchQuery,
-    section: string,
-  ): boolean {
-    // get the index of the course in planner
-    const index = planner.findIndex((course) => {
-      searchQuery.sectionNumber = course.sectionNumber; // searchQuery comes from result which won't have a sectionNumber
-      console.log(searchQuery, course);
-      return searchQueryEqual(course, searchQuery);
-    });
-    const course = planner[index];
-    if (
-      section === '' ||
-      typeof course.sectionNumber === 'undefined' ||
-      course.sectionNumber === ''
-    ) {
-      setPlanner(
-        planner.map((course, i) =>
-          i === index ? { ...course, sectionNumber: section } : course,
-        ),
-      );
-      return true;
-    } else return false;
+  function setPlannerSection(searchQuery: SearchQuery, section: string) {
+    setPlanner(
+      planner.map((course) => {
+        return searchQueryEqual(
+          removeSection(course),
+          removeSection(searchQuery),
+        )
+          ? { ...course, sectionNumber: section }
+          : course;
+      }),
+    );
   }
 
   //Store sections by course+prof combo

@@ -27,6 +27,7 @@ import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
+  removeSection,
   type SearchQuery,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
@@ -118,8 +119,8 @@ type SectionTableRowProps = {
   setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
 };
 
-function SectionTableRows(props: SectionTableRowProps) {
-  const [isSelected, setIsSelected] = useState<boolean>(false);
+function SectionTableRow(props: SectionTableRowProps) {
+  const isSelected = props.course.sectionNumber === props.data.section_number;
   return (
     <TableRow>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
@@ -127,26 +128,9 @@ function SectionTableRows(props: SectionTableRowProps) {
           checked={isSelected}
           onClick={() => {
             if (!isSelected) {
-              console.log('clisscked ' + searchQueryLabel(props.course));
-              const x = props.setPlannerSection(
-                props.course,
-                props.data.section_number,
-              );
-              console.log(
-                x
-                  ? 'set section to '
-                  : 'could not set section to ' + props.data.section_number,
-              );
-              setIsSelected(!isSelected);
+              props.setPlannerSection(props.course, props.data.section_number);
             } else {
-              console.log('un-clisscked ' + searchQueryLabel(props.course));
-              const x = props.setPlannerSection(props.course, '');
-              console.log(
-                x
-                  ? 'set section to '
-                  : 'could not set section to ' + props.data.section_number,
-              );
-              setIsSelected(!isSelected);
+              props.setPlannerSection(props.course, undefined);
             }
           }}
         />
@@ -160,8 +144,8 @@ function SectionTableRows(props: SectionTableRowProps) {
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
         {props.data.meetings
           .map(parseMeeting)
-          .map(([schedule, location, link]) => (
-            <>
+          .map(([schedule, location, link], i) => (
+            <div key={i}>
               {schedule !== ' -' && (
                 <Typography className="text-sm">{schedule}</Typography>
               )}
@@ -180,7 +164,7 @@ function SectionTableRows(props: SectionTableRowProps) {
                   )}
                 </Typography>
               )}
-            </>
+            </div>
           ))}
       </TableCell>
     </TableRow>
@@ -293,7 +277,7 @@ const PlannerCard = (props: PlannerCardProps) => {
           </Tooltip>
         </div>
         <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit">
-          {searchQueryLabel(props.query)}
+          {searchQueryLabel(removeSection(props.query))}
         </Typography>
       </div>
       {canOpenSections && (
@@ -305,8 +289,8 @@ const PlannerCard = (props: PlannerCardProps) => {
               </TableHead>
               <TableBody>
                 {sections.map((section, index) => (
-                  <SectionTableRows
-                    key={index}
+                  <SectionTableRow
+                    key={section.section_number}
                     data={section}
                     course={props.query}
                     lastRow={index === sections.length - 1}
@@ -322,7 +306,7 @@ const PlannerCard = (props: PlannerCardProps) => {
         <Collapse in={open === 'grades'} timeout="auto" unmountOnExit>
           <div className="p-2 md:p-4 flex flex-col gap-2">
             <SingleGradesInfo
-              course={props.query}
+              course={removeSection(props.query)}
               grades={props.grades}
               gradesToUse="unfiltered"
             />

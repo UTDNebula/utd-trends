@@ -8,6 +8,7 @@ import { type GenericFetchedData } from '@/modules/GenericFetchedData/GenericFet
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   convertToProfOnly,
+  removeSection,
   type SearchQuery,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
@@ -35,7 +36,8 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
       <div className="flex flex-col gap-4">
         {props.courses
           ? props.courses.map((course, index) => {
-              const sectionData = props.sections[searchQueryLabel(course)];
+              const sectionData =
+                props.sections[searchQueryLabel(removeSection(course))];
 
               if (typeof sectionData !== 'undefined') {
                 if (sectionData.state === 'loading') {
@@ -53,7 +55,7 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                       : sectionData.data.latest
                   }
                   setPlannerSection={props.setPlannerSection}
-                  grades={props.grades[searchQueryLabel(course)]}
+                  grades={props.grades[searchQueryLabel(removeSection(course))]}
                   rmp={props.rmp[searchQueryLabel(convertToProfOnly(course))]}
                   removeFromPlanner={() => {
                     props.removeFromPlanner(course);
