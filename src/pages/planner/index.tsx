@@ -162,9 +162,9 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
 
   const panelLRef = useRef<ImperativePanelHandle>(null);
   const panelRRef = useRef<ImperativePanelHandle>(null);
-  // Resets RHS & LHS to 30/70 when double clicking handle
+  // Resets RHS & LHS to 40/60 when double clicking handle
   const handleResizeDoubleClick = () => {
-    panelLRef.current?.resize(30);
+    panelLRef.current?.resize(40);
   };
 
   //Main content: loading, error, or normal
@@ -194,7 +194,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
           direction="horizontal"
           className="hidden sm:flex overflow-visible"
         >
-          <Panel ref={panelLRef} minSize={40} defaultSize={50}>
+          <Panel ref={panelLRef} minSize={30} defaultSize={40}>
             {plannerCoursesTable}
           </Panel>
           <PanelResizeHandle
@@ -204,8 +204,8 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
           <Panel
             className="overflow-visible min-w-0"
             ref={panelRRef}
-            minSize={30}
-            defaultSize={70}
+            minSize={50}
+            defaultSize={60}
           >
             <div className="sticky top-4 mt-4">
               <PlannerSchedule
