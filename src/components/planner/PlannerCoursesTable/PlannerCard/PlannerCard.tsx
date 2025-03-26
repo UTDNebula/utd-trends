@@ -116,7 +116,10 @@ type SectionTableRowProps = {
   data: SectionsData[number];
   course: SearchQuery;
   lastRow: boolean;
-  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
+  setPlannerSection: (
+    searchQuery: SearchQuery,
+    section: string | undefined,
+  ) => boolean;
 };
 
 function SectionTableRow(props: SectionTableRowProps) {
@@ -174,7 +177,10 @@ function SectionTableRow(props: SectionTableRowProps) {
 type PlannerCardProps = {
   query: SearchQuery;
   sections?: SectionsData;
-  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
+  setPlannerSection: (
+    searchQuery: SearchQuery,
+    section: string | undefined,
+  ) => boolean;
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RMPInterface>;
   removeFromPlanner: () => void;

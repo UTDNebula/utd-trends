@@ -178,7 +178,10 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   }
 
-  function setPlannerSection(searchQuery: SearchQuery, section: string) {
+  function setPlannerSection(
+    searchQuery: SearchQuery,
+    section: string | undefined,
+  ) {
     setPlanner(
       planner.map((course) => {
         return searchQueryEqual(

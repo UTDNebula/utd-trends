@@ -19,7 +19,10 @@ type PlannerCoursesTableProps = {
   courses?: SearchQuery[];
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
-  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
+  setPlannerSection: (
+    searchQuery: SearchQuery,
+    section: string | undefined,
+  ) => boolean;
   sections: {
     [key: string]: GenericFetchedData<SectionsType>;
   };

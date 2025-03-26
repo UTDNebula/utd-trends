@@ -39,7 +39,10 @@ interface Props {
   grades: {
     [key: string]: GenericFetchedData<GradesType>;
   };
-  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
+  setPlannerSection: (
+    searchQuery: SearchQuery,
+    section: string | undefined,
+  ) => boolean;
   fetchAndStoreGradesData: (
     course: SearchQuery,
     controller: AbortController,
