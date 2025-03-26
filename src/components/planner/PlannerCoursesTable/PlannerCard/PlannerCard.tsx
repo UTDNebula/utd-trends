@@ -172,8 +172,10 @@ type PlannerCardProps = {
 
 const PlannerCard = (props: PlannerCardProps) => {
   const [open, setOpen] = useState<'false' | 'sections' | 'grades'>('false');
+  //appease the typescript gods
+  const sections = props.sections;
   const canOpenSections =
-    typeof props.sections !== 'undefined' && props.sections.length !== 0;
+    typeof sections !== 'undefined' && sections.length !== 0;
   const canOpenGrades =
     !(typeof props.grades === 'undefined' || props.grades.state === 'error') ||
     !(typeof props.rmp === 'undefined' || props.rmp.state === 'error');
@@ -276,11 +278,11 @@ const PlannerCard = (props: PlannerCardProps) => {
                 <SectionTableHead />
               </TableHead>
               <TableBody>
-                {props.sections.map((section, index) => (
+                {sections.map((section, index) => (
                   <SectionTableRows
                     key={index}
                     data={section}
-                    lastRow={index === props.sections.length - 1}
+                    lastRow={index === sections.length - 1}
                   />
                 ))}
               </TableBody>
