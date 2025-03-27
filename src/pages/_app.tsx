@@ -16,6 +16,7 @@ import FeedbackPopup from '@/components/common/FeedbackPopup/FeedbackPopup';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
 import {
   removeSection,
+  sameCourse,
   type SearchQuery,
   searchQueryEqual,
 } from '@/modules/SearchQuery/SearchQuery';
@@ -184,11 +185,11 @@ function MyApp({ Component, pageProps }: AppProps) {
   ) {
     setPlanner(
       planner.map((course) => {
-        return searchQueryEqual(
+        return sameCourse(course, searchQuery) ?  { ...course, sectionNumber: searchQueryEqual(
           removeSection(course),
           removeSection(searchQuery),
         )
-          ? { ...course, sectionNumber: section }
+          ? section : undefined}
           : course;
       }),
     );

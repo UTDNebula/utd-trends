@@ -88,6 +88,19 @@ export function searchQueryEqual(
   return true;
 }
 
+export function sameCourse(
+  query1: SearchQuery,
+  query2: SearchQuery,
+): boolean {
+  if (query1.prefix !== query2.prefix) {
+    return false;
+  }
+  if (query1.number !== query2.number) {
+    return false;
+  }
+  return true;
+}
+
 export function decodeSearchQueryLabel(encodedSearchTerm: string): SearchQuery {
   const encodedSearchTermParts = encodedSearchTerm.split(' ');
   // Does it start with prefix

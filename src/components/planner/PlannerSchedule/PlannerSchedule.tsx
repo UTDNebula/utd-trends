@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { SearchQuery } from '@/modules/SearchQuery/SearchQuery';
-import type { SectionsData } from '@/pages/api/sections';
+import type { SectionData } from '@/pages/api/sections';
 
 import PlannerSection from './PlannerSection';
 
@@ -27,7 +27,7 @@ export const DAYS = [
 
 type PlannerScheduleProps = {
   courses: SearchQuery[];
-  selectedSections: SectionsData;
+  selectedSections: {course: SearchQuery, section: SectionData, color: string, selected: boolean}[];
 };
 
 const PlannerSchedule = (props: PlannerScheduleProps) => {
@@ -59,12 +59,12 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
       {props.selectedSections.map((x, i) => (
         <PlannerSection
           key={i}
-          selectedSection={x}
+          selectedSection={x.section}
           course={
-            props.courses.filter(
-              (course) => course.sectionNumber === x.section_number,
-            )[0]
+            x.course
           }
+          color={x.color}
+          selected={x.selected}
         />
       ))}
     </div>

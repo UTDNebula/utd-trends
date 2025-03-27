@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   type ImperativePanelHandle,
   Panel,
@@ -23,7 +23,8 @@ import {
 } from '@/modules/SearchQuery/SearchQuery';
 import type { SectionsType } from '@/modules/SectionsType/SectionsType';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import type { SectionsData } from '@/pages/api/sections';
+
+import type { SectionData } from '../api/sections';
 
 function removeDuplicates(array: SearchQuery[]) {
   return array.filter(
@@ -67,6 +68,7 @@ interface Props {
 
 export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
   const planner = props.planner;
+  const [openIndex, setOpenIndex] = useState(0);
   useEffect(() => {
     if (planner.length) {
       //To cancel on rerender
@@ -152,6 +154,8 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
         sections={props.sections}
         grades={props.grades}
         rmp={props.rmp}
+        openIndex={openIndex}
+        setOpenIndex={setOpenIndex}
       />
     );
 
@@ -184,7 +188,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
                 selectedSections={
                   results.state === 'done'
                     ? results.data
-                        .map((course) => {
+                        .flatMap((course, index) => {
                           const sectionData =
                             props.sections[
                               searchQueryLabel(removeSection(course))
@@ -199,7 +203,12 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
                                   section.section_number ===
                                   course.sectionNumber,
                               );
-                            return chosenSectionForCourse as SectionsData[number];
+                            if (typeof chosenSectionForCourse != 'undefined') {
+                              return {course: course, section: chosenSectionForCourse as SectionData, color:"#ff0000", selected:true};
+                            } else if (index == openIndex) {
+                              return sectionData.data.latest.map((sect)=>{return {course: course, section: sect as SectionData, color:"#ff0000", selected:false}})
+                            }
+                            
                           }
                         })
                         .filter((section) => typeof section !== 'undefined')

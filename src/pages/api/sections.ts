@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-export type SectionsData = {
+export type SectionData = {
   _id: string;
   section_number: string;
   course_reference: string;
@@ -37,7 +37,9 @@ export type SectionsData = {
   syllabus_uri: string;
   grade_distribution: number[];
   attributes: unknown;
-}[];
+};
+
+export type SectionsData = SectionData[];
 
 type Data = {
   message: string;

@@ -1,5 +1,5 @@
 import { Typography } from '@mui/material';
-import React from 'react';
+import React, { type Dispatch, type SetStateAction } from 'react';
 
 import PlannerCard, {
   LoadingRow,
@@ -28,6 +28,8 @@ type PlannerCoursesTableProps = {
   };
   grades: { [key: string]: GenericFetchedData<GradesType> };
   rmp: { [key: string]: GenericFetchedData<RMPInterface> };
+  openIndex: number;
+  setOpenIndex: Dispatch<SetStateAction<number>>;
 };
 
 const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
