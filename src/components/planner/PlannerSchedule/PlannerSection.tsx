@@ -1,15 +1,21 @@
 import React, { useEffect, useState } from 'react';
 
+import {
+  type SearchQuery,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
 import type { SectionsData } from '@/pages/api/sections';
 
 import { DAYS, numDays, START_HOUR } from './PlannerSchedule';
 
 type PlannerSectionComponentProps = {
   selectedSection: SectionsData[number];
+  course: SearchQuery;
 };
 
 const PlannerSection = (props: PlannerSectionComponentProps) => {
   //const SectionComponent = () => {
+  console.log(props.selectedSection);
   const [meetings, setMeetings] = useState<string[][]>([]);
   useEffect(() => {
     const tempMeetings = [];
@@ -73,7 +79,8 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
       }
       className={`col-start-[var(--start-col)] col-span-1 row-start-[var(--start-row)] row-span-1 relative top-[var(--offset)] h-[var(--height)] overflow-visible rounded-lg bg-cornflower-500`}
     >
-      <div>{}</div>
+      <div>{searchQueryLabel(props.course)}</div>
+      <div>{props.selectedSection.section_number}</div>
     </div>
   ));
 };
