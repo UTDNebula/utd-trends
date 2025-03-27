@@ -35,6 +35,7 @@ const Filters = ({
 }: FiltersProps) => {
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
+  const [filterNextSem, setFilterNextSem] = useState('false');
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
   academicSessions.sort((a, b) => compareSemesters(b, a)); // display the semesters in order of recency (most recent first)
@@ -49,6 +50,9 @@ const Filters = ({
         }
         if (typeof router.query.minRating === 'string') {
           setMinRating(router.query.minRating);
+        }
+        if (typeof router.query.availability === 'string') {
+          setFilterNextSem(router.query.availability);
         }
       }
     }
@@ -87,7 +91,7 @@ const Filters = ({
   //Update URL, state, and parent
   async function onChange(
     newValue: string,
-    toSet: 'minGPA' | 'minRating',
+    toSet: 'minGPA' | 'minRating' | 'availability',
     setter: (value: string) => void,
   ) {
     setter(newValue);
@@ -207,6 +211,36 @@ const Filters = ({
                 />
               </MenuItem>
             ))}
+          </Select>
+        </FormControl>
+      </Tooltip>
+
+      {/* Teaching Next Semester dropdown*/}
+
+      <Tooltip title={'Select Availability'} placement="top">
+        <FormControl
+          size="small"
+          className={`w-full ${
+            minRating
+              ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
+              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+          }`}
+        >
+          <InputLabel id="teachingNext">Teaching Next Semester</InputLabel>
+          <Select
+            label="Availability"
+            labelId="availability"
+            value={filterNextSem}
+            onChange={(event: SelectChangeEvent) => {
+              onChange(event.target.value, 'availability', setFilterNextSem);
+            }}
+          >
+            <MenuItem className="h-10" value="false">
+              <em>Any</em>
+            </MenuItem>
+            <MenuItem className="h-10" value="true">
+              <em>Teaching Next Semester</em>
+            </MenuItem>
           </Select>
         </FormControl>
       </Tooltip>

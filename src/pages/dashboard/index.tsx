@@ -33,6 +33,7 @@ import {
   searchQueryEqual,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
+import type { SectionsType } from '@/modules/SectionsType/SectionsType';
 import useGradeStore from '@/modules/useGradeStore/useGradeStore';
 import useRmpStore from '@/modules/useRmpStore/useRmpStore';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
@@ -187,6 +188,9 @@ export async function getServerSideProps(
 }
 
 interface Props {
+  sections: {
+    [key: string]: GenericFetchedData<SectionsType>;
+  };
   pageTitle: string;
   grades: {
     [key: string]: GenericFetchedData<GradesType>;
@@ -195,6 +199,10 @@ interface Props {
     course: SearchQuery,
     controller: AbortController,
   ) => Promise<GradesType | null>;
+  fetchAndStoreSectionsData: (
+    combo: SearchQuery,
+    controller: AbortController,
+  ) => void;
   recalcGrades: (course: SearchQuery) => void;
   recalcAllGrades: (results: SearchQuery[], academicSessions: string[]) => void;
   rmp: {
@@ -353,6 +361,13 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     //Grade data
     //Fetch each result
     for (const result of results) {
+      // combo section data?
+      const sectEntry = props.sections[searchQueryLabel(result)];
+      //Not already loading
+      if (typeof sectEntry === 'undefined' || sectEntry.state === 'error') {
+        props.fetchAndStoreSectionsData(result, controller);
+      }
+
       const entry = props.grades[searchQueryLabel(result)];
       //Not already loading
       if (typeof entry === 'undefined' || entry.state === 'error') {
@@ -454,6 +469,16 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         ) {
           return false;
         }
+        const courseSection = props.sections[searchQueryLabel(result)];
+        if (
+          router.query.availability === 'true' &&
+          typeof courseSection !== 'undefined' &&
+          courseSection.state === 'done' &&
+          !courseSection.data.latest.length
+        ) {
+          return false;
+        }
+
         return true;
       },
     );
