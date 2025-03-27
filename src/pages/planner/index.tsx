@@ -180,6 +180,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
           >
             <div className="sticky top-4 mt-4">
               <PlannerSchedule
+                courses={results.state === 'done' ? results.data : []}
                 selectedSections={
                   results.state === 'done'
                     ? results.data
