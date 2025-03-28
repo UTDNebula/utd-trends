@@ -1,3 +1,5 @@
+import BookIcon from '@mui/icons-material/Book';
+import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Checkbox,
@@ -33,52 +35,34 @@ import {
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
 function LoadingRow() {
-  const nameCell = (
-    <Typography className="w-1/2 sm:w-full leading-tight text-lg">
-      <Skeleton />
-    </Typography>
-  );
   return (
-    <>
-      <TableRow className="sm:hidden">
-        <TableCell
-          component="th"
-          scope="row"
-          className="w-full border-b-0 pb-0"
-          colSpan={3}
+    <TableRow>
+      <TableCell className="flex">
+        <IconButton aria-label="expand row" size="medium" disabled>
+          <KeyboardArrowIcon />
+        </IconButton>
+        <Checkbox disabled />
+        <Checkbox disabled icon={<BookOutlinedIcon />} />
+      </TableCell>
+      <TableCell component="th" scope="row" className="w-full">
+        <Typography className="w-full leading-tight text-lg">
+          <Skeleton />
+        </Typography>
+      </TableCell>
+      <TableCell align="center">
+        <Skeleton
+          variant="rounded"
+          className="rounded-full px-5 py-2 min-w-16 block mx-auto"
         >
-          {nameCell}
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell className="flex">
-          <IconButton aria-label="expand row" size="medium" disabled>
-            <KeyboardArrowIcon />
-          </IconButton>
-          <Checkbox disabled />
-        </TableCell>
-        <TableCell
-          component="th"
-          scope="row"
-          className="w-full hidden sm:table-cell"
-        >
-          {nameCell}
-        </TableCell>
-        <TableCell align="center">
-          <Skeleton
-            variant="rounded"
-            className="rounded-full px-5 py-2 min-w-16 block mx-auto"
-          >
-            <Typography className="text-base">A+</Typography>
-          </Skeleton>
-        </TableCell>
-        <TableCell align="center">
-          <Skeleton variant="rounded" className="rounded-full mx-auto">
-            <Rating sx={{ fontSize: 25 }} readOnly />
-          </Skeleton>
-        </TableCell>
-      </TableRow>
-    </>
+          <Typography className="text-base">A+</Typography>
+        </Skeleton>
+      </TableCell>
+      <TableCell align="center">
+        <Skeleton variant="rounded" className="rounded-full mx-auto">
+          <Rating sx={{ fontSize: 25 }} readOnly />
+        </Skeleton>
+      </TableCell>
+    </TableRow>
   );
 }
 
@@ -90,6 +74,9 @@ type RowProps = {
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
   color?: string;
+  inPlanner: boolean;
+  addToPlanner: (value: SearchQuery) => void;
+  removeFromPlanner: (value: SearchQuery) => void;
 };
 
 function Row({
@@ -100,11 +87,11 @@ function Row({
   addToCompare,
   removeFromCompare,
   color,
+  inPlanner,
+  addToPlanner,
+  removeFromPlanner,
 }: RowProps) {
   const [open, setOpen] = useState(false);
-  const canOpen =
-    !(typeof grades === 'undefined' || grades.state === 'error') ||
-    !(typeof rmp === 'undefined' || rmp.state === 'error');
 
   const rainbowColors = useRainbowColors();
 
@@ -141,10 +128,8 @@ function Row({
   return (
     <>
       <TableRow
-        onClick={() => {
-          if (canOpen) setOpen(!open);
-        }}
-        className={'table-row sm:hidden' + (canOpen ? ' cursor-pointer' : '')}
+        onClick={() => setOpen(!open)}
+        className="cursor-pointer table-row sm:hidden"
       >
         <TableCell
           component="th"
@@ -156,13 +141,11 @@ function Row({
         </TableCell>
       </TableRow>
       <TableRow
-        onClick={() => {
-          if (canOpen) setOpen(!open);
-        }} // opens/closes the card by clicking anywhere on the row
-        className={canOpen ? 'cursor-pointer' : ''}
+        onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
+        className="cursor-pointer"
       >
         <TableCell className="border-b-0">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center">
             <Tooltip
               title={open ? 'Minimize Result' : 'Expand Result'}
               placement="top"
@@ -170,10 +153,9 @@ function Row({
               <IconButton
                 aria-label="expand row"
                 size="medium"
-                disabled={!canOpen}
                 onClick={(e) => {
                   e.stopPropagation(); // prevents double opening/closing
-                  if (canOpen) setOpen(!open);
+                  setOpen(!open);
                 }}
                 className={'transition-transform' + (open ? ' rotate-90' : '')}
               >
@@ -208,6 +190,24 @@ function Row({
                       }
                     : undefined
                 } // Apply color if defined
+              />
+            </Tooltip>
+            <Tooltip
+              title={inPlanner ? 'Remove from Planner' : 'Add to Planner'}
+              placement="top"
+            >
+              <Checkbox
+                checked={inPlanner}
+                onClick={(e) => {
+                  e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
+                  if (inPlanner) {
+                    removeFromPlanner(course);
+                  } else {
+                    addToPlanner(course);
+                  }
+                }}
+                icon={<BookOutlinedIcon />}
+                checkedIcon={<BookIcon />}
               />
             </Tooltip>
           </div>
@@ -304,6 +304,9 @@ type SearchResultsTableProps = {
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
   colorMap: { [key: string]: string };
+  planner: SearchQuery[];
+  addToPlanner: (value: SearchQuery) => void;
+  removeFromPlanner: (value: SearchQuery) => void;
 };
 
 const SearchResultsTable = ({
@@ -315,6 +318,9 @@ const SearchResultsTable = ({
   addToCompare,
   removeFromCompare,
   colorMap,
+  planner,
+  addToPlanner,
+  removeFromPlanner,
 }: SearchResultsTableProps) => {
   //Table sorting category
   const [orderBy, setOrderBy] = useState<'name' | 'gpa' | 'rating'>('name');
@@ -426,7 +432,6 @@ const SearchResultsTable = ({
           bNumber.localeCompare(aNumber)
         );
       }
-      return 0;
     }
     if (orderBy === 'gpa') {
       const aGrades = grades[searchQueryLabel(a)];
@@ -553,6 +558,13 @@ const SearchResultsTable = ({
                     addToCompare={addToCompare}
                     removeFromCompare={removeFromCompare}
                     color={colorMap[searchQueryLabel(result)]}
+                    inPlanner={
+                      planner.findIndex((obj) =>
+                        searchQueryEqual(obj, result),
+                      ) !== -1
+                    }
+                    addToPlanner={addToPlanner}
+                    removeFromPlanner={removeFromPlanner}
                   />
                 ))
               : Array(10)
