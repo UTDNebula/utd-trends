@@ -221,14 +221,14 @@ const Filters = ({
         <FormControl
           size="small"
           className={`w-full ${
-            minRating
+            filterNextSem == 'true'
               ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
               : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
           }`}
         >
           <InputLabel id="teachingNext">Teaching Next Semester</InputLabel>
           <Select
-            label="Availability"
+            label="Teaching Next Semester"
             labelId="availability"
             value={filterNextSem}
             onChange={(event: SelectChangeEvent) => {
