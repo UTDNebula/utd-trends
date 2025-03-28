@@ -107,17 +107,26 @@ function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
   return [schedule, location, meeting.location.map_uri];
 }
 
-function MeetingSchedule({ meetings }: { meetings: SectionsData[number]['meetings'] }) {
+function MeetingSchedule({
+  meetings,
+}: {
+  meetings: SectionsData[number]['meetings'];
+}) {
   return (
     <Box className="p-2 mt-2 max-w-xs mx-auto">
       {meetings.map((meeting, i) => {
         const [schedule] = parseMeeting(meeting);
-        const [days, time] = schedule.split(" ");
-        const formattedDays = days.match(/[A-Z][a-z]*/g)?.join(" / ") || days;
+        const [days, time] = schedule.split(' ');
+        const formattedDays = days.match(/[A-Z][a-z]*/g)?.join(' / ') || days;
 
         return (
-          <div key={i} className="mb-1 p-1 rounded-3xl border border-cornflower-300 bg-white dark:bg-gray-700 shadow-sm">
-            <Typography className="text-sm font-semibold text-center">{formattedDays}</Typography>
+          <div
+            key={i}
+            className="mb-1 p-1 rounded-3xl border border-cornflower-300 bg-white dark:bg-gray-700 shadow-sm"
+          >
+            <Typography className="text-sm font-semibold text-center">
+              {formattedDays}
+            </Typography>
             <Typography className="text-sm text-center">{time}</Typography>
           </div>
         );
@@ -125,7 +134,6 @@ function MeetingSchedule({ meetings }: { meetings: SectionsData[number]['meeting
     </Box>
   );
 }
-
 
 type SectionTableRowProps = {
   data: SectionsData[number];
@@ -150,10 +158,7 @@ function SectionTableRow(props: SectionTableRowProps) {
     <>
       <TableRow>
         <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-          <Checkbox
-            checked={isSelected}
-            onChange={handleCheckboxChange}
-          />
+          <Checkbox checked={isSelected} onChange={handleCheckboxChange} />
         </TableCell>
         <TableCell className={props.lastRow ? 'border-b-0' : ''}>
           <Typography>{props.data.section_number}</Typography>
@@ -162,28 +167,30 @@ function SectionTableRow(props: SectionTableRowProps) {
           <Typography>{props.data.internal_class_number}</Typography>
         </TableCell>
         <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-          {props.data.meetings.map(parseMeeting).map(([schedule, location, link], i) => (
-            <div key={i}>
-              {schedule !== ' -' && (
-                <Typography className="text-sm">{schedule}</Typography>
-              )}
-              {location !== ' ' && (
-                <Typography className="text-sm">
-                  {link === '' ? (
-                    location
-                  ) : (
-                    <Link
-                      href={link}
-                      target="_blank"
-                      className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-                    >
-                      {location}
-                    </Link>
-                  )}
-                </Typography>
-              )}
-            </div>
-          ))}
+          {props.data.meetings
+            .map(parseMeeting)
+            .map(([schedule, location, link], i) => (
+              <div key={i}>
+                {schedule !== ' -' && (
+                  <Typography className="text-sm">{schedule}</Typography>
+                )}
+                {location !== ' ' && (
+                  <Typography className="text-sm">
+                    {link === '' ? (
+                      location
+                    ) : (
+                      <Link
+                        href={link}
+                        target="_blank"
+                        className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                      >
+                        {location}
+                      </Link>
+                    )}
+                  </Typography>
+                )}
+              </div>
+            ))}
         </TableCell>
       </TableRow>
     </>
@@ -204,7 +211,9 @@ type PlannerCardProps = {
 
 const PlannerCard = (props: PlannerCardProps) => {
   const [open, setOpen] = useState<'false' | 'sections' | 'grades'>('false');
-  const [selectedSections, setSelectedSections] = useState<SectionsData[number][]>([]); // Store selected sections
+  const [selectedSections, setSelectedSections] = useState<
+    SectionsData[number][]
+  >([]); // Store selected sections
 
   const handleSelectSection = (section: SectionsData[number]) => {
     setSelectedSections((prevSelected) => {
@@ -243,83 +252,87 @@ const PlannerCard = (props: PlannerCardProps) => {
       component={Paper}
       className="border border-royal dark:border-cornflower-300 rounded-lg"
     >
-  
-    <div
-    role="button"
-    tabIndex={0}
-    onClick={() => handleOpen('row')} // opens/closes the card by clicking anywhere on the row
-    onKeyDown={(e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        handleOpen('row');
-      }
-    }}
-    className={
-      'p-4 flex justify-between items-center gap-4' +
-      (canOpenSections ? ' cursor-pointer' : '')
-    }
-  >
-    {/* Left-side Content */}
-    <div className="flex items-center gap-4 flex-grow">
-      <Tooltip title={open === 'sections' ? 'Minimize Result' : 'Expand Result'} placement="top">
-        <span>
-          <IconButton
-            aria-label="expand row"
-            size="medium"
-            onClick={(e) => {
-              e.stopPropagation(); // prevents double opening/closing
-              handleOpen('sections');
-            }}
-            disabled={!canOpenSections}
-            className={
-              'transition-transform' +
-              (open === 'sections' ? ' rotate-90' : '')
-            }
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => handleOpen('row')} // opens/closes the card by clicking anywhere on the row
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            handleOpen('row');
+          }
+        }}
+        className={
+          'p-4 flex justify-between items-center gap-4' +
+          (canOpenSections ? ' cursor-pointer' : '')
+        }
+      >
+        {/* Left-side Content */}
+        <div className="flex items-center gap-4 flex-grow">
+          <Tooltip
+            title={open === 'sections' ? 'Minimize Result' : 'Expand Result'}
+            placement="top"
           >
-            <KeyboardArrowIcon fontSize="inherit" />
-          </IconButton>
-        </span>
-      </Tooltip>
-      <Tooltip title={'Remove from Planner'} placement="top">
-        <Checkbox
-          checked={true /*inPlanner?*/}
-          onClick={(e) => {
-            e.stopPropagation();
-            props.removeFromPlanner();
-          }}
-          icon={<BookOutlinedIcon />}
-          checkedIcon={<BookIcon />}
-        />
-      </Tooltip>
-      <Tooltip title={open === 'grades' ? 'Minimize Grades' : 'Expand Grades'} placement="top">
-        <span>
-          <IconButton
-            size="medium"
-            onClick={(e) => {
-              e.stopPropagation(); // prevents double opening/closing
-              handleOpen('grades');
-            }}
-            disabled={!canOpenGrades}
+            <span>
+              <IconButton
+                aria-label="expand row"
+                size="medium"
+                onClick={(e) => {
+                  e.stopPropagation(); // prevents double opening/closing
+                  handleOpen('sections');
+                }}
+                disabled={!canOpenSections}
+                className={
+                  'transition-transform' +
+                  (open === 'sections' ? ' rotate-90' : '')
+                }
+              >
+                <KeyboardArrowIcon fontSize="inherit" />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title={'Remove from Planner'} placement="top">
+            <Checkbox
+              checked={true /*inPlanner?*/}
+              onClick={(e) => {
+                e.stopPropagation();
+                props.removeFromPlanner();
+              }}
+              icon={<BookOutlinedIcon />}
+              checkedIcon={<BookIcon />}
+            />
+          </Tooltip>
+          <Tooltip
+            title={open === 'grades' ? 'Minimize Grades' : 'Expand Grades'}
+            placement="top"
           >
-            <BarChartIcon />
-          </IconButton>
-        </span>
-      </Tooltip>
-      <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit flex-grow">
-        {searchQueryLabel(removeSection(props.query))}
-      </Typography>
-    </div>
+            <span>
+              <IconButton
+                size="medium"
+                onClick={(e) => {
+                  e.stopPropagation(); // prevents double opening/closing
+                  handleOpen('grades');
+                }}
+                disabled={!canOpenGrades}
+              >
+                <BarChartIcon />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit flex-grow">
+            {searchQueryLabel(removeSection(props.query))}
+          </Typography>
+        </div>
 
-    {/* Right-side MeetingSchedule */}
-    {selectedSections.length > 0 && (
-      <div className="min-w-[150px]">
-        {selectedSections.map((section, i) => (
-          <MeetingSchedule key={i} meetings={section.meetings} />
-        ))}
+        {/* Right-side MeetingSchedule */}
+        {selectedSections.length > 0 && (
+          <div className="min-w-[150px]">
+            {selectedSections.map((section, i) => (
+              <MeetingSchedule key={i} meetings={section.meetings} />
+            ))}
+          </div>
+        )}
       </div>
-    )}
-  </div>
 
-  
       {canOpenSections && (
         <Collapse in={open === 'sections'} timeout="auto" unmountOnExit>
           <TableContainer className="rounded-t-none">
@@ -343,7 +356,7 @@ const PlannerCard = (props: PlannerCardProps) => {
           </TableContainer>
         </Collapse>
       )}
-  
+
       {canOpenGrades && (
         <Collapse in={open === 'grades'} timeout="auto" unmountOnExit>
           <div className="p-2 md:p-4 flex flex-col gap-2">
@@ -358,7 +371,6 @@ const PlannerCard = (props: PlannerCardProps) => {
       )}
     </Box>
   );
-  
 };
 
 export default PlannerCard;
