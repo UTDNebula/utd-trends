@@ -79,8 +79,9 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
       }
       className={`col-start-[var(--start-col)] col-span-1 row-start-[var(--start-row)] row-span-1 relative top-[var(--offset)] h-[var(--height)] overflow-visible rounded-lg bg-cornflower-500`}
     >
-      <div>{searchQueryLabel(props.course)}</div>
-      <div>{props.selectedSection.section_number}</div>
+        <div className="text-xlg font-lato text-center"> {props.course.prefix} {props.course.number}.{props.selectedSection.section_number}</div>
+        <div className="text-med  text-center"> {props.course.profFirst} {props.course.profLast} </div>
+        <div className="text-xs text-center"> {props.selectedSection.meetings[0]?.location?.building} {props.selectedSection.meetings[0]?.location?.room} </div>
     </div>
   ));
 };
