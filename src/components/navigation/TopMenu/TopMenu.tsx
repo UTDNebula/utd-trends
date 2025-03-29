@@ -132,7 +132,11 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
                     setOpenTutorial(true);
                   }}
                 >
-                  <HelpOutlineIcon className="text-3xl" />
+                  <HelpOutlineIcon
+                    className={
+                      'text-3xl' + (tutorialHint ? ' text-white' : '')
+                    }
+                  />
                 </IconButton>
               </Tooltip>
             </div>
