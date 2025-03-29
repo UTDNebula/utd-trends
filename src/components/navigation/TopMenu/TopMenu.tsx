@@ -1,5 +1,6 @@
 import { Share } from '@mui/icons-material';
-import { IconButton, Snackbar, Tooltip } from '@mui/material';
+import BookIcon from '@mui/icons-material/Book';
+import { Button, IconButton, Snackbar, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -80,12 +81,13 @@ export function TopMenu(props: TopMenuProps) {
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />
         )}
-        <Link
-          className="bg-cornflower-400 ml-auto"
+        <Button
+          className="bg-cornflower-500 rounded-xl ml-auto text-white dark:bg-cornflower-400 text p-2 px-4 normal-case"
           href={props.isPlanner ? '/dashboard' : '/planner'}
         >
+          <BookIcon className="mr-2" />
           {props.isPlanner ? 'Search Results' : 'My Planner'}
-        </Link>
+        </Button>
         <Tooltip title="Share link to search">
           <IconButton
             className="aspect-square"
