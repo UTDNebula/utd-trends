@@ -33,6 +33,7 @@ import {
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { SectionsType } from '@/modules/SectionsType/SectionsType';
 
 function LoadingRow() {
   return (
@@ -67,6 +68,7 @@ function LoadingRow() {
 }
 
 type RowProps = {
+  section: GenericFetchedData<SectionsType>;
   course: SearchQuery;
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RMPInterface>;
@@ -80,6 +82,7 @@ type RowProps = {
 };
 
 function Row({
+  section,
   course,
   grades,
   rmp,
@@ -91,6 +94,11 @@ function Row({
   addToPlanner,
   removeFromPlanner,
 }: RowProps) {
+  // Check if the course section has the latest semester data
+  let hasLatestSemester = !!(
+    section.state === 'done' && section.data.latest.length
+  );
+
   const [open, setOpen] = useState(false);
 
   const rainbowColors = useRainbowColors();
@@ -192,24 +200,26 @@ function Row({
                 } // Apply color if defined
               />
             </Tooltip>
-            <Tooltip
-              title={inPlanner ? 'Remove from Planner' : 'Add to Planner'}
-              placement="top"
-            >
-              <Checkbox
-                checked={inPlanner}
-                onClick={(e) => {
-                  e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
-                  if (inPlanner) {
-                    removeFromPlanner(course);
-                  } else {
-                    addToPlanner(course);
-                  }
-                }}
-                icon={<BookOutlinedIcon />}
-                checkedIcon={<BookIcon />}
-              />
-            </Tooltip>
+            {hasLatestSemester && (
+              <Tooltip
+                title={inPlanner ? 'Remove from Planner' : 'Add to Planner'}
+                placement="top"
+              >
+                <Checkbox
+                  checked={inPlanner}
+                  onClick={(e) => {
+                    e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
+                    if (inPlanner) {
+                      removeFromPlanner(course);
+                    } else {
+                      addToPlanner(course);
+                    }
+                  }}
+                  icon={<BookOutlinedIcon />}
+                  checkedIcon={<BookIcon />}
+                />
+              </Tooltip>
+            )}
           </div>
         </TableCell>
         <TableCell
@@ -296,6 +306,7 @@ function Row({
 }
 
 type SearchResultsTableProps = {
+  sections: { [key: string]: GenericFetchedData<SectionsType> };
   resultsLoading: 'loading' | 'done';
   includedResults: SearchQuery[];
   grades: { [key: string]: GenericFetchedData<GradesType> };
@@ -310,6 +321,7 @@ type SearchResultsTableProps = {
 };
 
 const SearchResultsTable = ({
+  sections,
   resultsLoading,
   includedResults,
   grades,
@@ -432,7 +444,6 @@ const SearchResultsTable = ({
           bNumber.localeCompare(aNumber)
         );
       }
-      return 0;
     }
     if (orderBy === 'gpa') {
       const aGrades = grades[searchQueryLabel(a)];
@@ -547,6 +558,7 @@ const SearchResultsTable = ({
             {resultsLoading === 'done'
               ? sortedResults.map((result) => (
                   <Row
+                    section={sections[searchQueryLabel(result)]}
                     key={searchQueryLabel(result)}
                     course={result}
                     grades={grades[searchQueryLabel(result)]}
