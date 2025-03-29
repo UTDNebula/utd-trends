@@ -1,6 +1,8 @@
 import { Campaign } from '@mui/icons-material';
 import { IconButton, Popover, Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import InfoIcon from '@mui/icons-material/Info';
 
 interface ReleaseData {
   id: number;
@@ -196,7 +198,8 @@ export function WhatsNewButton() {
           onClick={handleClick}
           aria-describedby={id}
         >
-          <Campaign className="text-4xl mr-1" />
+          <InfoIcon className="text-4xl mr-1 hidden dark:block" />
+          <InfoOutlinedIcon className="text-4xl mr-1 dark:hidden" />
           {hasUnreadFeature && (
             <span className="absolute -top-0 -right-0 bg-royal rounded-full h-3 w-3"></span>
           )}
