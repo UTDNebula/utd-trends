@@ -22,32 +22,32 @@ interface Feature {
  */
 export function WhatsNewButton() {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [latestFeature, setLatestFeature] = useState<Feature | null>(null);
+  const [latestFeatures, setLatestFeatures] = useState<Feature[]>([]);
   const [loading, setLoading] = useState(false);
   const [wasOpened, setWasOpened] = useState(false);
 
   // Check if the latest feature is unread
-  const hasUnreadFeature = latestFeature && !latestFeature.read;
+  const unreadCount = latestFeatures.filter((feature) => !feature.read).length;
   const open = Boolean(anchorEl);
   const id = open ? 'whats-new-popover' : undefined;
 
-  // Load feature from localStorage
+  // Load features from localStorage
   useEffect(() => {
-    const savedFeature = localStorage.getItem('utdTrendsLatestFeature');
-    if (savedFeature) {
-      setLatestFeature(JSON.parse(savedFeature));
+    const savedFeatures = localStorage.getItem('utdTrendsLatestFeatures');
+    if (savedFeatures) {
+      setLatestFeatures(JSON.parse(savedFeatures));
     }
   }, []);
 
-  // Save feature to localStorage whenever it changes
+  // Save features to localStorage whenever it changes
   useEffect(() => {
-    if (latestFeature) {
+    if (latestFeatures.length > 0) {
       localStorage.setItem(
-        'utdTrendsLatestFeature',
-        JSON.stringify(latestFeature),
+        'utdTrendsLatestFeatures',
+        JSON.stringify(latestFeatures),
       );
     }
-  }, [latestFeature]);
+  }, [latestFeatures]);
 
   // Fetch releases
   useEffect(() => {
@@ -93,7 +93,7 @@ export function WhatsNewButton() {
     return features;
   };
 
-  // Function to fetch only the most recent release
+  // Function to fetch only the 2 most recent releases
   const fetchReleases = async () => {
     if (loading) return;
 
@@ -101,7 +101,7 @@ export function WhatsNewButton() {
 
     try {
       const response = await fetch(
-        'https://api.github.com/repos/UTDNebula/utd-trends/releases?per_page=1',
+        'https://api.github.com/repos/UTDNebula/utd-trends/releases?per_page=2',
       );
 
       if (!response.ok) {
@@ -114,37 +114,45 @@ export function WhatsNewButton() {
         return;
       }
 
-      const release = releases[0]; // Get only the most recent release
+      const allFeatures: Feature[] = [];
 
-      if (release && release.body) {
-        const extractedFeatures = extractFeaturesFromRelease(release.body);
+      releases.forEach((release: ReleaseData) => {
+        if (release && release.body) {
+          const extractedFeatures = extractFeaturesFromRelease(release.body);
 
-        if (extractedFeatures.length > 0) {
-          // Get only the first feature from the latest release
-          const featureContent = extractedFeatures[0];
-          const id = `${release.id}-0`;
+          if (extractedFeatures.length > 0) {
+            // Get only the first feature from the latest release
+            const featureContent = extractedFeatures[0];
+            const id = `${release.id}-0`;
 
-          const newFeature = {
-            id,
-            content: featureContent,
-            read: false,
-            releaseUrl: release.html_url,
-            releaseId: release.id.toString(),
-          };
+            const newFeature = {
+              id,
+              content: featureContent,
+              read: false,
+              releaseUrl: release.html_url,
+              releaseId: release.id.toString(),
+            };
 
-          // Check if we already have this feature stored
-          const savedFeature = localStorage.getItem('utdTrendsLatestFeature');
-          if (savedFeature) {
-            const parsedFeature = JSON.parse(savedFeature) as Feature;
-
-            // If it's the same feature, keep the read status
-            if (parsedFeature.id === id) {
-              newFeature.read = parsedFeature.read;
+            // Check if we already have this feature stored
+            const savedFeature = localStorage.getItem(
+              'utdTrendsLatestFeatures',
+            );
+            if (savedFeature) {
+              const parsedFeature = (
+                JSON.parse(savedFeature) as Feature[]
+              ).filter((feature) => feature.id === id)[0];
+              // If it's the same feature, keep the read status
+              if (parsedFeature) {
+                newFeature.read = parsedFeature.read;
+              }
             }
+            allFeatures.push(newFeature);
           }
-
-          setLatestFeature(newFeature);
         }
+      });
+
+      if (allFeatures.length > 0) {
+        setLatestFeatures(allFeatures);
       }
     } catch (error) {
       console.error('Error fetching release data:', error);
@@ -161,30 +169,36 @@ export function WhatsNewButton() {
 
   // Handle closing the popover
   const handleClose = () => {
-    if (wasOpened && latestFeature) {
-      markFeatureAsRead();
+    if (wasOpened && latestFeatures) {
+      markAllFeaturesAsRead();
       setWasOpened(false);
     }
     setAnchorEl(null);
   };
 
-  // Mark the feature as read
-  const markFeatureAsRead = () => {
-    if (latestFeature) {
-      setLatestFeature({
-        ...latestFeature,
-        read: true,
-      });
-    }
+  // Mark a feature as read
+  const markFeatureAsRead = (featureId: string) => {
+    setLatestFeatures((prevFeatures) =>
+      prevFeatures.map((feature) =>
+        feature.id === featureId ? { ...feature, read: true } : feature,
+      ),
+    );
+  };
+
+  // Mark all features as read
+  const markAllFeaturesAsRead = () => {
+    setLatestFeatures((prevFeatures) =>
+      prevFeatures.map((feature) => ({ ...feature, read: true })),
+    );
   };
 
   // Navigate to the release page
-  const navigateToRelease = (e: React.MouseEvent) => {
+  const navigateToRelease = (feature: Feature, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (latestFeature) {
-      markFeatureAsRead();
-      window.open(latestFeature.releaseUrl, '_blank');
-      handleClose();
+    if (feature) {
+      markFeatureAsRead(feature.id);
+      window.open(feature.releaseUrl, '_blank');
+      // handleClose();
     }
   };
 
@@ -199,7 +213,7 @@ export function WhatsNewButton() {
         >
           <InfoIcon className="text-4xl mr-1 hidden dark:block" />
           <InfoOutlinedIcon className="text-4xl mr-1 dark:hidden" />
-          {hasUnreadFeature && (
+          {unreadCount > 0 && (
             <span className="absolute -top-0 -right-0 bg-royal rounded-full h-3 w-3"></span>
           )}
         </IconButton>
@@ -234,20 +248,25 @@ export function WhatsNewButton() {
               <div className="flex justify-center py-4">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-royal"></div>
               </div>
-            ) : latestFeature ? (
+            ) : latestFeatures.length > 0 ? (
               <div className="space-y-3">
-                <button
-                  className="flex items-start group w-full text-left hover:bg-gray-100 dark:hover:bg-cornflower-700 p-1 rounded-md transition-colors"
-                  onClick={navigateToRelease}
-                  title="Click to view release details"
-                >
-                  <div className="w-4 flex-shrink-0 inline-block">
-                    {!latestFeature.read && (
-                      <div className="mt-1 h-3 w-3 rounded-full bg-royal"></div>
-                    )}
-                  </div>
-                  <span className="text-sm">{latestFeature.content}</span>
-                </button>
+                {latestFeatures.map((feature) => (
+                  <button
+                    className="flex items-start group w-full text-left hover:bg-gray-100 dark:hover:bg-cornflower-700 p-1 rounded-md transition-colors"
+                    onClick={(e) =>
+                      navigateToRelease(feature, e as React.MouseEvent)
+                    }
+                    title="Click to view release details"
+                    key={feature.id}
+                  >
+                    <div className="w-4 flex-shrink-0 inline-block">
+                      {!feature.read && (
+                        <div className="mt-1 h-3 w-3 rounded-full bg-royal"></div>
+                      )}
+                    </div>
+                    <span className="text-sm">{feature.content}</span>
+                  </button>
+                ))}
               </div>
             ) : (
               <p className="text-sm text-gray-600 dark:text-gray-400">
