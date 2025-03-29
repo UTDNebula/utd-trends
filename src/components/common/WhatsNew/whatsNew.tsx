@@ -5,12 +5,16 @@ import React, { useEffect, useState } from 'react';
 
 interface ReleaseData {
   id: number;
+  name: string;
+  published_at: string;
   body: string;
   html_url: string;
 }
 
 interface Feature {
   id: string;
+  version: string;
+  date: string;
   content: string;
   read: boolean;
   releaseUrl: string;
@@ -119,6 +123,14 @@ export function WhatsNewButton() {
       releases.forEach((release: ReleaseData) => {
         if (release && release.body) {
           const extractedFeatures = extractFeaturesFromRelease(release.body);
+          const featureVersion = release.name;
+          const featureDate = new Date(release.published_at).toLocaleDateString(
+            'en-US',
+            {
+              month: 'short',
+              day: 'numeric',
+            },
+          );
 
           if (extractedFeatures.length > 0) {
             // Get only the first feature from the latest release
@@ -127,6 +139,8 @@ export function WhatsNewButton() {
 
             const newFeature = {
               id,
+              version: featureVersion,
+              date: featureDate,
               content: featureContent,
               read: false,
               releaseUrl: release.html_url,
@@ -252,19 +266,29 @@ export function WhatsNewButton() {
               <div className="space-y-3">
                 {latestFeatures.map((feature) => (
                   <button
-                    className="flex items-start group w-full text-left hover:bg-gray-100 dark:hover:bg-cornflower-700 p-1 rounded-md transition-colors"
+                    className="flex items-start group w-full text-left hover:bg-gray-100 dark:hover:bg-cornflower-700 p-1 pl-3 rounded-md transition-colors"
                     onClick={(e) =>
                       navigateToRelease(feature, e as React.MouseEvent)
                     }
                     title="Click to view release details"
                     key={feature.id}
                   >
-                    <div className="w-4 flex-shrink-0 inline-block">
-                      {!feature.read && (
-                        <div className="mt-1 h-3 w-3 rounded-full bg-royal"></div>
-                      )}
+                    <div className="flex flex-col">
+                      <div className="flex justify-between">
+                        <span
+                          className={`text-xs rounded-full ${!feature.read ? 'bg-cornflower-600 text-white dark:bg-cornflower-300 dark:text-cornflower-900' : 'ring-1 ring-cornflower-500 text-cornflower-700 dark:ring-cornflower-400 dark:text-cornflower-200'} p-0.5 px-2`}
+                        >
+                          {feature.version}
+                        </span>
+                        <span className="text-xs text-cornflower-500 dark:text-cornflower-400 mr-2">
+                          {feature.date}
+                        </span>
+                      </div>
+                      <span className="text-sm ml-0.5 mt-1">
+                        {feature.content}
+                      </span>
+                      <hr className=" mt-2 border-gray-300 dark:border-gray-600" />
                     </div>
-                    <span className="text-sm">{feature.content}</span>
                   </button>
                 ))}
               </div>
