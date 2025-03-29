@@ -22,7 +22,7 @@ export default function usePersistantState<T>(
     setFromStorage();
 
     // Update when another tab changes localStorage
-    function handleChange(event) {
+    function handleChange(event: StorageEvent) {
       if (event.key === key) {
         setFromStorage();
       }
