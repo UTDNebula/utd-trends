@@ -200,26 +200,25 @@ function Row({
                 } // Apply color if defined
               />
             </Tooltip>
-            {hasLatestSemester && (
-              <Tooltip
-                title={inPlanner ? 'Remove from Planner' : 'Add to Planner'}
-                placement="top"
-              >
-                <Checkbox
-                  checked={inPlanner}
-                  onClick={(e) => {
-                    e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
-                    if (inPlanner) {
-                      removeFromPlanner(course);
-                    } else {
-                      addToPlanner(course);
-                    }
-                  }}
-                  icon={<BookOutlinedIcon />}
-                  checkedIcon={<BookIcon />}
-                />
-              </Tooltip>
-            )}
+            <Tooltip
+              title={inPlanner ? 'Remove from Planner' : 'Add to Planner'}
+              placement="top"
+            >
+              <Checkbox
+                checked={inPlanner}
+                onClick={(e) => {
+                  e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
+                  if (inPlanner) {
+                    removeFromPlanner(course);
+                  } else {
+                    addToPlanner(course);
+                  }
+                }}
+                icon={<BookOutlinedIcon />}
+                checkedIcon={<BookIcon />}
+                disabled={!hasLatestSemester}
+              />
+            </Tooltip>
           </div>
         </TableCell>
         <TableCell
