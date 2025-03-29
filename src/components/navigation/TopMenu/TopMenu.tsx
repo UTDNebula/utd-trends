@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import Background from '@/../public/background.png';
 import Tutorial from '@/components/dashboard/Tutorial/Tutorial';
+import WhatsNew from '@/components/common/WhatsNew/whatsNew';
 import SearchBar from '@/components/search/SearchBar/SearchBar';
 
 /**
@@ -38,6 +39,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
       copyLink(url);
     }
   }
+
   function copyLink(url: string) {
     if (navigator.clipboard) {
       navigator.clipboard
@@ -48,6 +50,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
       alertLink(url);
     }
   }
+
   function alertLink(url: string) {
     alert(url);
   }
@@ -95,6 +98,11 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
           input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         />
         <div className="flex gap-2 md:gap-4 ml-auto">
+          <Tooltip title="See What's New in Trends!">
+            <div className="ml-auto">
+              <WhatsNew />
+            </div>
+          </Tooltip>
           <div className="relative">
             <span
               className={

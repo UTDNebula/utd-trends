@@ -33,33 +33,52 @@ import {
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
 function LoadingRow() {
+  const nameCell = (
+    <Typography className="w-1/2 sm:w-full leading-tight text-lg">
+      <Skeleton />
+    </Typography>
+  );
   return (
-    <TableRow>
-      <TableCell className="flex">
-        <IconButton aria-label="expand row" size="medium" disabled>
-          <KeyboardArrowIcon />
-        </IconButton>
-        <Checkbox disabled />
-      </TableCell>
-      <TableCell component="th" scope="row" className="w-full">
-        <Typography className="w-full leading-tight text-lg">
-          <Skeleton />
-        </Typography>
-      </TableCell>
-      <TableCell align="center">
-        <Skeleton
-          variant="rounded"
-          className="rounded-full px-5 py-2 min-w-16 block mx-auto"
+    <>
+      <TableRow className="sm:hidden">
+        <TableCell
+          component="th"
+          scope="row"
+          className="w-full border-b-0 pb-0"
+          colSpan={3}
         >
-          <Typography className="text-base">A+</Typography>
-        </Skeleton>
-      </TableCell>
-      <TableCell align="center">
-        <Skeleton variant="rounded" className="rounded-full mx-auto">
-          <Rating sx={{ fontSize: 25 }} readOnly />
-        </Skeleton>
-      </TableCell>
-    </TableRow>
+          {nameCell}
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell className="flex">
+          <IconButton aria-label="expand row" size="medium" disabled>
+            <KeyboardArrowIcon />
+          </IconButton>
+          <Checkbox disabled />
+        </TableCell>
+        <TableCell
+          component="th"
+          scope="row"
+          className="w-full hidden sm:table-cell"
+        >
+          {nameCell}
+        </TableCell>
+        <TableCell align="center">
+          <Skeleton
+            variant="rounded"
+            className="rounded-full px-5 py-2 min-w-16 block mx-auto"
+          >
+            <Typography className="text-base">A+</Typography>
+          </Skeleton>
+        </TableCell>
+        <TableCell align="center">
+          <Skeleton variant="rounded" className="rounded-full mx-auto">
+            <Rating sx={{ fontSize: 25 }} readOnly />
+          </Skeleton>
+        </TableCell>
+      </TableRow>
+    </>
   );
 }
 
