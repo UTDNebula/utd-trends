@@ -39,7 +39,7 @@ const Filters = ({
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
   academicSessions.sort((a, b) => compareSemesters(b, a)); // display the semesters in order of recency (most recent first)
-  
+
   //set value from query
   const router = useRouter();
   useEffect(() => {
@@ -68,7 +68,7 @@ const Filters = ({
       setSemesters(() => chosenSessions);
     }
   }, [chosenSessions]);
-  
+
   function getRecentSemesters() {
     let recentSemesters: string[] = [];
     // get current month and year
@@ -253,8 +253,10 @@ const Filters = ({
               if (chosenSessions.length === academicSessions.length) {
                 if (value.includes('recent')) {
                   addChosenSessions(() => recentSemesters);
-                } else if (value.includes('select-all')){
-                  addChosenSessions(() => (value as string[]).filter(e => e !== 'select-all'));
+                } else if (value.includes('select-all')) {
+                  addChosenSessions(() =>
+                    (value as string[]).filter((e) => e !== 'select-all'),
+                  );
                 } else {
                   addChosenSessions(() => []);
                 }
@@ -265,7 +267,9 @@ const Filters = ({
                 if (value.includes('select-all')) {
                   addChosenSessions(() => academicSessions);
                 } else if (value.includes('recent')) {
-                  addChosenSessions(() => (value as string[]).filter(e => e !== 'recent'));
+                  addChosenSessions(() =>
+                    (value as string[]).filter((e) => e !== 'recent'),
+                  );
                 } else {
                   addChosenSessions(() => academicSessions);
                 }
@@ -294,7 +298,9 @@ const Filters = ({
               if (chosenSessions.length === academicSessions.length) {
                 return 'All selected';
               }
-              return chosenSessions.sort((a, b) => compareSemesters(a, b)).join(', ');
+              return chosenSessions
+                .sort((a, b) => compareSemesters(a, b))
+                .join(', ');
             }}
             MenuProps={{ autoFocus: false }}
           >
