@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
 import Background from '@/../public/background.png';
+import WhatsNew from '@/components/common/WhatsNew/whatsNew';
 import SearchBar from '@/components/search/SearchBar/SearchBar';
 
 /**
@@ -36,6 +37,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
       copyLink(url);
     }
   }
+
   function copyLink(url: string) {
     if (navigator.clipboard) {
       navigator.clipboard
@@ -46,6 +48,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
       alertLink(url);
     }
   }
+
   function alertLink(url: string) {
     alert(url);
   }
@@ -73,7 +76,12 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
           className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
           input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         />
-        <Tooltip title="Share link to search" className="ml-auto">
+
+        <div className="ml-auto">
+          <WhatsNew />
+        </div>
+
+        <Tooltip title="Share link to search">
           <IconButton
             className="aspect-square"
             size="medium"
