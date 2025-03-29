@@ -218,7 +218,7 @@ export function WhatsNewButton() {
         }}
       >
         <div
-          className="w-64 bg-white dark:bg-gray-800 rounded-md"
+          className="w-64 bg-white dark:bg-[#242643] rounded-md"
           style={{
             maxHeight: '80vh',
             overflowY: 'auto',
@@ -235,7 +235,7 @@ export function WhatsNewButton() {
             ) : latestFeature ? (
               <div className="space-y-3">
                 <button
-                  className="flex items-start group w-full text-left hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded-md transition-colors"
+                  className="flex items-start group w-full text-left hover:bg-gray-100 dark:hover:bg-cornflower-700 p-1 rounded-md transition-colors"
                   onClick={navigateToRelease}
                   title="Click to view release details"
                 >

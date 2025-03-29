@@ -104,7 +104,7 @@ export default function FeedbackPopup() {
 
   return (
     <>
-      <Snackbar open={feedbackOpen}>
+      <Snackbar open={true}>
         <SnackbarContent
           className="bg-white dark:bg-haiti text-haiti dark:text-white"
           sx={{
