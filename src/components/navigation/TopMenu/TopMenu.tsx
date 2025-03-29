@@ -1,4 +1,3 @@
-import HelpIcon from '@mui/icons-material/Help';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ShareIcon from '@mui/icons-material/Share';
 import { IconButton, Snackbar, Tooltip } from '@mui/material';
@@ -98,54 +97,45 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
           className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
           input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         />
-        <div className="flex gap-2 md:gap-4 ml-auto">
+        <div className="flex gap-0 md:gap-4 ml-auto">
           <div className="ml-auto">
             <WhatsNew />
           </div>
           <div className="relative">
-            <span
+            <div
               className={
                 tutorialHint
                   ? 'absolute w-11 h-11 rounded-full bg-royal dark:bg-cornflower-400 animate-ping'
                   : 'hidden'
               }
             />
-            <span
+            <div
               className={
                 tutorialHint
-                  ? 'absolute w-11 h-11 rounded-full bg-royal dark:bg-cornflower-400'
-                  : 'hidden'
+                  ? ' rounded-full bg-royal dark:bg-cornflower-400'
+                  : ''
               }
-            />
-            <Tooltip title="Open tutorial">
-              <IconButton
-                className="aspect-square"
-                size="medium"
-                onClick={() => {
-                  setTutorialHint(false);
-                  localStorage.setItem(
-                    'tutorialHint',
-                    JSON.stringify({
-                      value: 'opened',
-                      cacheIndex: cacheIndex,
-                    }),
-                  );
-                  setOpenTutorial(true);
-                }}
-              >
-                <HelpIcon
-                  className={
-                    'text-3xl hidden dark:block' +
-                    (tutorialHint ? ' dark:text-cornflower-900' : '')
-                  }
-                />
-                <HelpOutlineIcon
-                  className={
-                    'text-3xl dark:hidden' + (tutorialHint ? ' text-white' : '')
-                  }
-                />
-              </IconButton>
-            </Tooltip>
+            >
+              <Tooltip title="Open tutorial">
+                <IconButton
+                  className="aspect-square"
+                  size="medium"
+                  onClick={() => {
+                    setTutorialHint(false);
+                    localStorage.setItem(
+                      'tutorialHint',
+                      JSON.stringify({
+                        value: 'opened',
+                        cacheIndex: cacheIndex,
+                      }),
+                    );
+                    setOpenTutorial(true);
+                  }}
+                >
+                  <HelpOutlineIcon className="text-3xl" />
+                </IconButton>
+              </Tooltip>
+            </div>
           </div>
           <Tooltip title="Share link to search" className="ml-auto">
             <IconButton
