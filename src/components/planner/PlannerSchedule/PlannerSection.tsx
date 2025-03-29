@@ -77,8 +77,8 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
           '--height': x[2] + '%',
           '--offset': x[3] + '%',
           '--color': props.color,
-          '--opacity':  props.selected ? "1" : "0.5",
-          '--h-opacity':  props.selected ? "1" : "0.75",
+          '--opacity': props.selected ? '1' : '0.5',
+          '--h-opacity': props.selected ? '1' : '0.75',
         } as React.CSSProperties
       }
       className={`col-start-[var(--start-col)] col-span-1 row-start-[var(--start-row)] row-span-1 relative top-[var(--offset)] h-[var(--height)] overflow-visible rounded-lg bg-[var(--color)] opacity-[var(--opacity)] hover:opacity-[var(--h-opacity)]`}

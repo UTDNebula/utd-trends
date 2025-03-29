@@ -184,15 +184,12 @@ function MyApp({ Component, pageProps }: AppProps) {
   ) {
     setPlanner(
       planner.map((course) => {
-        return {
-          ...course,
-          sectionNumber: searchQueryEqual(
-            removeSection(course),
-            removeSection(searchQuery),
-          )
-            ? section
-            : undefined,
-        };
+        return searchQueryEqual(
+          removeSection(course),
+          removeSection(searchQuery),
+        )
+          ? { ...course, sectionNumber: section }
+          : course;
       }),
     );
   }
