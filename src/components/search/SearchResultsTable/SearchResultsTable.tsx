@@ -32,8 +32,8 @@ import {
   searchQueryEqual,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
-import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import type { SectionsType } from '@/modules/SectionsType/SectionsType';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
 function LoadingRow() {
   return (
@@ -95,7 +95,7 @@ function Row({
   removeFromPlanner,
 }: RowProps) {
   // Check if the course section has the latest semester data
-  let hasLatestSemester = !!(
+  const hasLatestSemester = !!(
     section.state === 'done' && section.data.latest.length
   );
 
