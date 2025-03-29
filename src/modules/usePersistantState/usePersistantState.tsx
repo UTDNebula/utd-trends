@@ -13,7 +13,7 @@ export default function usePersistantState<T>(
       let parsed;
       try {
         parsed = JSON.parse(value);
-      } catch (e) {
+      } catch {
         setInternalState(initialValue);
         return;
       }
