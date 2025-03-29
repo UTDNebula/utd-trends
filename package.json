@@ -16,10 +16,10 @@
     "documentation:build": "styleguidist build"
   },
   "dependencies": {
-    "@emotion/react": "^11.8.1",
-    "@emotion/styled": "^11.6.0",
-    "@mui/icons-material": "^6.1.2",
-    "@mui/material": "^6.1.2",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.4.9",
+    "@mui/material": "^6.4.9",
     "@next/third-parties": "^14.2.15",
     "@vercel/speed-insights": "^1.0.12",
     "apexcharts": "^4.4.0",
@@ -55,7 +55,7 @@
     "@babel/preset-typescript": "^7.21.4",
     "@types/autosuggest-highlight": "^3.2.0",
     "@types/node": "^22.7.5",
-    "@types/react": "^18.2.0",
+    "@types/react": "^18.3.20",
     "@typescript-eslint/eslint-plugin": "^8.8.1",
     "@typescript-eslint/parser": "^8.8.1",
     "babel-loader": "^9.1.2",
