@@ -1,6 +1,6 @@
 import InfoIcon from '@mui/icons-material/Info';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { IconButton, Popover, Tooltip } from '@mui/material';
+import { IconButton, Paper, Popover, Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
 interface ReleaseData {
@@ -247,8 +247,9 @@ export function WhatsNewButton() {
           horizontal: 'center',
         }}
       >
-        <div
-          className="w-64 bg-white dark:bg-[#242643] rounded-md"
+        <Paper
+          className="w-64 bg-white dark:bg-haiti rounded-md"
+          elevation={6}
           style={{
             maxHeight: '80vh',
             overflowY: 'auto',
@@ -298,7 +299,7 @@ export function WhatsNewButton() {
               </p>
             )}
           </div>
-        </div>
+        </Paper>
       </Popover>
     </>
   );
