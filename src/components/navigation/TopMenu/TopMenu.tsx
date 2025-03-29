@@ -81,13 +81,15 @@ export function TopMenu(props: TopMenuProps) {
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />
         )}
-        <Button
-          className="bg-cornflower-500 rounded-xl ml-auto text-white dark:bg-cornflower-400 text p-2 px-4 normal-case"
+        <Link
           href={props.isPlanner ? '/dashboard' : '/planner'}
+          className="ml-auto rounded-xl"
         >
-          <BookIcon className="mr-2" />
-          {props.isPlanner ? 'Search Results' : 'My Planner'}
-        </Button>
+          <Button className="bg-cornflower-500 rounded-xl text-white dark:bg-cornflower-400 text p-2 px-4 normal-case">
+            <BookIcon className="mr-2" />
+            {props.isPlanner ? 'Search Results' : 'My Planner'}
+          </Button>
+        </Link>
         <Tooltip title="Share link to search">
           <IconButton
             className="aspect-square"
