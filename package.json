@@ -12,7 +12,8 @@
     "format:check": "prettier --check .",
     "lint": "next lint --fix",
     "lint:check": "next lint",
-    "documentation": "styleguidist server"
+    "documentation": "styleguidist server",
+    "documentation:build": "styleguidist build"
   },
   "dependencies": {
     "@emotion/react": "^11.8.1",

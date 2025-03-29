@@ -85,6 +85,9 @@ function Row({
   showTutorial,
 }: RowProps) {
   const [open, setOpen] = useState(false);
+  const canOpen =
+    !(typeof grades === 'undefined' || grades.state === 'error') ||
+    !(typeof rmp === 'undefined' || rmp.state === 'error');
 
   const rainbowColors = useRainbowColors();
 
@@ -106,12 +109,7 @@ function Row({
       }
       placement="top"
     >
-      <Typography
-        onClick={
-          (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
-        }
-        className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit"
-      >
+      <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit">
         {searchQueryLabel(course) +
           ((typeof course.profFirst === 'undefined' &&
             typeof course.profLast === 'undefined') ||
@@ -125,7 +123,12 @@ function Row({
 
   return (
     <>
-      <TableRow onClick={() => setOpen(!open)} className="table-row sm:hidden">
+      <TableRow
+        onClick={() => {
+          if (canOpen) setOpen(!open);
+        }}
+        className={'table-row sm:hidden' + (canOpen ? ' cursor-pointer' : '')}
+      >
         <TableCell
           component="th"
           scope="row"
@@ -136,8 +139,10 @@ function Row({
         </TableCell>
       </TableRow>
       <TableRow
-        onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
-        className="cursor-pointer"
+        onClick={() => {
+          if (canOpen) setOpen(!open);
+        }} // opens/closes the card by clicking anywhere on the row
+        className={canOpen ? 'cursor-pointer' : ''}
         data-tutorial-id={showTutorial && 'result'}
       >
         <TableCell
@@ -152,9 +157,10 @@ function Row({
               <IconButton
                 aria-label="expand row"
                 size="medium"
+                disabled={!canOpen}
                 onClick={(e) => {
                   e.stopPropagation(); // prevents double opening/closing
-                  setOpen(!open);
+                  if (canOpen) setOpen(!open);
                 }}
                 className={'transition-transform' + (open ? ' rotate-90' : '')}
               >
