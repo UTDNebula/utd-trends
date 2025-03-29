@@ -612,6 +612,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     );
     const searchResultsTable = (
       <SearchResultsTable
+        sections={props.sections}
         resultsLoading={results.state}
         includedResults={includedResults}
         grades={props.grades}
