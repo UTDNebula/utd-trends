@@ -1,4 +1,5 @@
-import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import HelpIcon from '@mui/icons-material/Help';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ShareIcon from '@mui/icons-material/Share';
 import { IconButton, Snackbar, Tooltip } from '@mui/material';
 import Image from 'next/image';
@@ -7,8 +8,8 @@ import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import Background from '@/../public/background.png';
-import Tutorial from '@/components/dashboard/Tutorial/Tutorial';
 import WhatsNew from '@/components/common/WhatsNew/whatsNew';
+import Tutorial from '@/components/dashboard/Tutorial/Tutorial';
 import SearchBar from '@/components/search/SearchBar/SearchBar';
 
 /**
@@ -98,29 +99,27 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
           input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         />
         <div className="flex gap-2 md:gap-4 ml-auto">
-          <Tooltip title="See What's New in Trends!">
-            <div className="ml-auto">
-              <WhatsNew />
-            </div>
-          </Tooltip>
+          <div className="ml-auto">
+            <WhatsNew />
+          </div>
           <div className="relative">
             <span
               className={
                 tutorialHint
-                  ? 'absolute w-12 h-12 rounded-full bg-royal dark:bg-cornflower-500 animate-ping'
+                  ? 'absolute w-11 h-11 rounded-full bg-royal dark:bg-cornflower-400 animate-ping'
                   : 'hidden'
               }
             />
             <span
               className={
                 tutorialHint
-                  ? 'absolute w-12 h-12 rounded-full bg-royal dark:bg-cornflower-500'
+                  ? 'absolute w-11 h-11 rounded-full bg-royal dark:bg-cornflower-400'
                   : 'hidden'
               }
             />
             <Tooltip title="Open tutorial">
               <IconButton
-                className="w-12 h-12"
+                className="aspect-square"
                 size="medium"
                 onClick={() => {
                   setTutorialHint(false);
@@ -134,8 +133,16 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
                   setOpenTutorial(true);
                 }}
               >
-                <QuestionMarkIcon
-                  className={'text-3xl' + (tutorialHint ? ' text-white' : '')}
+                <HelpIcon
+                  className={
+                    'text-3xl hidden dark:block' +
+                    (tutorialHint ? ' dark:text-cornflower-900' : '')
+                  }
+                />
+                <HelpOutlineIcon
+                  className={
+                    'text-3xl dark:hidden' + (tutorialHint ? ' text-white' : '')
+                  }
                 />
               </IconButton>
             </Tooltip>
