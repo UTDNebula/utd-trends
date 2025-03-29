@@ -7,11 +7,28 @@ export default function usePersistantState<T>(
   const [state, setInternalState] = useState<T>(initialValue);
 
   useEffect(() => {
-    const value = localStorage.getItem(key);
+    function setFromStorage() {
+      const value = localStorage.getItem(key);
+      if (!value) return;
+      let parsed;
+      try {
+        parsed = JSON.parse(value);
+      } catch (e) {
+        setInternalState(initialValue);
+        return;
+      }
+      setInternalState(parsed);
+    }
+    setFromStorage();
 
-    if (!value) return;
-
-    setInternalState(JSON.parse(value));
+    // Update when another tab changes localStorage
+    function handleChange(event) {
+      if (event.key === key) {
+        setFromStorage();
+      }
+    }
+    window.addEventListener('storage', handleChange);
+    return () => window.removeEventListener('storage', handleChange);
   }, [key]);
 
   const setState = (value: T) => {
