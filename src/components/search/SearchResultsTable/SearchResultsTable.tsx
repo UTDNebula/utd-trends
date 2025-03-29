@@ -1,3 +1,4 @@
+import { useTheme, useMediaQuery } from '@mui/material';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Checkbox,
@@ -33,6 +34,16 @@ import {
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
 function LoadingRow() {
+    function LoadingRow() {
+        const theme = useTheme();
+        const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+        const nameCell = (
+            <Typography className="w-1/2 sm:w-full leading-tight text-lg">
+                <Skeleton />
+            </Typography>
+        );
+
   const nameCell = (
     <Typography className="w-1/2 sm:w-full leading-tight text-lg">
       <Skeleton />
@@ -40,16 +51,19 @@ function LoadingRow() {
   );
   return (
     <>
-      <TableRow className="sm:hidden">
-        <TableCell
-          component="th"
-          scope="row"
-          className="w-full border-b-0 pb-0"
-          colSpan={3}
-        >
-          {nameCell}
-        </TableCell>
-      </TableRow>
+          {isMobile && (
+              <TableRow>
+                  <TableCell
+                      component="th"
+                      scope="row"
+                      className="w-full border-b-0 pb-0"
+                      colSpan={3}
+                  >
+                      {nameCell}
+                  </TableCell>
+              </TableRow>
+          )}
+
       <TableRow>
         <TableCell className="flex">
           <IconButton aria-label="expand row" size="medium" disabled>
@@ -93,6 +107,7 @@ type RowProps = {
 };
 
 function Row({
+ 
   course,
   grades,
   rmp,
@@ -101,7 +116,10 @@ function Row({
   removeFromCompare,
   color,
 }: RowProps) {
-  const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false);
+
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const canOpen =
     !(typeof grades === 'undefined' || grades.state === 'error') ||
     !(typeof rmp === 'undefined' || rmp.state === 'error');
