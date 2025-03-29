@@ -1,8 +1,7 @@
-import { Campaign } from '@mui/icons-material';
+import InfoIcon from '@mui/icons-material/Info';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { IconButton, Popover, Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import InfoIcon from '@mui/icons-material/Info';
 
 interface ReleaseData {
   id: number;
