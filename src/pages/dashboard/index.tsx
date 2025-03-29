@@ -10,15 +10,15 @@ import {
   PanelResizeHandle,
 } from 'react-resizable-panels';
 
-import Compare from '@/components/compare/Compare/compare';
-import DashboardEmpty from '@/components/dashboard/DashboardEmpty/dashboardEmpty';
-import DashboardError from '@/components/dashboard/DashboardError/dashboardError';
-import Carousel from '@/components/navigation/Carousel/carousel';
-import TopMenu from '@/components/navigation/topMenu/topMenu';
-import CourseOverview from '@/components/overview/CourseOverview/courseOverview';
-import ProfessorOverview from '@/components/overview/ProfessorOverview/professorOverview';
-import Filters from '@/components/search/Filters/filters';
-import SearchResultsTable from '@/components/search/SearchResultsTable/searchResultsTable';
+import Compare from '@/components/compare/Compare/Compare';
+import DashboardEmpty from '@/components/dashboard/DashboardEmpty/DashboardEmpty';
+import DashboardError from '@/components/dashboard/DashboardError/DashboardError';
+import Carousel from '@/components/navigation/Carousel/Carousel';
+import TopMenu from '@/components/navigation/TopMenu/TopMenu';
+import CourseOverview from '@/components/overview/CourseOverview/CourseOverview';
+import ProfessorOverview from '@/components/overview/ProfessorOverview/ProfessorOverview';
+import Filters from '@/components/search/Filters/Filters';
+import SearchResultsTable from '@/components/search/SearchResultsTable/SearchResultsTable';
 import { compareColors } from '@/modules/colors/colors';
 import fetchWithCache, {
   cacheIndexNebula,

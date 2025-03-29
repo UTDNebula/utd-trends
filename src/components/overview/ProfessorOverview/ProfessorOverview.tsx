@@ -3,8 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
-import SingleGradesInfo from '@/components/common/SingleGradesInfo/singleGradesInfo';
-import SingleProfInfo from '@/components/common/SingleProfInfo/singleProfInfo';
+import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
+import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import fetchWithCache, {
   cacheIndexNebula,
   expireTime,

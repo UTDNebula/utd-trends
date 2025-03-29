@@ -1,9 +1,9 @@
 import { Skeleton } from '@mui/material';
 import React from 'react';
 
-import BarGraph from '@/components/graph/BarGraph/barGraph';
-import LineGraph from '@/components/graph/LineGraph/lineGraph';
-import GraphToggle from '@/components/navigation/GraphToggle/graphToggle';
+import BarGraph from '@/components/graph/BarGraph/BarGraph';
+import LineGraph from '@/components/graph/LineGraph/LineGraph';
+import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {

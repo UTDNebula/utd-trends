@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 
 import Background from '@/../public/background.png';
 import WhatsNew from '@/components/common/WhatsNew/whatsNew';
-import SearchBar from '@/components/search/SearchBar/searchBar';
+import SearchBar from '@/components/search/SearchBar/SearchBar';
 
 /**
  * Props type used by the TopMenu component

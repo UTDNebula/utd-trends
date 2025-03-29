@@ -11,13 +11,11 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "next lint --fix",
-    "lint:check": "next lint"
-  },
-  "engines": {
-    "node": "^18"
+    "lint:check": "next lint",
+    "documentation": "styleguidist server",
+    "documentation:build": "styleguidist build"
   },
   "dependencies": {
-    "@babel/runtime": "^7.17.9",
     "@emotion/react": "^11.8.1",
     "@emotion/styled": "^11.6.0",
     "@mui/icons-material": "^6.1.2",
@@ -62,7 +60,6 @@
     "@typescript-eslint/parser": "^8.8.1",
     "babel-loader": "^9.1.2",
     "babel-plugin-styled-components": "^2.1.1",
-    "babel-polyfill": "^6.26.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.14",
     "eslint-config-prettier": "^9.1.0",

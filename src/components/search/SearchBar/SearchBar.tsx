@@ -74,7 +74,7 @@ const SearchBar = ({
     }
   }, [router.isReady, router.query.searchTerms]); // useEffect is called every time the query changes
 
-  // updateValue -> onSelect_internal -> updateQueries - clicking enter on an autocomplete suggestion in topMenu Searchbar
+  // updateValue -> onSelect_internal -> updateQueries - clicking enter on an autocomplete suggestion in TopMenu Searchbar
   // updateValue -> onSelect_internal -> onSelect (custom function) - clicking enter on an autocomplete suggestion in home page SearchBar
   // params.inputProps.onKeyDown -> handleKeyDown -> onSelect_internal -> updateQueries/onSelect - clicking enter in the SearchBar
   // Button onClick -> onSelect_internal -> updateQueries/onSelect - Pressing the "Search" Button
@@ -342,13 +342,15 @@ const SearchBar = ({
           disableElevation
           size="large"
           className={
-            'h-11 w-[5.5rem] shrink-0 normal-case bg-royal hover:bg-royalDark' +
-            (value.length == 0 ? ' text-cornflower-200' : '')
+            'h-11 w-[5.5rem] shrink-0 normal-case' +
+            (value.length == 0
+              ? ' text-cornflower-200 dark:text-cornflower-700'
+              : '')
           } //darkens the text when no valid search terms are entered (pseudo-disables the search button)
           onClick={() => onSelect_internal(value)}
         >
           {resultsLoading === 'loading' ? (
-            <CircularProgress className="h-6 w-6 text-cornflower-50" />
+            <CircularProgress className="h-6 w-6 text-cornflower-50 dark:text-haiti" />
           ) : (
             'Search'
           )}

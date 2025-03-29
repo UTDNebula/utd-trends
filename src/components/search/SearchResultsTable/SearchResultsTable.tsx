@@ -16,10 +16,10 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
-import Rating from '@/components/common/Rating/rating';
-import SingleGradesInfo from '@/components/common/SingleGradesInfo/singleGradesInfo';
-import SingleProfInfo from '@/components/common/SingleProfInfo/singleProfInfo';
-import TableSortLabel from '@/components/common/TableSortLabel/tableSortLabel';
+import Rating from '@/components/common/Rating/Rating';
+import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
+import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
+import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors/colors';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
@@ -83,14 +83,64 @@ function Row({
   color,
 }: RowProps) {
   const [open, setOpen] = useState(false);
+  const canOpen =
+    !(typeof grades === 'undefined' || grades.state === 'error') ||
+    !(typeof rmp === 'undefined' || rmp.state === 'error');
 
   const rainbowColors = useRainbowColors();
+
+  const nameCell = (
+    <Tooltip
+      title={
+        typeof course.profFirst !== 'undefined' &&
+        typeof course.profLast !== 'undefined' &&
+        (rmp !== undefined &&
+        rmp.state === 'done' &&
+        rmp.data.teacherRatingTags.length > 0
+          ? 'Tags: ' +
+            rmp.data.teacherRatingTags
+              .sort((a, b) => b.tagCount - a.tagCount)
+              .slice(0, 3)
+              .map((tag) => tag.tagName)
+              .join(', ')
+          : 'No Tags Available')
+      }
+      placement="top"
+    >
+      <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit">
+        {searchQueryLabel(course) +
+          ((typeof course.profFirst === 'undefined' &&
+            typeof course.profLast === 'undefined') ||
+          (typeof course.prefix === 'undefined' &&
+            typeof course.number === 'undefined')
+            ? ' (Overall)'
+            : '')}
+      </Typography>
+    </Tooltip>
+  );
 
   return (
     <>
       <TableRow
-        onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
-        className="cursor-pointer"
+        onClick={() => {
+          if (canOpen) setOpen(!open);
+        }}
+        className={'table-row sm:hidden' + (canOpen ? ' cursor-pointer' : '')}
+      >
+        <TableCell
+          component="th"
+          scope="row"
+          className="w-full border-b-0 pb-0"
+          colSpan={3}
+        >
+          {nameCell}
+        </TableCell>
+      </TableRow>
+      <TableRow
+        onClick={() => {
+          if (canOpen) setOpen(!open);
+        }} // opens/closes the card by clicking anywhere on the row
+        className={canOpen ? 'cursor-pointer' : ''}
       >
         <TableCell className="border-b-0">
           <div className="flex items-center gap-1">
@@ -101,9 +151,10 @@ function Row({
               <IconButton
                 aria-label="expand row"
                 size="medium"
+                disabled={!canOpen}
                 onClick={(e) => {
                   e.stopPropagation(); // prevents double opening/closing
-                  setOpen(!open);
+                  if (canOpen) setOpen(!open);
                 }}
                 className={'transition-transform' + (open ? ' rotate-90' : '')}
               >
@@ -142,39 +193,12 @@ function Row({
             </Tooltip>
           </div>
         </TableCell>
-        <TableCell component="th" scope="row" className="w-full border-b-0">
-          <Tooltip
-            title={
-              typeof course.profFirst !== 'undefined' &&
-              typeof course.profLast !== 'undefined' &&
-              (rmp !== undefined &&
-              rmp.state === 'done' &&
-              rmp.data.teacherRatingTags.length > 0
-                ? 'Tags: ' +
-                  rmp.data.teacherRatingTags
-                    .sort((a, b) => b.tagCount - a.tagCount)
-                    .slice(0, 3)
-                    .map((tag) => tag.tagName)
-                    .join(', ')
-                : 'No Tags Available')
-            }
-            placement="top"
-          >
-            <Typography
-              onClick={
-                (e) => e.stopPropagation() // prevents opening/closing the card when clicking on the text
-              }
-              className="leading-tight text-lg text-gray-600 dark:text-gray-200 cursor-text w-fit"
-            >
-              {searchQueryLabel(course) +
-                ((typeof course.profFirst === 'undefined' &&
-                  typeof course.profLast === 'undefined') ||
-                (typeof course.prefix === 'undefined' &&
-                  typeof course.number === 'undefined')
-                  ? ' (Overall)'
-                  : '')}
-            </Typography>
-          </Tooltip>
+        <TableCell
+          component="th"
+          scope="row"
+          className="w-full border-b-0 hidden sm:table-cell"
+        >
+          {nameCell}
         </TableCell>
         <TableCell align="center" className="border-b-0">
           {((typeof grades === 'undefined' || grades.state === 'error') && (
@@ -444,7 +468,7 @@ const SearchResultsTable = ({
         <Table stickyHeader aria-label="collapsible table">
           <TableHead>
             <TableRow>
-              <TableCell>Actions</TableCell>
+              <TableCell className="hidden sm:table-cell">Actions</TableCell>
               <TableCell>
                 <TableSortLabel
                   active={orderBy === 'name'}
