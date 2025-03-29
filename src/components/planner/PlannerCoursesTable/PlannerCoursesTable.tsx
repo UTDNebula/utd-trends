@@ -33,9 +33,12 @@ type PlannerCoursesTableProps = {
 const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
   return (
     <>
-      <Typography className="leading-tight text-3xl font-bold p-4">
-        My Planner
-      </Typography>
+    <Typography 
+    className="leading-tight text-3xl font-bold p-4"
+    style={{ color: '#3F298D' }}
+    >
+    Courses
+    </Typography>
       <div className="flex flex-col gap-4">
         {props.courses
           ? props.courses.map((course, index) => {

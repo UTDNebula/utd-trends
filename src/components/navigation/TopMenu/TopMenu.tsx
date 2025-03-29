@@ -79,8 +79,12 @@ export function TopMenu({
           input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         />
         <Link
-          className="bg-cornflower-400"
+          className="text-white font-bold py-2 px-4 rounded-lg border-2"
           href={isPlanner ? '/dashboard' : '/planner'}
+          style={{
+            backgroundColor: '#5F3FD3',
+            borderColor: '#5F3FD3',
+          }}
         >
           {isPlanner ? 'Search Results' : 'My Planner'}
         </Link>

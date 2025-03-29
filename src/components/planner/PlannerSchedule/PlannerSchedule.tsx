@@ -40,7 +40,7 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
       className={`w-full h-[calc(100vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[max-content_repeat(13,minmax(0,1fr))]`}
     >
       {/*Weekday Headers*/}
-      <div className="grid col-span-full grid-flow-row bg-cornflower-500 grid-cols-subgrid grid-rows-subgrid">
+      <div className="grid col-span-full grid-flow-row bg-[#5F3FD3] grid-cols-subgrid grid-rows-subgrid rounded-b-2x4">
         <div className="col-span-1 h-min"></div>
         {DAYS.slice(START_DAY, END_DAY + 1).map((x, i) => (
           <p
