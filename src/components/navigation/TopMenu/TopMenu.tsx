@@ -133,9 +133,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
                   }}
                 >
                   <HelpOutlineIcon
-                    className={
-                      'text-3xl' + (tutorialHint ? ' text-white' : '')
-                    }
+                    className={'text-3xl' + (tutorialHint ? ' text-white' : '')}
                   />
                 </IconButton>
               </Tooltip>
