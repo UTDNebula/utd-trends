@@ -24,13 +24,11 @@ export default function handler(
   const number = req.query.number;
   const profFirst = req.query.profFirst;
   const profLast = req.query.profLast;
-  const sectionNumber = req.query.sectionNumber;
   if (
     typeof prefix !== 'string' &&
     typeof number !== 'string' &&
     typeof profFirst !== 'string' &&
-    typeof profLast !== 'string' &&
-    typeof sectionNumber !== 'string'
+    typeof profLast !== 'string'
   ) {
     res.status(400).json({ message: 'Incorrect query present' });
     return;
@@ -49,9 +47,6 @@ export default function handler(
   if (typeof profFirst === 'string' && typeof profLast === 'string') {
     url.searchParams.append('first_name', profFirst);
     url.searchParams.append('last_name', profLast);
-  }
-  if (typeof sectionNumber === 'string') {
-    url.searchParams.append('section_number', sectionNumber);
   }
   return new Promise<void>((resolve) => {
     fetch(url.href, {

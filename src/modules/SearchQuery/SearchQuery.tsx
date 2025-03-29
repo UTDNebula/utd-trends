@@ -40,6 +40,12 @@ export function convertToCourseOnly(
   };
 }
 
+export function removeSection(searchQuery: SearchQuery): SearchQuery {
+  const result = { ...searchQuery };
+  delete result.sectionNumber;
+  return result;
+}
+
 export function searchQueryLabel(query: SearchQuery): string {
   let result = '';
   if (typeof query.prefix !== 'undefined') {
