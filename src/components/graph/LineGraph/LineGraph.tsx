@@ -114,7 +114,7 @@ const LineGraph = (props: Props): JSX.Element => {
     if (i !== parseInt(minSemester) || minSemester.includes('S')) {
       allSemesters.push(i + 'S');
     }
-    if (i !== parseInt(maxSemester) || minSemester.includes('F')) {
+    if (i !== parseInt(maxSemester) || maxSemester.includes('F')) {
       allSemesters.push(i + 'F');
     }
   }
