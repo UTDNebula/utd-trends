@@ -198,7 +198,7 @@ export function WhatsNewButton() {
         >
           <Campaign className="text-4xl mr-1" />
           {hasUnreadFeature && (
-            <span className="absolute -top-1 -right-1 bg-royal rounded-full h-3 w-3"></span>
+            <span className="absolute -top-0 -right-0 bg-royal rounded-full h-3 w-3"></span>
           )}
         </IconButton>
       </Tooltip>
