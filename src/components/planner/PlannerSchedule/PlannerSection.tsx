@@ -61,7 +61,6 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
           .map((day) => (day === 'Thursday' ? 'Z' : day.charAt(0)))
           .join('');
 
-
         tempMeetings.push([
           col.toString(),
           startRow.toString(),
@@ -90,8 +89,7 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
     Z: 'bg-[#62D425]',
     F: 'bg-[#62D425]',
     S: 'bg-[#62D425]',
-
-};
+  };
 
   return meetings.map((x: string[], i: number) => {
     return (
