@@ -16,6 +16,14 @@ export type Course = {
   number: string;
 };
 
+export type SearchQueryMultiSection = {
+  prefix?: string;
+  number?: string;
+  profFirst?: string;
+  profLast?: string;
+  sectionNumbers?: string[];
+};
+
 export function convertToProfOnly(
   searchQuery: SearchQuery,
 ): Professor | Record<string, never> {
@@ -40,10 +48,30 @@ export function convertToCourseOnly(
   };
 }
 
-export function removeSection(searchQuery: SearchQuery): SearchQuery {
+export function removeSection(
+  searchQuery: SearchQuery | SearchQueryMultiSection,
+): SearchQuery {
   const result = { ...searchQuery };
-  delete result.sectionNumber;
+  if ('sectionNumber' in result) {
+    delete result.sectionNumber;
+  }
+  if ('sectionNumbers' in result) {
+    delete result.sectionNumbers;
+  }
   return result;
+}
+
+export function searchQueryMultiSectionSplit(
+  searchQuery: SearchQueryMultiSection,
+): SearchQuery[] {
+  if (typeof searchQuery.sectionNumbers === 'undefined') {
+    return [];
+  }
+  return searchQuery.sectionNumbers.map((section) => {
+    const result = { ...searchQuery, sectionNumber: section };
+    delete result.sectionNumbers;
+    return result;
+  });
 }
 
 export function searchQueryLabel(query: SearchQuery): string {

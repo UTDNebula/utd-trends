@@ -11,18 +11,16 @@ import {
   removeSection,
   type SearchQuery,
   searchQueryLabel,
+  type SearchQueryMultiSection,
 } from '@/modules/SearchQuery/SearchQuery';
 import { type SectionsType } from '@/modules/SectionsType/SectionsType';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
 type PlannerCoursesTableProps = {
-  courses?: SearchQuery[];
+  courses?: SearchQueryMultiSection[];
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
-  setPlannerSection: (
-    searchQuery: SearchQuery,
-    section: string | undefined,
-  ) => boolean;
+  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
   sections: {
     [key: string]: GenericFetchedData<SectionsType>;
   };

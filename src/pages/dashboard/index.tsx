@@ -29,9 +29,11 @@ import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   convertToProfOnly,
   decodeSearchQueryLabel,
+  removeSection,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
+  type SearchQueryMultiSection,
 } from '@/modules/SearchQuery/SearchQuery';
 import useGradeStore from '@/modules/useGradeStore/useGradeStore';
 import useRmpStore from '@/modules/useRmpStore/useRmpStore';
@@ -188,7 +190,7 @@ export async function getServerSideProps(
 
 interface Props {
   pageTitle: string;
-  planner: SearchQuery[];
+  planner: SearchQueryMultiSection[];
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
   grades: {
@@ -595,7 +597,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         addToCompare={addToCompare}
         removeFromCompare={removeFromCompare}
         colorMap={colorMap}
-        planner={props.planner}
+        planner={props.planner.map((x) => removeSection(x))}
         addToPlanner={props.addToPlanner}
         removeFromPlanner={props.removeFromPlanner}
       />

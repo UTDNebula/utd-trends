@@ -30,6 +30,7 @@ import {
   removeSection,
   type SearchQuery,
   searchQueryLabel,
+  type SearchQueryMultiSection,
 } from '@/modules/SearchQuery/SearchQuery';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import { type SectionsData } from '@/pages/api/sections';
@@ -114,27 +115,21 @@ function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
 
 type SectionTableRowProps = {
   data: SectionsData[number];
-  course: SearchQuery;
+  course: SearchQueryMultiSection;
   lastRow: boolean;
-  setPlannerSection: (
-    searchQuery: SearchQuery,
-    section: string | undefined,
-  ) => boolean;
+  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
 };
 
 function SectionTableRow(props: SectionTableRowProps) {
-  const isSelected = props.course.sectionNumber === props.data.section_number;
+  const isSelected =
+    props.course.sectionNumbers?.includes(props.data.section_number) ?? false;
   return (
     <TableRow>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
         <Radio
           checked={isSelected}
           onClick={() => {
-            if (!isSelected) {
-              props.setPlannerSection(props.course, props.data.section_number);
-            } else {
-              props.setPlannerSection(props.course, undefined);
-            }
+            props.setPlannerSection(props.course, props.data.section_number);
           }}
         />
       </TableCell>
@@ -175,12 +170,9 @@ function SectionTableRow(props: SectionTableRowProps) {
 }
 
 type PlannerCardProps = {
-  query: SearchQuery;
+  query: SearchQueryMultiSection;
   sections?: SectionsData;
-  setPlannerSection: (
-    searchQuery: SearchQuery,
-    section: string | undefined,
-  ) => boolean;
+  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RMPInterface>;
   removeFromPlanner: () => void;
