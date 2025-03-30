@@ -57,7 +57,10 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
           Number(splitStartTime[1].slice(0, splitStartTime[1].length - 2)) / 60;
         const offsetTotalPercent = offset * 100;
 
-        const dayKey = meeting_day === 'Thursday' ? 'Z' : meeting_day.charAt(0);
+        let dayKey = meeting.meeting_days
+          .map((day) => (day === 'Thursday' ? 'Z' : day.charAt(0)))
+          .join('');
+
 
         tempMeetings.push([
           col.toString(),
@@ -73,15 +76,22 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
     console.log(numDays + 2);
   }, [props.selectedSection]);
 
-  //added color map colors are pretty ugly so change them based on figma color codes
-  //dont know what to do for firday combo classes or sat
   const colorMap: { [key: string]: string } = {
-    M: 'bg-purple-800',
-    W: 'bg-purple-800',
-    T: 'bg-purple-400',
-    Z: 'bg-purple-400',
-    F: 'bg-purple-600',
-  };
+    MW: 'bg-[#2D9DDD]',
+    TZ: 'bg-[#EB9B5A]',
+    ZF: 'bg-[#F0E549]',
+    WF: 'bg-[#563CFB]',
+    MWF: 'bg-[#F7ADCD]',
+    ZFS: 'bg-[#DD4E4E]',
+    MTWZ: 'bg-purple-800',
+    M: 'bg-[#62D425]',
+    W: 'bg-[#62D425]',
+    T: 'bg-[#62D425]',
+    Z: 'bg-[#62D425]',
+    F: 'bg-[#62D425]',
+    S: 'bg-[#62D425]',
+
+};
 
   return meetings.map((x: string[], i: number) => {
     return (
