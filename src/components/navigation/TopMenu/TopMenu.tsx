@@ -80,7 +80,26 @@ export function TopMenu({
         />
         <Link
           className="bg-cornflower-400"
-          href={isPlanner ? '/dashboard' : '/planner'}
+          href={
+            isPlanner
+              ? typeof sessionStorage !== 'undefined' &&
+                sessionStorage.getItem('dashboardSearchTerms')
+                ? '/dashboard?searchTerms=' +
+                  sessionStorage
+                    .getItem('dashboardSearchTerms')
+                    ?.replace(' ', '+')
+                    .replace(',', '%2C')
+                : '/'
+              : '/planner'
+          }
+          onClick={() =>
+            !isPlanner
+              ? sessionStorage.setItem(
+                  'dashboardSearchTerms',
+                  router.query.searchTerms?.toString() ?? '',
+                )
+              : null
+          }
         >
           {isPlanner ? 'Search Results' : 'My Planner'}
         </Link>
