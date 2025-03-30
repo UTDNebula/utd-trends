@@ -1,6 +1,9 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { IconButton, Paper, Popover, Tooltip } from '@mui/material';
+import { Badge, IconButton, Popover, Tooltip } from '@mui/material';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+
+import usePersistantState from '@/modules/usePersistantState/usePersistantState';
 
 interface ReleaseData {
   id: number;
@@ -15,7 +18,6 @@ interface Feature {
   version: string;
   date: string;
   content: string;
-  read: boolean;
   releaseUrl: string;
   releaseId: string;
 }
@@ -25,32 +27,18 @@ interface Feature {
  */
 export function WhatsNewButton() {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [readFeatures, setReadFeatures] = usePersistantState<string[]>(
+    'readFeatures',
+    [],
+  );
   const [latestFeatures, setLatestFeatures] = useState<Feature[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [wasOpened, setWasOpened] = useState(false);
+  const [state, setState] = useState('done');
 
   // Check if the latest feature is unread
-  const unreadCount = latestFeatures.filter((feature) => !feature.read).length;
+  const unread = Boolean(
+    latestFeatures.find((feature) => !readFeatures.includes(feature.id)),
+  );
   const open = Boolean(anchorEl);
-  const id = open ? 'whats-new-popover' : undefined;
-
-  // Load features from localStorage
-  useEffect(() => {
-    const savedFeatures = localStorage.getItem('utdTrendsLatestFeatures');
-    if (savedFeatures) {
-      setLatestFeatures(JSON.parse(savedFeatures));
-    }
-  }, []);
-
-  // Save features to localStorage whenever it changes
-  useEffect(() => {
-    if (latestFeatures.length > 0) {
-      localStorage.setItem(
-        'utdTrendsLatestFeatures',
-        JSON.stringify(latestFeatures),
-      );
-    }
-  }, [latestFeatures]);
 
   // Fetch releases
   useEffect(() => {
@@ -98,9 +86,9 @@ export function WhatsNewButton() {
 
   // Function to fetch only the 2 most recent releases
   const fetchReleases = async () => {
-    if (loading) return;
+    if (state === 'loading') return;
 
-    setLoading(true);
+    setState('loading');
 
     try {
       const response = await fetch(
@@ -141,24 +129,9 @@ export function WhatsNewButton() {
               version: featureVersion,
               date: featureDate,
               content: featureContent,
-              read: false,
               releaseUrl: release.html_url,
               releaseId: release.id.toString(),
             };
-
-            // Check if we already have this feature stored
-            const savedFeature = localStorage.getItem(
-              'utdTrendsLatestFeatures',
-            );
-            if (savedFeature) {
-              const parsedFeature = (
-                JSON.parse(savedFeature) as Feature[]
-              ).filter((feature) => feature.id === id)[0];
-              // If it's the same feature, keep the read status
-              if (parsedFeature) {
-                newFeature.read = parsedFeature.read;
-              }
-            }
             allFeatures.push(newFeature);
           }
         }
@@ -167,52 +140,40 @@ export function WhatsNewButton() {
       if (allFeatures.length > 0) {
         setLatestFeatures(allFeatures);
       }
-    } catch (error) {
-      console.error('Error fetching release data:', error);
+    } catch {
+      setState('error');
     } finally {
-      setLoading(false);
+      setState('done');
     }
   };
 
   // Handle opening the popover
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
-    setWasOpened(true);
   };
 
   // Handle closing the popover
   const handleClose = () => {
-    if (wasOpened && latestFeatures) {
+    if (anchorEl && latestFeatures) {
       markAllFeaturesAsRead();
-      setWasOpened(false);
     }
     setAnchorEl(null);
   };
 
   // Mark a feature as read
   const markFeatureAsRead = (featureId: string) => {
-    setLatestFeatures((prevFeatures) =>
-      prevFeatures.map((feature) =>
-        feature.id === featureId ? { ...feature, read: true } : feature,
-      ),
-    );
+    setReadFeatures(Array.from(new Set(readFeatures.concat([featureId]))));
   };
 
   // Mark all features as read
   const markAllFeaturesAsRead = () => {
-    setLatestFeatures((prevFeatures) =>
-      prevFeatures.map((feature) => ({ ...feature, read: true })),
+    setReadFeatures(
+      Array.from(
+        new Set(
+          readFeatures.concat(latestFeatures.map((feature) => feature.id)),
+        ),
+      ),
     );
-  };
-
-  // Navigate to the release page
-  const navigateToRelease = (feature: Feature, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (feature) {
-      markFeatureAsRead(feature.id);
-      window.open(feature.releaseUrl, '_blank');
-      // handleClose();
-    }
   };
 
   return (
@@ -222,17 +183,20 @@ export function WhatsNewButton() {
           className="aspect-square"
           size="medium"
           onClick={handleClick}
-          aria-describedby={id}
+          aria-describedby="whats-new-popover"
         >
-          <InfoOutlinedIcon className="text-3xl" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-0 -right-0 bg-royal dark:bg-cornflower-300 rounded-full h-3 w-3"></span>
+          {unread ? (
+            <Badge color="primary" badgeContent=" ">
+              <InfoOutlinedIcon className="text-3xl" />
+            </Badge>
+          ) : (
+            <InfoOutlinedIcon className="text-3xl" />
           )}
         </IconButton>
       </Tooltip>
 
       <Popover
-        id={id}
+        id="whats-new-popover"
         open={open}
         anchorEl={anchorEl}
         onClose={handleClose}
@@ -244,60 +208,65 @@ export function WhatsNewButton() {
           vertical: 'top',
           horizontal: 'center',
         }}
+        slotProps={{
+          paper: {
+            elevation: 6,
+            className:
+              'p-4 w-64 bg-white dark:bg-haiti rounded-md max-h-[80vh] overflow-y-auto',
+          },
+        }}
       >
-        <Paper
-          className="w-64 bg-white dark:bg-haiti rounded-md"
-          elevation={6}
-          style={{
-            maxHeight: '80vh',
-            overflowY: 'auto',
-          }}
-        >
-          <div className="p-4">
-            <h3 className="font-bold mb-3 text-base text-center">
-              What&apos;s New?
-            </h3>
-            {loading ? (
-              <div className="flex justify-center py-4">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-royal"></div>
-              </div>
-            ) : latestFeatures.length > 0 ? (
-              <div className="space-y-3">
-                {latestFeatures.map((feature) => (
-                  <button
-                    className="no-underline text-inherit flex items-start group w-full text-left hover:bg-gray-100 dark:hover:bg-cornflower-700 p-1 pl-3 rounded-md transition-colors"
-                    onClick={(e) =>
-                      navigateToRelease(feature, e as React.MouseEvent)
-                    }
-                    title="Click to view release details"
+        <h3 className="font-bold mb-3 text-base text-center">
+          What&apos;s New?
+        </h3>
+        {(state === 'loading' && (
+          <div className="flex justify-center py-4">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-royal"></div>
+          </div>
+        )) ||
+          (state === 'done' &&
+            (latestFeatures.length > 0 ? (
+              <div className="flex flex-col gap-2">
+                {latestFeatures.flatMap((feature, index) => [
+                  <Link
                     key={feature.id}
+                    href={feature.releaseUrl}
+                    target="_blank"
+                    onClick={() => markFeatureAsRead(feature.id)}
+                    onAuxClick={(e) => {
+                      if (e.button == 1) {
+                        // middle click
+                        markFeatureAsRead(feature.id);
+                      }
+                    }}
+                    title="Click to view release details"
+                    className="flex flex-col gap-1 hover:bg-gray-100 dark:hover:bg-cornflower-700 p-2 rounded-md transition-colors"
                   >
-                    <div className="flex flex-col">
-                      <div className="flex justify-between">
-                        <span
-                          className={`text-xs rounded-full ${!feature.read ? 'bg-cornflower-600 text-white dark:bg-cornflower-300 dark:text-cornflower-900' : 'ring-1 ring-cornflower-500 text-cornflower-700 dark:ring-cornflower-400 dark:text-cornflower-200'} p-0.5 px-2`}
-                        >
-                          {feature.version}
-                        </span>
-                        <span className="text-xs text-cornflower-500 dark:text-cornflower-400 mr-2">
-                          {feature.date}
-                        </span>
-                      </div>
-                      <span className="text-sm ml-0.5 mt-1">
-                        {feature.content}
+                    <div className="flex justify-between">
+                      <span
+                        className={`text-xs rounded-full ${readFeatures.includes(feature.id) ? 'ring-1 ring-cornflower-500 text-cornflower-700 dark:ring-cornflower-400 dark:text-cornflower-200' : 'bg-cornflower-600 text-white dark:bg-cornflower-300 dark:text-cornflower-900'} p-0.5 px-2`}
+                      >
+                        {feature.version}
                       </span>
-                      <hr className=" mt-2 border-gray-300 dark:border-gray-600" />
+                      <p className="text-xs text-cornflower-500 dark:text-cornflower-400 mr-2">
+                        {feature.date}
+                      </p>
                     </div>
-                  </button>
-                ))}
+                    <p className="text-sm ml-0.5">{feature.content}</p>
+                  </Link>,
+                  latestFeatures.length - 1 !== index ? (
+                    <hr
+                      key={feature.id + 'divider'}
+                      className="border-gray-300 dark:border-gray-600"
+                    />
+                  ) : null,
+                ])}
               </div>
             ) : (
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 No updates available
               </p>
-            )}
-          </div>
-        </Paper>
+            )))}
       </Popover>
     </>
   );
