@@ -1,4 +1,5 @@
 import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
@@ -52,6 +53,7 @@ function BarGraph(props: Props) {
   }
 
   const rainbowColors = useRainbowColors();
+  const theme = useTheme();
 
   const options: ApexOptions = {
     chart: {
@@ -75,6 +77,9 @@ function BarGraph(props: Props) {
       animations: {
         enabled: !fullScreenOpen,
       },
+    },
+    grid: {
+      borderColor: theme.palette.mode === 'dark' ? '#404040' : '#e0e0e0',
     },
     plotOptions: {
       bar: {

@@ -265,7 +265,7 @@ export function WhatsNewButton() {
               <div className="space-y-3">
                 {latestFeatures.map((feature) => (
                   <button
-                    className="flex items-start group w-full text-left hover:bg-gray-100 dark:hover:bg-cornflower-700 p-1 pl-3 rounded-md transition-colors"
+                    className="no-underline text-inherit flex items-start group w-full text-left hover:bg-gray-100 dark:hover:bg-cornflower-700 p-1 pl-3 rounded-md transition-colors"
                     onClick={(e) =>
                       navigateToRelease(feature, e as React.MouseEvent)
                     }
