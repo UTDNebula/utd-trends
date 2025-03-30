@@ -124,7 +124,7 @@ function MeetingSchedule({
   meetings: SectionsData[number]['meetings'];
 }) {
   return (
-    <Box className="p-2 mt-2 max-w-xs mx-auto">
+    <Box className="max-w-xs mx-auto">
       {meetings.map((meeting, i) => {
         const [schedule] = parseMeeting(meeting);
         const [days, time] = schedule.split(' ');
@@ -133,12 +133,12 @@ function MeetingSchedule({
         return (
           <div
             key={i}
-            className="mb-1 p-1 rounded-3xl border border-cornflower-300 bg-white dark:bg-gray-700 shadow-sm"
+            className="p-1 px-3 rounded-3xl border border-cornflower-300 bg-white dark:bg-gray-700 shadow-sm"
           >
-            <Typography className="text-sm font-semibold text-center">
+            <Typography className="text-xs font-semibold text-center">
               {formattedDays}
             </Typography>
-            <Typography className="text-sm text-center">{time}</Typography>
+            <Typography className="text-xs text-center">{time.substring(0, time.indexOf('-'))}</Typography>
           </div>
         );
       })}
@@ -344,7 +344,7 @@ const PlannerCard = (props: PlannerCardProps) => {
 
         {/* Right-side MeetingSchedule */}
         {selectedSections.length > 0 && (
-          <div className="min-w-[150px]">
+          <div className="">
             {selectedSections.map((section, i) => (
               <MeetingSchedule key={i} meetings={section.meetings} />
             ))}
