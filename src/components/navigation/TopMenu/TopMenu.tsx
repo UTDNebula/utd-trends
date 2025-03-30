@@ -14,18 +14,13 @@ import SearchBar from '@/components/search/SearchBar/SearchBar';
 interface TopMenuProps {
   resultsLoading: 'loading' | 'done' | 'error';
   setResultsLoading: () => void;
-  isPlanner: boolean;
 }
 
 /**
  * This is a component to hold UTD Trends branding and basic navigation
  * @returns
  */
-export function TopMenu({
-  resultsLoading,
-  setResultsLoading,
-  isPlanner,
-}: TopMenuProps) {
+export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
   const router = useRouter();
   const [openCopied, setOpenCopied] = useState(false);
 
@@ -78,12 +73,6 @@ export function TopMenu({
           className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
           input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
         />
-        <Link
-          className="bg-cornflower-400"
-          href={isPlanner ? '/dashboard' : '/planner'}
-        >
-          {isPlanner ? 'Search Results' : 'My Planner'}
-        </Link>
         <Tooltip title="Share link to search" className="ml-auto">
           <IconButton
             className="aspect-square"
