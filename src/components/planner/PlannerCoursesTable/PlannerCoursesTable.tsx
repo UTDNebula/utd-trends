@@ -52,6 +52,7 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
               return (
                 <PlannerCard
                   key={index}
+                  courseInd={index}
                   query={course}
                   sections={
                     typeof sectionData === 'undefined' ||
@@ -65,6 +66,8 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                   removeFromPlanner={() => {
                     props.removeFromPlanner(course);
                   }}
+                  openIndex={props.openIndex}
+                  setOpenIndex={props.setOpenIndex}
                 />
               );
             })

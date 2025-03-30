@@ -63,7 +63,6 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
           course={
             x.course
           }
-          color={x.color}
           selected={x.selected}
         />
       ))}
