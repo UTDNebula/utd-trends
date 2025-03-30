@@ -60,27 +60,25 @@ export function LoadingRow() {
 
 function SectionTableHead() {
   return (
-    <>
-      <TableRow className="bg-cornflower-600">
-        <TableCell className="py-2 px-4 border-b-0" align="left">
-          <Typography className="text-white text-xs">Select</Typography>
-        </TableCell>
-        <TableCell className="py-2 px-4 border-b-0">
-          <Typography className="text-white text-xs">Section #</Typography>
-        </TableCell>
-        <TableCell className="py-2 px-4 border-b-0">
-          <Typography className="text-white text-xs">Class #</Typography>
-        </TableCell>
-        <TableCell className="py-2 px-4 border-b-0">
-          <Typography className="text-white text-xs">
-            Schedule & Location
-          </Typography>
-        </TableCell>
-        <TableCell className="py-2 px-4 border-b-0">
-          <Typography className="text-white text-xs">Syllabus</Typography>
-        </TableCell>
-      </TableRow>
-    </>
+    <TableRow className="bg-cornflower-600">
+      <TableCell className="py-2 px-4 border-b-0" align="left">
+        <Typography className="text-white text-xs">Select</Typography>
+      </TableCell>
+      <TableCell className="py-2 px-4 border-b-0">
+        <Typography className="text-white text-xs">Section #</Typography>
+      </TableCell>
+      <TableCell className="py-2 px-4 border-b-0">
+        <Typography className="text-white text-xs">Class #</Typography>
+      </TableCell>
+      <TableCell className="py-2 px-4 border-b-0">
+        <Typography className="text-white text-xs">
+          Schedule & Location
+        </Typography>
+      </TableCell>
+      <TableCell className="py-2 px-4 border-b-0">
+        <Typography className="text-white text-xs">Syllabus</Typography>
+      </TableCell>
+    </TableRow>
   );
 }
 
