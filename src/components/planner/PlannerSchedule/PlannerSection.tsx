@@ -6,11 +6,12 @@ import {
 } from '@/modules/SearchQuery/SearchQuery';
 import type { SectionsData } from '@/pages/api/sections';
 
-import { DAYS, numDays, START_HOUR } from './PlannerSchedule';
+import { DAYS, START_HOUR } from './PlannerSchedule';
 
 type PlannerSectionComponentProps = {
   selectedSection: SectionsData[number];
   course: SearchQuery;
+  selected: boolean;
 };
 
 const PlannerSection = (props: PlannerSectionComponentProps) => {
@@ -59,11 +60,11 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
           startRow.toString(),
           lengthPercentHour.toString(),
           offsetTotalPercent.toString(),
+          props.selected.toString(),
         ]);
       }
     }
     setMeetings(tempMeetings);
-    console.log(numDays + 2);
   }, [props.selectedSection]);
 
   return meetings.map((x: string[], i: number) => (
@@ -73,11 +74,13 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
         {
           '--start-col': x[0],
           '--start-row': x[1],
-          '--offset': x[3] + '%',
           '--height': x[2] + '%',
+          '--offset': x[3] + '%',
+          '--opacity': props.selected ? '1' : '0.5',
+          '--h-opacity': props.selected ? '0.9' : '0.75',
         } as React.CSSProperties
       }
-      className={`col-start-[var(--start-col)] col-span-1 row-start-[var(--start-row)] row-span-1 relative top-[var(--offset)] h-[var(--height)] overflow-visible rounded-lg bg-cornflower-500`}
+      className={`col-start-[var(--start-col)] col-span-1 row-start-[var(--start-row)] row-span-1 relative top-[var(--offset)] h-[var(--height)] overflow-visible rounded-lg bg-purple-800 opacity-[var(--opacity)] hover:opacity-[var(--h-opacity)]`}
     >
       <div>{searchQueryLabel(props.course)}</div>
       <div>{props.selectedSection.section_number}</div>
