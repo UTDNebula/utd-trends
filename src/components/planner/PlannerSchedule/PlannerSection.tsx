@@ -65,6 +65,7 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
           lengthPercentHour.toString(),
           offsetTotalPercent.toString(),
           dayKey,
+          (d_h * 60 + d_m).toString(),
         ]);
       }
     }
@@ -75,42 +76,44 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
   //added color map colors are pretty ugly so change them based on figma color codes
   //dont know what to do for firday combo classes or sat
   const colorMap: { [key: string]: string } = {
-    M: 'bg-purple-400',
-    W: 'bg-purple-400',
-    T: 'bg-purple-800',
-    Z: 'bg-purple-800',
+    M: 'bg-purple-800',
+    W: 'bg-purple-800',
+    T: 'bg-purple-400',
+    Z: 'bg-purple-400',
+    F: 'bg-purple-600',
   };
 
-  return meetings.map((x: string[], i: number) => (
-    <div
-      key={props.selectedSection._id + i}
-      style={
-        {
-          '--start-col': x[0],
-          '--start-row': x[1],
-          '--offset': x[3] + '%',
-          '--height': x[2] + '%',
-        } as React.CSSProperties
-      }
-      className={`col-start-[var(--start-col)] col-span-1 
-        row-start-[var(--start-row)] row-span-1 relative 
-        top-[var(--offset)] h-[var(--height)] overflow-visible 
-        rounded-lg ${colorMap[x[4]] || 'bg-purple-100'} 
-        m-1 leading-relaxed shadow-md text-white`}
-    >
-      <div className="text-lg font-lato text-center">
-        {props.course.prefix} {props.course.number}.
-        {props.selectedSection.section_number}
+  return meetings.map((x: string[], i: number) => {
+    return (
+      <div
+        key={props.selectedSection._id + i}
+        style={
+          {
+            '--start-col': x[0],
+            '--start-row': x[1],
+            '--offset': x[3] + '%',
+            '--height': x[2] + '%',
+          } as React.CSSProperties
+        }
+        className={`col-start-[var(--start-col)] col-span-1 
+          row-start-[var(--start-row)] row-span-1 relative 
+          top-[var(--offset)] h-[var(--height)] overflow-hidden 
+          rounded-lg ${colorMap[x[4]] || 'bg-purple-100'} 
+          m-1 leading-relaxed shadow-md text-white`}
+      >
+        <div className={`text-lg font-lato text-center`}>
+          {props.course.prefix} {props.course.number}.
+          {props.selectedSection.section_number}
+        </div>
+        <div className="text-xs text-center">
+          {props.course.profFirst} {props.course.profLast}
+        </div>
+        <div className="text-xs text-center">
+          {props.selectedSection.meetings[0]?.location?.building}{' '}
+          {props.selectedSection.meetings[0]?.location?.room}
+        </div>
       </div>
-      <div className="text-xs text-center">
-        {props.course.profFirst} {props.course.profLast}
-      </div>
-      <div className="text-xs text-center">
-        {props.selectedSection.meetings[0]?.location?.building}{' '}
-        {props.selectedSection.meetings[0]?.location?.room}
-      </div>
-    </div>
-  ));
+    );
+  });
 };
-
 export default PlannerSection;
