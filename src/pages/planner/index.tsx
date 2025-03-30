@@ -207,7 +207,14 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
                           }
                         })
                         .filter(
-                          (obj) => obj && typeof obj.section !== 'undefined',
+                          (
+                            obj,
+                          ): obj is {
+                            course: SearchQuery;
+                            section: SectionsData[number];
+                          } =>
+                            obj !== undefined &&
+                            typeof obj.section !== 'undefined',
                         )
                     : []
                 }
