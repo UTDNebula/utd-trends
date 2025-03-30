@@ -117,7 +117,6 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
       };
     }
   }, [planner]);
-  console.log(/*props.grades, props.rmp, */ props.sections);
 
   let results: GenericFetchedData<SearchQuery[]> = {
     state: 'loading',

@@ -58,7 +58,7 @@ export function LoadingRow() {
   );
 }
 
-function SectionTableHead() {
+function SectionTableHead(props: { hasMultipleDateRanges: boolean }) {
   return (
     <TableRow className="bg-cornflower-600">
       <TableCell className="py-2 px-4 border-b-0" align="left">
@@ -75,8 +75,22 @@ function SectionTableHead() {
           Schedule & Location
         </Typography>
       </TableCell>
+      {props.hasMultipleDateRanges && (
+        <TableCell className="py-2 px-4 border-b-0">
+          <Typography className="text-white text-xs">Date Range</Typography>
+        </TableCell>
+      )}
     </TableRow>
   );
+}
+
+function parseDateRange(meeting: SectionsData[number]['meetings'][number]) {
+  const start_date = new Date(meeting.start_date);
+  const formatted_start = `${(start_date.getMonth() + 1).toString()}/${start_date.getDate().toString()}`;
+  const end_date = new Date(meeting.end_date);
+  const formatted_end = `${(end_date.getMonth() + 1).toString()}/${end_date.getDate().toString()}`;
+
+  return [formatted_start, formatted_end];
 }
 
 function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
@@ -105,7 +119,6 @@ function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
     return `${startTime.slice(0, -2)}-${endTime}`;
   }
   const time = classTime(meeting.start_time, meeting.end_time);
-
   const schedule = `${days} ${time}`;
   const location = `${meeting.location.building} ${meeting.location.room}`;
 
@@ -120,6 +133,7 @@ type SectionTableRowProps = {
     searchQuery: SearchQuery,
     section: string | undefined,
   ) => boolean;
+  hasMultipleDateRanges: boolean;
 };
 
 function SectionTableRow(props: SectionTableRowProps) {
@@ -170,6 +184,19 @@ function SectionTableRow(props: SectionTableRowProps) {
             </div>
           ))}
       </TableCell>
+      {props.hasMultipleDateRanges && (
+        <TableCell className={props.lastRow ? 'border-b-0' : ''}>
+          {props.data.meetings
+            .map(parseDateRange)
+            .map(([start_date, end_date], i) => (
+              <div key={i}>
+                {start_date && end_date && (
+                  <Typography className="text-sm">{`${start_date} - ${end_date}`}</Typography>
+                )}
+              </div>
+            ))}
+        </TableCell>
+      )}
     </TableRow>
   );
 }
@@ -210,6 +237,17 @@ const PlannerCard = (props: PlannerCardProps) => {
       setOpen('false');
     }
   }
+
+  const hasMultipleDateRanges =
+    typeof props.sections !== 'undefined' && props.sections.length >= 1
+      ? props.sections.some(
+          (section) =>
+            section.meetings[0].start_date !==
+              props.sections![0].meetings[0].start_date ||
+            section.meetings[0].end_date !==
+              props.sections![0].meetings[0].end_date,
+        )
+      : false;
 
   return (
     <Box
@@ -291,7 +329,9 @@ const PlannerCard = (props: PlannerCardProps) => {
           <TableContainer className="rounded-t-none">
             <Table>
               <TableHead>
-                <SectionTableHead />
+                <SectionTableHead
+                  hasMultipleDateRanges={hasMultipleDateRanges}
+                />
               </TableHead>
               <TableBody>
                 {sections.map((section, index) => (
@@ -301,6 +341,7 @@ const PlannerCard = (props: PlannerCardProps) => {
                     course={props.query}
                     lastRow={index === sections.length - 1}
                     setPlannerSection={props.setPlannerSection}
+                    hasMultipleDateRanges={hasMultipleDateRanges}
                   />
                 ))}
               </TableBody>
