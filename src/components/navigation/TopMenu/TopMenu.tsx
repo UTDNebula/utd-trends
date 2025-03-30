@@ -116,7 +116,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
                   : ''
               }
             >
-              <Tooltip title="Open tutorial">
+              <Tooltip title="Open Tutorial">
                 <IconButton
                   className="aspect-square"
                   size="medium"
@@ -139,7 +139,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
               </Tooltip>
             </div>
           </div>
-          <Tooltip title="Share link to search" className="ml-auto">
+          <Tooltip title="Share Link to Search">
             <IconButton
               className="aspect-square"
               size="medium"
@@ -155,7 +155,7 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
                 shareLink(url);
               }}
             >
-              <ShareIcon className="text-3xl mr-1" />
+              <ShareIcon className="text-3xl mr-0.5 -ml-0.5" />
             </IconButton>
           </Tooltip>
         </div>
