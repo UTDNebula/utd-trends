@@ -7,7 +7,7 @@ import PlannerSection from './PlannerSection';
 
 // hours shown (24-hour time)
 export const START_HOUR = 8;
-export const END_HOUR = 21;
+export const END_HOUR = 22;
 // days shown (0 = sunday -> 6 = Saturday)
 // NOTE: IF YOU CHANGE THESE PLEASE ALSO CHANGE THE REPEAT NUMBERS (5 and 13)
 //        IN THE TAILWIND CSS GRID SPECIFICATION (outer div in PlannerSchedule)
@@ -40,7 +40,7 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
 
   return (
     <div
-      className={`w-full h-[calc(140vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[max-content_repeat(13,minmax(0,1fr))]`}
+      className={`w-full h-[calc(140vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[max-content_repeat(14,minmax(0,1fr))]`}
     >
       {/*Weekday Headers*/}
       <div className="grid col-span-full grid-flow-row bg-cornflower-500 grid-cols-subgrid grid-rows-subgrid">

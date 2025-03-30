@@ -51,7 +51,7 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
         } else d_m = e_m - s_m;
         d_h = e_h - s_h;
 
-        const lengthPercentHour = ((d_h * 60 + d_m) * 125) / 90;
+        const lengthPercentHour = ((d_h * 60 + d_m) * 100) / 60;
 
         const offset =
           Number(splitStartTime[1].slice(0, splitStartTime[1].length - 2)) / 60;
