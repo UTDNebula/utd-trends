@@ -142,10 +142,12 @@ function SectionTableRow(props: SectionTableRowProps) {
         />
       </TableCell>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-        <Typography className='text-sm'>{props.data.section_number}</Typography>
+        <Typography className="text-sm">{props.data.section_number}</Typography>
       </TableCell>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-        <Typography className='text-sm'>{props.data.internal_class_number}</Typography>
+        <Typography className="text-sm">
+          {props.data.internal_class_number}
+        </Typography>
       </TableCell>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
         {props.data.meetings
