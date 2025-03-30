@@ -30,6 +30,7 @@ import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
+  removeSection,
   type SearchQuery,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
@@ -125,16 +126,27 @@ function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
 
 type SectionTableRowProps = {
   data: SectionsData[number];
+  course: SearchQuery;
   lastRow: boolean;
+  setPlannerSection: (
+    searchQuery: SearchQuery,
+    section: string | undefined,
+  ) => boolean;
 };
 
-function SectionTableRows(props: SectionTableRowProps) {
+function SectionTableRow(props: SectionTableRowProps) {
+  const isSelected = props.course.sectionNumber === props.data.section_number;
   return (
     <TableRow>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
         <Radio
+          checked={isSelected}
           onClick={() => {
-            console.log('clicked');
+            if (!isSelected) {
+              props.setPlannerSection(props.course, props.data.section_number);
+            } else {
+              props.setPlannerSection(props.course, undefined);
+            }
           }}
         />
       </TableCell>
@@ -147,8 +159,8 @@ function SectionTableRows(props: SectionTableRowProps) {
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
         {props.data.meetings
           .map(parseMeeting)
-          .map(([schedule, location, link]) => (
-            <>
+          .map(([schedule, location, link], i) => (
+            <div key={i}>
               {schedule !== ' -' && (
                 <Typography className="text-sm">{schedule}</Typography>
               )}
@@ -167,7 +179,7 @@ function SectionTableRows(props: SectionTableRowProps) {
                   )}
                 </Typography>
               )}
-            </>
+            </div>
           ))}
       </TableCell>
     </TableRow>
@@ -176,15 +188,22 @@ function SectionTableRows(props: SectionTableRowProps) {
 
 type PlannerCardProps = {
   query: SearchQuery;
-  sections: SectionsData;
+  sections?: SectionsData;
+  setPlannerSection: (
+    searchQuery: SearchQuery,
+    section: string | undefined,
+  ) => boolean;
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RMPInterface>;
   removeFromPlanner: () => void;
 };
 
 const PlannerCard = (props: PlannerCardProps) => {
-  const [open, setOpen] = useState(false);
-  const canOpenSections = props.sections.length !== 0;
+  const [open, setOpen] = useState<'false' | 'sections' | 'grades'>('false');
+  //appease the typescript gods
+  const sections = props.sections;
+  const canOpenSections =
+    typeof sections !== 'undefined' && sections.length !== 0;
   const canOpenGrades =
     !(typeof props.grades === 'undefined' || props.grades.state === 'error') ||
     !(typeof props.rmp === 'undefined' || props.rmp.state === 'error');
@@ -284,7 +303,7 @@ const PlannerCard = (props: PlannerCardProps) => {
           </Tooltip>
         </div>
         <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit">
-          {searchQueryLabel(props.query)}
+          {searchQueryLabel(removeSection(props.query))}
         </Typography>
       </div>
       {canOpenSections && (
@@ -299,11 +318,13 @@ const PlannerCard = (props: PlannerCardProps) => {
                 <SectionTableHead />
               </TableHead>
               <TableBody>
-                {props.sections.map((section, index) => (
-                  <SectionTableRows
-                    key={index}
+                {sections.map((section, index) => (
+                  <SectionTableRow
+                    key={section.section_number}
                     data={section}
-                    lastRow={index === props.sections.length - 1}
+                    course={props.query}
+                    lastRow={index === sections.length - 1}
+                    setPlannerSection={props.setPlannerSection}
                   />
                 ))}
               </TableBody>
@@ -319,7 +340,7 @@ const PlannerCard = (props: PlannerCardProps) => {
         >
           <div className="p-2 md:p-4 flex flex-col gap-2">
             <SingleGradesInfo
-              course={props.query}
+              course={removeSection(props.query)}
               grades={props.grades}
               gradesToUse="unfiltered"
             />

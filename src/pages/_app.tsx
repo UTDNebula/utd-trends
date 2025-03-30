@@ -15,6 +15,7 @@ import tailwindConfig from '@/../tailwind.config.js';
 import FeedbackPopup from '@/components/common/FeedbackPopup/FeedbackPopup';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
 import {
+  removeSection,
   type SearchQuery,
   searchQueryEqual,
 } from '@/modules/SearchQuery/SearchQuery';
@@ -177,6 +178,22 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   }
 
+  function setPlannerSection(
+    searchQuery: SearchQuery,
+    section: string | undefined,
+  ) {
+    setPlanner(
+      planner.map((course) => {
+        return searchQueryEqual(
+          removeSection(course),
+          removeSection(searchQuery),
+        )
+          ? { ...course, sectionNumber: section }
+          : course;
+      }),
+    );
+  }
+
   //Store sections by course+prof combo
   const [sections, , fetchAndStoreSectionsData] = useSectionsStore();
 
@@ -220,6 +237,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             planner={planner}
             addToPlanner={addToPlanner}
             removeFromPlanner={removeFromPlanner}
+            setPlannerSection={setPlannerSection}
             grades={grades}
             fetchAndStoreGradesData={fetchAndStoreGradesData}
             recalcGrades={recalcGrades}
