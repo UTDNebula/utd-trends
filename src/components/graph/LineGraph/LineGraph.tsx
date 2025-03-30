@@ -151,6 +151,9 @@ const LineGraph = (props: Props): JSX.Element => {
           !series.every((single) => single.data.length === 1),
       },
     },
+    grid: {
+      borderColor: theme.palette.mode === 'dark' ? '#404040' : '#e0e0e0',
+    },
     legend: {
       show: series.length !== 1,
     },
