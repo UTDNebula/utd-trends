@@ -181,7 +181,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
             <div className="sticky top-4 mt-4">
               <PlannerSchedule
                 courses={results.state === 'done' ? results.data : []}
-                selectedSections={
+                selectedSectionsAndCourses={
                   results.state === 'done'
                     ? results.data
                         .map((course) => {
@@ -199,10 +199,16 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
                                   section.section_number ===
                                   course.sectionNumber,
                               );
-                            return chosenSectionForCourse as SectionsData[number];
+                            return {
+                              course: course,
+                              section:
+                                chosenSectionForCourse as SectionsData[number],
+                            };
                           }
                         })
-                        .filter((section) => typeof section !== 'undefined')
+                        .filter(
+                          (obj) => obj && typeof obj.section !== 'undefined',
+                        )
                     : []
                 }
               />

@@ -27,13 +27,16 @@ export const DAYS = [
 
 type PlannerScheduleProps = {
   courses: SearchQuery[];
-  selectedSections: SectionsData;
+  selectedSectionsAndCourses: {
+    course: SearchQuery;
+    section: SectionsData[number];
+  }[];
 };
 
 const PlannerSchedule = (props: PlannerScheduleProps) => {
   //const PlannerCoursesTable = () => {
 
-  console.log(props.selectedSections);
+  console.log(props.selectedSectionsAndCourses);
 
   return (
     <div
@@ -56,16 +59,8 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
         <HourRow key={i} hour={i + START_HOUR} />
       ))}
 
-      {props.selectedSections.map((x, i) => (
-        <PlannerSection
-          key={i}
-          selectedSection={x}
-          course={
-            props.courses.filter(
-              (course) => course.sectionNumber === x.section_number,
-            )[0]
-          }
-        />
+      {props.selectedSectionsAndCourses.map((x, i) => (
+        <PlannerSection key={i} selectedSection={x.section} course={x.course} />
       ))}
     </div>
   );

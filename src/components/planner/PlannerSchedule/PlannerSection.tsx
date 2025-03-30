@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import {
-  type SearchQuery,
-  searchQueryLabel,
-} from '@/modules/SearchQuery/SearchQuery';
+import { type SearchQuery } from '@/modules/SearchQuery/SearchQuery';
 import type { SectionsData } from '@/pages/api/sections';
 
 import { DAYS, numDays, START_HOUR } from './PlannerSchedule';
