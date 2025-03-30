@@ -138,7 +138,9 @@ function MeetingSchedule({
             <Typography className="text-xs font-semibold text-center">
               {formattedDays}
             </Typography>
-            <Typography className="text-xs text-center">{time.substring(0, time.indexOf('-'))}</Typography>
+            <Typography className="text-xs text-center">
+              {time.substring(0, time.indexOf('-'))}
+            </Typography>
           </div>
         );
       })}
@@ -158,10 +160,14 @@ type SectionTableRowProps = {
 };
 
 function SectionTableRow(props: SectionTableRowProps) {
-  const [isSelected, setIsSelected] = useState(false);
+  const isSelected = props.course.sectionNumber === props.data.section_number;
 
   const handleCheckboxChange = () => {
-    setIsSelected(!isSelected);
+    if (!isSelected) {
+      props.setPlannerSection(props.course, props.data.section_number);
+    } else {
+      props.setPlannerSection(props.course, undefined);
+    }
     props.onSelectSection(props.data); // Notify parent (PlannerCard) when a section is selected
   };
 
@@ -169,7 +175,7 @@ function SectionTableRow(props: SectionTableRowProps) {
     <>
       <TableRow>
         <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-          <Checkbox checked={isSelected} onChange={handleCheckboxChange} />
+          <Checkbox checked={isSelected} onClick={handleCheckboxChange} />
         </TableCell>
         <TableCell className={props.lastRow ? 'border-b-0' : ''}>
           <Typography>{props.data.section_number}</Typography>
@@ -222,16 +228,15 @@ type PlannerCardProps = {
 
 const PlannerCard = (props: PlannerCardProps) => {
   const [open, setOpen] = useState(false);
-  const [selectedSections, setSelectedSections] = useState<
-    SectionsData[number][]
-  >([]); // Store selected sections
+  const [selectedSection, setSelectedSection] =
+    useState<SectionsData[number]>(null); // Store selected section
 
   const handleSelectSection = (section: SectionsData[number]) => {
-    setSelectedSections((prevSelected) => {
-      if (prevSelected.includes(section)) {
-        return prevSelected.filter((s) => s !== section); // Deselect if already selected
+    setSelectedSection((prevSelected) => {
+      if (prevSelected === section) {
+        return null; // Deselect if already selected
       }
-      return [...prevSelected, section]; // Select if not selected
+      return section; // Select if not selected
     });
   };
 
@@ -343,11 +348,9 @@ const PlannerCard = (props: PlannerCardProps) => {
         </div>
 
         {/* Right-side MeetingSchedule */}
-        {selectedSections.length > 0 && (
+        {selectedSection && (
           <div className="">
-            {selectedSections.map((section, i) => (
-              <MeetingSchedule key={i} meetings={section.meetings} />
-            ))}
+            <MeetingSchedule meetings={selectedSection.meetings} />
           </div>
         )}
       </div>
