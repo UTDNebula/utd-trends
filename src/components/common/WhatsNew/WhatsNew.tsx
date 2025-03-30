@@ -162,16 +162,18 @@ export function WhatsNewButton() {
 
   // Mark a feature as read
   const markFeatureAsRead = (featureId: string) => {
-    setReadFeatures([...new Set(readFeatures.concat([featureId]))]);
+    setReadFeatures(Array.from(new Set(readFeatures.concat([featureId]))));
   };
 
   // Mark all features as read
   const markAllFeaturesAsRead = () => {
-    setReadFeatures([
-      ...new Set(
-        readFeatures.concat(latestFeatures.map((feature) => feature.id)),
+    setReadFeatures(
+      Array.from(
+        new Set(
+          readFeatures.concat(latestFeatures.map((feature) => feature.id)),
+        ),
       ),
-    ]);
+    );
   };
 
   return (
