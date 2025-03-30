@@ -199,7 +199,7 @@ type PlannerCardProps = {
 };
 
 const PlannerCard = (props: PlannerCardProps) => {
-  const [open, setOpen] = useState<'false' | 'sections' | 'grades'>('false');
+  const [open, setOpen] = useState(false);
   //appease the typescript gods
   const sections = props.sections;
   const canOpenSections =
