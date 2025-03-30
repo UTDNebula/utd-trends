@@ -1,4 +1,3 @@
-import InfoIcon from '@mui/icons-material/Info';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { IconButton, Paper, Popover, Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
@@ -218,17 +217,16 @@ export function WhatsNewButton() {
 
   return (
     <>
-      <Tooltip title="What's New">
+      <Tooltip title="See What's New in Trends!">
         <IconButton
           className="aspect-square"
           size="medium"
           onClick={handleClick}
           aria-describedby={id}
         >
-          <InfoIcon className="text-4xl mr-1 hidden dark:block" />
-          <InfoOutlinedIcon className="text-4xl mr-1 dark:hidden" />
+          <InfoOutlinedIcon className="text-3xl" />
           {unreadCount > 0 && (
-            <span className="absolute -top-0 -right-0 bg-royal rounded-full h-3 w-3"></span>
+            <span className="absolute -top-0 -right-0 bg-royal dark:bg-cornflower-300 rounded-full h-3 w-3"></span>
           )}
         </IconButton>
       </Tooltip>

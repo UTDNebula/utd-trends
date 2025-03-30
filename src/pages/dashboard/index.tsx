@@ -585,6 +585,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     const searchResultsTable = (
       <SearchResultsTable
         resultsLoading={results.state}
+        numSearches={courses.length + professors.length}
         includedResults={includedResults}
         grades={props.grades}
         rmp={props.rmp}
@@ -615,14 +616,19 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
           <Grid size={{ xs: false, sm: 6, md: 6 }}></Grid>
         </Grid>
         <div className="sm:hidden">
-          {carousel}
-          {searchResultsTable}
+          <div data-tutorial-id="LHS"> {carousel} </div>
+          <div data-tutorial-id="RHS"> {searchResultsTable} </div>
         </div>
         <PanelGroup
           direction="horizontal"
           className="hidden sm:flex overflow-visible"
         >
-          <Panel ref={panelLRef} minSize={40} defaultSize={50}>
+          <Panel
+            ref={panelLRef}
+            minSize={40}
+            defaultSize={50}
+            data-tutorial-id="LHS"
+          >
             {searchResultsTable}
           </Panel>
           <PanelResizeHandle
@@ -634,6 +640,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
             ref={panelRRef}
             minSize={30}
             defaultSize={50}
+            data-tutorial-id="RHS"
           >
             <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto mt-4">
               {carousel}
