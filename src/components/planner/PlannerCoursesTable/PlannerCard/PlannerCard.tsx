@@ -9,6 +9,7 @@ import {
   Collapse,
   IconButton,
   Paper,
+  Radio,
   Skeleton,
   Table,
   TableBody,
@@ -162,20 +163,24 @@ type SectionTableRowProps = {
 function SectionTableRow(props: SectionTableRowProps) {
   const isSelected = props.course.sectionNumber === props.data.section_number;
 
-  const handleCheckboxChange = () => {
-    if (!isSelected) {
-      props.setPlannerSection(props.course, props.data.section_number);
-    } else {
-      props.setPlannerSection(props.course, undefined);
-    }
-    props.onSelectSection(props.data); // Notify parent (PlannerCard) when a section is selected
-  };
-
   return (
     <>
       <TableRow>
         <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-          <Checkbox checked={isSelected} onClick={handleCheckboxChange} />
+          <Radio
+            checked={isSelected}
+            onClick={() => {
+              if (!isSelected) {
+                props.setPlannerSection(
+                  props.course,
+                  props.data.section_number,
+                );
+              } else {
+                props.setPlannerSection(props.course, undefined);
+              }
+              props.onSelectSection(props.data); // Notify parent (PlannerCard) when a section is selected
+            }}
+          />
         </TableCell>
         <TableCell className={props.lastRow ? 'border-b-0' : ''}>
           <Typography>{props.data.section_number}</Typography>
