@@ -1,5 +1,5 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { IconButton, Paper, Popover, Tooltip } from '@mui/material';
+import { IconButton, Link, Paper, Popover, Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
 interface ReleaseData {
@@ -264,8 +264,8 @@ export function WhatsNewButton() {
             ) : latestFeatures.length > 0 ? (
               <div className="space-y-3">
                 {latestFeatures.map((feature) => (
-                  <button
-                    className="flex items-start group w-full text-left hover:bg-gray-100 dark:hover:bg-cornflower-700 p-1 pl-3 rounded-md transition-colors"
+                  <Link
+                    className="no-underline text-inherit flex items-start group w-full text-left hover:bg-gray-100 dark:hover:bg-cornflower-700 p-1 pl-3 rounded-md transition-colors"
                     onClick={(e) =>
                       navigateToRelease(feature, e as React.MouseEvent)
                     }
@@ -288,7 +288,7 @@ export function WhatsNewButton() {
                       </span>
                       <hr className=" mt-2 border-gray-300 dark:border-gray-600" />
                     </div>
-                  </button>
+                  </Link>
                 ))}
               </div>
             ) : (
