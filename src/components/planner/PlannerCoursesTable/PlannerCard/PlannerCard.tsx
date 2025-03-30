@@ -87,6 +87,9 @@ function SectionTableHead() {
           Schedule & Location
         </Typography>
       </TableCell>
+      <TableCell className="py-2 px-4 border-b-0">
+        <Typography className="text-white text-xs">Syllabus</Typography>
+      </TableCell>
     </TableRow>
   );
 }
@@ -151,10 +154,12 @@ function SectionTableRow(props: SectionTableRowProps) {
         />
       </TableCell>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-        <Typography>{props.data.section_number}</Typography>
+        <Typography className="text-sm">{props.data.section_number}</Typography>
       </TableCell>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-        <Typography>{props.data.internal_class_number}</Typography>
+        <Typography className="text-sm">
+          {props.data.internal_class_number}
+        </Typography>
       </TableCell>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
         {props.data.meetings
@@ -162,10 +167,10 @@ function SectionTableRow(props: SectionTableRowProps) {
           .map(([schedule, location, link], i) => (
             <div key={i}>
               {schedule !== ' -' && (
-                <Typography className="text-sm">{schedule}</Typography>
+                <Typography className="text-xs">{schedule}</Typography>
               )}
               {location !== ' ' && (
-                <Typography className="text-sm">
+                <Typography className="text-xs">
                   {link === '' ? (
                     location
                   ) : (
@@ -181,6 +186,17 @@ function SectionTableRow(props: SectionTableRowProps) {
               )}
             </div>
           ))}
+      </TableCell>
+      <TableCell className={props.lastRow ? 'border-b-0' : ''}>
+        {props.data.syllabus_uri && (
+          <Link
+            href={props.data.syllabus_uri}
+            target="_blank"
+            className="underline text-xs text-blue-600 hover:text-blue-800 visited:text-purple-600"
+          >
+            View Syllabus
+          </Link>
+        )}
       </TableCell>
     </TableRow>
   );
