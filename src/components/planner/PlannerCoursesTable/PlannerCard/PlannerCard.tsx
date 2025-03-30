@@ -32,6 +32,7 @@ import {
   searchQueryLabel,
   type SearchQueryMultiSection,
 } from '@/modules/SearchQuery/SearchQuery';
+import sectionCanOverlap from '@/modules/sections/sections';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import { type SectionsData } from '@/pages/api/sections';
 
@@ -126,12 +127,21 @@ function SectionTableRow(props: SectionTableRowProps) {
   return (
     <TableRow>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-        <Radio
-          checked={isSelected}
-          onClick={() => {
-            props.setPlannerSection(props.course, props.data.section_number);
-          }}
-        />
+        {sectionCanOverlap(props.data.section_number) ? (
+          <Checkbox
+            checked={isSelected}
+            onClick={() => {
+              props.setPlannerSection(props.course, props.data.section_number);
+            }}
+          />
+        ) : (
+          <Radio
+            checked={isSelected}
+            onClick={() => {
+              props.setPlannerSection(props.course, props.data.section_number);
+            }}
+          />
+        )}
       </TableCell>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
         <Typography>{props.data.section_number}</Typography>

@@ -20,6 +20,7 @@ import {
   searchQueryEqual,
   type SearchQueryMultiSection,
 } from '@/modules/SearchQuery/SearchQuery';
+import sectionCanOverlap from '@/modules/sections/sections';
 import useGradeStore from '@/modules/useGradeStore/useGradeStore';
 import usePersistantState from '@/modules/usePersistantState/usePersistantState';
 import useRmpStore from '@/modules/useRmpStore/useRmpStore';
@@ -196,9 +197,13 @@ function MyApp({ Component, pageProps }: AppProps) {
               ),
             };
           } else {
+            let newSections = course.sectionNumbers;
+            if (!sectionCanOverlap(section)) {
+              newSections = newSections.filter((s) => sectionCanOverlap(s));
+            }
             return {
               ...course,
-              sectionNumbers: course.sectionNumbers.concat([section]),
+              sectionNumbers: newSections.concat([section]),
             };
           }
         }
