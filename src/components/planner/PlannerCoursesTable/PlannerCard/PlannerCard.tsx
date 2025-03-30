@@ -1,6 +1,7 @@
 import BarChartIcon from '@mui/icons-material/BarChart';
 import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
+import EventIcon from '@mui/icons-material/Event';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Box,
@@ -16,6 +17,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -46,9 +49,18 @@ export function LoadingRow() {
             <KeyboardArrowIcon />
           </IconButton>
           <Checkbox checked={true} checkedIcon={<BookIcon />} disabled />
-          <IconButton size="medium" disabled>
-            <BarChartIcon />
-          </IconButton>
+          <ToggleButtonGroup
+            size="small"
+            aria-label="dropdown switch"
+            className="ml-2"
+          >
+            <ToggleButton value="" aria-label="sections" disabled>
+              <EventIcon />
+            </ToggleButton>
+            <ToggleButton value="" aria-label="grades and rmp" disabled>
+              <BarChartIcon />
+            </ToggleButton>
+          </ToggleButtonGroup>
         </div>
         <Typography className="w-1/2 leading-tight text-lg">
           <Skeleton />
@@ -187,7 +199,7 @@ type PlannerCardProps = {
 };
 
 const PlannerCard = (props: PlannerCardProps) => {
-  const [open, setOpen] = useState<'false' | 'sections' | 'grades'>('false');
+  const [open, setOpen] = useState(false);
   //appease the typescript gods
   const sections = props.sections;
   const canOpenSections =
@@ -195,19 +207,15 @@ const PlannerCard = (props: PlannerCardProps) => {
   const canOpenGrades =
     !(typeof props.grades === 'undefined' || props.grades.state === 'error') ||
     !(typeof props.rmp === 'undefined' || props.rmp.state === 'error');
-  function handleOpen(from: 'row' | 'sections' | 'grades') {
-    if (from === 'row' && open !== 'false') {
-      setOpen('false');
-    } else if (
-      open !== 'sections' &&
-      (from === 'sections' || from === 'row') &&
-      canOpenSections
+  const [whichOpen, setWhichOpen] = useState<'sections' | 'grades' | null>(
+    canOpenSections ? 'sections' : canOpenGrades ? 'grades' : null,
+  );
+  function handleOpen() {
+    if (
+      (whichOpen === 'sections' && canOpenSections) ||
+      (whichOpen === 'grades' && canOpenGrades)
     ) {
-      setOpen('sections');
-    } else if (open !== 'grades' && from === 'grades' && canOpenGrades) {
-      setOpen('grades');
-    } else {
-      setOpen('false');
+      setOpen(!open);
     }
   }
 
@@ -219,39 +227,34 @@ const PlannerCard = (props: PlannerCardProps) => {
       <div
         role="button"
         tabIndex={0}
-        onClick={() => handleOpen('row')} // opens/closes the card by clicking anywhere on the row
+        onClick={() => handleOpen()} // opens/closes the card by clicking anywhere on the row
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
-            handleOpen('row');
+            handleOpen();
           }
         }}
         className={
           'p-4 flex items-center gap-4' +
-          (canOpenSections ? ' cursor-pointer' : '')
+          (canOpenSections || canOpenGrades ? ' cursor-pointer' : '')
         }
       >
         <div className="flex items-center">
           <Tooltip
-            title={open === 'sections' ? 'Minimize Result' : 'Expand Result'}
+            title={`${open ? 'Minimize' : 'Expand'} ${whichOpen === 'sections' ? 'Sections' : 'Grades and RMP'}`}
             placement="top"
           >
-            <span>
-              <IconButton
-                aria-label="expand row"
-                size="medium"
-                onClick={(e) => {
-                  e.stopPropagation(); // prevents double opening/closing
-                  handleOpen('sections');
-                }}
-                disabled={!canOpenSections}
-                className={
-                  'transition-transform' +
-                  (open === 'sections' ? ' rotate-90' : '')
-                }
-              >
-                <KeyboardArrowIcon fontSize="inherit" />
-              </IconButton>
-            </span>
+            <IconButton
+              aria-label="expand row"
+              size="medium"
+              onClick={(e) => {
+                e.stopPropagation(); // prevents double opening/closing
+                handleOpen();
+              }}
+              disabled={!canOpenSections && !canOpenGrades}
+              className={'transition-transform' + (open ? ' rotate-90' : '')}
+            >
+              <KeyboardArrowIcon fontSize="inherit" />
+            </IconButton>
           </Tooltip>
           <Tooltip title={'Remove from Planner'} placement="top">
             <Checkbox
@@ -264,22 +267,39 @@ const PlannerCard = (props: PlannerCardProps) => {
               checkedIcon={<BookIcon />}
             />
           </Tooltip>
-          <Tooltip
-            title={open === 'grades' ? 'Minimize Grades' : 'Expand Grades'}
-            placement="top"
-          >
-            <span>
-              <IconButton
-                size="medium"
-                onClick={(e) => {
-                  e.stopPropagation(); // prevents double opening/closing
-                  handleOpen('grades');
-                }}
+          <Tooltip title="Switch Opening Sections/Grades" placement="top">
+            <ToggleButtonGroup
+              value={whichOpen}
+              exclusive
+              onChange={(_, newValue) => {
+                if (newValue === 'sections' && canOpenSections) {
+                  setWhichOpen('sections');
+                }
+                if (newValue === 'grades' && canOpenGrades) {
+                  setWhichOpen('grades');
+                }
+                setOpen(true);
+              }}
+              size="small"
+              aria-label="dropdown switch"
+              onClick={(e) => e.stopPropagation()}
+              className="ml-2"
+            >
+              <ToggleButton
+                value="sections"
+                aria-label="sections"
+                disabled={!canOpenSections}
+              >
+                <EventIcon />
+              </ToggleButton>
+              <ToggleButton
+                value="grades"
+                aria-label="grades and rmp"
                 disabled={!canOpenGrades}
               >
                 <BarChartIcon />
-              </IconButton>
-            </span>
+              </ToggleButton>
+            </ToggleButtonGroup>
           </Tooltip>
         </div>
         <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit">
@@ -287,7 +307,11 @@ const PlannerCard = (props: PlannerCardProps) => {
         </Typography>
       </div>
       {canOpenSections && (
-        <Collapse in={open === 'sections'} timeout="auto" unmountOnExit>
+        <Collapse
+          in={open && whichOpen === 'sections'}
+          timeout="auto"
+          unmountOnExit
+        >
           <TableContainer className="rounded-t-none">
             <Table>
               <TableHead>
@@ -309,7 +333,11 @@ const PlannerCard = (props: PlannerCardProps) => {
         </Collapse>
       )}
       {canOpenGrades && (
-        <Collapse in={open === 'grades'} timeout="auto" unmountOnExit>
+        <Collapse
+          in={open && whichOpen === 'grades'}
+          timeout="auto"
+          unmountOnExit
+        >
           <div className="p-2 md:p-4 flex flex-col gap-2">
             <SingleGradesInfo
               course={removeSection(props.query)}
