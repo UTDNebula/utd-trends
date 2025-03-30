@@ -82,7 +82,26 @@ export function TopMenu(props: TopMenuProps) {
           />
         )}
         <Link
-          href={props.isPlanner ? '/dashboard' : '/planner'}
+          href={
+            props.isPlanner
+              ? typeof sessionStorage !== 'undefined' &&
+                sessionStorage.getItem('dashboardSearchTerms')
+                ? '/dashboard?searchTerms=' +
+                  sessionStorage
+                    .getItem('dashboardSearchTerms')
+                    ?.replace(' ', '+')
+                    .replace(',', '%2C')
+                : '/'
+              : '/planner'
+          }
+          onClick={() =>
+            !props.isPlanner
+              ? sessionStorage.setItem(
+                  'dashboardSearchTerms',
+                  router.query.searchTerms?.toString() ?? '',
+                )
+              : null
+          }
           className="ml-auto rounded-xl"
         >
           <Button className="bg-cornflower-500 rounded-xl text-white dark:bg-cornflower-400 text p-2 px-4 normal-case">
