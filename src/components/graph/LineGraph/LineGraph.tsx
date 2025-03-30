@@ -156,6 +156,14 @@ const LineGraph = (props: Props): JSX.Element => {
     },
     xaxis: {
       categories: allSemesters,
+      tickAmount: allSemesters.length - 1, // Ensure all ticks are shown
+      labels: {
+        show: true,
+        rotate: -45, // Rotate labels if necessary to fit them
+        style: {
+          fontSize: '12px',
+        },
+      },
     },
     yaxis: {
       min: 1,
