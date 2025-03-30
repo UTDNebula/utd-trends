@@ -57,7 +57,7 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
           Number(splitStartTime[1].slice(0, splitStartTime[1].length - 2)) / 60;
         const offsetTotalPercent = offset * 100;
 
-        let dayKey = meeting.meeting_days
+        const dayKey = meeting.meeting_days
           .map((day) => (day === 'Thursday' ? 'Z' : day.charAt(0)))
           .join('');
 
