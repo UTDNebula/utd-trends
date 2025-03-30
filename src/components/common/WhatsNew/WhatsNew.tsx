@@ -1,5 +1,5 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { IconButton, Popover, Tooltip } from '@mui/material';
+import { Badge, IconButton, Popover, Tooltip } from '@mui/material';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
@@ -185,9 +185,12 @@ export function WhatsNewButton() {
           onClick={handleClick}
           aria-describedby="whats-new-popover"
         >
-          <InfoOutlinedIcon className="text-3xl" />
-          {unread && (
-            <span className="absolute -top-0 -right-0 bg-royal dark:bg-cornflower-300 rounded-full h-3 w-3"></span>
+          {unread ? (
+            <Badge color="primary" badgeContent=" ">
+              <InfoOutlinedIcon className="text-3xl" />
+            </Badge>
+          ) : (
+            <InfoOutlinedIcon className="text-3xl" />
           )}
         </IconButton>
       </Tooltip>
