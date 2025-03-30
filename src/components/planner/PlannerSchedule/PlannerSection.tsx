@@ -26,18 +26,23 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
         const splitStartTime = meeting.start_time.split(':');
         let startRow = Number(splitStartTime[0]) - START_HOUR + 2;
         // let endTime = Number(meeting.end_time.slice(0, splitStartTime[1].length - 2)) - START_HOUR;
-        if (meeting.start_time.includes('pm')) {
+        const startHour = Number(meeting.start_time.split(':')[0]);
+        const endHour = Number(meeting.end_time.split(':')[0]);
+
+        const isPM = (time: string) => time.includes('pm');
+
+        if (isPM(meeting.start_time) && startHour !== 12) {
           startRow += 12;
         }
 
         /**  TODO: what if no start/endtime **/
         const s_h =
           Number(meeting.start_time.split(':')[0]) +
-          (meeting.start_time.includes('pm') ? 12 : 0);
+          (isPM(meeting.start_time) && startHour !== 12 ? 12 : 0);
         const s_m = Number(meeting.start_time.split(':')[1].slice(0, 2));
         let e_h =
           Number(meeting.end_time.split(':')[0]) +
-          (meeting.end_time.includes('pm') ? 12 : 0);
+          (isPM(meeting.end_time) && endHour !== 12 ? 12 : 0);
         const e_m = Number(meeting.end_time.split(':')[1].slice(0, 2));
 
         let d_h = 0;
