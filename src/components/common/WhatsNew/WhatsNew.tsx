@@ -1,5 +1,6 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { IconButton, Paper, Popover, Tooltip } from '@mui/material';
+import { IconButton, Popover, Tooltip } from '@mui/material';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
 interface ReleaseData {
@@ -32,7 +33,6 @@ export function WhatsNewButton() {
   // Check if the latest feature is unread
   const unreadCount = latestFeatures.filter((feature) => !feature.read).length;
   const open = Boolean(anchorEl);
-  const id = open ? 'whats-new-popover' : undefined;
 
   // Load features from localStorage
   useEffect(() => {
@@ -205,16 +205,6 @@ export function WhatsNewButton() {
     );
   };
 
-  // Navigate to the release page
-  const navigateToRelease = (feature: Feature, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (feature) {
-      markFeatureAsRead(feature.id);
-      window.open(feature.releaseUrl, '_blank');
-      // handleClose();
-    }
-  };
-
   return (
     <>
       <Tooltip title="See What's New in Trends!">
@@ -232,7 +222,7 @@ export function WhatsNewButton() {
       </Tooltip>
 
       <Popover
-        id={id}
+        id="whats-new-popover"
         open={open}
         anchorEl={anchorEl}
         onClose={handleClose}
@@ -244,60 +234,57 @@ export function WhatsNewButton() {
           vertical: 'top',
           horizontal: 'center',
         }}
+        slotProps={{
+          paper: {
+            elevation: 6,
+            className:
+              'p-4 w-64 bg-white dark:bg-haiti rounded-md max-h-[80vh] overflow-y-auto',
+          },
+        }}
       >
-        <Paper
-          className="w-64 bg-white dark:bg-haiti rounded-md"
-          elevation={6}
-          style={{
-            maxHeight: '80vh',
-            overflowY: 'auto',
-          }}
-        >
-          <div className="p-4">
-            <h3 className="font-bold mb-3 text-base text-center">
-              What&apos;s New?
-            </h3>
-            {loading ? (
-              <div className="flex justify-center py-4">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-royal"></div>
-              </div>
-            ) : latestFeatures.length > 0 ? (
-              <div className="space-y-3">
-                {latestFeatures.map((feature) => (
-                  <button
-                    className="no-underline text-inherit flex items-start group w-full text-left hover:bg-gray-100 dark:hover:bg-cornflower-700 p-1 pl-3 rounded-md transition-colors"
-                    onClick={(e) =>
-                      navigateToRelease(feature, e as React.MouseEvent)
-                    }
-                    title="Click to view release details"
-                    key={feature.id}
-                  >
-                    <div className="flex flex-col">
-                      <div className="flex justify-between">
-                        <span
-                          className={`text-xs rounded-full ${!feature.read ? 'bg-cornflower-600 text-white dark:bg-cornflower-300 dark:text-cornflower-900' : 'ring-1 ring-cornflower-500 text-cornflower-700 dark:ring-cornflower-400 dark:text-cornflower-200'} p-0.5 px-2`}
-                        >
-                          {feature.version}
-                        </span>
-                        <span className="text-xs text-cornflower-500 dark:text-cornflower-400 mr-2">
-                          {feature.date}
-                        </span>
-                      </div>
-                      <span className="text-sm ml-0.5 mt-1">
-                        {feature.content}
-                      </span>
-                      <hr className=" mt-2 border-gray-300 dark:border-gray-600" />
-                    </div>
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                No updates available
-              </p>
-            )}
+        <h3 className="font-bold mb-3 text-base text-center">
+          What&apos;s New?
+        </h3>
+        {loading ? (
+          <div className="flex justify-center py-4">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-royal"></div>
           </div>
-        </Paper>
+        ) : latestFeatures.length > 0 ? (
+          <div className="flex flex-col gap-2">
+            {latestFeatures.flatMap((feature, index) => [
+              <Link
+                key={feature.id}
+                href={feature.releaseUrl}
+                target="_blank"
+                onClick={() => markFeatureAsRead(feature.id)}
+                title="Click to view release details"
+                className="flex flex-col gap-1 hover:bg-gray-100 dark:hover:bg-cornflower-700 p-2 rounded-md transition-colors"
+              >
+                <div className="flex justify-between">
+                  <span
+                    className={`text-xs rounded-full ${!feature.read ? 'bg-cornflower-600 text-white dark:bg-cornflower-300 dark:text-cornflower-900' : 'ring-1 ring-cornflower-500 text-cornflower-700 dark:ring-cornflower-400 dark:text-cornflower-200'} p-0.5 px-2`}
+                  >
+                    {feature.version}
+                  </span>
+                  <p className="text-xs text-cornflower-500 dark:text-cornflower-400 mr-2">
+                    {feature.date}
+                  </p>
+                </div>
+                <p className="text-sm ml-0.5">{feature.content}</p>
+              </Link>,
+              latestFeatures.length - 1 !== index ? (
+                <hr
+                  key={feature.id + 'divider'}
+                  className="border-gray-300 dark:border-gray-600"
+                />
+              ) : null,
+            ])}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            No updates available
+          </p>
+        )}
       </Popover>
     </>
   );
