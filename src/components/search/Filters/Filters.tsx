@@ -132,7 +132,7 @@ const Filters = ({
   }
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2" data-tutorial-id="filters">
       {/* min letter grade dropdown*/}
       <Tooltip title={'Select Minimum Letter Grade Average'} placement="top">
         <FormControl
