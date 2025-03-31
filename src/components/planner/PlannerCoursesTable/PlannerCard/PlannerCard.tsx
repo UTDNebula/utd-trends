@@ -240,13 +240,21 @@ function SectionTableRow(props: SectionTableRowProps) {
 }
 
 function MeetingChip(props: {
+  color: { fill: string; outline: string; font: string };
   meetings: SectionsData[number]['meetings'] | undefined;
 }) {
   if (typeof props.meetings === 'undefined') {
     return null;
   }
   return (
-    <div className="ml-auto p-1 px-3 rounded-3xl border border-cornflower-300 bg-white dark:bg-gray-700 shadow-sm">
+    <div
+      className="ml-auto p-1 px-3 rounded-3xl shadow-sm"
+      style={{
+        backgroundColor: props.color.fill,
+        color: props.color.font,
+        outline: `2px solid ${props.color.outline}`,
+      }}
+    >
       <Typography className="text-xs font-semibold text-center">
         {meetingDays(props.meetings[0].meeting_days)}
       </Typography>
@@ -393,6 +401,7 @@ const PlannerCard = (props: PlannerCardProps) => {
           {searchQueryLabel(removeSection(props.query))}
         </Typography>
         <MeetingChip
+          color={props.color}
           meetings={
             sections?.find(
               (section) =>
