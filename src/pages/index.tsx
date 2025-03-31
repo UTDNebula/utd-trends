@@ -81,8 +81,6 @@ const Home: NextPage = () => {
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />
         </div>
-        {/*eslint-disable-next-line react/jsx-no-target-blank*/}
-        
       </div>
     </>
   );
