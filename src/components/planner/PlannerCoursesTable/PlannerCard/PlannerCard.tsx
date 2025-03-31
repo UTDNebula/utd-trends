@@ -212,28 +212,19 @@ function SectionTableRow(props: SectionTableRowProps) {
 }
 
 function MeetingChip(props: {
-  meetings: SectionsData[number]['meetings'];
+  meetings: SectionsData[number]['meetings'] | undefined;
 }) {
   if (typeof props.meetings === 'undefined') {
     return null;
   }
   return (
-    <div className="ml-auto">
-      {props.meetings.map((meeting, i) => {
-        return (
-          <div
-            key={i}
-            className="p-1 px-3 rounded-3xl border border-cornflower-300 bg-white dark:bg-gray-700 shadow-sm"
-          >
-            <Typography className="text-xs font-semibold text-center">
-              {meetingDays(meeting.meeting_days)}
-            </Typography>
-            <Typography className="text-xs text-center">
-              {meeting.start_time}
-            </Typography>
-          </div>
-        );
-      })}
+    <div className="ml-auto p-1 px-3 rounded-3xl border border-cornflower-300 bg-white dark:bg-gray-700 shadow-sm">
+      <Typography className="text-xs font-semibold text-center">
+        {meetingDays(props.meetings[0].meeting_days)}
+      </Typography>
+      <Typography className="text-xs text-center">
+        {props.meetings[0].start_time}
+      </Typography>
     </div>
   );
 }
@@ -356,7 +347,15 @@ const PlannerCard = (props: PlannerCardProps) => {
         <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit flex-grow">
           {searchQueryLabel(removeSection(props.query))}
         </Typography>
-        <MeetingChip meetings={props.sections[0].meetings} />
+        <MeetingChip
+          meetings={
+            sections?.find(
+              (section) =>
+                !sectionCanOverlap(section.section_number) &&
+                props.query.sectionNumbers.includes(section.section_number),
+            )?.meetings
+          }
+        />
       </div>
 
       {canOpenSections && (
