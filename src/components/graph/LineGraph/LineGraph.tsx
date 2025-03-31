@@ -36,11 +36,24 @@ function getSemesterGPAs(
   },
   allSemesters: string[],
 ) {
-  const semesters = data.data
+  const averagedData = data.data.map((gradeDataObj) => {
+    return {
+      _id: gradeDataObj._id,
+      data: gradeDataObj.data.reduce((a, b) => {
+        return {
+          type: a.type,
+          grade_distribution: a.grade_distribution.map(
+            (obj, i) => a.grade_distribution[i] + b.grade_distribution[i],
+          ),
+        };
+      }),
+    };
+  });
+
+  const semesters = averagedData
     //remove summer and attach _id since we need the grade_distritubtion which us inside data in Gradesdata
-    .flatMap((item) =>
-      item.data.map((semester) => ({ ...semester, _id: item._id })),
-    ) // Attach _id from item
+    .map((item) => ({ ...item.data, _id: item._id }))
+    // Attach _id from item
     .filter((semester) => !semester._id.includes('U')) // Now _id exists on semester
 
     .toSorted((a, b) => sortSemesters(a._id, b._id))
