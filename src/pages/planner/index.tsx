@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef} from 'react';
 import {
   type ImperativePanelHandle,
   Panel,
@@ -8,7 +8,7 @@ import {
   PanelResizeHandle,
 } from 'react-resizable-panels';
 
-import TopMenu from '@/components/navigation/TopMenu/TopMenu';
+import TopMenu from '@/components/navigation/topMenu/TopMenu';
 import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/MyPlannerEmpty';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
 import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedule';
@@ -68,7 +68,6 @@ interface Props {
 
 export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
   const planner = props.planner;
-  const [openIndex, setOpenIndex] = useState(0);
   useEffect(() => {
     if (planner.length) {
       //To cancel on rerender
@@ -154,8 +153,6 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
         sections={props.sections}
         grades={props.grades}
         rmp={props.rmp}
-        openIndex={openIndex}
-        setOpenIndex={setOpenIndex}
       />
     );
 
@@ -188,7 +185,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
                 selectedSections={
                   results.state === 'done'
                     ? results.data
-                        .flatMap((course, index) => {
+                        .flatMap((course) => {
                           const sectionData =
                             props.sections[
                               searchQueryLabel(removeSection(course))
@@ -197,6 +194,9 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
                             typeof sectionData !== 'undefined' &&
                             sectionData.state === 'done'
                           ) {
+                            if (course.sectionNumber === 'all') {
+                              return sectionData.data.latest.map((sect)=>{return {course: course, section: sect as SectionData, color:"#ff0000", selected:false}})
+                            }
                             const chosenSectionForCourse =
                               sectionData.data.latest.find(
                                 (section) =>
@@ -205,8 +205,6 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
                               );
                             if (typeof chosenSectionForCourse != 'undefined') {
                               return {course: course, section: chosenSectionForCourse as SectionData, color:"#ff0000", selected:true};
-                            } else if (index == openIndex) {
-                              return sectionData.data.latest.map((sect)=>{return {course: course, section: sect as SectionData, color:"#ff0000", selected:false}})
                             }
                             
                           }

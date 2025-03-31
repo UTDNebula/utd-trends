@@ -23,7 +23,7 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
@@ -132,6 +132,7 @@ type SectionTableRowProps = {
     searchQuery: SearchQuery,
     section: string | undefined,
   ) => boolean;
+  cardOpen: boolean;
 };
 
 function SectionTableRow(props: SectionTableRowProps) {
@@ -145,7 +146,7 @@ function SectionTableRow(props: SectionTableRowProps) {
             if (!isSelected) {
               props.setPlannerSection(props.course, props.data.section_number);
             } else {
-              props.setPlannerSection(props.course, undefined);
+              props.setPlannerSection(props.course, props.cardOpen ? 'all' : undefined);
             }
           }}
         />
@@ -210,11 +211,20 @@ const PlannerCard = (props: PlannerCardProps) => {
   const [whichOpen, setWhichOpen] = useState<'sections' | 'grades' | null>(
     canOpenSections ? 'sections' : canOpenGrades ? 'grades' : null,
   );
+  useEffect (()=>{
+    console.log("checking")
+    if (typeof props.query.sectionNumber === 'undefined' || props.query.sectionNumber === 'all') {
+      props.setPlannerSection(props.query, !open ? 'all' : undefined);
+    }
+  }, [])
   function handleOpen() {
     if (
       (whichOpen === 'sections' && canOpenSections) ||
       (whichOpen === 'grades' && canOpenGrades)
     ) {
+      if (typeof props.query.sectionNumber === 'undefined' || props.query.sectionNumber === 'all') {
+        props.setPlannerSection(props.query, !open ? 'all' : undefined);
+      }
       setOpen(!open);
     }
   }
@@ -325,6 +335,7 @@ const PlannerCard = (props: PlannerCardProps) => {
                     course={props.query}
                     lastRow={index === sections.length - 1}
                     setPlannerSection={props.setPlannerSection}
+                    cardOpen={open}
                   />
                 ))}
               </TableBody>
