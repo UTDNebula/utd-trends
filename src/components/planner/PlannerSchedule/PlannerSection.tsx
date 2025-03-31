@@ -8,6 +8,7 @@ import { DAYS, numDays, START_HOUR } from './PlannerSchedule';
 type PlannerSectionComponentProps = {
   selectedSection: SectionsData[number];
   course: SearchQuery;
+  color: { fill: string; outline: string; font: string };
 };
 
 const PlannerSection = (props: PlannerSectionComponentProps) => {
@@ -74,22 +75,6 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
     console.log(numDays + 2);
   }, [props.selectedSection]);
 
-  const colorMap: { [key: string]: string } = {
-    MW: 'bg-[#2D9DDD]',
-    TZ: 'bg-[#EB9B5A]',
-    ZF: 'bg-[#F0E549]',
-    WF: 'bg-[#563CFB]',
-    MWF: 'bg-[#F7ADCD]',
-    ZFS: 'bg-[#DD4E4E]',
-    MTWZ: 'bg-purple-800',
-    M: 'bg-[#62D425]',
-    W: 'bg-[#62D425]',
-    T: 'bg-[#62D425]',
-    Z: 'bg-[#62D425]',
-    F: 'bg-[#62D425]',
-    S: 'bg-[#62D425]',
-  };
-
   return meetings.map((x: string[], i: number) => {
     return (
       <div
@@ -100,15 +85,18 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
             '--start-row': x[1],
             '--offset': x[3] + '%',
             '--height': x[2] + '%',
+            backgroundColor: props.color.fill,
+            borderColor: props.color.outline,
+            color: props.color.font,
           } as React.CSSProperties
         }
         className={`col-start-[var(--start-col)] col-span-1 
           row-start-[var(--start-row)] row-span-1 relative 
           top-[var(--offset)] h-[var(--height)] overflow-hidden 
-          rounded-lg ${colorMap[x[4]] || 'bg-purple-100'} 
-          m-1 leading-relaxed shadow-md text-white`}
+          rounded-xl border-2 p-0.5
+          m-1 leading-relaxed shadow-md`}
       >
-        <div className={`text-lg font-lato text-center`}>
+        <div className={`text-[15px] font-semibold font-inter text-center`}>
           {props.course.prefix} {props.course.number}.
           {props.selectedSection.section_number}
         </div>
