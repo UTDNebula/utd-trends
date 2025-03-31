@@ -237,7 +237,7 @@ function Row({
                 <Typography className="text-base w-6">A+</Typography>
               </Skeleton>
             )) ||
-            (grades.state === 'done' && (
+            ((grades.state === 'done' && grades.data.filtered.gpa >= 0) && (
               <Tooltip
                 title={'GPA: ' + grades.data.filtered.gpa.toFixed(2)}
                 placement="top"

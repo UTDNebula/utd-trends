@@ -53,7 +53,7 @@ function SingleGradesInfo({ title, course, grades, gradesToUse }: Props) {
 
   return (
     <div className="p-2">
-      <GraphToggle
+      { grades.data[gradesToUse].gpa !== -1 ? <GraphToggle
         state="done"
         bar={
           <BarGraph
@@ -102,7 +102,7 @@ function SingleGradesInfo({ title, course, grades, gradesToUse }: Props) {
             ]}
           />
         }
-      />
+      /> : <p>This professor/course combination hasn&apos;t been taught in the semesters you selected. To see more grade data, try changing your filters.</p>}
       <div className="flex flex-wrap justify-around">
         <p>
           Grades: <b>{grades.data[gradesToUse].total.toLocaleString()}</b>
