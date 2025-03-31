@@ -1,6 +1,9 @@
 import React from 'react';
 
-import type { SearchQuery } from '@/modules/SearchQuery/SearchQuery';
+import {
+  searchQueryLabel,
+  type SearchQuery,
+} from '@/modules/SearchQuery/SearchQuery';
 import type { SectionsData } from '@/pages/api/sections';
 
 import PlannerSection from './PlannerSection';
@@ -58,7 +61,11 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
       ))}
 
       {props.selectedSectionsAndCourses.map((x, i) => (
-        <PlannerSection key={i} selectedSection={x.section} course={x.course} />
+        <PlannerSection
+          key={searchQueryLabel(x.course)}
+          selectedSection={x.section}
+          course={x.course}
+        />
       ))}
     </div>
   );
