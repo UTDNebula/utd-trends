@@ -1,8 +1,14 @@
+import {
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  Tooltip,
+} from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { type ChangeEvent, useState } from 'react';
 
 import Background from '@/../public/background.png';
 import SearchBar from '@/components/search/SearchBar/SearchBar';
@@ -18,6 +24,12 @@ import {
 const Home: NextPage = () => {
   const router = useRouter();
 
+  const [results, setResults] = useState<GenericFetchedData<SearchQuery[]>>({
+    state: 'done',
+    data: [],
+  }); // essentially a dummy state. Used only for the loading animation to start in home screen before navigation to the dashboard
+  const [filterNextSem, setFilterNextSem] = useState('true');
+
   async function searchOptionChosen(chosenOptions: SearchQuery[]) {
     if (chosenOptions.length) {
       await router.push({
@@ -26,15 +38,11 @@ const Home: NextPage = () => {
           searchTerms: chosenOptions
             .map((el) => searchQueryLabel(el))
             .join(','),
+          availability: filterNextSem,
         },
       });
     }
   }
-
-  const [results, setResults] = useState<GenericFetchedData<SearchQuery[]>>({
-    state: 'done',
-    data: [],
-  }); // essentially a dummy state. Used only for the loading animation to start in home screen before navigation to the dashboard
 
   return (
     <>
@@ -80,6 +88,31 @@ const Home: NextPage = () => {
             setResultsLoading={() => setResults({ state: 'loading' })}
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />
+          {/* Filter for teaching next semester */}
+          {/* Teaching Next Semester dropdown*/}
+          <Tooltip title={'Select Availability'} placement="top">
+            <FormControl
+              size="small"
+              className={`w-full ${
+                filterNextSem == 'true'
+                  ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
+                  : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+              }`}
+            >
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={filterNextSem == 'true'}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                      setFilterNextSem(event.target.checked ? 'true' : 'false');
+                    }}
+                    inputProps={{ 'aria-label': 'controlled' }}
+                  />
+                }
+                label="Teaching Next Semester"
+              />
+            </FormControl>
+          </Tooltip>
         </div>
         {/*eslint-disable-next-line react/jsx-no-target-blank*/}
         <a
