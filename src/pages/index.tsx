@@ -1,14 +1,9 @@
-import {
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  Tooltip,
-} from '@mui/material';
+import { FormControl, Switch, Tooltip } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { type ChangeEvent, useState } from 'react';
+import React, { useState } from 'react';
 
 import Background from '@/../public/background.png';
 import SearchBar from '@/components/search/SearchBar/SearchBar';
@@ -88,29 +83,24 @@ const Home: NextPage = () => {
             setResultsLoading={() => setResults({ state: 'loading' })}
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />
-          {/* Filter for teaching next semester */}
-          {/* Teaching Next Semester dropdown*/}
-          <Tooltip title={'Select Availability'} placement="top">
+          {/* Teaching Next Semester switch*/}
+          <Tooltip title={'Select Availability'} placement="bottom-start">
             <FormControl
               size="small"
-              className={`w-full ${
+              className={`min-w-max flex-row items-center ${
                 filterNextSem == 'true'
                   ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
                   : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
               }`}
             >
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={filterNextSem == 'true'}
-                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                      setFilterNextSem(event.target.checked ? 'true' : 'false');
-                    }}
-                    inputProps={{ 'aria-label': 'controlled' }}
-                  />
-                }
-                label="Teaching Next Semester"
+              <Switch
+                checked={filterNextSem == 'true'}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  setFilterNextSem(event.target.checked ? 'true' : 'false');
+                }}
               />
+              <div className="text-sm min-w-max">Teaching Next Semester</div>
+              {/* <InputLabel id="teachingNext">Teaching Next Semester</InputLabel> */}
             </FormControl>
           </Tooltip>
         </div>
