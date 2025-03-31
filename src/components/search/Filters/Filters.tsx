@@ -22,6 +22,9 @@ interface FiltersProps {
   academicSessions: string[];
   chosenSessions: string[];
   addChosenSessions: (arg0: (arg0: string[]) => string[]) => void;
+  courseTypes: string[];
+  chosenCourseTypes: string[];
+  addChosenCourseTypes: (arg0: (arg0: string[]) => string[]) => void;
 }
 
 /**
@@ -32,6 +35,9 @@ const Filters = ({
   academicSessions,
   chosenSessions,
   addChosenSessions,
+  courseTypes,
+  chosenCourseTypes,
+  addChosenCourseTypes,
 }: FiltersProps) => {
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
@@ -126,6 +132,27 @@ const Filters = ({
       ' ' +
       { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)]
     );
+  }
+
+  function displayCourseTypeName(id: string): string {
+    const courseTypesMap: Record<string, string> = {
+      '0xx': 'Normal day lecture',
+      '0Wx': 'Online class',
+      '0Hx': 'Hybrid day class (online + face-to-face)',
+      '0Lx': 'LLC-only section',
+      '5Hx': 'Hybrid night class (online + face-to-face)',
+      '1xx': 'Lab section (sciences)',
+      '2xx': 'Discussion section (humanities)',
+      '3xx': 'Problem section (maths)',
+      '5xx': 'Night lecture (past 5 PM)',
+      '6xx': 'Lab night section (past 7 PM)',
+      '7xx': 'Exam section',
+      HNx: 'Honors-only',
+      HON: 'Honors-only',
+      xUx: 'Summer Class',
+    };
+
+    return courseTypesMap[id] || id; // Default to ID if no mapping exists
   }
 
   function compareSemesters(a: string, b: string) {
@@ -346,6 +373,80 @@ const Filters = ({
               >
                 <Checkbox checked={chosenSessions.includes(session)} />
                 <ListItemText primary={displayAcademicSessionName(session)} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Tooltip>
+
+      {/* Course Type dropdown */}
+      <Tooltip
+        title={'Select Course Type to Include Grades from'}
+        placement="top"
+      >
+        <FormControl
+          size="small"
+          className={`w-full ${
+            chosenCourseTypes.length !== courseTypes.length
+              ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
+              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+          }`}
+        >
+          <InputLabel id="Course Type">Course Type</InputLabel>
+          <Select
+            label="Course Type"
+            labelId="Course Type"
+            multiple
+            value={chosenCourseTypes}
+            onChange={(event: SelectChangeEvent<string[]>) => {
+              const {
+                target: { value },
+              } = event;
+              if (value.includes('select-all')) {
+                if (chosenCourseTypes.length === courseTypes.length) {
+                  addChosenCourseTypes(() => []);
+                } else {
+                  addChosenCourseTypes(() => courseTypes);
+                }
+              } else {
+                addChosenCourseTypes(() => value as string[]);
+              }
+            }}
+            renderValue={(selected) => {
+              if (chosenCourseTypes.length === courseTypes.length) {
+                return 'All selected';
+              }
+              return selected.join(', ');
+            }}
+            MenuProps={{ autoFocus: false }}
+          >
+            {/* select all courseTypes */}
+            <MenuItem className="h-10 items-center" value="select-all">
+              <Checkbox
+                checked={
+                  courseTypes.length > 0 &&
+                  chosenCourseTypes.length === courseTypes.length
+                }
+                indeterminate={
+                  chosenCourseTypes.length !== courseTypes.length &&
+                  chosenCourseTypes.length !== 0
+                }
+                disabled={courseTypes.length == 0}
+              />
+              <ListItemText
+                className={courseTypes.length > 0 ? '' : 'text-gray-400'}
+                primary="Select All"
+              />
+            </MenuItem>
+            {/* individual options */}
+            {courseTypes.map((courseType) => (
+              <MenuItem
+                className="h-10 items-center"
+                key={courseType}
+                value={courseType}
+              >
+                <Checkbox checked={chosenCourseTypes.includes(courseType)} />
+                <ListItemText primary={displayCourseTypeName(courseType)} />
               </MenuItem>
             ))}
           </Select>
