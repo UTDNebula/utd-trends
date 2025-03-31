@@ -12,6 +12,7 @@ import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/MyPlannerEmpty';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
 import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedule';
+import { plannerColors } from '@/modules/colors/colors';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
@@ -31,6 +32,19 @@ function removeDuplicates(array: SearchQuery[]) {
     (obj1, index, self) =>
       index === self.findIndex((obj2) => searchQueryEqual(obj1, obj2)),
   );
+}
+
+function createColorMap(courses: SearchQuery[]): {
+  [key: string]: { fill: string; outline: string; font: string };
+} {
+  const colorMap: {
+    [key: string]: { fill: string; outline: string; font: string };
+  } = {};
+  courses.forEach((course, index) => {
+    colorMap[searchQueryLabel(course)] =
+      plannerColors[index % plannerColors.length];
+  });
+  return colorMap;
 }
 
 interface Props {
@@ -126,6 +140,12 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
     };
   }
 
+  const colorMap = createColorMap(
+    results.state === 'done'
+      ? results.data.map((searchQuery) => removeSection(searchQuery))
+      : [],
+  );
+
   const panelLRef = useRef<ImperativePanelHandle>(null);
   const panelRRef = useRef<ImperativePanelHandle>(null);
   // Resets RHS & LHS to 40/60 when double clicking handle
@@ -148,6 +168,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
         sections={props.sections}
         grades={props.grades}
         rmp={props.rmp}
+        colorMap={colorMap}
       />
     );
 
@@ -183,30 +204,8 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
                       )
                     : []
                 }
-                selectedSections={
-                  results.state === 'done'
-                    ? results.data.flatMap((course) => {
-                        const sectionData =
-                          props.sections[
-                            searchQueryLabel(removeSection(course))
-                          ];
-                        if (
-                          typeof sectionData !== 'undefined' &&
-                          sectionData.state === 'done'
-                        ) {
-                          if (typeof course.sectionNumbers === 'undefined') {
-                            return [];
-                          }
-                          return sectionData.data.latest.filter((section) =>
-                            course.sectionNumbers?.includes(
-                              section.section_number,
-                            ),
-                          );
-                        }
-                        return [];
-                      })
-                    : []
-                }
+                sections={props.sections}
+                colorMap={colorMap}
               />
             </div>
           </Panel>

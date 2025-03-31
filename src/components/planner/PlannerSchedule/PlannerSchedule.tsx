@@ -1,13 +1,18 @@
 import React from 'react';
 
-import type { SearchQuery } from '@/modules/SearchQuery/SearchQuery';
-import type { SectionsData } from '@/pages/api/sections';
+import { type GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import {
+  removeSection,
+  type SearchQuery,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
+import { type SectionsType } from '@/modules/SectionsType/SectionsType';
 
 import PlannerSection from './PlannerSection';
 
 // hours shown (24-hour time)
 export const START_HOUR = 8;
-export const END_HOUR = 21;
+export const END_HOUR = 22;
 // days shown (0 = sunday -> 6 = Saturday)
 // NOTE: IF YOU CHANGE THESE PLEASE ALSO CHANGE THE REPEAT NUMBERS (5 and 13)
 //        IN THE TAILWIND CSS GRID SPECIFICATION (outer div in PlannerSchedule)
@@ -27,13 +32,16 @@ export const DAYS = [
 
 type PlannerScheduleProps = {
   courses: SearchQuery[];
-  selectedSections: SectionsData;
+  sections: {
+    [key: string]: GenericFetchedData<SectionsType>;
+  };
+  colorMap: { [key: string]: { fill: string; outline: string; font: string } };
 };
 
 const PlannerSchedule = (props: PlannerScheduleProps) => {
   return (
     <div
-      className={`w-full h-[calc(100vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[max-content_repeat(13,minmax(0,1fr))]`}
+      className={`w-full h-[calc(140vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[max-content_repeat(14,minmax(0,1fr))]`}
     >
       {/*Weekday Headers*/}
       <div className="grid col-span-full grid-flow-row bg-cornflower-500 grid-cols-subgrid grid-rows-subgrid">
@@ -52,17 +60,23 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
         <HourRow key={i} hour={i + START_HOUR} />
       ))}
 
-      {props.selectedSections.map((x, i) => (
-        <PlannerSection
-          key={i}
-          selectedSection={x}
-          course={
-            props.courses.filter(
-              (course) => course.sectionNumber === x.section_number,
-            )[0]
-          }
-        />
-      ))}
+      {props.courses.map((course) => {
+        const sections =
+          props.sections[searchQueryLabel(removeSection(course))];
+        if (typeof sections === 'undefined' || sections.state !== 'done') {
+          return null;
+        }
+        return (
+          <PlannerSection
+            key={searchQueryLabel(course)}
+            selectedSection={sections.data.latest.find(
+              (section) => section.section_number === course.sectionNumber,
+            )}
+            course={course}
+            color={props.colorMap[searchQueryLabel(removeSection(course))]}
+          />
+        );
+      })}
     </div>
   );
 };
