@@ -29,10 +29,13 @@ import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   convertToProfOnly,
   decodeSearchQueryLabel,
+  removeSection,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
+  type SearchQueryMultiSection,
 } from '@/modules/SearchQuery/SearchQuery';
+import type { SectionsType } from '@/modules/SectionsType/SectionsType';
 import useGradeStore from '@/modules/useGradeStore/useGradeStore';
 import useRmpStore from '@/modules/useRmpStore/useRmpStore';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
@@ -187,8 +190,11 @@ export async function getServerSideProps(
 }
 
 interface Props {
+  sections: {
+    [key: string]: GenericFetchedData<SectionsType>;
+  };
   pageTitle: string;
-  planner: SearchQuery[];
+  planner: SearchQueryMultiSection[];
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
   grades: {
@@ -198,6 +204,10 @@ interface Props {
     course: SearchQuery,
     controller: AbortController,
   ) => Promise<GradesType | null>;
+  fetchAndStoreSectionsData: (
+    combo: SearchQuery,
+    controller: AbortController,
+  ) => void;
   recalcGrades: (course: SearchQuery) => void;
   recalcAllGrades: (results: SearchQuery[], academicSessions: string[]) => void;
   rmp: {
@@ -221,7 +231,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     state: 'loading',
   });
 
-  //On search change, seperate into courses and profs, clear data, and fetch new results
+  //On search change, separate into courses and profs, clear data, and fetch new results
   useEffect(() => {
     if (router.isReady) {
       const { courseSearchTerms, professorSearchTerms } = getSearchTerms(
@@ -356,6 +366,13 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     //Grade data
     //Fetch each result
     for (const result of results) {
+      // combo section data?
+      const sectEntry = props.sections[searchQueryLabel(result)];
+      //Not already loading
+      if (typeof sectEntry === 'undefined' || sectEntry.state === 'error') {
+        props.fetchAndStoreSectionsData(result, controller);
+      }
+
       const entry = props.grades[searchQueryLabel(result)];
       //Not already loading
       if (typeof entry === 'undefined' || entry.state === 'error') {
@@ -587,6 +604,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     );
     const searchResultsTable = (
       <SearchResultsTable
+        sections={props.sections}
         resultsLoading={results.state}
         includedResults={includedResults}
         grades={props.grades}
@@ -595,7 +613,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         addToCompare={addToCompare}
         removeFromCompare={removeFromCompare}
         colorMap={colorMap}
-        planner={props.planner}
+        planner={props.planner.map((x) => removeSection(x))}
         addToPlanner={props.addToPlanner}
         removeFromPlanner={props.removeFromPlanner}
       />

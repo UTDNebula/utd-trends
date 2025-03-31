@@ -33,7 +33,9 @@ import {
   removeSection,
   type SearchQuery,
   searchQueryLabel,
+  type SearchQueryMultiSection,
 } from '@/modules/SearchQuery/SearchQuery';
+import sectionCanOverlap from '@/modules/sections/sections';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import { type SectionsData } from '@/pages/api/sections';
 
@@ -87,6 +89,9 @@ function SectionTableHead() {
           Schedule & Location
         </Typography>
       </TableCell>
+      <TableCell className="py-2 px-4 border-b-0">
+        <Typography className="text-white text-xs">Syllabus</Typography>
+      </TableCell>
     </TableRow>
   );
 }
@@ -129,39 +134,41 @@ function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
 
 type SectionTableRowProps = {
   data: SectionsData[number];
-  course: SearchQuery;
+  course: SearchQueryMultiSection;
   lastRow: boolean;
-  setPlannerSection: (
-    searchQuery: SearchQuery,
-    section: string | undefined,
-  ) => boolean;
+  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
 };
 
 function SectionTableRow(props: SectionTableRowProps) {
-  const isSelected = props.course.sectionNumber === props.data.section_number;
+  const isSelected =
+    props.course.sectionNumbers?.includes(props.data.section_number) ?? false;
 
   return (
     <TableRow>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-        <Radio
-          checked={isSelected}
-          onClick={() => {
-            if (!isSelected) {
-              props.setPlannerSection(
-                props.course,
-                props.data.section_number,
-              );
-            } else {
-              props.setPlannerSection(props.course, undefined);
-            }
-          }}
-        />
+        {sectionCanOverlap(props.data.section_number) ? (
+          <Checkbox
+            checked={isSelected}
+            onClick={() => {
+              props.setPlannerSection(props.course, props.data.section_number);
+            }}
+          />
+        ) : (
+          <Radio
+            checked={isSelected}
+            onClick={() => {
+              props.setPlannerSection(props.course, props.data.section_number);
+            }}
+          />
+        )}
       </TableCell>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-        <Typography>{props.data.section_number}</Typography>
+        <Typography className="text-sm">{props.data.section_number}</Typography>
       </TableCell>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-        <Typography>{props.data.internal_class_number}</Typography>
+        <Typography className="text-sm">
+          {props.data.internal_class_number}
+        </Typography>
       </TableCell>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
         {props.data.meetings
@@ -169,10 +176,10 @@ function SectionTableRow(props: SectionTableRowProps) {
           .map(([schedule, location, link], i) => (
             <div key={i}>
               {schedule !== ' -' && (
-                <Typography className="text-sm">{schedule}</Typography>
+                <Typography className="text-xs">{schedule}</Typography>
               )}
               {location !== ' ' && (
-                <Typography className="text-sm">
+                <Typography className="text-xs">
                   {link === '' ? (
                     location
                   ) : (
@@ -188,6 +195,17 @@ function SectionTableRow(props: SectionTableRowProps) {
               )}
             </div>
           ))}
+      </TableCell>
+      <TableCell className={props.lastRow ? 'border-b-0' : ''}>
+        {props.data.syllabus_uri && (
+          <Link
+            href={props.data.syllabus_uri}
+            target="_blank"
+            className="underline text-xs text-blue-600 hover:text-blue-800 visited:text-purple-600"
+          >
+            View Syllabus
+          </Link>
+        )}
       </TableCell>
     </TableRow>
   );
@@ -221,12 +239,9 @@ function MeetingChip(props: {
 }
 
 type PlannerCardProps = {
-  query: SearchQuery;
+  query: SearchQueryMultiSection;
   sections?: SectionsData;
-  setPlannerSection: (
-    searchQuery: SearchQuery,
-    section: string | undefined,
-  ) => boolean;
+  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RMPInterface>;
   removeFromPlanner: () => void;
