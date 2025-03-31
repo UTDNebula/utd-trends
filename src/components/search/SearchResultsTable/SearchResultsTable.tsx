@@ -580,17 +580,19 @@ const SearchResultsTable = ({
                   .map((_, index) => <LoadingRow key={index} />)}
 
             {/* Divider row */}
-            <TableRow>
-              <TableCell colSpan={5} className="p-0">
-                <div className="flex items-center py-2">
-                  <Divider className="flex-grow" />
-                  <Typography className="px-4 text-lg text-gray-500">
-                    Not teaching next semester
-                  </Typography>
-                  <Divider className="flex-grow" />
-                </div>
-              </TableCell>
-            </TableRow>
+            {sortedUnIncludedResults.length > 0 && (
+              <TableRow className="my-2 border-2 bg-gray-200">
+                <TableCell colSpan={5} className="p-0">
+                  <div className="flex items-center py-2 my-2">
+                    <Divider className="flex-grow" />
+                    <Typography className="px-4 text-base font-bold text-gray-500">
+                      Not teaching next semester
+                    </Typography>
+                    <Divider className="flex-grow" />
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
 
             {/* Unincluded Results (Unavailable courses) */}
             {resultsLoading === 'done' ? (
