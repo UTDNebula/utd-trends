@@ -35,7 +35,6 @@ const Filters = ({
 }: FiltersProps) => {
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
-  const [semesters, setSemesters] = useState<string[]>(chosenSessions);
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
   academicSessions.sort((a, b) => compareSemesters(b, a)); // display the semesters in order of recency (most recent first)
@@ -55,19 +54,16 @@ const Filters = ({
     }
   }, [router.isReady, router.query.minGPA, router.query.minRating]);
 
-  useEffect(() => {
-    if (chosenSessions.length === academicSessions.length) {
-      setSemesters(() => chosenSessions.concat(['select-all']));
-    } else if (
-      recentSemesters.length > 0 &&
-      chosenSessions.length === recentSemesters.length &&
-      chosenSessions.every((el) => recentSemesters.includes(el))
-    ) {
-      setSemesters(() => chosenSessions.concat(['recent']));
-    } else {
-      setSemesters(() => chosenSessions);
-    }
-  }, [chosenSessions]);
+  let semestersSelectValue = chosenSessions;
+  if (chosenSessions.length === academicSessions.length) {
+    semestersSelectValue = chosenSessions.concat(['select-all']);
+  } else if (
+    recentSemesters.length > 0 &&
+    chosenSessions.length === recentSemesters.length &&
+    chosenSessions.every((el) => recentSemesters.includes(el))
+  ) {
+    semestersSelectValue = chosenSessions.concat(['recent']);
+  }
 
   function getRecentSemesters() {
     // get current month and year
@@ -244,34 +240,43 @@ const Filters = ({
             label="Semesters"
             labelId="Semesters"
             multiple
-            value={semesters}
+            value={semestersSelectValue}
             onChange={(event: SelectChangeEvent<string[]>) => {
               const {
                 target: { value },
               } = event;
+              // starting from all
               if (chosenSessions.length === academicSessions.length) {
                 if (value.includes('recent')) {
+                  // swap to recent
                   addChosenSessions(() => recentSemesters);
                 } else if (value.includes('select-all')) {
+                  // removes semester clicked
                   addChosenSessions(() =>
                     (value as string[]).filter((e) => e !== 'select-all'),
                   );
                 } else {
+                  // unselect all
                   addChosenSessions(() => []);
                 }
+                // starting from recent
               } else if (
                 chosenSessions.length === recentSemesters.length &&
                 chosenSessions.every((el) => recentSemesters.includes(el))
               ) {
                 if (value.includes('select-all')) {
+                  // swap to all
                   addChosenSessions(() => academicSessions);
                 } else if (value.includes('recent')) {
+                  // removes semester clicked
                   addChosenSessions(() =>
                     (value as string[]).filter((e) => e !== 'recent'),
                   );
                 } else {
+                  // swap to all
                   addChosenSessions(() => academicSessions);
                 }
+                // normal
               } else {
                 if (value.includes('select-all')) {
                   addChosenSessions(() => academicSessions);
@@ -280,17 +285,6 @@ const Filters = ({
                 } else {
                   addChosenSessions(() => value as string[]);
                 }
-              }
-              if (chosenSessions.length === academicSessions.length) {
-                setSemesters(() => chosenSessions.concat(['select-all']));
-              } else if (
-                recentSemesters.length > 0 &&
-                chosenSessions.length === recentSemesters.length &&
-                chosenSessions.every((el) => recentSemesters.includes(el))
-              ) {
-                setSemesters(() => chosenSessions.concat(['recent']));
-              } else {
-                setSemesters(() => chosenSessions);
               }
             }}
             renderValue={() => {
