@@ -5,6 +5,7 @@ import {
   ListItemText,
   MenuItem,
   Select,
+  Switch,
   Tooltip,
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
@@ -94,6 +95,7 @@ const Filters = ({
     toSet: 'minGPA' | 'minRating' | 'availability',
     setter: (value: string) => void,
   ) {
+    console.log(newValue);
     setter(newValue);
     if (manageQuery && router.isReady) {
       const newQuery = { ...router.query };
@@ -215,36 +217,6 @@ const Filters = ({
         </FormControl>
       </Tooltip>
 
-      {/* Teaching Next Semester dropdown*/}
-
-      <Tooltip title={'Select Availability'} placement="top">
-        <FormControl
-          size="small"
-          className={`w-full ${
-            filterNextSem == 'true'
-              ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
-              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
-          }`}
-        >
-          <InputLabel id="teachingNext">Teaching Next Semester</InputLabel>
-          <Select
-            label="Teaching Next Semester"
-            labelId="availability"
-            value={filterNextSem}
-            onChange={(event: SelectChangeEvent) => {
-              onChange(event.target.value, 'availability', setFilterNextSem);
-            }}
-          >
-            <MenuItem className="h-10" value="false">
-              <em>Any</em>
-            </MenuItem>
-            <MenuItem className="h-10" value="true">
-              <em>Teaching Next Semester</em>
-            </MenuItem>
-          </Select>
-        </FormControl>
-      </Tooltip>
-
       {/* semester dropdown */}
       <Tooltip
         title={'Select Semesters to Include Grades from'}
@@ -346,6 +318,31 @@ const Filters = ({
               </MenuItem>
             ))}
           </Select>
+        </FormControl>
+      </Tooltip>
+
+      {/* Teaching Next Semester switch*/}
+      <Tooltip title={'Select Availability'} placement="top">
+        <FormControl
+          size="small"
+          className={`min-w-max flex-row items-center ${
+            filterNextSem == 'true'
+              ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
+              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+          }`}
+        >
+          <Switch
+            checked={filterNextSem == 'true'}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              onChange(
+                event.target.checked ? 'true' : 'false',
+                'availability',
+                setFilterNextSem,
+              );
+            }}
+          />
+          <div className="text-sm min-w-max">Teaching Next Semester</div>
+          {/* <InputLabel id="teachingNext">Teaching Next Semester</InputLabel> */}
         </FormControl>
       </Tooltip>
     </div>
