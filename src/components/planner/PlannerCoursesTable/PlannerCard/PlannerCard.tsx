@@ -352,7 +352,7 @@ const PlannerCard = (props: PlannerCardProps) => {
             sections?.find(
               (section) =>
                 !sectionCanOverlap(section.section_number) &&
-                props.query.sectionNumbers.includes(section.section_number),
+                props.query.sectionNumbers?.includes(section.section_number),
             )?.meetings
           }
         />
