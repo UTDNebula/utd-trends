@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material';
+import { Alert, Snackbar, Typography } from '@mui/material';
 import React, { useState } from 'react';
 
 import PlannerCard, {
@@ -29,11 +29,18 @@ type PlannerCoursesTableProps = {
   };
   grades: { [key: string]: GenericFetchedData<GradesType> };
   rmp: { [key: string]: GenericFetchedData<RMPInterface> };
-  selectedSections: SectionsData; // ADD THIS
-  setSelectedSections: React.Dispatch<React.SetStateAction<SectionsData>>; // ADD THIS
+  selectedSections: SectionsData;
 };
 
 const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
+  const [openConflictMessage, setOpenConflictMessage] = useState(false);
+  const conflictMessageClose = (_: unknown, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenConflictMessage(false);
+  };
+
   return (
     <>
       <Typography className="leading-tight text-3xl font-bold p-4">
@@ -66,8 +73,8 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                   removeFromPlanner={() => {
                     props.removeFromPlanner(course);
                   }}
-                  selectedSections={props.selectedSections} // ADD THIS
-                  setSelectedSections={props.setSelectedSections} // ADD THIS
+                  selectedSections={props.selectedSections}
+                  openConflictMessage={() => setOpenConflictMessage(true)}
                 />
               );
             })
@@ -75,9 +82,22 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
               .fill(0)
               .map((_, index) => <LoadingRow key={index} />)}
       </div>
+      <Snackbar
+        open={openConflictMessage}
+        autoHideDuration={6000}
+        onClose={conflictMessageClose}
+      >
+        <Alert
+          onClose={conflictMessageClose}
+          severity="error"
+          variant="filled"
+          className="w-full"
+        >
+          This section conflicts with your schedule!
+        </Alert>
+      </Snackbar>
     </>
   );
 };
 
 export default PlannerCoursesTable;
-
