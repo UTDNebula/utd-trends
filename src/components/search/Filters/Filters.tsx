@@ -1,10 +1,13 @@
 import {
   Checkbox,
   FormControl,
+  FormControlLabel,
+  Grid2 as Grid,
   InputLabel,
   ListItemText,
   MenuItem,
   Select,
+  Switch,
   Tooltip,
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
@@ -35,6 +38,7 @@ const Filters = ({
 }: FiltersProps) => {
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
+  const [filterNextSem, setFilterNextSem] = useState('false');
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
   academicSessions.sort((a, b) => compareSemesters(b, a)); // display the semesters in order of recency (most recent first)
@@ -49,6 +53,9 @@ const Filters = ({
         }
         if (typeof router.query.minRating === 'string') {
           setMinRating(router.query.minRating);
+        }
+        if (typeof router.query.availability === 'string') {
+          setFilterNextSem(router.query.availability);
         }
       }
     }
@@ -98,9 +105,10 @@ const Filters = ({
   //Update URL, state, and parent
   async function onChange(
     newValue: string,
-    toSet: 'minGPA' | 'minRating',
+    toSet: 'minGPA' | 'minRating' | 'availability',
     setter: (value: string) => void,
   ) {
+    console.log(newValue);
     setter(newValue);
     if (manageQuery && router.isReady) {
       const newQuery = { ...router.query };
@@ -143,215 +151,256 @@ const Filters = ({
   }
 
   return (
-    <div className="flex gap-2" data-tutorial-id="filters">
+    <Grid
+      container
+      spacing={2}
+      data-tutorial-id="filters"
+      className="mb-4 sm:m-0"
+    >
       {/* min letter grade dropdown*/}
-      <Tooltip title={'Select Minimum Letter Grade Average'} placement="top">
-        <FormControl
-          size="small"
-          className={`w-full ${
-            minGPA
-              ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
-              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
-          }`}
-        >
-          <InputLabel id="minGPA">Min Letter Grade</InputLabel>
-          <Select
-            label="Min Letter Grade"
-            labelId="minGPA"
-            value={minGPA}
-            onChange={async (event: SelectChangeEvent) => {
-              await onChange(event.target.value, 'minGPA', setMinGPA);
-            }}
+      <Grid size={{ xs: 6, sm: 3 }}>
+        <Tooltip title="Select Minimum Letter Grade Average" placement="top">
+          <FormControl
+            size="small"
+            className={`w-full ${
+              minGPA
+                ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
+                : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+            }`}
           >
-            <MenuItem className="h-10" value="">
-              <em>None</em>
-            </MenuItem>
-            {/* dropdown options*/}
-            {minGPAs.map((value) => (
-              <MenuItem className="h-10" key={value} value={value}>
-                {gpaToLetterGrade(Number(value))}
+            <InputLabel id="minGPA">Min Letter Grade</InputLabel>
+            <Select
+              label="Min Letter Grade"
+              labelId="minGPA"
+              value={minGPA}
+              onChange={async (event: SelectChangeEvent) => {
+                await onChange(event.target.value, 'minGPA', setMinGPA);
+              }}
+            >
+              <MenuItem className="h-10" value="">
+                <em>None</em>
               </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Tooltip>
+              {/* dropdown options*/}
+              {minGPAs.map((value) => (
+                <MenuItem className="h-10" key={value} value={value}>
+                  {gpaToLetterGrade(Number(value))}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Tooltip>
+      </Grid>
 
       {/* min rating dropdown*/}
-      <Tooltip title={'Select Minimum Professor Rating'} placement="top">
-        <FormControl
-          size="small"
-          className={`w-full ${
-            minRating
-              ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
-              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
-          }`}
-        >
-          <InputLabel id="minRating">Min Rating</InputLabel>
-          <Select
-            label="Min Rating"
-            labelId="minRating"
-            value={minRating}
-            onChange={async (event: SelectChangeEvent) => {
-              await onChange(event.target.value, 'minRating', setMinRating);
-            }}
-            renderValue={(value) => (
-              <Rating
-                key={value}
-                defaultValue={Number(value)}
-                precision={0.5}
-                sx={{ fontSize: 18 }}
-                readOnly
-              />
-            )}
+      <Grid size={{ xs: 6, sm: 3 }}>
+        <Tooltip title="Select Minimum Professor Rating" placement="top">
+          <FormControl
+            size="small"
+            className={`w-full ${
+              minRating
+                ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
+                : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+            }`}
           >
-            <MenuItem className="h-10" value="">
-              <em>None</em>
-            </MenuItem>
-            {/* dropdown options*/}
-            {minRatings.map((value) => (
-              <MenuItem className="h-10" key={value} value={value}>
+            <InputLabel id="minRating">Min Rating</InputLabel>
+            <Select
+              label="Min Rating"
+              labelId="minRating"
+              value={minRating}
+              onChange={async (event: SelectChangeEvent) => {
+                await onChange(event.target.value, 'minRating', setMinRating);
+              }}
+              renderValue={(value) => (
                 <Rating
+                  key={value}
                   defaultValue={Number(value)}
                   precision={0.5}
-                  sx={{ fontSize: 25 }}
+                  sx={{ fontSize: 18 }}
                   readOnly
                 />
+              )}
+            >
+              <MenuItem className="h-10" value="">
+                <em>None</em>
               </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Tooltip>
+              {/* dropdown options*/}
+              {minRatings.map((value) => (
+                <MenuItem className="h-10" key={value} value={value}>
+                  <Rating
+                    defaultValue={Number(value)}
+                    precision={0.5}
+                    sx={{ fontSize: 25 }}
+                    readOnly
+                  />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Tooltip>
+      </Grid>
 
       {/* semester dropdown */}
-      <Tooltip
-        title={'Select Semesters to Include Grades from'}
-        placement="top"
-      >
-        <FormControl
-          size="small"
-          className={`w-full ${
-            chosenSessions.length !== academicSessions.length
-              ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
-              : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
-          }`}
+      <Grid size={{ xs: 6, sm: 3 }}>
+        <Tooltip
+          title="Select Semesters to Include Grades from"
+          placement="top"
         >
-          <InputLabel id="Semesters">Semesters</InputLabel>
-          <Select
-            label="Semesters"
-            labelId="Semesters"
-            multiple
-            value={semestersSelectValue}
-            onChange={(event: SelectChangeEvent<string[]>) => {
-              const {
-                target: { value },
-              } = event;
-              // starting from all
-              if (chosenSessions.length === academicSessions.length) {
-                if (value.includes('recent')) {
-                  // swap to recent
-                  addChosenSessions(() => recentSemesters);
-                } else if (value.includes('select-all')) {
-                  // removes semester clicked
-                  addChosenSessions(() =>
-                    (value as string[]).filter((e) => e !== 'select-all'),
-                  );
-                } else {
-                  // unselect all
-                  addChosenSessions(() => []);
-                }
-                // starting from recent
-              } else if (
-                chosenSessions.length === recentSemesters.length &&
-                chosenSessions.every((el) => recentSemesters.includes(el))
-              ) {
-                if (value.includes('select-all')) {
-                  // swap to all
-                  addChosenSessions(() => academicSessions);
-                } else if (value.includes('recent')) {
-                  // removes semester clicked
-                  addChosenSessions(() =>
-                    (value as string[]).filter((e) => e !== 'recent'),
-                  );
-                } else {
-                  // swap to all
-                  addChosenSessions(() => academicSessions);
-                }
-                // normal
-              } else {
-                if (value.includes('select-all')) {
-                  addChosenSessions(() => academicSessions);
-                } else if (value.includes('recent')) {
-                  addChosenSessions(() => recentSemesters);
-                } else {
-                  addChosenSessions(() => value as string[]);
-                }
-              }
-            }}
-            renderValue={() => {
-              if (chosenSessions.length === academicSessions.length) {
-                return 'All selected';
-              }
-              return chosenSessions
-                .sort((a, b) => compareSemesters(a, b))
-                .join(', ');
-            }}
-            MenuProps={{ autoFocus: false }}
+          <FormControl
+            size="small"
+            className={`w-full ${
+              chosenSessions.length !== academicSessions.length
+                ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
+                : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+            }`}
           >
-            {/* select all sessions */}
-            <MenuItem className="h-10 items-center" value="select-all">
-              <Checkbox
-                checked={
-                  academicSessions.length > 0 &&
-                  chosenSessions.length === academicSessions.length
-                }
-                indeterminate={
-                  chosenSessions.length !== academicSessions.length &&
-                  chosenSessions.length !== 0 &&
-                  !(
-                    chosenSessions.length === recentSemesters.length &&
-                    chosenSessions.every((el) => recentSemesters.includes(el))
-                  ) // select-all is not indeterminate when recent is checked
-                }
-                disabled={academicSessions.length == 0}
-              />
-              <ListItemText
-                className={academicSessions.length > 0 ? '' : 'text-gray-400'}
-                primary="Select All"
-              />
-            </MenuItem>
-
-            {/* recent sessions -- last <recentSemesters.length> long-semesters from current semester*/}
-            <MenuItem className="h-10 items-center" value="recent">
-              <Checkbox
-                checked={
-                  recentSemesters.length > 0 &&
+            <InputLabel id="Semesters">Semesters</InputLabel>
+            <Select
+              label="Semesters"
+              labelId="Semesters"
+              multiple
+              value={semestersSelectValue}
+              onChange={(event: SelectChangeEvent<string[]>) => {
+                const {
+                  target: { value },
+                } = event;
+                // starting from all
+                if (chosenSessions.length === academicSessions.length) {
+                  if (value.includes('recent')) {
+                    // swap to recent
+                    addChosenSessions(() => recentSemesters);
+                  } else if (value.includes('select-all')) {
+                    // removes semester clicked
+                    addChosenSessions(() =>
+                      (value as string[]).filter((e) => e !== 'select-all'),
+                    );
+                  } else {
+                    // unselect all
+                    addChosenSessions(() => []);
+                  }
+                  // starting from recent
+                } else if (
                   chosenSessions.length === recentSemesters.length &&
                   chosenSessions.every((el) => recentSemesters.includes(el))
+                ) {
+                  if (value.includes('select-all')) {
+                    // swap to all
+                    addChosenSessions(() => academicSessions);
+                  } else if (value.includes('recent')) {
+                    // removes semester clicked
+                    addChosenSessions(() =>
+                      (value as string[]).filter((e) => e !== 'recent'),
+                    );
+                  } else {
+                    // swap to all
+                    addChosenSessions(() => academicSessions);
+                  }
+                  // normal
+                } else {
+                  if (value.includes('select-all')) {
+                    addChosenSessions(() => academicSessions);
+                  } else if (value.includes('recent')) {
+                    addChosenSessions(() => recentSemesters);
+                  } else {
+                    addChosenSessions(() => value as string[]);
+                  }
                 }
-                disabled={recentSemesters.length == 0}
-              />
-              <ListItemText
-                className={recentSemesters.length > 0 ? '' : 'text-gray-400'}
-                primary="Recent"
-              />
-            </MenuItem>
-            <hr className="border-t-2 border-cornflower-600 dark:border-gray-500" />
-
-            {/* individual options */}
-            {academicSessions.map((session) => (
-              <MenuItem
-                className="h-10 items-center"
-                key={session}
-                value={session}
-              >
-                <Checkbox checked={chosenSessions.includes(session)} />
-                <ListItemText primary={displayAcademicSessionName(session)} />
+              }}
+              renderValue={() => {
+                if (chosenSessions.length === academicSessions.length) {
+                  return 'All selected';
+                }
+                return chosenSessions
+                  .sort((a, b) => compareSemesters(a, b))
+                  .join(', ');
+              }}
+              MenuProps={{ autoFocus: false }}
+            >
+              {/* select all sessions */}
+              <MenuItem className="h-10 items-center" value="select-all">
+                <Checkbox
+                  checked={
+                    academicSessions.length > 0 &&
+                    chosenSessions.length === academicSessions.length
+                  }
+                  indeterminate={
+                    chosenSessions.length !== academicSessions.length &&
+                    chosenSessions.length !== 0 &&
+                    !(
+                      chosenSessions.length === recentSemesters.length &&
+                      chosenSessions.every((el) => recentSemesters.includes(el))
+                    ) // select-all is not indeterminate when recent is checked
+                  }
+                  disabled={academicSessions.length == 0}
+                />
+                <ListItemText
+                  className={academicSessions.length > 0 ? '' : 'text-gray-400'}
+                  primary="Select All"
+                />
               </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Tooltip>
-    </div>
+
+              {/* recent sessions -- last <recentSemesters.length> long-semesters from current semester*/}
+              <MenuItem className="h-10 items-center" value="recent">
+                <Checkbox
+                  checked={
+                    recentSemesters.length > 0 &&
+                    chosenSessions.length === recentSemesters.length &&
+                    chosenSessions.every((el) => recentSemesters.includes(el))
+                  }
+                  disabled={recentSemesters.length == 0}
+                />
+                <ListItemText
+                  className={recentSemesters.length > 0 ? '' : 'text-gray-400'}
+                  primary="Recent"
+                />
+              </MenuItem>
+              <hr className="border-t-2 border-cornflower-600 dark:border-gray-500" />
+
+              {/* individual options */}
+              {academicSessions.map((session) => (
+                <MenuItem
+                  className="h-10 items-center"
+                  key={session}
+                  value={session}
+                >
+                  <Checkbox checked={chosenSessions.includes(session)} />
+                  <ListItemText primary={displayAcademicSessionName(session)} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Tooltip>
+      </Grid>
+
+      {/* Teaching Next Semester switch*/}
+      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+        <Tooltip title="Select Availability" placement="top">
+          <FormControl
+            size="small"
+            className={`${
+              filterNextSem === 'true'
+                ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
+                : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+            }`}
+          >
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={filterNextSem === 'true'}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    onChange(
+                      event.target.checked ? 'true' : 'false',
+                      'availability',
+                      setFilterNextSem,
+                    );
+                  }}
+                />
+              }
+              label="Teaching Next Semester"
+            />
+          </FormControl>
+        </Tooltip>
+      </Grid>
+    </Grid>
   );
 };
 

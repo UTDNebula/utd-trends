@@ -2,6 +2,7 @@ import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Checkbox,
   Collapse,
+  Divider,
   IconButton,
   Paper,
   Skeleton,
@@ -237,7 +238,7 @@ function Row({
                 <Typography className="text-base w-6">A+</Typography>
               </Skeleton>
             )) ||
-            (grades.state === 'done' && (
+            (grades.state === 'done' && grades.data.filtered.gpa >= 0 && (
               <Tooltip
                 title={'GPA: ' + grades.data.filtered.gpa.toFixed(2)}
                 placement="top"
@@ -305,6 +306,7 @@ type SearchResultsTableProps = {
   resultsLoading: 'loading' | 'done';
   numSearches: number;
   includedResults: SearchQuery[];
+  unIncludedResults: SearchQuery[];
   grades: { [key: string]: GenericFetchedData<GradesType> };
   rmp: { [key: string]: GenericFetchedData<RMPInterface> };
   compare: SearchQuery[];
@@ -317,6 +319,7 @@ const SearchResultsTable = ({
   resultsLoading,
   numSearches,
   includedResults,
+  unIncludedResults,
   grades,
   rmp,
   compare,
@@ -344,7 +347,11 @@ const SearchResultsTable = ({
     }
   }
 
-  if (resultsLoading !== 'loading' && includedResults.length === 0) {
+  if (
+    resultsLoading !== 'loading' &&
+    includedResults.length === 0 &&
+    unIncludedResults.length === 0
+  ) {
     return (
       <div className="p-4">
         <Typography
@@ -362,7 +369,7 @@ const SearchResultsTable = ({
   }
 
   //Sort
-  const sortedResults = includedResults.sort((a, b) => {
+  function sortResults(a: SearchQuery, b: SearchQuery) {
     if (orderBy === 'name') {
       //same logic as in generateCombosTable.ts
       //handle undefined variables based on searchQueryLabel
@@ -483,7 +490,10 @@ const SearchResultsTable = ({
       return bRating - aRating;
     }
     return 0;
-  });
+  }
+
+  const sortedResults = includedResults.sort(sortResults);
+  const sortedUnIncludedResults = unIncludedResults.sort(sortResults);
 
   return (
     //TODO: sticky header
@@ -546,6 +556,7 @@ const SearchResultsTable = ({
             </TableRow>
           </TableHead>
           <TableBody>
+            {/* Included Results */}
             {resultsLoading === 'done'
               ? sortedResults.map((result, index) => (
                   <Row
@@ -567,6 +578,41 @@ const SearchResultsTable = ({
               : Array(10)
                   .fill(0)
                   .map((_, index) => <LoadingRow key={index} />)}
+
+            {/* Divider row */}
+            {sortedUnIncludedResults.length > 0 && (
+              <TableRow className="bg-gray-200 dark:bg-gray-700">
+                <TableCell colSpan={5} className="p-0">
+                  <div className="flex items-center py-2 my-2">
+                    <Divider className="flex-grow" />
+                    <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
+                      Not teaching next semester
+                    </Typography>
+                    <Divider className="flex-grow" />
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+
+            {/* Unincluded Results (Unavailable courses) */}
+            {resultsLoading === 'done' &&
+              sortedUnIncludedResults.map((result) => (
+                <Row
+                  key={searchQueryLabel(result)}
+                  course={result}
+                  grades={grades[searchQueryLabel(result)]}
+                  rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
+                  inCompare={
+                    compare.findIndex((obj) =>
+                      searchQueryEqual(obj, result),
+                    ) !== -1
+                  }
+                  addToCompare={addToCompare}
+                  removeFromCompare={removeFromCompare}
+                  color={colorMap[searchQueryLabel(result)]}
+                  showTutorial={false /*index === numSearches*/}
+                />
+              ))}
           </TableBody>
         </Table>
       </TableContainer>

@@ -1,4 +1,4 @@
-import { Card, Grid2 as Grid } from '@mui/material';
+import { Card } from '@mui/material';
 import type { NextPage, NextPageContext } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -33,6 +33,7 @@ import {
   searchQueryEqual,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
+import type { SectionsType } from '@/modules/SectionsType/SectionsType';
 import useGradeStore from '@/modules/useGradeStore/useGradeStore';
 import useRmpStore from '@/modules/useRmpStore/useRmpStore';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
@@ -187,6 +188,9 @@ export async function getServerSideProps(
 }
 
 interface Props {
+  sections: {
+    [key: string]: GenericFetchedData<SectionsType>;
+  };
   pageTitle: string;
   grades: {
     [key: string]: GenericFetchedData<GradesType>;
@@ -195,6 +199,10 @@ interface Props {
     course: SearchQuery,
     controller: AbortController,
   ) => Promise<GradesType | null>;
+  fetchAndStoreSectionsData: (
+    combo: SearchQuery,
+    controller: AbortController,
+  ) => void;
   recalcGrades: (course: SearchQuery) => void;
   recalcAllGrades: (results: SearchQuery[], academicSessions: string[]) => void;
   rmp: {
@@ -353,6 +361,13 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     //Grade data
     //Fetch each result
     for (const result of results) {
+      // combo section data?
+      const sectEntry = props.sections[searchQueryLabel(result)];
+      //Not already loading
+      if (typeof sectEntry === 'undefined' || sectEntry.state === 'error') {
+        props.fetchAndStoreSectionsData(result, controller);
+      }
+
       const entry = props.grades[searchQueryLabel(result)];
       //Not already loading
       if (typeof entry === 'undefined' || entry.state === 'error') {
@@ -414,10 +429,68 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
 
   //Filtered results
   let includedResults: SearchQuery[] = [];
+  let unIncludedResults: SearchQuery[] = [];
 
   //Filter results based on gpa, rmp, and rmp difficulty
   if (router.isReady) {
     includedResults = (results.state === 'done' ? results.data : []).filter(
+      (result) => {
+        //Remove if over threshold
+        const courseGrades = props.grades[searchQueryLabel(result)];
+        const courseSection = props.sections[searchQueryLabel(result)];
+        if (
+          typeof courseGrades !== 'undefined' &&
+          courseGrades.state === 'done' &&
+          courseGrades.data.filtered.gpa === -1 &&
+          !(
+            typeof courseSection !== 'undefined' &&
+            courseSection.state === 'done' &&
+            router.query.availability === 'true' &&
+            courseSection.data.latest.length
+          )
+        ) {
+          return false;
+        }
+        if (
+          typeof router.query.minGPA === 'string' &&
+          typeof courseGrades !== 'undefined' &&
+          courseGrades.state === 'done' &&
+          courseGrades.data.filtered.gpa < parseFloat(router.query.minGPA)
+        ) {
+          return false;
+        }
+        const courseRmp =
+          props.rmp[searchQueryLabel(convertToProfOnly(result))];
+        if (
+          typeof router.query.minRating === 'string' &&
+          typeof courseRmp !== 'undefined' &&
+          courseRmp.state === 'done' &&
+          courseRmp.data.avgRating < parseFloat(router.query.minRating)
+        ) {
+          return false;
+        }
+        if (
+          typeof router.query.maxDiff === 'string' &&
+          typeof courseRmp !== 'undefined' &&
+          courseRmp.state === 'done' &&
+          courseRmp.data.avgDifficulty > parseFloat(router.query.maxDiff)
+        ) {
+          return false;
+        }
+
+        if (
+          router.query.availability === 'true' &&
+          typeof courseSection !== 'undefined' &&
+          courseSection.state === 'done' &&
+          !courseSection.data.latest.length
+        ) {
+          return false;
+        }
+
+        return true;
+      },
+    );
+    unIncludedResults = (results.state === 'done' ? results.data : []).filter(
       (result) => {
         //Remove if over threshold
         const courseGrades = props.grades[searchQueryLabel(result)];
@@ -454,11 +527,24 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         ) {
           return false;
         }
+        const courseSection = props.sections[searchQueryLabel(result)];
+        if (
+          !(
+            router.query.availability === 'true' &&
+            typeof courseSection !== 'undefined' &&
+            courseSection.state === 'done' &&
+            !courseSection.data.latest.length
+          )
+        ) {
+          return false;
+        }
+
         return true;
       },
     );
   } else {
     includedResults = results.state === 'done' ? results.data : [];
+    unIncludedResults = [];
   }
 
   //List of course+prof combos saved for comparison
@@ -587,6 +673,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         resultsLoading={results.state}
         numSearches={courses.length + professors.length}
         includedResults={includedResults}
+        unIncludedResults={unIncludedResults}
         grades={props.grades}
         rmp={props.rmp}
         compare={compare}
@@ -604,17 +691,12 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     );
     contentComponent = (
       <>
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-            <Filters
-              manageQuery
-              academicSessions={academicSessions}
-              chosenSessions={chosenSessions}
-              addChosenSessions={addChosenSessions}
-            />
-          </Grid>
-          <Grid size={{ xs: false, sm: 6, md: 6 }}></Grid>
-        </Grid>
+        <Filters
+          manageQuery
+          academicSessions={academicSessions}
+          chosenSessions={chosenSessions}
+          addChosenSessions={addChosenSessions}
+        />
         <div className="sm:hidden">
           <div data-tutorial-id="LHS"> {carousel} </div>
           <div data-tutorial-id="RHS"> {searchResultsTable} </div>
