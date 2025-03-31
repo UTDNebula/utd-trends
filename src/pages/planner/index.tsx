@@ -68,7 +68,7 @@ interface Props {
 
 export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
   const planner = props.planner;
-  const [openIndex, setOpenIndex] = useState(-1);
+  const [openIndex, setOpenIndex] = useState(0);
   useEffect(() => {
     if (planner.length) {
       //To cancel on rerender

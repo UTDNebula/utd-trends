@@ -11,6 +11,7 @@ import { DAYS, START_HOUR } from './PlannerSchedule';
 type PlannerSectionComponentProps = {
   selectedSection: SectionsData[number];
   course: SearchQuery;
+  color: string;
   selected: boolean;
 };
 
@@ -60,7 +61,6 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
           startRow.toString(),
           lengthPercentHour.toString(),
           offsetTotalPercent.toString(),
-          props.selected.toString(),
         ]);
       }
     }
@@ -76,11 +76,12 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
           '--start-row': x[1],
           '--height': x[2] + '%',
           '--offset': x[3] + '%',
+          '--color': props.color,
           '--opacity': props.selected ? '1' : '0.5',
-          '--h-opacity': props.selected ? '0.9' : '0.75',
+          '--h-opacity': props.selected ? '1' : '0.75',
         } as React.CSSProperties
       }
-      className={`col-start-[var(--start-col)] col-span-1 row-start-[var(--start-row)] row-span-1 relative top-[var(--offset)] h-[var(--height)] overflow-visible rounded-lg bg-purple-800 opacity-[var(--opacity)] hover:opacity-[var(--h-opacity)]`}
+      className={`col-start-[var(--start-col)] col-span-1 row-start-[var(--start-row)] row-span-1 relative top-[var(--offset)] h-[var(--height)] overflow-visible rounded-lg bg-[var(--color)] opacity-[var(--opacity)] hover:opacity-[var(--h-opacity)]`}
     >
       <div>{searchQueryLabel(props.course)}</div>
       <div>{props.selectedSection.section_number}</div>

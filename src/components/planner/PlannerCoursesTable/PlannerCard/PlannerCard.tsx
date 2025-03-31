@@ -23,7 +23,7 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
-import React, { type Dispatch, type SetStateAction,useState } from 'react';
+import React, { useState } from 'react';
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
@@ -187,7 +187,6 @@ function SectionTableRow(props: SectionTableRowProps) {
 }
 
 type PlannerCardProps = {
-  courseInd: number;
   query: SearchQuery;
   sections?: SectionsData;
   setPlannerSection: (
@@ -196,12 +195,11 @@ type PlannerCardProps = {
   ) => boolean;
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RMPInterface>;
-  openIndex: number;
-  setOpenIndex: Dispatch<SetStateAction<number>>;
   removeFromPlanner: () => void;
 };
 
 const PlannerCard = (props: PlannerCardProps) => {
+  const [open, setOpen] = useState(false);
   //appease the typescript gods
   const sections = props.sections;
   const canOpenSections =
@@ -217,7 +215,7 @@ const PlannerCard = (props: PlannerCardProps) => {
       (whichOpen === 'sections' && canOpenSections) ||
       (whichOpen === 'grades' && canOpenGrades)
     ) {
-      props.setOpenIndex((props.openIndex == props.courseInd) ? -1 : props.courseInd);
+      setOpen(!open);
     }
   }
 
@@ -242,7 +240,7 @@ const PlannerCard = (props: PlannerCardProps) => {
       >
         <div className="flex items-center">
           <Tooltip
-            title={`${(props.openIndex == props.courseInd) ? 'Minimize' : 'Expand'} ${whichOpen === 'sections' ? 'Sections' : 'Grades and RMP'}`}
+            title={`${open ? 'Minimize' : 'Expand'} ${whichOpen === 'sections' ? 'Sections' : 'Grades and RMP'}`}
             placement="top"
           >
             <IconButton
@@ -253,7 +251,7 @@ const PlannerCard = (props: PlannerCardProps) => {
                 handleOpen();
               }}
               disabled={!canOpenSections && !canOpenGrades}
-              className={'transition-transform' + (props.openIndex == props.courseInd ? ' rotate-90' : '')}
+              className={'transition-transform' + (open ? ' rotate-90' : '')}
             >
               <KeyboardArrowIcon fontSize="inherit" />
             </IconButton>
@@ -280,7 +278,7 @@ const PlannerCard = (props: PlannerCardProps) => {
                 if (newValue === 'grades' && canOpenGrades) {
                   setWhichOpen('grades');
                 }
-                props.setOpenIndex(props.courseInd);
+                setOpen(true);
               }}
               size="small"
               aria-label="dropdown switch"
@@ -310,7 +308,7 @@ const PlannerCard = (props: PlannerCardProps) => {
       </div>
       {canOpenSections && (
         <Collapse
-          in={(props.openIndex == props.courseInd) && whichOpen === 'sections'}
+          in={open && whichOpen === 'sections'}
           timeout="auto"
           unmountOnExit
         >
@@ -336,7 +334,7 @@ const PlannerCard = (props: PlannerCardProps) => {
       )}
       {canOpenGrades && (
         <Collapse
-          in={(props.openIndex == props.courseInd) && whichOpen === 'grades'}
+          in={open && whichOpen === 'grades'}
           timeout="auto"
           unmountOnExit
         >
