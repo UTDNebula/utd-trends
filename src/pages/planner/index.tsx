@@ -143,6 +143,25 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
   if (results.state === 'done' && !results.data.length) {
     contentComponent = <MyPlannerEmpty />;
   } else {
+    const selectedSections =
+      results.state === 'done'
+        ? results.data
+            .map((course) => {
+              const sectionData =
+                props.sections[searchQueryLabel(removeSection(course))];
+              if (
+                typeof sectionData !== 'undefined' &&
+                sectionData.state === 'done'
+              ) {
+                const chosenSectionForCourse = sectionData.data.latest.find(
+                  (section) => section.section_number === course.sectionNumber,
+                );
+                return chosenSectionForCourse as SectionsData[number];
+              }
+            })
+            .filter((section) => typeof section !== 'undefined')
+        : [];
+
     const plannerCoursesTable = (
       <PlannerCoursesTable
         courses={results.state === 'done' ? results.data : []}
@@ -152,6 +171,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
         sections={props.sections}
         grades={props.grades}
         rmp={props.rmp}
+        selectedSections={selectedSections}
       />
     );
 
@@ -181,30 +201,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
             <div className="sticky top-4 mt-4">
               <PlannerSchedule
                 courses={results.state === 'done' ? results.data : []}
-                selectedSections={
-                  results.state === 'done'
-                    ? results.data
-                        .map((course) => {
-                          const sectionData =
-                            props.sections[
-                              searchQueryLabel(removeSection(course))
-                            ];
-                          if (
-                            typeof sectionData !== 'undefined' &&
-                            sectionData.state === 'done'
-                          ) {
-                            const chosenSectionForCourse =
-                              sectionData.data.latest.find(
-                                (section) =>
-                                  section.section_number ===
-                                  course.sectionNumber,
-                              );
-                            return chosenSectionForCourse as SectionsData[number];
-                          }
-                        })
-                        .filter((section) => typeof section !== 'undefined')
-                    : []
-                }
+                selectedSections={selectedSections}
               />
             </div>
           </Panel>
