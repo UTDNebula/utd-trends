@@ -6,7 +6,7 @@ import {
 } from '@/modules/SearchQuery/SearchQuery';
 import type { SectionsData } from '@/pages/api/sections';
 
-import { DAYS, numDays, START_HOUR } from './PlannerSchedule';
+import { DAYS, START_HOUR } from './PlannerSchedule';
 
 type PlannerSectionComponentProps = {
   selectedSection: SectionsData[number];
