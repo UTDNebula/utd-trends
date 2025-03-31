@@ -1,14 +1,12 @@
 import React from 'react';
 
+import { type GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import {
+  removeSection,
   type SearchQuery,
   searchQueryLabel,
-  searchQueryMultiSectionSplit,
-  removeSection,
 } from '@/modules/SearchQuery/SearchQuery';
-import type { SectionsData } from '@/pages/api/sections';
 import { type SectionsType } from '@/modules/SectionsType/SectionsType';
-import { type GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 
 import PlannerSection from './PlannerSection';
 
@@ -75,14 +73,23 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
         <HourRow key={i} hour={i + START_HOUR} />
       ))}
 
-      {props.courses.map((course, i) => (
-        <PlannerSection
-          key={searchQueryLabel(course)}
-          selectedSection={props.sections[searchQueryLabel(removeSection(course))]?.data.latest.find((section) => section.section_number === course.sectionNumber)}
-          course={course}
-          color={colors[i % 9]}
-        />
-      ))}
+      {props.courses.map((course, i) => {
+        const sections =
+          props.sections[searchQueryLabel(removeSection(course))];
+        if (sections.state !== 'done') {
+          return null;
+        }
+        return (
+          <PlannerSection
+            key={searchQueryLabel(course)}
+            selectedSection={sections.data.latest.find(
+              (section) => section.section_number === course.sectionNumber,
+            )}
+            course={course}
+            color={colors[i % 9]}
+          />
+        );
+      })}
     </div>
   );
 };
