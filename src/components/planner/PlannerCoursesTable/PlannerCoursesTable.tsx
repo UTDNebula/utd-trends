@@ -11,25 +11,24 @@ import {
   removeSection,
   type SearchQuery,
   searchQueryLabel,
+  type SearchQueryMultiSection,
+  searchQueryMultiSectionSplit,
 } from '@/modules/SearchQuery/SearchQuery';
+import sectionCanOverlap from '@/modules/sections/sections';
 import { type SectionsType } from '@/modules/SectionsType/SectionsType';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import { type SectionsData } from '@/pages/api/sections';
 
 type PlannerCoursesTableProps = {
-  courses?: SearchQuery[];
+  courses: SearchQueryMultiSection[];
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
-  setPlannerSection: (
-    searchQuery: SearchQuery,
-    section: string | undefined,
-  ) => boolean;
+  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
   sections: {
     [key: string]: GenericFetchedData<SectionsType>;
   };
   grades: { [key: string]: GenericFetchedData<GradesType> };
   rmp: { [key: string]: GenericFetchedData<RMPInterface> };
-  selectedSections: SectionsData;
+  colorMap: { [key: string]: { fill: string; outline: string; font: string } };
 };
 
 const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
@@ -65,7 +64,14 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                     typeof sectionData === 'undefined' ||
                     sectionData.state === 'error'
                       ? undefined
-                      : sectionData.data.latest
+                      : sectionData.data.latest.filter((section) => {
+                          if (
+                            typeof course.profFirst === 'undefined' &&
+                            typeof course.profLast === 'undefined'
+                          ) {
+                            return sectionCanOverlap(section.section_number);
+                          } else return true;
+                        })
                   }
                   setPlannerSection={props.setPlannerSection}
                   grades={props.grades[searchQueryLabel(removeSection(course))]}
@@ -73,8 +79,29 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                   removeFromPlanner={() => {
                     props.removeFromPlanner(course);
                   }}
-                  selectedSections={props.selectedSections}
+                  selectedSections={props.courses
+                    .flatMap((searchQuery) =>
+                      searchQueryMultiSectionSplit(searchQuery),
+                    )
+                    .map((course) => {
+                      const sections =
+                        props.sections[searchQueryLabel(removeSection(course))];
+                      if (
+                        typeof sections === 'undefined' ||
+                        sections.state !== 'done'
+                      ) {
+                        return undefined;
+                      }
+                      return sections.data.latest.find(
+                        (section) =>
+                          section.section_number === course.sectionNumber,
+                      );
+                    })
+                    .filter((section) => typeof section !== 'undefined')}
                   openConflictMessage={() => setOpenConflictMessage(true)}
+                  color={
+                    props.colorMap[searchQueryLabel(removeSection(course))]
+                  }
                 />
               );
             })

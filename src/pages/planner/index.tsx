@@ -12,6 +12,7 @@ import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/MyPlannerEmpty';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
 import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedule';
+import { plannerColors } from '@/modules/colors/colors';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
@@ -20,10 +21,11 @@ import {
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
+  type SearchQueryMultiSection,
+  searchQueryMultiSectionSplit,
 } from '@/modules/SearchQuery/SearchQuery';
 import type { SectionsType } from '@/modules/SectionsType/SectionsType';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import type { SectionsData } from '@/pages/api/sections';
 
 function removeDuplicates(array: SearchQuery[]) {
   return array.filter(
@@ -32,17 +34,27 @@ function removeDuplicates(array: SearchQuery[]) {
   );
 }
 
+function createColorMap(courses: SearchQuery[]): {
+  [key: string]: { fill: string; outline: string; font: string };
+} {
+  const colorMap: {
+    [key: string]: { fill: string; outline: string; font: string };
+  } = {};
+  courses.forEach((course, index) => {
+    colorMap[searchQueryLabel(course)] =
+      plannerColors[index % plannerColors.length];
+  });
+  return colorMap;
+}
+
 interface Props {
-  planner: SearchQuery[];
+  planner: SearchQueryMultiSection[];
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
   grades: {
     [key: string]: GenericFetchedData<GradesType>;
   };
-  setPlannerSection: (
-    searchQuery: SearchQuery,
-    section: string | undefined,
-  ) => boolean;
+  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
   fetchAndStoreGradesData: (
     course: SearchQuery,
     controller: AbortController,
@@ -117,9 +129,8 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
       };
     }
   }, [planner]);
-  console.log(/*props.grades, props.rmp, */ props.sections);
 
-  let results: GenericFetchedData<SearchQuery[]> = {
+  let results: GenericFetchedData<SearchQueryMultiSection[]> = {
     state: 'loading',
   };
   if (planner.length) {
@@ -129,6 +140,12 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
     };
   }
   console.log('COURSES IN PLANNER: ', results);
+
+  const colorMap = createColorMap(
+    results.state === 'done'
+      ? results.data.map((searchQuery) => removeSection(searchQuery))
+      : [],
+  );
 
   const panelLRef = useRef<ImperativePanelHandle>(null);
   const panelRRef = useRef<ImperativePanelHandle>(null);
@@ -143,25 +160,6 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
   if (results.state === 'done' && !results.data.length) {
     contentComponent = <MyPlannerEmpty />;
   } else {
-    const selectedSections =
-      results.state === 'done'
-        ? results.data
-            .map((course) => {
-              const sectionData =
-                props.sections[searchQueryLabel(removeSection(course))];
-              if (
-                typeof sectionData !== 'undefined' &&
-                sectionData.state === 'done'
-              ) {
-                const chosenSectionForCourse = sectionData.data.latest.find(
-                  (section) => section.section_number === course.sectionNumber,
-                );
-                return chosenSectionForCourse as SectionsData[number];
-              }
-            })
-            .filter((section) => typeof section !== 'undefined')
-        : [];
-
     const plannerCoursesTable = (
       <PlannerCoursesTable
         courses={results.state === 'done' ? results.data : []}
@@ -171,7 +169,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
         sections={props.sections}
         grades={props.grades}
         rmp={props.rmp}
-        selectedSections={selectedSections}
+        colorMap={colorMap}
       />
     );
 
@@ -200,8 +198,15 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
           >
             <div className="sticky top-4 mt-4">
               <PlannerSchedule
-                courses={results.state === 'done' ? results.data : []}
-                selectedSections={selectedSections}
+                courses={
+                  results.state === 'done'
+                    ? results.data.flatMap((searchQuery) =>
+                        searchQueryMultiSectionSplit(searchQuery),
+                      )
+                    : []
+                }
+                sections={props.sections}
+                colorMap={colorMap}
               />
             </div>
           </Panel>
@@ -230,11 +235,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
         />
       </Head>
       <div className="w-full bg-light h-full">
-        <TopMenu
-          resultsLoading={results.state}
-          setResultsLoading={() => {}}
-          isPlanner={true}
-        />
+        <TopMenu isPlanner />
         <main className="p-4">{contentComponent}</main>
       </div>
     </>

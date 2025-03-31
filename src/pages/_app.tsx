@@ -18,7 +18,9 @@ import {
   removeSection,
   type SearchQuery,
   searchQueryEqual,
+  type SearchQueryMultiSection,
 } from '@/modules/SearchQuery/SearchQuery';
+import sectionCanOverlap from '@/modules/sections/sections';
 import useGradeStore from '@/modules/useGradeStore/useGradeStore';
 import usePersistantState from '@/modules/usePersistantState/usePersistantState';
 import useRmpStore from '@/modules/useRmpStore/useRmpStore';
@@ -155,7 +157,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const [rmp, , fetchAndStoreRmpData] = useRmpStore();
 
   //Store course+prof combos in planner
-  const [planner, setPlanner] = usePersistantState<SearchQuery[]>(
+  const [planner, setPlanner] = usePersistantState<SearchQueryMultiSection[]>(
     'planner',
     [],
   );
@@ -178,18 +180,34 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   }
 
-  function setPlannerSection(
-    searchQuery: SearchQuery,
-    section: string | undefined,
-  ) {
+  function setPlannerSection(searchQuery: SearchQuery, section: string) {
     setPlanner(
       planner.map((course) => {
-        return searchQueryEqual(
-          removeSection(course),
-          removeSection(searchQuery),
-        )
-          ? { ...course, sectionNumber: section }
-          : course;
+        if (
+          searchQueryEqual(removeSection(course), removeSection(searchQuery))
+        ) {
+          if (typeof course.sectionNumbers === 'undefined') {
+            return { ...course, sectionNumbers: [section] };
+          }
+          if (course.sectionNumbers.includes(section)) {
+            return {
+              ...course,
+              sectionNumbers: course.sectionNumbers.filter(
+                (s) => s !== section,
+              ),
+            };
+          } else {
+            let newSections = course.sectionNumbers;
+            if (!sectionCanOverlap(section)) {
+              newSections = newSections.filter((s) => sectionCanOverlap(s));
+            }
+            return {
+              ...course,
+              sectionNumbers: newSections.concat([section]),
+            };
+          }
+        }
+        return course;
       }),
     );
   }

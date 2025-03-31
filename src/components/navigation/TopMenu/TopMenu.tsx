@@ -1,5 +1,6 @@
 import { Share } from '@mui/icons-material';
-import { IconButton, Snackbar, Tooltip } from '@mui/material';
+import BookIcon from '@mui/icons-material/Book';
+import { Button, IconButton, Snackbar, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -11,21 +12,21 @@ import SearchBar from '@/components/search/SearchBar/SearchBar';
 /**
  * Props type used by the TopMenu component
  */
-interface TopMenuProps {
+type DashboardTopMenuProps = {
   resultsLoading: 'loading' | 'done' | 'error';
   setResultsLoading: () => void;
-  isPlanner: boolean;
-}
+  isPlanner: false;
+};
+type PlannerTopMenuProps = {
+  isPlanner: true;
+};
+type TopMenuProps = DashboardTopMenuProps | PlannerTopMenuProps;
 
 /**
  * This is a component to hold UTD Trends branding and basic navigation
  * @returns
  */
-export function TopMenu({
-  resultsLoading,
-  setResultsLoading,
-  isPlanner,
-}: TopMenuProps) {
+export function TopMenu(props: TopMenuProps) {
   const router = useRouter();
   const [openCopied, setOpenCopied] = useState(false);
 
@@ -71,20 +72,44 @@ export function TopMenu({
         >
           UTD TRENDS
         </Link>
-        <SearchBar
-          manageQuery="onSelect"
-          resultsLoading={resultsLoading}
-          setResultsLoading={setResultsLoading}
-          className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
-          input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
-        />
+        {!props.isPlanner && (
+          <SearchBar
+            manageQuery="onSelect"
+            resultsLoading={props.resultsLoading}
+            setResultsLoading={props.setResultsLoading}
+            className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
+            input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+          />
+        )}
         <Link
-          className="bg-cornflower-400"
-          href={isPlanner ? '/dashboard' : '/planner'}
+          href={
+            props.isPlanner
+              ? typeof sessionStorage !== 'undefined' &&
+                sessionStorage.getItem('dashboardSearchTerms')
+                ? '/dashboard?searchTerms=' +
+                  sessionStorage
+                    .getItem('dashboardSearchTerms')
+                    ?.replace(' ', '+')
+                    .replace(',', '%2C')
+                : '/'
+              : '/planner'
+          }
+          onClick={() =>
+            !props.isPlanner
+              ? sessionStorage.setItem(
+                  'dashboardSearchTerms',
+                  router.query.searchTerms?.toString() ?? '',
+                )
+              : null
+          }
+          className="ml-auto rounded-xl"
         >
-          {isPlanner ? 'Search Results' : 'My Planner'}
+          <Button className="bg-cornflower-500 rounded-xl text-white dark:bg-cornflower-400 text p-2 px-4 normal-case">
+            <BookIcon className="mr-2" />
+            {props.isPlanner ? 'Search Results' : 'My Planner'}
+          </Button>
         </Link>
-        <Tooltip title="Share link to search" className="ml-auto">
+        <Tooltip title="Share link to search">
           <IconButton
             className="aspect-square"
             size="medium"
