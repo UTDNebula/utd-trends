@@ -146,7 +146,10 @@ function SectionTableRow(props: SectionTableRowProps) {
             if (!isSelected) {
               props.setPlannerSection(props.course, props.data.section_number);
             } else {
-              props.setPlannerSection(props.course, props.cardOpen ? 'all' : undefined);
+              props.setPlannerSection(
+                props.course,
+                props.cardOpen ? 'all' : undefined,
+              );
             }
           }}
         />
@@ -211,18 +214,23 @@ const PlannerCard = (props: PlannerCardProps) => {
   const [whichOpen, setWhichOpen] = useState<'sections' | 'grades' | null>(
     canOpenSections ? 'sections' : canOpenGrades ? 'grades' : null,
   );
-  useEffect (()=>{
-    console.log("checking")
-    if (typeof props.query.sectionNumber === 'undefined' || props.query.sectionNumber === 'all') {
-      props.setPlannerSection(props.query, !open ? 'all' : undefined);
+  useEffect(() => {
+    if (
+      typeof props.query.sectionNumber === 'undefined' ||
+      props.query.sectionNumber === 'all'
+    ) {
+      props.setPlannerSection(props.query, undefined);
     }
-  }, [])
+  }, []);
   function handleOpen() {
     if (
       (whichOpen === 'sections' && canOpenSections) ||
       (whichOpen === 'grades' && canOpenGrades)
     ) {
-      if (typeof props.query.sectionNumber === 'undefined' || props.query.sectionNumber === 'all') {
+      if (
+        typeof props.query.sectionNumber === 'undefined' ||
+        props.query.sectionNumber === 'all'
+      ) {
         props.setPlannerSection(props.query, !open ? 'all' : undefined);
       }
       setOpen(!open);

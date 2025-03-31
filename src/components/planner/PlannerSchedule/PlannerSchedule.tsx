@@ -27,7 +27,12 @@ export const DAYS = [
 
 type PlannerScheduleProps = {
   courses: SearchQuery[];
-  selectedSections: {course: SearchQuery, section: SectionData, color: string, selected: boolean}[];
+  selectedSections: {
+    course: SearchQuery;
+    section: SectionData;
+    color: string;
+    selected: boolean;
+  }[];
 };
 
 const PlannerSchedule = (props: PlannerScheduleProps) => {
@@ -60,9 +65,7 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
         <PlannerSection
           key={i}
           selectedSection={x.section}
-          course={
-            x.course
-          }
+          course={x.course}
           color={x.color}
           selected={x.selected}
         />

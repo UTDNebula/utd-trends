@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import React, { useEffect, useRef} from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   type ImperativePanelHandle,
   Panel,
@@ -8,7 +8,7 @@ import {
   PanelResizeHandle,
 } from 'react-resizable-panels';
 
-import TopMenu from '@/components/navigation/topMenu/TopMenu';
+import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/MyPlannerEmpty';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
 import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedule';
@@ -195,7 +195,14 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
                             sectionData.state === 'done'
                           ) {
                             if (course.sectionNumber === 'all') {
-                              return sectionData.data.latest.map((sect)=>{return {course: course, section: sect as SectionData, color:"#ff0000", selected:false}})
+                              return sectionData.data.latest.map((sect) => {
+                                return {
+                                  course: course,
+                                  section: sect as SectionData,
+                                  color: '#ff0000',
+                                  selected: false,
+                                };
+                              });
                             }
                             const chosenSectionForCourse =
                               sectionData.data.latest.find(
@@ -204,9 +211,13 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
                                   course.sectionNumber,
                               );
                             if (typeof chosenSectionForCourse != 'undefined') {
-                              return {course: course, section: chosenSectionForCourse as SectionData, color:"#ff0000", selected:true};
+                              return {
+                                course: course,
+                                section: chosenSectionForCourse as SectionData,
+                                color: '#ff0000',
+                                selected: true,
+                              };
                             }
-                            
                           }
                         })
                         .filter((section) => typeof section !== 'undefined')
