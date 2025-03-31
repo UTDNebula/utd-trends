@@ -298,8 +298,6 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
   const [academicSessions, setAcademicSessions] = useState<string[]>([]);
   //Selected sessions to perform calculations with, starts as all of them
   const [chosenSessions, setChosenSessions] = useState<string[]>([]);
-  // is the recent filter on?
-  const [recent, setRecent] = useState<boolean>(false);
 
   //A wrapper on the setter function for chosenSessions that also recalculates GPA and such data for saved grade data based on the new set of chosen sessions
   function addChosenSessions(func: (arg0: string[]) => string[]) {
@@ -444,15 +442,6 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
           courseGrades.state === 'done' &&
           courseGrades.data.filtered.gpa === -1
         ) {
-          const courseSection = props.sections[searchQueryLabel(result)];
-          if (
-            recent &&
-            typeof courseSection !== 'undefined' &&
-            courseSection.state === 'done' &&
-            courseSection.data.latest.length
-          ) {
-            return true;
-          }
           return false;
         }
         if (
@@ -702,8 +691,6 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
               academicSessions={academicSessions}
               chosenSessions={chosenSessions}
               addChosenSessions={addChosenSessions}
-              recent={recent}
-              setRecent={setRecent}
             />
           </Grid>
           <Grid size={{ xs: false, sm: 6, md: 6 }}></Grid>

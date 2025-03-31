@@ -10,12 +10,7 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { useRouter } from 'next/router';
-import React, {
-  type Dispatch,
-  type SetStateAction,
-  useEffect,
-  useState,
-} from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Rating from '@/components/common/Rating/Rating';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
@@ -27,8 +22,6 @@ interface FiltersProps {
   manageQuery?: boolean;
   academicSessions: string[];
   chosenSessions: string[];
-  recent: boolean;
-  setRecent: Dispatch<SetStateAction<boolean>>;
   addChosenSessions: (arg0: (arg0: string[]) => string[]) => void;
 }
 
@@ -40,7 +33,6 @@ const Filters = ({
   academicSessions,
   chosenSessions,
   addChosenSessions,
-  setRecent,
 }: FiltersProps) => {
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
@@ -65,14 +57,7 @@ const Filters = ({
         }
       }
     }
-  }, [
-    manageQuery,
-    router.isReady,
-    router.query.availability,
-    router.query.minGPA,
-    router.query.minRating,
-    router.query.searchTerms,
-  ]);
+  }, [router.isReady, router.query.minGPA, router.query.minRating]);
 
   function getRecentSemesters() {
     // get current month and year
@@ -272,11 +257,6 @@ const Filters = ({
                 }
               } else {
                 addChosenSessions(() => value as string[]);
-              }
-              if (value.includes('recent')) {
-                setRecent(true);
-              } else {
-                setRecent(false);
               }
             }}
             renderValue={(selected) => {
