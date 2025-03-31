@@ -54,12 +54,14 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                     typeof sectionData === 'undefined' ||
                     sectionData.state === 'error'
                       ? undefined
-                      : sectionData.data.latest.filter(
-                          (section) =>
+                      : sectionData.data.latest.filter((section) => {
+                          if (
                             typeof course.profFirst === 'undefined' &&
-                            typeof course.profLast === 'undefined' &&
-                            sectionCanOverlap(section.section_number),
-                        )
+                            typeof course.profLast === 'undefined'
+                          ) {
+                            return sectionCanOverlap(section.section_number);
+                          } else return true;
+                        })
                   }
                   setPlannerSection={props.setPlannerSection}
                   grades={props.grades[searchQueryLabel(removeSection(course))]}
