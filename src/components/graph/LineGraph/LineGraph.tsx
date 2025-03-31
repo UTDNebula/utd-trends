@@ -114,7 +114,7 @@ const LineGraph = (props: Props): JSX.Element => {
     if (i !== parseInt(minSemester) || minSemester.includes('S')) {
       allSemesters.push(i + 'S');
     }
-    if (i !== parseInt(maxSemester) || minSemester.includes('F')) {
+    if (i !== parseInt(maxSemester) || maxSemester.includes('F')) {
       allSemesters.push(i + 'F');
     }
   }
@@ -151,11 +151,22 @@ const LineGraph = (props: Props): JSX.Element => {
           !series.every((single) => single.data.length === 1),
       },
     },
+    grid: {
+      borderColor: theme.palette.mode === 'dark' ? '#404040' : '#e0e0e0',
+    },
     legend: {
       show: series.length !== 1,
     },
     xaxis: {
       categories: allSemesters,
+      tickAmount: allSemesters.length - 1, // Ensure all ticks are shown
+      labels: {
+        show: true,
+        rotate: -45, // Rotate labels if necessary to fit them
+        style: {
+          fontSize: '12px',
+        },
+      },
     },
     yaxis: {
       min: 1,
