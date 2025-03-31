@@ -1,6 +1,7 @@
 import BarChartIcon from '@mui/icons-material/BarChart';
 import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
+import EventIcon from '@mui/icons-material/Event';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Box,
@@ -16,6 +17,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -30,7 +33,9 @@ import {
   removeSection,
   type SearchQuery,
   searchQueryLabel,
+  type SearchQueryMultiSection,
 } from '@/modules/SearchQuery/SearchQuery';
+import sectionCanOverlap from '@/modules/sections/sections';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import { type SectionsData } from '@/pages/api/sections';
 
@@ -46,9 +51,18 @@ export function LoadingRow() {
             <KeyboardArrowIcon />
           </IconButton>
           <Checkbox checked={true} checkedIcon={<BookIcon />} disabled />
-          <IconButton size="medium" disabled>
-            <BarChartIcon />
-          </IconButton>
+          <ToggleButtonGroup
+            size="small"
+            aria-label="dropdown switch"
+            className="ml-2"
+          >
+            <ToggleButton value="" aria-label="sections" disabled>
+              <EventIcon />
+            </ToggleButton>
+            <ToggleButton value="" aria-label="grades and rmp" disabled>
+              <BarChartIcon />
+            </ToggleButton>
+          </ToggleButtonGroup>
         </div>
         <Typography className="w-1/2 leading-tight text-lg">
           <Skeleton />
@@ -80,6 +94,9 @@ function SectionTableHead(props: { hasMultipleDateRanges: boolean }) {
           <Typography className="text-white text-xs">Date Range</Typography>
         </TableCell>
       )}
+      <TableCell className="py-2 px-4 border-b-0">
+        <Typography className="text-white text-xs">Syllabus</Typography>
+      </TableCell>
     </TableRow>
   );
 }
@@ -93,7 +110,7 @@ function parseDateRange(meeting: SectionsData[number]['meetings'][number]) {
   return [formatted_start, formatted_end];
 }
 
-function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
+function meetingDays(days: string[]): string {
   function daySlice(day: string): string {
     if (day.slice(0, 1) === 'S') {
       return day.slice(0, 2);
@@ -105,11 +122,14 @@ function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
 
     return day.slice(0, 1);
   }
-  let days: string = '';
-  meeting.meeting_days.forEach((day) => {
-    days += daySlice(day);
+  let result: string = '';
+  days.forEach((day) => {
+    result += daySlice(day);
   });
+  return result;
+}
 
+function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
   function classTime(startTime: string, endTime: string): string {
     const startAmPm = startTime.slice(-2);
     const endAmPm = endTime.slice(-2);
@@ -119,7 +139,8 @@ function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
     return `${startTime.slice(0, -2)}-${endTime}`;
   }
   const time = classTime(meeting.start_time, meeting.end_time);
-  const schedule = `${days} ${time}`;
+
+  const schedule = `${meetingDays(meeting.meeting_days)} ${time}`;
   const location = `${meeting.location.building} ${meeting.location.room}`;
 
   return [schedule, location, meeting.location.map_uri];
@@ -127,36 +148,42 @@ function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
 
 type SectionTableRowProps = {
   data: SectionsData[number];
-  course: SearchQuery;
+  course: SearchQueryMultiSection;
   lastRow: boolean;
-  setPlannerSection: (
-    searchQuery: SearchQuery,
-    section: string | undefined,
-  ) => boolean;
+  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
   hasMultipleDateRanges: boolean;
 };
 
 function SectionTableRow(props: SectionTableRowProps) {
-  const isSelected = props.course.sectionNumber === props.data.section_number;
+  const isSelected =
+    props.course.sectionNumbers?.includes(props.data.section_number) ?? false;
+
   return (
     <TableRow>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-        <Radio
-          checked={isSelected}
-          onClick={() => {
-            if (!isSelected) {
+        {sectionCanOverlap(props.data.section_number) ? (
+          <Checkbox
+            checked={isSelected}
+            onClick={() => {
               props.setPlannerSection(props.course, props.data.section_number);
-            } else {
-              props.setPlannerSection(props.course, undefined);
-            }
-          }}
-        />
+            }}
+          />
+        ) : (
+          <Radio
+            checked={isSelected}
+            onClick={() => {
+              props.setPlannerSection(props.course, props.data.section_number);
+            }}
+          />
+        )}
       </TableCell>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-        <Typography>{props.data.section_number}</Typography>
+        <Typography className="text-sm">{props.data.section_number}</Typography>
       </TableCell>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-        <Typography>{props.data.internal_class_number}</Typography>
+        <Typography className="text-sm">
+          {props.data.internal_class_number}
+        </Typography>
       </TableCell>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
         {props.data.meetings
@@ -164,10 +191,10 @@ function SectionTableRow(props: SectionTableRowProps) {
           .map(([schedule, location, link], i) => (
             <div key={i}>
               {schedule !== ' -' && (
-                <Typography className="text-sm">{schedule}</Typography>
+                <Typography className="text-xs">{schedule}</Typography>
               )}
               {location !== ' ' && (
-                <Typography className="text-sm">
+                <Typography className="text-xs">
                   {link === '' ? (
                     location
                   ) : (
@@ -191,30 +218,57 @@ function SectionTableRow(props: SectionTableRowProps) {
             .map(([start_date, end_date], i) => (
               <div key={i}>
                 {start_date && end_date && (
-                  <Typography className="text-sm">{`${start_date} - ${end_date}`}</Typography>
+                  <Typography className="text-sm">{`${start_date}-${end_date}`}</Typography>
                 )}
               </div>
             ))}
         </TableCell>
       )}
+      <TableCell className={props.lastRow ? 'border-b-0' : ''}>
+        {props.data.syllabus_uri && (
+          <Link
+            href={props.data.syllabus_uri}
+            target="_blank"
+            className="underline text-xs text-blue-600 hover:text-blue-800 visited:text-purple-600"
+          >
+            View Syllabus
+          </Link>
+        )}
+      </TableCell>
     </TableRow>
   );
 }
 
+function MeetingChip(props: {
+  meetings: SectionsData[number]['meetings'] | undefined;
+}) {
+  if (typeof props.meetings === 'undefined') {
+    return null;
+  }
+  return (
+    <div className="ml-auto p-1 px-3 rounded-3xl border border-cornflower-300 bg-white dark:bg-gray-700 shadow-sm">
+      <Typography className="text-xs font-semibold text-center">
+        {meetingDays(props.meetings[0].meeting_days)}
+      </Typography>
+      <Typography className="text-xs text-center">
+        {props.meetings[0].start_time}
+      </Typography>
+    </div>
+  );
+}
+
 type PlannerCardProps = {
-  query: SearchQuery;
+  query: SearchQueryMultiSection;
   sections?: SectionsData;
-  setPlannerSection: (
-    searchQuery: SearchQuery,
-    section: string | undefined,
-  ) => boolean;
+  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RMPInterface>;
   removeFromPlanner: () => void;
 };
 
 const PlannerCard = (props: PlannerCardProps) => {
-  const [open, setOpen] = useState<'false' | 'sections' | 'grades'>('false');
+  const [open, setOpen] = useState(false);
+
   //appease the typescript gods
   const sections = props.sections;
   const canOpenSections =
@@ -222,19 +276,15 @@ const PlannerCard = (props: PlannerCardProps) => {
   const canOpenGrades =
     !(typeof props.grades === 'undefined' || props.grades.state === 'error') ||
     !(typeof props.rmp === 'undefined' || props.rmp.state === 'error');
-  function handleOpen(from: 'row' | 'sections' | 'grades') {
-    if (from === 'row' && open !== 'false') {
-      setOpen('false');
-    } else if (
-      open !== 'sections' &&
-      (from === 'sections' || from === 'row') &&
-      canOpenSections
+  const [whichOpen, setWhichOpen] = useState<'sections' | 'grades' | null>(
+    canOpenSections ? 'sections' : canOpenGrades ? 'grades' : null,
+  );
+  function handleOpen() {
+    if (
+      (whichOpen === 'sections' && canOpenSections) ||
+      (whichOpen === 'grades' && canOpenGrades)
     ) {
-      setOpen('sections');
-    } else if (open !== 'grades' && from === 'grades' && canOpenGrades) {
-      setOpen('grades');
-    } else {
-      setOpen('false');
+      setOpen(!open);
     }
   }
 
@@ -257,39 +307,35 @@ const PlannerCard = (props: PlannerCardProps) => {
       <div
         role="button"
         tabIndex={0}
-        onClick={() => handleOpen('row')} // opens/closes the card by clicking anywhere on the row
+        onClick={() => handleOpen()} // opens/closes the card by clicking anywhere on the row
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
-            handleOpen('row');
+            handleOpen();
           }
         }}
         className={
           'p-4 flex items-center gap-4' +
-          (canOpenSections ? ' cursor-pointer' : '')
+          (canOpenSections || canOpenGrades ? ' cursor-pointer' : '')
         }
       >
+        {/* Left-side Content */}
         <div className="flex items-center">
           <Tooltip
-            title={open === 'sections' ? 'Minimize Result' : 'Expand Result'}
+            title={`${open ? 'Minimize' : 'Expand'} ${whichOpen === 'sections' ? 'Sections' : 'Grades and RMP'}`}
             placement="top"
           >
-            <span>
-              <IconButton
-                aria-label="expand row"
-                size="medium"
-                onClick={(e) => {
-                  e.stopPropagation(); // prevents double opening/closing
-                  handleOpen('sections');
-                }}
-                disabled={!canOpenSections}
-                className={
-                  'transition-transform' +
-                  (open === 'sections' ? ' rotate-90' : '')
-                }
-              >
-                <KeyboardArrowIcon fontSize="inherit" />
-              </IconButton>
-            </span>
+            <IconButton
+              aria-label="expand row"
+              size="medium"
+              onClick={(e) => {
+                e.stopPropagation(); // prevents double opening/closing
+                handleOpen();
+              }}
+              disabled={!canOpenSections && !canOpenGrades}
+              className={'transition-transform' + (open ? ' rotate-90' : '')}
+            >
+              <KeyboardArrowIcon fontSize="inherit" />
+            </IconButton>
           </Tooltip>
           <Tooltip title={'Remove from Planner'} placement="top">
             <Checkbox
@@ -302,30 +348,61 @@ const PlannerCard = (props: PlannerCardProps) => {
               checkedIcon={<BookIcon />}
             />
           </Tooltip>
-          <Tooltip
-            title={open === 'grades' ? 'Minimize Grades' : 'Expand Grades'}
-            placement="top"
-          >
-            <span>
-              <IconButton
-                size="medium"
-                onClick={(e) => {
-                  e.stopPropagation(); // prevents double opening/closing
-                  handleOpen('grades');
-                }}
+          <Tooltip title="Switch Opening Sections/Grades" placement="top">
+            <ToggleButtonGroup
+              value={whichOpen}
+              exclusive
+              onChange={(_, newValue) => {
+                if (newValue === 'sections' && canOpenSections) {
+                  setWhichOpen('sections');
+                }
+                if (newValue === 'grades' && canOpenGrades) {
+                  setWhichOpen('grades');
+                }
+                setOpen(true);
+              }}
+              size="small"
+              aria-label="dropdown switch"
+              onClick={(e) => e.stopPropagation()}
+              className="ml-2"
+            >
+              <ToggleButton
+                value="sections"
+                aria-label="sections"
+                disabled={!canOpenSections}
+              >
+                <EventIcon />
+              </ToggleButton>
+              <ToggleButton
+                value="grades"
+                aria-label="grades and rmp"
                 disabled={!canOpenGrades}
               >
                 <BarChartIcon />
-              </IconButton>
-            </span>
+              </ToggleButton>
+            </ToggleButtonGroup>
           </Tooltip>
         </div>
-        <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit">
+        <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit flex-grow">
           {searchQueryLabel(removeSection(props.query))}
         </Typography>
+        <MeetingChip
+          meetings={
+            sections?.find(
+              (section) =>
+                !sectionCanOverlap(section.section_number) &&
+                props.query.sectionNumbers?.includes(section.section_number),
+            )?.meetings
+          }
+        />
       </div>
+
       {canOpenSections && (
-        <Collapse in={open === 'sections'} timeout="auto" unmountOnExit>
+        <Collapse
+          in={open && whichOpen === 'sections'}
+          timeout="auto"
+          unmountOnExit
+        >
           <TableContainer className="rounded-t-none">
             <Table>
               <TableHead>
@@ -349,8 +426,13 @@ const PlannerCard = (props: PlannerCardProps) => {
           </TableContainer>
         </Collapse>
       )}
+
       {canOpenGrades && (
-        <Collapse in={open === 'grades'} timeout="auto" unmountOnExit>
+        <Collapse
+          in={open && whichOpen === 'grades'}
+          timeout="auto"
+          unmountOnExit
+        >
           <div className="p-2 md:p-4 flex flex-col gap-2">
             <SingleGradesInfo
               course={removeSection(props.query)}

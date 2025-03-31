@@ -53,9 +53,14 @@ function checkLatestSemester() {
     { prefix: 'GOVT', number: '2306' },
     new AbortController(),
   ).then((res: SectionsData) => {
-    return res.sort((a, b) =>
-      compareSemesters(b.academic_session.name, a.academic_session.name),
-    )[0].academic_session.name;
+    return (
+      res
+        //exclude summers
+        .filter((sem) => !sem.academic_session.name.includes('U'))
+        .sort((a, b) =>
+          compareSemesters(b.academic_session.name, a.academic_session.name),
+        )[0].academic_session.name
+    );
   });
 }
 
