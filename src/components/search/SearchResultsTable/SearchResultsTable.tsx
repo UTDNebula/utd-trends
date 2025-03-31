@@ -347,7 +347,11 @@ const SearchResultsTable = ({
     }
   }
 
-  if (resultsLoading !== 'loading' && includedResults.length === 0) {
+  if (
+    resultsLoading !== 'loading' &&
+    includedResults.length === 0 &&
+    unIncludedResults.length === 0
+  ) {
     return (
       <div className="p-4">
         <Typography

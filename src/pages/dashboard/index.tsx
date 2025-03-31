@@ -437,10 +437,17 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
       (result) => {
         //Remove if over threshold
         const courseGrades = props.grades[searchQueryLabel(result)];
+        const courseSection = props.sections[searchQueryLabel(result)];
         if (
           typeof courseGrades !== 'undefined' &&
           courseGrades.state === 'done' &&
-          courseGrades.data.filtered.gpa === -1
+          courseGrades.data.filtered.gpa === -1 &&
+          !(
+            typeof courseSection !== 'undefined' &&
+            courseSection.state === 'done' &&
+            router.query.availability === 'true' &&
+            courseSection.data.latest.length
+          )
         ) {
           return false;
         }
@@ -470,7 +477,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         ) {
           return false;
         }
-        const courseSection = props.sections[searchQueryLabel(result)];
+
         if (
           router.query.availability === 'true' &&
           typeof courseSection !== 'undefined' &&
