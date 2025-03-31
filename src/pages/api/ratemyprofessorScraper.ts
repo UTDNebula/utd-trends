@@ -42,7 +42,18 @@ const PROFESSOR_SEARCH_QUERY = {
                 r4
                 r5
               }
-            }
+              ratings (first: 10) {
+                edges {
+                node { 
+                  comment
+                  grade
+                  date
+                  wouldTakeAgain
+                  }
+                }
+              }
+                
+            } 
           }
         }
       }
