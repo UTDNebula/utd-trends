@@ -29,9 +29,11 @@ import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   convertToProfOnly,
   decodeSearchQueryLabel,
+  removeSection,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
+  type SearchQueryMultiSection,
 } from '@/modules/SearchQuery/SearchQuery';
 import type { SectionsType } from '@/modules/SectionsType/SectionsType';
 import useGradeStore from '@/modules/useGradeStore/useGradeStore';
@@ -192,7 +194,7 @@ interface Props {
     [key: string]: GenericFetchedData<SectionsType>;
   };
   pageTitle: string;
-  planner: SearchQuery[];
+  planner: SearchQueryMultiSection[];
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
   grades: {
@@ -611,7 +613,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         addToCompare={addToCompare}
         removeFromCompare={removeFromCompare}
         colorMap={colorMap}
-        planner={props.planner}
+        planner={props.planner.map((x) => removeSection(x))}
         addToPlanner={props.addToPlanner}
         removeFromPlanner={props.removeFromPlanner}
       />

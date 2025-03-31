@@ -20,10 +20,11 @@ import {
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
+  type SearchQueryMultiSection,
+  searchQueryMultiSectionSplit,
 } from '@/modules/SearchQuery/SearchQuery';
 import type { SectionsType } from '@/modules/SectionsType/SectionsType';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import type { SectionsData } from '@/pages/api/sections';
 
 function removeDuplicates(array: SearchQuery[]) {
   return array.filter(
@@ -33,16 +34,13 @@ function removeDuplicates(array: SearchQuery[]) {
 }
 
 interface Props {
-  planner: SearchQuery[];
+  planner: SearchQueryMultiSection[];
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
   grades: {
     [key: string]: GenericFetchedData<GradesType>;
   };
-  setPlannerSection: (
-    searchQuery: SearchQuery,
-    section: string | undefined,
-  ) => boolean;
+  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
   fetchAndStoreGradesData: (
     course: SearchQuery,
     controller: AbortController,
@@ -119,7 +117,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
   }, [planner]);
   console.log(/*props.grades, props.rmp, */ props.sections);
 
-  let results: GenericFetchedData<SearchQuery[]> = {
+  let results: GenericFetchedData<SearchQueryMultiSection[]> = {
     state: 'loading',
   };
   if (planner.length) {
@@ -180,29 +178,35 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
           >
             <div className="sticky top-4 mt-4">
               <PlannerSchedule
-                courses={results.state === 'done' ? results.data : []}
+                courses={
+                  results.state === 'done'
+                    ? results.data.flatMap((searchQuery) =>
+                        searchQueryMultiSectionSplit(searchQuery),
+                      )
+                    : []
+                }
                 selectedSections={
                   results.state === 'done'
-                    ? results.data
-                        .map((course) => {
-                          const sectionData =
-                            props.sections[
-                              searchQueryLabel(removeSection(course))
-                            ];
-                          if (
-                            typeof sectionData !== 'undefined' &&
-                            sectionData.state === 'done'
-                          ) {
-                            const chosenSectionForCourse =
-                              sectionData.data.latest.find(
-                                (section) =>
-                                  section.section_number ===
-                                  course.sectionNumber,
-                              );
-                            return chosenSectionForCourse as SectionsData[number];
+                    ? results.data.flatMap((course) => {
+                        const sectionData =
+                          props.sections[
+                            searchQueryLabel(removeSection(course))
+                          ];
+                        if (
+                          typeof sectionData !== 'undefined' &&
+                          sectionData.state === 'done'
+                        ) {
+                          if (typeof course.sectionNumbers === 'undefined') {
+                            return [];
                           }
-                        })
-                        .filter((section) => typeof section !== 'undefined')
+                          return sectionData.data.latest.filter((section) =>
+                            course.sectionNumbers?.includes(
+                              section.section_number,
+                            ),
+                          );
+                        }
+                        return [];
+                      })
                     : []
                 }
               />
