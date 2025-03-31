@@ -10,7 +10,12 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { useRouter } from 'next/router';
-import React, { type Dispatch, type SetStateAction,useEffect, useState } from 'react';
+import React, {
+  type Dispatch,
+  type SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 
 import Rating from '@/components/common/Rating/Rating';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
@@ -35,7 +40,7 @@ const Filters = ({
   academicSessions,
   chosenSessions,
   addChosenSessions,
-  setRecent
+  setRecent,
 }: FiltersProps) => {
   const [minGPA, setMinGPA] = useState('');
   const [minRating, setMinRating] = useState('');
@@ -269,9 +274,9 @@ const Filters = ({
                 addChosenSessions(() => value as string[]);
               }
               if (value.includes('recent')) {
-                setRecent(true)
+                setRecent(true);
               } else {
-                setRecent(false)
+                setRecent(false);
               }
             }}
             renderValue={(selected) => {
