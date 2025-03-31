@@ -3,8 +3,12 @@ import React from 'react';
 import {
   type SearchQuery,
   searchQueryLabel,
+  searchQueryMultiSectionSplit,
+  removeSection,
 } from '@/modules/SearchQuery/SearchQuery';
 import type { SectionsData } from '@/pages/api/sections';
+import { type SectionsType } from '@/modules/SectionsType/SectionsType';
+import { type GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 
 import PlannerSection from './PlannerSection';
 
@@ -30,10 +34,9 @@ export const DAYS = [
 
 type PlannerScheduleProps = {
   courses: SearchQuery[];
-  selectedSectionsAndCourses: {
-    course: SearchQuery;
-    section: SectionsData[number];
-  }[];
+  sections: {
+    [key: string]: GenericFetchedData<SectionsType>;
+  };
 };
 
 const PlannerSchedule = (props: PlannerScheduleProps) => {
@@ -72,11 +75,11 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
         <HourRow key={i} hour={i + START_HOUR} />
       ))}
 
-      {props.selectedSectionsAndCourses.map((x, i) => (
+      {props.courses.map((course, i) => (
         <PlannerSection
-          key={searchQueryLabel(x.course)}
-          selectedSection={x.section}
-          course={x.course}
+          key={searchQueryLabel(course)}
+          selectedSection={props.sections[searchQueryLabel(removeSection(course))]?.data.latest.find((section) => section.section_number === course.sectionNumber)}
+          course={course}
           color={colors[i % 9]}
         />
       ))}

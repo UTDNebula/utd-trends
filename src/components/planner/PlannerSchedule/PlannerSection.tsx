@@ -6,13 +6,16 @@ import type { SectionsData } from '@/pages/api/sections';
 import { DAYS, numDays, START_HOUR } from './PlannerSchedule';
 
 type PlannerSectionComponentProps = {
-  selectedSection: SectionsData[number];
+  selectedSection: SectionsData[number] | undefined;
   course: SearchQuery;
   color: { fill: string; outline: string; font: string };
 };
 
 const PlannerSection = (props: PlannerSectionComponentProps) => {
-  //const SectionComponent = () => {
+  if (typeof props.selectedSection === 'undefined') {
+    return null;
+  }
+
   const [meetings, setMeetings] = useState<string[][]>([]);
   useEffect(() => {
     const tempMeetings = [];
