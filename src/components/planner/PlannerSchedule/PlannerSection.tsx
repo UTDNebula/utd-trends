@@ -90,7 +90,6 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
             color: props.color.font,
           } as React.CSSProperties
         }
-
         className={`col-start-[var(--start-col)] col-span-1 
           row-start-[var(--start-row)] row-span-1 relative 
           top-[var(--offset)] h-[var(--height)] overflow-hidden 
