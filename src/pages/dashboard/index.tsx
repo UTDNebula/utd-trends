@@ -1,5 +1,5 @@
-import { Card, Grid2 as Grid, useMediaQuery } from '@mui/material';
-import type { NextPage } from 'next';
+import { Card, Grid2 as Grid } from '@mui/material';
+import type { NextPage, NextPageContext } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -10,21 +10,22 @@ import {
   PanelResizeHandle,
 } from 'react-resizable-panels';
 
-import Compare from '@/components/compare/Compare/compare';
-import DashboardEmpty from '@/components/dashboard/DashboardEmpty/dashboardEmpty';
-import DashboardError from '@/components/dashboard/DashboardError/dashboardError';
-import Carousel from '@/components/navigation/Carousel/carousel';
-import TopMenu from '@/components/navigation/topMenu/topMenu';
-import CourseOverview from '@/components/overview/CourseOverview/courseOverview';
-import ProfessorOverview from '@/components/overview/ProfessorOverview/professorOverview';
-import Filters from '@/components/search/Filters/filters';
-import SearchResultsTable from '@/components/search/SearchResultsTable/searchResultsTable';
+import Compare from '@/components/compare/Compare/Compare';
+import DashboardEmpty from '@/components/dashboard/DashboardEmpty/DashboardEmpty';
+import DashboardError from '@/components/dashboard/DashboardError/DashboardError';
+import Carousel from '@/components/navigation/Carousel/Carousel';
+import TopMenu from '@/components/navigation/TopMenu/TopMenu';
+import CourseOverview from '@/components/overview/CourseOverview/CourseOverview';
+import ProfessorOverview from '@/components/overview/ProfessorOverview/ProfessorOverview';
+import Filters from '@/components/search/Filters/Filters';
+import SearchResultsTable from '@/components/search/SearchResultsTable/SearchResultsTable';
 import { compareColors } from '@/modules/colors/colors';
 import fetchWithCache, {
   cacheIndexNebula,
-  cacheIndexRmp,
   expireTime,
 } from '@/modules/fetchWithCache/fetchWithCache';
+import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   convertToProfOnly,
   decodeSearchQueryLabel,
@@ -32,27 +33,9 @@ import {
   searchQueryEqual,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
-import type { GradesData } from '@/pages/api/grades';
+import useGradeStore from '@/modules/useGradeStore/useGradeStore';
+import useRmpStore from '@/modules/useRmpStore/useRmpStore';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-
-//Limit cached number of grades and rmp data entries
-const MAX_ENTRIES = 1000;
-
-type GenericFetchedDataError<T> = {
-  state: 'error';
-  data?: T;
-};
-type GenericFetchedDataLoading = {
-  state: 'loading';
-};
-type GenericFetchedDataDone<T> = {
-  state: 'done';
-  data: T;
-};
-export type GenericFetchedData<T> =
-  | GenericFetchedDataError<T>
-  | GenericFetchedDataLoading
-  | GenericFetchedDataDone<T>;
 
 function removeDuplicates(array: SearchQuery[]) {
   return array.filter(
@@ -127,116 +110,6 @@ function fetchSearchResults(
   });
 }
 
-//Find GPA, total, and grade_distribution based on including some set of semesters
-function calculateGrades(grades: GradesData, academicSessions?: string[]) {
-  let grade_distribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-  for (const session of grades) {
-    if (
-      typeof academicSessions === 'undefined' ||
-      academicSessions.includes(session._id)
-    ) {
-      grade_distribution = grade_distribution.map(
-        (item, i) => item + session.grade_distribution[i],
-      );
-    }
-  }
-
-  const total: number = grade_distribution.reduce(
-    (accumulator, currentValue) => accumulator + currentValue,
-    0,
-  );
-
-  const GPALookup = [
-    4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
-  ];
-  let gpa = -1;
-  if (total !== 0) {
-    gpa =
-      GPALookup.reduce(
-        (accumulator, currentValue, index) =>
-          accumulator + currentValue * grade_distribution[index],
-        0,
-      ) /
-      (total - grade_distribution[grade_distribution.length - 1]);
-  }
-
-  return {
-    gpa: gpa,
-    total: total,
-    grade_distribution: grade_distribution,
-  };
-}
-export type GradesType = {
-  gpa: number;
-  total: number;
-  grade_distribution: number[];
-  grades: GradesData;
-};
-//Fetch grades by academic session from nebula api
-function fetchGradesData(
-  course: SearchQuery,
-  controller: AbortController,
-): Promise<GradesType> {
-  return fetchWithCache(
-    '/api/grades?' +
-      Object.keys(course)
-        .map(
-          (key) =>
-            key +
-            '=' +
-            encodeURIComponent(String(course[key as keyof SearchQuery])),
-        )
-        .join('&'),
-    cacheIndexNebula,
-    expireTime,
-    {
-      signal: controller.signal,
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
-    },
-  ).then((response) => {
-    if (response.message !== 'success') {
-      throw new Error(response.message);
-    }
-    if (response.data == null) {
-      throw new Error('null data');
-    }
-    return {
-      ...calculateGrades(response.data),
-      grades: response.data, //type GradesData
-    };
-  });
-}
-
-//Fetch RMP data from RMP
-function fetchRmpData(
-  professor: SearchQuery,
-  controller: AbortController,
-): Promise<RMPInterface> {
-  return fetchWithCache(
-    '/api/ratemyprofessorScraper?profFirst=' +
-      encodeURIComponent(String(professor.profFirst)) +
-      '&profLast=' +
-      encodeURIComponent(String(professor.profLast)),
-    cacheIndexRmp,
-    expireTime,
-    {
-      signal: controller.signal,
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
-    },
-  ).then((response) => {
-    if (response.message !== 'success') {
-      throw new Error(response.message);
-    }
-    return response.data;
-  });
-}
-
 // Add this utility function after the existing type definitions
 function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
   const colorMap: { [key: string]: string } = {};
@@ -247,7 +120,93 @@ function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
   return colorMap;
 }
 
-export const Dashboard: NextPage = () => {
+/**
+ * Seperates courses and professors from a string of comma-delimited searchTerms or string[] of searchTerms
+ * @param searchTermInput
+ * @returns an array of courseSearchTerms and professorSearchTerms
+ */
+function getSearchTerms(searchTermInput: string | string[] | undefined): {
+  courseSearchTerms: SearchQuery[];
+  professorSearchTerms: SearchQuery[];
+} {
+  let array = searchTermInput ?? [];
+  if (!Array.isArray(array)) {
+    array = array.split(','); // if searchTermsInput is a comma-delimited string, make it an array
+  }
+  const searchTerms = array.map((el) => decodeSearchQueryLabel(el)); // convert an array of strings to an array of SearchQuery's
+
+  const courseSearchTerms: SearchQuery[] = [];
+  const professorSearchTerms: SearchQuery[] = [];
+
+  // split the search terms into professors and courses
+  searchTerms.map((searchTerm) => {
+    if (typeof searchTerm.profLast !== 'undefined') {
+      professorSearchTerms.push(searchTerm);
+    }
+    if (typeof searchTerm.prefix !== 'undefined') {
+      courseSearchTerms.push(searchTerm);
+    }
+  });
+
+  return { courseSearchTerms, professorSearchTerms };
+}
+
+/**
+ *
+ * @param courseSearchTerms
+ * @param professorSearchTerms
+ * @returns an empty string or a comma-delimited list of courses and professors, ending with a " - "
+ */
+function buildPageTitle(
+  courseSearchTerms: SearchQuery[],
+  professorSearchTerms: SearchQuery[],
+): string {
+  let pageTitle = '';
+  courseSearchTerms.map((term) => {
+    pageTitle += searchQueryLabel(term) + ', ';
+  });
+  professorSearchTerms.map((term) => {
+    pageTitle += searchQueryLabel(term) + ', ';
+  });
+  pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
+  return pageTitle;
+}
+
+export async function getServerSideProps(
+  context: NextPageContext,
+): Promise<{ props: { pageTitle: string } }> {
+  const { courseSearchTerms, professorSearchTerms } = getSearchTerms(
+    context.query.searchTerms,
+  );
+
+  return {
+    props: {
+      pageTitle: buildPageTitle(courseSearchTerms, professorSearchTerms),
+    },
+  };
+}
+
+interface Props {
+  pageTitle: string;
+  grades: {
+    [key: string]: GenericFetchedData<GradesType>;
+  };
+  fetchAndStoreGradesData: (
+    course: SearchQuery,
+    controller: AbortController,
+  ) => Promise<GradesType | null>;
+  recalcGrades: (course: SearchQuery) => void;
+  recalcAllGrades: (results: SearchQuery[], academicSessions: string[]) => void;
+  rmp: {
+    [key: string]: GenericFetchedData<RMPInterface>;
+  };
+  fetchAndStoreRmpData: (
+    course: SearchQuery,
+    controller: AbortController,
+  ) => void;
+}
+
+export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
   const router = useRouter();
 
   //Searches seperated into courses and professors to create combos
@@ -262,24 +221,9 @@ export const Dashboard: NextPage = () => {
   //On search change, seperate into courses and profs, clear data, and fetch new results
   useEffect(() => {
     if (router.isReady) {
-      let array = router.query.searchTerms ?? [];
-      if (!Array.isArray(array)) {
-        array = array.split(',');
-      }
-      const searchTerms = array.map((el) => decodeSearchQueryLabel(el));
-
-      const courseSearchTerms: SearchQuery[] = [];
-      const professorSearchTerms: SearchQuery[] = [];
-
-      // split the search terms into professors and courses
-      searchTerms.map((searchTerm) => {
-        if (typeof searchTerm.profLast !== 'undefined') {
-          professorSearchTerms.push(searchTerm);
-        }
-        if (typeof searchTerm.prefix !== 'undefined') {
-          courseSearchTerms.push(searchTerm);
-        }
-      });
+      const { courseSearchTerms, professorSearchTerms } = getSearchTerms(
+        router.query.searchTerms,
+      );
       setCourses(courseSearchTerms);
       setProfessors(professorSearchTerms);
 
@@ -300,21 +244,23 @@ export const Dashboard: NextPage = () => {
 
       //Get course/prof info
       if (courseSearchTerms.length === 1) {
-        if (!(searchQueryLabel(courseSearchTerms[0]) in rhsGrades.course)) {
-          fetchAndAddRHSGrades(courseSearchTerms[0], controller);
-        }
+        fetchAndAddRHSGrades(courseSearchTerms[0], controller);
       }
       if (professorSearchTerms.length === 1) {
-        if (
-          !(searchQueryLabel(professorSearchTerms[0]) in rhsGrades.professor)
-        ) {
-          fetchAndAddRHSGrades(professorSearchTerms[0], controller);
-        }
+        fetchAndAddRHSGrades(professorSearchTerms[0], controller);
+      }
+
+      //Order search terms
+      let searchTerms: [SearchQuery[], SearchQuery[]] = [[], []];
+      if (courseSearchTerms.length > 0) {
+        searchTerms = [courseSearchTerms, professorSearchTerms];
+      } else if (professorSearchTerms.length > 0) {
+        searchTerms = [professorSearchTerms, courseSearchTerms];
       }
 
       //Get results from combos
-      if (courseSearchTerms.length > 0) {
-        fetchSearchResults(courseSearchTerms, professorSearchTerms, controller)
+      if (courseSearchTerms.length > 0 || professorSearchTerms.length > 0) {
+        fetchSearchResults(...searchTerms, controller)
           .then((res) => {
             setResults({
               state: 'done',
@@ -323,22 +269,16 @@ export const Dashboard: NextPage = () => {
             getData(res, controller);
           })
           .catch((error) => {
-            setResults({ state: 'error', data: [] });
-            console.error('Search Results', error);
+            if (
+              !(error instanceof DOMException && error.name == 'AbortError')
+            ) {
+              setResults({ state: 'error', data: [] });
+            }
           });
-      } else if (professorSearchTerms.length > 0) {
-        fetchSearchResults(professorSearchTerms, courseSearchTerms, controller)
-          .then((res) => {
-            setResults({
-              state: 'done',
-              data: res,
-            });
-            getData(res, controller);
-          })
-          .catch((error) => {
-            setResults({ state: 'error', data: [] });
-            console.error('Search Results', error);
-          });
+      } else {
+        setResults({
+          state: 'error',
+        });
       }
       return () => {
         controller.abort();
@@ -356,35 +296,12 @@ export const Dashboard: NextPage = () => {
     setChosenSessions((old) => {
       const newVal = func(old);
       if (results.state === 'done') {
-        setGrades((oldGrades) => {
-          const grades = { ...oldGrades };
-          //Relavent keys
-          for (const result of [
-            ...(results.state === 'done' ? results.data : []),
-          ]) {
-            const entry = grades[searchQueryLabel(result)];
-            if (entry && entry.state === 'done') {
-              entry.data = {
-                ...entry.data,
-                ...calculateGrades(entry.data.grades, newVal),
-              };
-            }
-          }
-          return grades;
-        });
+        props.recalcAllGrades(
+          [...(results.state === 'done' ? results.data : [])],
+          newVal,
+        );
       }
-      setCompareGrades((grades) => {
-        Object.keys(grades).forEach((key) => {
-          const entry = grades[key];
-          if (entry && entry.state === 'done') {
-            entry.data = {
-              ...entry.data,
-              ...calculateGrades(entry.data.grades, newVal),
-            };
-          }
-        });
-        return grades;
-      });
+      recalcAllCompareGrades(compare, newVal);
       return newVal;
     });
   }
@@ -431,151 +348,27 @@ export const Dashboard: NextPage = () => {
     });
   }
 
-  //Store grades by course+prof combo
-  const [grades, setGrades] = useState<{
-    [key: string]: GenericFetchedData<GradesType>;
-  }>({});
-  function addToGrades(key: string, value: GenericFetchedData<GradesType>) {
-    setGrades((old) => {
-      const newVal = { ...old };
-      if (typeof newVal[key] !== 'undefined') {
-        newVal[key] = value;
-        return newVal;
-      }
-      if (Object.keys(newVal).length >= MAX_ENTRIES) {
-        // Remove the oldest entry
-        const oldestKey = Object.keys(newVal)[0];
-        delete newVal[oldestKey];
-      }
-      newVal[key] = value;
-      return newVal;
-    });
-  }
-
-  // holds data for course and professor overviews
-  type rhsGradesType = { [key: string]: GenericFetchedData<GradesType> };
-  const [rhsGrades, setRHSGrades] = useState<{
-    course: rhsGradesType;
-    professor: rhsGradesType;
-  }>({ course: {}, professor: {} });
-  function fetchAndAddRHSGrades(
-    query: SearchQuery,
-    controller: AbortController,
-  ) {
-    const rhsKey = searchQueryLabel(query);
-    // only update course on course query or vice versa
-    const isCourse = typeof query.prefix !== 'undefined';
-    setRHSGrades((old) => ({
-      course: isCourse ? { [rhsKey]: { state: 'loading' } } : old.course,
-      professor: isCourse ? old.professor : { [rhsKey]: { state: 'loading' } },
-    }));
-    fetchGradesData(query, controller)
-      .then((rhsGrade) => {
-        const rhsGradeFetched: GenericFetchedData<GradesType> = {
-          state: rhsGrade.gpa !== -1 ? 'done' : 'error',
-          data: rhsGrade,
-        };
-        setRHSGrades((old) => ({
-          course: isCourse ? { [rhsKey]: rhsGradeFetched } : old.course,
-          professor: isCourse ? old.professor : { [rhsKey]: rhsGradeFetched },
-        }));
-      })
-      .catch((err) => console.error('Grades data for ' + rhsKey, err));
-  }
-
-  //Store rmp scores by profs
-  const [rmp, setRmp] = useState<{
-    [key: string]: GenericFetchedData<RMPInterface>;
-  }>({});
-  function addToRmp(key: string, value: GenericFetchedData<RMPInterface>) {
-    setRmp((old) => {
-      const newVal = { ...old };
-      if (typeof newVal[key] !== 'undefined') {
-        newVal[key] = value;
-        return newVal;
-      }
-      if (Object.keys(newVal).length >= MAX_ENTRIES) {
-        // Remove the oldest entry
-        const oldestKey = Object.keys(newVal)[0];
-        delete newVal[oldestKey];
-      }
-      newVal[key] = value;
-      return newVal;
-    });
-  }
-
-  //Call fetchGradesData and store response
-  function fetchAndStoreGradesData(
-    course: SearchQuery,
-    controller: AbortController,
-  ) {
-    addToGrades(searchQueryLabel(course), { state: 'loading' });
-    fetchGradesData(course, controller)
-      .then((res: GradesType) => {
-        //Add to storage
-        //Set loading status to done, unless total was 0 in calculateGrades
-        addToGrades(searchQueryLabel(course), {
-          state: res.gpa !== -1 ? 'done' : 'error',
-          data: res,
-        });
-        //Add any more academic sessions to list
-        addAcademicSessions(res.grades.map((session) => session._id));
-      })
-      .catch((error) => {
-        //Set loading status to error
-        addToGrades(searchQueryLabel(course), { state: 'error' });
-        console.error('Grades data for ' + searchQueryLabel(course), error);
-      });
-  }
-
-  //Call fetchRmpData and store response
-  function fetchAndStoreRmpData(
-    professor: SearchQuery,
-    controller: AbortController,
-  ) {
-    addToRmp(searchQueryLabel(professor), { state: 'loading' });
-    fetchRmpData(professor, controller)
-      .then((res: RMPInterface) => {
-        //Add to storage
-        //Set loading status to done
-        addToRmp(searchQueryLabel(professor), {
-          state: typeof res !== 'undefined' ? 'done' : 'error',
-          data: res,
-        });
-      })
-      .catch((error) => {
-        //Set loading status to error
-        addToRmp(searchQueryLabel(professor), { state: 'error' });
-        console.error('RMP data for ' + searchQueryLabel(professor), error);
-      });
-  }
-
   //On change to results, load new data
   function getData(results: SearchQuery[], controller: AbortController) {
     //Grade data
     //Fetch each result
     for (const result of results) {
-      const entry = grades[searchQueryLabel(result)];
+      const entry = props.grades[searchQueryLabel(result)];
       //Not already loading
-      if (typeof entry === 'undefined') {
-        fetchAndStoreGradesData(result, controller);
-      } else {
+      if (typeof entry === 'undefined' || entry.state === 'error') {
+        props
+          .fetchAndStoreGradesData(result, controller)
+          .then((res: GradesType | null | undefined) => {
+            //Add any more academic sessions to list
+            if (res) {
+              addAcademicSessions(res.grades.map((session) => session._id));
+            }
+          });
+      } else if (entry.state === 'done') {
         //Recalc gpa and such from past stored data for new page
-        setGrades((oldGrades) => {
-          const grades = { ...oldGrades };
-          const entry = grades[searchQueryLabel(result)];
-          if (entry && entry.state === 'done') {
-            entry.data = {
-              ...entry.data,
-              ...calculateGrades(entry.data.grades),
-            };
-          }
-          return grades;
-        });
+        props.recalcGrades(result);
         //Readd academic sessions
-        if (entry.state === 'done') {
-          addAcademicSessions(entry.data.grades.map((session) => session._id));
-        }
+        addAcademicSessions(entry.data.grades.map((session) => session._id));
       }
     }
 
@@ -598,10 +391,24 @@ export const Dashboard: NextPage = () => {
       professorsInResults.push(professors[0]);
     }
     for (const professor of professorsInResults) {
+      const entry = props.rmp[searchQueryLabel(professor)];
       //Not already loading
-      if (typeof rmp[searchQueryLabel(professor)] === 'undefined') {
-        fetchAndStoreRmpData(professor, controller);
+      if (typeof entry === 'undefined' || entry.state === 'error') {
+        props.fetchAndStoreRmpData(professor, controller);
       }
+    }
+  }
+
+  // get data for course and professor overviews
+  function fetchAndAddRHSGrades(
+    query: SearchQuery,
+    controller: AbortController,
+  ) {
+    //Grade data
+    const entry = props.grades[searchQueryLabel(query)];
+    //Not already loading
+    if (typeof entry === 'undefined' || entry.state === 'error') {
+      props.fetchAndStoreGradesData(query, controller);
     }
   }
 
@@ -613,11 +420,11 @@ export const Dashboard: NextPage = () => {
     includedResults = (results.state === 'done' ? results.data : []).filter(
       (result) => {
         //Remove if over threshold
-        const courseGrades = grades[searchQueryLabel(result)];
+        const courseGrades = props.grades[searchQueryLabel(result)];
         if (
           typeof courseGrades !== 'undefined' &&
           courseGrades.state === 'done' &&
-          courseGrades.data.gpa === -1
+          courseGrades.data.filtered.gpa === -1
         ) {
           return false;
         }
@@ -625,11 +432,12 @@ export const Dashboard: NextPage = () => {
           typeof router.query.minGPA === 'string' &&
           typeof courseGrades !== 'undefined' &&
           courseGrades.state === 'done' &&
-          courseGrades.data.gpa < parseFloat(router.query.minGPA)
+          courseGrades.data.filtered.gpa < parseFloat(router.query.minGPA)
         ) {
           return false;
         }
-        const courseRmp = rmp[searchQueryLabel(convertToProfOnly(result))];
+        const courseRmp =
+          props.rmp[searchQueryLabel(convertToProfOnly(result))];
         if (
           typeof router.query.minRating === 'string' &&
           typeof courseRmp !== 'undefined' &&
@@ -656,13 +464,10 @@ export const Dashboard: NextPage = () => {
   //List of course+prof combos saved for comparison
   const [compare, setCompare] = useState<SearchQuery[]>([]);
   //Their saved grade data
-  const [compareGrades, setCompareGrades] = useState<{
-    [key: string]: GenericFetchedData<GradesType>;
-  }>({});
+  const [compareGrades, setCompareGrades, , , recalcAllCompareGrades] =
+    useGradeStore();
   //Saved data for their professors
-  const [compareRmp, setCompareRmp] = useState<{
-    [key: string]: GenericFetchedData<RMPInterface>;
-  }>({});
+  const [compareRmp, setCompareRmp] = useRmpStore();
 
   //Add a course+prof combo to compare (happens from search results)
   //copy over data basically
@@ -676,7 +481,7 @@ export const Dashboard: NextPage = () => {
         return {
           ...old,
           [searchQueryLabel(searchQuery)]:
-            grades[searchQueryLabel(searchQuery)],
+            props.grades[searchQueryLabel(searchQuery)],
         };
       });
       //Save prof data
@@ -685,7 +490,7 @@ export const Dashboard: NextPage = () => {
           return {
             ...old,
             [searchQueryLabel(convertToProfOnly(searchQuery))]:
-              rmp[searchQueryLabel(convertToProfOnly(searchQuery))],
+              props.rmp[searchQueryLabel(convertToProfOnly(searchQuery))],
           };
         });
       }
@@ -722,7 +527,6 @@ export const Dashboard: NextPage = () => {
 
   const panelLRef = useRef<ImperativePanelHandle>(null);
   const panelRRef = useRef<ImperativePanelHandle>(null);
-  const isSmallScreen = useMediaQuery('(max-width: 600px)');
   // Resets RHS & LHS to 50/50 when double clicking handle
   const handleResizeDoubleClick = () => {
     panelLRef.current?.resize(50);
@@ -734,7 +538,11 @@ export const Dashboard: NextPage = () => {
   //Main content: loading, error, or normal
   let contentComponent;
 
-  if (courses.length === 0 && professors.length === 0) {
+  if (
+    courses.length === 0 &&
+    professors.length === 0 &&
+    results.state !== 'loading'
+  ) {
     contentComponent = <DashboardEmpty />;
   } else if (results.state === 'error') {
     contentComponent = <DashboardError />;
@@ -748,8 +556,8 @@ export const Dashboard: NextPage = () => {
         <ProfessorOverview
           key="professor"
           professor={professors[0]}
-          grades={rhsGrades.professor[searchQueryLabel(professors[0])]}
-          rmp={rmp[searchQueryLabel(professors[0])]}
+          grades={props.grades[searchQueryLabel(professors[0])]}
+          rmp={props.rmp[searchQueryLabel(professors[0])]}
         />,
       );
     }
@@ -759,7 +567,7 @@ export const Dashboard: NextPage = () => {
         <CourseOverview
           key="course"
           course={courses[0]}
-          grades={rhsGrades.course[searchQueryLabel(courses[0])]}
+          grades={props.grades[searchQueryLabel(courses[0])]}
         />,
       );
     }
@@ -777,9 +585,10 @@ export const Dashboard: NextPage = () => {
     const searchResultsTable = (
       <SearchResultsTable
         resultsLoading={results.state}
+        numSearches={courses.length + professors.length}
         includedResults={includedResults}
-        grades={grades}
-        rmp={rmp}
+        grades={props.grades}
+        rmp={props.rmp}
         compare={compare}
         addToCompare={addToCompare}
         removeFromCompare={removeFromCompare}
@@ -806,46 +615,57 @@ export const Dashboard: NextPage = () => {
           </Grid>
           <Grid size={{ xs: false, sm: 6, md: 6 }}></Grid>
         </Grid>
-        {isSmallScreen ? (
-          <div>
-            {carousel}
+        <div className="sm:hidden">
+          <div data-tutorial-id="LHS"> {carousel} </div>
+          <div data-tutorial-id="RHS"> {searchResultsTable} </div>
+        </div>
+        <PanelGroup
+          direction="horizontal"
+          className="hidden sm:flex overflow-visible"
+        >
+          <Panel
+            ref={panelLRef}
+            minSize={40}
+            defaultSize={50}
+            data-tutorial-id="LHS"
+          >
             {searchResultsTable}
-          </div>
-        ) : (
-          <PanelGroup direction="horizontal" className="overflow-visible">
-            <Panel ref={panelLRef} minSize={40} defaultSize={50}>
-              {searchResultsTable}
-            </Panel>
-            <PanelResizeHandle
-              className="mt-4 p-1 mx-1 w-0.5 rounded-full opacity-25 data-[resize-handle-state=drag]:opacity-50 transition ease-in-out bg-transparent hover:bg-royal data-[resize-handle-state=drag]:bg-royal"
-              onDoubleClick={handleResizeDoubleClick}
-            />
-            <Panel
-              className="overflow-visible min-w-0"
-              ref={panelRRef}
-              minSize={30}
-              defaultSize={50}
-            >
-              <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto mt-4">
-                {carousel}
-              </div>
-            </Panel>
-          </PanelGroup>
-        )}
+          </Panel>
+          <PanelResizeHandle
+            className="mt-4 p-1 mx-1 w-0.5 rounded-full opacity-25 data-[resize-handle-state=drag]:opacity-50 transition ease-in-out bg-transparent hover:bg-royal data-[resize-handle-state=drag]:bg-royal"
+            onDoubleClick={handleResizeDoubleClick}
+          />
+          <Panel
+            className="overflow-visible min-w-0"
+            ref={panelRRef}
+            minSize={30}
+            defaultSize={50}
+            data-tutorial-id="RHS"
+          >
+            <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto mt-4">
+              {carousel}
+            </div>
+          </Panel>
+        </PanelGroup>
       </>
     );
   }
 
-  /* Final page */
-
   return (
     <>
       <Head>
-        <title>Results - UTD Trends</title>
+        <title>
+          {'Results - ' + buildPageTitle(courses, professors) + 'UTD TRENDS'}
+        </title>
         <link
           rel="canonical"
           href="https://trends.utdnebula.com/dashboard"
           key="canonical"
+        />
+        <meta
+          key="og:title"
+          property="og:title"
+          content={'Results - ' + props.pageTitle + 'UTD TRENDS'}
         />
         <meta
           property="og:url"
@@ -853,7 +673,10 @@ export const Dashboard: NextPage = () => {
         />
       </Head>
       <div className="w-full bg-light h-full">
-        <TopMenu />
+        <TopMenu
+          resultsLoading={results.state}
+          setResultsLoading={() => setResults({ state: 'loading' })}
+        />
         <main className="p-4">{contentComponent}</main>
       </div>
     </>

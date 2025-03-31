@@ -2,10 +2,11 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 
 import Background from '@/../public/background.png';
-import SearchBar from '@/components/search/SearchBar/searchBar';
+import SearchBar from '@/components/search/SearchBar/SearchBar';
+import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import {
   type SearchQuery,
   searchQueryLabel,
@@ -16,9 +17,10 @@ import {
  */
 const Home: NextPage = () => {
   const router = useRouter();
-  function searchOptionChosen(chosenOptions: SearchQuery[]) {
+
+  async function searchOptionChosen(chosenOptions: SearchQuery[]) {
     if (chosenOptions.length) {
-      router.push({
+      await router.push({
         pathname: '/dashboard',
         query: {
           searchTerms: chosenOptions
@@ -29,9 +31,10 @@ const Home: NextPage = () => {
     }
   }
 
-  useEffect(() => {
-    router.prefetch('/dashboard');
-  }, [router]);
+  const [results, setResults] = useState<GenericFetchedData<SearchQuery[]>>({
+    state: 'done',
+    data: [],
+  }); // essentially a dummy state. Used only for the loading animation to start in home screen before navigation to the dashboard
 
   return (
     <>
@@ -43,14 +46,14 @@ const Home: NextPage = () => {
         />
         <meta property="og:url" content="https://trends.utdnebula.com" />
       </Head>
-      <div className="relative bg-lighten dark:bg-darken h-full w-full flex justify-center items-center p-8">
+      <div className="relative bg-lighten dark:bg-darken h-full w-full flex flex-col items-center gap-4 px-8 py-4">
         <Image
           src={Background}
           alt="gradient background"
           fill
           className="object-cover -z-20"
         />
-        <div className="max-w-xl">
+        <div className="max-w-xl grow flex flex-col justify-center">
           <h2 className="text-sm font-semibold mb-3 text-cornflower-600 dark:text-cornflower-400 tracking-wider">
             POWERED BY {/*eslint-disable-next-line react/jsx-no-target-blank*/}
             <a
@@ -73,7 +76,8 @@ const Home: NextPage = () => {
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus={true}
             onSelect={searchOptionChosen}
-            className="mb-3"
+            resultsLoading={results.state}
+            setResultsLoading={() => setResults({ state: 'loading' })}
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />
         </div>
@@ -82,7 +86,7 @@ const Home: NextPage = () => {
           href="https://utdgrades.com/"
           target="_blank"
           rel="noopener"
-          className="absolute bottom-4 bg-white dark:bg-black text-black dark:text-white py-3 px-5 rounded transition hover:scale-[1.01]"
+          className="bg-white dark:bg-black text-black dark:text-white py-3 px-5 rounded transition hover:scale-[1.01]"
         >
           Also check out <b>UTD Grades</b>
         </a>
