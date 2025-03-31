@@ -264,6 +264,7 @@ type PlannerCardProps = {
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RMPInterface>;
   removeFromPlanner: () => void;
+  color: { fill: string; outline: string; font: string };
 };
 
 const PlannerCard = (props: PlannerCardProps) => {
@@ -346,6 +347,11 @@ const PlannerCard = (props: PlannerCardProps) => {
               }}
               icon={<BookOutlinedIcon />}
               checkedIcon={<BookIcon />}
+              sx={{
+                '&.Mui-checked': {
+                  color: props.color.fill,
+                },
+              }}
             />
           </Tooltip>
           <Tooltip title="Switch Opening Sections/Grades" placement="top">

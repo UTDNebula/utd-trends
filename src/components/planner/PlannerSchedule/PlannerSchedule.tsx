@@ -35,23 +35,11 @@ type PlannerScheduleProps = {
   sections: {
     [key: string]: GenericFetchedData<SectionsType>;
   };
+  colorMap: { [key: string]: { fill: string; outline: string; font: string } };
 };
 
 const PlannerSchedule = (props: PlannerScheduleProps) => {
-  //const PlannerCoursesTable = () => {
-
-  const colors = [
-    { fill: '#FFA6C2', outline: '#FEC2D5', font: '#780909' },
-    { fill: '#D4A6E2', outline: '#DEBDE8', font: '#590972' },
-    { fill: '#93BDFF', outline: '#B1CFFF', font: '#0E397C' },
-    { fill: '#E9D0AC', outline: '#FFECD0', font: '#5D3804' },
-    { fill: '#7BD6DD', outline: '#A2F4FA', font: '#034F55' },
-    { fill: '#89EDAF', outline: '#B0FBCD', font: '#335600' },
-    { fill: '#E5DAFF', outline: '#FBF9FF', font: '#483080' },
-    { fill: '#F9C28A', outline: '#FFCDB7', font: '#611F00' },
-    { fill: '#9FF9C9', outline: '#BFFFDD', font: '#005025' },
-  ];
-
+  console.log(props.colorMap);
   return (
     <div
       className={`w-full h-[calc(140vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[max-content_repeat(14,minmax(0,1fr))]`}
@@ -73,10 +61,10 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
         <HourRow key={i} hour={i + START_HOUR} />
       ))}
 
-      {props.courses.map((course, i) => {
+      {props.courses.map((course) => {
         const sections =
           props.sections[searchQueryLabel(removeSection(course))];
-        if (sections.state !== 'done') {
+        if (typeof sections === 'undefined' || sections.state !== 'done') {
           return null;
         }
         return (
@@ -86,7 +74,7 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
               (section) => section.section_number === course.sectionNumber,
             )}
             course={course}
-            color={colors[i % 9]}
+            color={props.colorMap[searchQueryLabel(removeSection(course))]}
           />
         );
       })}
