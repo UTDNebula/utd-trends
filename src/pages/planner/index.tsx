@@ -139,7 +139,6 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
       data: planner,
     };
   }
-  console.log('COURSES IN PLANNER: ', results);
 
   const colorMap = createColorMap(
     results.state === 'done'
