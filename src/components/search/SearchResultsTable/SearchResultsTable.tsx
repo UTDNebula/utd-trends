@@ -580,20 +580,23 @@ const SearchResultsTable = ({
                   .map((_, index) => <LoadingRow key={index} />)}
 
             {/* Divider row */}
-            <TableRow>
-              <TableCell colSpan={5} className="p-0">
-                <div className="flex items-center py-2">
-                  <Divider className="flex-grow" />
-                  <Typography className="px-4 text-lg text-gray-500">
-                    Not teaching next semester
-                  </Typography>
-                  <Divider className="flex-grow" />
-                </div>
-              </TableCell>
-            </TableRow>
+            {resultsLoading === 'done' &&
+              sortedUnIncludedResults.length !== 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="p-0">
+                    <div className="flex items-center py-2">
+                      <Divider className="flex-grow" />
+                      <Typography className="px-4 text-lg text-gray-500">
+                        Not teaching next semester
+                      </Typography>
+                      <Divider className="flex-grow" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
 
             {/* Unincluded Results (Unavailable courses) */}
-            {resultsLoading === 'done' ? (
+            {resultsLoading === 'done' &&
               sortedUnIncludedResults.map((result) => (
                 <Row
                   key={searchQueryLabel(result)}
@@ -610,10 +613,7 @@ const SearchResultsTable = ({
                   color={colorMap[searchQueryLabel(result)]}
                   showTutorial={false /*index === numSearches*/}
                 />
-              ))
-            ) : (
-              <></>
-            )}
+              ))}
           </TableBody>
         </Table>
       </TableContainer>

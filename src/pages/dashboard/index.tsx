@@ -1,4 +1,4 @@
-import { Card, Grid2 as Grid } from '@mui/material';
+import { Card } from '@mui/material';
 import type { NextPage, NextPageContext } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -691,17 +691,12 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     );
     contentComponent = (
       <>
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-            <Filters
-              manageQuery
-              academicSessions={academicSessions}
-              chosenSessions={chosenSessions}
-              addChosenSessions={addChosenSessions}
-            />
-          </Grid>
-          <Grid size={{ xs: false, sm: 6, md: 6 }}></Grid>
-        </Grid>
+        <Filters
+          manageQuery
+          academicSessions={academicSessions}
+          chosenSessions={chosenSessions}
+          addChosenSessions={addChosenSessions}
+        />
         <div className="sm:hidden">
           <div data-tutorial-id="LHS"> {carousel} </div>
           <div data-tutorial-id="RHS"> {searchResultsTable} </div>

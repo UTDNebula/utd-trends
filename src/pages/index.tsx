@@ -1,4 +1,4 @@
-import { FormControl, Switch, Tooltip } from '@mui/material';
+import { FormControl, FormControlLabel, Switch, Tooltip } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -84,7 +84,7 @@ const Home: NextPage = () => {
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />
           {/* Teaching Next Semester switch*/}
-          <Tooltip title={'Select Availability'} placement="bottom-start">
+          <Tooltip title="Select Availability" placement="bottom-start">
             <FormControl
               size="small"
               className={`min-w-max flex-row items-center ${
@@ -93,14 +93,17 @@ const Home: NextPage = () => {
                   : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
               }`}
             >
-              <Switch
-                checked={filterNextSem == 'true'}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  setFilterNextSem(event.target.checked ? 'true' : 'false');
-                }}
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={filterNextSem == 'true'}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      setFilterNextSem(event.target.checked ? 'true' : 'false');
+                    }}
+                  />
+                }
+                label="Teaching Next Semester"
               />
-              <div className="text-sm min-w-max">Teaching Next Semester</div>
-              {/* <InputLabel id="teachingNext">Teaching Next Semester</InputLabel> */}
             </FormControl>
           </Tooltip>
         </div>
