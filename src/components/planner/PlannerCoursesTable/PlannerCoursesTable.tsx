@@ -27,6 +27,7 @@ type PlannerCoursesTableProps = {
   };
   grades: { [key: string]: GenericFetchedData<GradesType> };
   rmp: { [key: string]: GenericFetchedData<RMPInterface> };
+  colorMap: { [key: string]: { fill: string; outline: string; font: string } };
 };
 
 const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
@@ -69,6 +70,9 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                   removeFromPlanner={() => {
                     props.removeFromPlanner(course);
                   }}
+                  color={
+                    props.colorMap[searchQueryLabel(removeSection(course))]
+                  }
                 />
               );
             })

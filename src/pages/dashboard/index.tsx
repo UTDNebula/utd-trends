@@ -113,7 +113,6 @@ function fetchSearchResults(
   });
 }
 
-// Add this utility function after the existing type definitions
 function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
   const colorMap: { [key: string]: string } = {};
   courses.forEach((course, index) => {
@@ -552,7 +551,6 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     panelLRef.current?.resize(50);
   };
 
-  // Add this after the compare state declaration
   const colorMap = createColorMap(compare);
 
   //Main content: loading, error, or normal
