@@ -55,7 +55,6 @@ export default function handler(
     })
       .then((response) => response.json())
       .then((data) => {
-        //console.log('data', data, data.message);
         if (data.message !== 'success') {
           throw new Error(data.message);
         }

@@ -115,7 +115,6 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
       };
     }
   }, [planner]);
-  console.log(/*props.grades, props.rmp, */ props.sections);
 
   let results: GenericFetchedData<SearchQueryMultiSection[]> = {
     state: 'loading',
@@ -126,7 +125,6 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
       data: planner,
     };
   }
-  console.log('COURSES IN PLANNER: ', results);
 
   const panelLRef = useRef<ImperativePanelHandle>(null);
   const panelRRef = useRef<ImperativePanelHandle>(null);

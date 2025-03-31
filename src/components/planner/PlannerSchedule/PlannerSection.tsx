@@ -14,8 +14,6 @@ type PlannerSectionComponentProps = {
 };
 
 const PlannerSection = (props: PlannerSectionComponentProps) => {
-  //const SectionComponent = () => {
-  console.log(props.selectedSection);
   const [meetings, setMeetings] = useState<string[][]>([]);
   useEffect(() => {
     const tempMeetings = [];
@@ -63,7 +61,6 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
       }
     }
     setMeetings(tempMeetings);
-    console.log(numDays + 2);
   }, [props.selectedSection]);
 
   return meetings.map((x: string[], i: number) => (
