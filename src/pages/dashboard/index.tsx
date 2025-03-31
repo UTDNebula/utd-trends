@@ -431,6 +431,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
 
   //Filtered results
   let includedResults: SearchQuery[] = [];
+  let unIncludedResults: SearchQuery[] = [];
 
   //Filter results based on gpa, rmp, and rmp difficulty
   if (router.isReady) {
@@ -493,8 +494,61 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         return true;
       },
     );
+    unIncludedResults = (results.state === 'done' ? results.data : []).filter(
+      (result) => {
+        //Remove if over threshold
+        const courseGrades = props.grades[searchQueryLabel(result)];
+        if (
+          typeof courseGrades !== 'undefined' &&
+          courseGrades.state === 'done' &&
+          courseGrades.data.filtered.gpa === -1
+        ) {
+          return false;
+        }
+        if (
+          typeof router.query.minGPA === 'string' &&
+          typeof courseGrades !== 'undefined' &&
+          courseGrades.state === 'done' &&
+          courseGrades.data.filtered.gpa < parseFloat(router.query.minGPA)
+        ) {
+          return false;
+        }
+        const courseRmp =
+          props.rmp[searchQueryLabel(convertToProfOnly(result))];
+        if (
+          typeof router.query.minRating === 'string' &&
+          typeof courseRmp !== 'undefined' &&
+          courseRmp.state === 'done' &&
+          courseRmp.data.avgRating < parseFloat(router.query.minRating)
+        ) {
+          return false;
+        }
+        if (
+          typeof router.query.maxDiff === 'string' &&
+          typeof courseRmp !== 'undefined' &&
+          courseRmp.state === 'done' &&
+          courseRmp.data.avgDifficulty > parseFloat(router.query.maxDiff)
+        ) {
+          return false;
+        }
+        const courseSection = props.sections[searchQueryLabel(result)];
+        if (
+          !(
+            router.query.availability === 'true' &&
+            typeof courseSection !== 'undefined' &&
+            courseSection.state === 'done' &&
+            !courseSection.data.latest.length
+          )
+        ) {
+          return false;
+        }
+
+        return true;
+      },
+    );
   } else {
     includedResults = results.state === 'done' ? results.data : [];
+    unIncludedResults = [];
   }
 
   //List of course+prof combos saved for comparison
@@ -623,6 +677,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         resultsLoading={results.state}
         numSearches={courses.length + professors.length}
         includedResults={includedResults}
+        unIncludedResults={unIncludedResults}
         grades={props.grades}
         rmp={props.rmp}
         compare={compare}
