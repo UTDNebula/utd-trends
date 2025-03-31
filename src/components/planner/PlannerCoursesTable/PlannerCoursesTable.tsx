@@ -13,6 +13,7 @@ import {
   searchQueryLabel,
   type SearchQueryMultiSection,
 } from '@/modules/SearchQuery/SearchQuery';
+import sectionCanOverlap from '@/modules/sections/sections';
 import { type SectionsType } from '@/modules/SectionsType/SectionsType';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
@@ -53,7 +54,12 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                     typeof sectionData === 'undefined' ||
                     sectionData.state === 'error'
                       ? undefined
-                      : sectionData.data.latest
+                      : sectionData.data.latest.filter(
+                          (section) =>
+                            typeof course.profFirst === 'undefined' &&
+                            typeof course.profLast === 'undefined' &&
+                            sectionCanOverlap(section.section_number),
+                        )
                   }
                   setPlannerSection={props.setPlannerSection}
                   grades={props.grades[searchQueryLabel(removeSection(course))]}
