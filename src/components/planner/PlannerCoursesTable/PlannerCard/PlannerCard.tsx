@@ -91,7 +91,7 @@ function SectionTableHead() {
   );
 }
 
-function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
+function meetingDays(days: string[]): string {
   function daySlice(day: string): string {
     if (day.slice(0, 1) === 'S') {
       return day.slice(0, 2);
@@ -103,50 +103,28 @@ function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
 
     return day.slice(0, 1);
   }
-  let days: string = '';
-  meeting.meeting_days.forEach((day) => {
-    days += daySlice(day);
+  let result: string = '';
+  days.forEach((day) => {
+    result += daySlice(day);
   });
+  return result;
+}
 
+function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
   function classTime(startTime: string, endTime: string): string {
-    return `${startTime}-${endTime}`;
+    const startAmPm = startTime.slice(-2);
+    const endAmPm = endTime.slice(-2);
+    if (startAmPm !== endAmPm) {
+      return `${startTime}-${endTime}`;
+    }
+    return `${startTime.slice(0, -2)}-${endTime}`;
   }
   const time = classTime(meeting.start_time, meeting.end_time);
 
-  const schedule = `${days} ${time}`;
+  const schedule = `${meetingDays(meeting.meeting_days)} ${time}`;
   const location = `${meeting.location.building} ${meeting.location.room}`;
 
   return [schedule, location, meeting.location.map_uri];
-}
-
-function MeetingSchedule({
-  meetings,
-}: {
-  meetings: SectionsData[number]['meetings'];
-}) {
-  return (
-    <Box className="max-w-xs mx-auto">
-      {meetings.map((meeting, i) => {
-        const [schedule] = parseMeeting(meeting);
-        const [days, time] = schedule.split(' ');
-        const formattedDays = days.match(/[A-Z][a-z]*/g)?.join(' / ') || days;
-
-        return (
-          <div
-            key={i}
-            className="p-1 px-3 rounded-3xl border border-cornflower-300 bg-white dark:bg-gray-700 shadow-sm"
-          >
-            <Typography className="text-xs font-semibold text-center">
-              {formattedDays}
-            </Typography>
-            <Typography className="text-xs text-center">
-              {time.substring(0, time.indexOf('-'))}
-            </Typography>
-          </div>
-        );
-      })}
-    </Box>
-  );
 }
 
 type SectionTableRowProps = {
@@ -157,65 +135,88 @@ type SectionTableRowProps = {
     searchQuery: SearchQuery,
     section: string | undefined,
   ) => boolean;
-  onSelectSection: (section: SectionsData[number]) => void;
 };
 
 function SectionTableRow(props: SectionTableRowProps) {
   const isSelected = props.course.sectionNumber === props.data.section_number;
 
   return (
-    <>
-      <TableRow>
-        <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-          <Radio
-            checked={isSelected}
-            onClick={() => {
-              if (!isSelected) {
-                props.setPlannerSection(
-                  props.course,
-                  props.data.section_number,
-                );
-              } else {
-                props.setPlannerSection(props.course, undefined);
-              }
-              props.onSelectSection(props.data); // Notify parent (PlannerCard) when a section is selected
-            }}
-          />
-        </TableCell>
-        <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-          <Typography>{props.data.section_number}</Typography>
-        </TableCell>
-        <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-          <Typography>{props.data.internal_class_number}</Typography>
-        </TableCell>
-        <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-          {props.data.meetings
-            .map(parseMeeting)
-            .map(([schedule, location, link], i) => (
-              <div key={i}>
-                {schedule !== ' -' && (
-                  <Typography className="text-sm">{schedule}</Typography>
-                )}
-                {location !== ' ' && (
-                  <Typography className="text-sm">
-                    {link === '' ? (
-                      location
-                    ) : (
-                      <Link
-                        href={link}
-                        target="_blank"
-                        className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-                      >
-                        {location}
-                      </Link>
-                    )}
-                  </Typography>
-                )}
-              </div>
-            ))}
-        </TableCell>
-      </TableRow>
-    </>
+    <TableRow>
+      <TableCell className={props.lastRow ? 'border-b-0' : ''}>
+        <Radio
+          checked={isSelected}
+          onClick={() => {
+            if (!isSelected) {
+              props.setPlannerSection(
+                props.course,
+                props.data.section_number,
+              );
+            } else {
+              props.setPlannerSection(props.course, undefined);
+            }
+          }}
+        />
+      </TableCell>
+      <TableCell className={props.lastRow ? 'border-b-0' : ''}>
+        <Typography>{props.data.section_number}</Typography>
+      </TableCell>
+      <TableCell className={props.lastRow ? 'border-b-0' : ''}>
+        <Typography>{props.data.internal_class_number}</Typography>
+      </TableCell>
+      <TableCell className={props.lastRow ? 'border-b-0' : ''}>
+        {props.data.meetings
+          .map(parseMeeting)
+          .map(([schedule, location, link], i) => (
+            <div key={i}>
+              {schedule !== ' -' && (
+                <Typography className="text-sm">{schedule}</Typography>
+              )}
+              {location !== ' ' && (
+                <Typography className="text-sm">
+                  {link === '' ? (
+                    location
+                  ) : (
+                    <Link
+                      href={link}
+                      target="_blank"
+                      className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                    >
+                      {location}
+                    </Link>
+                  )}
+                </Typography>
+              )}
+            </div>
+          ))}
+      </TableCell>
+    </TableRow>
+  );
+}
+
+function MeetingChip(props: {
+  meetings: SectionsData[number]['meetings'];
+}) {
+  if (typeof props.meetings === 'undefined') {
+    return null;
+  }
+  return (
+    <div className="ml-auto">
+      {props.meetings.map((meeting, i) => {
+        return (
+          <div
+            key={i}
+            className="p-1 px-3 rounded-3xl border border-cornflower-300 bg-white dark:bg-gray-700 shadow-sm"
+          >
+            <Typography className="text-xs font-semibold text-center">
+              {meetingDays(meeting.meeting_days)}
+            </Typography>
+            <Typography className="text-xs text-center">
+              {meeting.start_time}
+            </Typography>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -233,17 +234,6 @@ type PlannerCardProps = {
 
 const PlannerCard = (props: PlannerCardProps) => {
   const [open, setOpen] = useState(false);
-  const [selectedSection, setSelectedSection] =
-    useState<SectionsData[number]>(null); // Store selected section
-
-  const handleSelectSection = (section: SectionsData[number]) => {
-    setSelectedSection((prevSelected) => {
-      if (prevSelected === section) {
-        return null; // Deselect if already selected
-      }
-      return section; // Select if not selected
-    });
-  };
 
   //appease the typescript gods
   const sections = props.sections;
@@ -279,12 +269,12 @@ const PlannerCard = (props: PlannerCardProps) => {
           }
         }}
         className={
-          'p-4 flex justify-between items-center gap-4' +
+          'p-4 flex items-center gap-4' +
           (canOpenSections || canOpenGrades ? ' cursor-pointer' : '')
         }
       >
         {/* Left-side Content */}
-        <div className="flex items-center gap-4 flex-grow">
+        <div className="flex items-center">
           <Tooltip
             title={`${open ? 'Minimize' : 'Expand'} ${whichOpen === 'sections' ? 'Sections' : 'Grades and RMP'}`}
             placement="top"
@@ -347,17 +337,11 @@ const PlannerCard = (props: PlannerCardProps) => {
               </ToggleButton>
             </ToggleButtonGroup>
           </Tooltip>
-          <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit flex-grow">
-            {searchQueryLabel(removeSection(props.query))}
-          </Typography>
         </div>
-
-        {/* Right-side MeetingSchedule */}
-        {selectedSection && (
-          <div className="">
-            <MeetingSchedule meetings={selectedSection.meetings} />
-          </div>
-        )}
+        <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit flex-grow">
+          {searchQueryLabel(removeSection(props.query))}
+        </Typography>
+        <MeetingChip meetings={props.sections[0].meetings} />
       </div>
 
       {canOpenSections && (
@@ -379,7 +363,6 @@ const PlannerCard = (props: PlannerCardProps) => {
                     course={props.query}
                     lastRow={index === sections.length - 1}
                     setPlannerSection={props.setPlannerSection}
-                    onSelectSection={handleSelectSection}
                   />
                 ))}
               </TableBody>
