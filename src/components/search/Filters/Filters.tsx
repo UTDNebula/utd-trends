@@ -61,6 +61,17 @@ const Filters = ({
     }
   }, [router.isReady, router.query.minGPA, router.query.minRating]);
 
+  let semestersSelectValue = chosenSessions;
+  if (chosenSessions.length === academicSessions.length) {
+    semestersSelectValue = chosenSessions.concat(['select-all']);
+  } else if (
+    recentSemesters.length > 0 &&
+    chosenSessions.length === recentSemesters.length &&
+    chosenSessions.every((el) => recentSemesters.includes(el))
+  ) {
+    semestersSelectValue = chosenSessions.concat(['recent']);
+  }
+
   function getRecentSemesters() {
     // get current month and year
     const today = new Date();
@@ -247,35 +258,58 @@ const Filters = ({
               label="Semesters"
               labelId="Semesters"
               multiple
-              value={chosenSessions}
+              value={semestersSelectValue}
               onChange={(event: SelectChangeEvent<string[]>) => {
                 const {
                   target: { value },
                 } = event;
-                if (value.includes('select-all')) {
-                  if (chosenSessions.length === academicSessions.length) {
-                    addChosenSessions(() => []);
-                  } else {
-                    addChosenSessions(() => academicSessions);
-                  }
-                } else if (value.includes('recent')) {
-                  if (
-                    chosenSessions.length === recentSemesters.length &&
-                    chosenSessions.every((el) => recentSemesters.includes(el))
-                  ) {
-                    addChosenSessions(() => academicSessions);
-                  } else {
+                // starting from all
+                if (chosenSessions.length === academicSessions.length) {
+                  if (value.includes('recent')) {
+                    // swap to recent
                     addChosenSessions(() => recentSemesters);
+                  } else if (value.includes('select-all')) {
+                    // removes semester clicked
+                    addChosenSessions(() =>
+                      (value as string[]).filter((e) => e !== 'select-all'),
+                    );
+                  } else {
+                    // unselect all
+                    addChosenSessions(() => []);
                   }
+                  // starting from recent
+                } else if (
+                  chosenSessions.length === recentSemesters.length &&
+                  chosenSessions.every((el) => recentSemesters.includes(el))
+                ) {
+                  if (value.includes('select-all')) {
+                    // swap to all
+                    addChosenSessions(() => academicSessions);
+                  } else if (value.includes('recent')) {
+                    // removes semester clicked
+                    addChosenSessions(() =>
+                      (value as string[]).filter((e) => e !== 'recent'),
+                    );
+                  } else {
+                    // swap to all
+                    addChosenSessions(() => academicSessions);
+                  }
+                  // normal
                 } else {
-                  addChosenSessions(() => value as string[]);
+                  if (value.includes('select-all')) {
+                    addChosenSessions(() => academicSessions);
+                  } else if (value.includes('recent')) {
+                    addChosenSessions(() => recentSemesters);
+                  } else {
+                    addChosenSessions(() => value as string[]);
+                  }
                 }
               }}
-              renderValue={(selected) => {
+              renderValue={() => {
                 if (chosenSessions.length === academicSessions.length) {
                   return 'All selected';
                 }
-                return selected
+                return chosenSessions
                   .sort((a, b) => compareSemesters(a, b))
                   .join(', ');
               }}
@@ -319,6 +353,7 @@ const Filters = ({
                   primary="Recent"
                 />
               </MenuItem>
+              <hr className="border-t-2 border-cornflower-600 dark:border-gray-500" />
 
               {/* individual options */}
               {academicSessions.map((session) => (
