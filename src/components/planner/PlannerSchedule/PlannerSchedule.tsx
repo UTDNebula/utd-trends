@@ -2,7 +2,6 @@ import React from 'react';
 
 import type { SearchQuery } from '@/modules/SearchQuery/SearchQuery';
 import type { SectionsData } from '@/pages/api/sections';
-
 import PlannerSection from './PlannerSection';
 
 // hours shown (24-hour time)
@@ -31,10 +30,7 @@ type PlannerScheduleProps = {
 };
 
 const PlannerSchedule = (props: PlannerScheduleProps) => {
-  //const PlannerCoursesTable = () => {
-
-  console.log(props.selectedSections);
-
+  console.log(props.selectedSections)
   return (
     <div
       className={`w-full h-[calc(100vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[max-content_repeat(13,minmax(0,1fr))]`}
@@ -101,3 +97,4 @@ const HourRow = (props: HourRowProps) => {
 };
 
 export default PlannerSchedule;
+

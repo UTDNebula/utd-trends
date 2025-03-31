@@ -1,3 +1,4 @@
+import { toast } from 'react-toastify'; // ADD THIS LINE
 import BarChartIcon from '@mui/icons-material/BarChart';
 import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
@@ -33,6 +34,75 @@ import {
 } from '@/modules/SearchQuery/SearchQuery';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import { type SectionsData } from '@/pages/api/sections';
+
+// Add these functions here, before LoadingRow
+
+function hasConflict(newSection: SectionsData[number], selectedSections: SectionsData): boolean {
+  if (!newSection || !selectedSections) return false;
+
+  for (const selectedSection of selectedSections) {
+    if (!selectedSection || !selectedSection.meetings) continue;
+
+    for (const newMeeting of newSection.meetings) {
+      if (!newMeeting || !newMeeting.meeting_days) continue;
+
+      for (const existingMeeting of selectedSection.meetings) {
+        if (!existingMeeting || !existingMeeting.meeting_days) continue;
+
+        // Check if days overlap
+        const overlappingDays = newMeeting.meeting_days.some(day =>
+          existingMeeting.meeting_days.includes(day)
+        );
+
+        if (overlappingDays) {
+          // Convert times to comparable values
+          const newStart = parseTime(newMeeting.start_time);
+          const newEnd = parseTime(newMeeting.end_time);
+          const existingStart = parseTime(existingMeeting.start_time);
+          const existingEnd = parseTime(existingMeeting.end_time);
+
+          // Check if times overlap
+          if (
+            (newStart < existingEnd && newStart >= existingStart) ||
+            (newEnd > existingStart && newEnd <= existingEnd) ||
+            (newStart <= existingStart && newEnd >= existingEnd) ||
+            (newStart >= existingStart && newEnd <= existingEnd)
+          ) {
+            return true; // Conflict detected
+          }
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+function showConflictToast() {
+  toast.error('This section conflicts with your schedule!', {
+    position: 'top-right',
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  });
+}
+
+
+function parseTime(time: string | undefined): number {
+  if (!time) return 0;
+  const [hour, minute] = time.split(':').map(s => parseInt(s));
+  const isPM = time.includes('pm');
+  let hourNum = hour;
+  if (isPM && hour !== 12) {
+    hourNum += 12;
+  } else if (!isPM && hour === 12) {
+    hourNum = 0; // Midnight case
+  }
+  return hourNum + minute / 60;
+}
 
 export function LoadingRow() {
   return (
@@ -120,6 +190,8 @@ type SectionTableRowProps = {
     searchQuery: SearchQuery,
     section: string | undefined,
   ) => boolean;
+  selectedSections: SectionsData;
+  setSelectedSections: React.Dispatch<React.SetStateAction<SectionsData>>; 
 };
 
 function SectionTableRow(props: SectionTableRowProps) {
@@ -131,9 +203,15 @@ function SectionTableRow(props: SectionTableRowProps) {
           checked={isSelected}
           onClick={() => {
             if (!isSelected) {
+              if (hasConflict(props.data, props.selectedSections)) { // Check for conflict
+                showConflictToast(); // Show toast if conflict exists
+                return; // Prevent section selection
+              }
               props.setPlannerSection(props.course, props.data.section_number);
+              props.setSelectedSections([...props.selectedSections, props.data]); // Update selectedSections state
             } else {
               props.setPlannerSection(props.course, undefined);
+              props.setSelectedSections(props.selectedSections.filter(section => section.section_number !== props.data.section_number)); // Remove section from selectedSections state
             }
           }}
         />
@@ -184,6 +262,8 @@ type PlannerCardProps = {
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RMPInterface>;
   removeFromPlanner: () => void;
+  selectedSections: SectionsData;
+  setSelectedSections: React.Dispatch<React.SetStateAction<SectionsData>>; 
 };
 
 const PlannerCard = (props: PlannerCardProps) => {
@@ -301,6 +381,8 @@ const PlannerCard = (props: PlannerCardProps) => {
                     course={props.query}
                     lastRow={index === sections.length - 1}
                     setPlannerSection={props.setPlannerSection}
+                    selectedSections={props.selectedSections} // ADD THIS
+                    setSelectedSections={props.setSelectedSections} // ADD THIS
                   />
                 ))}
               </TableBody>

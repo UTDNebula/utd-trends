@@ -14,11 +14,11 @@ type PlannerSectionComponentProps = {
 };
 
 const PlannerSection = (props: PlannerSectionComponentProps) => {
-  //const SectionComponent = () => {
-  console.log(props.selectedSection);
+  console.log(props.selectedSection)
   const [meetings, setMeetings] = useState<string[][]>([]);
+
   useEffect(() => {
-    const tempMeetings = [];
+    const tempMeetings: string[][] = [];
     for (let j = 0; j < props.selectedSection.meetings.length; j++) {
       const meeting = props.selectedSection.meetings[j];
       for (const meeting_day of meeting.meeting_days) {
@@ -43,7 +43,6 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
         let d_h = 0;
         let d_m = 0;
         if (e_m < s_m) {
-          // lmao i'm doing elementary carry subtraction
           e_h--;
           d_m = e_m + 60 - s_m;
         } else d_m = e_m - s_m;
@@ -63,7 +62,6 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
       }
     }
     setMeetings(tempMeetings);
-    console.log(numDays + 2);
   }, [props.selectedSection]);
 
   return meetings.map((x: string[], i: number) => (

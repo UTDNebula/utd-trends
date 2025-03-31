@@ -1,5 +1,5 @@
 import { Typography } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 
 import PlannerCard, {
   LoadingRow,
@@ -14,6 +14,7 @@ import {
 } from '@/modules/SearchQuery/SearchQuery';
 import { type SectionsType } from '@/modules/SectionsType/SectionsType';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import { type SectionsData } from '@/pages/api/sections';
 
 type PlannerCoursesTableProps = {
   courses?: SearchQuery[];
@@ -28,6 +29,8 @@ type PlannerCoursesTableProps = {
   };
   grades: { [key: string]: GenericFetchedData<GradesType> };
   rmp: { [key: string]: GenericFetchedData<RMPInterface> };
+  selectedSections: SectionsData; // ADD THIS
+  setSelectedSections: React.Dispatch<React.SetStateAction<SectionsData>>; // ADD THIS
 };
 
 const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
@@ -63,6 +66,8 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                   removeFromPlanner={() => {
                     props.removeFromPlanner(course);
                   }}
+                  selectedSections={props.selectedSections} // ADD THIS
+                  setSelectedSections={props.setSelectedSections} // ADD THIS
                 />
               );
             })
@@ -75,3 +80,4 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
 };
 
 export default PlannerCoursesTable;
+
