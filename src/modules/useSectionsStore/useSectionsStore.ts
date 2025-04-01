@@ -1,9 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 
-import fetchWithCache, {
-  cacheIndexNebula,
-  expireTime,
-} from '@/modules/fetchWithCache/fetchWithCache';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import {
   convertToCourseOnly,
@@ -20,7 +16,7 @@ function fetchSectionsData(
   query: SearchQuery,
   controller: AbortController,
 ): Promise<SectionsData> {
-  return fetchWithCache(
+  return fetch(
     '/api/sections?' +
       Object.keys(query)
         .map(
@@ -30,8 +26,6 @@ function fetchSectionsData(
             encodeURIComponent(String(query[key as keyof SearchQuery])),
         )
         .join('&'),
-    cacheIndexNebula,
-    expireTime,
     {
       signal: controller.signal,
       method: 'GET',
@@ -39,12 +33,14 @@ function fetchSectionsData(
         Accept: 'application/json',
       },
     },
-  ).then((response) => {
-    if (response.message !== 'success') {
-      throw new Error(response.message);
-    }
-    return response.data;
-  });
+  )
+    .then((response) => response.json())
+    .then((response) => {
+      if (response.message !== 'success') {
+        throw new Error(response.message);
+      }
+      return response.data;
+    });
 }
 
 // Finding the most recent semester in the database by the newest GOVT 2306 semester (don't judge me)
@@ -53,9 +49,14 @@ function checkLatestSemester() {
     { prefix: 'GOVT', number: '2306' },
     new AbortController(),
   ).then((res: SectionsData) => {
-    return res.sort((a, b) =>
-      compareSemesters(b.academic_session.name, a.academic_session.name),
-    )[0].academic_session.name;
+    return (
+      res
+        //exclude summers
+        .filter((sem) => !sem.academic_session.name.includes('U'))
+        .sort((a, b) =>
+          compareSemesters(b.academic_session.name, a.academic_session.name),
+        )[0].academic_session.name
+    );
   });
 }
 

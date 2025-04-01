@@ -5,10 +5,6 @@ import React, { useEffect, useState } from 'react';
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
-import fetchWithCache, {
-  cacheIndexNebula,
-  expireTime,
-} from '@/modules/fetchWithCache/fetchWithCache';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
@@ -56,13 +52,11 @@ const ProfessorOverview = ({
 
   useEffect(() => {
     setProfData({ state: 'loading' });
-    fetchWithCache(
+    fetch(
       '/api/professor?profFirst=' +
         encodeURIComponent(String(professor.profFirst)) +
         '&profLast=' +
         encodeURIComponent(String(professor.profLast)),
-      cacheIndexNebula,
-      expireTime,
       {
         method: 'GET',
         headers: {
@@ -70,6 +64,7 @@ const ProfessorOverview = ({
         },
       },
     )
+      .then((response) => response.json())
       .then((response) => {
         if (response.message !== 'success') {
           throw new Error(response.message);

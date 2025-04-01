@@ -1,6 +1,7 @@
+import BookIcon from '@mui/icons-material/Book';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ShareIcon from '@mui/icons-material/Share';
-import { IconButton, Snackbar, Tooltip } from '@mui/material';
+import { Button, IconButton, Snackbar, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -14,16 +15,21 @@ import SearchBar from '@/components/search/SearchBar/SearchBar';
 /**
  * Props type used by the TopMenu component
  */
-interface TopMenuProps {
+type DashboardTopMenuProps = {
   resultsLoading: 'loading' | 'done' | 'error';
   setResultsLoading: () => void;
-}
+  isPlanner: false;
+};
+type PlannerTopMenuProps = {
+  isPlanner: true;
+};
+type TopMenuProps = DashboardTopMenuProps | PlannerTopMenuProps;
 
 /**
  * This is a component to hold UTD Trends branding and basic navigation
  * @returns
  */
-export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
+export function TopMenu(props: TopMenuProps) {
   const router = useRouter();
   const [openCopied, setOpenCopied] = useState(false);
 
@@ -39,7 +45,6 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
       copyLink(url);
     }
   }
-
   function copyLink(url: string) {
     if (navigator.clipboard) {
       navigator.clipboard
@@ -50,7 +55,6 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
       alertLink(url);
     }
   }
-
   function alertLink(url: string) {
     alert(url);
   }
@@ -90,14 +94,47 @@ export function TopMenu({ resultsLoading, setResultsLoading }: TopMenuProps) {
         >
           UTD TRENDS
         </Link>
-        <SearchBar
-          manageQuery="onSelect"
-          resultsLoading={resultsLoading}
-          setResultsLoading={setResultsLoading}
-          className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
-          input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
-        />
-        <div className="flex gap-0 md:gap-4 ml-auto">
+        {!props.isPlanner && (
+          <SearchBar
+            manageQuery="onSelect"
+            resultsLoading={props.resultsLoading}
+            setResultsLoading={props.setResultsLoading}
+            className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
+            input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+          />
+        )}
+        <Link
+          href={
+            props.isPlanner
+              ? typeof sessionStorage !== 'undefined' &&
+                sessionStorage.getItem('dashboardSearchTerms')
+                ? '/dashboard?' + sessionStorage.getItem('dashboardSearchTerms')
+                : '/dashboard'
+              : '/planner'
+          }
+          onClick={() =>
+            !props.isPlanner
+              ? sessionStorage.setItem(
+                  'dashboardSearchTerms',
+                  Object.entries(router.query)
+                    .map(([key, value]) => {
+                      if (typeof value === 'string') {
+                        return key + '=' + encodeURIComponent(value);
+                      }
+                      return '';
+                    })
+                    .join('&') ?? '',
+                )
+              : null
+          }
+          className="ml-auto rounded-xl"
+        >
+          <Button className="bg-cornflower-500 rounded-xl text-white dark:bg-cornflower-400 text p-2 px-4 normal-case">
+            <BookIcon className="mr-2" />
+            {props.isPlanner ? 'Search Results' : 'My Planner'}
+          </Button>
+        </Link>
+        <div className="flex gap-0 md:gap-4">
           <div className="ml-auto">
             <WhatsNew />
           </div>

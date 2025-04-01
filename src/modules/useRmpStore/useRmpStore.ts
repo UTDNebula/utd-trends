@@ -1,9 +1,5 @@
 import { useState } from 'react';
 
-import fetchWithCache, {
-  cacheIndexRmp,
-  expireTime,
-} from '@/modules/fetchWithCache/fetchWithCache';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import {
   type SearchQuery,
@@ -16,13 +12,11 @@ function fetchRmpData(
   professor: SearchQuery,
   controller: AbortController,
 ): Promise<RMPInterface> {
-  return fetchWithCache(
+  return fetch(
     '/api/ratemyprofessorScraper?profFirst=' +
       encodeURIComponent(String(professor.profFirst)) +
       '&profLast=' +
       encodeURIComponent(String(professor.profLast)),
-    cacheIndexRmp,
-    expireTime,
     {
       signal: controller.signal,
       method: 'GET',
@@ -30,12 +24,14 @@ function fetchRmpData(
         Accept: 'application/json',
       },
     },
-  ).then((response) => {
-    if (response.message !== 'success') {
-      throw new Error(response.message);
-    }
-    return response.data;
-  });
+  )
+    .then((response) => response.json())
+    .then((response) => {
+      if (response.message !== 'success') {
+        throw new Error(response.message);
+      }
+      return response.data;
+    });
 }
 
 //Limit cached number of grades and rmp data entries

@@ -1,3 +1,5 @@
+import BookIcon from '@mui/icons-material/Book';
+import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Checkbox,
@@ -31,6 +33,7 @@ import {
   searchQueryEqual,
   searchQueryLabel,
 } from '@/modules/SearchQuery/SearchQuery';
+import type { SectionsType } from '@/modules/SectionsType/SectionsType';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
 function LoadingRow() {
@@ -57,6 +60,11 @@ function LoadingRow() {
             <KeyboardArrowIcon />
           </IconButton>
           <Checkbox disabled />
+          <Checkbox
+            disabled
+            icon={<BookOutlinedIcon />}
+            className="animate-pulse"
+          />
         </TableCell>
         <TableCell
           component="th"
@@ -84,6 +92,7 @@ function LoadingRow() {
 }
 
 type RowProps = {
+  section: GenericFetchedData<SectionsType>;
   course: SearchQuery;
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RMPInterface>;
@@ -91,10 +100,14 @@ type RowProps = {
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
   color?: string;
+  inPlanner: boolean;
+  addToPlanner: (value: SearchQuery) => void;
+  removeFromPlanner: (value: SearchQuery) => void;
   showTutorial: boolean;
 };
 
 function Row({
+  section,
   course,
   grades,
   rmp,
@@ -102,8 +115,16 @@ function Row({
   addToCompare,
   removeFromCompare,
   color,
+  inPlanner,
+  addToPlanner,
+  removeFromPlanner,
   showTutorial,
 }: RowProps) {
+  // Check if the course section has the latest semester data
+  const hasLatestSemester = !!(
+    section.state === 'done' && section.data.latest.length
+  );
+
   const [open, setOpen] = useState(false);
   const canOpen =
     !(typeof grades === 'undefined' || grades.state === 'error') ||
@@ -217,6 +238,43 @@ function Row({
                 } // Apply color if defined
               />
             </Tooltip>
+            {!(
+              typeof course.prefix === 'undefined' &&
+              typeof course.number === 'undefined'
+            ) && (
+              <Tooltip
+                title={
+                  hasLatestSemester
+                    ? inPlanner
+                      ? 'Remove from Planner'
+                      : 'Add to Planner'
+                    : section.state === 'loading'
+                      ? undefined
+                      : 'Not being taught'
+                }
+                placement="top"
+              >
+                <span>
+                  <Checkbox
+                    checked={inPlanner}
+                    onClick={(e) => {
+                      e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
+                      if (inPlanner) {
+                        removeFromPlanner(course);
+                      } else {
+                        addToPlanner(course);
+                      }
+                    }}
+                    className={
+                      section.state === 'loading' ? 'animate-pulse' : ''
+                    }
+                    icon={<BookOutlinedIcon />}
+                    checkedIcon={<BookIcon />}
+                    disabled={!hasLatestSemester}
+                  />
+                </span>
+              </Tooltip>
+            )}
           </div>
         </TableCell>
         <TableCell
@@ -308,6 +366,7 @@ function Row({
 }
 
 type SearchResultsTableProps = {
+  sections: { [key: string]: GenericFetchedData<SectionsType> };
   resultsLoading: 'loading' | 'done';
   numSearches: number;
   includedResults: SearchQuery[];
@@ -318,9 +377,13 @@ type SearchResultsTableProps = {
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
   colorMap: { [key: string]: string };
+  planner: SearchQuery[];
+  addToPlanner: (value: SearchQuery) => void;
+  removeFromPlanner: (value: SearchQuery) => void;
 };
 
 const SearchResultsTable = ({
+  sections,
   resultsLoading,
   numSearches,
   includedResults,
@@ -331,6 +394,9 @@ const SearchResultsTable = ({
   addToCompare,
   removeFromCompare,
   colorMap,
+  planner,
+  addToPlanner,
+  removeFromPlanner,
 }: SearchResultsTableProps) => {
   //Table sorting category
   const [orderBy, setOrderBy] = useState<'name' | 'gpa' | 'rating'>('name');
@@ -446,7 +512,6 @@ const SearchResultsTable = ({
           bNumber.localeCompare(aNumber)
         );
       }
-      return 0;
     }
     if (orderBy === 'gpa') {
       const aGrades = grades[searchQueryLabel(a)];
@@ -565,6 +630,7 @@ const SearchResultsTable = ({
             {resultsLoading === 'done'
               ? sortedResults.map((result, index) => (
                   <Row
+                    section={sections[searchQueryLabel(result)]}
                     key={searchQueryLabel(result)}
                     course={result}
                     grades={grades[searchQueryLabel(result)]}
@@ -577,6 +643,13 @@ const SearchResultsTable = ({
                     addToCompare={addToCompare}
                     removeFromCompare={removeFromCompare}
                     color={colorMap[searchQueryLabel(result)]}
+                    inPlanner={
+                      planner.findIndex((obj) =>
+                        searchQueryEqual(obj, result),
+                      ) !== -1
+                    }
+                    addToPlanner={addToPlanner}
+                    removeFromPlanner={removeFromPlanner}
                     showTutorial={index === numSearches}
                   />
                 ))
@@ -603,6 +676,7 @@ const SearchResultsTable = ({
             {resultsLoading === 'done' &&
               sortedUnIncludedResults.map((result) => (
                 <Row
+                  section={sections[searchQueryLabel(result)]}
                   key={searchQueryLabel(result)}
                   course={result}
                   grades={grades[searchQueryLabel(result)]}
@@ -615,7 +689,14 @@ const SearchResultsTable = ({
                   addToCompare={addToCompare}
                   removeFromCompare={removeFromCompare}
                   color={colorMap[searchQueryLabel(result)]}
-                  showTutorial={false /*index === numSearches*/}
+                  inPlanner={
+                    planner.findIndex((obj) =>
+                      searchQueryEqual(obj, result),
+                    ) !== -1
+                  }
+                  addToPlanner={addToPlanner}
+                  removeFromPlanner={removeFromPlanner}
+                  showTutorial={false}
                 />
               ))}
           </TableBody>

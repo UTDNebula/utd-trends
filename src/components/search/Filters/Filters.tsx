@@ -61,17 +61,6 @@ const Filters = ({
     }
   }, [router.isReady, router.query.minGPA, router.query.minRating]);
 
-  let semestersSelectValue = chosenSessions;
-  if (chosenSessions.length === academicSessions.length) {
-    semestersSelectValue = chosenSessions.concat(['select-all']);
-  } else if (
-    recentSemesters.length > 0 &&
-    chosenSessions.length === recentSemesters.length &&
-    chosenSessions.every((el) => recentSemesters.includes(el))
-  ) {
-    semestersSelectValue = chosenSessions.concat(['recent']);
-  }
-
   function getRecentSemesters() {
     // get current month and year
     const today = new Date();
@@ -108,7 +97,6 @@ const Filters = ({
     toSet: 'minGPA' | 'minRating' | 'availability',
     setter: (value: string) => void,
   ) {
-    console.log(newValue);
     setter(newValue);
     if (manageQuery && router.isReady) {
       const newQuery = { ...router.query };
@@ -158,8 +146,8 @@ const Filters = ({
       className="mb-4 sm:m-0"
     >
       {/* min letter grade dropdown*/}
-      <Grid size={{ xs: 6, sm: 3 }}>
-        <Tooltip title="Select Minimum Letter Grade Average" placement="top">
+      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+        <Tooltip title={'Select Minimum Letter Grade Average'} placement="top">
           <FormControl
             size="small"
             className={`w-full ${
@@ -192,8 +180,8 @@ const Filters = ({
       </Grid>
 
       {/* min rating dropdown*/}
-      <Grid size={{ xs: 6, sm: 3 }}>
-        <Tooltip title="Select Minimum Professor Rating" placement="top">
+      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+        <Tooltip title={'Select Minimum Professor Rating'} placement="top">
           <FormControl
             size="small"
             className={`w-full ${
@@ -240,9 +228,9 @@ const Filters = ({
       </Grid>
 
       {/* semester dropdown */}
-      <Grid size={{ xs: 6, sm: 3 }}>
+      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
         <Tooltip
-          title="Select Semesters to Include Grades from"
+          title={'Select Semesters to Include Grades from'}
           placement="top"
         >
           <FormControl
@@ -258,58 +246,35 @@ const Filters = ({
               label="Semesters"
               labelId="Semesters"
               multiple
-              value={semestersSelectValue}
+              value={chosenSessions}
               onChange={(event: SelectChangeEvent<string[]>) => {
                 const {
                   target: { value },
                 } = event;
-                // starting from all
-                if (chosenSessions.length === academicSessions.length) {
-                  if (value.includes('recent')) {
-                    // swap to recent
-                    addChosenSessions(() => recentSemesters);
-                  } else if (value.includes('select-all')) {
-                    // removes semester clicked
-                    addChosenSessions(() =>
-                      (value as string[]).filter((e) => e !== 'select-all'),
-                    );
-                  } else {
-                    // unselect all
+                if (value.includes('select-all')) {
+                  if (chosenSessions.length === academicSessions.length) {
                     addChosenSessions(() => []);
-                  }
-                  // starting from recent
-                } else if (
-                  chosenSessions.length === recentSemesters.length &&
-                  chosenSessions.every((el) => recentSemesters.includes(el))
-                ) {
-                  if (value.includes('select-all')) {
-                    // swap to all
-                    addChosenSessions(() => academicSessions);
-                  } else if (value.includes('recent')) {
-                    // removes semester clicked
-                    addChosenSessions(() =>
-                      (value as string[]).filter((e) => e !== 'recent'),
-                    );
                   } else {
-                    // swap to all
                     addChosenSessions(() => academicSessions);
                   }
-                  // normal
-                } else {
-                  if (value.includes('select-all')) {
+                } else if (value.includes('recent')) {
+                  if (
+                    chosenSessions.length === recentSemesters.length &&
+                    chosenSessions.every((el) => recentSemesters.includes(el))
+                  ) {
                     addChosenSessions(() => academicSessions);
-                  } else if (value.includes('recent')) {
+                  } else {
                     addChosenSessions(() => recentSemesters);
-                  } else {
-                    addChosenSessions(() => value as string[]);
                   }
+                } else {
+                  addChosenSessions(() => value as string[]);
                 }
               }}
-              renderValue={() => {
+              renderValue={(selected) => {
                 if (chosenSessions.length === academicSessions.length) {
                   return 'All selected';
                 }
-                return chosenSessions
+                return selected
                   .sort((a, b) => compareSemesters(a, b))
                   .join(', ');
               }}
@@ -353,7 +318,6 @@ const Filters = ({
                   primary="Recent"
                 />
               </MenuItem>
-              <hr className="border-t-2 border-cornflower-600 dark:border-gray-500" />
 
               {/* individual options */}
               {academicSessions.map((session) => (

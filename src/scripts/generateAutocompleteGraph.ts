@@ -92,11 +92,11 @@ function addWithParents(
 
 //Add node in format: <prefix>[<number>| <number>[.<section>]
 //and: (<number>|<number> )<prefix>[.<section>]
-function addCourse(prefix: string, number: string, sectionNumber: string) {
+function addCourse(prefix: string, number: string) {
   //<prefix>[ ]<number>
   const prefixNode = addSearchQueryCharacter(root, prefix);
   const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
-  const classNode = addWithParents([prefixNode, prefixSpaceNode], number, {
+  addWithParents([prefixNode, prefixSpaceNode], number, {
     prefix: prefix,
     number: number,
   });
@@ -108,22 +108,6 @@ function addCourse(prefix: string, number: string, sectionNumber: string) {
     prefix: prefix,
     number: number,
   });
-
-  if (sectionNumber === 'HON') {
-    //<prefix>[ ]<number>.<section>
-    //<number>.<section>
-    addWithParents([classNode, classNode2], '.' + sectionNumber, {
-      prefix: prefix,
-      number: number,
-      sectionNumber: sectionNumber,
-    });
-    //<number>.<section> <prefix>
-    addSearchQueryCharacter(classNode2, '.' + sectionNumber + ' ' + prefix, {
-      prefix: prefix,
-      number: number,
-      sectionNumber: sectionNumber,
-    });
-  }
 }
 
 //Add nodes in format: (<professorLast>|<professorFirst> <professorLast>)
@@ -156,17 +140,13 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
     ) {
       const academicSessionData =
         courseNumberData.academic_sessions[academicSessionItr];
+      addCourse(prefixData.subject_prefix, courseNumberData.course_number);
       for (
         let sectionItr = 0;
         sectionItr < academicSessionData.sections.length;
         sectionItr++
       ) {
         const sectionData = academicSessionData.sections[sectionItr];
-        addCourse(
-          prefixData.subject_prefix,
-          courseNumberData.course_number,
-          sectionData.section_number,
-        );
         for (
           let professorItr = 0;
           professorItr < sectionData.professors.length;
