@@ -1,9 +1,5 @@
 import { useState } from 'react';
 
-import fetchWithCache, {
-  cacheIndexNebula,
-  expireTime,
-} from '@/modules/fetchWithCache/fetchWithCache';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
@@ -72,7 +68,7 @@ function fetchGradesData(
   course: SearchQuery,
   controller: AbortController,
 ): Promise<GradesType> {
-  return fetchWithCache(
+  return fetch(
     '/api/grades?' +
       Object.keys(course)
         .map(
@@ -82,8 +78,6 @@ function fetchGradesData(
             encodeURIComponent(String(course[key as keyof SearchQuery])),
         )
         .join('&'),
-    cacheIndexNebula,
-    expireTime,
     {
       signal: controller.signal,
       method: 'GET',
@@ -91,20 +85,22 @@ function fetchGradesData(
         Accept: 'application/json',
       },
     },
-  ).then((response) => {
-    if (response.message !== 'success') {
-      throw new Error(response.message);
-    }
-    if (response.data == null) {
-      throw new Error('null data');
-    }
-    const calculated = calculateGrades(response.data);
-    return {
-      filtered: calculated,
-      unfiltered: calculated,
-      grades: response.data, //type GradesData
-    };
-  });
+  )
+    .then((response) => response.json())
+    .then((response) => {
+      if (response.message !== 'success') {
+        throw new Error(response.message);
+      }
+      if (response.data == null) {
+        throw new Error('null data');
+      }
+      const calculated = calculateGrades(response.data);
+      return {
+        filtered: calculated,
+        unfiltered: calculated,
+        grades: response.data, //type GradesData
+      };
+    });
 }
 
 //Limit cached number of grades and rmp data entries

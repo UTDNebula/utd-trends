@@ -20,18 +20,16 @@ import ProfessorOverview from '@/components/overview/ProfessorOverview/Professor
 import Filters from '@/components/search/Filters/Filters';
 import SearchResultsTable from '@/components/search/SearchResultsTable/SearchResultsTable';
 import { compareColors } from '@/modules/colors/colors';
-import fetchWithCache, {
-  cacheIndexNebula,
-  expireTime,
-} from '@/modules/fetchWithCache/fetchWithCache';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   convertToProfOnly,
   decodeSearchQueryLabel,
+  removeSection,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
+  type SearchQueryMultiSection,
 } from '@/modules/SearchQuery/SearchQuery';
 import type { SectionsType } from '@/modules/SectionsType/SectionsType';
 import useGradeStore from '@/modules/useGradeStore/useGradeStore';
@@ -50,29 +48,26 @@ function combosSearchResultsFetch(
   searchTerm: SearchQuery,
   controller: AbortController,
 ): Promise<SearchQuery[]> {
-  return fetchWithCache(
-    '/api/combo?input=' + searchQueryLabel(searchTerm),
-    cacheIndexNebula,
-    expireTime,
-    {
-      // use the search terms to fetch all the result course-professor combinations
-      signal: controller.signal,
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
+  return fetch('/api/combo?input=' + searchQueryLabel(searchTerm), {
+    // use the search terms to fetch all the result course-professor combinations
+    signal: controller.signal,
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
     },
-  ).then((response) => {
-    if (response.message !== 'success') {
-      throw new Error(response.message);
-    }
-    return [searchTerm].concat(
-      response.data.map((obj: SearchQuery) => ({
-        ...searchTerm,
-        ...obj,
-      })),
-    );
-  });
+  })
+    .then((response) => response.json())
+    .then((response) => {
+      if (response.message !== 'success') {
+        throw new Error(response.message);
+      }
+      return [searchTerm].concat(
+        response.data.map((obj: SearchQuery) => ({
+          ...searchTerm,
+          ...obj,
+        })),
+      );
+    });
 }
 
 //Get all course+prof combos for searchTerms and keep only the ones that match filterTerms
@@ -111,7 +106,6 @@ function fetchSearchResults(
   });
 }
 
-// Add this utility function after the existing type definitions
 function createColorMap(courses: SearchQuery[]): { [key: string]: string } {
   const colorMap: { [key: string]: string } = {};
   courses.forEach((course, index) => {
@@ -192,6 +186,9 @@ interface Props {
     [key: string]: GenericFetchedData<SectionsType>;
   };
   pageTitle: string;
+  planner: SearchQueryMultiSection[];
+  addToPlanner: (value: SearchQuery) => void;
+  removeFromPlanner: (value: SearchQuery) => void;
   grades: {
     [key: string]: GenericFetchedData<GradesType>;
   };
@@ -226,7 +223,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     state: 'loading',
   });
 
-  //On search change, seperate into courses and profs, clear data, and fetch new results
+  //On search change, separate into courses and profs, clear data, and fetch new results
   useEffect(() => {
     if (router.isReady) {
       const { courseSearchTerms, professorSearchTerms } = getSearchTerms(
@@ -618,7 +615,6 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     panelLRef.current?.resize(50);
   };
 
-  // Add this after the compare state declaration
   const colorMap = createColorMap(compare);
 
   //Main content: loading, error, or normal
@@ -670,6 +666,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     );
     const searchResultsTable = (
       <SearchResultsTable
+        sections={props.sections}
         resultsLoading={results.state}
         numSearches={courses.length + professors.length}
         includedResults={includedResults}
@@ -680,6 +677,9 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         addToCompare={addToCompare}
         removeFromCompare={removeFromCompare}
         colorMap={colorMap}
+        planner={props.planner.map((x) => removeSection(x))}
+        addToPlanner={props.addToPlanner}
+        removeFromPlanner={props.removeFromPlanner}
       />
     );
     const carousel = (
@@ -758,6 +758,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         <TopMenu
           resultsLoading={results.state}
           setResultsLoading={() => setResults({ state: 'loading' })}
+          isPlanner={false}
         />
         <main className="p-4">{contentComponent}</main>
       </div>

@@ -14,7 +14,16 @@ import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config.js';
 import FeedbackPopup from '@/components/common/FeedbackPopup/FeedbackPopup';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
+import {
+  convertToCourseOnly,
+  removeSection,
+  type SearchQuery,
+  searchQueryEqual,
+  type SearchQueryMultiSection,
+} from '@/modules/SearchQuery/SearchQuery';
+import sectionCanOverlap from '@/modules/sections/sections';
 import useGradeStore from '@/modules/useGradeStore/useGradeStore';
+import usePersistantState from '@/modules/usePersistantState/usePersistantState';
 import useRmpStore from '@/modules/useRmpStore/useRmpStore';
 import useSectionsStore from '@/modules/useSectionsStore/useSectionsStore';
 
@@ -148,6 +157,76 @@ function MyApp({ Component, pageProps }: AppProps) {
   //Store rmp scores by profs
   const [rmp, , fetchAndStoreRmpData] = useRmpStore();
 
+  //Store course+prof combos in planner
+  const [planner, setPlanner] = usePersistantState<SearchQueryMultiSection[]>(
+    'planner',
+    [],
+  );
+
+  //Add a course+prof combo to planner (happens from search results)
+  function addToPlanner(searchQuery: SearchQuery) {
+    //If not already there
+    if (planner.findIndex((obj) => searchQueryEqual(obj, searchQuery)) === -1) {
+      //Add to list
+      setPlanner(planner.concat([searchQuery]));
+    }
+  }
+
+  //Remove a course+prof combo from compare
+  function removeFromPlanner(searchQuery: SearchQuery) {
+    //If already there
+    if (planner.findIndex((obj) => searchQueryEqual(obj, searchQuery)) !== -1) {
+      //Remove from list
+      setPlanner(planner.filter((el) => !searchQueryEqual(el, searchQuery)));
+    }
+  }
+
+  function setPlannerSection(searchQuery: SearchQuery, section: string) {
+    setPlanner(
+      planner.map((course) => {
+        if (
+          searchQueryEqual(removeSection(course), removeSection(searchQuery))
+        ) {
+          if (typeof course.sectionNumbers === 'undefined') {
+            return { ...course, sectionNumbers: [section] };
+          }
+          if (course.sectionNumbers.includes(section)) {
+            return {
+              ...course,
+              sectionNumbers: course.sectionNumbers.filter(
+                (s) => s !== section,
+              ),
+            };
+          } else {
+            let newSections = course.sectionNumbers;
+            if (!sectionCanOverlap(section)) {
+              newSections = newSections.filter((s) => sectionCanOverlap(s));
+            }
+            return {
+              ...course,
+              sectionNumbers: newSections.concat([section]),
+            };
+          }
+        } else if (
+          searchQueryEqual(
+            convertToCourseOnly(course),
+            convertToCourseOnly(searchQuery),
+          ) &&
+          typeof course.sectionNumbers !== 'undefined'
+        ) {
+          //to remove from a different combo
+          return {
+            ...course,
+            sectionNumbers: course.sectionNumbers.filter((s) =>
+              sectionCanOverlap(s),
+            ),
+          };
+        }
+        return course;
+      }),
+    );
+  }
+
   //Store sections by course+prof combo
   const [sections, , fetchAndStoreSectionsData] = useSectionsStore();
 
@@ -188,6 +267,10 @@ function MyApp({ Component, pageProps }: AppProps) {
         >
           <Component
             {...pageProps}
+            planner={planner}
+            addToPlanner={addToPlanner}
+            removeFromPlanner={removeFromPlanner}
+            setPlannerSection={setPlannerSection}
             grades={grades}
             fetchAndStoreGradesData={fetchAndStoreGradesData}
             recalcGrades={recalcGrades}

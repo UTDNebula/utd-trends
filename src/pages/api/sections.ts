@@ -17,7 +17,7 @@ export type SectionsData = {
     last_name: string;
     role: string;
     email: string;
-  };
+  }[];
   internal_class_number: string;
   instruction_mode: string;
   meetings: {

@@ -2,10 +2,6 @@ import { Skeleton } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
-import fetchWithCache, {
-  cacheIndexNebula,
-  expireTime,
-} from '@/modules/fetchWithCache/fetchWithCache';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
@@ -207,13 +203,11 @@ const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
 
   useEffect(() => {
     setCourseData({ state: 'loading' });
-    fetchWithCache(
+    fetch(
       '/api/course?prefix=' +
         encodeURIComponent(String(course.prefix)) +
         '&number=' +
         encodeURIComponent(String(course.number)),
-      cacheIndexNebula,
-      expireTime,
       {
         method: 'GET',
         headers: {
@@ -221,6 +215,7 @@ const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
         },
       },
     )
+      .then((response) => response.json())
       .then((response) => {
         if (response.message !== 'success') {
           throw new Error(response.message);
