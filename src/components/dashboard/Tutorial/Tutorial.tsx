@@ -1,6 +1,7 @@
 import type { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
+import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import CloseIcon from '@mui/icons-material/Close';
-import { Backdrop, Button, IconButton, Popover } from '@mui/material';
+import { Backdrop, Button, Checkbox, IconButton, Popover } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
 type TutorialPopupProps = {
@@ -129,11 +130,22 @@ const stepsTemplate: StepTemplate[] = [
   },
   {
     id: 'actions',
-    title: 'More Information & Compare',
+    title: 'Actions',
     content: (
       <>
         <p>Open a result for more detailed information.</p>
-        <p>Click the checkbox to add an item to the compare tab.</p>
+        <div className="flex items-center">
+          <Checkbox />
+          <p>
+            add an item to the <b>compare</b> tab.
+          </p>
+        </div>
+        <div className="flex items-center">
+          <Checkbox icon={<BookOutlinedIcon />} />
+          <p>
+            add an item to the <b>My Planner</b> page.
+          </p>
+        </div>
       </>
     ),
     anchorOrigin: { vertical: 'bottom', horizontal: 'center' },
