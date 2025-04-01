@@ -40,34 +40,6 @@ function addCombo( //variables
   ) {
     table[profString].push(courseObject);
   }
-
-  if (sectionNumber === 'HON') {
-    //honor course separate
-    const courseWSectionString = prefix + ' ' + number + '.' + sectionNumber;
-    const courseWSectionObject: SearchQuery = {
-      prefix,
-      number,
-      sectionNumber,
-    };
-    if (!Object.prototype.hasOwnProperty.call(table, courseWSectionString)) {
-      table[courseWSectionString] = [profObject]; //add from query like with regular course
-    } else if (
-      table[courseWSectionString].findIndex((x) =>
-        searchQueryEqual(profObject, x),
-      ) === -1
-    ) {
-      table[courseWSectionString].push(profObject);
-    }
-    if (!Object.prototype.hasOwnProperty.call(table, profString)) {
-      table[profString] = [courseWSectionObject];
-    } else if (
-      table[profString].findIndex((x) =>
-        searchQueryEqual(courseWSectionObject, x),
-      ) === -1
-    ) {
-      table[profString].push(courseWSectionObject);
-    }
-  }
 }
 
 function sortResults(key: string) {

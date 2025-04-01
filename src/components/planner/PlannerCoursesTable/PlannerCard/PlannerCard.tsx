@@ -39,6 +39,60 @@ import sectionCanOverlap from '@/modules/sections/sections';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import { type SectionsData } from '@/pages/api/sections';
 
+function parseTime(time: string): number {
+  const [hour, minute] = time.split(':').map((s) => parseInt(s));
+  const isPM = time.includes('pm');
+  let hourNum = hour;
+  if (isPM && hour !== 12) {
+    hourNum += 12;
+  } else if (!isPM && hour === 12) {
+    hourNum = 0; // Midnight case
+  }
+  return hourNum + minute / 60;
+}
+
+function hasConflict(
+  newSection: SectionsData[number],
+  selectedSections: SectionsData,
+): boolean {
+  if (!newSection || !selectedSections) return false;
+
+  for (const selectedSection of selectedSections) {
+    for (const newMeeting of newSection.meetings) {
+      if (!newMeeting || !newMeeting.meeting_days) continue;
+
+      for (const existingMeeting of selectedSection.meetings) {
+        if (!existingMeeting || !existingMeeting.meeting_days) continue;
+
+        // Check if days overlap
+        const overlappingDays = newMeeting.meeting_days.some((day) =>
+          existingMeeting.meeting_days.includes(day),
+        );
+
+        if (overlappingDays) {
+          // Convert times to comparable values
+          const newStart = parseTime(newMeeting.start_time);
+          const newEnd = parseTime(newMeeting.end_time);
+          const existingStart = parseTime(existingMeeting.start_time);
+          const existingEnd = parseTime(existingMeeting.end_time);
+
+          // Check if times overlap
+          if (
+            (newStart < existingEnd && newStart >= existingStart) ||
+            (newEnd > existingStart && newEnd <= existingEnd) ||
+            (newStart <= existingStart && newEnd >= existingEnd) ||
+            (newStart >= existingStart && newEnd <= existingEnd)
+          ) {
+            return true; // Conflict detected
+          }
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
 export function LoadingRow() {
   return (
     <Box
@@ -152,6 +206,8 @@ type SectionTableRowProps = {
   lastRow: boolean;
   setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
   hasMultipleDateRanges: boolean;
+  selectedSections: SectionsData;
+  openConflictMessage: () => void;
 };
 
 function SectionTableRow(props: SectionTableRowProps) {
@@ -165,6 +221,14 @@ function SectionTableRow(props: SectionTableRowProps) {
           <Checkbox
             checked={isSelected}
             onClick={() => {
+              if (
+                !isSelected &&
+                hasConflict(props.data, props.selectedSections)
+              ) {
+                // Check for conflict
+                props.openConflictMessage();
+                return; // Prevent section selection
+              }
               props.setPlannerSection(props.course, props.data.section_number);
             }}
           />
@@ -172,6 +236,14 @@ function SectionTableRow(props: SectionTableRowProps) {
           <Radio
             checked={isSelected}
             onClick={() => {
+              if (
+                !isSelected &&
+                hasConflict(props.data, props.selectedSections)
+              ) {
+                // Check for conflict
+                props.openConflictMessage();
+                return; // Prevent section selection
+              }
               props.setPlannerSection(props.course, props.data.section_number);
             }}
           />
@@ -272,6 +344,8 @@ type PlannerCardProps = {
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RMPInterface>;
   removeFromPlanner: () => void;
+  selectedSections: SectionsData;
+  openConflictMessage: () => void;
   color: { fill: string; outline: string; font: string };
 };
 
@@ -442,6 +516,8 @@ const PlannerCard = (props: PlannerCardProps) => {
                     course={props.query}
                     lastRow={index === sections.length - 1}
                     setPlannerSection={props.setPlannerSection}
+                    selectedSections={props.selectedSections}
+                    openConflictMessage={props.openConflictMessage}
                     hasMultipleDateRanges={hasMultipleDateRanges}
                   />
                 ))}

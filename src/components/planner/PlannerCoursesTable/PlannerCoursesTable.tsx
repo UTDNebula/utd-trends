@@ -1,5 +1,5 @@
-import { Typography } from '@mui/material';
-import React from 'react';
+import { Alert, Snackbar, Typography } from '@mui/material';
+import React, { useState } from 'react';
 
 import PlannerCard, {
   LoadingRow,
@@ -7,18 +7,20 @@ import PlannerCard, {
 import { type GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
+  convertToCourseOnly,
   convertToProfOnly,
   removeSection,
   type SearchQuery,
   searchQueryLabel,
   type SearchQueryMultiSection,
+  searchQueryMultiSectionSplit,
 } from '@/modules/SearchQuery/SearchQuery';
 import sectionCanOverlap from '@/modules/sections/sections';
 import { type SectionsType } from '@/modules/SectionsType/SectionsType';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
 type PlannerCoursesTableProps = {
-  courses?: SearchQueryMultiSection[];
+  courses: SearchQueryMultiSection[];
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
   setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
@@ -31,6 +33,14 @@ type PlannerCoursesTableProps = {
 };
 
 const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
+  const [openConflictMessage, setOpenConflictMessage] = useState(false);
+  const conflictMessageClose = (_: unknown, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenConflictMessage(false);
+  };
+
   return (
     <>
       <Typography className="leading-tight text-3xl font-bold p-4">
@@ -70,8 +80,30 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                   removeFromPlanner={() => {
                     props.removeFromPlanner(course);
                   }}
+                  selectedSections={props.courses
+                    .flatMap((searchQuery) =>
+                      searchQueryMultiSectionSplit(searchQuery),
+                    )
+                    .map((course) => {
+                      const sections =
+                        props.sections[searchQueryLabel(removeSection(course))];
+                      if (
+                        typeof sections === 'undefined' ||
+                        sections.state !== 'done'
+                      ) {
+                        return undefined;
+                      }
+                      return sections.data.latest.find(
+                        (section) =>
+                          section.section_number === course.sectionNumber,
+                      );
+                    })
+                    .filter((section) => typeof section !== 'undefined')}
+                  openConflictMessage={() => setOpenConflictMessage(true)}
                   color={
-                    props.colorMap[searchQueryLabel(removeSection(course))]
+                    props.colorMap[
+                      searchQueryLabel(convertToCourseOnly(course))
+                    ]
                   }
                 />
               );
@@ -80,6 +112,20 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
               .fill(0)
               .map((_, index) => <LoadingRow key={index} />)}
       </div>
+      <Snackbar
+        open={openConflictMessage}
+        autoHideDuration={6000}
+        onClose={conflictMessageClose}
+      >
+        <Alert
+          onClose={conflictMessageClose}
+          severity="error"
+          variant="filled"
+          className="w-full"
+        >
+          This section conflicts with your schedule!
+        </Alert>
+      </Snackbar>
     </>
   );
 };

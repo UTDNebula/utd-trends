@@ -75,6 +75,7 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
   }
 
   return meetings.map((x: string[], i: number) => {
+    const height = parseInt(x[2]);
     return (
       <div
         key={selectedSection._id + i}
@@ -93,16 +94,29 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
           row-start-[var(--start-row)] row-span-1 relative 
           top-[var(--offset)] h-[var(--height)] overflow-hidden 
           rounded-xl border-2
-          ml-1 leading-relaxed shadow-md dark:shadow-lg dark:shadow-white/20`}
+          ml-1 leading-relaxed`}
       >
-        <div className={`text-[15px] font-semibold font-inter text-center`}>
+        <div
+          className={
+            'font-semibold text-center font-inter ' +
+            (height > 100 ? 'text-sm' : 'text-xs leading-none')
+          }
+        >
           {props.course.prefix} {props.course.number}.
           {selectedSection.section_number}
         </div>
-        <div className="text-xs text-center">
+        <div
+          className={
+            'text-xs text-center ' + (height > 100 ? '' : 'leading-none')
+          }
+        >
           {props.course.profFirst} {props.course.profLast}
         </div>
-        <div className="text-xs text-center">
+        <div
+          className={
+            'text-xs text-center ' + (height > 100 ? '' : 'leading-none')
+          }
+        >
           {selectedSection.meetings[0]?.location?.building}{' '}
           {selectedSection.meetings[0]?.location?.room}
         </div>
