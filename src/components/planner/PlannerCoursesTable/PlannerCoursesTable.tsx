@@ -7,6 +7,7 @@ import PlannerCard, {
 import { type GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
+  convertToCourseOnly,
   convertToProfOnly,
   removeSection,
   type SearchQuery,
@@ -100,7 +101,9 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                     .filter((section) => typeof section !== 'undefined')}
                   openConflictMessage={() => setOpenConflictMessage(true)}
                   color={
-                    props.colorMap[searchQueryLabel(removeSection(course))]
+                    props.colorMap[
+                      searchQueryLabel(convertToCourseOnly(course))
+                    ]
                   }
                 />
               );
