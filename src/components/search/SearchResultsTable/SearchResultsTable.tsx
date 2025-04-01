@@ -43,7 +43,11 @@ function LoadingRow() {
           <KeyboardArrowIcon />
         </IconButton>
         <Checkbox disabled />
-        <Checkbox disabled icon={<BookOutlinedIcon />} />
+        <Checkbox
+          disabled
+          icon={<BookOutlinedIcon />}
+          className="animate-pulse"
+        />
       </TableCell>
       <TableCell component="th" scope="row" className="w-full">
         <Typography className="w-full leading-tight text-lg">
@@ -206,7 +210,9 @@ function Row({
                   ? inPlanner
                     ? 'Remove from Planner'
                     : 'Add to Planner'
-                  : 'Not being taught'
+                  : section.state === 'loading'
+                    ? undefined
+                    : 'Not being taught'
               }
               placement="top"
             >
@@ -221,6 +227,7 @@ function Row({
                       addToPlanner(course);
                     }
                   }}
+                  className={section.state === 'loading' ? 'animate-pulse' : ''}
                   icon={<BookOutlinedIcon />}
                   checkedIcon={<BookIcon />}
                   disabled={!hasLatestSemester}
