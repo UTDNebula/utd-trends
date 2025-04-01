@@ -23,7 +23,7 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
@@ -288,6 +288,15 @@ const PlannerCard = (props: PlannerCardProps) => {
   const [whichOpen, setWhichOpen] = useState<'sections' | 'grades' | null>(
     canOpenSections ? 'sections' : canOpenGrades ? 'grades' : null,
   );
+  useEffect(() => {
+    if (whichOpen === null) {
+      if (canOpenSections) {
+        setWhichOpen('sections');
+      } else if (canOpenGrades) {
+        setWhichOpen('grades');
+      }
+    }
+  }, [canOpenSections, canOpenGrades]);
   function handleOpen() {
     if (
       (whichOpen === 'sections' && canOpenSections) ||
