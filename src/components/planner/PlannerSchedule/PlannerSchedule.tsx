@@ -50,7 +50,7 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
         {DAYS.slice(START_DAY, END_DAY + 1).map((x, i) => (
           <p
             key={i}
-            className="text-sm col-span-1 border-l text-center h-min overflow-hidden"
+            className="text-sm text-white col-span-1 border-l text-center h-min overflow-hidden"
           >
             {x}
           </p>
@@ -100,9 +100,10 @@ const HourRow = (props: HourRowProps) => {
       className={`grid row-span-1 row-start-[var(--row-start-row)] col-span-full grid-rows-subgrid grid-cols-subgrid`}
     >
       <p
-        className={`text-sm col-span-1 col-start-1 bg-cornflower-300 border-t px-1 text-right`}
+        className={`text-[0.8125rem] text-white col-span-1 col-start-1 bg-cornflower-300 border-t px-1 text-right`}
       >
-        {props.hour}:00
+        {props.hour > 12 ? props.hour - 12 : props.hour}:00
+        {props.hour >= 12 ? 'PM' : 'AM'}
       </p>
       <div className="col-start-2 col-span-full bg-white dark:bg-black border-t border-gray-300 dark:border-gray-600">
         <div className="relative top-1/4 col-span-full border-t border-gray-100 dark:border-gray-800"></div>
