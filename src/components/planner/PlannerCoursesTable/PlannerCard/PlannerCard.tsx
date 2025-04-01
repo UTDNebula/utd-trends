@@ -36,7 +36,7 @@ import {
   type SearchQuery,
   searchQueryLabel,
   type SearchQueryMultiSection,
-  sectionCanOverlap
+  sectionCanOverlap,
 } from '@/types/SearchQuery';
 
 function parseTime(time: string): number {

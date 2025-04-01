@@ -5,10 +5,7 @@ import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesI
 import type { CourseData } from '@/pages/api/course';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import type { GradesType } from '@/types/GradesType';
-import {
-  type SearchQuery,
-  searchQueryLabel,
-} from '@/types/SearchQuery';
+import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
 type CourseOverviewProps = {
   course: SearchQuery;

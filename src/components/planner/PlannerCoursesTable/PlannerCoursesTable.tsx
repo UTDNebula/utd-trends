@@ -15,7 +15,7 @@ import {
   searchQueryLabel,
   type SearchQueryMultiSection,
   searchQueryMultiSectionSplit,
-  sectionCanOverlap
+  sectionCanOverlap,
 } from '@/types/SearchQuery';
 import type { SectionsType } from '@/types/SectionsType';
 

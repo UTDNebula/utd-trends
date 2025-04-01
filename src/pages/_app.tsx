@@ -24,7 +24,7 @@ import {
   type SearchQuery,
   searchQueryEqual,
   type SearchQueryMultiSection,
-  sectionCanOverlap
+  sectionCanOverlap,
 } from '@/types/SearchQuery';
 
 const inter = Inter({

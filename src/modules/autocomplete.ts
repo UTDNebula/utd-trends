@@ -1,10 +1,7 @@
 import { DirectedGraph } from 'graphology';
 
 import type { NodeAttributes } from '@/scripts/generateAutocompleteGraph';
-import {
-  type SearchQuery,
-  searchQueryEqual,
-} from '@/types/SearchQuery';
+import { type SearchQuery, searchQueryEqual } from '@/types/SearchQuery';
 
 const root = '0';
 

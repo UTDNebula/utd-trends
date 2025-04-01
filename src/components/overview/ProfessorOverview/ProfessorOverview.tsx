@@ -8,10 +8,7 @@ import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import type { GradesType } from '@/types/GradesType';
-import {
-  type SearchQuery,
-  searchQueryLabel,
-} from '@/types/SearchQuery';
+import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
 const fallbackSrc = 'https://profiles.utdallas.edu/img/default.png';
 
