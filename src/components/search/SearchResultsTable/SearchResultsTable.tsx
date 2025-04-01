@@ -676,6 +676,7 @@ const SearchResultsTable = ({
             {resultsLoading === 'done' &&
               sortedUnIncludedResults.map((result) => (
                 <Row
+                  section={sections[searchQueryLabel(result)]}
                   key={searchQueryLabel(result)}
                   course={result}
                   grades={grades[searchQueryLabel(result)]}
@@ -688,7 +689,14 @@ const SearchResultsTable = ({
                   addToCompare={addToCompare}
                   removeFromCompare={removeFromCompare}
                   color={colorMap[searchQueryLabel(result)]}
-                  showTutorial={false /*index === numSearches*/}
+                  inPlanner={
+                    planner.findIndex((obj) =>
+                      searchQueryEqual(obj, result),
+                    ) !== -1
+                  }
+                  addToPlanner={addToPlanner}
+                  removeFromPlanner={removeFromPlanner}
+                  showTutorial={false}
                 />
               ))}
           </TableBody>
