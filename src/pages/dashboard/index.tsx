@@ -1,4 +1,4 @@
-import { Card, Grid2 as Grid } from '@mui/material';
+import { Card } from '@mui/material';
 import type { NextPage, NextPageContext } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -426,10 +426,68 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
 
   //Filtered results
   let includedResults: SearchQuery[] = [];
+  let unIncludedResults: SearchQuery[] = [];
 
   //Filter results based on gpa, rmp, and rmp difficulty
   if (router.isReady) {
     includedResults = (results.state === 'done' ? results.data : []).filter(
+      (result) => {
+        //Remove if over threshold
+        const courseGrades = props.grades[searchQueryLabel(result)];
+        const courseSection = props.sections[searchQueryLabel(result)];
+        if (
+          typeof courseGrades !== 'undefined' &&
+          courseGrades.state === 'done' &&
+          courseGrades.data.filtered.gpa === -1 &&
+          !(
+            typeof courseSection !== 'undefined' &&
+            courseSection.state === 'done' &&
+            router.query.availability === 'true' &&
+            courseSection.data.latest.length
+          )
+        ) {
+          return false;
+        }
+        if (
+          typeof router.query.minGPA === 'string' &&
+          typeof courseGrades !== 'undefined' &&
+          courseGrades.state === 'done' &&
+          courseGrades.data.filtered.gpa < parseFloat(router.query.minGPA)
+        ) {
+          return false;
+        }
+        const courseRmp =
+          props.rmp[searchQueryLabel(convertToProfOnly(result))];
+        if (
+          typeof router.query.minRating === 'string' &&
+          typeof courseRmp !== 'undefined' &&
+          courseRmp.state === 'done' &&
+          courseRmp.data.avgRating < parseFloat(router.query.minRating)
+        ) {
+          return false;
+        }
+        if (
+          typeof router.query.maxDiff === 'string' &&
+          typeof courseRmp !== 'undefined' &&
+          courseRmp.state === 'done' &&
+          courseRmp.data.avgDifficulty > parseFloat(router.query.maxDiff)
+        ) {
+          return false;
+        }
+
+        if (
+          router.query.availability === 'true' &&
+          typeof courseSection !== 'undefined' &&
+          courseSection.state === 'done' &&
+          !courseSection.data.latest.length
+        ) {
+          return false;
+        }
+
+        return true;
+      },
+    );
+    unIncludedResults = (results.state === 'done' ? results.data : []).filter(
       (result) => {
         //Remove if over threshold
         const courseGrades = props.grades[searchQueryLabel(result)];
@@ -466,11 +524,24 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
         ) {
           return false;
         }
+        const courseSection = props.sections[searchQueryLabel(result)];
+        if (
+          !(
+            router.query.availability === 'true' &&
+            typeof courseSection !== 'undefined' &&
+            courseSection.state === 'done' &&
+            !courseSection.data.latest.length
+          )
+        ) {
+          return false;
+        }
+
         return true;
       },
     );
   } else {
     includedResults = results.state === 'done' ? results.data : [];
+    unIncludedResults = [];
   }
 
   //List of course+prof combos saved for comparison
@@ -597,7 +668,9 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
       <SearchResultsTable
         sections={props.sections}
         resultsLoading={results.state}
+        numSearches={courses.length + professors.length}
         includedResults={includedResults}
+        unIncludedResults={unIncludedResults}
         grades={props.grades}
         rmp={props.rmp}
         compare={compare}
@@ -618,26 +691,26 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     );
     contentComponent = (
       <>
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-            <Filters
-              manageQuery
-              academicSessions={academicSessions}
-              chosenSessions={chosenSessions}
-              addChosenSessions={addChosenSessions}
-            />
-          </Grid>
-          <Grid size={{ xs: false, sm: 6, md: 6 }}></Grid>
-        </Grid>
+        <Filters
+          manageQuery
+          academicSessions={academicSessions}
+          chosenSessions={chosenSessions}
+          addChosenSessions={addChosenSessions}
+        />
         <div className="sm:hidden">
-          {carousel}
-          {searchResultsTable}
+          <div data-tutorial-id="LHS"> {carousel} </div>
+          <div data-tutorial-id="RHS"> {searchResultsTable} </div>
         </div>
         <PanelGroup
           direction="horizontal"
           className="hidden sm:flex overflow-visible"
         >
-          <Panel ref={panelLRef} minSize={40} defaultSize={50}>
+          <Panel
+            ref={panelLRef}
+            minSize={40}
+            defaultSize={50}
+            data-tutorial-id="LHS"
+          >
             {searchResultsTable}
           </Panel>
           <PanelResizeHandle
@@ -649,6 +722,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
             ref={panelRRef}
             minSize={30}
             defaultSize={50}
+            data-tutorial-id="RHS"
           >
             <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto mt-4">
               {carousel}

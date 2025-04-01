@@ -5,6 +5,7 @@ import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   type SearchQuery,
@@ -42,7 +43,10 @@ function SingleGradesInfo({ title, course, grades, gradesToUse }: Props) {
             Grades: <Skeleton className="inline-block w-[5ch]" />
           </p>
           <p>
-            GPA: <Skeleton className="inline-block w-[5ch]" />
+            Median GPA: <Skeleton className="inline-block w-[5ch]" />
+          </p>
+          <p>
+            Mean GPA: <Skeleton className="inline-block w-[5ch]" />
           </p>
         </div>
       </div>
@@ -53,66 +57,82 @@ function SingleGradesInfo({ title, course, grades, gradesToUse }: Props) {
 
   return (
     <div className="p-2">
-      <GraphToggle
-        state="done"
-        bar={
-          <BarGraph
-            title={title ?? '# of Students'}
-            xaxisLabels={[
-              'A+',
-              'A',
-              'A-',
-              'B+',
-              'B',
-              'B-',
-              'C+',
-              'C',
-              'C-',
-              'D+',
-              'D',
-              'D-',
-              'F',
-              'W',
-            ]}
-            yaxisFormatter={(value: number) =>
-              Number(value).toFixed(0).toLocaleString()
-            }
-            tooltipFormatter={(
-              value: number,
-              { dataPointIndex }: { dataPointIndex: number },
-            ) =>
-              Number(value).toFixed(0).toLocaleString() +
-              ' (' +
-              percents[dataPointIndex].toFixed(2) +
-              '%)'
-            }
-            series={[
-              {
-                name: searchQueryLabel(course),
-                data: grades.data[gradesToUse].grade_distribution,
-              },
-            ]}
-          />
-        }
-        line={
-          <LineGraph
-            title="GPA Trend"
-            series={[
-              { name: searchQueryLabel(course), data: grades.data.grades },
-            ]}
-          />
-        }
-      />
+      {grades.data[gradesToUse].gpa !== -1 ? (
+        <GraphToggle
+          state="done"
+          bar={
+            <BarGraph
+              title={title ?? '# of Students'}
+              xaxisLabels={[
+                'A+',
+                'A',
+                'A-',
+                'B+',
+                'B',
+                'B-',
+                'C+',
+                'C',
+                'C-',
+                'D+',
+                'D',
+                'D-',
+                'F',
+                'W',
+              ]}
+              yaxisFormatter={(value: number) =>
+                Number(value).toFixed(0).toLocaleString()
+              }
+              tooltipFormatter={(
+                value: number,
+                { dataPointIndex }: { dataPointIndex: number },
+              ) =>
+                Number(value).toFixed(0).toLocaleString() +
+                ' (' +
+                percents[dataPointIndex].toFixed(2) +
+                '%)'
+              }
+              series={[
+                {
+                  name: searchQueryLabel(course),
+                  data: grades.data[gradesToUse].grade_distribution,
+                },
+              ]}
+            />
+          }
+          line={
+            <LineGraph
+              title="GPA Trend"
+              series={[
+                { name: searchQueryLabel(course), data: grades.data.grades },
+              ]}
+            />
+          }
+        />
+      ) : (
+        <p>
+          This professor/course combination hasn&apos;t been taught in the
+          semesters you selected. To see more grade data, try changing your
+          filters.
+        </p>
+      )}
       <div className="flex flex-wrap justify-around">
         <p>
           Grades: <b>{grades.data[gradesToUse].total.toLocaleString()}</b>
         </p>
         <p>
-          GPA:{' '}
+          Median GPA:{' '}
           <b>
             {grades.data[gradesToUse].gpa === -1
               ? 'None'
-              : grades.data[gradesToUse].gpa.toFixed(3)}
+              : gpaToLetterGrade(grades.data[gradesToUse].gpa)}
+          </b>
+        </p>
+        <p>
+          Mean GPA:{' '}
+          <b>
+            {grades.data[gradesToUse].mean_gpa === -1
+              ? 'None'
+              : grades.data[gradesToUse].mean_gpa.toFixed(3)}
           </b>
         </p>
       </div>

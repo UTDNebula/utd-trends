@@ -4,6 +4,7 @@ import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Checkbox,
   Collapse,
+  Divider,
   IconButton,
   Paper,
   Skeleton,
@@ -36,38 +37,57 @@ import type { SectionsType } from '@/modules/SectionsType/SectionsType';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
 function LoadingRow() {
+  const nameCell = (
+    <Typography className="w-1/2 sm:w-full leading-tight text-lg">
+      <Skeleton />
+    </Typography>
+  );
   return (
-    <TableRow>
-      <TableCell className="flex">
-        <IconButton aria-label="expand row" size="medium" disabled>
-          <KeyboardArrowIcon />
-        </IconButton>
-        <Checkbox disabled />
-        <Checkbox
-          disabled
-          icon={<BookOutlinedIcon />}
-          className="animate-pulse"
-        />
-      </TableCell>
-      <TableCell component="th" scope="row" className="w-full">
-        <Typography className="w-full leading-tight text-lg">
-          <Skeleton />
-        </Typography>
-      </TableCell>
-      <TableCell align="center">
-        <Skeleton
-          variant="rounded"
-          className="rounded-full px-5 py-2 min-w-16 block mx-auto"
+    <>
+      <TableRow className="sm:hidden">
+        <TableCell
+          component="th"
+          scope="row"
+          className="w-full border-b-0 pb-0"
+          colSpan={3}
         >
-          <Typography className="text-base">A+</Typography>
-        </Skeleton>
-      </TableCell>
-      <TableCell align="center">
-        <Skeleton variant="rounded" className="rounded-full mx-auto">
-          <Rating sx={{ fontSize: 25 }} readOnly />
-        </Skeleton>
-      </TableCell>
-    </TableRow>
+          {nameCell}
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell className="flex">
+          <IconButton aria-label="expand row" size="medium" disabled>
+            <KeyboardArrowIcon />
+          </IconButton>
+          <Checkbox disabled />
+          <Checkbox
+            disabled
+            icon={<BookOutlinedIcon />}
+            className="animate-pulse"
+          />
+        </TableCell>
+        <TableCell
+          component="th"
+          scope="row"
+          className="w-full hidden sm:table-cell"
+        >
+          {nameCell}
+        </TableCell>
+        <TableCell align="center">
+          <Skeleton
+            variant="rounded"
+            className="rounded-full px-5 py-2 min-w-16 block mx-auto"
+          >
+            <Typography className="text-base">A+</Typography>
+          </Skeleton>
+        </TableCell>
+        <TableCell align="center">
+          <Skeleton variant="rounded" className="rounded-full mx-auto">
+            <Rating sx={{ fontSize: 25 }} readOnly />
+          </Skeleton>
+        </TableCell>
+      </TableRow>
+    </>
   );
 }
 
@@ -83,6 +103,7 @@ type RowProps = {
   inPlanner: boolean;
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
+  showTutorial: boolean;
 };
 
 function Row({
@@ -97,6 +118,7 @@ function Row({
   inPlanner,
   addToPlanner,
   removeFromPlanner,
+  showTutorial,
 }: RowProps) {
   // Check if the course section has the latest semester data
   const hasLatestSemester = !!(
@@ -104,6 +126,9 @@ function Row({
   );
 
   const [open, setOpen] = useState(false);
+  const canOpen =
+    !(typeof grades === 'undefined' || grades.state === 'error') ||
+    !(typeof rmp === 'undefined' || rmp.state === 'error');
 
   const rainbowColors = useRainbowColors();
 
@@ -140,8 +165,10 @@ function Row({
   return (
     <>
       <TableRow
-        onClick={() => setOpen(!open)}
-        className="cursor-pointer table-row sm:hidden"
+        onClick={() => {
+          if (canOpen) setOpen(!open);
+        }}
+        className={'table-row sm:hidden' + (canOpen ? ' cursor-pointer' : '')}
       >
         <TableCell
           component="th"
@@ -153,11 +180,17 @@ function Row({
         </TableCell>
       </TableRow>
       <TableRow
-        onClick={() => setOpen(!open)} // opens/closes the card by clicking anywhere on the row
-        className="cursor-pointer"
+        onClick={() => {
+          if (canOpen) setOpen(!open);
+        }} // opens/closes the card by clicking anywhere on the row
+        className={canOpen ? 'cursor-pointer' : ''}
+        data-tutorial-id={showTutorial && 'result'}
       >
-        <TableCell className="border-b-0">
-          <div className="flex items-center">
+        <TableCell
+          className="border-b-0"
+          data-tutorial-id={showTutorial && 'actions'}
+        >
+          <div className="flex items-center gap-1">
             <Tooltip
               title={open ? 'Minimize Result' : 'Expand Result'}
               placement="top"
@@ -165,9 +198,10 @@ function Row({
               <IconButton
                 aria-label="expand row"
                 size="medium"
+                disabled={!canOpen}
                 onClick={(e) => {
                   e.stopPropagation(); // prevents double opening/closing
-                  setOpen(!open);
+                  if (canOpen) setOpen(!open);
                 }}
                 className={'transition-transform' + (open ? ' rotate-90' : '')}
               >
@@ -262,9 +296,14 @@ function Row({
                 <Typography className="text-base w-6">A+</Typography>
               </Skeleton>
             )) ||
-            (grades.state === 'done' && (
+            (grades.state === 'done' && grades.data.filtered.gpa >= 0 && (
               <Tooltip
-                title={'GPA: ' + grades.data.filtered.gpa.toFixed(2)}
+                title={
+                  'Median GPA: ' +
+                  grades.data.filtered.gpa.toFixed(2) +
+                  ' | Mean GPA: ' +
+                  grades.data.filtered.mean_gpa.toFixed(2)
+                }
                 placement="top"
               >
                 <Typography
@@ -329,7 +368,9 @@ function Row({
 type SearchResultsTableProps = {
   sections: { [key: string]: GenericFetchedData<SectionsType> };
   resultsLoading: 'loading' | 'done';
+  numSearches: number;
   includedResults: SearchQuery[];
+  unIncludedResults: SearchQuery[];
   grades: { [key: string]: GenericFetchedData<GradesType> };
   rmp: { [key: string]: GenericFetchedData<RMPInterface> };
   compare: SearchQuery[];
@@ -344,7 +385,9 @@ type SearchResultsTableProps = {
 const SearchResultsTable = ({
   sections,
   resultsLoading,
+  numSearches,
   includedResults,
+  unIncludedResults,
   grades,
   rmp,
   compare,
@@ -375,7 +418,11 @@ const SearchResultsTable = ({
     }
   }
 
-  if (resultsLoading !== 'loading' && includedResults.length === 0) {
+  if (
+    resultsLoading !== 'loading' &&
+    includedResults.length === 0 &&
+    unIncludedResults.length === 0
+  ) {
     return (
       <div className="p-4">
         <Typography
@@ -393,7 +440,7 @@ const SearchResultsTable = ({
   }
 
   //Sort
-  const sortedResults = includedResults.sort((a, b) => {
+  function sortResults(a: SearchQuery, b: SearchQuery) {
     if (orderBy === 'name') {
       //same logic as in generateCombosTable.ts
       //handle undefined variables based on searchQueryLabel
@@ -513,7 +560,10 @@ const SearchResultsTable = ({
       return bRating - aRating;
     }
     return 0;
-  });
+  }
+
+  const sortedResults = includedResults.sort(sortResults);
+  const sortedUnIncludedResults = unIncludedResults.sort(sortResults);
 
   return (
     //TODO: sticky header
@@ -576,8 +626,9 @@ const SearchResultsTable = ({
             </TableRow>
           </TableHead>
           <TableBody>
+            {/* Included Results */}
             {resultsLoading === 'done'
-              ? sortedResults.map((result) => (
+              ? sortedResults.map((result, index) => (
                   <Row
                     section={sections[searchQueryLabel(result)]}
                     key={searchQueryLabel(result)}
@@ -599,11 +650,47 @@ const SearchResultsTable = ({
                     }
                     addToPlanner={addToPlanner}
                     removeFromPlanner={removeFromPlanner}
+                    showTutorial={index === numSearches}
                   />
                 ))
               : Array(10)
                   .fill(0)
                   .map((_, index) => <LoadingRow key={index} />)}
+
+            {/* Divider row */}
+            {sortedUnIncludedResults.length > 0 && (
+              <TableRow className="bg-gray-200 dark:bg-gray-700">
+                <TableCell colSpan={5} className="p-0">
+                  <div className="flex items-center py-2 my-2">
+                    <Divider className="flex-grow" />
+                    <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
+                      Not teaching next semester
+                    </Typography>
+                    <Divider className="flex-grow" />
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+
+            {/* Unincluded Results (Unavailable courses) */}
+            {resultsLoading === 'done' &&
+              sortedUnIncludedResults.map((result) => (
+                <Row
+                  key={searchQueryLabel(result)}
+                  course={result}
+                  grades={grades[searchQueryLabel(result)]}
+                  rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
+                  inCompare={
+                    compare.findIndex((obj) =>
+                      searchQueryEqual(obj, result),
+                    ) !== -1
+                  }
+                  addToCompare={addToCompare}
+                  removeFromCompare={removeFromCompare}
+                  color={colorMap[searchQueryLabel(result)]}
+                  showTutorial={false /*index === numSearches*/}
+                />
+              ))}
           </TableBody>
         </Table>
       </TableContainer>

@@ -1,3 +1,4 @@
+import { FormControl, FormControlLabel, Switch, Tooltip } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -18,6 +19,12 @@ import {
 const Home: NextPage = () => {
   const router = useRouter();
 
+  const [results, setResults] = useState<GenericFetchedData<SearchQuery[]>>({
+    state: 'done',
+    data: [],
+  }); // essentially a dummy state. Used only for the loading animation to start in home screen before navigation to the dashboard
+  const [filterNextSem, setFilterNextSem] = useState('true');
+
   async function searchOptionChosen(chosenOptions: SearchQuery[]) {
     if (chosenOptions.length) {
       await router.push({
@@ -26,15 +33,11 @@ const Home: NextPage = () => {
           searchTerms: chosenOptions
             .map((el) => searchQueryLabel(el))
             .join(','),
+          availability: filterNextSem,
         },
       });
     }
   }
-
-  const [results, setResults] = useState<GenericFetchedData<SearchQuery[]>>({
-    state: 'done',
-    data: [],
-  }); // essentially a dummy state. Used only for the loading animation to start in home screen before navigation to the dashboard
 
   return (
     <>
@@ -80,16 +83,30 @@ const Home: NextPage = () => {
             setResultsLoading={() => setResults({ state: 'loading' })}
             input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
           />
+          {/* Teaching Next Semester switch*/}
+          <Tooltip title="Select Availability" placement="bottom-start">
+            <FormControl
+              size="small"
+              className={`min-w-max flex-row items-center ${
+                filterNextSem == 'true'
+                  ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
+                  : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+              }`}
+            >
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={filterNextSem == 'true'}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      setFilterNextSem(event.target.checked ? 'true' : 'false');
+                    }}
+                  />
+                }
+                label="Teaching Next Semester"
+              />
+            </FormControl>
+          </Tooltip>
         </div>
-        {/*eslint-disable-next-line react/jsx-no-target-blank*/}
-        <a
-          href="https://utdgrades.com/"
-          target="_blank"
-          rel="noopener"
-          className="bg-white dark:bg-black text-black dark:text-white py-3 px-5 rounded transition hover:scale-[1.01]"
-        >
-          Also check out <b>UTD Grades</b>
-        </a>
       </div>
     </>
   );

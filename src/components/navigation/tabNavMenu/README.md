@@ -1,5 +1,0 @@
-### TabNavMenu Example
-
-```tsx
-
-```
