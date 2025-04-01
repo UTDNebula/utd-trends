@@ -108,22 +108,6 @@ function addCourse(prefix: string, number: string, sectionNumber: string) {
     prefix: prefix,
     number: number,
   });
-
-  if (sectionNumber === 'HON') {
-    //<prefix>[ ]<number>.<section>
-    //<number>.<section>
-    addWithParents([classNode, classNode2], '.' + sectionNumber, {
-      prefix: prefix,
-      number: number,
-      sectionNumber: sectionNumber,
-    });
-    //<number>.<section> <prefix>
-    addSearchQueryCharacter(classNode2, '.' + sectionNumber + ' ' + prefix, {
-      prefix: prefix,
-      number: number,
-      sectionNumber: sectionNumber,
-    });
-  }
 }
 
 //Add nodes in format: (<professorLast>|<professorFirst> <professorLast>)
