@@ -58,7 +58,7 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
           }
           return (
             <PlannerCard
-              key={index}
+              key={searchQueryLabel(removeSection(course))}
               query={course}
               sections={
                 typeof sectionData === 'undefined' ||
