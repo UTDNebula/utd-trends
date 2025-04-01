@@ -95,14 +95,27 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
           rounded-xl border-2
           ml-1 leading-relaxed`}
       >
-        <div className={`text-[15px] font-semibold font-inter text-center`}>
+        <div
+          className={
+            'font-semibold text-center font-inter ' +
+            (x[2] > 100 ? 'text-sm' : 'text-xs leading-none')
+          }
+        >
           {props.course.prefix} {props.course.number}.
           {selectedSection.section_number}
         </div>
-        <div className="text-xs text-center">
+        <div
+          className={
+            'text-xs text-center ' + (x[2] > 100 ? '' : 'leading-none')
+          }
+        >
           {props.course.profFirst} {props.course.profLast}
         </div>
-        <div className="text-xs text-center">
+        <div
+          className={
+            'text-xs text-center ' + (x[2] > 100 ? '' : 'leading-none')
+          }
+        >
           {selectedSection.meetings[0]?.location?.building}{' '}
           {selectedSection.meetings[0]?.location?.room}
         </div>
