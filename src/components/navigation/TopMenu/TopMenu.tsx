@@ -134,7 +134,7 @@ export function TopMenu(props: TopMenuProps) {
             {props.isPlanner ? 'Search Results' : 'My Planner'}
           </Button>
         </Link>
-        <div className="flex gap-0 md:gap-4 ml-auto">
+        <div className="flex gap-0 md:gap-4">
           <div className="ml-auto">
             <WhatsNew />
           </div>
