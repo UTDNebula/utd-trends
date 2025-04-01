@@ -43,74 +43,68 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
 
   return (
     <>
-      <Typography className="leading-tight text-3xl font-bold p-4">
+      <Typography variant="h2" className="leading-tight text-3xl font-bold p-4">
         My Planner
       </Typography>
-      <div className="flex flex-col gap-4">
-        {props.courses
-          ? props.courses.map((course, index) => {
-              const sectionData =
-                props.sections[searchQueryLabel(removeSection(course))];
+      <div className="flex flex-col gap-4 mb-4 sm:mb-0">
+        {props.courses.map((course, index) => {
+          const sectionData =
+            props.sections[searchQueryLabel(removeSection(course))];
 
-              if (typeof sectionData !== 'undefined') {
-                if (sectionData.state === 'loading') {
-                  return <LoadingRow key={index} />;
-                }
-              }
-              return (
-                <PlannerCard
-                  key={index}
-                  query={course}
-                  sections={
-                    typeof sectionData === 'undefined' ||
-                    sectionData.state === 'error'
-                      ? undefined
-                      : sectionData.data.latest.filter((section) => {
-                          if (
-                            typeof course.profFirst === 'undefined' &&
-                            typeof course.profLast === 'undefined'
-                          ) {
-                            return sectionCanOverlap(section.section_number);
-                          } else return true;
-                        })
-                  }
-                  setPlannerSection={props.setPlannerSection}
-                  grades={props.grades[searchQueryLabel(removeSection(course))]}
-                  rmp={props.rmp[searchQueryLabel(convertToProfOnly(course))]}
-                  removeFromPlanner={() => {
-                    props.removeFromPlanner(course);
-                  }}
-                  selectedSections={props.courses
-                    .flatMap((searchQuery) =>
-                      searchQueryMultiSectionSplit(searchQuery),
-                    )
-                    .map((course) => {
-                      const sections =
-                        props.sections[searchQueryLabel(removeSection(course))];
+          if (typeof sectionData !== 'undefined') {
+            if (sectionData.state === 'loading') {
+              return <LoadingRow key={index} />;
+            }
+          }
+          return (
+            <PlannerCard
+              key={index}
+              query={course}
+              sections={
+                typeof sectionData === 'undefined' ||
+                sectionData.state === 'error'
+                  ? undefined
+                  : sectionData.data.latest.filter((section) => {
                       if (
-                        typeof sections === 'undefined' ||
-                        sections.state !== 'done'
+                        typeof course.profFirst === 'undefined' &&
+                        typeof course.profLast === 'undefined'
                       ) {
-                        return undefined;
-                      }
-                      return sections.data.latest.find(
-                        (section) =>
-                          section.section_number === course.sectionNumber,
-                      );
+                        return sectionCanOverlap(section.section_number);
+                      } else return true;
                     })
-                    .filter((section) => typeof section !== 'undefined')}
-                  openConflictMessage={() => setOpenConflictMessage(true)}
-                  color={
-                    props.colorMap[
-                      searchQueryLabel(convertToCourseOnly(course))
-                    ]
+              }
+              setPlannerSection={props.setPlannerSection}
+              grades={props.grades[searchQueryLabel(removeSection(course))]}
+              rmp={props.rmp[searchQueryLabel(convertToProfOnly(course))]}
+              removeFromPlanner={() => {
+                props.removeFromPlanner(course);
+              }}
+              selectedSections={props.courses
+                .flatMap((searchQuery) =>
+                  searchQueryMultiSectionSplit(searchQuery),
+                )
+                .map((course) => {
+                  const sections =
+                    props.sections[searchQueryLabel(removeSection(course))];
+                  if (
+                    typeof sections === 'undefined' ||
+                    sections.state !== 'done'
+                  ) {
+                    return undefined;
                   }
-                />
-              );
-            })
-          : Array(5)
-              .fill(0)
-              .map((_, index) => <LoadingRow key={index} />)}
+                  return sections.data.latest.find(
+                    (section) =>
+                      section.section_number === course.sectionNumber,
+                  );
+                })
+                .filter((section) => typeof section !== 'undefined')}
+              openConflictMessage={() => setOpenConflictMessage(true)}
+              color={
+                props.colorMap[searchQueryLabel(convertToCourseOnly(course))]
+              }
+            />
+          );
+        })}
       </div>
       <Snackbar
         open={openConflictMessage}

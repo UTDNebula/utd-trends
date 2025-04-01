@@ -9,8 +9,8 @@ import {
 } from 'react-resizable-panels';
 
 import TopMenu from '@/components/navigation/TopMenu/TopMenu';
-import MyPlannerEmpty from '@/components/planner/MyPlannerEmpty/MyPlannerEmpty';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
+import PlannerEmpty from '@/components/planner/PlannerEmpty/PlannerEmpty';
 import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedule';
 import { plannerColors } from '@/modules/colors/colors';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
@@ -156,66 +156,61 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
     panelLRef.current?.resize(40);
   };
 
-  //Main content: loading, error, or normal
-  let contentComponent;
+  const plannerCoursesTable = (
+    <PlannerCoursesTable
+      courses={results.state === 'done' ? results.data : []}
+      addToPlanner={props.addToPlanner}
+      removeFromPlanner={props.removeFromPlanner}
+      setPlannerSection={props.setPlannerSection}
+      sections={props.sections}
+      grades={props.grades}
+      rmp={props.rmp}
+      colorMap={colorMap}
+    />
+  );
+  const plannerEmpty = <PlannerEmpty />;
+  const plannerSchedule = (
+    <PlannerSchedule
+      courses={
+        results.state === 'done'
+          ? results.data.flatMap((searchQuery) =>
+              searchQueryMultiSectionSplit(searchQuery),
+            )
+          : []
+      }
+      sections={props.sections}
+      colorMap={colorMap}
+    />
+  );
 
-  if (results.state === 'done' && !results.data.length) {
-    contentComponent = <MyPlannerEmpty />;
-  } else {
-    const plannerCoursesTable = (
-      <PlannerCoursesTable
-        courses={results.state === 'done' ? results.data : []}
-        addToPlanner={props.addToPlanner}
-        removeFromPlanner={props.removeFromPlanner}
-        setPlannerSection={props.setPlannerSection}
-        sections={props.sections}
-        grades={props.grades}
-        rmp={props.rmp}
-        colorMap={colorMap}
-      />
-    );
-
-    contentComponent = (
-      <>
-        <div className="sm:hidden">
-          {}
-          {plannerCoursesTable}
-        </div>
-        <PanelGroup
-          direction="horizontal"
-          className="hidden sm:flex overflow-visible"
+  const contentComponent = (
+    <>
+      <div className="sm:hidden">
+        {results.state === 'loading' ? plannerEmpty : plannerCoursesTable}
+        {plannerSchedule}
+      </div>
+      <PanelGroup
+        direction="horizontal"
+        className="hidden sm:flex overflow-visible"
+      >
+        <Panel ref={panelLRef} minSize={30} defaultSize={40}>
+          {results.state === 'loading' ? plannerEmpty : plannerCoursesTable}
+        </Panel>
+        <PanelResizeHandle
+          className="mt-4 p-1 mx-1 w-0.5 rounded-full opacity-25 data-[resize-handle-state=drag]:opacity-50 transition ease-in-out bg-transparent hover:bg-royal data-[resize-handle-state=drag]:bg-royal"
+          onDoubleClick={handleResizeDoubleClick}
+        />
+        <Panel
+          className="overflow-visible min-w-0"
+          ref={panelRRef}
+          minSize={50}
+          defaultSize={60}
         >
-          <Panel ref={panelLRef} minSize={30} defaultSize={40}>
-            {plannerCoursesTable}
-          </Panel>
-          <PanelResizeHandle
-            className="mt-4 p-1 mx-1 w-0.5 rounded-full opacity-25 data-[resize-handle-state=drag]:opacity-50 transition ease-in-out bg-transparent hover:bg-royal data-[resize-handle-state=drag]:bg-royal"
-            onDoubleClick={handleResizeDoubleClick}
-          />
-          <Panel
-            className="overflow-visible min-w-0"
-            ref={panelRRef}
-            minSize={50}
-            defaultSize={60}
-          >
-            <div className="sticky top-4 mt-4">
-              <PlannerSchedule
-                courses={
-                  results.state === 'done'
-                    ? results.data.flatMap((searchQuery) =>
-                        searchQueryMultiSectionSplit(searchQuery),
-                      )
-                    : []
-                }
-                sections={props.sections}
-                colorMap={colorMap}
-              />
-            </div>
-          </Panel>
-        </PanelGroup>
-      </>
-    );
-  }
+          <div className="sticky top-4 mt-4">{plannerSchedule}</div>
+        </Panel>
+      </PanelGroup>
+    </>
+  );
 
   return (
     <>
