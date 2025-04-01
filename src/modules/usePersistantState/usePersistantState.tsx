@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 export default function usePersistantState<T>(
   key: string,
   initialValue: T,
-): [T, (value: T) => void] {
+): [T, (value: T | ((old: T) => T)) => void] {
   const [state, setInternalState] = useState<T>(initialValue);
 
   useEffect(() => {
@@ -31,9 +31,14 @@ export default function usePersistantState<T>(
     return () => window.removeEventListener('storage', handleChange);
   }, [key]);
 
-  const setState = (value: T) => {
-    localStorage.setItem(key, JSON.stringify(value));
-    setInternalState(value);
+  const setState = (value: T | ((old: T) => T)) => {
+    setInternalState((old: T) => {
+      const newValue =
+        typeof value === 'function' ? (value as (old: T) => T)(old) : value;
+
+      localStorage.setItem(key, JSON.stringify(newValue));
+      return newValue;
+    });
   };
 
   return [state, setState];

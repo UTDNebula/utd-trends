@@ -165,25 +165,31 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   //Add a course+prof combo to planner (happens from search results)
   function addToPlanner(searchQuery: SearchQuery) {
-    //If not already there
-    if (planner.findIndex((obj) => searchQueryEqual(obj, searchQuery)) === -1) {
-      //Add to list
-      setPlanner(planner.concat([searchQuery]));
-    }
+    setPlanner((old: SearchQueryMultiSection[]) => {
+      //If not already there
+      if (old.findIndex((obj) => searchQueryEqual(obj, searchQuery)) === -1) {
+        //Add to list
+        return old.concat([searchQuery]);
+      }
+      return old;
+    });
   }
 
   //Remove a course+prof combo from compare
   function removeFromPlanner(searchQuery: SearchQuery) {
-    //If already there
-    if (planner.findIndex((obj) => searchQueryEqual(obj, searchQuery)) !== -1) {
-      //Remove from list
-      setPlanner(planner.filter((el) => !searchQueryEqual(el, searchQuery)));
-    }
+    setPlanner((old: SearchQueryMultiSection[]) => {
+      //If already there
+      if (planner.some((obj) => searchQueryEqual(obj, searchQuery))) {
+        //Remove to list
+        return old.filter((el) => !searchQueryEqual(el, searchQuery));
+      }
+      return old;
+    });
   }
 
   function setPlannerSection(searchQuery: SearchQuery, section: string) {
-    setPlanner(
-      planner.map((course) => {
+    setPlanner((old: SearchQueryMultiSection[]) =>
+      old.map((course) => {
         if (
           searchQueryEqual(removeSection(course), removeSection(searchQuery))
         ) {
