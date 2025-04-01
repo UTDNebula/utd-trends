@@ -2,6 +2,7 @@ import React from 'react';
 
 import { type GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import {
+  convertToCourseOnly,
   removeSection,
   type SearchQuery,
   searchQueryLabel,
@@ -73,7 +74,9 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
               (section) => section.section_number === course.sectionNumber,
             )}
             course={course}
-            color={props.colorMap[searchQueryLabel(removeSection(course))]}
+            color={
+              props.colorMap[searchQueryLabel(convertToCourseOnly(course))]
+            }
           />
         );
       })}

@@ -16,6 +16,7 @@ import { plannerColors } from '@/modules/colors/colors';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
+  convertToCourseOnly,
   convertToProfOnly,
   removeSection,
   type SearchQuery,
@@ -142,7 +143,9 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
 
   const colorMap = createColorMap(
     results.state === 'done'
-      ? results.data.map((searchQuery) => removeSection(searchQuery))
+      ? removeDuplicates(
+          results.data.map((searchQuery) => convertToCourseOnly(searchQuery)),
+        )
       : [],
   );
 
