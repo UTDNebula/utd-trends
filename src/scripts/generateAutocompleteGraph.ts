@@ -140,10 +140,7 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
     ) {
       const academicSessionData =
         courseNumberData.academic_sessions[academicSessionItr];
-      addCourse(
-        prefixData.subject_prefix,
-        courseNumberData.course_number,
-      );
+      addCourse(prefixData.subject_prefix, courseNumberData.course_number);
       for (
         let sectionItr = 0;
         sectionItr < academicSessionData.sections.length;
