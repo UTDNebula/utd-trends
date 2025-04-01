@@ -124,7 +124,7 @@ function SingleGradesInfo({ title, course, grades, gradesToUse }: Props) {
           <b>
             {grades.data[gradesToUse].gpa === -1
               ? 'None'
-              : gpaToLetterGrade(grades.data[gradesToUse].gpa.toFixed(3))}
+              : gpaToLetterGrade(grades.data[gradesToUse].gpa)}
           </b>
         </p>
         <p>
