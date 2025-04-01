@@ -93,7 +93,7 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
           row-start-[var(--start-row)] row-span-1 relative 
           top-[var(--offset)] h-[var(--height)] overflow-hidden 
           rounded-xl border-2
-          ml-1 leading-relaxed shadow-md dark:shadow-lg dark:shadow-white/20`}
+          ml-1 leading-relaxed`}
       >
         <div className={`text-[15px] font-semibold font-inter text-center`}>
           {props.course.prefix} {props.course.number}.
