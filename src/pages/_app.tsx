@@ -15,6 +15,7 @@ import tailwindConfig from '@/../tailwind.config.js';
 import FeedbackPopup from '@/components/common/FeedbackPopup/FeedbackPopup';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
 import {
+  convertToCourseOnly,
   removeSection,
   type SearchQuery,
   searchQueryEqual,
@@ -206,6 +207,20 @@ function MyApp({ Component, pageProps }: AppProps) {
               sectionNumbers: newSections.concat([section]),
             };
           }
+        } else if (
+          searchQueryEqual(
+            convertToCourseOnly(course),
+            convertToCourseOnly(searchQuery),
+          ) &&
+          typeof course.sectionNumbers !== 'undefined'
+        ) {
+          //to remove from a different combo
+          return {
+            ...course,
+            sectionNumbers: course.sectionNumbers.filter((s) =>
+              sectionCanOverlap(s),
+            ),
+          };
         }
         return course;
       }),
