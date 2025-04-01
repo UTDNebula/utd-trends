@@ -49,3 +49,18 @@ export function useRainbowColors() {
     ? rainbowColors_dark
     : rainbowColors_light;
 }
+
+export function gpaToColor(colors: string[], gpa: number): string {
+  if (gpa >= 4.0) return colors[1];
+  if (gpa >= 3.67) return colors[2];
+  if (gpa >= 3.33) return colors[3];
+  if (gpa >= 3.0) return colors[4];
+  if (gpa >= 2.67) return colors[5];
+  if (gpa >= 2.33) return colors[6];
+  if (gpa >= 2.0) return colors[7];
+  if (gpa >= 1.67) return colors[8];
+  if (gpa >= 1.33) return colors[9];
+  if (gpa >= 1.0) return colors[10];
+  if (gpa >= 0.67) return colors[11];
+  return colors[12];
+}

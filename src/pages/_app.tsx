@@ -12,8 +12,11 @@ import React from 'react';
 import resolveConfig from 'tailwindcss/resolveConfig';
 
 import tailwindConfig from '@/../tailwind.config.js';
-import FeedbackPopup from '@/components/common/FeedbackPopup/feedbackPopup';
-import GitHubButton from '@/components/common/GitHubButton/gitHubButton';
+import FeedbackPopup from '@/components/common/FeedbackPopup/FeedbackPopup';
+import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
+import useGradeStore from '@/modules/useGradeStore/useGradeStore';
+import useRmpStore from '@/modules/useRmpStore/useRmpStore';
+import useSectionsStore from '@/modules/useSectionsStore/useSectionsStore';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -21,6 +24,7 @@ const inter = Inter({
 });
 const kallisto = localFont({
   src: [
+    /*
     {
       path: '../fonts/Kallisto/Kallisto Thin.otf',
       weight: '100',
@@ -51,26 +55,31 @@ const kallisto = localFont({
       weight: '500',
       style: 'italic',
     },
+    */
     {
       path: '../fonts/Kallisto/Kallisto Bold.otf',
       weight: '700',
       style: 'normal',
     },
+    /*
     {
       path: '../fonts/Kallisto/Kallisto Bold Italic.otf',
       weight: '700',
       style: 'italic',
     },
+    */
     {
       path: '../fonts/Kallisto/Kallisto Heavy.otf',
       weight: '900',
       style: 'normal',
     },
+    /*
     {
       path: '../fonts/Kallisto/Kallisto Heavy Italic.otf',
       weight: '900',
       style: 'italic',
     },
+    */
   ],
   variable: '--font-kallisto',
 });
@@ -80,7 +89,7 @@ const fullTailwindConfig = resolveConfig(tailwindConfig);
 function MyApp({ Component, pageProps }: AppProps) {
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   const colors = fullTailwindConfig.theme.colors as any;
-  const palette = {
+  const lightPalette = {
     palette: {
       //copied from tailwind.config.js
       primary: {
@@ -95,11 +104,26 @@ function MyApp({ Component, pageProps }: AppProps) {
       },
     },
   };
+  const darkPalette = {
+    palette: {
+      //copied from tailwind.config.js
+      primary: {
+        main: colors.cornflower['300'] as string,
+      },
+      secondary: {
+        main: colors.royal as string,
+        light: colors.periwinkle as string,
+      },
+      error: {
+        main: colors.persimmon['500'] as string,
+      },
+    },
+  };
   const muiTheme = createTheme({
     cssVariables: true,
     colorSchemes: {
-      light: palette,
-      dark: palette,
+      light: lightPalette,
+      dark: darkPalette,
     },
     typography: {
       fontFamily: 'inherit',
@@ -116,6 +140,16 @@ function MyApp({ Component, pageProps }: AppProps) {
   });
 
   const router = useRouter();
+
+  //Store grades by course+prof combo
+  const [grades, , fetchAndStoreGradesData, recalcGrades, recalcAllGrades] =
+    useGradeStore();
+
+  //Store rmp scores by profs
+  const [rmp, , fetchAndStoreRmpData] = useRmpStore();
+
+  //Store sections by course+prof combo
+  const [sections, , fetchAndStoreSectionsData] = useSectionsStore();
 
   return (
     <>
@@ -152,7 +186,17 @@ function MyApp({ Component, pageProps }: AppProps) {
             ' h-full text-haiti dark:text-white'
           }
         >
-          <Component {...pageProps} />
+          <Component
+            {...pageProps}
+            grades={grades}
+            fetchAndStoreGradesData={fetchAndStoreGradesData}
+            recalcGrades={recalcGrades}
+            recalcAllGrades={recalcAllGrades}
+            rmp={rmp}
+            fetchAndStoreRmpData={fetchAndStoreRmpData}
+            sections={sections}
+            fetchAndStoreSectionsData={fetchAndStoreSectionsData}
+          />
           <FeedbackPopup />
           <GitHubButton />
         </div>
