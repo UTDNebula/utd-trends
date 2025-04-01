@@ -20,10 +20,6 @@ import ProfessorOverview from '@/components/overview/ProfessorOverview/Professor
 import Filters from '@/components/search/Filters/Filters';
 import SearchResultsTable from '@/components/search/SearchResultsTable/SearchResultsTable';
 import { compareColors } from '@/modules/colors/colors';
-import fetchWithCache, {
-  cacheIndexNebula,
-  expireTime,
-} from '@/modules/fetchWithCache/fetchWithCache';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
@@ -52,29 +48,26 @@ function combosSearchResultsFetch(
   searchTerm: SearchQuery,
   controller: AbortController,
 ): Promise<SearchQuery[]> {
-  return fetchWithCache(
-    '/api/combo?input=' + searchQueryLabel(searchTerm),
-    cacheIndexNebula,
-    expireTime,
-    {
-      // use the search terms to fetch all the result course-professor combinations
-      signal: controller.signal,
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
+  return fetch('/api/combo?input=' + searchQueryLabel(searchTerm), {
+    // use the search terms to fetch all the result course-professor combinations
+    signal: controller.signal,
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
     },
-  ).then((response) => {
-    if (response.message !== 'success') {
-      throw new Error(response.message);
-    }
-    return [searchTerm].concat(
-      response.data.map((obj: SearchQuery) => ({
-        ...searchTerm,
-        ...obj,
-      })),
-    );
-  });
+  })
+    .then((response) => response.json())
+    .then((response) => {
+      if (response.message !== 'success') {
+        throw new Error(response.message);
+      }
+      return [searchTerm].concat(
+        response.data.map((obj: SearchQuery) => ({
+          ...searchTerm,
+          ...obj,
+        })),
+      );
+    });
 }
 
 //Get all course+prof combos for searchTerms and keep only the ones that match filterTerms
