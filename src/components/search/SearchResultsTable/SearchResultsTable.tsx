@@ -23,18 +23,18 @@ import Rating from '@/components/common/Rating/Rating';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
-import { gpaToColor, useRainbowColors } from '@/modules/colors/colors';
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
-import type { GradesType } from '@/modules/GradesType/GradesType';
+import { gpaToColor, useRainbowColors } from '@/modules/colors';
+import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import type { GradesType } from '@/types/GradesType';
 import {
   convertToProfOnly,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
-} from '@/modules/SearchQuery/SearchQuery';
-import type { SectionsType } from '@/modules/SectionsType/SectionsType';
-import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+} from '@/types/SearchQuery';
+import type { SectionsType } from '@/types/SectionsType';
 
 function LoadingRow() {
   const nameCell = (

@@ -4,8 +4,8 @@ import autocompleteGraph from '@/data/autocomplete_graph.json';
 import {
   getGraph,
   searchAutocomplete,
-} from '@/modules/autocomplete/autocomplete';
-import { type SearchQuery } from '@/modules/SearchQuery/SearchQuery';
+} from '@/modules/autocomplete';
+import { type SearchQuery } from '@/types/SearchQuery';
 
 const graph = getGraph(autocompleteGraph as object);
 

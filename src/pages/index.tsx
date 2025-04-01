@@ -7,11 +7,11 @@ import React, { useState } from 'react';
 
 import Background from '@/../public/background.png';
 import SearchBar from '@/components/search/SearchBar/SearchBar';
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   type SearchQuery,
   searchQueryLabel,
-} from '@/modules/SearchQuery/SearchQuery';
+} from '@/types/SearchQuery';
 
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components

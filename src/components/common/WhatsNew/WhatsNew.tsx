@@ -3,7 +3,7 @@ import { Badge, IconButton, Popover, Tooltip } from '@mui/material';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
-import usePersistantState from '@/modules/usePersistantState/usePersistantState';
+import usePersistantState from '@/modules/usePersistantState';
 
 interface ReleaseData {
   id: number;

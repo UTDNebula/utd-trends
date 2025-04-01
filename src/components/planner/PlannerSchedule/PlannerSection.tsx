@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { type SearchQuery } from '@/modules/SearchQuery/SearchQuery';
 import type { SectionsData } from '@/pages/api/sections';
+import { type SearchQuery } from '@/types/SearchQuery';
 
 import { DAYS, START_HOUR } from './PlannerSchedule';
 

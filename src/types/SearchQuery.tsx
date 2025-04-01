@@ -74,6 +74,10 @@ export function searchQueryMultiSectionSplit(
   });
 }
 
+export function sectionCanOverlap(section: string): boolean {
+  return /^[12367]/.test(section);
+}
+
 export function searchQueryLabel(query: SearchQuery): string {
   let result = '';
   if (typeof query.prefix !== 'undefined') {

@@ -4,13 +4,13 @@ import React from 'react';
 import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
-import type { GradesType } from '@/modules/GradesType/GradesType';
+import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import type { GradesType } from '@/types/GradesType';
 import {
   type SearchQuery,
   searchQueryLabel,
-} from '@/modules/SearchQuery/SearchQuery';
+} from '@/types/SearchQuery';
 
 function convertNumbersToPercents(
   distribution: GradesType,

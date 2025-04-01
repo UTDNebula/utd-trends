@@ -14,18 +14,18 @@ import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config.js';
 import FeedbackPopup from '@/components/common/FeedbackPopup/FeedbackPopup';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
+import useGradeStore from '@/modules/useGradeStore';
+import usePersistantState from '@/modules/usePersistantState';
+import useRmpStore from '@/modules/useRmpStore';
+import useSectionsStore from '@/modules/useSectionsStore';
 import {
   convertToCourseOnly,
   removeSection,
   type SearchQuery,
   searchQueryEqual,
   type SearchQueryMultiSection,
-} from '@/modules/SearchQuery/SearchQuery';
-import sectionCanOverlap from '@/modules/sections/sections';
-import useGradeStore from '@/modules/useGradeStore/useGradeStore';
-import usePersistantState from '@/modules/usePersistantState/usePersistantState';
-import useRmpStore from '@/modules/useRmpStore/useRmpStore';
-import useSectionsStore from '@/modules/useSectionsStore/useSectionsStore';
+  sectionCanOverlap
+} from '@/types/SearchQuery';
 
 const inter = Inter({
   subsets: ['latin'],

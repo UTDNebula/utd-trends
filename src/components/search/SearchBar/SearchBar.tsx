@@ -15,7 +15,7 @@ import {
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
-} from '@/modules/SearchQuery/SearchQuery';
+} from '@/types/SearchQuery';
 
 /**
  * Props type used by the SearchBar component

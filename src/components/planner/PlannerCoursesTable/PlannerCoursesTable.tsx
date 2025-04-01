@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import PlannerCard, {
   LoadingRow,
 } from '@/components/planner/PlannerCoursesTable/PlannerCard/PlannerCard';
-import { type GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import type { GradesType } from '@/modules/GradesType/GradesType';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import { type GenericFetchedData } from '@/types/GenericFetchedData';
+import type { GradesType } from '@/types/GradesType';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -14,10 +15,9 @@ import {
   searchQueryLabel,
   type SearchQueryMultiSection,
   searchQueryMultiSectionSplit,
-} from '@/modules/SearchQuery/SearchQuery';
-import sectionCanOverlap from '@/modules/sections/sections';
-import { type SectionsType } from '@/modules/SectionsType/SectionsType';
-import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+  sectionCanOverlap
+} from '@/types/SearchQuery';
+import type { SectionsType } from '@/types/SectionsType';
 
 type PlannerCoursesTableProps = {
   courses: SearchQueryMultiSection[];
