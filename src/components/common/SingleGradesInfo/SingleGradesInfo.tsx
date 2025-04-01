@@ -5,6 +5,7 @@ import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
   type SearchQuery,
@@ -42,7 +43,10 @@ function SingleGradesInfo({ title, course, grades, gradesToUse }: Props) {
             Grades: <Skeleton className="inline-block w-[5ch]" />
           </p>
           <p>
-            GPA: <Skeleton className="inline-block w-[5ch]" />
+            Median GPA: <Skeleton className="inline-block w-[5ch]" />
+          </p>
+          <p>
+            Mean GPA: <Skeleton className="inline-block w-[5ch]" />
           </p>
         </div>
       </div>
@@ -116,11 +120,19 @@ function SingleGradesInfo({ title, course, grades, gradesToUse }: Props) {
           Grades: <b>{grades.data[gradesToUse].total.toLocaleString()}</b>
         </p>
         <p>
-          GPA:{' '}
+          Median GPA:{' '}
           <b>
             {grades.data[gradesToUse].gpa === -1
               ? 'None'
-              : grades.data[gradesToUse].gpa.toFixed(3)}
+              : gpaToLetterGrade(grades.data[gradesToUse].gpa)}
+          </b>
+        </p>
+        <p>
+          Mean GPA:{' '}
+          <b>
+            {grades.data[gradesToUse].mean_gpa === -1
+              ? 'None'
+              : grades.data[gradesToUse].mean_gpa.toFixed(3)}
           </b>
         </p>
       </div>

@@ -240,7 +240,12 @@ function Row({
             )) ||
             (grades.state === 'done' && grades.data.filtered.gpa >= 0 && (
               <Tooltip
-                title={'GPA: ' + grades.data.filtered.gpa.toFixed(2)}
+                title={
+                  'Median GPA: ' +
+                  grades.data.filtered.gpa.toFixed(2) +
+                  ' | Mean GPA: ' +
+                  grades.data.filtered.mean_gpa.toFixed(2)
+                }
                 placement="top"
               >
                 <Typography
