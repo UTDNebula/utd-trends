@@ -1,13 +1,19 @@
 import React from 'react';
 
-import type { SearchQuery } from '@/modules/SearchQuery/SearchQuery';
-import type { SectionsData } from '@/pages/api/sections';
+import { type GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import {
+  convertToCourseOnly,
+  removeSection,
+  type SearchQuery,
+  searchQueryLabel,
+} from '@/modules/SearchQuery/SearchQuery';
+import { type SectionsType } from '@/modules/SectionsType/SectionsType';
 
 import PlannerSection from './PlannerSection';
 
 // hours shown (24-hour time)
 export const START_HOUR = 8;
-export const END_HOUR = 21;
+export const END_HOUR = 22;
 // days shown (0 = sunday -> 6 = Saturday)
 // NOTE: IF YOU CHANGE THESE PLEASE ALSO CHANGE THE REPEAT NUMBERS (5 and 13)
 //        IN THE TAILWIND CSS GRID SPECIFICATION (outer div in PlannerSchedule)
@@ -27,17 +33,16 @@ export const DAYS = [
 
 type PlannerScheduleProps = {
   courses: SearchQuery[];
-  selectedSections: SectionsData;
+  sections: {
+    [key: string]: GenericFetchedData<SectionsType>;
+  };
+  colorMap: { [key: string]: { fill: string; outline: string; font: string } };
 };
 
 const PlannerSchedule = (props: PlannerScheduleProps) => {
-  //const PlannerCoursesTable = () => {
-
-  console.log(props.selectedSections);
-
   return (
     <div
-      className={`w-full h-[calc(100vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[max-content_repeat(13,minmax(0,1fr))]`}
+      className={`w-full h-[calc(100vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[max-content_repeat(14,minmax(0,1fr))]`}
     >
       {/*Weekday Headers*/}
       <div className="grid col-span-full grid-flow-row bg-cornflower-500 grid-cols-subgrid grid-rows-subgrid">
@@ -45,7 +50,7 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
         {DAYS.slice(START_DAY, END_DAY + 1).map((x, i) => (
           <p
             key={i}
-            className="text-sm col-span-1 border-l text-center h-min overflow-hidden"
+            className="text-sm text-white col-span-1 border-l text-center h-min overflow-hidden"
           >
             {x}
           </p>
@@ -56,17 +61,25 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
         <HourRow key={i} hour={i + START_HOUR} />
       ))}
 
-      {props.selectedSections.map((x, i) => (
-        <PlannerSection
-          key={i}
-          selectedSection={x}
-          course={
-            props.courses.filter(
-              (course) => course.sectionNumber === x.section_number,
-            )[0]
-          }
-        />
-      ))}
+      {props.courses.map((course) => {
+        const sections =
+          props.sections[searchQueryLabel(removeSection(course))];
+        if (typeof sections === 'undefined' || sections.state !== 'done') {
+          return null;
+        }
+        return (
+          <PlannerSection
+            key={searchQueryLabel(course)}
+            selectedSection={sections.data.latest.find(
+              (section) => section.section_number === course.sectionNumber,
+            )}
+            course={course}
+            color={
+              props.colorMap[searchQueryLabel(convertToCourseOnly(course))]
+            }
+          />
+        );
+      })}
     </div>
   );
 };
@@ -87,9 +100,10 @@ const HourRow = (props: HourRowProps) => {
       className={`grid row-span-1 row-start-[var(--row-start-row)] col-span-full grid-rows-subgrid grid-cols-subgrid`}
     >
       <p
-        className={`text-sm col-span-1 col-start-1 bg-cornflower-300 border-t px-1 text-right`}
+        className={`text-[0.8125rem] text-white col-span-1 col-start-1 bg-cornflower-300 border-t px-1 text-right`}
       >
-        {props.hour}:00
+        {props.hour > 12 ? props.hour - 12 : props.hour}:00
+        {props.hour >= 12 ? 'PM' : 'AM'}
       </p>
       <div className="col-start-2 col-span-full bg-white dark:bg-black border-t border-gray-300 dark:border-gray-600">
         <div className="relative top-1/4 col-span-full border-t border-gray-100 dark:border-gray-800"></div>

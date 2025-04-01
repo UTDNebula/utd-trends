@@ -43,7 +43,11 @@ function LoadingRow() {
           <KeyboardArrowIcon />
         </IconButton>
         <Checkbox disabled />
-        <Checkbox disabled icon={<BookOutlinedIcon />} />
+        <Checkbox
+          disabled
+          icon={<BookOutlinedIcon />}
+          className="animate-pulse"
+        />
       </TableCell>
       <TableCell component="th" scope="row" className="w-full">
         <Typography className="w-full leading-tight text-lg">
@@ -200,33 +204,43 @@ function Row({
                 } // Apply color if defined
               />
             </Tooltip>
-            <Tooltip
-              title={
-                hasLatestSemester
-                  ? inPlanner
-                    ? 'Remove from Planner'
-                    : 'Add to Planner'
-                  : 'Not being taught'
-              }
-              placement="top"
-            >
-              <span>
-                <Checkbox
-                  checked={inPlanner}
-                  onClick={(e) => {
-                    e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
-                    if (inPlanner) {
-                      removeFromPlanner(course);
-                    } else {
-                      addToPlanner(course);
+            {!(
+              typeof course.prefix === 'undefined' &&
+              typeof course.number === 'undefined'
+            ) && (
+              <Tooltip
+                title={
+                  hasLatestSemester
+                    ? inPlanner
+                      ? 'Remove from Planner'
+                      : 'Add to Planner'
+                    : section.state === 'loading'
+                      ? undefined
+                      : 'Not being taught'
+                }
+                placement="top"
+              >
+                <span>
+                  <Checkbox
+                    checked={inPlanner}
+                    onClick={(e) => {
+                      e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
+                      if (inPlanner) {
+                        removeFromPlanner(course);
+                      } else {
+                        addToPlanner(course);
+                      }
+                    }}
+                    className={
+                      section.state === 'loading' ? 'animate-pulse' : ''
                     }
-                  }}
-                  icon={<BookOutlinedIcon />}
-                  checkedIcon={<BookIcon />}
-                  disabled={!hasLatestSemester}
-                />
-              </span>
-            </Tooltip>
+                    icon={<BookOutlinedIcon />}
+                    checkedIcon={<BookIcon />}
+                    disabled={!hasLatestSemester}
+                  />
+                </span>
+              </Tooltip>
+            )}
           </div>
         </TableCell>
         <TableCell

@@ -86,19 +86,22 @@ export function TopMenu(props: TopMenuProps) {
             props.isPlanner
               ? typeof sessionStorage !== 'undefined' &&
                 sessionStorage.getItem('dashboardSearchTerms')
-                ? '/dashboard?searchTerms=' +
-                  sessionStorage
-                    .getItem('dashboardSearchTerms')
-                    ?.replace(' ', '+')
-                    .replace(',', '%2C')
-                : '/'
+                ? '/dashboard?' + sessionStorage.getItem('dashboardSearchTerms')
+                : '/dashboard'
               : '/planner'
           }
           onClick={() =>
             !props.isPlanner
               ? sessionStorage.setItem(
                   'dashboardSearchTerms',
-                  router.query.searchTerms?.toString() ?? '',
+                  Object.entries(router.query)
+                    .map(([key, value]) => {
+                      if (typeof value === 'string') {
+                        return key + '=' + encodeURIComponent(value);
+                      }
+                      return '';
+                    })
+                    .join('&') ?? '',
                 )
               : null
           }

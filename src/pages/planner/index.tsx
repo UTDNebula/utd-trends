@@ -12,9 +12,11 @@ import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
 import PlannerEmpty from '@/components/planner/PlannerEmpty/PlannerEmpty';
 import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedule';
+import { plannerColors } from '@/modules/colors/colors';
 import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { GradesType } from '@/modules/GradesType/GradesType';
 import {
+  convertToCourseOnly,
   convertToProfOnly,
   removeSection,
   type SearchQuery,
@@ -31,6 +33,19 @@ function removeDuplicates(array: SearchQuery[]) {
     (obj1, index, self) =>
       index === self.findIndex((obj2) => searchQueryEqual(obj1, obj2)),
   );
+}
+
+function createColorMap(courses: SearchQuery[]): {
+  [key: string]: { fill: string; outline: string; font: string };
+} {
+  const colorMap: {
+    [key: string]: { fill: string; outline: string; font: string };
+  } = {};
+  courses.forEach((course, index) => {
+    colorMap[searchQueryLabel(course)] =
+      plannerColors[index % plannerColors.length];
+  });
+  return colorMap;
 }
 
 interface Props {
@@ -115,7 +130,6 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
       };
     }
   }, [planner]);
-  console.log(/*props.grades, props.rmp, */ props.sections);
 
   let results: GenericFetchedData<SearchQueryMultiSection[]> = {
     state: 'loading',
@@ -126,7 +140,14 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
       data: planner,
     };
   }
-  console.log('COURSES IN PLANNER: ', results);
+
+  const colorMap = createColorMap(
+    results.state === 'done'
+      ? removeDuplicates(
+          results.data.map((searchQuery) => convertToCourseOnly(searchQuery)),
+        )
+      : [],
+  );
 
   const panelLRef = useRef<ImperativePanelHandle>(null);
   const panelRRef = useRef<ImperativePanelHandle>(null);
@@ -144,6 +165,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
       sections={props.sections}
       grades={props.grades}
       rmp={props.rmp}
+      colorMap={colorMap}
     />
   );
   const plannerEmpty = <PlannerEmpty />;
@@ -156,41 +178,23 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
             )
           : []
       }
-      selectedSections={
-        results.state === 'done'
-          ? results.data.flatMap((course) => {
-              const sectionData =
-                props.sections[searchQueryLabel(removeSection(course))];
-              if (
-                typeof sectionData !== 'undefined' &&
-                sectionData.state === 'done'
-              ) {
-                if (typeof course.sectionNumbers === 'undefined') {
-                  return [];
-                }
-                return sectionData.data.latest.filter((section) =>
-                  course.sectionNumbers?.includes(section.section_number),
-                );
-              }
-              return [];
-            })
-          : []
-      }
+      sections={props.sections}
+      colorMap={colorMap}
     />
   );
 
   const contentComponent = (
     <>
       <div className="sm:hidden">
-        {results.state === 'loading' ? plannerEmpty : plannerSchedule}
-        {plannerCoursesTable}
+        {results.state === 'loading' ? plannerEmpty : plannerCoursesTable}
+        {plannerSchedule}
       </div>
       <PanelGroup
         direction="horizontal"
         className="hidden sm:flex overflow-visible"
       >
         <Panel ref={panelLRef} minSize={30} defaultSize={40}>
-          {results.state === 'loading' ? plannerEmpty : plannerSchedule}
+          {results.state === 'loading' ? plannerEmpty : plannerCoursesTable}
         </Panel>
         <PanelResizeHandle
           className="mt-4 p-1 mx-1 w-0.5 rounded-full opacity-25 data-[resize-handle-state=drag]:opacity-50 transition ease-in-out bg-transparent hover:bg-royal data-[resize-handle-state=drag]:bg-royal"

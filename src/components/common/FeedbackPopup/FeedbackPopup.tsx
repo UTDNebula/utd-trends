@@ -104,7 +104,10 @@ export default function FeedbackPopup() {
 
   return (
     <>
-      <Snackbar open={feedbackOpen}>
+      <Snackbar
+        open={feedbackOpen}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
         <SnackbarContent
           className="bg-white dark:bg-haiti text-haiti dark:text-white"
           sx={{

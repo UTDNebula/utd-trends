@@ -23,7 +23,7 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
@@ -38,6 +38,60 @@ import {
 import sectionCanOverlap from '@/modules/sections/sections';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import { type SectionsData } from '@/pages/api/sections';
+
+function parseTime(time: string): number {
+  const [hour, minute] = time.split(':').map((s) => parseInt(s));
+  const isPM = time.includes('pm');
+  let hourNum = hour;
+  if (isPM && hour !== 12) {
+    hourNum += 12;
+  } else if (!isPM && hour === 12) {
+    hourNum = 0; // Midnight case
+  }
+  return hourNum + minute / 60;
+}
+
+function hasConflict(
+  newSection: SectionsData[number],
+  selectedSections: SectionsData,
+): boolean {
+  if (!newSection || !selectedSections) return false;
+
+  for (const selectedSection of selectedSections) {
+    for (const newMeeting of newSection.meetings) {
+      if (!newMeeting || !newMeeting.meeting_days) continue;
+
+      for (const existingMeeting of selectedSection.meetings) {
+        if (!existingMeeting || !existingMeeting.meeting_days) continue;
+
+        // Check if days overlap
+        const overlappingDays = newMeeting.meeting_days.some((day) =>
+          existingMeeting.meeting_days.includes(day),
+        );
+
+        if (overlappingDays) {
+          // Convert times to comparable values
+          const newStart = parseTime(newMeeting.start_time);
+          const newEnd = parseTime(newMeeting.end_time);
+          const existingStart = parseTime(existingMeeting.start_time);
+          const existingEnd = parseTime(existingMeeting.end_time);
+
+          // Check if times overlap
+          if (
+            (newStart < existingEnd && newStart >= existingStart) ||
+            (newEnd > existingStart && newEnd <= existingEnd) ||
+            (newStart <= existingStart && newEnd >= existingEnd) ||
+            (newStart >= existingStart && newEnd <= existingEnd)
+          ) {
+            return true; // Conflict detected
+          }
+        }
+      }
+    }
+  }
+
+  return false;
+}
 
 export function LoadingRow() {
   return (
@@ -72,7 +126,7 @@ export function LoadingRow() {
   );
 }
 
-function SectionTableHead() {
+function SectionTableHead(props: { hasMultipleDateRanges: boolean }) {
   return (
     <TableRow className="bg-cornflower-600">
       <TableCell className="py-2 px-4 border-b-0" align="left">
@@ -89,11 +143,25 @@ function SectionTableHead() {
           Schedule & Location
         </Typography>
       </TableCell>
+      {props.hasMultipleDateRanges && (
+        <TableCell className="py-2 px-4 border-b-0">
+          <Typography className="text-white text-xs">Date Range</Typography>
+        </TableCell>
+      )}
       <TableCell className="py-2 px-4 border-b-0">
         <Typography className="text-white text-xs">Syllabus</Typography>
       </TableCell>
     </TableRow>
   );
+}
+
+function parseDateRange(meeting: SectionsData[number]['meetings'][number]) {
+  const start_date = new Date(meeting.start_date);
+  const formatted_start = `${(start_date.getMonth() + 1).toString()}/${start_date.getDate().toString()}`;
+  const end_date = new Date(meeting.end_date);
+  const formatted_end = `${(end_date.getMonth() + 1).toString()}/${end_date.getDate().toString()}`;
+
+  return [formatted_start, formatted_end];
 }
 
 function meetingDays(days: string[]): string {
@@ -137,6 +205,9 @@ type SectionTableRowProps = {
   course: SearchQueryMultiSection;
   lastRow: boolean;
   setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
+  hasMultipleDateRanges: boolean;
+  selectedSections: SectionsData;
+  openConflictMessage: () => void;
 };
 
 function SectionTableRow(props: SectionTableRowProps) {
@@ -150,6 +221,14 @@ function SectionTableRow(props: SectionTableRowProps) {
           <Checkbox
             checked={isSelected}
             onClick={() => {
+              if (
+                !isSelected &&
+                hasConflict(props.data, props.selectedSections)
+              ) {
+                // Check for conflict
+                props.openConflictMessage();
+                return; // Prevent section selection
+              }
               props.setPlannerSection(props.course, props.data.section_number);
             }}
           />
@@ -157,6 +236,14 @@ function SectionTableRow(props: SectionTableRowProps) {
           <Radio
             checked={isSelected}
             onClick={() => {
+              if (
+                !isSelected &&
+                hasConflict(props.data, props.selectedSections)
+              ) {
+                // Check for conflict
+                props.openConflictMessage();
+                return; // Prevent section selection
+              }
               props.setPlannerSection(props.course, props.data.section_number);
             }}
           />
@@ -196,6 +283,19 @@ function SectionTableRow(props: SectionTableRowProps) {
             </div>
           ))}
       </TableCell>
+      {props.hasMultipleDateRanges && (
+        <TableCell className={props.lastRow ? 'border-b-0' : ''}>
+          {props.data.meetings
+            .map(parseDateRange)
+            .map(([start_date, end_date], i) => (
+              <div key={i}>
+                {start_date && end_date && (
+                  <Typography className="text-sm">{`${start_date}-${end_date}`}</Typography>
+                )}
+              </div>
+            ))}
+        </TableCell>
+      )}
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
         {props.data.syllabus_uri && (
           <Link
@@ -212,13 +312,21 @@ function SectionTableRow(props: SectionTableRowProps) {
 }
 
 function MeetingChip(props: {
+  color: { fill: string; outline: string; font: string };
   meetings: SectionsData[number]['meetings'] | undefined;
 }) {
   if (typeof props.meetings === 'undefined') {
     return null;
   }
   return (
-    <div className="ml-auto p-1 px-3 rounded-3xl border border-cornflower-300 bg-white dark:bg-gray-700 shadow-sm">
+    <div
+      className="ml-auto p-1 px-3 rounded-3xl shadow-sm"
+      style={{
+        backgroundColor: props.color.fill,
+        color: props.color.font,
+        outline: `2px solid ${props.color.outline}`,
+      }}
+    >
       <Typography className="text-xs font-semibold text-center">
         {meetingDays(props.meetings[0].meeting_days)}
       </Typography>
@@ -236,6 +344,9 @@ type PlannerCardProps = {
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RMPInterface>;
   removeFromPlanner: () => void;
+  selectedSections: SectionsData;
+  openConflictMessage: () => void;
+  color: { fill: string; outline: string; font: string };
 };
 
 const PlannerCard = (props: PlannerCardProps) => {
@@ -251,6 +362,15 @@ const PlannerCard = (props: PlannerCardProps) => {
   const [whichOpen, setWhichOpen] = useState<'sections' | 'grades' | null>(
     canOpenSections ? 'sections' : canOpenGrades ? 'grades' : null,
   );
+  useEffect(() => {
+    if (whichOpen === null) {
+      if (canOpenSections) {
+        setWhichOpen('sections');
+      } else if (canOpenGrades) {
+        setWhichOpen('grades');
+      }
+    }
+  }, [canOpenSections, canOpenGrades]);
   function handleOpen() {
     if (
       (whichOpen === 'sections' && canOpenSections) ||
@@ -259,6 +379,17 @@ const PlannerCard = (props: PlannerCardProps) => {
       setOpen(!open);
     }
   }
+
+  const hasMultipleDateRanges =
+    typeof props.sections !== 'undefined' && props.sections.length >= 1
+      ? props.sections.some(
+          (section) =>
+            section.meetings[0].start_date !==
+              props.sections![0].meetings[0].start_date ||
+            section.meetings[0].end_date !==
+              props.sections![0].meetings[0].end_date,
+        )
+      : false;
 
   return (
     <Box
@@ -307,6 +438,11 @@ const PlannerCard = (props: PlannerCardProps) => {
               }}
               icon={<BookOutlinedIcon />}
               checkedIcon={<BookIcon />}
+              sx={{
+                '&.Mui-checked': {
+                  color: props.color.fill,
+                },
+              }}
             />
           </Tooltip>
           <Tooltip title="Switch Opening Sections/Grades" placement="top">
@@ -348,6 +484,7 @@ const PlannerCard = (props: PlannerCardProps) => {
           {searchQueryLabel(removeSection(props.query))}
         </Typography>
         <MeetingChip
+          color={props.color}
           meetings={
             sections?.find(
               (section) =>
@@ -367,7 +504,9 @@ const PlannerCard = (props: PlannerCardProps) => {
           <TableContainer className="rounded-t-none">
             <Table>
               <TableHead>
-                <SectionTableHead />
+                <SectionTableHead
+                  hasMultipleDateRanges={hasMultipleDateRanges}
+                />
               </TableHead>
               <TableBody>
                 {sections.map((section, index) => (
@@ -377,6 +516,9 @@ const PlannerCard = (props: PlannerCardProps) => {
                     course={props.query}
                     lastRow={index === sections.length - 1}
                     setPlannerSection={props.setPlannerSection}
+                    selectedSections={props.selectedSections}
+                    openConflictMessage={props.openConflictMessage}
+                    hasMultipleDateRanges={hasMultipleDateRanges}
                   />
                 ))}
               </TableBody>
