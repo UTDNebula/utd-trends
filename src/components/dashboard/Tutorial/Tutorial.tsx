@@ -167,7 +167,8 @@ const Tutorial = ({ open, close }: TutorialProps) => {
 
   useEffect(() => {
     // For each element, set anchor based on `data-tutorial-id`
-    const elements = document.querySelectorAll('[data-tutorial-id]');
+    const elements =
+      document.querySelectorAll<HTMLElement>('[data-tutorial-id]');
     if (!elements.length) {
       close();
       return;
