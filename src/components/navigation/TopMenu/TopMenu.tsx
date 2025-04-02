@@ -138,44 +138,48 @@ export function TopMenu(props: TopMenuProps) {
           <div className="ml-auto">
             <WhatsNew />
           </div>
-          <div className="relative">
-            <div
-              className={
-                tutorialHint
-                  ? 'absolute w-11 h-11 rounded-full bg-royal dark:bg-cornflower-400 animate-ping'
-                  : 'hidden'
-              }
-            />
-            <div
-              className={
-                tutorialHint
-                  ? ' rounded-full bg-royal dark:bg-cornflower-400'
-                  : ''
-              }
-            >
-              <Tooltip title="Open Tutorial">
-                <IconButton
-                  className="aspect-square"
-                  size="medium"
-                  onClick={() => {
-                    setTutorialHint(false);
-                    localStorage.setItem(
-                      'tutorialHint',
-                      JSON.stringify({
-                        value: 'opened',
-                        cacheIndex: cacheIndex,
-                      }),
-                    );
-                    setOpenTutorial(true);
-                  }}
-                >
-                  <HelpOutlineIcon
-                    className={'text-3xl' + (tutorialHint ? ' text-white' : '')}
-                  />
-                </IconButton>
-              </Tooltip>
+          {!props.isPlanner && (
+            <div className="relative">
+              <div
+                className={
+                  tutorialHint
+                    ? 'absolute w-11 h-11 rounded-full bg-royal dark:bg-cornflower-400 animate-ping'
+                    : 'hidden'
+                }
+              />
+              <div
+                className={
+                  tutorialHint
+                    ? ' rounded-full bg-royal dark:bg-cornflower-400'
+                    : ''
+                }
+              >
+                <Tooltip title="Open Tutorial">
+                  <IconButton
+                    className="aspect-square"
+                    size="medium"
+                    onClick={() => {
+                      setTutorialHint(false);
+                      localStorage.setItem(
+                        'tutorialHint',
+                        JSON.stringify({
+                          value: 'opened',
+                          cacheIndex: cacheIndex,
+                        }),
+                      );
+                      setOpenTutorial(true);
+                    }}
+                  >
+                    <HelpOutlineIcon
+                      className={
+                        'text-3xl' + (tutorialHint ? ' text-white' : '')
+                      }
+                    />
+                  </IconButton>
+                </Tooltip>
+              </div>
             </div>
-          </div>
+          )}
           <Tooltip title="Share Link to Search">
             <IconButton
               className="aspect-square"

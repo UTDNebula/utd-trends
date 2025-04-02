@@ -167,14 +167,15 @@ const Tutorial = ({ open, close }: TutorialProps) => {
 
   useEffect(() => {
     // For each element, set anchor based on `data-tutorial-id`
-    const elements = document.querySelectorAll('[data-tutorial-id]');
+    const elements =
+      document.querySelectorAll<HTMLElement>('[data-tutorial-id]');
     if (!elements.length) {
       close();
       return;
     }
     const newSteps = [...stepsTemplate];
     elements.forEach((element) => {
-      if (element.checkVisibility()) {
+      if (element.offsetParent !== null) {
         const id = element.getAttribute('data-tutorial-id') as string;
         const foundStep = newSteps.findIndex((step) => step.id === id);
         if (foundStep !== -1) {
