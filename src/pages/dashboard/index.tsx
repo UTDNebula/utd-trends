@@ -698,8 +698,8 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
           addChosenSessions={addChosenSessions}
         />
         <div className="sm:hidden">
-          <div data-tutorial-id="LHS"> {carousel} </div>
-          <div data-tutorial-id="RHS"> {searchResultsTable} </div>
+          <div data-tutorial-id="RHS"> {carousel} </div>
+          <div data-tutorial-id="LHS"> {searchResultsTable} </div>
         </div>
         <PanelGroup
           direction="horizontal"

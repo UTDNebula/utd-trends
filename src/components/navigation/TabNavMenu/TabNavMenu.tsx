@@ -40,7 +40,6 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
           value={props.value}
           onChange={(event, newValue) => props.turner(newValue - props.value)}
           aria-label="Tab switcher"
-          className="shadow dark:shadow-lg"
           variant="scrollable"
         >
           {props.options.map((option, index) => (

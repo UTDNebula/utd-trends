@@ -29,10 +29,12 @@ import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import type { GradesType } from '@/types/GradesType';
 import {
+  convertToCourseOnly,
   convertToProfOnly,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
+  sectionCanOverlap,
 } from '@/types/SearchQuery';
 import type { SectionsType } from '@/types/SectionsType';
 
@@ -101,6 +103,7 @@ type RowProps = {
   removeFromCompare: (arg0: SearchQuery) => void;
   color?: string;
   inPlanner: boolean;
+  addJustCourseToo: boolean;
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
   showTutorial: boolean;
@@ -116,6 +119,7 @@ function Row({
   removeFromCompare,
   color,
   inPlanner,
+  addJustCourseToo,
   addToPlanner,
   removeFromPlanner,
   showTutorial,
@@ -238,43 +242,39 @@ function Row({
                 } // Apply color if defined
               />
             </Tooltip>
-            {!(
-              typeof course.prefix === 'undefined' &&
-              typeof course.number === 'undefined'
-            ) && (
-              <Tooltip
-                title={
-                  hasLatestSemester
-                    ? inPlanner
-                      ? 'Remove from Planner'
-                      : 'Add to Planner'
-                    : section.state === 'loading'
-                      ? undefined
-                      : 'Not being taught'
-                }
-                placement="top"
-              >
-                <span>
-                  <Checkbox
-                    checked={inPlanner}
-                    onClick={(e) => {
-                      e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
-                      if (inPlanner) {
-                        removeFromPlanner(course);
-                      } else {
-                        addToPlanner(course);
+            <Tooltip
+              title={
+                hasLatestSemester
+                  ? inPlanner
+                    ? 'Remove from Planner'
+                    : 'Add to Planner'
+                  : section.state === 'loading'
+                    ? undefined
+                    : 'Not being taught'
+              }
+              placement="top"
+            >
+              <span>
+                <Checkbox
+                  checked={inPlanner}
+                  onClick={(e) => {
+                    e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
+                    if (inPlanner) {
+                      removeFromPlanner(course);
+                    } else {
+                      addToPlanner(course);
+                      if (addJustCourseToo) {
+                        addToPlanner(convertToCourseOnly(course));
                       }
-                    }}
-                    className={
-                      section.state === 'loading' ? 'animate-pulse' : ''
                     }
-                    icon={<BookOutlinedIcon />}
-                    checkedIcon={<BookIcon />}
-                    disabled={!hasLatestSemester}
-                  />
-                </span>
-              </Tooltip>
-            )}
+                  }}
+                  className={section.state === 'loading' ? 'animate-pulse' : ''}
+                  icon={<BookOutlinedIcon />}
+                  checkedIcon={<BookIcon />}
+                  disabled={!hasLatestSemester}
+                />
+              </span>
+            </Tooltip>
           </div>
         </TableCell>
         <TableCell
@@ -628,31 +628,43 @@ const SearchResultsTable = ({
           <TableBody>
             {/* Included Results */}
             {resultsLoading === 'done'
-              ? sortedResults.map((result, index) => (
-                  <Row
-                    section={sections[searchQueryLabel(result)]}
-                    key={searchQueryLabel(result)}
-                    course={result}
-                    grades={grades[searchQueryLabel(result)]}
-                    rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
-                    inCompare={
-                      compare.findIndex((obj) =>
+              ? sortedResults.map((result, index) => {
+                  const courseOnlySections =
+                    sections[searchQueryLabel(convertToCourseOnly(result))];
+                  const canAddCourseOnlyToPlanner =
+                    typeof courseOnlySections !== 'undefined' &&
+                    courseOnlySections.state === 'done' &&
+                    courseOnlySections.data.latest.some((section) =>
+                      sectionCanOverlap(section.section_number),
+                    );
+                  return (
+                    <Row
+                      section={sections[searchQueryLabel(result)]}
+                      key={searchQueryLabel(result)}
+                      course={result}
+                      grades={grades[searchQueryLabel(result)]}
+                      rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
+                      inCompare={compare.some((obj) =>
                         searchQueryEqual(obj, result),
-                      ) !== -1
-                    }
-                    addToCompare={addToCompare}
-                    removeFromCompare={removeFromCompare}
-                    color={colorMap[searchQueryLabel(result)]}
-                    inPlanner={
-                      planner.findIndex((obj) =>
+                      )}
+                      addToCompare={addToCompare}
+                      removeFromCompare={removeFromCompare}
+                      color={colorMap[searchQueryLabel(result)]}
+                      inPlanner={planner.some((obj) =>
                         searchQueryEqual(obj, result),
-                      ) !== -1
-                    }
-                    addToPlanner={addToPlanner}
-                    removeFromPlanner={removeFromPlanner}
-                    showTutorial={index === numSearches}
-                  />
-                ))
+                      )}
+                      addJustCourseToo={
+                        !searchQueryEqual(
+                          result,
+                          convertToCourseOnly(result),
+                        ) && canAddCourseOnlyToPlanner
+                      }
+                      addToPlanner={addToPlanner}
+                      removeFromPlanner={removeFromPlanner}
+                      showTutorial={index === numSearches}
+                    />
+                  );
+                })
               : Array(10)
                   .fill(0)
                   .map((_, index) => <LoadingRow key={index} />)}
@@ -674,31 +686,41 @@ const SearchResultsTable = ({
 
             {/* Unincluded Results (Unavailable courses) */}
             {resultsLoading === 'done' &&
-              sortedUnIncludedResults.map((result) => (
-                <Row
-                  section={sections[searchQueryLabel(result)]}
-                  key={searchQueryLabel(result)}
-                  course={result}
-                  grades={grades[searchQueryLabel(result)]}
-                  rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
-                  inCompare={
-                    compare.findIndex((obj) =>
+              sortedUnIncludedResults.map((result) => {
+                const courseOnlySections =
+                  sections[searchQueryLabel(convertToCourseOnly(result))];
+                const canAddCourseOnlyToPlanner =
+                  typeof courseOnlySections !== 'undefined' &&
+                  courseOnlySections.state === 'done' &&
+                  courseOnlySections.data.latest.some((section) =>
+                    sectionCanOverlap(section.section_number),
+                  );
+                return (
+                  <Row
+                    section={sections[searchQueryLabel(result)]}
+                    key={searchQueryLabel(result)}
+                    course={result}
+                    grades={grades[searchQueryLabel(result)]}
+                    rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
+                    inCompare={compare.some((obj) =>
                       searchQueryEqual(obj, result),
-                    ) !== -1
-                  }
-                  addToCompare={addToCompare}
-                  removeFromCompare={removeFromCompare}
-                  color={colorMap[searchQueryLabel(result)]}
-                  inPlanner={
-                    planner.findIndex((obj) =>
+                    )}
+                    addToCompare={addToCompare}
+                    removeFromCompare={removeFromCompare}
+                    color={colorMap[searchQueryLabel(result)]}
+                    inPlanner={planner.some((obj) =>
                       searchQueryEqual(obj, result),
-                    ) !== -1
-                  }
-                  addToPlanner={addToPlanner}
-                  removeFromPlanner={removeFromPlanner}
-                  showTutorial={false}
-                />
-              ))}
+                    )}
+                    addJustCourseToo={
+                      !searchQueryEqual(result, convertToCourseOnly(result)) &&
+                      canAddCourseOnlyToPlanner
+                    }
+                    addToPlanner={addToPlanner}
+                    removeFromPlanner={removeFromPlanner}
+                    showTutorial={false}
+                  />
+                );
+              })}
           </TableBody>
         </Table>
       </TableContainer>
