@@ -119,7 +119,6 @@ function Row({
   addToCompare,
   removeFromCompare,
   color,
-  canAddToPlanner,
   inPlanner,
   addJustCourseToo,
   addToPlanner,
@@ -244,47 +243,44 @@ function Row({
                 } // Apply color if defined
               />
             </Tooltip>
-            {canAddToPlanner && (
-              <Tooltip
-                title={
-                  hasLatestSemester
-                    ? inPlanner
-                      ? 'Remove from Planner'
-                      : 'Add to Planner'
-                    : section.state === 'loading'
-                      ? undefined
-                      : 'Not being taught'
-                }
-                placement="top"
-              >
-                <span>
-                  <Checkbox
-                    checked={inPlanner}
-                    onClick={(e) => {
-                      e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
-                      if (inPlanner) {
-                        removeFromPlanner(course);
-                        if (addJustCourseToo) {
-                          removeFromPlanner(convertToCourseOnly(course));
-                        }
-                      } else {
-                        addToPlanner(course);
-                        if (addJustCourseToo) {
-                          addToPlanner(convertToCourseOnly(course));
-                        }
+            <Tooltip
+              title={
+                hasLatestSemester
+                  ? inPlanner
+                    ? 'Remove from Planner'
+                    : 'Add to Planner'
+                  : section.state === 'loading'
+                    ? undefined
+                    : 'Not being taught'
+              }
+              placement="top"
+            >
+              <span>
+                <Checkbox
+                  checked={inPlanner}
+                  onClick={(e) => {
+                    e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
+                    if (inPlanner) {
+                      removeFromPlanner(course);
+                      if (addJustCourseToo) {
+                        removeFromPlanner(convertToCourseOnly(course));
                       }
-                      console.log(addJustCourseToo);
-                    }}
-                    className={
-                      section.state === 'loading' ? 'animate-pulse' : ''
+                    } else {
+                      addToPlanner(course);
+                      if (addJustCourseToo) {
+                        addToPlanner(convertToCourseOnly(course));
+                      }
                     }
-                    icon={<BookOutlinedIcon />}
-                    checkedIcon={<BookIcon />}
-                    disabled={!hasLatestSemester}
-                  />
-                </span>
-              </Tooltip>
-            )}
+                  }}
+                  className={
+                    section.state === 'loading' ? 'animate-pulse' : ''
+                  }
+                  icon={<BookOutlinedIcon />}
+                  checkedIcon={<BookIcon />}
+                  disabled={!hasLatestSemester}
+                />
+              </span>
+            </Tooltip>
           </div>
         </TableCell>
         <TableCell
@@ -642,6 +638,7 @@ const SearchResultsTable = ({
                   const courseOnlySections =
                     sections[searchQueryLabel(convertToCourseOnly(result))];
                   const canAddCourseOnlyToPlanner =
+                    typeof courseOnlySections !== 'undefined' &&
                     courseOnlySections.state === 'done' &&
                     courseOnlySections.data.latest.some((section) =>
                       sectionCanOverlap(section.section_number),
@@ -659,15 +656,6 @@ const SearchResultsTable = ({
                       addToCompare={addToCompare}
                       removeFromCompare={removeFromCompare}
                       color={colorMap[searchQueryLabel(result)]}
-                      canAddToPlanner={
-                        !(
-                          (typeof result.prefix === 'undefined' &&
-                            typeof result.number === 'undefined') ||
-                          (typeof result.profFirst === 'undefined' &&
-                            typeof result.profLast === 'undefined' &&
-                            !canAddCourseOnlyToPlanner)
-                        )
-                      }
                       inPlanner={planner.some((obj) =>
                         searchQueryEqual(obj, result),
                       )}
@@ -708,6 +696,7 @@ const SearchResultsTable = ({
                 const courseOnlySections =
                   sections[searchQueryLabel(convertToCourseOnly(result))];
                 const canAddCourseOnlyToPlanner =
+                  typeof courseOnlySections !== 'undefined' &&
                   courseOnlySections.state === 'done' &&
                   courseOnlySections.data.latest.some((section) =>
                     sectionCanOverlap(section.section_number),
@@ -725,15 +714,6 @@ const SearchResultsTable = ({
                     addToCompare={addToCompare}
                     removeFromCompare={removeFromCompare}
                     color={colorMap[searchQueryLabel(result)]}
-                    canAddToPlanner={
-                      !(
-                        (typeof result.prefix === 'undefined' &&
-                          typeof result.number === 'undefined') ||
-                        (typeof result.profFirst === 'undefined' &&
-                          typeof result.profLast === 'undefined' &&
-                          !canAddCourseOnlyToPlanner)
-                      )
-                    }
                     inPlanner={planner.some((obj) =>
                       searchQueryEqual(obj, result),
                     )}
