@@ -4,10 +4,7 @@ Build the combos table
 import { writeFileSync } from 'fs';
 
 import aggregatedData from '../data/aggregated_data.json';
-import {
-  type SearchQuery,
-  searchQueryEqual,
-} from '../modules/SearchQuery/SearchQuery';
+import { type SearchQuery, searchQueryEqual } from '../types/SearchQuery';
 
 export type TableType = { [key: string]: SearchQuery[] };
 

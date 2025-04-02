@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import { compareSemesters } from '@/modules/semesters';
+import type { SectionsData } from '@/pages/api/sections';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToCourseOnly,
   convertToProfOnly,
   type SearchQuery,
   searchQueryLabel,
-} from '@/modules/SearchQuery/SearchQuery';
-import type { SectionsType } from '@/modules/SectionsType/SectionsType';
-import { compareSemesters } from '@/modules/semesters/semesters';
-import type { SectionsData } from '@/pages/api/sections';
+} from '@/types/SearchQuery';
+import type { SectionsType } from '@/types/SectionsType';
 
 //Fetch section data from nebula api
 function fetchSectionsData(

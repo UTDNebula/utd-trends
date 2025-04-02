@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
-import { compareColors } from '@/modules/colors/colors';
+import { compareColors } from '@/modules/colors';
 import type { GradesData } from '@/pages/api/grades';
 
 function sortSemesters(a: string, b: string) {

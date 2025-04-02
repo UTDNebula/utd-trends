@@ -4,13 +4,10 @@ import CompareTable from '@/components/compare/CompareTable/CompareTable';
 import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import type { GradesType } from '@/modules/GradesType/GradesType';
-import {
-  type SearchQuery,
-  searchQueryLabel,
-} from '@/modules/SearchQuery/SearchQuery';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import type { GradesType } from '@/types/GradesType';
+import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
 type CompareProps = {
   courses: SearchQuery[];

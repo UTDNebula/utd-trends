@@ -9,8 +9,8 @@ import {
 import Link from 'next/link';
 import React, { useState } from 'react';
 
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
 
 type Props = {
   rmp: GenericFetchedData<RMPInterface>;

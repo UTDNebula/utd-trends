@@ -19,9 +19,12 @@ import CourseOverview from '@/components/overview/CourseOverview/CourseOverview'
 import ProfessorOverview from '@/components/overview/ProfessorOverview/ProfessorOverview';
 import Filters from '@/components/search/Filters/Filters';
 import SearchResultsTable from '@/components/search/SearchResultsTable/SearchResultsTable';
-import { compareColors } from '@/modules/colors/colors';
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import type { GradesType } from '@/modules/GradesType/GradesType';
+import { compareColors } from '@/modules/colors';
+import useGradeStore from '@/modules/useGradeStore';
+import useRmpStore from '@/modules/useRmpStore';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import type { GradesType } from '@/types/GradesType';
 import {
   convertToProfOnly,
   decodeSearchQueryLabel,
@@ -30,11 +33,8 @@ import {
   searchQueryEqual,
   searchQueryLabel,
   type SearchQueryMultiSection,
-} from '@/modules/SearchQuery/SearchQuery';
-import type { SectionsType } from '@/modules/SectionsType/SectionsType';
-import useGradeStore from '@/modules/useGradeStore/useGradeStore';
-import useRmpStore from '@/modules/useRmpStore/useRmpStore';
-import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+} from '@/types/SearchQuery';
+import type { SectionsType } from '@/types/SectionsType';
 
 function removeDuplicates(array: SearchQuery[]) {
   return array.filter(

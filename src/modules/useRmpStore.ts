@@ -1,11 +1,8 @@
 import { useState } from 'react';
 
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import {
-  type SearchQuery,
-  searchQueryLabel,
-} from '@/modules/SearchQuery/SearchQuery';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
 //Fetch RMP data from RMP
 function fetchRmpData(

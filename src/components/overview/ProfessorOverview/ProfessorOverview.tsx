@@ -5,13 +5,10 @@ import React, { useEffect, useState } from 'react';
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import type { GradesType } from '@/modules/GradesType/GradesType';
-import {
-  type SearchQuery,
-  searchQueryLabel,
-} from '@/modules/SearchQuery/SearchQuery';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import type { GradesType } from '@/types/GradesType';
+import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
 const fallbackSrc = 'https://profiles.utdallas.edu/img/default.png';
 
