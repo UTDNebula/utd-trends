@@ -15,7 +15,6 @@ import {
   type SearchQueryMultiSection,
   searchQueryMultiSectionSplit,
 } from '@/modules/SearchQuery/SearchQuery';
-import sectionCanOverlap from '@/modules/sections/sections';
 import { type SectionsType } from '@/modules/SectionsType/SectionsType';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 
