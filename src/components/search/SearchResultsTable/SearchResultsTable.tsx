@@ -261,9 +261,6 @@ function Row({
                     e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
                     if (inPlanner) {
                       removeFromPlanner(course);
-                      if (addJustCourseToo) {
-                        removeFromPlanner(convertToCourseOnly(course));
-                      }
                     } else {
                       addToPlanner(course);
                       if (addJustCourseToo) {
