@@ -102,7 +102,6 @@ type RowProps = {
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
   color?: string;
-  canAddToPlanner: boolean;
   inPlanner: boolean;
   addJustCourseToo: boolean;
   addToPlanner: (value: SearchQuery) => void;
@@ -272,9 +271,7 @@ function Row({
                       }
                     }
                   }}
-                  className={
-                    section.state === 'loading' ? 'animate-pulse' : ''
-                  }
+                  className={section.state === 'loading' ? 'animate-pulse' : ''}
                   icon={<BookOutlinedIcon />}
                   checkedIcon={<BookIcon />}
                   disabled={!hasLatestSemester}
