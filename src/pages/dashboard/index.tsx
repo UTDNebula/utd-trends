@@ -692,7 +692,6 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     contentComponent = (
       <>
         <Filters
-          manageQuery
           academicSessions={academicSessions}
           chosenSessions={chosenSessions}
           addChosenSessions={addChosenSessions}
