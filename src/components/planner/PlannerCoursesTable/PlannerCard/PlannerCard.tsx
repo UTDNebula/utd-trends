@@ -363,13 +363,12 @@ const PlannerCard = (props: PlannerCardProps) => {
     canOpenSections ? 'sections' : canOpenGrades ? 'grades' : null,
   );
   useEffect(() => {
-    if (whichOpen === null) {
-      if (canOpenSections) {
-        setWhichOpen('sections');
-      } else if (canOpenGrades) {
-        setWhichOpen('grades');
+    setWhichOpen((prev) => {
+      if (prev === null) {
+        return canOpenSections ? 'sections' : canOpenGrades ? 'grades' : null;
       }
-    }
+      return prev;
+    });
   }, [canOpenSections, canOpenGrades]);
   function handleOpen() {
     if (

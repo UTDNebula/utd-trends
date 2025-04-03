@@ -89,8 +89,8 @@ const ProfessorOverview = ({
           height={280}
           width={280}
           className="w-32 h-32 rounded-full self-center"
-          onLoadingComplete={(result) => {
-            if (result.naturalWidth === 0) {
+          onLoad={(result) => {
+            if (result.currentTarget.naturalWidth === 0) {
               // Broken image
               setSrc(fallbackSrc);
             }
