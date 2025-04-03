@@ -60,7 +60,7 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
               key={index}
               query={course}
               sections={
-                typeof sectionData === 'undefined' ||
+                typeof sectionData !== 'undefined' &&
                 sectionData.state === 'done'
                   ? sectionData.data.latest
                   : undefined
