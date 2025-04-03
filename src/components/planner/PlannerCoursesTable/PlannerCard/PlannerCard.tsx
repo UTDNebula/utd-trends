@@ -27,17 +27,17 @@ import React, { useEffect, useState } from 'react';
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import type { GradesType } from '@/modules/GradesType/GradesType';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import { type SectionsData } from '@/pages/api/sections';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import type { GradesType } from '@/types/GradesType';
 import {
   removeSection,
   type SearchQuery,
   searchQueryLabel,
   type SearchQueryMultiSection,
-} from '@/modules/SearchQuery/SearchQuery';
-import sectionCanOverlap from '@/modules/sections/sections';
-import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import { type SectionsData } from '@/pages/api/sections';
+  sectionCanOverlap,
+} from '@/types/SearchQuery';
 
 function parseTime(time: string): number {
   const [hour, minute] = time.split(':').map((s) => parseInt(s));

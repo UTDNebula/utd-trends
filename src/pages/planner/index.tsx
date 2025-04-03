@@ -12,9 +12,10 @@ import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
 import PlannerEmpty from '@/components/planner/PlannerEmpty/PlannerEmpty';
 import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedule';
-import { plannerColors } from '@/modules/colors/colors';
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import type { GradesType } from '@/modules/GradesType/GradesType';
+import { plannerColors } from '@/modules/colors';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import type { GradesType } from '@/types/GradesType';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -24,9 +25,8 @@ import {
   searchQueryLabel,
   type SearchQueryMultiSection,
   searchQueryMultiSectionSplit,
-} from '@/modules/SearchQuery/SearchQuery';
-import type { SectionsType } from '@/modules/SectionsType/SectionsType';
-import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+} from '@/types/SearchQuery';
+import type { SectionsType } from '@/types/SectionsType';
 
 function removeDuplicates(array: SearchQuery[]) {
   return array.filter(

@@ -14,15 +14,15 @@ import {
 import React, { useState } from 'react';
 
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
-import { gpaToColor, useRainbowColors } from '@/modules/colors/colors';
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import type { GradesType } from '@/modules/GradesType/GradesType';
+import { gpaToColor, useRainbowColors } from '@/modules/colors';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import type { GradesType } from '@/types/GradesType';
 import {
   convertToProfOnly,
   type SearchQuery,
   searchQueryLabel,
-} from '@/modules/SearchQuery/SearchQuery';
-import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+} from '@/types/SearchQuery';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(

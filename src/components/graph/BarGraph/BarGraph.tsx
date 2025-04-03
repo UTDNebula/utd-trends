@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
-import { compareColors, useRainbowColors } from '@/modules/colors/colors';
+import { compareColors, useRainbowColors } from '@/modules/colors';
 
 // Dynamically import react-apexcharts with SSR disabled.
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });

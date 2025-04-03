@@ -1,12 +1,9 @@
 import { useState } from 'react';
 
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import type { GradesType } from '@/modules/GradesType/GradesType';
-import {
-  type SearchQuery,
-  searchQueryLabel,
-} from '@/modules/SearchQuery/SearchQuery';
 import type { GradesData } from '@/pages/api/grades';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import type { GradesType } from '@/types/GradesType';
+import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
 //Find GPA, total, and grade_distribution based on including some set of semesters
 export function calculateGrades(

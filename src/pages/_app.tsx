@@ -14,18 +14,18 @@ import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config.js';
 import FeedbackPopup from '@/components/common/FeedbackPopup/FeedbackPopup';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
+import useGradeStore from '@/modules/useGradeStore';
+import usePersistantState from '@/modules/usePersistantState';
+import useRmpStore from '@/modules/useRmpStore';
+import useSectionsStore from '@/modules/useSectionsStore';
 import {
   convertToCourseOnly,
   removeSection,
   type SearchQuery,
   searchQueryEqual,
   type SearchQueryMultiSection,
-} from '@/modules/SearchQuery/SearchQuery';
-import sectionCanOverlap from '@/modules/sections/sections';
-import useGradeStore from '@/modules/useGradeStore/useGradeStore';
-import usePersistantState from '@/modules/usePersistantState/usePersistantState';
-import useRmpStore from '@/modules/useRmpStore/useRmpStore';
-import useSectionsStore from '@/modules/useSectionsStore/useSectionsStore';
+  sectionCanOverlap,
+} from '@/types/SearchQuery';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -165,25 +165,31 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   //Add a course+prof combo to planner (happens from search results)
   function addToPlanner(searchQuery: SearchQuery) {
-    //If not already there
-    if (planner.findIndex((obj) => searchQueryEqual(obj, searchQuery)) === -1) {
-      //Add to list
-      setPlanner(planner.concat([searchQuery]));
-    }
+    setPlanner((old: SearchQueryMultiSection[]) => {
+      //If not already there
+      if (old.findIndex((obj) => searchQueryEqual(obj, searchQuery)) === -1) {
+        //Add to list
+        return old.concat([searchQuery]);
+      }
+      return old;
+    });
   }
 
   //Remove a course+prof combo from compare
   function removeFromPlanner(searchQuery: SearchQuery) {
-    //If already there
-    if (planner.findIndex((obj) => searchQueryEqual(obj, searchQuery)) !== -1) {
-      //Remove from list
-      setPlanner(planner.filter((el) => !searchQueryEqual(el, searchQuery)));
-    }
+    setPlanner((old: SearchQueryMultiSection[]) => {
+      //If already there
+      if (planner.some((obj) => searchQueryEqual(obj, searchQuery))) {
+        //Remove to list
+        return old.filter((el) => !searchQueryEqual(el, searchQuery));
+      }
+      return old;
+    });
   }
 
   function setPlannerSection(searchQuery: SearchQuery, section: string) {
-    setPlanner(
-      planner.map((course) => {
+    setPlanner((old: SearchQueryMultiSection[]) =>
+      old.map((course) => {
         if (
           searchQueryEqual(removeSection(course), removeSection(searchQuery))
         ) {

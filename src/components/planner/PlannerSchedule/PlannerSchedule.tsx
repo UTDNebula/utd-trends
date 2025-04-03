@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { type GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToCourseOnly,
   removeSection,
   type SearchQuery,
   searchQueryLabel,
-} from '@/modules/SearchQuery/SearchQuery';
-import { type SectionsType } from '@/modules/SectionsType/SectionsType';
+} from '@/types/SearchQuery';
+import type { SectionsType } from '@/types/SectionsType';
 
 import PlannerSection from './PlannerSection';
 

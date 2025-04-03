@@ -1,17 +1,22 @@
-import { FormControl, FormControlLabel, Switch, Tooltip } from '@mui/material';
+import BookIcon from '@mui/icons-material/Book';
+import {
+  Button,
+  FormControl,
+  FormControlLabel,
+  Switch,
+  Tooltip,
+} from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
 import Background from '@/../public/background.png';
 import SearchBar from '@/components/search/SearchBar/SearchBar';
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import {
-  type SearchQuery,
-  searchQueryLabel,
-} from '@/modules/SearchQuery/SearchQuery';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
@@ -56,6 +61,12 @@ const Home: NextPage = () => {
           fill
           className="object-cover -z-20"
         />
+        <Link href="/planner" className="absolute top-4 right-4 rounded-xl">
+          <Button className="bg-cornflower-500 rounded-xl text-white dark:bg-cornflower-400 text p-2 px-4 normal-case">
+            <BookIcon className="mr-2" />
+            My Planner
+          </Button>
+        </Link>
         <div className="max-w-xl grow flex flex-col justify-center">
           <h2 className="text-sm font-semibold mb-3 text-cornflower-600 dark:text-cornflower-400 tracking-wider">
             POWERED BY {/*eslint-disable-next-line react/jsx-no-target-blank*/}

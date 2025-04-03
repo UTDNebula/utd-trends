@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import PlannerCard, {
   LoadingRow,
 } from '@/components/planner/PlannerCoursesTable/PlannerCard/PlannerCard';
-import { type GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import type { GradesType } from '@/modules/GradesType/GradesType';
+import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import { type GenericFetchedData } from '@/types/GenericFetchedData';
+import type { GradesType } from '@/types/GradesType';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -14,10 +15,8 @@ import {
   searchQueryLabel,
   type SearchQueryMultiSection,
   searchQueryMultiSectionSplit,
-} from '@/modules/SearchQuery/SearchQuery';
-import sectionCanOverlap from '@/modules/sections/sections';
-import { type SectionsType } from '@/modules/SectionsType/SectionsType';
-import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+} from '@/types/SearchQuery';
+import type { SectionsType } from '@/types/SectionsType';
 
 type PlannerCoursesTableProps = {
   courses: SearchQueryMultiSection[];
@@ -61,17 +60,10 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
               key={index}
               query={course}
               sections={
-                typeof sectionData === 'undefined' ||
-                sectionData.state === 'error'
-                  ? undefined
-                  : sectionData.data.latest.filter((section) => {
-                      if (
-                        typeof course.profFirst === 'undefined' &&
-                        typeof course.profLast === 'undefined'
-                      ) {
-                        return sectionCanOverlap(section.section_number);
-                      } else return true;
-                    })
+                typeof sectionData !== 'undefined' &&
+                sectionData.state === 'done'
+                  ? sectionData.data.latest
+                  : undefined
               }
               setPlannerSection={props.setPlannerSection}
               grades={props.grades[searchQueryLabel(removeSection(course))]}

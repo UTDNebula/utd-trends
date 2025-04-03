@@ -15,7 +15,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import Rating from '@/components/common/Rating/Rating';
-import gpaToLetterGrade from '@/modules/gpaToLetterGrade/gpaToLetterGrade';
+import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];

@@ -6,7 +6,7 @@ import { writeFileSync } from 'fs';
 import { DirectedGraph } from 'graphology';
 
 import aggregatedData from '../data/aggregated_data.json';
-import { type SearchQuery } from '../modules/SearchQuery/SearchQuery';
+import { type SearchQuery } from '../types/SearchQuery';
 
 export type NodeAttributes = {
   c: string;

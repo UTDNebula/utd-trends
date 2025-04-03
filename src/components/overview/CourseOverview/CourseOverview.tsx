@@ -2,13 +2,10 @@ import { Skeleton } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
-import type { GenericFetchedData } from '@/modules/GenericFetchedData/GenericFetchedData';
-import type { GradesType } from '@/modules/GradesType/GradesType';
-import {
-  type SearchQuery,
-  searchQueryLabel,
-} from '@/modules/SearchQuery/SearchQuery';
 import type { CourseData } from '@/pages/api/course';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import type { GradesType } from '@/types/GradesType';
+import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
 type CourseOverviewProps = {
   course: SearchQuery;
