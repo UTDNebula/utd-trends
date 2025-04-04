@@ -155,21 +155,20 @@ function getSearchTerms(searchTermInput: string | string[] | undefined): {
 function buildPageTitle(
   courseSearchTerms: SearchQuery[],
   professorSearchTerms: SearchQuery[],
-): string {
-  let pageTitle = '';
+): string[] {
+  const pageTitle: string[] = [];
   courseSearchTerms.map((term) => {
-    pageTitle += searchQueryLabel(term) + ', ';
+    pageTitle.push(searchQueryLabel(term));
   });
   professorSearchTerms.map((term) => {
-    pageTitle += searchQueryLabel(term) + ', ';
+    pageTitle.push(searchQueryLabel(term));
   });
-  pageTitle = pageTitle.slice(0, -2) + (pageTitle.length > 0 ? ' - ' : '');
   return pageTitle;
 }
 
 export async function getServerSideProps(
   context: NextPageContext,
-): Promise<{ props: { pageTitle: string } }> {
+): Promise<{ props: { pageTitle: string[] } }> {
   const { courseSearchTerms, professorSearchTerms } = getSearchTerms(
     context.query.searchTerms,
   );
@@ -185,7 +184,7 @@ interface Props {
   sections: {
     [key: string]: GenericFetchedData<SectionsType>;
   };
-  pageTitle: string;
+  pageTitle: string[];
   planner: SearchQueryMultiSection[];
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
@@ -733,21 +732,53 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     );
   }
 
+  const pageTitle =
+    props.pageTitle.join(', ') + (props.pageTitle.length ? ' - ' : '');
+  const dynamicPageTitle = buildPageTitle(courses, professors);
+  const pageDescription = !props.pageTitle.length
+    ? "Choose the perfect classes for you: Nebula Labs's data analytics platform to help you make informed decisions about your coursework with UT Dallas grade and Rate My Professors data."
+    : 'Choose the perfect classes for you: Compare ' +
+      (props.pageTitle.length === 1
+        ? props.pageTitle[0] +
+          (typeof decodeSearchQueryLabel(props.pageTitle[0]).prefix !==
+          'undefined'
+            ? ' professors'
+            : ' courses')
+        : props.pageTitle.slice(0, -1).join(', ') +
+          (props.pageTitle.length > 2 ? ',' : '') +
+          ' and ' +
+          props.pageTitle.slice(-1)) +
+      " on Nebula Labs's data analytics platform to help you make informed decisions about your coursework with UT Dallas grade and Rate My Professors data.";
+
   return (
     <>
       <Head>
         <title>
-          {'Results - ' + buildPageTitle(courses, professors) + 'UTD TRENDS'}
+          {'Results - ' +
+            dynamicPageTitle.join(', ') +
+            (dynamicPageTitle.length ? ' - ' : '') +
+            'UTD TRENDS'}
         </title>
         <link
           rel="canonical"
-          href="https://trends.utdnebula.com/dashboard"
+          href={
+            'https://trends.utdnebula.com/dashboard' +
+            (router.query.searchTerms
+              ? '?searchTerms=' + router.query.searchTerms
+              : '')
+          }
           key="canonical"
         />
         <meta
           key="og:title"
           property="og:title"
-          content={'Results - ' + props.pageTitle + 'UTD TRENDS'}
+          content={'Results - ' + pageTitle + 'UTD TRENDS'}
+        />
+        <meta key="description" name="description" content={pageDescription} />
+        <meta
+          key="og:description"
+          property="og:description"
+          content={pageDescription}
         />
         <meta
           property="og:url"

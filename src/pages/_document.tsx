@@ -11,17 +11,15 @@ function Document() {
     <Html lang="en">
       <Head prefix="og: http://ogp.me/ns#">
         <meta
-          name="description"
-          content="Choose the perfect classes for you: Nebula Labs's data analytics platform to help you make informed decisions about your coursework with grade and Rate My Professors data."
+          name="keywords"
+          content="UT Dallas, schedule, planner, grades, Rate My Professors"
         />
+        <meta name="geo.region" content="US-TX" />
+        <meta name="geo.placename" content="Richardson" />
         <meta
           name="theme-color"
           // eslint-disable-next-line  @typescript-eslint/no-explicit-any
           content={(fullTailwindConfig.theme.colors as any).royal as string}
-        />
-        <meta
-          property="og:description"
-          content="Choose the perfect classes for you: Nebula Labs's data analytics platform to help you make informed decisions about your coursework with grade and Rate My Professors data."
         />
         <meta property="og:type" content="website" />
         <meta

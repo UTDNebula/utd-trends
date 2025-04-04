@@ -242,6 +242,16 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <title>UTD TRENDS</title>
         <meta key="og:title" property="og:title" content="UTD TRENDS" />
+        <meta
+          key="description"
+          name="description"
+          content="Choose the perfect classes for you: Nebula Labs's data analytics and schedule planner platform to help you make informed decisions about your coursework with UT Dallas grade and Rate My Professors data."
+        />
+        <meta
+          key="og:description"
+          property="og:description"
+          content="Choose the perfect classes for you: Nebula Labs's data analytics and schedule planner platform to help you make informed decisions about your coursework with UT Dallas grade and Rate My Professors data."
+        />
         <link
           rel="icon"
           type="image/png"
