@@ -224,7 +224,17 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
         <meta
           key="og:title"
           property="og:title"
-          content="Planner - UTD TRENDS"
+          content="My Planner - UTD TRENDS"
+        />
+        <meta
+          key="description"
+          name="description"
+          content="Choose the perfect classes for you: Nebula Labs's schedule planner to help you build an informed schedule with UT Dallas grade and Rate My Professors data."
+        />
+        <meta
+          key="og:description"
+          property="og:description"
+          content="Choose the perfect classes for you: Nebula Labs's schedule planner to help you build an informed schedule with UT Dallas grade and Rate My Professors data."
         />
         <meta
           property="og:url"
