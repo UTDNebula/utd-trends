@@ -266,7 +266,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <div
           className={
             inter.variable +
-            ' ' +
+            ' font-inter ' +
             kallisto.variable +
             ' h-full text-haiti dark:text-white'
           }

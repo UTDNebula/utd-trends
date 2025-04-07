@@ -80,7 +80,7 @@ export function TopMenu(props: TopMenuProps) {
 
   return (
     <>
-      <div className="relative overflow-hidden flex items-center gap-y-0 gap-x-4 md:gap-x-8 lg:gap-x-16 py-1 md:py-2 px-4 md:px-8 lg:px-16 bg-lighten dark:bg-darken flex-wrap sm:flex-nowrap">
+      <div className="relative overflow-hidden flex items-center gap-y-0 gap-x-2 md:gap-x-4 lg:gap-x-8 py-1 md:py-2 px-4 md:px-8 lg:px-16 bg-lighten dark:bg-darken flex-wrap sm:flex-nowrap">
         <Image
           src={Background}
           alt="gradient background"
