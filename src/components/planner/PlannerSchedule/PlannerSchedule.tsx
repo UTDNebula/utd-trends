@@ -1,5 +1,7 @@
+import { Tooltip } from '@mui/material';
 import React from 'react';
 
+import type { CourseData } from '@/pages/api/course';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToCourseOnly,
@@ -33,6 +35,7 @@ export const DAYS = [
 
 type PlannerScheduleProps = {
   courses: SearchQuery[];
+  courseData: { [key: string]: CourseData };
   sections: {
     [key: string]: GenericFetchedData<SectionsType>;
   };
@@ -68,16 +71,35 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
           return null;
         }
         return (
-          <PlannerSection
-            key={searchQueryLabel(course)}
-            selectedSection={sections.data.latest.find(
-              (section) => section.section_number === course.sectionNumber,
-            )}
-            course={course}
-            color={
-              props.colorMap[searchQueryLabel(convertToCourseOnly(course))]
+          <Tooltip
+            title={
+              props.courseData &&
+              course &&
+              props.courseData[searchQueryLabel(convertToCourseOnly(course))]
+                ? props.courseData[
+                    searchQueryLabel(convertToCourseOnly(course))
+                  ].title
+                : 'sss'
             }
-          />
+            placement="top"
+            key={searchQueryLabel(course)}
+          >
+            <PlannerSection
+              key={searchQueryLabel(course)}
+              courseData={
+                props.courseData &&
+                course &&
+                props.courseData[searchQueryLabel(convertToCourseOnly(course))]
+              }
+              selectedSection={sections.data.latest.find(
+                (section) => section.section_number === course.sectionNumber,
+              )}
+              course={course}
+              color={
+                props.colorMap[searchQueryLabel(convertToCourseOnly(course))]
+              }
+            />
+          </Tooltip>
         );
       })}
     </div>

@@ -1,11 +1,14 @@
+import { Tooltip } from '@mui/material';
 import React from 'react';
 
+import type { CourseData } from '@/pages/api/course';
 import type { SectionsData } from '@/pages/api/sections';
 import { type SearchQuery } from '@/types/SearchQuery';
 
 import { DAYS, START_HOUR } from './PlannerSchedule';
 
 type PlannerSectionComponentProps = {
+  courseData?: CourseData;
   selectedSection: SectionsData[number] | undefined;
   course: SearchQuery;
   color: { fill: string; outline: string; font: string };
@@ -77,50 +80,56 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
   return meetings.map((x: string[], i: number) => {
     const height = parseInt(x[2]);
     return (
-      <div
+      <Tooltip
+        title={props.courseData ? props.courseData.title : ''}
+        placement="top"
         key={selectedSection._id + i}
-        style={
-          {
-            '--start-col': x[0],
-            '--start-row': x[1],
-            '--offset': x[3] + '%',
-            '--height': x[2] + '%',
-            backgroundColor: props.color.fill,
-            borderColor: props.color.outline,
-            color: props.color.font,
-          } as React.CSSProperties
-        }
-        className={`col-start-[var(--start-col)] col-span-1 
-          row-start-[var(--start-row)] row-span-1 relative 
-          top-[var(--offset)] h-[var(--height)] overflow-hidden 
-          rounded-xl border-2
-          ml-1 leading-relaxed`}
       >
         <div
-          className={
-            'font-semibold text-center font-inter ' +
-            (height > 100 ? 'text-sm' : 'text-xs leading-none')
+          key={selectedSection._id + i}
+          style={
+            {
+              '--start-col': x[0],
+              '--start-row': x[1],
+              '--offset': x[3] + '%',
+              '--height': x[2] + '%',
+              backgroundColor: props.color.fill,
+              borderColor: props.color.outline,
+              color: props.color.font,
+            } as React.CSSProperties
           }
+          className={`col-start-[var(--start-col)] col-span-1 
+            row-start-[var(--start-row)] row-span-1 relative 
+            top-[var(--offset)] h-[var(--height)] overflow-hidden 
+            rounded-xl border-2
+            ml-1 leading-relaxed`}
         >
-          {props.course.prefix} {props.course.number}.
-          {selectedSection.section_number}
+          <div
+            className={
+              'font-semibold text-center font-inter ' +
+              (height > 100 ? 'text-sm' : 'text-xs leading-none')
+            }
+          >
+            {props.course.prefix} {props.course.number}.
+            {selectedSection.section_number}
+          </div>
+          <div
+            className={
+              'text-xs text-center ' + (height > 100 ? '' : 'leading-none')
+            }
+          >
+            {props.course.profFirst} {props.course.profLast}
+          </div>
+          <div
+            className={
+              'text-xs text-center ' + (height > 100 ? '' : 'leading-none')
+            }
+          >
+            {selectedSection.meetings[0]?.location?.building}{' '}
+            {selectedSection.meetings[0]?.location?.room}
+          </div>
         </div>
-        <div
-          className={
-            'text-xs text-center ' + (height > 100 ? '' : 'leading-none')
-          }
-        >
-          {props.course.profFirst} {props.course.profLast}
-        </div>
-        <div
-          className={
-            'text-xs text-center ' + (height > 100 ? '' : 'leading-none')
-          }
-        >
-          {selectedSection.meetings[0]?.location?.building}{' '}
-          {selectedSection.meetings[0]?.location?.room}
-        </div>
-      </div>
+      </Tooltip>
     );
   });
 };

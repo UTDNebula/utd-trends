@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   type ImperativePanelHandle,
   Panel,
@@ -27,6 +27,8 @@ import {
   searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
 import type { SectionsType } from '@/types/SectionsType';
+
+import type { CourseData } from '../api/course';
 
 function removeDuplicates(array: SearchQuery[]) {
   return array.filter(
@@ -80,6 +82,12 @@ interface Props {
 
 export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
   const planner = props.planner;
+  const [courseData, setCourseData] = useState<
+    GenericFetchedData<{ [key: string]: CourseData }>
+  >({
+    state: 'loading',
+  });
+
   useEffect(() => {
     if (planner.length) {
       //To cancel on rerender
@@ -125,6 +133,60 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
         }
       }
 
+      //Course data
+      for (const course of planner) {
+        if (
+          courseData.state === 'done' &&
+          typeof courseData.data[
+            searchQueryLabel(convertToCourseOnly(course))
+          ] !== 'undefined'
+        )
+          continue;
+        else {
+          setCourseData({ state: 'loading' });
+          fetch(
+            '/api/course?prefix=' +
+              encodeURIComponent(String(course.prefix)) +
+              '&number=' +
+              encodeURIComponent(String(course.number)),
+            {
+              method: 'GET',
+              headers: {
+                Accept: 'application/json',
+              },
+            },
+          )
+            .then((response) => response.json())
+            .then((response) => {
+              if (response.message !== 'success') {
+                throw new Error(response.message);
+              }
+              return response.data;
+            })
+            .then((response: CourseData[]) => {
+              response.sort((a, b) => b.catalog_year - a.catalog_year); // sort by year descending, so index 0 has the most recent year
+              setCourseData((prev) => {
+                const prevData = prev.state === 'done' ? prev.data : {};
+
+                return {
+                  ...prev,
+                  state: response ? 'done' : 'error',
+                  data: {
+                    ...prevData,
+                    [searchQueryLabel(convertToCourseOnly(course))]:
+                      response[0] as CourseData,
+                  },
+                };
+              });
+            })
+
+            .catch((error) => {
+              setCourseData({ state: 'error' });
+              console.error('Course data', error);
+            });
+        }
+      }
+
       return () => {
         controller.abort();
       };
@@ -159,6 +221,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
   const plannerCoursesTable = (
     <PlannerCoursesTable
       courses={results.state === 'done' ? results.data : []}
+      courseData={courseData.state === 'done' ? courseData.data : {}}
       addToPlanner={props.addToPlanner}
       removeFromPlanner={props.removeFromPlanner}
       setPlannerSection={props.setPlannerSection}
@@ -178,6 +241,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
             )
           : []
       }
+      courseData={courseData.state === 'done' ? courseData.data : {}}
       sections={props.sections}
       colorMap={colorMap}
     />
