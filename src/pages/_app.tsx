@@ -151,8 +151,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
   //Store grades by course+prof combo
-  const [grades, , fetchAndStoreGradesData, recalcGrades, recalcAllGrades] =
-    useGradeStore();
+  const [grades, , fetchAndStoreGradesData, recalcAllGrades] = useGradeStore();
 
   //Store rmp scores by profs
   const [rmp, , fetchAndStoreRmpData] = useRmpStore();
@@ -279,7 +278,6 @@ function MyApp({ Component, pageProps }: AppProps) {
             setPlannerSection={setPlannerSection}
             grades={grades}
             fetchAndStoreGradesData={fetchAndStoreGradesData}
-            recalcGrades={recalcGrades}
             recalcAllGrades={recalcAllGrades}
             rmp={rmp}
             fetchAndStoreRmpData={fetchAndStoreRmpData}

@@ -102,6 +102,10 @@ export default function useSectionsStore(): [
     combo: SearchQuery,
     controller: AbortController,
   ) {
+    const entry = sections[searchQueryLabel(combo)];
+    if (typeof entry !== 'undefined' && entry.state !== 'error') {
+      return;
+    }
     addToSections(searchQueryLabel(combo), { state: 'loading' });
     //Wait for latestSemester to be found
     if (latestSemester.current === '') {

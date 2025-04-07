@@ -114,7 +114,6 @@ export default function useGradeStore(): [
     course: SearchQuery,
     controller: AbortController,
   ) => Promise<GradesType | null>,
-  (course: SearchQuery) => void,
   (results: SearchQuery[], academicSessions: string[]) => void,
 ] {
   const [grades, setGrades] = useState<Grades>({});
@@ -141,6 +140,14 @@ export default function useGradeStore(): [
     course: SearchQuery,
     controller: AbortController,
   ) {
+    const entry = grades[searchQueryLabel(course)];
+    if (typeof entry !== 'undefined' && entry.state !== 'error') {
+      if (entry.state === 'done') {
+        return Promise.resolve(entry.data);
+      } else {
+        return Promise.resolve(null);
+      }
+    }
     addToGrades(searchQueryLabel(course), { state: 'loading' });
     return fetchGradesData(course, controller)
       .then((res: GradesType) => {
@@ -157,18 +164,6 @@ export default function useGradeStore(): [
         addToGrades(searchQueryLabel(course), { state: 'error' });
         return null;
       });
-  }
-
-  function recalcGrades(course: SearchQuery) {
-    //Recalc gpa and such from past stored data for new page
-    setGrades((oldGrades) => {
-      const grades = { ...oldGrades };
-      const entry = grades[searchQueryLabel(course)];
-      if (entry && entry.state === 'done') {
-        entry.data.unfiltered = calculateGrades(entry.data.grades);
-      }
-      return grades;
-    });
   }
 
   function recalcAllGrades(results: SearchQuery[], academicSessions: string[]) {
@@ -188,11 +183,5 @@ export default function useGradeStore(): [
     });
   }
 
-  return [
-    grades,
-    setGrades,
-    fetchAndStoreGradesData,
-    recalcGrades,
-    recalcAllGrades,
-  ];
+  return [grades, setGrades, fetchAndStoreGradesData, recalcAllGrades];
 }

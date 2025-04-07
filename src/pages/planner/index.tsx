@@ -60,8 +60,6 @@ interface Props {
     course: SearchQuery,
     controller: AbortController,
   ) => Promise<GradesType | null>;
-  recalcGrades: (course: SearchQuery) => void;
-  recalcAllGrades: (results: SearchQuery[], academicSessions: string[]) => void;
   rmp: {
     [key: string]: GenericFetchedData<RMPInterface>;
   };
@@ -80,7 +78,22 @@ interface Props {
 
 export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
   const planner = props.planner;
+
+  //Don't need to rerun fetches when these change
+  const fetchAndStoreGradesData = useRef(props.fetchAndStoreGradesData);
   useEffect(() => {
+    fetchAndStoreGradesData.current = props.fetchAndStoreGradesData;
+  }, [props.fetchAndStoreGradesData]);
+  const fetchAndStoreRmpData = useRef(props.fetchAndStoreRmpData);
+  useEffect(() => {
+    fetchAndStoreSectionsData.current = props.fetchAndStoreSectionsData;
+  }, [props.fetchAndStoreSectionsData]);
+  const fetchAndStoreSectionsData = useRef(props.fetchAndStoreSectionsData);
+  useEffect(() => {
+    fetchAndStoreSectionsData.current = props.fetchAndStoreSectionsData;
+  }, [props.fetchAndStoreSectionsData]);
+  useEffect(() => {
+    console.log('hi');
     if (planner.length) {
       //To cancel on rerender
       const controller = new AbortController();
@@ -89,11 +102,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
       //Fetch each result
       for (const result of planner) {
         const sectionlessResult = removeSection(result);
-        const entry = props.grades[searchQueryLabel(sectionlessResult)];
-        //Not already loading
-        if (typeof entry === 'undefined' || entry.state === 'error') {
-          props.fetchAndStoreGradesData(sectionlessResult, controller);
-        }
+        fetchAndStoreGradesData.current(sectionlessResult, controller);
       }
 
       //RMP data
@@ -108,21 +117,13 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
       );
       //Fetch each professor
       for (const professor of professorsInResults) {
-        const entry = props.rmp[searchQueryLabel(professor)];
-        //Not already loading
-        if (typeof entry === 'undefined' || entry.state === 'error') {
-          props.fetchAndStoreRmpData(professor, controller);
-        }
+        fetchAndStoreRmpData.current(professor, controller);
       }
 
       //Section data
       for (const result of planner) {
         const sectionlessResult = removeSection(result);
-        const entry = props.sections[searchQueryLabel(sectionlessResult)];
-        //Not already loading
-        if (typeof entry === 'undefined' || entry.state === 'error') {
-          props.fetchAndStoreSectionsData(sectionlessResult, controller);
-        }
+        fetchAndStoreSectionsData.current(sectionlessResult, controller);
       }
 
       return () => {
