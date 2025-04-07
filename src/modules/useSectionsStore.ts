@@ -44,7 +44,7 @@ function fetchSectionsData(
 }
 
 // Finding the most recent semester in the database by the newest GOVT 2306 semester (don't judge me)
-function checkLatestSemester() {
+export function checkLatestSemester() {
   return fetchSectionsData(
     { prefix: 'GOVT', number: '2306' },
     new AbortController(),
