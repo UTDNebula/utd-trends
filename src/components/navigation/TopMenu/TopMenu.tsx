@@ -109,7 +109,7 @@ export function TopMenu(props: TopMenuProps) {
               ? typeof sessionStorage !== 'undefined' &&
                 sessionStorage.getItem('dashboardSearchTerms')
                 ? '/dashboard?' + sessionStorage.getItem('dashboardSearchTerms')
-                : '/dashboard'
+                : '/dashboard?availability=true'
               : '/planner'
           }
           onClick={() =>
