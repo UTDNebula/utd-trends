@@ -16,6 +16,7 @@ import React, { useEffect, useState } from 'react';
 
 import Rating from '@/components/common/Rating/Rating';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import { checkLatestSemester } from '@/modules/useSectionsStore';
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
@@ -60,6 +61,13 @@ const Filters = ({
       }
     }
   }, [router.isReady, router.query.minGPA, router.query.minRating]);
+
+  const [latestSemester, setLatestSemester] = useState<string | null>(null);
+  useEffect(() => {
+    checkLatestSemester().then((result: string) => {
+      setLatestSemester(result);
+    });
+  }, []);
 
   function getRecentSemesters() {
     // get current month and year
@@ -115,13 +123,21 @@ const Filters = ({
     }
   }
 
-  function displayAcademicSessionName(id: string) {
-    return (
-      '20' +
-      id.slice(0, 2) +
-      ' ' +
-      { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)]
-    );
+  function displayAcademicSessionName(id: string, yearFirst = true) {
+    if (yearFirst)
+      return (
+        '20' +
+        id.slice(0, 2) +
+        ' ' +
+        { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)]
+      );
+    else
+      return (
+        { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)] +
+        ' ' +
+        '20' +
+        id.slice(0, 2)
+      );
   }
 
   function compareSemesters(a: string, b: string) {
@@ -359,7 +375,12 @@ const Filters = ({
                   }}
                 />
               }
-              label="Teaching Next Semester"
+              label={
+                'Teaching ' +
+                (latestSemester
+                  ? 'in ' + displayAcademicSessionName(latestSemester, false)
+                  : 'Next Semester')
+              }
             />
           </FormControl>
         </Tooltip>
