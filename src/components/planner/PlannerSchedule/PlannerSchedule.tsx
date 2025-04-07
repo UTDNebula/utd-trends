@@ -1,4 +1,3 @@
-import { Tooltip } from '@mui/material';
 import React from 'react';
 
 import type { CourseData } from '@/pages/api/course';
@@ -71,35 +70,21 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
           return null;
         }
         return (
-          <Tooltip
-            title={
+          <PlannerSection
+            key={searchQueryLabel(course)}
+            courseData={
               props.courseData &&
               course &&
               props.courseData[searchQueryLabel(convertToCourseOnly(course))]
-                ? props.courseData[
-                    searchQueryLabel(convertToCourseOnly(course))
-                  ].title
-                : 'sss'
             }
-            placement="top"
-            key={searchQueryLabel(course)}
-          >
-            <PlannerSection
-              key={searchQueryLabel(course)}
-              courseData={
-                props.courseData &&
-                course &&
-                props.courseData[searchQueryLabel(convertToCourseOnly(course))]
-              }
-              selectedSection={sections.data.latest.find(
-                (section) => section.section_number === course.sectionNumber,
-              )}
-              course={course}
-              color={
-                props.colorMap[searchQueryLabel(convertToCourseOnly(course))]
-              }
-            />
-          </Tooltip>
+            selectedSection={sections.data.latest.find(
+              (section) => section.section_number === course.sectionNumber,
+            )}
+            course={course}
+            color={
+              props.colorMap[searchQueryLabel(convertToCourseOnly(course))]
+            }
+          />
         );
       })}
     </div>
