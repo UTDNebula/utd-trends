@@ -38,6 +38,8 @@ import {
 } from '@/types/SearchQuery';
 import type { SectionsType } from '@/types/SectionsType';
 
+import { displayAcademicSessionName } from '../Filters/Filters';
+
 function LoadingRow() {
   const nameCell = (
     <Typography className="w-1/2 sm:w-full leading-tight text-lg">
@@ -366,6 +368,7 @@ function Row({
 }
 
 type SearchResultsTableProps = {
+  latestSemester: string | null;
   sections: { [key: string]: GenericFetchedData<SectionsType> };
   resultsLoading: 'loading' | 'done';
   numSearches: number;
@@ -383,6 +386,7 @@ type SearchResultsTableProps = {
 };
 
 const SearchResultsTable = ({
+  latestSemester,
   sections,
   resultsLoading,
   numSearches,
@@ -676,7 +680,11 @@ const SearchResultsTable = ({
                   <div className="flex items-center py-2 my-2">
                     <Divider className="flex-grow" />
                     <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
-                      Not teaching next semester
+                      {'Not teaching ' +
+                        (latestSemester
+                          ? 'in ' +
+                            displayAcademicSessionName(latestSemester, false)
+                          : 'Next Semester')}
                     </Typography>
                     <Divider className="flex-grow" />
                   </div>

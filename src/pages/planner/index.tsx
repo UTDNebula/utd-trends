@@ -51,6 +51,7 @@ function createColorMap(courses: SearchQuery[]): {
 }
 
 interface Props {
+  latestSemester: string | null;
   planner: SearchQueryMultiSection[];
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
@@ -220,6 +221,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
 
   const plannerCoursesTable = (
     <PlannerCoursesTable
+      latestSemester={props.latestSemester}
       courses={results.state === 'done' ? results.data : []}
       courseData={courseData.state === 'done' ? courseData.data : {}}
       addToPlanner={props.addToPlanner}

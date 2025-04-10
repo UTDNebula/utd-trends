@@ -16,22 +16,40 @@ import React, { useEffect, useState } from 'react';
 
 import Rating from '@/components/common/Rating/Rating';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import { checkLatestSemester } from '@/modules/useSectionsStore';
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
 
 interface FiltersProps {
+  latestSemester: string | null;
   manageQuery?: boolean;
   academicSessions: string[];
   chosenSessions: string[];
   addChosenSessions: (arg0: (arg0: string[]) => string[]) => void;
 }
 
+export function displayAcademicSessionName(id: string, yearFirst = true) {
+  if (yearFirst)
+    return (
+      '20' +
+      id.slice(0, 2) +
+      ' ' +
+      { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)]
+    );
+  else
+    return (
+      { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)] +
+      ' ' +
+      '20' +
+      id.slice(0, 2)
+    );
+}
+
 /**
  * This component returns a set of filters with which to sort results.
  */
 const Filters = ({
+  latestSemester,
   manageQuery,
   academicSessions,
   chosenSessions,
@@ -61,13 +79,6 @@ const Filters = ({
       }
     }
   }, [router.isReady, router.query.minGPA, router.query.minRating]);
-
-  const [latestSemester, setLatestSemester] = useState<string | null>(null);
-  useEffect(() => {
-    checkLatestSemester().then((result: string) => {
-      setLatestSemester(result);
-    });
-  }, []);
 
   function getRecentSemesters() {
     // get current month and year
@@ -121,23 +132,6 @@ const Filters = ({
         { shallow: true },
       );
     }
-  }
-
-  function displayAcademicSessionName(id: string, yearFirst = true) {
-    if (yearFirst)
-      return (
-        '20' +
-        id.slice(0, 2) +
-        ' ' +
-        { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)]
-      );
-    else
-      return (
-        { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)] +
-        ' ' +
-        '20' +
-        id.slice(0, 2)
-      );
   }
 
   function compareSemesters(a: string, b: string) {

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import PlannerCard, {
   LoadingRow,
 } from '@/components/planner/PlannerCoursesTable/PlannerCard/PlannerCard';
+import { displayAcademicSessionName } from '@/components/search/Filters/Filters';
 import type { CourseData } from '@/pages/api/course';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import { type GenericFetchedData } from '@/types/GenericFetchedData';
@@ -20,6 +21,7 @@ import {
 import type { SectionsType } from '@/types/SectionsType';
 
 type PlannerCoursesTableProps = {
+  latestSemester: string | null;
   courses: SearchQueryMultiSection[];
   courseData: { [key: string]: CourseData };
   addToPlanner: (value: SearchQuery) => void;
@@ -45,7 +47,10 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
   return (
     <>
       <Typography variant="h2" className="leading-tight text-3xl font-bold p-4">
-        My Planner
+        {'My Planner' +
+          (props.latestSemester
+            ? ' — ' + displayAcademicSessionName(props.latestSemester, false)
+            : '')}
       </Typography>
       <div className="flex flex-col gap-4 mb-4 sm:mb-0">
         {props.courses.map((course, index) => {

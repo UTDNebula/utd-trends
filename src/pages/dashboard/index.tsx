@@ -182,6 +182,7 @@ export async function getServerSideProps(
 }
 
 interface Props {
+  latestSemester: string | null;
   sections: {
     [key: string]: GenericFetchedData<SectionsType>;
   };
@@ -666,6 +667,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     );
     const searchResultsTable = (
       <SearchResultsTable
+        latestSemester={props.latestSemester}
         sections={props.sections}
         resultsLoading={results.state}
         numSearches={courses.length + professors.length}
@@ -696,6 +698,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
           academicSessions={academicSessions}
           chosenSessions={chosenSessions}
           addChosenSessions={addChosenSessions}
+          latestSemester={props.latestSemester}
         />
         <div className="sm:hidden">
           <div data-tutorial-id="RHS"> {carousel} </div>

@@ -8,7 +8,7 @@ import { Inter } from 'next/font/google';
 import localFont from 'next/font/local';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import resolveConfig from 'tailwindcss/resolveConfig';
 
 import tailwindConfig from '@/../tailwind.config.js';
@@ -17,7 +17,9 @@ import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
 import useGradeStore from '@/modules/useGradeStore';
 import usePersistantState from '@/modules/usePersistantState';
 import useRmpStore from '@/modules/useRmpStore';
-import useSectionsStore from '@/modules/useSectionsStore';
+import useSectionsStore, {
+  checkLatestSemester,
+} from '@/modules/useSectionsStore';
 import {
   convertToCourseOnly,
   removeSection,
@@ -233,6 +235,14 @@ function MyApp({ Component, pageProps }: AppProps) {
     );
   }
 
+  const [latestSemester, setLatestSemester] = useState<string | null>(null);
+
+  useEffect(() => {
+    checkLatestSemester().then((result: string) => {
+      setLatestSemester(result);
+    });
+  }, []);
+
   //Store sections by course+prof combo
   const [sections, , fetchAndStoreSectionsData] = useSectionsStore();
 
@@ -273,6 +283,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         >
           <Component
             {...pageProps}
+            latestSemester={latestSemester}
             planner={planner}
             addToPlanner={addToPlanner}
             removeFromPlanner={removeFromPlanner}

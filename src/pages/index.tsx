@@ -14,14 +14,19 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
 import Background from '@/../public/background.png';
+import { displayAcademicSessionName } from '@/components/search/Filters/Filters';
 import SearchBar from '@/components/search/SearchBar/SearchBar';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
+interface Props {
+  latestSemester: string | null;
+}
+
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
-const Home: NextPage = () => {
+const Home: NextPage<Props> = (props: Props) => {
   const router = useRouter();
 
   const [results, setResults] = useState<GenericFetchedData<SearchQuery[]>>({
@@ -113,7 +118,13 @@ const Home: NextPage = () => {
                     }}
                   />
                 }
-                label="Teaching Next Semester"
+                label={
+                  'Teaching ' +
+                  (props.latestSemester
+                    ? 'in ' +
+                      displayAcademicSessionName(props.latestSemester, false)
+                    : 'Next Semester')
+                }
               />
             </FormControl>
           </Tooltip>
