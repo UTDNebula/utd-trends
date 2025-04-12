@@ -2,7 +2,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   Chip,
   Collapse,
-  Grid2 as Grid,
+  Grid,
   IconButton,
   Skeleton,
 } from '@mui/material';
