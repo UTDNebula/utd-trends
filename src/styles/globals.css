@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import 'tailwindcss' important;
 
 /*If changing be sure to update in layout.tsx too*/
 @theme {
@@ -52,7 +52,8 @@
 
 @layer utilities {
   html,
-  body {
+  body,
+  #__next {
     padding: 0;
     margin: 0;
     height: 100%;
