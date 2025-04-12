@@ -87,7 +87,7 @@ type Props = {
   includedColors?: boolean[];
 };
 
-const LineGraph = (props: Props): JSX.Element => {
+const LineGraph = (props: Props) => {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
