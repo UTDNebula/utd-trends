@@ -1,10 +1,11 @@
-import { Rating as _Rating, styled } from '@mui/material';
+import { Rating, styled } from '@mui/material';
+import type {} from '@mui/material/themeCssVarsAugmentation';
 
 // for star color for rating
-const Rating = styled(_Rating)(({ theme }) => ({
+const NewRating = styled(Rating)(({ theme }) => ({
   '& .MuiRating-iconFilled': {
-    color: theme.palette.primary.main,
+    color: theme.vars.palette.primary.main,
   },
 }));
 
-export default Rating;
+export default NewRating;

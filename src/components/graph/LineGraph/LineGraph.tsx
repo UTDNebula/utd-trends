@@ -124,6 +124,7 @@ const LineGraph = (props: Props) => {
   );
 
   const theme = useTheme();
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
   const options: ApexOptions = {
     chart: {
@@ -152,7 +153,7 @@ const LineGraph = (props: Props) => {
       },
     },
     grid: {
-      borderColor: theme.palette.mode === 'dark' ? '#404040' : '#e0e0e0',
+      borderColor: prefersDarkMode ? '#404040' : '#e0e0e0',
     },
     legend: {
       show: series.length !== 1,
@@ -177,7 +178,7 @@ const LineGraph = (props: Props) => {
     },
     colors:
       series.length === 1
-        ? [theme.palette.primary.main]
+        ? [theme.vars.palette.primary.main]
         : compareColors.filter(
             (searchQuery, i) => props.includedColors?.[i] ?? 1,
           ),
@@ -203,7 +204,7 @@ const LineGraph = (props: Props) => {
       },
     },
     theme: {
-      mode: useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light',
+      mode: prefersDarkMode ? 'dark' : 'light',
     },
     markers: {
       size: 4,
