@@ -1,13 +1,12 @@
-import type { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import React, { useState } from 'react';
+import React, { type ReactElement, useState } from 'react';
 
 type Props = {
   state: string;
-  bar?: ReactJSXElement;
-  line?: ReactJSXElement;
+  bar?: ReactElement;
+  line?: ReactElement;
 };
 
 function GraphToggle(props: Props) {

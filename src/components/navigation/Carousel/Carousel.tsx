@@ -1,13 +1,12 @@
-import type { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
 import { Collapse, useMediaQuery } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { type ReactElement, useEffect, useRef, useState } from 'react';
 
 import { TabNavMenu } from '@/components/navigation/TabNavMenu/TabNavMenu';
 
 interface CarouselProps {
   names: string[] | string;
-  children: ReactJSXElement[] | ReactJSXElement;
+  children: ReactElement[] | ReactElement;
   compareLength: number;
 }
 
