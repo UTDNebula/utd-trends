@@ -1,10 +1,5 @@
 import { Head, Html, Main, NextScript } from 'next/document';
 import React from 'react';
-import resolveConfig from 'tailwindcss/resolveConfig';
-
-import tailwindConfig from '@/../tailwind.config.js';
-
-const fullTailwindConfig = resolveConfig(tailwindConfig);
 
 function Document() {
   return (
@@ -14,11 +9,8 @@ function Document() {
           name="description"
           content="Choose the perfect classes for you: Nebula Labs's data analytics platform to help you make informed decisions about your coursework with grade and Rate My Professors data."
         />
-        <meta
-          name="theme-color"
-          // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-          content={(fullTailwindConfig.theme.colors as any).royal as string}
-        />
+        {/*copied from globals.css*/}
+        <meta name="theme-color" content="#a297fd" />
         <meta
           property="og:description"
           content="Choose the perfect classes for you: Nebula Labs's data analytics platform to help you make informed decisions about your coursework with grade and Rate My Professors data."

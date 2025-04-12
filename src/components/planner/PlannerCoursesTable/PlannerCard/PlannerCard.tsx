@@ -320,7 +320,7 @@ function MeetingChip(props: {
   }
   return (
     <div
-      className="ml-auto p-1 px-3 rounded-3xl shadow-sm"
+      className="ml-auto p-1 px-3 rounded-3xl shadow-xs"
       style={{
         backgroundColor: props.color.fill,
         color: props.color.font,
@@ -480,7 +480,7 @@ const PlannerCard = (props: PlannerCardProps) => {
             </ToggleButtonGroup>
           </Tooltip>
         </div>
-        <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit flex-grow">
+        <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit grow">
           {searchQueryLabel(removeSection(props.query))}
         </Typography>
         <MeetingChip

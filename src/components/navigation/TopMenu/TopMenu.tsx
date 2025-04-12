@@ -100,7 +100,7 @@ export function TopMenu(props: TopMenuProps) {
             resultsLoading={props.resultsLoading}
             setResultsLoading={props.setResultsLoading}
             className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
-            input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+            input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
           />
         )}
         <Link

@@ -92,7 +92,7 @@ const Home: NextPage = () => {
             onSelect={searchOptionChosen}
             resultsLoading={results.state}
             setResultsLoading={() => setResults({ state: 'loading' })}
-            input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
+            input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
           />
           {/* Teaching Next Semester switch*/}
           <Tooltip title="Select Availability" placement="bottom-start">
@@ -100,8 +100,8 @@ const Home: NextPage = () => {
               size="small"
               className={`min-w-max flex-row items-center ${
                 filterNextSem == 'true'
-                  ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
-                  : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+                  ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
+                  : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
               }`}
             >
               <FormControlLabel

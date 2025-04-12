@@ -674,11 +674,11 @@ const SearchResultsTable = ({
               <TableRow className="bg-gray-200 dark:bg-gray-700">
                 <TableCell colSpan={5} className="p-0">
                   <div className="flex items-center py-2 my-2">
-                    <Divider className="flex-grow" />
+                    <Divider className="grow" />
                     <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
                       Not teaching next semester
                     </Typography>
-                    <Divider className="flex-grow" />
+                    <Divider className="grow" />
                   </div>
                 </TableCell>
               </TableRow>
