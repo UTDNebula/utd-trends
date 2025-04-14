@@ -11,7 +11,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
-import { useRouter } from 'next/router';
+import { usePathname, useSearchParams } from 'next/navigation';
 import React from 'react';
 
 import Rating from '@/components/common/Rating/Rating';
@@ -38,16 +38,18 @@ const Filters = ({
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
   academicSessions.sort((a, b) => compareSemesters(b, a)); // display the semesters in order of recency (most recent first)
 
-  const router = useRouter();
-  let minGPA = router.query.minGPA ?? '';
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  let minGPA = searchParams.get('minGPA') ?? '';
   if (Array.isArray(minGPA)) {
     minGPA = minGPA[0]; // if minGPA is an array, make it a string
   }
-  let minRating = router.query.minRating ?? '';
+  let minRating = searchParams.get('minRating') ?? '';
   if (Array.isArray(minRating)) {
     minRating = minRating[0]; // if minRating is an array, make it a string
   }
-  const filterNextSem = router.query.availability === 'true';
+  const filterNextSem = searchParams.get('availability') === 'true';
 
   function getRecentSemesters() {
     // get current month and year
@@ -126,22 +128,18 @@ const Filters = ({
               labelId="minGPA"
               value={minGPA}
               onChange={(event: SelectChangeEvent) => {
-                if (router.isReady) {
-                  const newQuery = { ...router.query };
-                  const newValue = event.target.value;
-                  if (newValue !== '') {
-                    newQuery.minGPA = newValue;
-                  } else {
-                    delete newQuery.minGPA;
-                  }
-                  router.replace(
-                    {
-                      query: newQuery,
-                    },
-                    undefined,
-                    { shallow: true },
-                  );
+                const params = new URLSearchParams(searchParams.toString());
+                const newValue = event.target.value;
+                if (newValue !== '') {
+                  params.set('minGPA', newValue);
+                } else {
+                  params.delete('minGPA');
                 }
+                window.history.replaceState(
+                  null,
+                  '',
+                  `${pathname}?${params.toString()}`,
+                );
               }}
             >
               <MenuItem className="h-10" value="">
@@ -175,22 +173,18 @@ const Filters = ({
               labelId="minRating"
               value={minRating}
               onChange={(event: SelectChangeEvent) => {
-                if (router.isReady) {
-                  const newQuery = { ...router.query };
-                  const newValue = event.target.value;
-                  if (newValue !== '') {
-                    newQuery.minRating = newValue;
-                  } else {
-                    delete newQuery.minRating;
-                  }
-                  router.replace(
-                    {
-                      query: newQuery,
-                    },
-                    undefined,
-                    { shallow: true },
-                  );
+                const params = new URLSearchParams(searchParams.toString());
+                const newValue = event.target.value;
+                if (newValue !== '') {
+                  params.set('minRating', newValue);
+                } else {
+                  params.delete('minRating');
                 }
+                window.history.replaceState(
+                  null,
+                  '',
+                  `${pathname}?${params.toString()}`,
+                );
               }}
               renderValue={(value) => (
                 <Rating
@@ -345,21 +339,17 @@ const Filters = ({
                 <Switch
                   checked={filterNextSem}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    if (router.isReady) {
-                      const newQuery = { ...router.query };
-                      if (event.target.checked) {
-                        newQuery.availability = 'true';
-                      } else {
-                        delete newQuery.availability;
-                      }
-                      router.replace(
-                        {
-                          query: newQuery,
-                        },
-                        undefined,
-                        { shallow: true },
-                      );
+                    const params = new URLSearchParams(searchParams.toString());
+                    if (event.target.checked) {
+                      params.set('availability', 'true');
+                    } else {
+                      params.delete('availability');
                     }
+                    window.history.replaceState(
+                      null,
+                      '',
+                      `${pathname}?${params.toString()}`,
+                    );
                   }}
                 />
               }
