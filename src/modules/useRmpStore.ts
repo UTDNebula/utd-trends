@@ -67,6 +67,10 @@ export default function useRmpStore(): [
     professor: SearchQuery,
     controller: AbortController,
   ) {
+    const entry = rmp[searchQueryLabel(professor)];
+    if (typeof entry !== 'undefined' && entry.state !== 'error') {
+      return;
+    }
     addToRmp(searchQueryLabel(professor), { state: 'loading' });
     fetchRmpData(professor, controller)
       .then((res: RMPInterface) => {

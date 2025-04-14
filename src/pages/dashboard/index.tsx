@@ -200,7 +200,6 @@ interface Props {
     combo: SearchQuery,
     controller: AbortController,
   ) => void;
-  recalcGrades: (course: SearchQuery) => void;
   recalcAllGrades: (results: SearchQuery[], academicSessions: string[]) => void;
   rmp: {
     [key: string]: GenericFetchedData<RMPInterface>;
@@ -358,30 +357,17 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     //Grade data
     //Fetch each result
     for (const result of results) {
-      // combo section data?
-      const sectEntry = props.sections[searchQueryLabel(result)];
-      //Not already loading
-      if (typeof sectEntry === 'undefined' || sectEntry.state === 'error') {
-        props.fetchAndStoreSectionsData(result, controller);
-      }
+      // combo section data
+      props.fetchAndStoreSectionsData(result, controller);
 
-      const entry = props.grades[searchQueryLabel(result)];
-      //Not already loading
-      if (typeof entry === 'undefined' || entry.state === 'error') {
-        props
-          .fetchAndStoreGradesData(result, controller)
-          .then((res: GradesType | null | undefined) => {
-            //Add any more academic sessions to list
-            if (res) {
-              addAcademicSessions(res.grades.map((session) => session._id));
-            }
-          });
-      } else if (entry.state === 'done') {
-        //Recalc gpa and such from past stored data for new page
-        props.recalcGrades(result);
-        //Readd academic sessions
-        addAcademicSessions(entry.data.grades.map((session) => session._id));
-      }
+      props
+        .fetchAndStoreGradesData(result, controller)
+        .then((res: GradesType | null | undefined) => {
+          //Add any more academic sessions to list
+          if (res) {
+            addAcademicSessions(res.grades.map((session) => session._id));
+          }
+        });
     }
 
     //RMP data
@@ -403,11 +389,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
       professorsInResults.push(professors[0]);
     }
     for (const professor of professorsInResults) {
-      const entry = props.rmp[searchQueryLabel(professor)];
-      //Not already loading
-      if (typeof entry === 'undefined' || entry.state === 'error') {
-        props.fetchAndStoreRmpData(professor, controller);
-      }
+      props.fetchAndStoreRmpData(professor, controller);
     }
   }
 
@@ -547,7 +529,7 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
   //List of course+prof combos saved for comparison
   const [compare, setCompare] = useState<SearchQuery[]>([]);
   //Their saved grade data
-  const [compareGrades, setCompareGrades, , , recalcAllCompareGrades] =
+  const [compareGrades, setCompareGrades, , recalcAllCompareGrades] =
     useGradeStore();
   //Saved data for their professors
   const [compareRmp, setCompareRmp] = useRmpStore();
@@ -692,7 +674,6 @@ export const Dashboard: NextPage<Props> = (props: Props): React.ReactNode => {
     contentComponent = (
       <>
         <Filters
-          manageQuery
           academicSessions={academicSessions}
           chosenSessions={chosenSessions}
           addChosenSessions={addChosenSessions}

@@ -76,16 +76,18 @@ const Carousel = ({ names, children, compareLength }: CarouselProps) => {
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(!isSmallScreen), [isSmallScreen]);
   useEffect(() => {
-    if (lastCompareLength.current <= compareLength) {
-      setDirection(1);
-      setCurrentCard(Array.isArray(children) ? children.length - 1 : 0);
+    if (compareLength !== lastCompareLength.current) {
+      if (lastCompareLength.current <= compareLength) {
+        setDirection(1);
+        setCurrentCard(Array.isArray(children) ? children.length - 1 : 0);
+      }
+      if (lastCompareLength.current == 1 && compareLength == 0) {
+        setDirection(-1);
+        setCurrentCard(0);
+      }
+      lastCompareLength.current = compareLength;
     }
-    if (lastCompareLength.current == 1 && compareLength == 0) {
-      setDirection(-1);
-      setCurrentCard(0);
-    }
-    lastCompareLength.current = compareLength;
-  }, [compareLength]);
+  }, [compareLength, children]);
 
   return (
     <>
