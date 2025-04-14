@@ -1,8 +1,8 @@
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
-  type SearchQuery,
   convertToCourseOnly,
   convertToProfOnly,
+  type SearchQuery,
 } from '@/types/SearchQuery';
 
 type SectionsData = {
@@ -121,7 +121,7 @@ async function fetchSingleSections(
 export default async function fetchSections(
   query: SearchQuery,
 ): Promise<GenericFetchedData<Sections>> {
-  const seperatedCombo = [convertToCourseOnly(combo), convertToProfOnly(combo)]
+  const seperatedCombo = [convertToCourseOnly(query), convertToProfOnly(query)]
     //Remove empty objects (for non combos)
     .filter((obj) => Object.keys(obj).length !== 0);
   //Call each

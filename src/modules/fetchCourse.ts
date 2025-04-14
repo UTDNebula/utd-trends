@@ -39,7 +39,7 @@ export type Course = {
   title: string;
 };
 
-export default function fetchCourse(
+export default async function fetchCourse(
   query: SearchQuery,
 ): Promise<GenericFetchedData<Course>> {
   const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
@@ -48,7 +48,7 @@ export default function fetchCourse(
   }
 
   try {
-    const url = new URL('https://api.utdnebula.com/professor');
+    const url = new URL('https://api.utdnebula.com/course');
     if (typeof query.prefix === 'string' && typeof query.number === 'string') {
       url.searchParams.append('subject_prefix', query.prefix);
       url.searchParams.append('course_number', query.number);
@@ -71,9 +71,14 @@ export default function fetchCourse(
       throw new Error(data.message);
     }
 
+    // find most recent year
+    const mostRecent = data.data.reduce((prev, curr) =>
+      prev.catalog_year > curr.catalog_year ? prev : curr,
+    );
+
     return {
       message: 'success',
-      data: data,
+      data: mostRecent,
     };
   } catch (error) {
     return {

@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  Autocomplete,
-  Button,
-  CircularProgress,
-  TextField,
-  Tooltip,
-} from '@mui/material';
+import { Autocomplete, Button, TextField, Tooltip } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -25,8 +19,6 @@ import {
 interface SearchProps {
   manageQuery?: 'onSelect';
   onSelect?: (value: SearchQuery[]) => void;
-  resultsLoading?: 'loading' | 'done' | 'error';
-  setResultsLoading?: () => void;
   className?: string;
   input_className?: string;
   autoFocus?: boolean;
@@ -41,8 +33,6 @@ interface SearchProps {
 const SearchBar = ({
   manageQuery,
   onSelect,
-  resultsLoading,
-  setResultsLoading,
   className,
   input_className,
   autoFocus,
@@ -68,7 +58,7 @@ const SearchBar = ({
   const searchParams = useSearchParams();
   const searchTerms = searchParams.get('searchTerms');
   useEffect(() => {
-    if (searchTerms !== 'undefined') {
+    if (searchTerms != null) {
       let array = searchTerms;
       if (!Array.isArray(array)) {
         array = array.split(',');
@@ -102,9 +92,6 @@ const SearchBar = ({
       // do not initiate a new search when the searchTerms haven't changed
       return;
     setErrorTooltip(!newValue.length);
-    if (newValue.length && typeof setResultsLoading !== 'undefined') {
-      setResultsLoading();
-    }
     if (typeof onSelect !== 'undefined') {
       onSelect(newValue);
     }
@@ -348,11 +335,7 @@ const SearchBar = ({
           } //darkens the text when no valid search terms are entered (pseudo-disables the search button)
           onClick={() => onSelect_internal(value)}
         >
-          {resultsLoading === 'loading' ? (
-            <CircularProgress className="h-6 w-6 text-cornflower-50 dark:text-haiti" />
-          ) : (
-            'Search'
-          )}
+          Search
         </Button>
       </Tooltip>
     </div>

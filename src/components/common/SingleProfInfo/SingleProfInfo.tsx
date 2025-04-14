@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import type { RMP } from '@/modules/fetchRmp';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 
-function LoadingSingleProfInfo() {
+export function LoadingSingleProfInfo() {
   const loadingTags = [
     'Group projects (54)',
     'Lecture heavy (29)',

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+
 import autocompleteGraph from '@/data/autocomplete_graph.json';
 import { getGraph, searchAutocomplete } from '@/modules/autocomplete';
 import { type SearchQuery } from '@/types/SearchQuery';

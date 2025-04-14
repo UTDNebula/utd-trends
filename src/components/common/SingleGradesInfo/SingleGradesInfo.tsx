@@ -4,9 +4,9 @@ import React from 'react';
 import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
+import type { Grades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
-import type { Grades } from '@/modules/fetchGrades';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
 export function LoadingSingleGradesInfo() {

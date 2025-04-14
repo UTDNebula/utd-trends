@@ -2,25 +2,46 @@
 
 import React, { createContext, useContext, useState } from 'react';
 
-import {
-  convertToCourseOnly,
-  removeSection,
-  type SearchQuery,
-  searchQueryEqual,
-  type SearchQueryMultiSection,
-  sectionCanOverlap,
-  convertToCourseOnly,
-  removeDuplicates,
-  searchQueryLabel,
-} from '@/types/SearchQuery';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import { compareColors, plannerColors } from '@/modules/colors';
 import type { Grades } from '@/modules/fetchGrades';
 import type { RMP } from '@/modules/fetchRmp';
 import type { Sections } from '@/modules/fetchSections';
-import { compareColors, plannerColors } from '@/modules/colors';
 import usePersistantState from '@/modules/usePersistantState';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import {
+  convertToCourseOnly,
+  removeDuplicates,
+  removeSection,
+  type SearchQuery,
+  searchQueryEqual,
+  searchQueryLabel,
+  type SearchQueryMultiSection,
+  sectionCanOverlap,
+} from '@/types/SearchQuery';
 
-const SharedStateContext = createContext<any>(null);
+type Setter<T> = (value: T | ((prev: T) => T)) => void;
+
+const SharedStateContext = createContext<{
+  grades: { [key: string]: GenericFetchedData<Grades> };
+  setGrades: Setter<{ [key: string]: GenericFetchedData<Grades> }>;
+  rmp: { [key: string]: GenericFetchedData<RMP> };
+  setRmp: Setter<{ [key: string]: GenericFetchedData<RMP> }>;
+  sections: { [key: string]: GenericFetchedData<Sections> };
+  setSections: Setter<{ [key: string]: GenericFetchedData<Sections> }>;
+  compare: SearchQuery[];
+  addToCompare: (query: SearchQuery) => void;
+  removeFromCompare: (query: SearchQuery) => void;
+  compareGrades: { [key: string]: GenericFetchedData<Grades> };
+  compareRmp: { [key: string]: GenericFetchedData<RMP> };
+  compareColorMap: { [key: string]: string };
+  planner: SearchQueryMultiSection[];
+  addToPlanner: (query: SearchQuery) => void;
+  removeFromPlanner: (query: SearchQuery) => void;
+  setPlannerSection: (query: SearchQuery, section: string) => void;
+  plannerColorMap: {
+    [key: string]: { fill: string; outline: string; font: string };
+  };
+}>(null);
 
 export const SharedStateProvider = ({
   children,
@@ -47,26 +68,25 @@ export const SharedStateProvider = ({
 
   //Add a course+prof combo to compare (happens from search results)
   //copy over data basically
-  function addToCompare(searchQuery: SearchQuery) {
+  function addToCompare(query: SearchQuery) {
     //If not already there
-    if (compare.every((obj) => !searchQueryEqual(obj, searchQuery))) {
+    if (compare.every((obj) => !searchQueryEqual(obj, query))) {
       //Add to list
-      setCompare((old) => old.concat([searchQuery]));
+      setCompare((prev) => prev.concat([query]));
       //Save grade data
-      setCompareGrades((old) => {
+      setCompareGrades((prev) => {
         return {
-          ...old,
-          [searchQueryLabel(searchQuery)]:
-            grades[searchQueryLabel(searchQuery)],
+          ...prev,
+          [searchQueryLabel(query)]: grades[searchQueryLabel(query)],
         };
       });
       //Save prof data
-      if (typeof searchQuery.profLast !== 'undefined') {
-        setCompareRmp((old) => {
+      if (typeof query.profLast !== 'undefined') {
+        setCompareRmp((prev) => {
           return {
-            ...old,
-            [searchQueryLabel(convertToProfOnly(searchQuery))]:
-              rmp[searchQueryLabel(convertToProfOnly(searchQuery))],
+            ...prev,
+            [searchQueryLabel(convertToProfOnly(query))]:
+              rmp[searchQueryLabel(convertToProfOnly(query))],
           };
         });
       }
@@ -74,34 +94,32 @@ export const SharedStateProvider = ({
   }
 
   //Remove a course+prof combo from compare
-  function removeFromCompare(searchQuery: SearchQuery) {
+  function removeFromCompare(query: SearchQuery) {
     //If already there
-    if (compare.some((obj) => searchQueryEqual(obj, searchQuery))) {
+    if (compare.some((obj) => searchQueryEqual(obj, query))) {
       //Remove from list
-      setCompare((old) =>
-        old.filter((el) => !searchQueryEqual(el, searchQuery)),
-      );
+      setCompare((prev) => prev.filter((el) => !searchQueryEqual(el, query)));
       //Remove from saved grade data
-      setCompareGrades((old) => {
-        delete old[searchQueryLabel(searchQuery)];
-        return old;
+      setCompareGrades((prev) => {
+        delete prev[searchQueryLabel(query)];
+        return prev;
       });
       //If no other courses in compare have the same professor
       if (
         !compare
-          .filter((el) => !searchQueryEqual(el, searchQuery))
-          .some((el) => searchQueryEqual(el, convertToProfOnly(searchQuery)))
+          .filter((el) => !searchQueryEqual(el, query))
+          .some((el) => searchQueryEqual(el, convertToProfOnly(query)))
       ) {
         //Remove from saved rmp data
-        setCompareRmp((old) => {
-          delete old[searchQueryLabel(convertToProfOnly(searchQuery))];
-          return old;
+        setCompareRmp((prev) => {
+          delete prev[searchQueryLabel(convertToProfOnly(query))];
+          return prev;
         });
       }
     }
   }
 
-  const compareColorMap: { [key: string]: string } = Object.fromEntries(
+  const compareColorMap = Object.fromEntries(
     Object.entries(compare).map(([key], index) => [
       key,
       compareColors[index % compareColors.length],
@@ -115,35 +133,33 @@ export const SharedStateProvider = ({
   );
 
   //Add a course+prof combo to planner (happens from search results)
-  function addToPlanner(searchQuery: SearchQuery) {
-    setPlanner((old: SearchQueryMultiSection[]) => {
+  function addToPlanner(query: SearchQuery) {
+    setPlanner((prev: SearchQueryMultiSection[]) => {
       //If not already there
-      if (old.findIndex((obj) => searchQueryEqual(obj, searchQuery)) === -1) {
+      if (prev.findIndex((obj) => searchQueryEqual(obj, query)) === -1) {
         //Add to list
-        return old.concat([searchQuery]);
+        return prev.concat([query]);
       }
-      return old;
+      return prev;
     });
   }
 
   //Remove a course+prof combo from compare
-  function removeFromPlanner(searchQuery: SearchQuery) {
-    setPlanner((old: SearchQueryMultiSection[]) => {
+  function removeFromPlanner(query: SearchQuery) {
+    setPlanner((prev: SearchQueryMultiSection[]) => {
       //If already there
-      if (planner.some((obj) => searchQueryEqual(obj, searchQuery))) {
+      if (planner.some((obj) => searchQueryEqual(obj, query))) {
         //Remove to list
-        return old.filter((el) => !searchQueryEqual(el, searchQuery));
+        return prev.filter((el) => !searchQueryEqual(el, query));
       }
-      return old;
+      return prev;
     });
   }
 
-  function setPlannerSection(searchQuery: SearchQuery, section: string) {
-    setPlanner((old: SearchQueryMultiSection[]) =>
-      old.map((course) => {
-        if (
-          searchQueryEqual(removeSection(course), removeSection(searchQuery))
-        ) {
+  function setPlannerSection(query: SearchQuery, section: string) {
+    setPlanner((prev: SearchQueryMultiSection[]) =>
+      prev.map((course) => {
+        if (searchQueryEqual(removeSection(course), removeSection(query))) {
           if (typeof course.sectionNumbers === 'undefined') {
             return { ...course, sectionNumbers: [section] };
           }
@@ -167,7 +183,7 @@ export const SharedStateProvider = ({
         } else if (
           searchQueryEqual(
             convertToCourseOnly(course),
-            convertToCourseOnly(searchQuery),
+            convertToCourseOnly(query),
           ) &&
           typeof course.sectionNumbers !== 'undefined'
         ) {
@@ -184,7 +200,7 @@ export const SharedStateProvider = ({
     );
   }
 
-  const plannerColorMap: { [key: string]: string } = Object.fromEntries(
+  const plannerColorMap = Object.fromEntries(
     removeDuplicates(planner.map(convertToCourseOnly)).map((key, index) => [
       searchQueryLabel(key),
       plannerColors[index % plannerColors.length],
@@ -201,11 +217,10 @@ export const SharedStateProvider = ({
         sections,
         setSections,
         compare,
-        setCompare,
+        addToCompare,
+        removeFromCompare,
         compareGrades,
-        setCompareGrades,
         compareRmp,
-        setCompareRmp,
         compareColorMap,
         planner,
         addToPlanner,

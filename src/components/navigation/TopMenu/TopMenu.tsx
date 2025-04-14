@@ -93,8 +93,6 @@ export function TopMenu(props: Props) {
         {!props.isPlanner && (
           <SearchBar
             manageQuery="onSelect"
-            resultsLoading={props.resultsLoading}
-            setResultsLoading={props.setResultsLoading}
             className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
             input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
           />

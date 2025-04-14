@@ -2,16 +2,18 @@ import React from 'react';
 
 import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
 import comboTable from '@/data/combo_table.json';
+import fetchGrades from '@/modules/fetchGrades';
+import fetchRmp from '@/modules/fetchRmp';
+import fetchSections from '@/modules/fetchSections';
 import {
+  convertToProfOnly,
+  removeDuplicates,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
-  removeDuplicates,
 } from '@/types/SearchQuery';
+
 import ClientLeft from './ClientLeft';
-import { fetchGrades } from '@/modules/fetchGrades';
-import { fetchRmp } from '@/modules/fetchRmp';
-import { fetchSections } from '@/modules/fetchSections';
 
 //Get all course+prof combos for searchTerms and keep only the ones that match filterTerms
 //When filterTerms is blank, just gets all searchTerms
@@ -19,7 +21,6 @@ import { fetchSections } from '@/modules/fetchSections';
 function fetchSearchResults(
   searchTerms: SearchQuery[],
   filterTerms: SearchQuery[], //filterTerms is blank if the searchTerms are ALL courses or ALL professors
-  controller: AbortController,
 ) {
   return searchTerms
     .flatMap((searchTerm) =>
@@ -34,20 +35,24 @@ function fetchSearchResults(
     );
 }
 
-export function LoadingServerLeft() {
-  let results: SearchQuery[] = [];
-  if (props.courses.length > 0) {
-    results = fetchSearchResults(props.courses, props.professors);
-  } else if (props.professors.length > 0) {
-    results = fetchSearchResults(props.professors, []);
-  }
-
-  return <LoadingSearchResultsTable resultsLength={results.length} />;
+interface Props {
+  courses?: SearchQuery[];
+  professors?: SearchQuery[];
 }
 
-interface Props {
-  courses: SearchQuery[];
-  professors: SearchQuery[];
+export function LoadingServerLeft(props: Props) {
+  let resultsLength = 20;
+  if (typeof props.courses !== 'undefined' && typeof props.professors !== 'undefined') {
+    let results: SearchQuery[] = [];
+    if (props.courses.length > 0) {
+      results = fetchSearchResults(props.courses, props.professors);
+    } else if (props.professors.length > 0) {
+      results = fetchSearchResults(props.professors, []);
+    }
+    resultsLength = results.length;
+  }
+
+  return <LoadingSearchResultsTable resultsLength={resultsLength} />;
 }
 
 /**

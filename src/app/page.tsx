@@ -15,7 +15,6 @@ import React, { useState } from 'react';
 
 import Background from '@/../public/background.png';
 import SearchBar from '@/components/search/SearchBar/SearchBar';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
 /**
@@ -24,10 +23,6 @@ import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 export default function Home() {
   const router = useRouter();
 
-  const [results, setResults] = useState<GenericFetchedData<SearchQuery[]>>({
-    state: 'done',
-    data: [],
-  }); // essentially a dummy state. Used only for the loading animation to start in home screen before navigation to the dashboard
   const [filterNextSem, setFilterNextSem] = useState('true');
 
   async function searchOptionChosen(chosenOptions: SearchQuery[]) {
@@ -77,8 +72,6 @@ export default function Home() {
           // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus={true}
           onSelect={searchOptionChosen}
-          resultsLoading={results.state}
-          setResultsLoading={() => setResults({ state: 'loading' })}
           input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
         />
         {/* Teaching Next Semester switch*/}

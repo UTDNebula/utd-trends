@@ -21,15 +21,17 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
-import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import type { RMP } from '@/modules/fetchRmp';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import type { Grades } from '@/modules/fetchGrades';
+import type { RMP } from '@/modules/fetchRmp';
+import type { Sections } from '@/modules/fetchSections';
+import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -38,8 +40,6 @@ import {
   searchQueryLabel,
   sectionCanOverlap,
 } from '@/types/SearchQuery';
-import type { Sections } from '@/modules/fetchSections';
-import { useSharedState } from './SharedStateProvider';
 
 function LoadingRow() {
   const nameCell = (
@@ -186,8 +186,8 @@ function Row({
 
   const [open, setOpen] = useState(false);
   const canOpen =
-    !(typeof grades === 'undefined' || grades.state === 'error') ||
-    !(typeof rmp === 'undefined' || rmp.state === 'error');
+    !(typeof grades === 'undefined' || grades.message !== 'success') ||
+    !(typeof rmp === 'undefined' || rmp.message !== 'success');
 
   const rainbowColors = useRainbowColors();
 
@@ -332,7 +332,7 @@ function Row({
           {nameCell}
         </TableCell>
         <TableCell align="center" className="border-b-0">
-          {((typeof grades === 'undefined' || grades.state === 'error') && (
+          {((typeof grades === 'undefined' || grades.message !== 'success') && (
             <></>
           )) ||
             (grades.message === 'success' && grades.data.filtered.gpa >= 0 && (
@@ -361,7 +361,9 @@ function Row({
             null}
         </TableCell>
         <TableCell align="center" className="border-b-0">
-          {((typeof rmp === 'undefined' || rmp.state === 'error') && <></>) ||
+          {((typeof rmp === 'undefined' || rmp.message !== 'success') && (
+            <></>
+          )) ||
             (rmp.message === 'success' && rmp.data.numRatings == 0 && <></>) ||
             (rmp.message === 'success' && rmp.data.numRatings != 0 && (
               <Tooltip
@@ -538,16 +540,16 @@ export default function SearchResultsTable({
       const aGrades = grades[searchQueryLabel(a)];
       const bGrades = grades[searchQueryLabel(b)];
       if (
-        (!aGrades || aGrades.state !== 'done') &&
-        (!bGrades || bGrades.state !== 'done')
+        (!aGrades || aGrades.message !== 'success') &&
+        (!bGrades || bGrades.message !== 'success')
       ) {
         return 0;
       }
 
-      if (!aGrades || aGrades.state !== 'done') {
+      if (!aGrades || aGrades.message !== 'success') {
         return 9999;
       }
-      if (!bGrades || bGrades.state !== 'done') {
+      if (!bGrades || bGrades.message !== 'success') {
         return -9999;
       }
 
@@ -561,16 +563,16 @@ export default function SearchResultsTable({
       const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
       //drop loading/error rows to bottom
       if (
-        (!aRmp || aRmp.state !== 'done' || aRmp.data.numRatings == 0) &&
-        (!bRmp || bRmp.state !== 'done' || bRmp.data.numRatings == 0)
+        (!aRmp || aRmp.message !== 'success' || aRmp.data.numRatings == 0) &&
+        (!bRmp || bRmp.message !== 'success' || bRmp.data.numRatings == 0)
       ) {
         // If both aRmp and bRmp are not done, treat them as equal and return 0
         return 0;
       }
-      if (!aRmp || aRmp.state !== 'done' || aRmp.data.numRatings == 0) {
+      if (!aRmp || aRmp.message !== 'success' || aRmp.data.numRatings == 0) {
         return 9999;
       }
-      if (!bRmp || bRmp.state !== 'done' || bRmp.data.numRatings == 0) {
+      if (!bRmp || bRmp.message !== 'success' || bRmp.data.numRatings == 0) {
         return -9999;
       }
       const aRating = aRmp?.data?.avgRating ?? 0; // Fallback to 0 if undefined

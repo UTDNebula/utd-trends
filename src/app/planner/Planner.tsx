@@ -2,21 +2,18 @@
 
 import React, { useEffect, useState } from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import Split from '@/components/common/Split/Split';
-import { useSharedState } from './SharedStateProvider';
-import {
-  type SearchQuery,
-  searchQueryMultiSectionSplit,
-} from '@/types/SearchQuery';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
-import type { Grades } from '@/modules/fetchGrades';
-import type { RMP } from '@/modules/fetchRmp';
-import type { Sections } from '@/modules/fetchSections';
 import PlannerCoursesTable, {
   LoadingPlannerCoursesTable,
 } from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
 import PlannerEmpty from '@/components/planner/PlannerEmpty/PlannerEmpty';
 import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedule';
+import type { Grades } from '@/modules/fetchGrades';
+import type { RMP } from '@/modules/fetchRmp';
+import type { Sections } from '@/modules/fetchSections';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import { type SearchQuery } from '@/types/SearchQuery';
 
 interface Props {
   fetchPlannerData: (queries: SearchQuery[]) => Promise<{
@@ -32,14 +29,27 @@ interface Props {
 export default function Planner(props: Props) {
   const { setGrades, setRmp, setSections, planner } = useSharedState();
   const [state, setState] = useState('loading');
-  useEffect(async () => {
-    setState('loading');
-    const { grades, rmp, sections } = await props.fetchPlannerData(planner);
-    setGrades(grades);
-    setRmp(rmp);
-    setSections(sections);
-    setState('done');
-  }, planner);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const fetchData = async () => {
+      setState('loading');
+      const { grades, rmp, sections } = await props.fetchPlannerData(planner);
+      if (isCancelled) return;
+
+      setGrades(grades);
+      setRmp(rmp);
+      setSections(sections);
+      setState('done');
+    };
+
+    fetchData();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [planner]);
 
   return (
     <Split

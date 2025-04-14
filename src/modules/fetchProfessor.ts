@@ -19,7 +19,7 @@ interface Professor {
   titles: string[];
 }
 
-export default function fetchProfessor(
+export default async function fetchProfessor(
   query: SearchQuery,
 ): Promise<GenericFetchedData<Professor>> {
   const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;

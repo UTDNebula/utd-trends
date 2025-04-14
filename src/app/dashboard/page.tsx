@@ -1,25 +1,25 @@
 import type { Metadata } from 'next';
 import React, { Suspense } from 'react';
 
-import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
-import DashboardEmpty from '@/components/dashboard/DashboardEmpty/DashboardEmpty';
 import Split from '@/components/common/Split/Split';
-import { decodeSearchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
-
-import ServerLeft, { LoadingServerLeft } from './ServerLeft';
-import Right from './Right';
+import DashboardEmpty from '@/components/dashboard/DashboardEmpty/DashboardEmpty';
 import TopMenu from '@/components/navigation/TopMenu/TopMenu';
+import Filters from '@/components/search/Filters/Filters';
+import { decodeSearchQueryLabel, searchQueryLabel } from '@/types/SearchQuery';
+
+import Right, { LoadingRight } from './Right';
+import ServerLeft, { LoadingServerLeft } from './ServerLeft';
 
 interface Props {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export async function generateMetadata(props: Props): Metadata {
+export async function generateMetadata({ searchParams }: Props): Metadata {
   let title = '';
-  let decription =
+  let description =
     "Choose the perfect classes for you: Nebula Labs's data analytics platform to help you make informed decisions about your coursework with UT Dallas grade and Rate My Professors data.";
 
-  let searchTerms = props.searchParams.searchTerms;
+  let searchTerms = (await searchParams).searchTerms;
   if (Array.isArray(searchTerms)) {
     searchTerms = searchTerms[0];
   }
@@ -50,8 +50,8 @@ export async function generateMetadata(props: Props): Metadata {
 /**
  * Returns the results page
  */
-export default function Page(props: Props) {
-  let searchTerms = props.searchParams.searchTerms;
+export default async function Page({ searchParams }: Props) {
+  let searchTerms = (await searchParams).searchTerms;
   if (Array.isArray(searchTerms)) {
     searchTerms = searchTerms[0];
   }
@@ -78,14 +78,14 @@ export default function Page(props: Props) {
     <>
       <TopMenu isPlanner={false} />
       <main className="p-4">
-        <Filters
-          academicSessions={[]}
-          chosenSessions={[]}
-          addChosenSessions={(arg0: (arg0: string[]) => {}) => {}}
-        />
+        <Filters />
         <Split
           left={
-            <Suspense fallback={<LoadingServerLeft />}>
+            <Suspense
+              fallback={
+                <LoadingServerLeft courses={courses} professors={professors} />
+              }
+            >
               <ServerLeft courses={courses} professors={professors} />
             </Suspense>
           }

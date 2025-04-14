@@ -1,7 +1,5 @@
-import { Badge, Card } from '@mui/material';
+import { Card } from '@mui/material';
 import React from 'react';
-
-import { type SearchQuery } from '@/types/SearchQuery';
 
 import Compare from '@/components/compare/Compare/Compare';
 import Carousel from '@/components/navigation/Carousel/Carousel';
@@ -11,10 +9,16 @@ import CourseOverview, {
 import ProfessorOverview, {
   LoadingProfessorOverview,
 } from '@/components/overview/ProfessorOverview/ProfessorOverview';
-import { fetchGrades } from '@/modules/fetchGrades';
-import { fetchRmp } from '@/modules/fetchRmp';
-import { fetchProfessor } from '@/modules/fetchProfessor';
-import { fetchCourse } from '@/modules/fetchCourse';
+import fetchCourse from '@/modules/fetchCourse';
+import fetchGrades from '@/modules/fetchGrades';
+import fetchProfessor from '@/modules/fetchProfessor';
+import fetchRmp from '@/modules/fetchRmp';
+import { type SearchQuery } from '@/types/SearchQuery';
+
+interface Props {
+  courses: SearchQuery[];
+  professors: SearchQuery[];
+}
 
 export function LoadingRight(props: Props) {
   //Add RHS tabs, only add overview tab if one course/prof
@@ -36,11 +40,6 @@ export function LoadingRight(props: Props) {
       <Carousel names={names}>{tabs}</Carousel>
     </Card>
   );
-}
-
-interface Props {
-  courses: SearchQuery[];
-  professors: SearchQuery[];
 }
 
 /**

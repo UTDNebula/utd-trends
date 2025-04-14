@@ -2,12 +2,12 @@
 
 import React from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import CompareTable from '@/components/compare/CompareTable/CompareTable';
 import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
 import { searchQueryLabel } from '@/types/SearchQuery';
-import { useSharedState } from './SharedStateProvider';
 
 function convertNumbersToPercents(distribution: GradesType): number[] {
   const total = distribution.filtered.total;
@@ -59,7 +59,7 @@ export default function Compare() {
               let response = Number(value).toFixed(2).toLocaleString() + '%';
               const grade =
                 compareGrades[searchQueryLabel(courses[seriesIndex])];
-              if (grade.state === 'done') {
+              if (grade.message === 'success') {
                 response +=
                   ' (' +
                   grade.data.filtered.grade_distribution[dataPointIndex]
@@ -81,7 +81,7 @@ export default function Compare() {
                     ? ' (Overall)' //Indicates that this entry is an aggregate for the entire course/professor
                     : ''),
                 data:
-                  grade.state === 'done'
+                  grade.message === 'success'
                     ? convertNumbersToPercents(grade.data)
                     : [],
               };
@@ -102,7 +102,7 @@ export default function Compare() {
                     typeof course.number === 'undefined')
                     ? ' (Overall)' //Indicates that this entry is an aggregate for the entire course/professor
                     : ''),
-                data: grade.state === 'done' ? grade.data.grades : [],
+                data: grade.message === 'success' ? grade.data.grades : [],
               };
             })}
           />

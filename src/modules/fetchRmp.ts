@@ -100,8 +100,8 @@ export default async function fetchRmp(
   query: SearchQuery,
 ): Promise<GenericFetchedData<RMP>> {
   try {
-    const singleProfFirst = profFirst.split(' ')[0];
-    const name = singleProfFirst + ' ' + profLast;
+    const singleProfFirst = query.profFirst.split(' ')[0];
+    const name = singleProfFirst + ' ' + query.profLast;
 
     // create fetch object for professor
     const graphQlUrlProp = getGraphQlUrlProp(name);
@@ -125,7 +125,7 @@ export default async function fetchRmp(
       (prof: { node: RMPInterface }) =>
         prof.node.school.name === SCHOOL_NAME &&
         prof.node.firstName.includes(singleProfFirst) &&
-        prof.node.lastName.includes(profLast),
+        prof.node.lastName.includes(query.profLast),
     );
     //Pick prof instance with most ratings
     let maxRatingsProfessor = professors[0];

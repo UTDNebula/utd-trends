@@ -3,7 +3,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import {
   Checkbox,
-  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -17,9 +16,9 @@ import React, { useState } from 'react';
 
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
+import type { Grades } from '@/modules/fetchGrades';
 import type { RMP } from '@/modules/fetchRmp';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
-import type { Grades } from '@/modules/fetchGrades';
 import {
   convertToProfOnly,
   type SearchQuery,
@@ -75,7 +74,6 @@ type GradeOrRmpRowProps<T> = {
   formatValue: (arg0: number) => string;
   goodValue: number;
   badValue: number;
-  loadingFiller: string;
   cell_className: string;
   colors: string[];
   orderBy: string;
@@ -92,7 +90,6 @@ function GradeOrRmpRow<T>({
   formatValue, // formatting for display
   goodValue, // for gradient
   badValue,
-  loadingFiller, // there is no loading in the compare component since you can't add to it until everything is loaded but nice to have
   cell_className, // for specifying border mostly
   colors, // border colors
   orderBy, // for controlling sorting
@@ -154,15 +151,10 @@ function GradeOrRmpRow<T>({
             backgroundColor: colors[index] + '10', // add transparency
           }}
         >
-          {((typeof value === 'undefined' || value.state === 'error') && (
+          {((typeof value === 'undefined' || value.message !== 'success') && (
             <></>
           )) ||
-            (value.state === 'loading' && (
-              <Skeleton variant="rounded" className="rounded-full px-5 py-2">
-                <Typography className="text-base">{loadingFiller}</Typography>
-              </Skeleton>
-            )) ||
-            (value.state === 'done' && getValue(value.data) !== -1 ? (
+            (value.message === 'success' && getValue(value.data) !== -1 ? (
               (name !== 'GPA' ? (value.data as RMP).numRatings > 0 : true) && ( // do not display RMP data (non-GPA data) if there are no reviews
                 <Tooltip
                   title={`${name}: ${formatValue(getValue(value.data))}`}
@@ -206,7 +198,6 @@ type GradeAndRmpRowProps = {
   rmpValues: GenericFetchedData<RMP>[];
   getGradeValue: (arg0: Grades) => number;
   getRmpValue: (arg0: RMP) => number;
-  loadingFiller: string;
   cell_className: string;
   colors: string[];
 };
@@ -217,7 +208,6 @@ function GradeAndRmpRow({
   rmpValues, // rmp data points
   getGradeValue, // extract specific grade related point from object
   getRmpValue, // extract specific rmp related point from object
-  loadingFiller, // no loading here yet
   cell_className, // for specifying border mostly
   colors, // border colors
 }: GradeAndRmpRowProps) {
@@ -247,11 +237,11 @@ function GradeAndRmpRow({
         // so ts can remember the type of rmp (which it can't do for rmpValues[index]) and know's that when its state is done, you can access its data value
         .map(([grade, rmp], index) => {
           const gradeValue =
-            typeof grade !== 'undefined' && grade.state === 'done'
+            typeof grade !== 'undefined' && grade.message === 'success'
               ? getGradeValue(grade.data as Grades)
               : null;
           const rmpValue =
-            typeof rmp !== 'undefined' && rmp.state === 'done'
+            typeof rmp !== 'undefined' && rmp.message === 'success'
               ? getRmpValue(rmp.data as RMP)
               : null;
 
@@ -271,39 +261,20 @@ function GradeAndRmpRow({
               >
                 <span>
                   {((typeof grade === 'undefined' ||
-                    grade.state === 'error') && <CloseIcon />) ||
-                    (grade.state === 'loading' && (
-                      <Skeleton
-                        variant="rounded"
-                        className="rounded-full px-5 py-2"
-                      >
-                        <Typography className="text-base">
-                          {loadingFiller}
-                        </Typography>
-                      </Skeleton>
-                    )) ||
-                    (grade.state === 'done' && (
+                    grade.message !== 'success') && <CloseIcon />) ||
+                    (grade.message === 'success' && (
                       <Typography className="text-base inline">
                         {gradeValue}
                       </Typography>
                     )) ||
                     null}
                   {' / '}
-                  {((typeof rmp === 'undefined' || rmp.state === 'error') && (
-                    <CloseIcon />
-                  )) ||
-                    (rmp.state === 'loading' && (
-                      <Skeleton
-                        variant="rounded"
-                        className="rounded-full px-5 py-2"
-                      >
-                        <Typography className="text-base">
-                          {loadingFiller}
-                        </Typography>
-                      </Skeleton>
+                  {((typeof rmp === 'undefined' ||
+                    rmp.message !== 'success') && <CloseIcon />) ||
+                    (rmp.message === 'success' && rmpValue == 0 && (
+                      <CloseIcon />
                     )) ||
-                    (rmp.state === 'done' && rmpValue == 0 && <CloseIcon />) ||
-                    (rmp.state === 'done' && rmpValue != 0 && (
+                    (rmp.message === 'success' && rmpValue != 0 && (
                       <Typography className="text-base inline">
                         {rmpValue}
                       </Typography>
@@ -432,15 +403,15 @@ const CompareTable = ({
       const bGrades = grades[searchQueryLabel(b)];
       //drop loading/error rows to bottom
       if (
-        (!aGrades || aGrades.state !== 'done') &&
-        (!bGrades || bGrades.state !== 'done')
+        (!aGrades || aGrades.message !== 'success') &&
+        (!bGrades || bGrades.message !== 'success')
       ) {
         return 0;
       }
-      if (!aGrades || aGrades.state !== 'done') {
+      if (!aGrades || aGrades.message !== 'success') {
         return 9999;
       }
-      if (!bGrades || bGrades.state !== 'done') {
+      if (!bGrades || bGrades.message !== 'success') {
         return -9999;
       }
       if (order === 'asc') {
@@ -457,16 +428,16 @@ const CompareTable = ({
       const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
       //drop loading/error rows to bottom
       if (
-        (!aRmp || aRmp.state !== 'done') &&
-        (!bRmp || bRmp.state !== 'done')
+        (!aRmp || aRmp.message !== 'success') &&
+        (!bRmp || bRmp.message !== 'success')
       ) {
         // If both aRmp and bRmp are not done, treat them as equal and return 0
         return 0;
       }
-      if (!aRmp || aRmp.state !== 'done') {
+      if (!aRmp || aRmp.message !== 'success') {
         return 9999;
       }
-      if (!bRmp || bRmp.state !== 'done') {
+      if (!bRmp || bRmp.message !== 'success') {
         return -9999;
       }
       if (orderBy === 'Rating') {
@@ -538,7 +509,6 @@ const CompareTable = ({
               formatValue={(value: number) => value.toFixed(2)}
               goodValue={4}
               badValue={0}
-              loadingFiller="4.00"
               cell_className="py-3 border-x-2"
               colors={mappedColors}
               orderBy={orderBy}
@@ -556,7 +526,6 @@ const CompareTable = ({
               formatValue={(value: number) => value.toFixed(1)}
               goodValue={5}
               badValue={0}
-              loadingFiller="5.0"
               cell_className="py-3 border-x-2"
               colors={mappedColors}
               orderBy={orderBy}
@@ -573,7 +542,6 @@ const CompareTable = ({
               formatValue={(value: number) => value.toFixed(0) + '%'}
               goodValue={100}
               badValue={0}
-              loadingFiller="90%"
               cell_className="py-3 border-x-2"
               colors={mappedColors}
               orderBy={orderBy}
@@ -590,7 +558,6 @@ const CompareTable = ({
               formatValue={(value: number) => value.toFixed(1)}
               goodValue={0}
               badValue={5}
-              loadingFiller="5.0"
               cell_className="py-3 border-x-2"
               colors={mappedColors}
               orderBy={orderBy}
@@ -609,7 +576,6 @@ const CompareTable = ({
               )}
               getGradeValue={(data: Grades) => data.filtered.total}
               getRmpValue={(data: RMP) => data.numRatings}
-              loadingFiller="100"
               cell_className="pt-3 pb-2 border-x-2"
               colors={mappedColors}
             />

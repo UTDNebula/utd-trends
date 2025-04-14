@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Checkbox,
   FormControl,
@@ -20,20 +22,14 @@ import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
 
-interface FiltersProps {
-  academicSessions: string[];
-  chosenSessions: string[];
-  addChosenSessions: (arg0: (arg0: string[]) => string[]) => void;
-}
-
 /**
  * This component returns a set of filters with which to sort results.
  */
-const Filters = ({
-  academicSessions,
-  chosenSessions,
-  addChosenSessions,
-}: FiltersProps) => {
+const Filters = () => {
+  const academicSessions = [];
+  const chosenSessions = [];
+  const addChosenSessions = () => {};
+
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
   academicSessions.sort((a, b) => compareSemesters(b, a)); // display the semesters in order of recency (most recent first)

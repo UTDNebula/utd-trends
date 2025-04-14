@@ -1,15 +1,12 @@
 import React from 'react';
 
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import { useSharedState } from '@/app/SharedStateProvider';
+import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection/PlannerSection';
 import {
   convertToCourseOnly,
   removeSection,
-  type SearchQuery,
   searchQueryLabel,
 } from '@/types/SearchQuery';
-
-import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection/PlannerSection';
-import { useSharedState } from './SharedStateProvider';
 
 // hours shown (24-hour time)
 export const START_HOUR = 8;
@@ -90,14 +87,18 @@ export default function PlannerSchedule() {
       ))}
 
       {courses.map((course) => {
-        const sections = sections[searchQueryLabel(removeSection(course))];
-        if (typeof sections === 'undefined' || sections.message !== 'success') {
+        const courseSections =
+          sections[searchQueryLabel(removeSection(course))];
+        if (
+          typeof courseSections === 'undefined' ||
+          courseSections.message !== 'success'
+        ) {
           return null;
         }
         return (
           <PlannerSection
             key={searchQueryLabel(course)}
-            selectedSection={sections.data.latest.find(
+            selectedSection={courseSections.data.latest.find(
               (section) => section.section_number === course.sectionNumber,
             )}
             course={course}

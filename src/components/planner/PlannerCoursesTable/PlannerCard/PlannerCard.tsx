@@ -29,10 +29,9 @@ import React, { useEffect, useState } from 'react';
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
-import type { RMP } from '@/modules/fetchRmp';
-
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import type { Grades } from '@/modules/fetchGrades';
+import type { RMP } from '@/modules/fetchRmp';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   removeSection,
   type SearchQuery,
@@ -351,7 +350,7 @@ type PlannerCardProps = {
   color: { fill: string; outline: string; font: string };
 };
 
-export default function PlannerCard() {
+export default function PlannerCard(props: PlannerCardProps) {
   const [open, setOpen] = useState(false);
 
   //appease the typescript gods
@@ -359,8 +358,9 @@ export default function PlannerCard() {
   const canOpenSections =
     typeof sections !== 'undefined' && sections.length !== 0;
   const canOpenGrades =
-    !(typeof props.grades === 'undefined' || props.grades.state === 'error') ||
-    !(typeof props.rmp === 'undefined' || props.rmp.state === 'error');
+    !(
+      typeof props.grades === 'undefined' || props.grades.message !== 'success'
+    ) || !(typeof props.rmp === 'undefined' || props.rmp.message === 'success');
   const [whichOpen, setWhichOpen] = useState<'sections' | 'grades' | null>(
     canOpenSections ? 'sections' : canOpenGrades ? 'grades' : null,
   );

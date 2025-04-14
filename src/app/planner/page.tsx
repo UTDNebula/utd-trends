@@ -2,20 +2,20 @@ import type { Metadata } from 'next';
 import React from 'react';
 
 import TopMenu from '@/components/navigation/TopMenu/TopMenu';
-
-import Planner from './Planner';
+import type { Grades } from '@/modules/fetchGrades';
+import { fetchGrades } from '@/modules/fetchGrades';
+import type { RMP } from '@/modules/fetchRmp';
+import { fetchRmp } from '@/modules/fetchRmp';
+import type { Sections } from '@/modules/fetchSections';
+import { fetchSections } from '@/modules/fetchSections';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
+  removeDuplicates,
   type SearchQuery,
   searchQueryLabel,
-  removeDuplicates,
 } from '@/types/SearchQuery';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
-import type { Grades } from '@/modules/fetchGrades';
-import type { RMP } from '@/modules/fetchRmp';
-import type { Sections } from '@/modules/fetchSections';
-import { fetchGrades } from '@/modules/fetchGrades';
-import { fetchRmp } from '@/modules/fetchRmp';
-import { fetchSections } from '@/modules/fetchSections';
+
+import Planner from './Planner';
 
 export const metadata: Metadata = {
   title: 'My Planner' + title,
@@ -31,15 +31,15 @@ export async function fetchPlannerData(queries: SearchQuery[]): Promise<{
   //Grade data
   //Fetch each result
   const gradesPromises = Object.fromEntries(
-    results.map((result) => [searchQueryLabel(result), fetchGrades(result)]),
+    queries.map((result) => [searchQueryLabel(result), fetchGrades(result)]),
   );
 
   //RMP data
-  //Get list of profs from results
+  //Get list of profs from queries
   //Remove duplicates so as not to fetch multiple times
   const rmpPromises = Object.fromEntries(
     removeDuplicates(
-      results
+      queries
         //Remove course data from each
         .map((result) => convertToProfOnly(result))
         //Remove empty objects (used to be only course data)
@@ -48,7 +48,7 @@ export async function fetchPlannerData(queries: SearchQuery[]): Promise<{
   );
 
   const sectionsPromises = Object.fromEntries(
-    results.map((result) => [searchQueryLabel(result), fetchSections(result)]),
+    queries.map((result) => [searchQueryLabel(result), fetchSections(result)]),
   );
 
   const [gradesResults, rmpResults, sectionsResults] = await Promise.allSettled(

@@ -1,15 +1,15 @@
 import { Skeleton } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import SingleGradesInfo, {
   LoadingSingleGradesInfo,
 } from '@/components/common/SingleGradesInfo/SingleGradesInfo';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
-import type { Grades } from '@/modules/fetchGrades';
 import type { Course } from '@/modules/fetchCourse';
+import type { Grades } from '@/modules/fetchGrades';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
-export default function LoadingCourseOverview() {
+export function LoadingCourseOverview() {
   const courseComponent = (
     <>
       <p className="text-2xl font-bold self-center w-[min(25ch,100%)]">
@@ -45,7 +45,7 @@ export default function LoadingCourseOverview() {
   );
 }
 
-function parseDescription(course: CourseData): {
+function parseDescription(course: Course): {
   formattedDescription: string;
   requisites: string[];
   sameAsText: string;

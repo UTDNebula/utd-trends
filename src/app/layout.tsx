@@ -9,10 +9,11 @@ import { Inter } from 'next/font/google';
 import localFont from 'next/font/local';
 import React from 'react';
 
-import { SharedStateProvider } from './SharedStateProvider';
 import FeedbackPopup from '@/components/common/FeedbackPopup/FeedbackPopup';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
 import theme from '@/modules/theme';
+
+import { SharedStateProvider } from './SharedStateProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -123,6 +124,7 @@ export default function RootLayout({
             <SharedStateProvider>{children}</SharedStateProvider>
             <FeedbackPopup />
             <GitHubButton />
+            <SpeedInsights />
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>

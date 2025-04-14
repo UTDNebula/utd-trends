@@ -3,6 +3,7 @@
 import { Alert, Snackbar, Typography } from '@mui/material';
 import React, { useState } from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerCard, {
   LoadingPlannerCard,
 } from '@/components/planner/PlannerCoursesTable/PlannerCard/PlannerCard';
@@ -10,12 +11,9 @@ import {
   convertToCourseOnly,
   convertToProfOnly,
   removeSection,
-  type SearchQuery,
   searchQueryLabel,
-  type SearchQueryMultiSection,
   searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
-import { useSharedState } from './SharedStateProvider';
 
 export function LoadingPlannerCoursesTable() {
   const { planner } = useSharedState();
@@ -40,7 +38,6 @@ export default function PlannerCoursesTable() {
     rmp,
     sections,
     planner,
-    addToPlanner,
     removeFromPlanner,
     setPlannerSection,
     plannerColorMap,

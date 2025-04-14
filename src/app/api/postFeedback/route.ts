@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   let body;
   try {
     body = await request.json();
-  } catch (err) {
+  } catch {
     return NextResponse.json({ message: 'Invalid JSON body' }, { status: 400 });
   }
 
@@ -47,7 +47,13 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ message: 'success' }, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 400 });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        message:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      },
+      { status: 400 },
+    );
   }
 }

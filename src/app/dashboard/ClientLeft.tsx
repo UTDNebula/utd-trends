@@ -3,12 +3,17 @@
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect } from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import SearchResultsTable from '@/components/search/SearchResultsTable/SearchResultsTable';
-import { useSharedState } from './SharedStateProvider';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import type { Grades } from '@/modules/fetchGrades';
 import type { RMP } from '@/modules/fetchRmp';
 import type { Sections } from '@/modules/fetchSections';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import {
+  convertToProfOnly,
+  type SearchQuery,
+  searchQueryLabel,
+} from '@/types/SearchQuery';
 
 interface Props {
   numSearches: number;
@@ -21,7 +26,7 @@ interface Props {
 /**
  * Returns the left side
  */
-export default async function ClientLeft(props: Props) {
+export default function ClientLeft(props: Props) {
   const { grades, setGrades, rmp, setRmp, sections, setSections } =
     useSharedState();
   useEffect(() => {

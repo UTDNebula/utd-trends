@@ -4,6 +4,7 @@ import { Collapse, useMediaQuery } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { type ReactNode, useEffect, useRef, useState } from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import { TabNavMenu } from '@/components/navigation/TabNavMenu/TabNavMenu';
 
 interface CarouselProps {

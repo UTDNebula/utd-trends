@@ -3,7 +3,7 @@
 import { Skeleton } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import SingleGradesInfo, {
   LoadingSingleGradesInfo,
@@ -11,10 +11,10 @@ import SingleGradesInfo, {
 import SingleProfInfo, {
   LoadingSingleProfInfo,
 } from '@/components/common/SingleProfInfo/SingleProfInfo';
-import type { RMP } from '@/modules/fetchRmp';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import type { Grades } from '@/modules/fetchGrades';
 import type { Professor } from '@/modules/fetchProfessor';
+import type { RMP } from '@/modules/fetchRmp';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
 export function LoadingProfessorOverview() {
@@ -47,7 +47,7 @@ export default function ProfessorOverview({
   profData,
   grades,
   rmp,
-}: ProfessorOverviewProps) {
+}: Props) {
   const [src, setSrc] = useState(fallbackSrc);
 
   return (
