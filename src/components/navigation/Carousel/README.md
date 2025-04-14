@@ -3,11 +3,11 @@ It uses the `framer-motion` library to provide sliding carousel animations when 
 
 ### Props Table
 
-| Prop            | Type                           | Description                                                    | Required |
-| :-------------- | :----------------------------- | :------------------------------------------------------------- | -------- |
-| `names`         | `string, string[]`             | The name(s) of the children element(s)                         | Yes      |
-| `children`      | `ReactElement, ReactElement[]` | The element(s) that will be rendered in the carousel           | Yes      |
-| `compareLength` | `number`                       | The number of element(s) that will be rendered in the carousel | Yes      |
+| Prop            | Type               | Description                                                    | Required |
+| :-------------- | :----------------- | :------------------------------------------------------------- | -------- |
+| `names`         | `string, string[]` | The name(s) of the children element(s)                         | Yes      |
+| `children`      | `ReactNode`        | The element(s) that will be rendered in the carousel           | Yes      |
+| `compareLength` | `number`           | The number of element(s) that will be rendered in the carousel | Yes      |
 
 ### Carousel Example
 

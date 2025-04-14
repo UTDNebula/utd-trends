@@ -1,3 +1,5 @@
+'use client';
+
 import CloseIcon from '@mui/icons-material/Close';
 import {
   Checkbox,
@@ -15,9 +17,9 @@ import React, { useState } from 'react';
 
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
-import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { RMP } from '@/modules/fetchRmp';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
-import type { GradesType } from '@/types/GradesType';
+import type { Grades } from '@/modules/fetchGrades';
 import {
   convertToProfOnly,
   type SearchQuery,
@@ -161,9 +163,7 @@ function GradeOrRmpRow<T>({
               </Skeleton>
             )) ||
             (value.state === 'done' && getValue(value.data) !== -1 ? (
-              (name !== 'GPA'
-                ? (value.data as RMPInterface).numRatings > 0
-                : true) && ( // do not display RMP data (non-GPA data) if there are no reviews
+              (name !== 'GPA' ? (value.data as RMP).numRatings > 0 : true) && ( // do not display RMP data (non-GPA data) if there are no reviews
                 <Tooltip
                   title={`${name}: ${formatValue(getValue(value.data))}`}
                   placement="top"
@@ -202,10 +202,10 @@ function GradeOrRmpRow<T>({
 
 type GradeAndRmpRowProps = {
   name: string;
-  gradeValues: GenericFetchedData<GradesType>[];
-  rmpValues: GenericFetchedData<RMPInterface>[];
-  getGradeValue: (arg0: GradesType) => number;
-  getRmpValue: (arg0: RMPInterface) => number;
+  gradeValues: GenericFetchedData<Grades>[];
+  rmpValues: GenericFetchedData<RMP>[];
+  getGradeValue: (arg0: Grades) => number;
+  getRmpValue: (arg0: RMP) => number;
   loadingFiller: string;
   cell_className: string;
   colors: string[];
@@ -248,11 +248,11 @@ function GradeAndRmpRow({
         .map(([grade, rmp], index) => {
           const gradeValue =
             typeof grade !== 'undefined' && grade.state === 'done'
-              ? getGradeValue(grade.data as GradesType)
+              ? getGradeValue(grade.data as Grades)
               : null;
           const rmpValue =
             typeof rmp !== 'undefined' && rmp.state === 'done'
-              ? getRmpValue(rmp.data as RMPInterface)
+              ? getRmpValue(rmp.data as RMP)
               : null;
 
           return (
@@ -387,8 +387,8 @@ function CheckboxRow({
 
 type CompareTableProps = {
   includedResults: SearchQuery[];
-  grades: { [key: string]: GenericFetchedData<GradesType> };
-  rmp: { [key: string]: GenericFetchedData<RMPInterface> };
+  grades: { [key: string]: GenericFetchedData<Grades> };
+  rmp: { [key: string]: GenericFetchedData<RMP> };
   removeFromCompare: (arg0: SearchQuery) => void;
   colorMap: { [key: string]: string };
 };
@@ -529,12 +529,12 @@ const CompareTable = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            <GradeOrRmpRow<GradesType>
+            <GradeOrRmpRow<Grades>
               name="GPA"
               values={sortedResults.map(
                 (result) => grades[searchQueryLabel(result)],
               )}
-              getValue={(data: GradesType) => data.filtered.gpa}
+              getValue={(data: Grades) => data.filtered.gpa}
               formatValue={(value: number) => value.toFixed(2)}
               goodValue={4}
               badValue={0}
@@ -547,12 +547,12 @@ const CompareTable = ({
               rainbowColors={rainbowColors}
             />
 
-            <GradeOrRmpRow<RMPInterface>
+            <GradeOrRmpRow<RMP>
               name="Rating"
               values={sortedResults.map(
                 (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
               )}
-              getValue={(data: RMPInterface) => data.avgRating}
+              getValue={(data: RMP) => data.avgRating}
               formatValue={(value: number) => value.toFixed(1)}
               goodValue={5}
               badValue={0}
@@ -564,12 +564,12 @@ const CompareTable = ({
               handleClick={handleClick}
               rainbowColors={rainbowColors}
             />
-            <GradeOrRmpRow<RMPInterface>
+            <GradeOrRmpRow<RMP>
               name="Would Take Again"
               values={sortedResults.map(
                 (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
               )}
-              getValue={(data: RMPInterface) => data.wouldTakeAgainPercent}
+              getValue={(data: RMP) => data.wouldTakeAgainPercent}
               formatValue={(value: number) => value.toFixed(0) + '%'}
               goodValue={100}
               badValue={0}
@@ -581,12 +581,12 @@ const CompareTable = ({
               handleClick={handleClick}
               rainbowColors={rainbowColors}
             />
-            <GradeOrRmpRow<RMPInterface>
+            <GradeOrRmpRow<RMP>
               name="Difficulty"
               values={sortedResults.map(
                 (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
               )}
-              getValue={(data: RMPInterface) => data.avgDifficulty}
+              getValue={(data: RMP) => data.avgDifficulty}
               formatValue={(value: number) => value.toFixed(1)}
               goodValue={0}
               badValue={5}
@@ -607,8 +607,8 @@ const CompareTable = ({
               rmpValues={sortedResults.map(
                 (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
               )}
-              getGradeValue={(data: GradesType) => data.filtered.total}
-              getRmpValue={(data: RMPInterface) => data.numRatings}
+              getGradeValue={(data: Grades) => data.filtered.total}
+              getRmpValue={(data: RMP) => data.numRatings}
               loadingFiller="100"
               cell_className="pt-3 pb-2 border-x-2"
               colors={mappedColors}

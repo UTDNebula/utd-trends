@@ -1,7 +1,9 @@
+'use client';
+
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import { Backdrop, Button, Checkbox, IconButton, Popover } from '@mui/material';
-import React, { type ReactElement, useEffect, useState } from 'react';
+import React, { type ReactNode, useEffect, useState } from 'react';
 
 type TutorialPopupProps = {
   element: Element;
@@ -18,7 +20,7 @@ type TutorialPopupProps = {
     vertical: 'center' | 'bottom' | 'top';
     horizontal: 'center' | 'left' | 'right';
   };
-  children: ReactElement | string;
+  children: ReactNode;
 };
 
 const TutorialPopup = ({
@@ -91,7 +93,7 @@ type StepTemplate = {
   id: string;
   element?: Element;
   title: string;
-  content: ReactElement | string;
+  content: ReactNode;
   anchorOrigin: {
     vertical: 'center' | 'bottom' | 'top';
     horizontal: 'center' | 'left' | 'right';

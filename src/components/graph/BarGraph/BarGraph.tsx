@@ -1,3 +1,5 @@
+'use client';
+
 import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
 import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';

@@ -1,3 +1,5 @@
+'use client';
+
 import BarChartIcon from '@mui/icons-material/BarChart';
 import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
@@ -27,10 +29,10 @@ import React, { useEffect, useState } from 'react';
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
-import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import { type SectionsData } from '@/pages/api/sections';
+import type { RMP } from '@/modules/fetchRmp';
+
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
-import type { GradesType } from '@/types/GradesType';
+import type { Grades } from '@/modules/fetchGrades';
 import {
   removeSection,
   type SearchQuery,
@@ -38,6 +40,39 @@ import {
   type SearchQueryMultiSection,
   sectionCanOverlap,
 } from '@/types/SearchQuery';
+
+export function LoadingPlannerCard() {
+  return (
+    <Box
+      component={Paper}
+      className="border border-royal dark:border-cornflower-300 rounded-lg"
+    >
+      <div className="p-4 flex items-center gap-4">
+        <div className="flex items-center">
+          <IconButton aria-label="expand row" size="medium" disabled>
+            <KeyboardArrowIcon />
+          </IconButton>
+          <Checkbox checked={true} checkedIcon={<BookIcon />} disabled />
+          <ToggleButtonGroup
+            size="small"
+            aria-label="dropdown switch"
+            className="ml-2"
+          >
+            <ToggleButton value="" aria-label="sections" disabled>
+              <EventIcon />
+            </ToggleButton>
+            <ToggleButton value="" aria-label="grades and rmp" disabled>
+              <BarChartIcon />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </div>
+        <Typography className="w-1/2 leading-tight text-lg">
+          <Skeleton />
+        </Typography>
+      </div>
+    </Box>
+  );
+}
 
 function parseTime(time: string): number {
   const [hour, minute] = time.split(':').map((s) => parseInt(s));
@@ -52,8 +87,8 @@ function parseTime(time: string): number {
 }
 
 function hasConflict(
-  newSection: SectionsData[number],
-  selectedSections: SectionsData,
+  newSection: Sections[number],
+  selectedSections: Sections,
 ): boolean {
   if (!newSection || !selectedSections) return false;
 
@@ -93,39 +128,6 @@ function hasConflict(
   return false;
 }
 
-export function LoadingRow() {
-  return (
-    <Box
-      component={Paper}
-      className="border border-royal dark:border-cornflower-300 rounded-lg"
-    >
-      <div className="p-4 flex items-center gap-4">
-        <div className="flex items-center">
-          <IconButton aria-label="expand row" size="medium" disabled>
-            <KeyboardArrowIcon />
-          </IconButton>
-          <Checkbox checked={true} checkedIcon={<BookIcon />} disabled />
-          <ToggleButtonGroup
-            size="small"
-            aria-label="dropdown switch"
-            className="ml-2"
-          >
-            <ToggleButton value="" aria-label="sections" disabled>
-              <EventIcon />
-            </ToggleButton>
-            <ToggleButton value="" aria-label="grades and rmp" disabled>
-              <BarChartIcon />
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </div>
-        <Typography className="w-1/2 leading-tight text-lg">
-          <Skeleton />
-        </Typography>
-      </div>
-    </Box>
-  );
-}
-
 function SectionTableHead(props: { hasMultipleDateRanges: boolean }) {
   return (
     <TableRow className="bg-cornflower-600">
@@ -155,7 +157,7 @@ function SectionTableHead(props: { hasMultipleDateRanges: boolean }) {
   );
 }
 
-function parseDateRange(meeting: SectionsData[number]['meetings'][number]) {
+function parseDateRange(meeting: Sections[number]['meetings'][number]) {
   const start_date = new Date(meeting.start_date);
   const formatted_start = `${(start_date.getMonth() + 1).toString()}/${start_date.getDate().toString()}`;
   const end_date = new Date(meeting.end_date);
@@ -183,7 +185,7 @@ function meetingDays(days: string[]): string {
   return result;
 }
 
-function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
+function parseMeeting(meeting: Sections[number]['meetings'][number]) {
   function classTime(startTime: string, endTime: string): string {
     const startAmPm = startTime.slice(-2);
     const endAmPm = endTime.slice(-2);
@@ -201,12 +203,12 @@ function parseMeeting(meeting: SectionsData[number]['meetings'][number]) {
 }
 
 type SectionTableRowProps = {
-  data: SectionsData[number];
+  data: Sections[number];
   course: SearchQueryMultiSection;
   lastRow: boolean;
   setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
   hasMultipleDateRanges: boolean;
-  selectedSections: SectionsData;
+  selectedSections: Sections;
   openConflictMessage: () => void;
 };
 
@@ -313,7 +315,7 @@ function SectionTableRow(props: SectionTableRowProps) {
 
 function MeetingChip(props: {
   color: { fill: string; outline: string; font: string };
-  meetings: SectionsData[number]['meetings'] | undefined;
+  meetings: Sections[number]['meetings'] | undefined;
 }) {
   if (typeof props.meetings === 'undefined') {
     return null;
@@ -339,17 +341,17 @@ function MeetingChip(props: {
 
 type PlannerCardProps = {
   query: SearchQueryMultiSection;
-  sections?: SectionsData;
+  sections?: Sections;
   setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
-  grades: GenericFetchedData<GradesType>;
-  rmp: GenericFetchedData<RMPInterface>;
+  grades: GenericFetchedData<Grades>;
+  rmp: GenericFetchedData<RMP>;
   removeFromPlanner: () => void;
-  selectedSections: SectionsData;
+  selectedSections: Sections;
   openConflictMessage: () => void;
   color: { fill: string; outline: string; font: string };
 };
 
-const PlannerCard = (props: PlannerCardProps) => {
+export default function PlannerCard() {
   const [open, setOpen] = useState(false);
 
   //appease the typescript gods
@@ -545,6 +547,4 @@ const PlannerCard = (props: PlannerCardProps) => {
       )}
     </Box>
   );
-};
-
-export default PlannerCard;
+}

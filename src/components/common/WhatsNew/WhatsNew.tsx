@@ -1,3 +1,5 @@
+'use client';
+
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Badge, IconButton, Popover, Tooltip } from '@mui/material';
 import Link from 'next/link';

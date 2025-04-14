@@ -1,3 +1,5 @@
+'use client';
+
 import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';

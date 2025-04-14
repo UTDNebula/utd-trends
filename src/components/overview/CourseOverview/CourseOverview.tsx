@@ -1,16 +1,49 @@
 import { Skeleton } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
-import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
-import type { CourseData } from '@/pages/api/course';
+import SingleGradesInfo, {
+  LoadingSingleGradesInfo,
+} from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
-import type { GradesType } from '@/types/GradesType';
+import type { Grades } from '@/modules/fetchGrades';
+import type { Course } from '@/modules/fetchCourse';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
-type CourseOverviewProps = {
-  course: SearchQuery;
-  grades: GenericFetchedData<GradesType>;
-};
+export default function LoadingCourseOverview() {
+  const courseComponent = (
+    <>
+      <p className="text-2xl font-bold self-center w-[min(25ch,100%)]">
+        <Skeleton />
+      </p>
+      <p className="text-lg font-semibold self-center w-[10ch] ">
+        <Skeleton />
+      </p>
+      <p className="font-semibold w-[80%] ">
+        <Skeleton />
+      </p>
+      <Skeleton variant="rounded" className="w-full h-24" />
+      <p className="w-[30ch]">
+        <Skeleton />
+      </p>
+      <p className="w-[21ch]">
+        <Skeleton />
+      </p>
+      <p className="w-[24ch]">
+        <Skeleton />
+      </p>
+      <p className="w-[33ch]">
+        <Skeleton />
+      </p>
+    </>
+  );
+
+  return (
+    <div className="flex flex-col gap-2">
+      {courseComponent}
+      <LoadingSingleGradesInfo />
+    </div>
+  );
+}
 
 function parseDescription(course: CourseData): {
   formattedDescription: string;
@@ -193,76 +226,16 @@ function parseDescription(course: CourseData): {
   };
 }
 
-const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
-  const [courseData, setCourseData] = useState<GenericFetchedData<CourseData>>({
-    state: 'loading',
-  });
+interface Props {
+  course: SearchQuery;
+  courseData: GenericFetchedData<Course>;
+  grades: GenericFetchedData<Grades>;
+}
 
-  useEffect(() => {
-    setCourseData({ state: 'loading' });
-    fetch(
-      '/api/course?prefix=' +
-        encodeURIComponent(String(course.prefix)) +
-        '&number=' +
-        encodeURIComponent(String(course.number)),
-      {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-        },
-      },
-    )
-      .then((response) => response.json())
-      .then((response) => {
-        if (response.message !== 'success') {
-          throw new Error(response.message);
-        }
-        return response.data;
-      })
-      .then((response: CourseData[]) => {
-        response.sort((a, b) => b.catalog_year - a.catalog_year); // sort by year descending, so index 0 has the most recent year
-        setCourseData({
-          state: typeof response !== 'undefined' ? 'done' : 'error',
-          data: response[0] as CourseData,
-        });
-      })
-
-      .catch((error) => {
-        setCourseData({ state: 'error' });
-        console.error('Course data', error);
-      });
-  }, [course]);
-
+export default function CourseOverview({ course, courseData, grades }: Props) {
   let courseComponent = null;
-  if (courseData.state === 'loading') {
-    courseComponent = (
-      <>
-        <p className="text-2xl font-bold self-center w-[min(25ch,100%)]">
-          <Skeleton />
-        </p>
-        <p className="text-lg font-semibold self-center w-[10ch] ">
-          <Skeleton />
-        </p>
-        <p className="font-semibold w-[80%] ">
-          <Skeleton />
-        </p>
-        <Skeleton variant="rounded" className="w-full h-24" />
-        <p className="w-[30ch]">
-          <Skeleton />
-        </p>
-        <p className="w-[21ch]">
-          <Skeleton />
-        </p>
-        <p className="w-[24ch]">
-          <Skeleton />
-        </p>
-        <p className="w-[33ch]">
-          <Skeleton />
-        </p>
-      </>
-    );
-  } else if (
-    courseData.state === 'done' &&
+  if (
+    courseData.message === 'success' &&
     typeof courseData.data !== 'undefined'
   ) {
     const {
@@ -302,7 +275,7 @@ const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
       </>
     );
   } else {
-    return (
+    courseComponent = (
       <p className="text-lg font-semibold text-center">
         Course information is not available
       </p>
@@ -319,6 +292,4 @@ const CourseOverview = ({ course, grades }: CourseOverviewProps) => {
       />
     </div>
   );
-};
-
-export default CourseOverview;
+}

@@ -1,10 +1,12 @@
+'use client';
+
 import BookIcon from '@mui/icons-material/Book';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ShareIcon from '@mui/icons-material/Share';
 import { Button, IconButton, Snackbar, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import Background from '@/../public/background.png';
@@ -15,22 +17,16 @@ import SearchBar from '@/components/search/SearchBar/SearchBar';
 /**
  * Props type used by the TopMenu component
  */
-type DashboardTopMenuProps = {
-  resultsLoading: 'loading' | 'done' | 'error';
-  setResultsLoading: () => void;
-  isPlanner: false;
+type Props = {
+  isPlanner: boolean;
 };
-type PlannerTopMenuProps = {
-  isPlanner: true;
-};
-type TopMenuProps = DashboardTopMenuProps | PlannerTopMenuProps;
 
 /**
  * This is a component to hold UTD Trends branding and basic navigation
  * @returns
  */
-export function TopMenu(props: TopMenuProps) {
-  const router = useRouter();
+export function TopMenu(props: Props) {
+  const searchParams = useSearchParams();
   const [openCopied, setOpenCopied] = useState(false);
 
   function shareLink(url: string) {
@@ -116,14 +112,7 @@ export function TopMenu(props: TopMenuProps) {
             !props.isPlanner
               ? sessionStorage.setItem(
                   'dashboardSearchTerms',
-                  Object.entries(router.query)
-                    .map(([key, value]) => {
-                      if (typeof value === 'string') {
-                        return key + '=' + encodeURIComponent(value);
-                      }
-                      return '';
-                    })
-                    .join('&') ?? '',
+                  searchParams.toString(),
                 )
               : null
           }
@@ -186,11 +175,7 @@ export function TopMenu(props: TopMenuProps) {
               size="medium"
               onClick={() => {
                 let url = window.location.href;
-                if (
-                  router.query &&
-                  Object.keys(router.query).length === 0 &&
-                  Object.getPrototypeOf(router.query) === Object.prototype
-                ) {
+                if (searchParams.toString() === '') {
                   url = 'https://trends.utdnebula.com/';
                 }
                 shareLink(url);

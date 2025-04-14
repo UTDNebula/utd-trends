@@ -1,80 +1,82 @@
+'use client';
+
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Chip, Collapse, Grid, IconButton, Skeleton } from '@mui/material';
 import Link from 'next/link';
 import React, { useState } from 'react';
 
-import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import type { RMP } from '@/modules/fetchRmp';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 
+function LoadingSingleProfInfo() {
+  const loadingTags = [
+    'Group projects (54)',
+    'Lecture heavy (29)',
+    'Hilarious (13)',
+    'Respected (9)',
+    'Clear grading criteria (9)',
+  ];
+  return (
+    <Grid container spacing={2} className="p-4">
+      {/* Loading skeletons for each metric */}
+      <Grid size={6}>
+        <Skeleton variant="rounded">
+          <p className="text-xl font-bold">5.0</p>
+        </Skeleton>
+        <p>Professor rating</p>
+      </Grid>
+      <Grid size={6}>
+        <Skeleton variant="rounded">
+          <p className="text-xl font-bold">5.0</p>
+        </Skeleton>
+        <p>Difficulty</p>
+      </Grid>
+      <Grid size={6}>
+        <Skeleton variant="rounded">
+          <p className="text-xl font-bold">1,000</p>
+        </Skeleton>
+        <p>Ratings given</p>
+      </Grid>
+      <Grid size={6}>
+        <Skeleton variant="rounded">
+          <p className="text-xl font-bold">99%</p>
+        </Skeleton>
+        <p>Would take again</p>
+      </Grid>
+
+      <Grid size={12}>
+        <div className="flex gap-1 flex-wrap">
+          {loadingTags.map((tag, index) => (
+            <Skeleton key={index} variant="rounded" className="rounded-full">
+              <Chip label={tag} />
+            </Skeleton>
+          ))}
+          <Skeleton variant="rounded" className="rounded-full">
+            <IconButton size="small">
+              <ExpandMoreIcon />
+            </IconButton>
+          </Skeleton>
+        </div>
+      </Grid>
+
+      <Grid size={12}>
+        <Skeleton variant="rounded">
+          <p>Visit Rate My Professors</p>
+        </Skeleton>
+      </Grid>
+    </Grid>
+  );
+}
+
 type Props = {
-  rmp: GenericFetchedData<RMPInterface>;
+  rmp: GenericFetchedData<RMP>;
 };
 
-function SingleProfInfo({ rmp }: Props) {
+export default function SingleProfInfo({ rmp }: Props) {
   const [showMore, setShowMore] = useState(false);
 
-  if (typeof rmp === 'undefined' || rmp.state === 'error') {
+  if (typeof rmp === 'undefined' || rmp.message !== 'success') {
     return null;
-  }
-
-  if (rmp.state === 'loading') {
-    const loadingTags = [
-      'Group projects (54)',
-      'Lecture heavy (29)',
-      'Hilarious (13)',
-      'Respected (9)',
-      'Clear grading criteria (9)',
-    ];
-    return (
-      <Grid container spacing={2} className="p-4">
-        {/* Loading skeletons for each metric */}
-        <Grid size={6}>
-          <Skeleton variant="rounded">
-            <p className="text-xl font-bold">5.0</p>
-          </Skeleton>
-          <p>Professor rating</p>
-        </Grid>
-        <Grid size={6}>
-          <Skeleton variant="rounded">
-            <p className="text-xl font-bold">5.0</p>
-          </Skeleton>
-          <p>Difficulty</p>
-        </Grid>
-        <Grid size={6}>
-          <Skeleton variant="rounded">
-            <p className="text-xl font-bold">1,000</p>
-          </Skeleton>
-          <p>Ratings given</p>
-        </Grid>
-        <Grid size={6}>
-          <Skeleton variant="rounded">
-            <p className="text-xl font-bold">99%</p>
-          </Skeleton>
-          <p>Would take again</p>
-        </Grid>
-
-        <Grid size={12}>
-          <div className="flex gap-1 flex-wrap">
-            {loadingTags.map((tag, index) => (
-              <Skeleton key={index} variant="rounded" className="rounded-full">
-                <Chip label={tag} />
-              </Skeleton>
-            ))}
-            <Skeleton variant="rounded" className="rounded-full">
-              <IconButton size="small">
-                <ExpandMoreIcon />
-              </IconButton>
-            </Skeleton>
-          </div>
-        </Grid>
-
-        <Grid size={12}>
-          <Skeleton variant="rounded">
-            <p>Visit Rate My Professors</p>
-          </Skeleton>
-        </Grid>
-      </Grid>
-    );
   }
 
   if (rmp.data.numRatings == 0) {
@@ -189,5 +191,3 @@ function SingleProfInfo({ rmp }: Props) {
     </Grid>
   );
 }
-
-export default SingleProfInfo;

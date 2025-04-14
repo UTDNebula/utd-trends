@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Autocomplete,
   Button,
@@ -7,7 +9,7 @@ import {
 } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
-import { useRouter } from 'next/router';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { type Key, useEffect, useRef, useState } from 'react';
 
 import {
@@ -63,16 +65,17 @@ const SearchBar = ({
   const [value, setValue] = useState<SearchQuery[]>([]);
 
   //set value from query
-  const router = useRouter();
+  const searchParams = useSearchParams();
+  const searchTerms = searchParams.get('searchTerms');
   useEffect(() => {
-    if (router.isReady && typeof router.query.searchTerms !== 'undefined') {
-      let array = router.query.searchTerms;
+    if (searchTerms !== 'undefined') {
+      let array = searchTerms;
       if (!Array.isArray(array)) {
         array = array.split(',');
       }
       setValue(array.map((el) => decodeSearchQueryLabel(el)));
     }
-  }, [router.isReady, router.query.searchTerms]); // useEffect is called every time the query changes
+  }, [searchTerms]); // useEffect is called every time the query changes
 
   // updateValue -> onSelect_internal -> updateQueries - clicking enter on an autocomplete suggestion in TopMenu Searchbar
   // updateValue -> onSelect_internal -> onSelect (custom function) - clicking enter on an autocomplete suggestion in home page SearchBar
@@ -95,10 +98,7 @@ const SearchBar = ({
 
   //update parent and queries
   function onSelect_internal(newValue: SearchQuery[]) {
-    if (
-      router.query.searchTerms ==
-      newValue.map((el) => searchQueryLabel(el)).join(',')
-    )
+    if (searchTerms == newValue.map((el) => searchQueryLabel(el)).join(','))
       // do not initiate a new search when the searchTerms haven't changed
       return;
     setErrorTooltip(!newValue.length);
@@ -113,25 +113,21 @@ const SearchBar = ({
     }
   }
 
+  const router = useRouter();
+  const pathname = usePathname();
+
   //update url with what's in value
   async function updateQueries(newValue: SearchQuery[]) {
-    if (typeof manageQuery !== 'undefined' && router.isReady) {
-      const newQuery = router.query;
-      if (newValue.length > 0) {
-        newQuery.searchTerms = newValue
-          .map((el) => searchQueryLabel(el))
-          .join(',');
-      } else {
-        delete newQuery.searchTerms;
-      }
-      router.push(
-        {
-          query: router.query,
-        },
-        undefined,
-        { shallow: true },
+    const params = new URLSearchParams(searchParams.toString());
+    if (newValue.length > 0) {
+      params.set(
+        'searchTerms',
+        newValue.map((el) => searchQueryLabel(el)).join(','),
       );
+    } else {
+      params.delete('searchTerms');
     }
+    router.push(`${pathname}?${params.toString()}`);
   }
 
   //fetch new options, add tags if valid

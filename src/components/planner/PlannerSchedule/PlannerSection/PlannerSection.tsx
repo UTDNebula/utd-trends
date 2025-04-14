@@ -1,17 +1,17 @@
 import React from 'react';
 
-import type { SectionsData } from '@/pages/api/sections';
+import type { Sections } from '@/modules/fetchSections';
 import { type SearchQuery } from '@/types/SearchQuery';
 
 import { DAYS, START_HOUR } from './PlannerSchedule';
 
-type PlannerSectionComponentProps = {
-  selectedSection: SectionsData[number] | undefined;
+interface PlannerSectionComponentProps {
+  selectedSection: Sections[number] | undefined;
   course: SearchQuery;
   color: { fill: string; outline: string; font: string };
-};
+}
 
-const PlannerSection = (props: PlannerSectionComponentProps) => {
+export default function PlannerSection(props: PlannerSectionComponentProps) {
   const selectedSection = props.selectedSection;
   if (typeof selectedSection === 'undefined') {
     return null;
@@ -125,5 +125,4 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
       </div>
     );
   });
-};
-export default PlannerSection;
+}

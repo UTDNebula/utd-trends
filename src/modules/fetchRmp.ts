@@ -1,4 +1,5 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import { type SearchQuery } from '@/types/SearchQuery';
 
 const RMP_GRAPHQL_URL = 'https://www.ratemyprofessors.com/graphql';
 const SCHOOL_ID = '1273';
@@ -62,10 +63,12 @@ function getGraphQlUrlProp(name: string) {
     method: 'POST',
     headers: HEADERS,
     body: JSON.stringify(PROFESSOR_SEARCH_QUERY),
+    cache: 'force-cache',
+    next: { revalidate: 3600 },
   };
 }
 
-export interface RMPInterface {
+export interface RMP {
   id: string;
   legacyId: string;
   firstName: string;
@@ -93,22 +96,10 @@ export interface RMPInterface {
   };
 }
 
-type Data = {
-  message: string;
-  data?: RMPInterface;
-};
-
-export default function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>,
-) {
-  const profFirst = req.query.profFirst;
-  const profLast = req.query.profLast;
-  if (typeof profFirst !== 'string' || typeof profLast !== 'string') {
-    res.status(400).json({ message: 'Incorrect query present' });
-    return;
-  }
-  return new Promise<void>((resolve) => {
+export default async function fetchRmp(
+  query: SearchQuery,
+): Promise<GenericFetchedData<RMP>> {
+  try {
     const singleProfFirst = profFirst.split(' ')[0];
     const name = singleProfFirst + ' ' + profLast;
 
@@ -116,47 +107,41 @@ export default function handler(
     const graphQlUrlProp = getGraphQlUrlProp(name);
 
     // fetch professor info by name with graphQL
-    fetch(RMP_GRAPHQL_URL, graphQlUrlProp)
-      .then((response) => response.json())
-      .then((response) => {
-        if (
-          response == null ||
-          !Object.hasOwn(response, 'data') ||
-          !Object.hasOwn(response.data, 'newSearch') ||
-          !Object.hasOwn(response.data.newSearch, 'teachers') ||
-          !Object.hasOwn(response.data.newSearch.teachers, 'edges')
-        ) {
-          res.status(400).json({ message: 'Data for professor not found' });
-          resolve();
-          return;
-        }
-        //Remove profs not at UTD and with bad name match
-        const professors = response.data.newSearch.teachers.edges.filter(
-          (prof: { node: RMPInterface }) =>
-            prof.node.school.name === SCHOOL_NAME &&
-            prof.node.firstName.includes(singleProfFirst) &&
-            prof.node.lastName.includes(profLast),
-        );
-        //Pick prof instance with most ratings
-        let maxRatingsProfessor = professors[0];
-        for (let i = 1; i < professors.length; i++) {
-          if (
-            professors[i].node.numRatings > maxRatingsProfessor.node.numRatings
-          ) {
-            maxRatingsProfessor = professors[i];
-          }
-        }
-        res.status(200).json({
-          message: 'success',
-          data: maxRatingsProfessor.node,
-        });
-        resolve();
-        return;
-      })
-      .catch((error) => {
-        res.status(400).json({ message: error.message });
-        resolve();
-        return;
-      });
-  });
+    const res = await fetch(RMP_GRAPHQL_URL, graphQlUrlProp);
+
+    const data = await res.json();
+
+    if (
+      data == null ||
+      !Object.hasOwn(data, 'data') ||
+      !Object.hasOwn(data.data, 'newSearch') ||
+      !Object.hasOwn(data.data.newSearch, 'teachers') ||
+      !Object.hasOwn(data.data.newSearch.teachers, 'edges')
+    ) {
+      throw new Error('Data for professor not found');
+    }
+    //Remove profs not at UTD and with bad name match
+    const professors = data.data.newSearch.teachers.edges.filter(
+      (prof: { node: RMPInterface }) =>
+        prof.node.school.name === SCHOOL_NAME &&
+        prof.node.firstName.includes(singleProfFirst) &&
+        prof.node.lastName.includes(profLast),
+    );
+    //Pick prof instance with most ratings
+    let maxRatingsProfessor = professors[0];
+    for (let i = 1; i < professors.length; i++) {
+      if (professors[i].node.numRatings > maxRatingsProfessor.node.numRatings) {
+        maxRatingsProfessor = professors[i];
+      }
+    }
+    return {
+      message: 'success',
+      data: maxRatingsProfessor.node,
+    };
+  } catch (error) {
+    return {
+      message:
+        error instanceof Error ? error.message : 'An unknown error occurred',
+    };
+  }
 }

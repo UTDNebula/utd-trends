@@ -1,12 +1,14 @@
+'use client';
+
 import BarChartIcon from '@mui/icons-material/BarChart';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import React, { type ReactElement, useState } from 'react';
+import React, { type ReactNode, useState } from 'react';
 
 type Props = {
   state: string;
-  bar?: ReactElement;
-  line?: ReactElement;
+  bar?: ReactNode;
+  line?: ReactNode;
 };
 
 function GraphToggle(props: Props) {

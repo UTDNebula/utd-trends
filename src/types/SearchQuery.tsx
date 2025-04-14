@@ -187,3 +187,10 @@ export function decodeSearchQueryLabel(encodedSearchTerm: string): SearchQuery {
     };
   }
 }
+
+function removeDuplicates(array: SearchQuery[]) {
+  return array.filter(
+    (obj1, index, self) =>
+      index === self.findIndex((obj2) => searchQueryEqual(obj1, obj2)),
+  );
+}
