@@ -93,7 +93,7 @@ export const MyPlanner: NextPage<Props> = (props: Props): React.ReactNode => {
     fetchAndStoreSectionsData.current = props.fetchAndStoreSectionsData;
   }, [props.fetchAndStoreSectionsData]);
   useEffect(() => {
-    console.log('hi');
+    // console.log('hi');
     if (planner.length) {
       //To cancel on rerender
       const controller = new AbortController();
