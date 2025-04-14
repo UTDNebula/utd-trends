@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import Rating from '@/components/common/Rating/Rating';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
@@ -21,7 +21,6 @@ const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
 
 interface FiltersProps {
-  manageQuery?: boolean;
   academicSessions: string[];
   chosenSessions: string[];
   addChosenSessions: (arg0: (arg0: string[]) => string[]) => void;
@@ -31,35 +30,24 @@ interface FiltersProps {
  * This component returns a set of filters with which to sort results.
  */
 const Filters = ({
-  manageQuery,
   academicSessions,
   chosenSessions,
   addChosenSessions,
 }: FiltersProps) => {
-  const [minGPA, setMinGPA] = useState('');
-  const [minRating, setMinRating] = useState('');
-  const [filterNextSem, setFilterNextSem] = useState('false');
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
   academicSessions.sort((a, b) => compareSemesters(b, a)); // display the semesters in order of recency (most recent first)
 
-  //set value from query
   const router = useRouter();
-  useEffect(() => {
-    if (manageQuery) {
-      if (router.isReady && typeof router.query.searchTerms !== 'undefined') {
-        if (typeof router.query.minGPA === 'string') {
-          setMinGPA(router.query.minGPA);
-        }
-        if (typeof router.query.minRating === 'string') {
-          setMinRating(router.query.minRating);
-        }
-        if (typeof router.query.availability === 'string') {
-          setFilterNextSem(router.query.availability);
-        }
-      }
-    }
-  }, [router.isReady, router.query.minGPA, router.query.minRating]);
+  let minGPA = router.query.minGPA ?? '';
+  if (Array.isArray(minGPA)) {
+    minGPA = minGPA[0]; // if minGPA is an array, make it a string
+  }
+  let minRating = router.query.minRating ?? '';
+  if (Array.isArray(minRating)) {
+    minRating = minRating[0]; // if minRating is an array, make it a string
+  }
+  const filterNextSem = router.query.availability === 'true';
 
   function getRecentSemesters() {
     // get current month and year
@@ -89,30 +77,6 @@ const Filters = ({
     }
 
     return recentSemesters.filter((value) => academicSessions.includes(value));
-  }
-
-  //Update URL, state, and parent
-  async function onChange(
-    newValue: string,
-    toSet: 'minGPA' | 'minRating' | 'availability',
-    setter: (value: string) => void,
-  ) {
-    setter(newValue);
-    if (manageQuery && router.isReady) {
-      const newQuery = { ...router.query };
-      if (newValue !== '') {
-        newQuery[toSet] = newValue;
-      } else {
-        delete newQuery[toSet];
-      }
-      await router.replace(
-        {
-          query: newQuery,
-        },
-        undefined,
-        { shallow: true },
-      );
-    }
   }
 
   function displayAcademicSessionName(id: string) {
@@ -161,8 +125,23 @@ const Filters = ({
               label="Min Letter Grade"
               labelId="minGPA"
               value={minGPA}
-              onChange={async (event: SelectChangeEvent) => {
-                await onChange(event.target.value, 'minGPA', setMinGPA);
+              onChange={(event: SelectChangeEvent) => {
+                if (router.isReady) {
+                  const newQuery = { ...router.query };
+                  const newValue = event.target.value;
+                  if (newValue !== '') {
+                    newQuery.minGPA = newValue;
+                  } else {
+                    delete newQuery.minGPA;
+                  }
+                  router.replace(
+                    {
+                      query: newQuery,
+                    },
+                    undefined,
+                    { shallow: true },
+                  );
+                }
               }}
             >
               <MenuItem className="h-10" value="">
@@ -195,8 +174,23 @@ const Filters = ({
               label="Min Rating"
               labelId="minRating"
               value={minRating}
-              onChange={async (event: SelectChangeEvent) => {
-                await onChange(event.target.value, 'minRating', setMinRating);
+              onChange={(event: SelectChangeEvent) => {
+                if (router.isReady) {
+                  const newQuery = { ...router.query };
+                  const newValue = event.target.value;
+                  if (newValue !== '') {
+                    newQuery.minRating = newValue;
+                  } else {
+                    delete newQuery.minRating;
+                  }
+                  router.replace(
+                    {
+                      query: newQuery,
+                    },
+                    undefined,
+                    { shallow: true },
+                  );
+                }
               }}
               renderValue={(value) => (
                 <Rating
@@ -341,7 +335,7 @@ const Filters = ({
           <FormControl
             size="small"
             className={`${
-              filterNextSem === 'true'
+              filterNextSem
                 ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
                 : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
             }`}
@@ -349,13 +343,23 @@ const Filters = ({
             <FormControlLabel
               control={
                 <Switch
-                  checked={filterNextSem === 'true'}
+                  checked={filterNextSem}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    onChange(
-                      event.target.checked ? 'true' : 'false',
-                      'availability',
-                      setFilterNextSem,
-                    );
+                    if (router.isReady) {
+                      const newQuery = { ...router.query };
+                      if (event.target.checked) {
+                        newQuery.availability = 'true';
+                      } else {
+                        delete newQuery.availability;
+                      }
+                      router.replace(
+                        {
+                          query: newQuery,
+                        },
+                        undefined,
+                        { shallow: true },
+                      );
+                    }
                   }}
                 />
               }

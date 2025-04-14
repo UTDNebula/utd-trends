@@ -78,7 +78,11 @@ export default function Page(props: Props) {
     <>
       <TopMenu isPlanner={false} />
       <main className="p-4">
-        <Filters />
+        <Filters
+          academicSessions={[]}
+          chosenSessions={[]}
+          addChosenSessions={(arg0: (arg0: string[]) => {}) => {}}
+        />
         <Split
           left={
             <Suspense fallback={<LoadingServerLeft />}>
