@@ -1,7 +1,11 @@
 import { writeFileSync } from 'fs';
 
 import aggregatedData from '../data/aggregated_data.json';
-import { type SearchQuery } from '../types/SearchQuery';
+import {
+  convertToCourseOnly,
+  type SearchQuery,
+  searchQueryLabel,
+} from '../types/SearchQuery';
 
 export type TableType = { [key: string]: SearchQuery[] };
 
@@ -36,3 +40,20 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
 writeFileSync('src/data/course_name_table.json', JSON.stringify(table));
 
 console.log('Course name table generation done.');
+
+const reverseTable: { [key: string]: string } = {};
+for (const [title, queries] of Object.entries(table)) {
+  for (const query of queries) {
+    if (query.prefix && query.number) {
+      const key = searchQueryLabel(convertToCourseOnly(query));
+      reverseTable[key] = title;
+    }
+  }
+}
+
+writeFileSync(
+  'src/data/course_prefix_number_table.json',
+  JSON.stringify(reverseTable),
+);
+
+console.log('Course prefix-number table generation done.');
