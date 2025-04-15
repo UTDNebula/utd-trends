@@ -85,7 +85,7 @@ export default function PlannerCoursesTable() {
                     sections[searchQueryLabel(removeSection(single))];
                   if (
                     typeof singleSectionData === 'undefined' ||
-                    singleSectionData.message === 'success'
+                    singleSectionData.message !== 'success'
                   ) {
                     return undefined;
                   }
