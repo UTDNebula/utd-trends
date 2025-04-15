@@ -92,11 +92,9 @@ export default async function Page({ searchParams }: Props) {
             </Suspense>
           }
           right={
-            <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto mt-4">
-              <Suspense fallback={<LoadingRight />}>
-                <Right courses={courses} professors={professors} />
-              </Suspense>
-            </div>
+            <Suspense fallback={<LoadingRight />}>
+              <Right courses={courses} professors={professors} />
+            </Suspense>
           }
           minLeft={40}
           minRight={30}

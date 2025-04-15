@@ -56,7 +56,9 @@ export default function Split(props: Props) {
           defaultSize={100 - props.defaultLeft}
           data-tutorial-id="RHS"
         >
-          {props.right}
+          <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto mt-4">
+            {props.right}
+          </div>
         </Panel>
       </PanelGroup>
     </>
