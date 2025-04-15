@@ -102,9 +102,7 @@ async function fetchSingleSections(
         });
     }
 
-    const res = await recursiveFetch(url, 0);
-
-    const data = await res.json();
+    const data = await recursiveFetch(url, 0);
 
     return {
       message: 'success',
@@ -121,38 +119,49 @@ async function fetchSingleSections(
 export default async function fetchSections(
   query: SearchQuery,
 ): Promise<GenericFetchedData<Sections>> {
-  const seperatedCombo = [convertToCourseOnly(query), convertToProfOnly(query)]
-    //Remove empty objects (for non combos)
-    .filter((obj) => Object.keys(obj).length !== 0);
-  //Call each
-  const data = await Promise.all(
-    seperatedCombo.map((query) => fetchSingleSections(query, controller)),
-  );
-  if (data[0].message !== 'success') {
-    return { message: data[0].message };
-  }
-  if (data[1] && data[1].message !== 'success') {
-    return { message: data[1].message };
-  }
-
-  //Find intersection of all course sections and all professor sections
-  let intersection: Sections = [];
-  if (data.length === 1) {
-    intersection = data[0];
-  } else if (data.length === 2) {
-    intersection = data[0].filter(
-      (value) => data[1].findIndex((val) => val._id === value._id) !== -1,
+  try {
+    const seperatedCombo = [
+      convertToCourseOnly(query),
+      convertToProfOnly(query),
+    ]
+      //Remove empty objects (for non combos)
+      .filter((obj) => Object.keys(obj).length !== 0);
+    //Call each
+    const data = await Promise.all(
+      seperatedCombo.map((query) => fetchSingleSections(query)),
     );
+    if (data[0].message !== 'success') {
+      return { message: data[0].message };
+    }
+    if (data[1] && data[1].message !== 'success') {
+      return { message: data[1].message };
+    }
+
+    //Find intersection of all course sections and all professor sections
+    let intersection: Sections = [];
+    if (data.length === 1) {
+      intersection = data[0].data;
+    } else if (data.length === 2) {
+      intersection = data[0].data.filter(
+        (value) =>
+          data[1].data.findIndex((val) => val._id === value._id) !== -1,
+      );
+    }
+    //Filter to only latestSemester
+    const latest = intersection.filter(
+      (section) => section.academic_session.name === '25F', /// CHANGE BACK: latestSemester.current,
+    );
+    return {
+      message: 'success',
+      data: {
+        all: intersection,
+        latest: latest,
+      },
+    };
+  } catch (error) {
+    return {
+      message:
+        error instanceof Error ? error.message : 'An unknown error occurred',
+    };
   }
-  //Filter to only latestSemester
-  const latest = intersection.filter(
-    (section) => section.academic_session.name === '25F', /// CHANGE BACK: latestSemester.current,
-  );
-  return {
-    message: 'success',
-    data: {
-      all: intersection,
-      latest: latest,
-    },
-  };
 }

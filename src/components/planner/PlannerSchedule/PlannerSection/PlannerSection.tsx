@@ -1,9 +1,11 @@
 import React from 'react';
 
+import {
+  DAYS,
+  START_HOUR,
+} from '@/components/planner/PlannerSchedule/PlannerSchedule';
 import type { Sections } from '@/modules/fetchSections';
 import { type SearchQuery } from '@/types/SearchQuery';
-
-import { DAYS, START_HOUR } from './PlannerSchedule';
 
 interface PlannerSectionComponentProps {
   selectedSection: Sections[number] | undefined;

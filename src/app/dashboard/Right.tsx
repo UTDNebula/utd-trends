@@ -3,9 +3,7 @@ import React from 'react';
 
 import Compare from '@/components/compare/Compare/Compare';
 import Carousel from '@/components/navigation/Carousel/Carousel';
-import CourseOverview, {
-  LoadingCourseOverview,
-} from '@/components/overview/CourseOverview/CourseOverview';
+import CourseOverview from '@/components/overview/CourseOverview/CourseOverview';
 import ProfessorOverview, {
   LoadingProfessorOverview,
 } from '@/components/overview/ProfessorOverview/ProfessorOverview';
@@ -15,31 +13,23 @@ import fetchProfessor from '@/modules/fetchProfessor';
 import fetchRmp from '@/modules/fetchRmp';
 import { type SearchQuery } from '@/types/SearchQuery';
 
-interface Props {
-  courses: SearchQuery[];
-  professors: SearchQuery[];
-}
-
-export function LoadingRight(props: Props) {
-  //Add RHS tabs, only add overview tab if one course/prof
-  const names = [];
-  const tabs = [];
-  if (props.professors.length === 1) {
-    names.push('Professor');
-    tabs.push(<LoadingProfessorOverview key="professor" />);
-  }
-  if (props.courses.length === 1) {
-    names.push('Class');
-    tabs.push(<LoadingCourseOverview key="course" />);
-  }
-  names.push('Compare');
-  tabs.push(<Compare key="compare" />);
+export function LoadingRight() {
+  const names = ['Professor', 'Compare'];
+  const tabs = [
+    <LoadingProfessorOverview key="professor" />,
+    <Compare key="compare" />,
+  ];
 
   return (
     <Card>
       <Carousel names={names}>{tabs}</Carousel>
     </Card>
   );
+}
+
+interface Props {
+  courses: SearchQuery[];
+  professors: SearchQuery[];
 }
 
 /**

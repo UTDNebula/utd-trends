@@ -1,14 +1,10 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import SearchResultsTable from '@/components/search/SearchResultsTable/SearchResultsTable';
-import type { Grades } from '@/modules/fetchGrades';
-import type { RMP } from '@/modules/fetchRmp';
-import type { Sections } from '@/modules/fetchSections';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToProfOnly,
   type SearchQuery,
@@ -18,22 +14,13 @@ import {
 interface Props {
   numSearches: number;
   results: SearchQuery[];
-  grades: { [key: string]: GenericFetchedData<Grades> };
-  rmp: { [key: string]: GenericFetchedData<RMP> };
-  sections: { [key: string]: GenericFetchedData<Sections> };
 }
 
 /**
  * Returns the left side
  */
 export default function ClientLeft(props: Props) {
-  const { grades, setGrades, rmp, setRmp, sections, setSections } =
-    useSharedState();
-  useEffect(() => {
-    setGrades(props.grades);
-    setRmp(props.rmp);
-    setSections(props.sections);
-  }, []);
+  const { grades, rmp, sections } = useSharedState();
 
   const searchParams = useSearchParams();
 

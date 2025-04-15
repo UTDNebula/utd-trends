@@ -92,11 +92,7 @@ function LoadingRow() {
   );
 }
 
-export function LoadingSearchResultsTable({
-  resultsLength,
-}: {
-  resultsLength: number;
-}) {
+export function LoadingSearchResultsTable() {
   return (
     //TODO: sticky header
     <>
@@ -136,7 +132,7 @@ export function LoadingSearchResultsTable({
             </TableRow>
           </TableHead>
           <TableBody>
-            {Array(resultsLength)
+            {Array(20)
               .fill(0)
               .map((_, index) => (
                 <LoadingRow key={index} />
@@ -181,7 +177,9 @@ function Row({
 }: RowProps) {
   // Check if the course section has the latest semester data
   const hasLatestSemester = !!(
-    section.message === 'success' && section.data.latest.length
+    typeof section !== 'undefined' &&
+    section.message === 'success' &&
+    section.data.latest.length
   );
 
   const [open, setOpen] = useState(false);
@@ -250,23 +248,30 @@ function Row({
           data-tutorial-id={showTutorial && 'actions'}
         >
           <div className="flex items-center gap-1">
-            <Tooltip
-              title={open ? 'Minimize Result' : 'Expand Result'}
-              placement="top"
-            >
-              <IconButton
-                aria-label="expand row"
-                size="medium"
-                disabled={!canOpen}
-                onClick={(e) => {
-                  e.stopPropagation(); // prevents double opening/closing
-                  if (canOpen) setOpen(!open);
-                }}
-                className={'transition-transform' + (open ? ' rotate-90' : '')}
+            {canOpen ? (
+              <Tooltip
+                title={open ? 'Minimize Result' : 'Expand Result'}
+                placement="top"
               >
+                <IconButton
+                  aria-label="expand row"
+                  size="medium"
+                  onClick={(e) => {
+                    e.stopPropagation(); // prevents double opening/closing
+                    if (canOpen) setOpen(!open);
+                  }}
+                  className={
+                    'transition-transform' + (open ? ' rotate-90' : '')
+                  }
+                >
+                  <KeyboardArrowIcon fontSize="inherit" />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <IconButton aria-label="expand row" size="medium" disabled>
                 <KeyboardArrowIcon fontSize="inherit" />
               </IconButton>
-            </Tooltip>
+            )}
             <Tooltip
               title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
               placement="top"

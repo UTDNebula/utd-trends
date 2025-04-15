@@ -57,13 +57,13 @@ export default function PlannerCoursesTable() {
         My Planner
       </Typography>
       <div className="flex flex-col gap-4 mb-4 sm:mb-0">
-        {planner.map((course, index) => {
-          const sectionData = sections[searchQueryLabel(removeSection(course))];
+        {planner.map((query, index) => {
+          const sectionData = sections[searchQueryLabel(removeSection(query))];
 
           return (
             <PlannerCard
               key={index}
-              query={course}
+              query={query}
               sections={
                 typeof sectionData !== 'undefined' &&
                 sectionData.message === 'success'
@@ -71,33 +71,33 @@ export default function PlannerCoursesTable() {
                   : undefined
               }
               setPlannerSection={setPlannerSection}
-              grades={grades[searchQueryLabel(removeSection(course))]}
-              rmp={rmp[searchQueryLabel(convertToProfOnly(course))]}
+              grades={grades[searchQueryLabel(removeSection(query))]}
+              rmp={rmp[searchQueryLabel(convertToProfOnly(query))]}
               removeFromPlanner={() => {
-                removeFromPlanner(course);
+                removeFromPlanner(query);
               }}
               selectedSections={planner
                 .flatMap((searchQuery) =>
                   searchQueryMultiSectionSplit(searchQuery),
                 )
-                .map((course) => {
-                  const sections =
-                    sections[searchQueryLabel(removeSection(course))];
+                .map((single) => {
+                  const singleSectionData =
+                    sections[searchQueryLabel(removeSection(single))];
                   if (
-                    typeof sections === 'undefined' ||
-                    sections.message !== 'success'
+                    typeof singleSectionData === 'undefined' ||
+                    singleSectionData.message !== 'success'
                   ) {
                     return undefined;
                   }
-                  return sections.data.latest.find(
+                  return singleSectionData.data.latest.find(
                     (section) =>
-                      section.section_number === course.sectionNumber,
+                      section.section_number === single.sectionNumber,
                   );
                 })
                 .filter((section) => typeof section !== 'undefined')}
               openConflictMessage={() => setOpenConflictMessage(true)}
               color={
-                plannerColorMap[searchQueryLabel(convertToCourseOnly(course))]
+                plannerColorMap[searchQueryLabel(convertToCourseOnly(query))]
               }
             />
           );

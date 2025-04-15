@@ -50,21 +50,21 @@ export const SharedStateProvider = ({
 }) => {
   const [grades, setGrades] = useState<{
     [key: string]: GenericFetchedData<Grades>;
-  }>([]);
+  }>({});
   const [rmp, setRmp] = useState<{ [key: string]: GenericFetchedData<RMP> }>(
-    [],
+    {},
   );
   const [sections, setSections] = useState<{
     [key: string]: GenericFetchedData<Sections>;
-  }>([]);
+  }>({});
 
   const [compare, setCompare] = useState<SearchQuery[]>([]);
   const [compareGrades, setCompareGrades] = useState<{
     [key: string]: GenericFetchedData<Grades>;
-  }>([]);
+  }>({});
   const [compareRmp, setCompareRmp] = useState<{
     [key: string]: GenericFetchedData<RMP>;
-  }>([]);
+  }>({});
 
   //Add a course+prof combo to compare (happens from search results)
   //copy over data basically

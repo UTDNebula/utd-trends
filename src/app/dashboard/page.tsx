@@ -5,10 +5,11 @@ import Split from '@/components/common/Split/Split';
 import DashboardEmpty from '@/components/dashboard/DashboardEmpty/DashboardEmpty';
 import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import Filters from '@/components/search/Filters/Filters';
+import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
 import { decodeSearchQueryLabel, searchQueryLabel } from '@/types/SearchQuery';
 
 import Right, { LoadingRight } from './Right';
-import ServerLeft, { LoadingServerLeft } from './ServerLeft';
+import ServerLeft from './ServerLeft';
 
 interface Props {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -81,11 +82,7 @@ export default async function Page({ searchParams }: Props) {
         <Filters />
         <Split
           left={
-            <Suspense
-              fallback={
-                <LoadingServerLeft courses={courses} professors={professors} />
-              }
-            >
+            <Suspense fallback={<LoadingSearchResultsTable />}>
               <ServerLeft courses={courses} professors={professors} />
             </Suspense>
           }

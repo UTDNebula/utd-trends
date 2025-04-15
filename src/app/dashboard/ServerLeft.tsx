@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
 import comboTable from '@/data/combo_table.json';
 import fetchGrades from '@/modules/fetchGrades';
 import fetchRmp from '@/modules/fetchRmp';
@@ -14,6 +13,7 @@ import {
 } from '@/types/SearchQuery';
 
 import ClientLeft from './ClientLeft';
+import SyncServerDataToContext from './SyncServerDataToContext';
 
 //Get all course+prof combos for searchTerms and keep only the ones that match filterTerms
 //When filterTerms is blank, just gets all searchTerms
@@ -24,8 +24,14 @@ function fetchSearchResults(
 ) {
   return searchTerms
     .flatMap((searchTerm) =>
-      [searchTerm].concat(comboTable[searchQueryLabel(searchTerm)]),
+      [searchTerm].concat(
+        comboTable[searchQueryLabel(searchTerm)].map((combo) => ({
+          ...searchTerm,
+          ...combo,
+        })),
+      ),
     )
+
     .filter(
       (searchTerm) =>
         !filterTerms.length ||
@@ -38,21 +44,6 @@ function fetchSearchResults(
 interface Props {
   courses?: SearchQuery[];
   professors?: SearchQuery[];
-}
-
-export function LoadingServerLeft(props: Props) {
-  let resultsLength = 20;
-  if (typeof props.courses !== 'undefined' && typeof props.professors !== 'undefined') {
-    let results: SearchQuery[] = [];
-    if (props.courses.length > 0) {
-      results = fetchSearchResults(props.courses, props.professors);
-    } else if (props.professors.length > 0) {
-      results = fetchSearchResults(props.professors, []);
-    }
-    resultsLength = results.length;
-  }
-
-  return <LoadingSearchResultsTable resultsLength={resultsLength} />;
 }
 
 /**
@@ -89,33 +80,33 @@ export default async function ServerLeft(props: Props) {
     results.map((result) => [searchQueryLabel(result), fetchSections(result)]),
   );
 
-  const [gradesResults, rmpResults, sectionsResults] = await Promise.allSettled(
-    [
-      Promise.allSettled(Object.values(gradesPromises)),
-      Promise.allSettled(Object.values(rmpPromises)),
-      Promise.allSettled(Object.values(sectionsPromises)),
-    ],
-  );
+  const [gradesResults, rmpResults, sectionsResults] = await Promise.all([
+    Promise.allSettled(Object.values(gradesPromises)),
+    Promise.allSettled(Object.values(rmpPromises)),
+    Promise.allSettled(Object.values(sectionsPromises)),
+  ]);
 
   const gradesKeys = Object.keys(gradesPromises);
   const rmpKeys = Object.keys(rmpPromises);
   const sectionsKeys = Object.keys(sectionsPromises);
 
   const grades = Object.fromEntries(
-    gradesKeys.map((key, i) => [key, gradesResults[i]]),
+    gradesKeys.map((key, i) => [key, gradesResults[i].value]),
   );
-  const rmp = Object.fromEntries(rmpKeys.map((key, i) => [key, rmpResults[i]]));
+  const rmp = Object.fromEntries(
+    rmpKeys.map((key, i) => [key, rmpResults[i].value]),
+  );
   const sections = Object.fromEntries(
-    sectionsKeys.map((key, i) => [key, sectionsResults[i]]),
+    sectionsKeys.map((key, i) => [key, sectionsResults[i].value]),
   );
 
   return (
-    <ClientLeft
-      numSearches={props.courses.length + props.professors.length}
-      results={results}
-      grades={grades}
-      rmp={rmp}
-      sections={sections}
-    />
+    <>
+      <SyncServerDataToContext grades={grades} rmp={rmp} sections={sections} />
+      <ClientLeft
+        numSearches={props.courses.length + props.professors.length}
+        results={results}
+      />
+    </>
   );
 }

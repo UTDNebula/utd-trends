@@ -6,6 +6,7 @@ import {
   convertToCourseOnly,
   removeSection,
   searchQueryLabel,
+  searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
 
 // hours shown (24-hour time)

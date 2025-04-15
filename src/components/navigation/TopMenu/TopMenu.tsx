@@ -74,6 +74,13 @@ export function TopMenu(props: Props) {
   }, []);
   const cacheIndex = 0; //Increment this to open the popup for all users on next deployment
 
+  const [dashboardSearchTerms, setDashboardSearchTerms] = useState(null);
+  useEffect(() => {
+    setDashboardSearchTerms(
+      window.sessionStorage.getItem('dashboardSearchTerms'),
+    );
+  }, []);
+
   return (
     <>
       <div className="relative overflow-hidden flex items-center gap-y-0 gap-x-2 md:gap-x-4 lg:gap-x-8 py-1 md:py-2 px-4 md:px-8 lg:px-16 bg-lighten dark:bg-darken flex-wrap sm:flex-nowrap">
@@ -100,9 +107,8 @@ export function TopMenu(props: Props) {
         <Link
           href={
             props.isPlanner
-              ? typeof sessionStorage !== 'undefined' &&
-                sessionStorage.getItem('dashboardSearchTerms')
-                ? '/dashboard?' + sessionStorage.getItem('dashboardSearchTerms')
+              ? dashboardSearchTerms != null
+                ? '/dashboard?' + dashboardSearchTerms
                 : '/dashboard'
               : '/planner'
           }
