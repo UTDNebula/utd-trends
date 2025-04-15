@@ -3,12 +3,12 @@
 import BarChartIcon from '@mui/icons-material/BarChart';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import React, { type ReactNode, useState } from 'react';
+import React, { useState } from 'react';
 
 type Props = {
   state: string;
-  bar?: ReactNode;
-  line?: ReactNode;
+  bar?: React.ReactNode;
+  line?: React.ReactNode;
 };
 
 export default function GraphToggle(props: Props) {

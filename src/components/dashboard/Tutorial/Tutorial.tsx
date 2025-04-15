@@ -3,7 +3,7 @@
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import { Backdrop, Button, Checkbox, IconButton, Popover } from '@mui/material';
-import React, { type ReactNode, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 type TutorialPopupProps = {
   element: Element;
@@ -20,7 +20,7 @@ type TutorialPopupProps = {
     vertical: 'center' | 'bottom' | 'top';
     horizontal: 'center' | 'left' | 'right';
   };
-  children: ReactNode;
+  children: React.ReactNode;
 };
 
 const TutorialPopup = ({
@@ -93,7 +93,7 @@ type StepTemplate = {
   id: string;
   element?: Element;
   title: string;
-  content: ReactNode;
+  content: React.ReactNode;
   anchorOrigin: {
     vertical: 'center' | 'bottom' | 'top';
     horizontal: 'center' | 'left' | 'right';
