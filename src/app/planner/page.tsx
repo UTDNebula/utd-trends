@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: 'My Planner',
   description:
     "Choose the perfect classes for you: Nebula Labs's schedule planner to help you build an informed schedule with UT Dallas grade and Rate My Professors data.",
+  openGraph: {
+    url: 'https://rooms.utdnebula.com/planner',
+  },
 };
 
 /**

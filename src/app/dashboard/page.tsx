@@ -45,6 +45,9 @@ export async function generateMetadata({
   return {
     title: 'Results' + title,
     description: description,
+    openGraph: {
+      url: 'https://trends.utdnebula.com/dashboard',
+    },
   };
 }
 
