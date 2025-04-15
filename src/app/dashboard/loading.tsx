@@ -10,7 +10,7 @@ import { LoadingRight } from './Right';
 /**
  * Returns the loading results page
  */
-export default async function Page() {
+export default function Page() {
   return (
     <>
       <TopMenu isPlanner={false} />

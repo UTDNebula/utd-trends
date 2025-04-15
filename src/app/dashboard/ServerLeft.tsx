@@ -4,6 +4,8 @@ import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTabl
 import rawComboTable from '@/data/combo_table.json';
 import fetchAll from '@/modules/fetchAll';
 import {
+  convertToCourseOnly,
+  convertToProfOnly,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
@@ -30,12 +32,13 @@ function fetchSearchResults(
         })),
       ),
     )
-
     .filter(
       (searchTerm) =>
         !filterTerms.length ||
-        filterTerms.find((filterTerm) =>
-          searchQueryEqual(searchTerm, filterTerm),
+        filterTerms.find(
+          (filterTerm) =>
+            searchQueryEqual(convertToCourseOnly(searchTerm), filterTerm) ||
+            searchQueryEqual(convertToProfOnly(searchTerm), filterTerm),
         ),
     );
 }
