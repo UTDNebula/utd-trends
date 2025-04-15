@@ -1,7 +1,7 @@
-import { Skeleton } from '@mui/material';
 import React from 'react';
 
 import Split from '@/components/common/Split/Split';
+import StickySide from '@/components/common/Split/StickySide';
 import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import { LoadingFilters } from '@/components/search/Filters/Filters';
 import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
@@ -19,7 +19,11 @@ export default function Page() {
         <LoadingFilters />
         <Split
           left={<LoadingSearchResultsTable />}
-          right={<LoadingRight />}
+          right={
+            <StickySide>
+              <LoadingRight />
+            </StickySide>
+          }
           minLeft={40}
           minRight={30}
           defaultLeft={50}

@@ -4,6 +4,7 @@ import React from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import Split from '@/components/common/Split/Split';
+import StickySide from '@/components/common/Split/StickySide';
 import PlannerCoursesTable, {
   LoadingPlannerCoursesTable,
 } from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
@@ -27,7 +28,11 @@ export default function Planner() {
           <PlannerCoursesTable />
         )
       }
-      right={<PlannerSchedule />}
+      right={
+        <StickySide>
+          <PlannerSchedule />
+        </StickySide>
+      }
       minLeft={30}
       minRight={50}
       defaultLeft={40}

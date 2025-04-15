@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import React, { Suspense } from 'react';
 
 import Split from '@/components/common/Split/Split';
+import StickySide from '@/components/common/Split/StickySide';
 import DashboardEmpty from '@/components/dashboard/DashboardEmpty/DashboardEmpty';
 import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import Filters, { LoadingFilters } from '@/components/search/Filters/Filters';
@@ -92,13 +93,15 @@ export default async function Page({ searchParams }: Props) {
             </Suspense>
           }
           right={
-            <Suspense
-              fallback={
-                <LoadingRight courses={courses} professors={professors} />
-              }
-            >
-              <Right courses={courses} professors={professors} />
-            </Suspense>
+            <StickySide>
+              <Suspense
+                fallback={
+                  <LoadingRight courses={courses} professors={professors} />
+                }
+              >
+                <Right courses={courses} professors={professors} />
+              </Suspense>
+            </StickySide>
           }
           minLeft={40}
           minRight={30}

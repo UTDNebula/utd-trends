@@ -1,6 +1,6 @@
 'use client';
 
-import React, { type ReactNode, useRef } from 'react';
+import React, { useRef } from 'react';
 import {
   type ImperativePanelHandle,
   Panel,
@@ -9,8 +9,8 @@ import {
 } from 'react-resizable-panels';
 
 interface Props {
-  left: ReactNode;
-  right: ReactNode;
+  left: React.ReactNode;
+  right: React.ReactNode;
   minLeft: number;
   minRight: number;
   defaultLeft: number;
@@ -56,9 +56,7 @@ export default function Split(props: Props) {
           defaultSize={100 - props.defaultLeft}
           data-tutorial-id="RHS"
         >
-          <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto mt-4">
-            {props.right}
-          </div>
+          {props.right}
         </Panel>
       </PanelGroup>
     </>
