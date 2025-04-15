@@ -227,7 +227,7 @@ export default function SearchBar(props: Props) {
 
   //add value
   function addValue(newValue: SearchQuery) {
-    setValue((old) => [...old, newValue]);
+    setValue((prev) => [...prev, newValue]);
   }
 
   useEffect(() => {
@@ -267,8 +267,8 @@ export default function SearchBar(props: Props) {
           }
           //remove from options
           if (newValue.length > value.length) {
-            setOptions((old) =>
-              old.filter(
+            setOptions((prev) =>
+              prev.filter(
                 (item) =>
                   !searchQueryEqual(
                     newValue[newValue.length - 1] as SearchQuery,

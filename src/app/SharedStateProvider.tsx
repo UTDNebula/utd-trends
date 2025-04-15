@@ -1,11 +1,12 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useState } from 'react';
 
 import { compareColors, plannerColors } from '@/modules/colors';
-import type { Grades } from '@/modules/fetchGrades';
+import { calculateGrades, type Grades } from '@/modules/fetchGrades';
 import type { RMP } from '@/modules/fetchRmp';
 import type { Sections } from '@/modules/fetchSections';
+import { compareSemesters } from '@/modules/semesters';
 import usePersistantState from '@/modules/usePersistantState';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
@@ -20,7 +21,8 @@ import {
   sectionCanOverlap,
 } from '@/types/SearchQuery';
 
-type Setter<T> = (value: T | ((prev: T) => T)) => void;
+type SetterValue<T> = T | ((prev: T) => T);
+type Setter<T> = (value: SetterValue<T>) => void;
 
 const SharedStateContext = createContext<
   | {
@@ -43,6 +45,9 @@ const SharedStateContext = createContext<
       plannerColorMap: {
         [key: string]: { fill: string; outline: string; font: string };
       };
+      semesters: string[];
+      chosenSemesters: string[];
+      setChosenSemesters: Setter<string[]>;
     }
   | undefined
 >(undefined);
@@ -52,12 +57,64 @@ export function SharedStateProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [grades, setGrades] = useState<{
+  const [grades, internalSetGrades] = useState<{
     [key: string]: GenericFetchedData<Grades>;
   }>({});
+  const [semesters, setSemesters] = useState<string[]>([]);
+  const [chosenSemesters, internalSetChosenSemesters] = useState<string[]>([]);
+  const setGrades = useCallback(
+    (value: SetterValue<{ [key: string]: GenericFetchedData<Grades> }>) => {
+      internalSetGrades((prev) => {
+        const newValue = typeof value === 'function' ? value(prev) : value;
+
+        const newSemesters = Object.values(newValue)
+          // remove errored
+          .filter((grade) => grade.message === 'success')
+          //remove grade data, just semesters
+          .flatMap((grade) =>
+            grade.data.grades.map((gradeSemester) => gradeSemester._id),
+          )
+          // remove duplicates
+          .filter((value, index, array) => array.indexOf(value) === index)
+          // display the semesters in order of recency (most recent first)
+          .sort((a, b) => compareSemesters(b, a));
+
+        setSemesters(newSemesters);
+        internalSetChosenSemesters(newSemesters);
+
+        return newValue;
+      });
+    },
+    [internalSetGrades, setSemesters, internalSetChosenSemesters],
+  );
+  const setChosenSemesters = useCallback(
+    (value: SetterValue<string[]>) => {
+      internalSetChosenSemesters((prev) => {
+        const newValue = typeof value === 'function' ? value(prev) : value;
+
+        // recalc filtered grades
+        internalSetGrades((prev) => {
+          for (const grade of Object.values(prev)) {
+            if (grade.message === 'success') {
+              grade.data.filtered = calculateGrades(
+                grade.data.grades,
+                newValue,
+              );
+            }
+          }
+          return prev;
+        });
+
+        return newValue;
+      });
+    },
+    [internalSetGrades, internalSetChosenSemesters],
+  );
+
   const [rmp, setRmp] = useState<{ [key: string]: GenericFetchedData<RMP> }>(
     {},
   );
+
   const [sections, setSections] = useState<{
     [key: string]: GenericFetchedData<Sections>;
   }>({});
@@ -231,6 +288,9 @@ export function SharedStateProvider({
         removeFromPlanner,
         setPlannerSection,
         plannerColorMap,
+        semesters,
+        chosenSemesters,
+        setChosenSemesters,
       }}
     >
       {children}

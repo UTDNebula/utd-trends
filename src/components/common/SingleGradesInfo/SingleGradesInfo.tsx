@@ -111,7 +111,7 @@ export default function SingleGradesInfo({
           }
         />
       ) : (
-        <p>
+        <p className="p-1 pt-0">
           This professor/course combination hasn&apos;t been taught in the
           semesters you selected. To see more grade data, try changing your
           filters.

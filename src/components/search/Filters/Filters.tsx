@@ -16,8 +16,11 @@ import type { SelectChangeEvent } from '@mui/material/Select';
 import { usePathname, useSearchParams } from 'next/navigation';
 import React from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import { compareSemesters, displaySemesterName } from '@/modules/semesters';
+import useHasHydrated from '@/modules/useHasHydrated';
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
@@ -78,18 +81,19 @@ export function LoadingFilters() {
  * This component returns a set of filters with which to sort results.
  */
 export default function Filters() {
-  const academicSessions: string[] = [];
-  const chosenSessions: string[] = [];
-  const addChosenSessions = (arg0?: () => string[]) => {
-    console.log(arg0);
-  };
+  const { semesters, chosenSemesters, setChosenSemesters } = useSharedState();
 
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
-  academicSessions.sort((a, b) => compareSemesters(b, a)); // display the semesters in order of recency (most recent first)
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
+
+  // To avoid hydration errors
+  const hasHydrated = useHasHydrated();
+  if (!hasHydrated) {
+    return <LoadingFilters />;
+  }
 
   let minGPA = searchParams.get('minGPA') ?? '';
   if (Array.isArray(minGPA)) {
@@ -128,30 +132,7 @@ export default function Filters() {
       recentSemesters.push(yyyy.toString().substring(2) + season);
     }
 
-    return recentSemesters.filter((value) => academicSessions.includes(value));
-  }
-
-  function displayAcademicSessionName(id: string) {
-    return (
-      '20' +
-      id.slice(0, 2) +
-      ' ' +
-      { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)]
-    );
-  }
-
-  function compareSemesters(a: string, b: string) {
-    const x = a.substring(0, 2).localeCompare(b.substring(0, 2));
-    if (x == 0) {
-      const a_char = a[2];
-      const b_char = b[2];
-      // a_char and b_char cannot both be the same semester because x == 0
-      if (a_char == 'S') return -1;
-      if (a_char == 'U' && b_char == 'S') return 1;
-      if (a_char == 'U' && b_char == 'F') return -1;
-      if (a_char == 'F') return 1;
-      return 0;
-    } else return x;
+    return recentSemesters.filter((value) => semesters.includes(value));
   }
 
   return (
@@ -274,7 +255,7 @@ export default function Filters() {
           <FormControl
             size="small"
             className={`w-full ${
-              chosenSessions.length !== academicSessions.length
+              chosenSemesters.length !== semesters.length
                 ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
                 : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
             }`}
@@ -284,32 +265,32 @@ export default function Filters() {
               label="Semesters"
               labelId="Semesters"
               multiple
-              value={chosenSessions}
+              value={chosenSemesters}
               onChange={(event: SelectChangeEvent<string[]>) => {
                 const {
                   target: { value },
                 } = event;
                 if (value.includes('select-all')) {
-                  if (chosenSessions.length === academicSessions.length) {
-                    addChosenSessions(() => []);
+                  if (chosenSemesters.length === semesters.length) {
+                    setChosenSemesters([]);
                   } else {
-                    addChosenSessions(() => academicSessions);
+                    setChosenSemesters(semesters);
                   }
                 } else if (value.includes('recent')) {
                   if (
-                    chosenSessions.length === recentSemesters.length &&
-                    chosenSessions.every((el) => recentSemesters.includes(el))
+                    chosenSemesters.length === recentSemesters.length &&
+                    chosenSemesters.every((el) => recentSemesters.includes(el))
                   ) {
-                    addChosenSessions(() => academicSessions);
+                    setChosenSemesters(semesters);
                   } else {
-                    addChosenSessions(() => recentSemesters);
+                    setChosenSemesters(recentSemesters);
                   }
                 } else {
-                  addChosenSessions(() => value as string[]);
+                  setChosenSemesters(value as string[]);
                 }
               }}
               renderValue={(selected) => {
-                if (chosenSessions.length === academicSessions.length) {
+                if (chosenSemesters.length === semesters.length) {
                   return 'All selected';
                 }
                 return selected
@@ -321,21 +302,23 @@ export default function Filters() {
               <MenuItem className="h-10 items-center" value="select-all">
                 <Checkbox
                   checked={
-                    academicSessions.length > 0 &&
-                    chosenSessions.length === academicSessions.length
+                    semesters.length > 0 &&
+                    chosenSemesters.length === semesters.length
                   }
                   indeterminate={
-                    chosenSessions.length !== academicSessions.length &&
-                    chosenSessions.length !== 0 &&
+                    chosenSemesters.length !== semesters.length &&
+                    chosenSemesters.length !== 0 &&
                     !(
-                      chosenSessions.length === recentSemesters.length &&
-                      chosenSessions.every((el) => recentSemesters.includes(el))
+                      chosenSemesters.length === recentSemesters.length &&
+                      chosenSemesters.every((el) =>
+                        recentSemesters.includes(el),
+                      )
                     ) // select-all is not indeterminate when recent is checked
                   }
-                  disabled={academicSessions.length == 0}
+                  disabled={semesters.length == 0}
                 />
                 <ListItemText
-                  className={academicSessions.length > 0 ? '' : 'text-gray-400'}
+                  className={semesters.length > 0 ? '' : 'text-gray-400'}
                   primary="Select All"
                 />
               </MenuItem>
@@ -345,8 +328,8 @@ export default function Filters() {
                 <Checkbox
                   checked={
                     recentSemesters.length > 0 &&
-                    chosenSessions.length === recentSemesters.length &&
-                    chosenSessions.every((el) => recentSemesters.includes(el))
+                    chosenSemesters.length === recentSemesters.length &&
+                    chosenSemesters.every((el) => recentSemesters.includes(el))
                   }
                   disabled={recentSemesters.length == 0}
                 />
@@ -357,14 +340,14 @@ export default function Filters() {
               </MenuItem>
 
               {/* individual options */}
-              {academicSessions.map((session) => (
+              {semesters.map((session) => (
                 <MenuItem
                   className="h-10 items-center"
                   key={session}
                   value={session}
                 >
-                  <Checkbox checked={chosenSessions.includes(session)} />
-                  <ListItemText primary={displayAcademicSessionName(session)} />
+                  <Checkbox checked={chosenSemesters.includes(session)} />
+                  <ListItemText primary={displaySemesterName(session)} />
                 </MenuItem>
               ))}
             </Select>
