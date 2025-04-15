@@ -181,8 +181,8 @@ export function SharedStateProvider({
   }
 
   const compareColorMap = Object.fromEntries(
-    Object.entries(compare).map(([key], index) => [
-      key,
+    compare.map((key, index) => [
+      searchQueryLabel(key),
       compareColors[index % compareColors.length],
     ]),
   );
