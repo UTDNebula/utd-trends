@@ -48,7 +48,9 @@ export default function ProfessorOverview({
   grades,
   rmp,
 }: Props) {
-  const [src, setSrc] = useState(fallbackSrc);
+  const [src, setSrc] = useState(
+    profData.message === 'success' ? profData.data.image_uri : '',
+  );
 
   return (
     <div className="flex flex-col gap-2">

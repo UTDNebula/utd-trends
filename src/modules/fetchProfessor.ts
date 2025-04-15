@@ -55,7 +55,7 @@ export default async function fetchProfessor(
 
     return {
       message: 'success',
-      data: data,
+      data: data.data[0],
     };
   } catch (error) {
     return {
