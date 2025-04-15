@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerCard, {
   LoadingPlannerCard,
-} from '@/components/planner/PlannerCoursesTable/PlannerCard/PlannerCard';
+} from '@/components/planner/PlannerCoursesTable/PlannerCard';
 import {
   convertToCourseOnly,
   convertToProfOnly,

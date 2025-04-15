@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
-import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection/PlannerSection';
+import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection';
 import {
   convertToCourseOnly,
   removeSection,
