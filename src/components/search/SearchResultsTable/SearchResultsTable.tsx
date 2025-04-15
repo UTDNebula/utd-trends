@@ -31,6 +31,7 @@ import type { Grades } from '@/modules/fetchGrades';
 import type { RMP } from '@/modules/fetchRmp';
 import type { Sections } from '@/modules/fetchSections';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import useHasHydrated from '@/modules/useHasHydrated';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToCourseOnly,
@@ -448,6 +449,12 @@ export default function SearchResultsTable({
         setOrder('asc');
       }
     }
+  }
+
+  // To avoid hydration errors
+  const hasHydrated = useHasHydrated();
+  if (!hasHydrated) {
+    return <LoadingSearchResultsTable />;
   }
 
   if (includedResults.length === 0 && unIncludedResults.length === 0) {

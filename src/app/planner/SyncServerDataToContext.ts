@@ -1,19 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import fetchAll from '@/modules/fetchAll';
-
-function useHasHydrated() {
-  const [hasHydrated, setHasHydrated] = useState(false);
-
-  useEffect(() => {
-    setHasHydrated(true);
-  }, []);
-
-  return hasHydrated;
-}
+import useHasHydrated from '@/modules/useHasHydrated';
 
 export default function SyncServerDataToContext() {
   const hasHydrated = useHasHydrated();
