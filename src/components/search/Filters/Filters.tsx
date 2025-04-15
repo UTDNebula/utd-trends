@@ -316,7 +316,6 @@ export default function Filters() {
                   .sort((a, b) => compareSemesters(a, b))
                   .join(', ');
               }}
-              MenuProps={{ autoFocus: false }}
             >
               {/* select all sessions */}
               <MenuItem className="h-10 items-center" value="select-all">

@@ -11,7 +11,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useState, useTransition } from 'react';
 
 import Background from '@/../public/background.png';
 import SearchBar, {
@@ -25,6 +25,9 @@ import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 export default function Home() {
   const router = useRouter();
 
+  //for spinner after router.push
+  const [isPending, startTransition] = useTransition();
+
   const [filterNextSem, setFilterNextSem] = useState('true');
 
   async function searchOptionChosen(chosenOptions: SearchQuery[]) {
@@ -33,7 +36,9 @@ export default function Home() {
         searchTerms: chosenOptions.map(searchQueryLabel).join(','),
         availability: filterNextSem,
       });
-      router.push(`/dashboard?${searchParams.toString()}`);
+      startTransition(() => {
+        router.push(`/dashboard?${searchParams.toString()}`);
+      });
     }
   }
 
@@ -80,6 +85,7 @@ export default function Home() {
             autoFocus={true}
             onSelect={searchOptionChosen}
             input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
+            isPending={isPending}
           />
         </Suspense>
         {/* Teaching Next Semester switch*/}

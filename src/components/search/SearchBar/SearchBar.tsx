@@ -1,10 +1,22 @@
 'use client';
 
-import { Autocomplete, Button, TextField, Tooltip } from '@mui/material';
+import {
+  Autocomplete,
+  Button,
+  CircularProgress,
+  TextField,
+  Tooltip,
+} from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import React, { type Key, useEffect, useRef, useState } from 'react';
+import React, {
+  type Key,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
 
 import {
   decodeSearchQueryLabel,
@@ -18,12 +30,9 @@ interface LoadingSearchBarProps {
   input_className?: string;
 }
 
-export function LoadingSearchBar({
-  className,
-  input_className,
-}: LoadingSearchBarProps) {
+export function LoadingSearchBar(props: LoadingSearchBarProps) {
   return (
-    <div className={'flex items-center gap-2 ' + (className ?? '')}>
+    <div className={'flex items-center gap-2 ' + (props.className ?? '')}>
       <Autocomplete
         className="grow"
         options={[]}
@@ -31,7 +40,7 @@ export function LoadingSearchBar({
           return (
             <TextField
               {...params}
-              className={input_className}
+              className={props.input_className}
               placeholder="ex. GOVT 2306"
             />
           );
@@ -58,6 +67,7 @@ interface Props {
   className?: string;
   input_className?: string;
   autoFocus?: boolean;
+  isPending?: boolean;
 }
 
 /**
@@ -66,13 +76,10 @@ interface Props {
  *
  * Styled for the splash page
  */
-export default function SearchBar({
-  manageQuery,
-  onSelect,
-  className,
-  input_className,
-  autoFocus,
-}: Props) {
+export default function SearchBar(props: Props) {
+  //for spinner after router.push
+  const [isPending, startTransition] = useTransition();
+
   //what you can choose from
   const [options, setOptions] = useState<SearchQuery[]>([]);
   //initial loading prop for first load
@@ -103,35 +110,35 @@ export default function SearchBar({
     }
   }, [searchTerms]); // useEffect is called every time the query changes
 
-  // updateValue -> onSelect_internal -> updateQueries - clicking enter on an autocomplete suggestion in TopMenu Searchbar
-  // updateValue -> onSelect_internal -> onSelect (custom function) - clicking enter on an autocomplete suggestion in home page SearchBar
-  // params.inputProps.onKeyDown -> handleKeyDown -> onSelect_internal -> updateQueries/onSelect - clicking enter in the SearchBar
-  // Button onClick -> onSelect_internal -> updateQueries/onSelect - Pressing the "Search" Button
+  // updateValue -> onSelect -> updateQueries - clicking enter on an autocomplete suggestion in TopMenu Searchbar
+  // updateValue -> onSelect -> props.onSelect (custom function) - clicking enter on an autocomplete suggestion in home page SearchBar
+  // params.inputProps.onKeyDown -> handleKeyDown -> onSelect -> updateQueries/props.onSelect - clicking enter in the SearchBar
+  // Button onClick -> onSelect -> updateQueries/props.onSelect - Pressing the "Search" Button
 
   //change all values
   function updateValue(newValue: SearchQuery[]) {
     setValue(newValue);
-    onSelect_internal(newValue); // clicking enter to select a autocomplete suggestion triggers a new search (it also 'Enters' for the searchbar)
+    onSelect(newValue); // clicking enter to select a autocomplete suggestion triggers a new search (it also 'Enters' for the searchbar)
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Enter' && inputValue === '') {
       event.preventDefault();
       event.stopPropagation();
-      onSelect_internal(value);
+      onSelect(value);
     }
   }
 
   //update parent and queries
-  function onSelect_internal(newValue: SearchQuery[]) {
+  function onSelect(newValue: SearchQuery[]) {
     if (searchTerms == newValue.map((el) => searchQueryLabel(el)).join(','))
       // do not initiate a new search when the searchTerms haven't changed
       return;
     setErrorTooltip(!newValue.length);
-    if (typeof onSelect !== 'undefined') {
-      onSelect(newValue);
+    if (typeof props.onSelect !== 'undefined') {
+      props.onSelect(newValue);
     }
-    if (newValue.length && manageQuery === 'onSelect') {
+    if (newValue.length && props.manageQuery === 'onSelect') {
       updateQueries(newValue);
     }
   }
@@ -150,7 +157,10 @@ export default function SearchBar({
     } else {
       params.delete('searchTerms');
     }
-    router.push(`${pathname}?${params.toString()}`);
+    startTransition(() => {
+      console.log('hi');
+      router.push(`${pathname}?${params.toString()}`);
+    });
   }
 
   //fetch new options, add tags if valid
@@ -226,7 +236,7 @@ export default function SearchBar({
 
   return (
     <div
-      className={'flex items-center gap-2 ' + (className ?? '')}
+      className={'flex items-center gap-2 ' + (props.className ?? '')}
       data-tutorial-id="search"
     >
       <Autocomplete
@@ -280,10 +290,10 @@ export default function SearchBar({
             <TextField
               {...params}
               variant="outlined"
-              className={input_className}
+              className={props.input_className}
               placeholder="ex. GOVT 2306"
               //eslint-disable-next-line jsx-a11y/no-autofocus
-              autoFocus={autoFocus}
+              autoFocus={props.autoFocus}
             />
           );
         }}
@@ -369,9 +379,16 @@ export default function SearchBar({
               ? ' text-cornflower-200 dark:text-cornflower-700'
               : '')
           } //darkens the text when no valid search terms are entered (pseudo-disables the search button)
-          onClick={() => onSelect_internal(value)}
+          onClick={() => onSelect(value)}
         >
-          Search
+          {isPending || props.isPending ? (
+            <CircularProgress
+              color="inherit"
+              className="h-6 w-6 text-cornflower-50 dark:text-haiti"
+            />
+          ) : (
+            'Search'
+          )}
         </Button>
       </Tooltip>
     </div>
