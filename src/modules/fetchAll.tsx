@@ -1,6 +1,6 @@
 'use server';
 
-import fetchGrades, { type RMP } from '@/modules/fetchGrades';
+import fetchGrades, { type Grades } from '@/modules/fetchGrades';
 import fetchRmp, { type RMP } from '@/modules/fetchRmp';
 import fetchSections, { type Sections } from '@/modules/fetchSections';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
@@ -11,9 +11,7 @@ import {
   searchQueryLabel,
 } from '@/types/SearchQuery';
 
-export default async function fetchPlannerData(
-  queries: SearchQuery[],
-): Promise<{
+export default async function fetchAll(queries: SearchQuery[]): Promise<{
   grades: { [key: string]: GenericFetchedData<Grades> };
   rmp: { [key: string]: GenericFetchedData<RMP> };
   sections: { [key: string]: GenericFetchedData<Sections> };
@@ -52,13 +50,22 @@ export default async function fetchPlannerData(
   const sectionsKeys = Object.keys(sectionsPromises);
 
   const grades = Object.fromEntries(
-    gradesKeys.map((key, i) => [key, gradesResults[i].value]),
+    gradesKeys.flatMap((key, i) => {
+      const result = gradesResults[i];
+      return result.status === 'fulfilled' ? [[key, result.value]] : [];
+    }),
   );
   const rmp = Object.fromEntries(
-    rmpKeys.map((key, i) => [key, rmpResults[i].value]),
+    rmpKeys.flatMap((key, i) => {
+      const result = rmpResults[i];
+      return result.status === 'fulfilled' ? [[key, result.value]] : [];
+    }),
   );
   const sections = Object.fromEntries(
-    sectionsKeys.map((key, i) => [key, sectionsResults[i].value]),
+    sectionsKeys.flatMap((key, i) => {
+      const result = sectionsResults[i];
+      return result.status === 'fulfilled' ? [[key, result.value]] : [];
+    }),
   );
 
   return {

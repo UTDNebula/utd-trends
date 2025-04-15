@@ -10,6 +10,7 @@ import usePersistantState from '@/modules/usePersistantState';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToCourseOnly,
+  convertToProfOnly,
   removeDuplicates,
   removeSection,
   type SearchQuery,
@@ -21,33 +22,36 @@ import {
 
 type Setter<T> = (value: T | ((prev: T) => T)) => void;
 
-const SharedStateContext = createContext<{
-  grades: { [key: string]: GenericFetchedData<Grades> };
-  setGrades: Setter<{ [key: string]: GenericFetchedData<Grades> }>;
-  rmp: { [key: string]: GenericFetchedData<RMP> };
-  setRmp: Setter<{ [key: string]: GenericFetchedData<RMP> }>;
-  sections: { [key: string]: GenericFetchedData<Sections> };
-  setSections: Setter<{ [key: string]: GenericFetchedData<Sections> }>;
-  compare: SearchQuery[];
-  addToCompare: (query: SearchQuery) => void;
-  removeFromCompare: (query: SearchQuery) => void;
-  compareGrades: { [key: string]: GenericFetchedData<Grades> };
-  compareRmp: { [key: string]: GenericFetchedData<RMP> };
-  compareColorMap: { [key: string]: string };
-  planner: SearchQueryMultiSection[];
-  addToPlanner: (query: SearchQuery) => void;
-  removeFromPlanner: (query: SearchQuery) => void;
-  setPlannerSection: (query: SearchQuery, section: string) => void;
-  plannerColorMap: {
-    [key: string]: { fill: string; outline: string; font: string };
-  };
-}>(null);
+const SharedStateContext = createContext<
+  | {
+      grades: { [key: string]: GenericFetchedData<Grades> };
+      setGrades: Setter<{ [key: string]: GenericFetchedData<Grades> }>;
+      rmp: { [key: string]: GenericFetchedData<RMP> };
+      setRmp: Setter<{ [key: string]: GenericFetchedData<RMP> }>;
+      sections: { [key: string]: GenericFetchedData<Sections> };
+      setSections: Setter<{ [key: string]: GenericFetchedData<Sections> }>;
+      compare: SearchQuery[];
+      addToCompare: (query: SearchQuery) => void;
+      removeFromCompare: (query: SearchQuery) => void;
+      compareGrades: { [key: string]: GenericFetchedData<Grades> };
+      compareRmp: { [key: string]: GenericFetchedData<RMP> };
+      compareColorMap: { [key: string]: string };
+      planner: SearchQueryMultiSection[];
+      addToPlanner: (query: SearchQuery) => void;
+      removeFromPlanner: (query: SearchQuery) => void;
+      setPlannerSection: (query: SearchQuery, section: string) => void;
+      plannerColorMap: {
+        [key: string]: { fill: string; outline: string; font: string };
+      };
+    }
+  | undefined
+>(undefined);
 
-export const SharedStateProvider = ({
+export function SharedStateProvider({
   children,
 }: {
   children: React.ReactNode;
-}) => {
+}) {
   const [grades, setGrades] = useState<{
     [key: string]: GenericFetchedData<Grades>;
   }>({});
@@ -232,6 +236,12 @@ export const SharedStateProvider = ({
       {children}
     </SharedStateContext.Provider>
   );
-};
+}
 
-export const useSharedState = () => useContext(SharedStateContext);
+export function useSharedState() {
+  const context = useContext(SharedStateContext);
+  if (!context) {
+    throw new Error('useSharedState must be used within a SharedStateProvider');
+  }
+  return context;
+}

@@ -13,10 +13,46 @@ import {
   searchQueryLabel,
 } from '@/types/SearchQuery';
 
+interface LoadingSearchBarProps {
+  className?: string;
+  input_className?: string;
+}
+
+export function LoadingSearchBar({
+  className,
+  input_className,
+}: LoadingSearchBarProps) {
+  return (
+    <div className={'flex items-center gap-2 ' + (className ?? '')}>
+      <Autocomplete
+        className="grow"
+        options={[]}
+        renderInput={(params) => {
+          return (
+            <TextField
+              {...params}
+              className={input_className}
+              placeholder="ex. GOVT 2306"
+            />
+          );
+        }}
+      />
+      <Button
+        variant="contained"
+        disableElevation
+        size="large"
+        className="h-11 w-[5.5rem] shrink-0 normal-case text-cornflower-200 dark:text-cornflower-700"
+      >
+        Search
+      </Button>
+    </div>
+  );
+}
+
 /**
  * Props type used by the SearchBar component
  */
-interface SearchProps {
+interface Props {
   manageQuery?: 'onSelect';
   onSelect?: (value: SearchQuery[]) => void;
   className?: string;
@@ -30,13 +66,13 @@ interface SearchProps {
  *
  * Styled for the splash page
  */
-const SearchBar = ({
+export default function SearchBar({
   manageQuery,
   onSelect,
   className,
   input_className,
   autoFocus,
-}: SearchProps) => {
+}: Props) {
   //what you can choose from
   const [options, setOptions] = useState<SearchQuery[]>([]);
   //initial loading prop for first load
@@ -59,10 +95,10 @@ const SearchBar = ({
   const searchTerms = searchParams.get('searchTerms');
   useEffect(() => {
     if (searchTerms != null) {
-      let array = searchTerms;
-      if (!Array.isArray(array)) {
-        array = array.split(',');
-      }
+      const arrayParam = searchTerms;
+      const array = Array.isArray(arrayParam)
+        ? arrayParam
+        : arrayParam.split(',');
       setValue(array.map((el) => decodeSearchQueryLabel(el)));
     }
   }, [searchTerms]); // useEffect is called every time the query changes
@@ -340,6 +376,4 @@ const SearchBar = ({
       </Tooltip>
     </div>
   );
-};
-
-export default SearchBar;
+}

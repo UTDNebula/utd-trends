@@ -1,12 +1,9 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 
-import comboTable from '@/data/combo_table.json';
-import fetchGrades from '@/modules/fetchGrades';
-import fetchRmp from '@/modules/fetchRmp';
-import fetchSections from '@/modules/fetchSections';
+import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
+import rawComboTable from '@/data/combo_table.json';
+import fetchAll from '@/modules/fetchAll';
 import {
-  convertToProfOnly,
-  removeDuplicates,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
@@ -14,6 +11,8 @@ import {
 
 import ClientLeft from './ClientLeft';
 import SyncServerDataToContext from './SyncServerDataToContext';
+
+const comboTable = rawComboTable as { [key: string]: SearchQuery[] };
 
 //Get all course+prof combos for searchTerms and keep only the ones that match filterTerms
 //When filterTerms is blank, just gets all searchTerms
@@ -42,8 +41,8 @@ function fetchSearchResults(
 }
 
 interface Props {
-  courses?: SearchQuery[];
-  professors?: SearchQuery[];
+  courses: SearchQuery[];
+  professors: SearchQuery[];
 }
 
 /**
@@ -57,56 +56,17 @@ export default async function ServerLeft(props: Props) {
     results = fetchSearchResults(props.professors, []);
   }
 
-  //Grade data
-  //Fetch each result
-  const gradesPromises = Object.fromEntries(
-    results.map((result) => [searchQueryLabel(result), fetchGrades(result)]),
-  );
-
-  //RMP data
-  //Get list of profs from results
-  //Remove duplicates so as not to fetch multiple times
-  const rmpPromises = Object.fromEntries(
-    removeDuplicates(
-      results
-        //Remove course data from each
-        .map((result) => convertToProfOnly(result))
-        //Remove empty objects (used to be only course data)
-        .filter((obj) => Object.keys(obj).length !== 0) as SearchQuery[],
-    ).map((result) => [searchQueryLabel(result), fetchRmp(result)]),
-  );
-
-  const sectionsPromises = Object.fromEntries(
-    results.map((result) => [searchQueryLabel(result), fetchSections(result)]),
-  );
-
-  const [gradesResults, rmpResults, sectionsResults] = await Promise.all([
-    Promise.allSettled(Object.values(gradesPromises)),
-    Promise.allSettled(Object.values(rmpPromises)),
-    Promise.allSettled(Object.values(sectionsPromises)),
-  ]);
-
-  const gradesKeys = Object.keys(gradesPromises);
-  const rmpKeys = Object.keys(rmpPromises);
-  const sectionsKeys = Object.keys(sectionsPromises);
-
-  const grades = Object.fromEntries(
-    gradesKeys.map((key, i) => [key, gradesResults[i].value]),
-  );
-  const rmp = Object.fromEntries(
-    rmpKeys.map((key, i) => [key, rmpResults[i].value]),
-  );
-  const sections = Object.fromEntries(
-    sectionsKeys.map((key, i) => [key, sectionsResults[i].value]),
-  );
+  const { grades, rmp, sections } = await fetchAll(results);
 
   return (
     <>
       <SyncServerDataToContext grades={grades} rmp={rmp} sections={sections} />
-      <ClientLeft
-        numSearches={props.courses.length + props.professors.length}
-        results={results}
-      />
+      <Suspense fallback={<LoadingSearchResultsTable />}>
+        <ClientLeft
+          numSearches={props.courses.length + props.professors.length}
+          results={results}
+        />
+      </Suspense>
     </>
   );
 }

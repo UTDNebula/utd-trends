@@ -6,13 +6,14 @@ import ShareIcon from '@mui/icons-material/Share';
 import { Button, IconButton, Snackbar, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useState } from 'react';
 
 import Background from '@/../public/background.png';
 import WhatsNew from '@/components/common/WhatsNew/WhatsNew';
 import Tutorial from '@/components/dashboard/Tutorial/Tutorial';
-import SearchBar from '@/components/search/SearchBar/SearchBar';
+import SearchBar, {
+  LoadingSearchBar,
+} from '@/components/search/SearchBar/SearchBar';
 
 /**
  * Props type used by the TopMenu component
@@ -25,8 +26,7 @@ type Props = {
  * This is a component to hold UTD Trends branding and basic navigation
  * @returns
  */
-export function TopMenu(props: Props) {
-  const searchParams = useSearchParams();
+export default function TopMenu(props: Props) {
   const [openCopied, setOpenCopied] = useState(false);
 
   function shareLink(url: string) {
@@ -74,7 +74,9 @@ export function TopMenu(props: Props) {
   }, []);
   const cacheIndex = 0; //Increment this to open the popup for all users on next deployment
 
-  const [dashboardSearchTerms, setDashboardSearchTerms] = useState(null);
+  const [dashboardSearchTerms, setDashboardSearchTerms] = useState<
+    null | string
+  >(null);
   useEffect(() => {
     setDashboardSearchTerms(
       window.sessionStorage.getItem('dashboardSearchTerms'),
@@ -98,11 +100,20 @@ export function TopMenu(props: Props) {
           UTD TRENDS
         </Link>
         {!props.isPlanner && (
-          <SearchBar
-            manageQuery="onSelect"
-            className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
-            input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
-          />
+          <Suspense
+            fallback={
+              <LoadingSearchBar
+                className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
+                input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
+              />
+            }
+          >
+            <SearchBar
+              manageQuery="onSelect"
+              className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
+              input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
+            />
+          </Suspense>
         )}
         <Link
           href={
@@ -116,7 +127,7 @@ export function TopMenu(props: Props) {
             !props.isPlanner
               ? sessionStorage.setItem(
                   'dashboardSearchTerms',
-                  searchParams.toString(),
+                  new URLSearchParams(window.location.search).toString(),
                 )
               : null
           }
@@ -179,7 +190,9 @@ export function TopMenu(props: Props) {
               size="medium"
               onClick={() => {
                 let url = window.location.href;
-                if (searchParams.toString() === '') {
+                if (
+                  new URLSearchParams(window.location.search).toString() === ''
+                ) {
                   url = 'https://trends.utdnebula.com/';
                 }
                 shareLink(url);
@@ -200,5 +213,3 @@ export function TopMenu(props: Props) {
     </>
   );
 }
-
-export default TopMenu;

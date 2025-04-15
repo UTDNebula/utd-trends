@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
 import { compareColors } from '@/modules/colors';
-import type { GradesData } from '@/pages/api/grades';
+import type { Grades } from '@/modules/fetchGrades';
 
 function sortSemesters(a: string, b: string) {
   let aNum = parseInt(a);
@@ -34,7 +34,7 @@ function sortSemesters(a: string, b: string) {
 function getSemesterGPAs(
   data: {
     name: string;
-    data: GradesData;
+    data: Grades['grades'];
   },
   allSemesters: string[],
 ) {
@@ -84,12 +84,12 @@ type Props = {
   xAxisLabels?: string[];
   series: {
     name: string;
-    data: GradesData;
+    data: Grades['grades'];
   }[];
   includedColors?: boolean[];
 };
 
-const LineGraph = (props: Props) => {
+export default function LineGraph(props: Props) {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
@@ -233,6 +233,4 @@ const LineGraph = (props: Props) => {
       </Modal>
     </>
   );
-};
-
-export default LineGraph;
+}

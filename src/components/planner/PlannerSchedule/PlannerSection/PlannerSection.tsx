@@ -8,7 +8,7 @@ import type { Sections } from '@/modules/fetchSections';
 import { type SearchQuery } from '@/types/SearchQuery';
 
 interface PlannerSectionComponentProps {
-  selectedSection: Sections[number] | undefined;
+  selectedSection: Sections['all'][number] | undefined;
   course: SearchQuery;
   color: { fill: string; outline: string; font: string };
 }

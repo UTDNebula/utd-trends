@@ -2,21 +2,17 @@ import { NextResponse } from 'next/server';
 
 import autocompleteGraph from '@/data/autocomplete_graph.json';
 import { getGraph, searchAutocomplete } from '@/modules/autocomplete';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery } from '@/types/SearchQuery';
 
 const graph = getGraph(autocompleteGraph as object);
-
-type Data = {
-  message: string;
-  data?: SearchQuery[];
-};
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const input = searchParams.get('input');
   if (typeof input !== 'string') {
     return NextResponse.json(
-      { message: 'Incorrect query parameters' },
+      { message: false, error: 'Incorrect query parameters' },
       { status: 400 },
     );
   }
@@ -39,7 +35,7 @@ export async function GET(request: Request) {
     {
       message: 'success',
       data: results,
-    } satisfies Data,
+    } satisfies GenericFetchedData<SearchQuery[]>,
     { status: 200 },
   );
 }

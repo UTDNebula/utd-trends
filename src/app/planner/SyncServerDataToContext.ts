@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
-
-import fetchPlannerData from './fetchPlannerData';
+import fetchAll from '@/modules/fetchAll';
 
 function useHasHydrated() {
   const [hasHydrated, setHasHydrated] = useState(false);
@@ -25,7 +24,7 @@ export default function SyncServerDataToContext() {
       let isCancelled = false;
 
       const fetchData = async () => {
-        const { grades, rmp, sections } = await fetchPlannerData(planner);
+        const { grades, rmp, sections } = await fetchAll(planner);
         if (isCancelled) return;
 
         setGrades(grades);

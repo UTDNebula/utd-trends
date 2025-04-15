@@ -11,7 +11,7 @@ type Props = {
   line?: ReactNode;
 };
 
-function GraphToggle(props: Props) {
+export default function GraphToggle(props: Props) {
   const [chartType, setChartType] = useState<'line' | 'bar'>('bar');
 
   const handleChartToggle = (
@@ -54,5 +54,3 @@ function GraphToggle(props: Props) {
     </div>
   );
 }
-
-export default GraphToggle;

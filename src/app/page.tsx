@@ -11,10 +11,12 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 
 import Background from '@/../public/background.png';
-import SearchBar from '@/components/search/SearchBar/SearchBar';
+import SearchBar, {
+  LoadingSearchBar,
+} from '@/components/search/SearchBar/SearchBar';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
 /**
@@ -68,12 +70,18 @@ export default function Home() {
           Explore and compare past grades, professor ratings, and reviews to
           find the perfect class.
         </p>
-        <SearchBar
-          // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus={true}
-          onSelect={searchOptionChosen}
-          input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
-        />
+        <Suspense
+          fallback={
+            <LoadingSearchBar input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti" />
+          }
+        >
+          <SearchBar
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus={true}
+            onSelect={searchOptionChosen}
+            input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
+          />
+        </Suspense>
         {/* Teaching Next Semester switch*/}
         <Tooltip title="Select Availability" placement="bottom-start">
           <FormControl

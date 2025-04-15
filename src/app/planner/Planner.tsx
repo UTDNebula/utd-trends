@@ -22,7 +22,7 @@ export default function Planner() {
         planner.length === 0 ? (
           <PlannerEmpty />
         ) : Object.keys(sections).length === 0 ? (
-          <LoadingPlannerCoursesTable plannerLength={planner.length} />
+          <LoadingPlannerCoursesTable />
         ) : (
           <PlannerCoursesTable />
         )

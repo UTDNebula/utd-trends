@@ -364,13 +364,13 @@ type CompareTableProps = {
   colorMap: { [key: string]: string };
 };
 
-const CompareTable = ({
+export default function CompareTable({
   includedResults,
   grades,
   rmp,
   removeFromCompare,
   colorMap,
-}: CompareTableProps) => {
+}: CompareTableProps) {
   //Table sorting category
   const [orderBy, setOrderBy] = useState<string>('Color');
   //Table sorting direction
@@ -594,6 +594,4 @@ const CompareTable = ({
       </TableContainer>
     </div>
   );
-};
-
-export default CompareTable;
+}

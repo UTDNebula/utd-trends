@@ -2,7 +2,7 @@ import React from 'react';
 
 import Split from '@/components/common/Split/Split';
 import TopMenu from '@/components/navigation/TopMenu/TopMenu';
-import Filters from '@/components/search/Filters/Filters';
+import { LoadingFilters } from '@/components/search/Filters/Filters';
 import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
 
 import { LoadingRight } from './Right';
@@ -15,7 +15,7 @@ export default async function Page() {
     <>
       <TopMenu isPlanner={false} />
       <main className="p-4">
-        <Filters />
+        <LoadingFilters />
         <Split
           left={<LoadingSearchResultsTable />}
           right={

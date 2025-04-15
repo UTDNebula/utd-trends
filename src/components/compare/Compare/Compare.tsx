@@ -7,9 +7,10 @@ import CompareTable from '@/components/compare/CompareTable/CompareTable';
 import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
+import type { Grades } from '@/modules/fetchGrades';
 import { searchQueryLabel } from '@/types/SearchQuery';
 
-function convertNumbersToPercents(distribution: GradesType): number[] {
+function convertNumbersToPercents(distribution: Grades): number[] {
   const total = distribution.filtered.total;
   return distribution.filtered.grade_distribution.map(
     (frequencyOfLetterGrade) => (frequencyOfLetterGrade / total) * 100,
@@ -58,7 +59,7 @@ export default function Compare() {
             tooltipFormatter={(value, { seriesIndex, dataPointIndex }) => {
               let response = Number(value).toFixed(2).toLocaleString() + '%';
               const grade =
-                compareGrades[searchQueryLabel(courses[seriesIndex])];
+                compareGrades[searchQueryLabel(compare[seriesIndex])];
               if (grade.message === 'success') {
                 response +=
                   ' (' +
@@ -69,7 +70,7 @@ export default function Compare() {
               }
               return response;
             }}
-            series={courses.map((course) => {
+            series={compare.map((course) => {
               const grade = compareGrades[searchQueryLabel(course)];
               return {
                 name:
@@ -91,7 +92,7 @@ export default function Compare() {
         line={
           <LineGraph
             title="GPA Trends"
-            series={courses.map((course) => {
+            series={compare.map((course) => {
               const grade = compareGrades[searchQueryLabel(course)];
               return {
                 name:
@@ -109,7 +110,7 @@ export default function Compare() {
         }
       />
       <CompareTable
-        includedResults={courses}
+        includedResults={compare}
         grades={compareGrades}
         rmp={compareRmp}
         removeFromCompare={removeFromCompare}

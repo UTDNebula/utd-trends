@@ -28,6 +28,12 @@ export default function ClientLeft(props: Props) {
   let includedResults: SearchQuery[] = [];
   let unIncludedResults: SearchQuery[] = [];
 
+  //Filters
+  const minGPA = searchParams.get('minGPA');
+  const minRating = searchParams.get('minRating');
+  const maxDiff = searchParams.get('maxDiff');
+  const availability = searchParams.get('availability') === 'true';
+
   //Filter results based on gpa, rmp, and rmp difficulty
   includedResults = props.results.filter((result) => {
     //Remove if over threshold
@@ -39,43 +45,43 @@ export default function ClientLeft(props: Props) {
       courseGrades.data.filtered.gpa === -1 &&
       !(
         typeof courseSection !== 'undefined' &&
-        courseSection.message === 'done' &&
-        searchParams.get('availability') === 'true' &&
+        courseSection.message === 'success' &&
+        availability &&
         courseSection.data.latest.length
       )
     ) {
       return false;
     }
     if (
-      typeof searchParams.get('minGPA') === 'string' &&
+      typeof minGPA === 'string' &&
       typeof courseGrades !== 'undefined' &&
       courseGrades.message === 'success' &&
-      courseGrades.data.filtered.gpa < parseFloat(searchParams.get('minGPA'))
+      courseGrades.data.filtered.gpa < parseFloat(minGPA)
     ) {
       return false;
     }
     const courseRmp = rmp[searchQueryLabel(convertToProfOnly(result))];
     if (
-      typeof searchParams.get('minRating') === 'string' &&
+      typeof minRating === 'string' &&
       typeof courseRmp !== 'undefined' &&
       courseRmp.message === 'success' &&
-      courseRmp.data.avgRating < parseFloat(searchParams.get('minRating'))
+      courseRmp.data.avgRating < parseFloat(minRating)
     ) {
       return false;
     }
     if (
-      typeof searchParams.get('maxDiff') === 'string' &&
+      typeof maxDiff === 'string' &&
       typeof courseRmp !== 'undefined' &&
       courseRmp.message === 'success' &&
-      courseRmp.data.avgDifficulty > parseFloat(searchParams.get('maxDiff'))
+      courseRmp.data.avgDifficulty > parseFloat(maxDiff)
     ) {
       return false;
     }
 
     if (
-      searchParams.get('availability') === 'true' &&
       typeof courseSection !== 'undefined' &&
       courseSection.message === 'success' &&
+      availability &&
       !courseSection.data.latest.length
     ) {
       return false;
@@ -94,36 +100,36 @@ export default function ClientLeft(props: Props) {
       return false;
     }
     if (
-      typeof searchParams.get('minGPA') === 'string' &&
+      typeof minGPA === 'string' &&
       typeof courseGrades !== 'undefined' &&
       courseGrades.message === 'success' &&
-      courseGrades.data.filtered.gpa < parseFloat(searchParams.get('minGPA'))
+      courseGrades.data.filtered.gpa < parseFloat(minGPA)
     ) {
       return false;
     }
     const courseRmp = rmp[searchQueryLabel(convertToProfOnly(result))];
     if (
-      typeof searchParams.get('minRating') === 'string' &&
+      typeof minRating === 'string' &&
       typeof courseRmp !== 'undefined' &&
       courseRmp.message === 'success' &&
-      courseRmp.data.avgRating < parseFloat(searchParams.get('minRating'))
+      courseRmp.data.avgRating < parseFloat(minRating)
     ) {
       return false;
     }
     if (
-      typeof searchParams.get('maxDiff') === 'string' &&
+      typeof maxDiff === 'string' &&
       typeof courseRmp !== 'undefined' &&
       courseRmp.message === 'success' &&
-      courseRmp.data.avgDifficulty > parseFloat(searchParams.get('maxDiff'))
+      courseRmp.data.avgDifficulty > parseFloat(maxDiff)
     ) {
       return false;
     }
     const courseSection = sections[searchQueryLabel(result)];
     if (
       !(
-        searchParams.get('availability') === 'true' &&
         typeof courseSection !== 'undefined' &&
         courseSection.message === 'success' &&
+        availability &&
         !courseSection.data.latest.length
       )
     ) {

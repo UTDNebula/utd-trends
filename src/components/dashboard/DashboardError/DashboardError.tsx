@@ -3,7 +3,7 @@
 import { Button, Typography } from '@mui/material';
 import React from 'react';
 
-function DashboardError() {
+export default function DashboardError() {
   return (
     <div className="mt-8 flex flex-col items-center">
       <Typography
@@ -19,5 +19,3 @@ function DashboardError() {
     </div>
   );
 }
-
-export default DashboardError;

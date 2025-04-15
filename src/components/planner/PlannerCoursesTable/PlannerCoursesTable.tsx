@@ -85,11 +85,11 @@ export default function PlannerCoursesTable() {
                     sections[searchQueryLabel(removeSection(single))];
                   if (
                     typeof singleSectionData === 'undefined' ||
-                    singleSectionData.message !== 'success'
+                    singleSectionData.message === 'success'
                   ) {
                     return undefined;
                   }
-                  return singleSectionData.data.latest.find(
+                  return singleSectionData.data?.latest.find(
                     (section) =>
                       section.section_number === single.sectionNumber,
                   );

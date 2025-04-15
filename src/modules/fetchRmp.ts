@@ -63,7 +63,6 @@ function getGraphQlUrlProp(name: string) {
     method: 'POST',
     headers: HEADERS,
     body: JSON.stringify(PROFESSOR_SEARCH_QUERY),
-    cache: 'force-cache',
     next: { revalidate: 3600 },
   };
 }
@@ -100,8 +99,17 @@ export default async function fetchRmp(
   query: SearchQuery,
 ): Promise<GenericFetchedData<RMP>> {
   try {
-    const singleProfFirst = query.profFirst.split(' ')[0];
-    const name = singleProfFirst + ' ' + query.profLast;
+    if (
+      typeof query.profFirst !== 'string' ||
+      typeof query.profLast !== 'string'
+    ) {
+      throw new Error('Incorrect query present');
+    }
+    const profFirst = query.profFirst;
+    const profLast = query.profLast;
+
+    const singleProfFirst = profFirst.split(' ')[0];
+    const name = singleProfFirst + ' ' + profLast;
 
     // create fetch object for professor
     const graphQlUrlProp = getGraphQlUrlProp(name);
@@ -122,10 +130,10 @@ export default async function fetchRmp(
     }
     //Remove profs not at UTD and with bad name match
     const professors = data.data.newSearch.teachers.edges.filter(
-      (prof: { node: RMPInterface }) =>
+      (prof: { node: RMP }) =>
         prof.node.school.name === SCHOOL_NAME &&
         prof.node.firstName.includes(singleProfFirst) &&
-        prof.node.lastName.includes(query.profLast),
+        prof.node.lastName.includes(profLast),
     );
     //Pick prof instance with most ratings
     let maxRatingsProfessor = professors[0];
@@ -140,7 +148,8 @@ export default async function fetchRmp(
     };
   } catch (error) {
     return {
-      message:
+      message: 'error',
+      error:
         error instanceof Error ? error.message : 'An unknown error occurred',
     };
   }

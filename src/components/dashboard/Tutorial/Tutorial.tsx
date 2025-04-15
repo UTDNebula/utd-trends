@@ -174,7 +174,7 @@ type TutorialProps = {
   close: () => void;
 };
 
-const Tutorial = ({ open, close }: TutorialProps) => {
+export default function Tutorial({ open, close }: TutorialProps) {
   const [steps, setSteps] = useState<Step[]>([]);
   const [place, setPlace] = useState(0);
 
@@ -225,6 +225,4 @@ const Tutorial = ({ open, close }: TutorialProps) => {
       ))}
     </>
   );
-};
-
-export default Tutorial;
+}

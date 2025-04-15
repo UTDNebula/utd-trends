@@ -22,13 +22,67 @@ import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
 
+export function LoadingFilters() {
+  return (
+    <Grid container spacing={2} className="mb-4 sm:m-0">
+      {/* min letter grade dropdown*/}
+      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+        <FormControl
+          size="small"
+          className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
+        >
+          <InputLabel id="minGPA">Min Letter Grade</InputLabel>
+          <Select label="Min Letter Grade" labelId="minGPA" value=""></Select>
+        </FormControl>
+      </Grid>
+
+      {/* min rating dropdown*/}
+      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+        <FormControl
+          size="small"
+          className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
+        >
+          <InputLabel id="minRating">Min Rating</InputLabel>
+          <Select label="Min Rating" labelId="minRating" value=""></Select>
+        </FormControl>
+      </Grid>
+
+      {/* semester dropdown */}
+      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+        <FormControl
+          size="small"
+          className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
+        >
+          <InputLabel id="Semesters">Semesters</InputLabel>
+          <Select label="Semesters" labelId="Semesters" value=""></Select>
+        </FormControl>
+      </Grid>
+
+      {/* Teaching Next Semester switch*/}
+      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+        <FormControl
+          size="small"
+          className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
+        >
+          <FormControlLabel
+            control={<Switch checked={true} />}
+            label="Teaching Next Semester"
+          />
+        </FormControl>
+      </Grid>
+    </Grid>
+  );
+}
+
 /**
  * This component returns a set of filters with which to sort results.
  */
-const Filters = () => {
-  const academicSessions = [];
-  const chosenSessions = [];
-  const addChosenSessions = () => {};
+export default function Filters() {
+  const academicSessions: string[] = [];
+  const chosenSessions: string[] = [];
+  const addChosenSessions = (arg0?: () => string[]) => {
+    console.log(arg0);
+  };
 
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
@@ -356,6 +410,4 @@ const Filters = () => {
       </Grid>
     </Grid>
   );
-};
-
-export default Filters;
+}

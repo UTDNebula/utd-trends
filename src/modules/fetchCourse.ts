@@ -44,7 +44,7 @@ export default async function fetchCourse(
 ): Promise<GenericFetchedData<Course>> {
   const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
   if (typeof API_KEY !== 'string') {
-    return { message: 'API key is undefined' };
+    return { message: 'error', error: 'API key is undefined' };
   }
 
   try {
@@ -61,7 +61,6 @@ export default async function fetchCourse(
         'x-api-key': API_KEY,
         Accept: 'application/json',
       },
-      cache: 'force-cache',
       next: { revalidate: 3600 },
     });
 
@@ -72,7 +71,7 @@ export default async function fetchCourse(
     }
 
     // find most recent year
-    const mostRecent = data.data.reduce((prev, curr) =>
+    const mostRecent = data.data.reduce((prev: Course, curr: Course) =>
       prev.catalog_year > curr.catalog_year ? prev : curr,
     );
 
@@ -82,7 +81,8 @@ export default async function fetchCourse(
     };
   } catch (error) {
     return {
-      message:
+      message: 'error',
+      error:
         error instanceof Error ? error.message : 'An unknown error occurred',
     };
   }

@@ -43,17 +43,50 @@ type SectionsData = {
   attributes: unknown;
 }[];
 
-type Sections = {
+export type Sections = {
   all: SectionsData;
   latest: SectionsData;
 };
+
+async function recursiveFetchSingleSections(
+  url: URL,
+  offset: number,
+): Promise<SectionsData> {
+  const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
+  if (typeof API_KEY !== 'string') {
+    return [];
+  }
+
+  const offsetUrl = new URL(url);
+  offsetUrl.searchParams.append('latter_offset', offset.toString());
+
+  const res = await fetch(offsetUrl.href, {
+    method: 'GET',
+    headers: {
+      'x-api-key': API_KEY,
+      Accept: 'application/json',
+    },
+    next: { revalidate: 3600 },
+  });
+
+  const data = await res.json();
+
+  if (data.message !== 'success') {
+    throw new Error(data.message);
+  }
+  if (data.data === null) {
+    return [];
+  }
+  const nextData = await recursiveFetchSingleSections(url, offset + 20);
+  return data.data.concat(nextData);
+}
 
 async function fetchSingleSections(
   query: SearchQuery,
 ): Promise<GenericFetchedData<SectionsData>> {
   const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
   if (typeof API_KEY !== 'string') {
-    return { message: 'API key is undefined' };
+    return { message: 'error', error: 'API key is undefined' };
   }
 
   try {
@@ -72,37 +105,10 @@ async function fetchSingleSections(
       url.searchParams.append('last_name', profLast);
     }
     if (typeof url === 'undefined') {
-      return { message: 'Incorrect query present' };
+      return { message: 'error', error: 'Incorrect query present' };
     }
 
-    function recursiveFetch(url: URL, offset: number): Promise<Sections> {
-      const offsetUrl = new URL(url);
-      offsetUrl.searchParams.append('latter_offset', offset.toString());
-
-      return fetch(offsetUrl.href, {
-        method: 'GET',
-        headers: {
-          'x-api-key': API_KEY,
-          Accept: 'application/json',
-        },
-        cache: 'force-cache',
-        next: { revalidate: 3600 },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.message !== 'success') {
-            throw new Error(data.message);
-          }
-          if (data.data === null) {
-            return [];
-          }
-          return recursiveFetch(url, offset + 20).then((nextData) =>
-            data.data.concat(nextData),
-          );
-        });
-    }
-
-    const data = await recursiveFetch(url, 0);
+    const data = await recursiveFetchSingleSections(url, 0);
 
     return {
       message: 'success',
@@ -110,7 +116,8 @@ async function fetchSingleSections(
     };
   } catch (error) {
     return {
-      message:
+      message: 'error',
+      error:
         error instanceof Error ? error.message : 'An unknown error occurred',
     };
   }
@@ -131,20 +138,20 @@ export default async function fetchSections(
       seperatedCombo.map((query) => fetchSingleSections(query)),
     );
     if (data[0].message !== 'success') {
-      return { message: data[0].message };
+      return { message: 'error', error: data[0].message };
     }
     if (data[1] && data[1].message !== 'success') {
-      return { message: data[1].message };
+      return { message: 'error', error: data[1].message };
     }
 
     //Find intersection of all course sections and all professor sections
-    let intersection: Sections = [];
+    let intersection: SectionsData = [];
     if (data.length === 1) {
       intersection = data[0].data;
     } else if (data.length === 2) {
       intersection = data[0].data.filter(
         (value) =>
-          data[1].data.findIndex((val) => val._id === value._id) !== -1,
+          !data[1]?.data || data[1].data.some((val) => val._id === value._id),
       );
     }
     //Filter to only latestSemester
@@ -160,7 +167,8 @@ export default async function fetchSections(
     };
   } catch (error) {
     return {
-      message:
+      message: 'error',
+      error:
         error instanceof Error ? error.message : 'An unknown error occurred',
     };
   }

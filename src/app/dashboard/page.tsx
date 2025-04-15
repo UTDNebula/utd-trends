@@ -4,9 +4,9 @@ import React, { Suspense } from 'react';
 import Split from '@/components/common/Split/Split';
 import DashboardEmpty from '@/components/dashboard/DashboardEmpty/DashboardEmpty';
 import TopMenu from '@/components/navigation/TopMenu/TopMenu';
-import Filters from '@/components/search/Filters/Filters';
+import Filters, { LoadingFilters } from '@/components/search/Filters/Filters';
 import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
-import { decodeSearchQueryLabel, searchQueryLabel } from '@/types/SearchQuery';
+import { decodeSearchQueryLabel } from '@/types/SearchQuery';
 
 import Right, { LoadingRight } from './Right';
 import ServerLeft from './ServerLeft';
@@ -15,7 +15,9 @@ interface Props {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export async function generateMetadata({ searchParams }: Props): Metadata {
+export async function generateMetadata({
+  searchParams,
+}: Props): Promise<Metadata> {
   let title = '';
   let description =
     "Choose the perfect classes for you: Nebula Labs's data analytics platform to help you make informed decisions about your coursework with UT Dallas grade and Rate My Professors data.";
@@ -25,16 +27,14 @@ export async function generateMetadata({ searchParams }: Props): Metadata {
     searchTerms = searchTerms[0];
   }
   if (typeof searchTerms !== 'undefined') {
-    const queries = searchTerms
-      .split(',')
-      .map(decodeSearchQueryLabel)
-      .map(searchQueryLabel);
+    const queries = searchTerms.split(',');
+    const firstIsCourse =
+      typeof decodeSearchQueryLabel(queries[0]).prefix !== 'undefined';
     title = ' - ' + queries.join(', ');
     description =
       'Choose the perfect classes for you: Compare ' +
       (queries.length === 1
-        ? queries[0] +
-          (queries[0].prefix !== 'undefined' ? ' professors' : ' courses')
+        ? queries[0] + (firstIsCourse ? ' professors' : ' courses')
         : queries.slice(0, -1).join(', ') +
           (queries.length > 2 ? ',' : '') +
           ' and ' +
@@ -67,11 +67,11 @@ export default async function Page({ searchParams }: Props) {
     );
   }
 
-  searchTerms = searchTerms.split(',').map(decodeSearchQueryLabel);
-  const courses = searchTerms.filter(
+  const decodedSearchTerms = searchTerms.split(',').map(decodeSearchQueryLabel);
+  const courses = decodedSearchTerms.filter(
     (query) => typeof query.prefix !== 'undefined',
   );
-  const professors = searchTerms.filter(
+  const professors = decodedSearchTerms.filter(
     (query) => typeof query.profLast !== 'undefined',
   );
 
@@ -79,7 +79,9 @@ export default async function Page({ searchParams }: Props) {
     <>
       <TopMenu isPlanner={false} />
       <main className="p-4">
-        <Filters />
+        <Suspense fallback={<LoadingFilters />}>
+          <Filters />
+        </Suspense>
         <Split
           left={
             <Suspense fallback={<LoadingSearchResultsTable />}>

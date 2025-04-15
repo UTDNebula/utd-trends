@@ -31,6 +31,7 @@ import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesI
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import type { Grades } from '@/modules/fetchGrades';
 import type { RMP } from '@/modules/fetchRmp';
+import type { Sections } from '@/modules/fetchSections';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   removeSection,
@@ -86,8 +87,8 @@ function parseTime(time: string): number {
 }
 
 function hasConflict(
-  newSection: Sections[number],
-  selectedSections: Sections,
+  newSection: Sections['all'][number],
+  selectedSections: Sections['all'],
 ): boolean {
   if (!newSection || !selectedSections) return false;
 
@@ -156,7 +157,7 @@ function SectionTableHead(props: { hasMultipleDateRanges: boolean }) {
   );
 }
 
-function parseDateRange(meeting: Sections[number]['meetings'][number]) {
+function parseDateRange(meeting: Sections['all'][number]['meetings'][number]) {
   const start_date = new Date(meeting.start_date);
   const formatted_start = `${(start_date.getMonth() + 1).toString()}/${start_date.getDate().toString()}`;
   const end_date = new Date(meeting.end_date);
@@ -184,7 +185,7 @@ function meetingDays(days: string[]): string {
   return result;
 }
 
-function parseMeeting(meeting: Sections[number]['meetings'][number]) {
+function parseMeeting(meeting: Sections['all'][number]['meetings'][number]) {
   function classTime(startTime: string, endTime: string): string {
     const startAmPm = startTime.slice(-2);
     const endAmPm = endTime.slice(-2);
@@ -202,12 +203,12 @@ function parseMeeting(meeting: Sections[number]['meetings'][number]) {
 }
 
 type SectionTableRowProps = {
-  data: Sections[number];
+  data: Sections['all'][number];
   course: SearchQueryMultiSection;
   lastRow: boolean;
-  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
+  setPlannerSection: (searchQuery: SearchQuery, section: string) => void;
   hasMultipleDateRanges: boolean;
-  selectedSections: Sections;
+  selectedSections: Sections['all'];
   openConflictMessage: () => void;
 };
 
@@ -314,7 +315,7 @@ function SectionTableRow(props: SectionTableRowProps) {
 
 function MeetingChip(props: {
   color: { fill: string; outline: string; font: string };
-  meetings: Sections[number]['meetings'] | undefined;
+  meetings: Sections['all'][number]['meetings'] | undefined;
 }) {
   if (typeof props.meetings === 'undefined') {
     return null;
@@ -340,12 +341,12 @@ function MeetingChip(props: {
 
 type PlannerCardProps = {
   query: SearchQueryMultiSection;
-  sections?: Sections;
-  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
+  sections?: Sections['all'];
+  setPlannerSection: (searchQuery: SearchQuery, section: string) => void;
   grades: GenericFetchedData<Grades>;
   rmp: GenericFetchedData<RMP>;
   removeFromPlanner: () => void;
-  selectedSections: Sections;
+  selectedSections: Sections['all'];
   openConflictMessage: () => void;
   color: { fill: string; outline: string; font: string };
 };

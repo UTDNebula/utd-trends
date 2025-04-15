@@ -24,7 +24,7 @@ export default function Split(props: Props) {
   const panelRRef = useRef<ImperativePanelHandle>(null);
   // Resets RHS & LHS when double clicking handle
   const handleResizeDoubleClick = () => {
-    panelLRef.current?.resize(defaultLeft);
+    panelLRef.current?.resize(props.defaultLeft);
   };
 
   return (

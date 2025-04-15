@@ -33,7 +33,7 @@ type Props = {
  * @param props
  * @returns vertical bar graph
  */
-function BarGraph(props: Props) {
+export default function BarGraph(props: Props) {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
@@ -167,5 +167,3 @@ function BarGraph(props: Props) {
     </>
   );
 }
-
-export default BarGraph;
