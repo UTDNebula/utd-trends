@@ -1,3 +1,4 @@
+import { Skeleton } from '@mui/material';
 import React from 'react';
 
 import Split from '@/components/common/Split/Split';
@@ -18,11 +19,7 @@ export default function Page() {
         <LoadingFilters />
         <Split
           left={<LoadingSearchResultsTable />}
-          right={
-            <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto mt-4">
-              <LoadingRight />
-            </div>
-          }
+          right={<LoadingRight />}
           minLeft={40}
           minRight={30}
           defaultLeft={50}

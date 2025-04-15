@@ -92,7 +92,11 @@ export default async function Page({ searchParams }: Props) {
             </Suspense>
           }
           right={
-            <Suspense fallback={<LoadingRight />}>
+            <Suspense
+              fallback={
+                <LoadingRight courses={courses} professors={professors} />
+              }
+            >
               <Right courses={courses} professors={professors} />
             </Suspense>
           }
