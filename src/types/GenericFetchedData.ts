@@ -1,12 +1,11 @@
-type GenericFetchedDataError<T> = {
+type GenericFetchedDataError = {
   message: 'error';
-  error: string;
-  data?: T;
+  error?: string;
 };
 type GenericFetchedDataDone<T> = {
   message: 'success';
   data: T;
 };
 export type GenericFetchedData<T> =
-  | GenericFetchedDataError<T>
+  | GenericFetchedDataError
   | GenericFetchedDataDone<T>;

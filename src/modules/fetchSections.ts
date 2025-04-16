@@ -1,3 +1,4 @@
+import { compareSemesters } from '@/modules/semesters';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToCourseOnly,
@@ -123,6 +124,37 @@ async function fetchSingleSections(
   }
 }
 
+async function fetchLatestSemester(): Promise<GenericFetchedData<string>> {
+  try {
+    const sections = await fetchSingleSections({
+      prefix: 'GOVT',
+      number: '2306',
+    });
+    if (sections.message !== 'success') {
+      return sections;
+    }
+    const latestSemester = sections.data
+      //exclude summers
+      .filter((sem) => !sem.academic_session.name.includes('U'))
+      //find max
+      .reduce((a, b) =>
+        compareSemesters(b.academic_session.name, a.academic_session.name) < 0
+          ? a
+          : b,
+      ).academic_session.name;
+    return {
+      message: 'success',
+      data: latestSemester,
+    };
+  } catch (error) {
+    return {
+      message: 'error',
+      error:
+        error instanceof Error ? error.message : 'An unknown error occurred',
+    };
+  }
+}
+
 export default async function fetchSections(
   query: SearchQuery,
 ): Promise<GenericFetchedData<Sections>> {
@@ -133,14 +165,20 @@ export default async function fetchSections(
     ]
       //Remove empty objects (for non combos)
       .filter((obj) => Object.keys(obj).length !== 0);
+
     //Call each
-    const data = await Promise.all(
-      seperatedCombo.map((query) => fetchSingleSections(query)),
-    );
+    const [latestSemester, data] = await Promise.all([
+      fetchLatestSemester(),
+      Promise.all(seperatedCombo.map((query) => fetchSingleSections(query))),
+    ]);
+
+    if (latestSemester.message !== 'success') {
+      return { message: 'error', error: latestSemester.message };
+    }
     if (data[0].message !== 'success') {
       return { message: 'error', error: data[0].message };
     }
-    if (data[1] && data[1].message !== 'success') {
+    if (data.length === 2 && data[1].message !== 'success') {
       return { message: 'error', error: data[1].message };
     }
 
@@ -151,12 +189,13 @@ export default async function fetchSections(
     } else if (data.length === 2) {
       intersection = data[0].data.filter(
         (value) =>
-          !data[1]?.data || data[1].data.some((val) => val._id === value._id),
+          data[1].message !== 'success' ||
+          data[1].data.some((val) => val._id === value._id),
       );
     }
     //Filter to only latestSemester
     const latest = intersection.filter(
-      (section) => section.academic_session.name === '25F', /// CHANGE BACK: latestSemester.current,
+      (section) => section.academic_session.name === latestSemester.data,
     );
     return {
       message: 'success',

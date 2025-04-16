@@ -293,9 +293,7 @@ export default function Filters() {
                 if (chosenSemesters.length === semesters.length) {
                   return 'All selected';
                 }
-                return selected
-                  .sort((a, b) => compareSemesters(a, b))
-                  .join(', ');
+                return selected.sort(compareSemesters).join(', ');
               }}
             >
               {/* select all sessions */}
