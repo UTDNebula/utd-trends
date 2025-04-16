@@ -1,6 +1,12 @@
 'use client';
 
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+} from 'react';
 
 import { compareColors, plannerColors } from '@/modules/colors';
 import { calculateGrades, type Grades } from '@/modules/fetchGrades';
@@ -62,6 +68,38 @@ export function SharedStateProvider({
   }>({});
   const [semesters, setSemesters] = useState<string[]>([]);
   const [chosenSemesters, internalSetChosenSemesters] = useState<string[]>([]);
+
+  const [rmp, setRmp] = useState<{ [key: string]: GenericFetchedData<RMP> }>(
+    {},
+  );
+
+  const [sections, setSections] = useState<{
+    [key: string]: GenericFetchedData<Sections>;
+  }>({});
+
+  const [compare, setCompare] = useState<SearchQuery[]>([]);
+  const [compareGrades, internalSetCompareGrades] = useState<{
+    [key: string]: GenericFetchedData<Grades>;
+  }>({});
+  const compareGradesRef = useRef(compareGrades);
+  //Uupdate ref for setGrades
+  const setCompareGrades = useCallback(
+    (value: SetterValue<{ [key: string]: GenericFetchedData<Grades> }>) => {
+      internalSetCompareGrades((prev) => {
+        const newValue = typeof value === 'function' ? value(prev) : value;
+
+        compareGradesRef.current = newValue;
+
+        return newValue;
+      });
+    },
+    [internalSetCompareGrades],
+  );
+  const [compareRmp, setCompareRmp] = useState<{
+    [key: string]: GenericFetchedData<RMP>;
+  }>({});
+
+  //Set grades and update semesters
   const setGrades = useCallback(
     (value: SetterValue<{ [key: string]: GenericFetchedData<Grades> }>) => {
       internalSetGrades((prev) => {
@@ -73,20 +111,32 @@ export function SharedStateProvider({
           //remove grade data, just semesters
           .flatMap((grade) =>
             grade.data.grades.map((gradeSemester) => gradeSemester._id),
-          )
+          );
+        // add semesters from compare grades
+        const semestersFromCompare = Object.values(compareGradesRef.current)
+          // remove errored
+          .filter((grade) => grade.message === 'success')
+          //remove grade data, just semesters
+          .flatMap((grade) =>
+            grade.data.grades.map((gradeSemester) => gradeSemester._id),
+          );
+        const allSemesters = newSemesters
+          .concat(semestersFromCompare)
           // remove duplicates
           .filter((value, index, array) => array.indexOf(value) === index)
           // display the semesters in order of recency (most recent first)
           .sort((a, b) => compareSemesters(b, a));
 
-        setSemesters(newSemesters);
-        internalSetChosenSemesters(newSemesters);
+        setSemesters(allSemesters);
+        internalSetChosenSemesters(allSemesters);
 
         return newValue;
       });
     },
     [internalSetGrades, setSemesters, internalSetChosenSemesters],
   );
+
+  //Set chosen semesters and update grades and compare grades
   const setChosenSemesters = useCallback(
     (value: SetterValue<string[]>) => {
       internalSetChosenSemesters((prev) => {
@@ -104,28 +154,23 @@ export function SharedStateProvider({
           }
           return prev;
         });
+        setCompareGrades((prev) => {
+          for (const grade of Object.values(prev)) {
+            if (grade.message === 'success') {
+              grade.data.filtered = calculateGrades(
+                grade.data.grades,
+                newValue,
+              );
+            }
+          }
+          return prev;
+        });
 
         return newValue;
       });
     },
-    [internalSetGrades, internalSetChosenSemesters],
+    [internalSetGrades, internalSetChosenSemesters, setCompareGrades],
   );
-
-  const [rmp, setRmp] = useState<{ [key: string]: GenericFetchedData<RMP> }>(
-    {},
-  );
-
-  const [sections, setSections] = useState<{
-    [key: string]: GenericFetchedData<Sections>;
-  }>({});
-
-  const [compare, setCompare] = useState<SearchQuery[]>([]);
-  const [compareGrades, setCompareGrades] = useState<{
-    [key: string]: GenericFetchedData<Grades>;
-  }>({});
-  const [compareRmp, setCompareRmp] = useState<{
-    [key: string]: GenericFetchedData<RMP>;
-  }>({});
 
   //Add a course+prof combo to compare (happens from search results)
   //copy over data basically
