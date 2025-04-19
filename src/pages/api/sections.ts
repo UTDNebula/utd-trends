@@ -76,24 +76,25 @@ export default function handler(
     Accept: 'application/json',
   };
 
-  return new Promise<void>((resolve) => 
+  return new Promise<void>((resolve) =>
     fetch(url.href, {
       method: 'GET',
       headers: headers,
     })
-    .then((response) => response.json())
-    .then((response) => {
-      if (response.message !== 'success') {
-        throw new Error(response.message);
-      }
-      res.status(200).json({
-        message: 'success',
-        data: response.data,
-      });
-      resolve();
-    })
-    .catch((error) => {
-      res.status(400).json({ message: error.message });
-      resolve();
-    }));
+      .then((response) => response.json())
+      .then((response) => {
+        if (response.message !== 'success') {
+          throw new Error(response.message);
+        }
+        res.status(200).json({
+          message: 'success',
+          data: response.data,
+        });
+        resolve();
+      })
+      .catch((error) => {
+        res.status(400).json({ message: error.message });
+        resolve();
+      }),
+  );
 }

@@ -14,7 +14,7 @@ import type { SectionsType } from '@/types/SectionsType';
 interface CachedSectionRequests {
   [key: string]: Promise<SectionsData>;
 }
-const SectionRequestCache: CachedSectionRequests = {}
+const SectionRequestCache: CachedSectionRequests = {};
 
 //Fetch section data from nebula api
 function fetchSectionsData(
@@ -23,9 +23,8 @@ function fetchSectionsData(
 ): Promise<SectionsData> {
   const queryLabel = searchQueryLabel(query);
   const cachedSectionRequest = SectionRequestCache[queryLabel];
-  if (typeof cachedSectionRequest !== 'undefined')
-    return cachedSectionRequest;
-  
+  if (typeof cachedSectionRequest !== 'undefined') return cachedSectionRequest;
+
   SectionRequestCache[queryLabel] = fetch(
     '/api/sections?' +
       Object.keys(query)
@@ -52,7 +51,7 @@ function fetchSectionsData(
       return response.data;
     });
 
-    return SectionRequestCache[queryLabel];
+  return SectionRequestCache[queryLabel];
 }
 
 // Finding the most recent semester in the database by the newest GOVT 2306 semester (don't judge me)
