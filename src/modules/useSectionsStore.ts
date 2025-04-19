@@ -14,7 +14,7 @@ import type { SectionsType } from '@/types/SectionsType';
 interface CachedSectionRequests {
   [key: string]: Promise<SectionsData>;
 }
-export const SectionRequestCache: CachedSectionRequests = {}
+const SectionRequestCache: CachedSectionRequests = {}
 
 //Fetch section data from nebula api
 function fetchSectionsData(
