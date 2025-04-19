@@ -59,11 +59,11 @@ export default function handler(
   const profFirst = req.query.profFirst;
   const profLast = req.query.profLast;
   if (typeof prefix === 'string' && typeof number === 'string') {
-    url = new URL('https://api.utdnebula.com/course/sections');
+    url = new URL('https://api.utdnebula.com/course/sections/trends');
     url.searchParams.append('subject_prefix', prefix);
     url.searchParams.append('course_number', number);
   } else if (typeof profFirst === 'string' && typeof profLast === 'string') {
-    url = new URL('https://api.utdnebula.com/professor/sections');
+    url = new URL('https://api.utdnebula.com/professor/sections/trends');
     url.searchParams.append('first_name', profFirst);
     url.searchParams.append('last_name', profLast);
   }
@@ -76,40 +76,24 @@ export default function handler(
     Accept: 'application/json',
   };
 
-  function recursiveFetch(url: URL, offset: number): Promise<SectionsData> {
-    const offsetUrl = new URL(url);
-    offsetUrl.searchParams.append('latter_offset', offset.toString());
-
-    return fetch(offsetUrl.href, {
+  return new Promise<void>((resolve) => 
+    fetch(url.href, {
       method: 'GET',
       headers: headers,
     })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.message !== 'success') {
-          throw new Error(data.message);
-        }
-        if (data.data === null) {
-          return [];
-        }
-        return recursiveFetch(url, offset + 20).then((nextData) =>
-          data.data.concat(nextData),
-        );
+    .then((response) => response.json())
+    .then((response) => {
+      if (response.message !== 'success') {
+        throw new Error(response.message);
+      }
+      res.status(200).json({
+        message: 'success',
+        data: response.data,
       });
-  }
-
-  return new Promise<void>((resolve) => {
-    recursiveFetch(url, 0)
-      .then((data) => {
-        res.status(200).json({
-          message: 'success',
-          data: data,
-        });
-        resolve();
-      })
-      .catch((error) => {
-        res.status(400).json({ message: error.message });
-        resolve();
-      });
-  });
+      resolve();
+    })
+    .catch((error) => {
+      res.status(400).json({ message: error.message });
+      resolve();
+    }));
 }
