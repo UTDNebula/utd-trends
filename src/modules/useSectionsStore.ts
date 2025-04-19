@@ -11,12 +11,22 @@ import {
 } from '@/types/SearchQuery';
 import type { SectionsType } from '@/types/SectionsType';
 
+interface CachedSectionRequests {
+  [key: string]: Promise<SectionsData>;
+}
+export const SectionRequestCache: CachedSectionRequests = {}
+
 //Fetch section data from nebula api
 function fetchSectionsData(
   query: SearchQuery,
   controller: AbortController,
 ): Promise<SectionsData> {
-  return fetch(
+  const queryLabel = searchQueryLabel(query);
+  const cachedSectionRequest = SectionRequestCache[queryLabel];
+  if (typeof cachedSectionRequest !== 'undefined')
+    return cachedSectionRequest;
+  
+  SectionRequestCache[queryLabel] = fetch(
     '/api/sections?' +
       Object.keys(query)
         .map(
@@ -41,6 +51,8 @@ function fetchSectionsData(
       }
       return response.data;
     });
+
+    return SectionRequestCache[queryLabel];
 }
 
 // Finding the most recent semester in the database by the newest GOVT 2306 semester (don't judge me)
