@@ -1,4 +1,5 @@
-import type { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
+'use client';
+
 import BarChartIcon from '@mui/icons-material/BarChart';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material';
@@ -6,11 +7,11 @@ import React, { useState } from 'react';
 
 type Props = {
   state: string;
-  bar?: ReactJSXElement;
-  line?: ReactJSXElement;
+  bar?: React.ReactNode;
+  line?: React.ReactNode;
 };
 
-function GraphToggle(props: Props) {
+export default function GraphToggle(props: Props) {
   const [chartType, setChartType] = useState<'line' | 'bar'>('bar');
 
   const handleChartToggle = (
@@ -53,5 +54,3 @@ function GraphToggle(props: Props) {
     </div>
   );
 }
-
-export default GraphToggle;

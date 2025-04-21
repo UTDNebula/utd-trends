@@ -1,37 +1,32 @@
+'use client';
+
 import React from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import CompareTable from '@/components/compare/CompareTable/CompareTable';
 import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
-import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
-import type { GradesType } from '@/types/GradesType';
-import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
+import type { Grades } from '@/modules/fetchGrades';
+import { searchQueryLabel } from '@/types/SearchQuery';
 
-type CompareProps = {
-  courses: SearchQuery[];
-  grades: { [key: string]: GenericFetchedData<GradesType> };
-  rmp: { [key: string]: GenericFetchedData<RMPInterface> };
-  removeFromCompare: { (arg0: SearchQuery): void };
-  colorMap: { [key: string]: string };
-};
-
-function convertNumbersToPercents(distribution: GradesType): number[] {
+function convertNumbersToPercents(distribution: Grades): number[] {
   const total = distribution.filtered.total;
   return distribution.filtered.grade_distribution.map(
     (frequencyOfLetterGrade) => (frequencyOfLetterGrade / total) * 100,
   );
 }
 
-const Compare = ({
-  courses,
-  grades,
-  rmp,
-  removeFromCompare,
-  colorMap,
-}: CompareProps) => {
-  if (courses.length === 0) {
+export default function Compare() {
+  const {
+    compare,
+    removeFromCompare,
+    compareGrades,
+    compareRmp,
+    compareColorMap,
+  } = useSharedState();
+
+  if (compare.length === 0) {
     return <p>Click a checkbox to add something to compare.</p>;
   }
 
@@ -63,8 +58,9 @@ const Compare = ({
             }
             tooltipFormatter={(value, { seriesIndex, dataPointIndex }) => {
               let response = Number(value).toFixed(2).toLocaleString() + '%';
-              const grade = grades[searchQueryLabel(courses[seriesIndex])];
-              if (grade.state === 'done') {
+              const grade =
+                compareGrades[searchQueryLabel(compare[seriesIndex])];
+              if (grade.message === 'success') {
                 response +=
                   ' (' +
                   grade.data.filtered.grade_distribution[dataPointIndex]
@@ -74,8 +70,8 @@ const Compare = ({
               }
               return response;
             }}
-            series={courses.map((course) => {
-              const grade = grades[searchQueryLabel(course)];
+            series={compare.map((course) => {
+              const grade = compareGrades[searchQueryLabel(course)];
               return {
                 name:
                   searchQueryLabel(course) +
@@ -86,7 +82,7 @@ const Compare = ({
                     ? ' (Overall)' //Indicates that this entry is an aggregate for the entire course/professor
                     : ''),
                 data:
-                  grade.state === 'done'
+                  grade.message === 'success'
                     ? convertNumbersToPercents(grade.data)
                     : [],
               };
@@ -96,8 +92,8 @@ const Compare = ({
         line={
           <LineGraph
             title="GPA Trends"
-            series={courses.map((course) => {
-              const grade = grades[searchQueryLabel(course)];
+            series={compare.map((course) => {
+              const grade = compareGrades[searchQueryLabel(course)];
               return {
                 name:
                   searchQueryLabel(course) +
@@ -107,21 +103,19 @@ const Compare = ({
                     typeof course.number === 'undefined')
                     ? ' (Overall)' //Indicates that this entry is an aggregate for the entire course/professor
                     : ''),
-                data: grade.state === 'done' ? grade.data.grades : [],
+                data: grade.message === 'success' ? grade.data.grades : [],
               };
             })}
           />
         }
       />
       <CompareTable
-        includedResults={courses}
-        grades={grades}
-        rmp={rmp}
+        includedResults={compare}
+        grades={compareGrades}
+        rmp={compareRmp}
         removeFromCompare={removeFromCompare}
-        colorMap={colorMap}
+        colorMap={compareColorMap}
       />
     </div>
   );
-};
-
-export default Compare;
+}
