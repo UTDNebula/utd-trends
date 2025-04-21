@@ -49,39 +49,6 @@ export type Sections = {
   latest: SectionsData;
 };
 
-async function recursiveFetchSingleSections(
-  url: URL,
-  offset: number,
-): Promise<SectionsData> {
-  const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
-  if (typeof API_KEY !== 'string') {
-    return [];
-  }
-
-  const offsetUrl = new URL(url);
-  offsetUrl.searchParams.append('latter_offset', offset.toString());
-
-  const res = await fetch(offsetUrl.href, {
-    method: 'GET',
-    headers: {
-      'x-api-key': API_KEY,
-      Accept: 'application/json',
-    },
-    next: { revalidate: 3600 },
-  });
-
-  const data = await res.json();
-
-  if (data.message !== 'success') {
-    throw new Error(data.message);
-  }
-  if (data.data === null) {
-    return [];
-  }
-  const nextData = await recursiveFetchSingleSections(url, offset + 20);
-  return data.data.concat(nextData);
-}
-
 async function fetchSingleSections(
   query: SearchQuery,
 ): Promise<GenericFetchedData<SectionsData>> {
@@ -97,23 +64,36 @@ async function fetchSingleSections(
     const profFirst = query.profFirst;
     const profLast = query.profLast;
     if (typeof prefix === 'string' && typeof number === 'string') {
-      url = new URL('https://api.utdnebula.com/course/sections');
+      url = new URL('https://api.utdnebula.com/course/sections/trends');
       url.searchParams.append('subject_prefix', prefix);
       url.searchParams.append('course_number', number);
     } else if (typeof profFirst === 'string' && typeof profLast === 'string') {
-      url = new URL('https://api.utdnebula.com/professor/sections');
+      url = new URL('https://api.utdnebula.com/professor/sections/trends');
       url.searchParams.append('first_name', profFirst);
       url.searchParams.append('last_name', profLast);
     }
     if (typeof url === 'undefined') {
-      return { message: 'error', data: 'Incorrect query present' };
+      throw new Error('Incorrect query present');
     }
 
-    const data = await recursiveFetchSingleSections(url, 0);
+    const res = await fetch(url.href, {
+      method: 'GET',
+      headers: {
+        'x-api-key': API_KEY,
+        Accept: 'application/json',
+      },
+      next: { revalidate: 3600 },
+    });
+
+    const data = await res.json();
+
+    if (data.message !== 'success') {
+      throw new Error(data.data ?? data.message);
+    }
 
     return {
       message: 'success',
-      data: data,
+      data: data.data,
     };
   } catch (error) {
     return {

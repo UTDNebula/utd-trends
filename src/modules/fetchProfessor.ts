@@ -50,7 +50,7 @@ export default async function fetchProfessor(
     const data = await res.json();
 
     if (data.message !== 'success') {
-      throw new Error(data.message);
+      throw new Error(data.data ?? data.message);
     }
 
     return {

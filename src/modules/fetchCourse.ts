@@ -67,7 +67,7 @@ export default async function fetchCourse(
     const data = await res.json();
 
     if (data.message !== 'success') {
-      throw new Error(data.message);
+      throw new Error(data.data ?? data.message);
     }
 
     // find most recent year

@@ -182,7 +182,7 @@ export default function SearchBar(props: Props) {
       .then((response) => response.json())
       .then((data) => {
         if (data.message !== 'success') {
-          throw new Error(data.message);
+          throw new Error(data.data ?? data.message);
         }
         //remove currently chosen values
         const filtered = data.data.filter(
