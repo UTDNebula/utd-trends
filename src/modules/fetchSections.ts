@@ -93,7 +93,7 @@ async function fetchSingleSections(
 
     return {
       message: 'success',
-      data: data,
+      data: data.data,
     };
   } catch (error) {
     return {
