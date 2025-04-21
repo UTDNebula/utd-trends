@@ -4,13 +4,32 @@ import React from 'react';
 import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
+import type { Grades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
-import type { GradesType } from '@/types/GradesType';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
+export function LoadingSingleGradesInfo() {
+  return (
+    <div className="p-2">
+      <GraphToggle state="loading" />
+      <div className="flex flex-wrap justify-around">
+        <p>
+          Grades: <Skeleton className="inline-block w-[5ch]" />
+        </p>
+        <p>
+          Median GPA: <Skeleton className="inline-block w-[5ch]" />
+        </p>
+        <p>
+          Mean GPA: <Skeleton className="inline-block w-[5ch]" />
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function convertNumbersToPercents(
-  distribution: GradesType,
+  distribution: Grades,
   gradesToUse: 'filtered' | 'unfiltered',
 ): number[] {
   const total = distribution[gradesToUse].total;
@@ -22,32 +41,18 @@ function convertNumbersToPercents(
 type Props = {
   title?: string;
   course: SearchQuery;
-  grades: GenericFetchedData<GradesType>;
+  grades: GenericFetchedData<Grades>;
   gradesToUse: 'filtered' | 'unfiltered';
 };
 
-function SingleGradesInfo({ title, course, grades, gradesToUse }: Props) {
-  if (typeof grades === 'undefined' || grades.state === 'error') {
+export default function SingleGradesInfo({
+  title,
+  course,
+  grades,
+  gradesToUse,
+}: Props) {
+  if (typeof grades === 'undefined' || grades.message !== 'success') {
     return null;
-  }
-
-  if (grades.state === 'loading') {
-    return (
-      <div className="p-2">
-        <GraphToggle state="loading" />
-        <div className="flex flex-wrap justify-around">
-          <p>
-            Grades: <Skeleton className="inline-block w-[5ch]" />
-          </p>
-          <p>
-            Median GPA: <Skeleton className="inline-block w-[5ch]" />
-          </p>
-          <p>
-            Mean GPA: <Skeleton className="inline-block w-[5ch]" />
-          </p>
-        </div>
-      </div>
-    );
   }
 
   const percents = convertNumbersToPercents(grades.data, gradesToUse);
@@ -106,7 +111,7 @@ function SingleGradesInfo({ title, course, grades, gradesToUse }: Props) {
           }
         />
       ) : (
-        <p>
+        <p className="p-1 pt-0">
           This professor/course combination hasn&apos;t been taught in the
           semesters you selected. To see more grade data, try changing your
           filters.
@@ -136,5 +141,3 @@ function SingleGradesInfo({ title, course, grades, gradesToUse }: Props) {
     </div>
   );
 }
-
-export default SingleGradesInfo;

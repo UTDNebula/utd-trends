@@ -1,3 +1,5 @@
+'use client';
+
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Badge, IconButton, Popover, Tooltip } from '@mui/material';
 import Link from 'next/link';
@@ -116,7 +118,7 @@ const fetchReleases = async () => {
 /**
  * WhatsNewButton component that shows the latest feature from GitHub releases
  */
-export function WhatsNewButton() {
+export default function WhatsNewButton() {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [readFeatures, setReadFeatures] = usePersistantState<string[]>(
     'readFeatures',
@@ -266,5 +268,3 @@ export function WhatsNewButton() {
     </>
   );
 }
-
-export default WhatsNewButton;

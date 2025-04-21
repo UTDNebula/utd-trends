@@ -1,3 +1,5 @@
+'use client';
+
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Badge, IconButton, Tab, Tabs } from '@mui/material';
 import React from 'react';

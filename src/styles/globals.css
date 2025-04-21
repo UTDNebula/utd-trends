@@ -1,39 +1,71 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss' important;
 
-html,
-body,
-#__next {
-  padding: 0;
-  margin: 0;
-  height: 100%;
-  width: 100%;
-  background-color: rgb(var(--light-DEFAULT));
+/*If changing be sure to update in layout.tsx too*/
+@theme {
+  --color-haiti: #090b2c;
+  --color-persimmon-50: #ffe5de;
+  --color-persimmon-100: #ffcabd;
+  --color-persimmon-200: #ffb09d;
+  --color-persimmon-300: #ff947e;
+  --color-persimmon-400: #ff7760;
+  --color-persimmon-500: #ff5743; /* brand accent, danger*/
+  --color-persimmon-600: #d14a39;
+  --color-persimmon-700: #a43d2e;
+  --color-persimmon-800: #793025;
+  --color-persimmon-900: #51231b;
+  --color-royal: #573dff; /* brand secondary (dark)*/
+  --color-royalDark: #3c2ab2;
+  --color-cornflower-50: #eae4ff;
+  --color-cornflower-100: #d3caff; /* ~periwinkle*/
+  --color-cornflower-200: #bcb0fe;
+  --color-cornflower-300: #a297fd;
+  --color-cornflower-400: #857efc;
+  --color-cornflower-500: #6266fa; /* brand primary*/
+  --color-cornflower-600: #5455cc;
+  --color-cornflower-700: #45449f; /* ~royal*/
+  --color-cornflower-800: #363475;
+  --color-cornflower-900: #28254d;
+  --color-periwinkle: #c2c8ff; /* brand secondary (light)*/
+  --color-shade: #101828; /* drop shadow color from shipfaster ui*/
+
+  --font-kallisto: var(--font-kallisto), Roboto, sans-serif;
+  --font-inter: var(--font-inter), Roboto, sans-serif;
 }
 
-* {
-  box-sizing: border-box;
+@utility bg-lighten {
+  background-color: rgba(255, 255, 255, 0.6);
 }
 
-.apexcharts-toolbar {
-  z-index: 0 !important;
+@utility bg-darken {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+@utility tutorial-raise {
+  position: relative;
+  z-index: calc(var(--mui-zIndex-modal) + 1);
+  scroll-margin: 10rem;
+}
+
+@utility tutorial-table {
+  background-color: var(--mui-palette-background-paper);
 }
 
 @layer utilities {
-  .bg-lighten {
-    background-color: rgba(255, 255, 255, 0.6);
-  }
-  .bg-darken {
-    background-color: rgba(0, 0, 0, 0.6);
+  html,
+  body,
+  #__next {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(var(--light-DEFAULT));
   }
 
-  .tutorial-raise {
-    position: relative;
-    z-index: calc(var(--mui-zIndex-modal) + 1);
-    scroll-margin: 10rem;
+  * {
+    box-sizing: border-box;
   }
-  .tutorial-table {
-    background-color: var(--mui-palette-background-paper);
+
+  .apexcharts-toolbar {
+    z-index: 0 !important;
   }
 }

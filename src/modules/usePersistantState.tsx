@@ -4,7 +4,7 @@ export default function usePersistantState<T>(
   key: string,
   initialValue: T,
 ): [T, (value: T | ((old: T) => T)) => void] {
-  const [state, setInternalState] = useState<T>(initialValue);
+  const [state, internalSetState] = useState<T>(initialValue);
 
   const initialValueRef = useRef(initialValue);
   useEffect(() => {
@@ -15,10 +15,10 @@ export default function usePersistantState<T>(
       try {
         parsed = JSON.parse(value);
       } catch {
-        setInternalState(initialValueRef.current);
+        internalSetState(initialValueRef.current);
         return;
       }
-      setInternalState(parsed);
+      internalSetState(parsed);
     }
     setFromStorage();
 
@@ -32,10 +32,10 @@ export default function usePersistantState<T>(
     return () => window.removeEventListener('storage', handleChange);
   }, [key]);
 
-  const setState = (value: T | ((old: T) => T)) => {
-    setInternalState((old: T) => {
+  const setState = (value: T | ((prev: T) => T)) => {
+    internalSetState((prev: T) => {
       const newValue =
-        typeof value === 'function' ? (value as (old: T) => T)(old) : value;
+        typeof value === 'function' ? (value as (prev: T) => T)(prev) : value;
 
       localStorage.setItem(key, JSON.stringify(newValue));
       return newValue;

@@ -1,8 +1,10 @@
+'use client';
+
 import {
   Checkbox,
   FormControl,
   FormControlLabel,
-  Grid2 as Grid,
+  Grid,
   InputLabel,
   ListItemText,
   MenuItem,
@@ -11,43 +13,97 @@ import {
   Tooltip,
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
-import { useRouter } from 'next/router';
+import { usePathname, useSearchParams } from 'next/navigation';
 import React from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import { compareSemesters, displaySemesterName } from '@/modules/semesters';
+import useHasHydrated from '@/modules/useHasHydrated';
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
 
-interface FiltersProps {
-  academicSessions: string[];
-  chosenSessions: string[];
-  addChosenSessions: (arg0: (arg0: string[]) => string[]) => void;
+export function LoadingFilters() {
+  return (
+    <Grid container spacing={2} className="mb-4 sm:m-0">
+      {/* min letter grade dropdown*/}
+      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+        <FormControl
+          size="small"
+          className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
+        >
+          <InputLabel id="minGPA">Min Letter Grade</InputLabel>
+          <Select label="Min Letter Grade" labelId="minGPA" value=""></Select>
+        </FormControl>
+      </Grid>
+
+      {/* min rating dropdown*/}
+      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+        <FormControl
+          size="small"
+          className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
+        >
+          <InputLabel id="minRating">Min Rating</InputLabel>
+          <Select label="Min Rating" labelId="minRating" value=""></Select>
+        </FormControl>
+      </Grid>
+
+      {/* semester dropdown */}
+      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+        <FormControl
+          size="small"
+          className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
+        >
+          <InputLabel id="Semesters">Semesters</InputLabel>
+          <Select label="Semesters" labelId="Semesters" value=""></Select>
+        </FormControl>
+      </Grid>
+
+      {/* Teaching Next Semester switch*/}
+      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+        <FormControl
+          size="small"
+          className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
+        >
+          <FormControlLabel
+            control={<Switch checked={true} />}
+            label="Teaching Next Semester"
+          />
+        </FormControl>
+      </Grid>
+    </Grid>
+  );
 }
 
 /**
  * This component returns a set of filters with which to sort results.
  */
-const Filters = ({
-  academicSessions,
-  chosenSessions,
-  addChosenSessions,
-}: FiltersProps) => {
+export default function Filters() {
+  const { semesters, chosenSemesters, setChosenSemesters } = useSharedState();
+
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
-  academicSessions.sort((a, b) => compareSemesters(b, a)); // display the semesters in order of recency (most recent first)
 
-  const router = useRouter();
-  let minGPA = router.query.minGPA ?? '';
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  // To avoid hydration errors
+  const hasHydrated = useHasHydrated();
+  if (!hasHydrated) {
+    return <LoadingFilters />;
+  }
+
+  let minGPA = searchParams.get('minGPA') ?? '';
   if (Array.isArray(minGPA)) {
     minGPA = minGPA[0]; // if minGPA is an array, make it a string
   }
-  let minRating = router.query.minRating ?? '';
+  let minRating = searchParams.get('minRating') ?? '';
   if (Array.isArray(minRating)) {
     minRating = minRating[0]; // if minRating is an array, make it a string
   }
-  const filterNextSem = router.query.availability === 'true';
+  const filterNextSem = searchParams.get('availability') === 'true';
 
   function getRecentSemesters() {
     // get current month and year
@@ -76,30 +132,7 @@ const Filters = ({
       recentSemesters.push(yyyy.toString().substring(2) + season);
     }
 
-    return recentSemesters.filter((value) => academicSessions.includes(value));
-  }
-
-  function displayAcademicSessionName(id: string) {
-    return (
-      '20' +
-      id.slice(0, 2) +
-      ' ' +
-      { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)]
-    );
-  }
-
-  function compareSemesters(a: string, b: string) {
-    const x = a.substring(0, 2).localeCompare(b.substring(0, 2));
-    if (x == 0) {
-      const a_char = a[2];
-      const b_char = b[2];
-      // a_char and b_char cannot both be the same semester because x == 0
-      if (a_char == 'S') return -1;
-      if (a_char == 'U' && b_char == 'S') return 1;
-      if (a_char == 'U' && b_char == 'F') return -1;
-      if (a_char == 'F') return 1;
-      return 0;
-    } else return x;
+    return recentSemesters.filter((value) => semesters.includes(value));
   }
 
   return (
@@ -116,8 +149,8 @@ const Filters = ({
             size="small"
             className={`w-full ${
               minGPA
-                ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
-                : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
+                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
             }`}
           >
             <InputLabel id="minGPA">Min Letter Grade</InputLabel>
@@ -126,22 +159,18 @@ const Filters = ({
               labelId="minGPA"
               value={minGPA}
               onChange={(event: SelectChangeEvent) => {
-                if (router.isReady) {
-                  const newQuery = { ...router.query };
-                  const newValue = event.target.value;
-                  if (newValue !== '') {
-                    newQuery.minGPA = newValue;
-                  } else {
-                    delete newQuery.minGPA;
-                  }
-                  router.replace(
-                    {
-                      query: newQuery,
-                    },
-                    undefined,
-                    { shallow: true },
-                  );
+                const params = new URLSearchParams(searchParams.toString());
+                const newValue = event.target.value;
+                if (newValue !== '') {
+                  params.set('minGPA', newValue);
+                } else {
+                  params.delete('minGPA');
                 }
+                window.history.replaceState(
+                  null,
+                  '',
+                  `${pathname}?${params.toString()}`,
+                );
               }}
             >
               <MenuItem className="h-10" value="">
@@ -165,8 +194,8 @@ const Filters = ({
             size="small"
             className={`w-full ${
               minRating
-                ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
-                : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
+                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
             }`}
           >
             <InputLabel id="minRating">Min Rating</InputLabel>
@@ -175,22 +204,18 @@ const Filters = ({
               labelId="minRating"
               value={minRating}
               onChange={(event: SelectChangeEvent) => {
-                if (router.isReady) {
-                  const newQuery = { ...router.query };
-                  const newValue = event.target.value;
-                  if (newValue !== '') {
-                    newQuery.minRating = newValue;
-                  } else {
-                    delete newQuery.minRating;
-                  }
-                  router.replace(
-                    {
-                      query: newQuery,
-                    },
-                    undefined,
-                    { shallow: true },
-                  );
+                const params = new URLSearchParams(searchParams.toString());
+                const newValue = event.target.value;
+                if (newValue !== '') {
+                  params.set('minRating', newValue);
+                } else {
+                  params.delete('minRating');
                 }
+                window.history.replaceState(
+                  null,
+                  '',
+                  `${pathname}?${params.toString()}`,
+                );
               }}
               renderValue={(value) => (
                 <Rating
@@ -230,9 +255,9 @@ const Filters = ({
           <FormControl
             size="small"
             className={`w-full ${
-              chosenSessions.length !== academicSessions.length
-                ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
-                : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+              chosenSemesters.length !== semesters.length
+                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
+                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
             }`}
           >
             <InputLabel id="Semesters">Semesters</InputLabel>
@@ -240,37 +265,35 @@ const Filters = ({
               label="Semesters"
               labelId="Semesters"
               multiple
-              value={chosenSessions}
+              value={chosenSemesters}
               onChange={(event: SelectChangeEvent<string[]>) => {
                 const {
                   target: { value },
                 } = event;
                 if (value.includes('select-all')) {
-                  if (chosenSessions.length === academicSessions.length) {
-                    addChosenSessions(() => []);
+                  if (chosenSemesters.length === semesters.length) {
+                    setChosenSemesters([]);
                   } else {
-                    addChosenSessions(() => academicSessions);
+                    setChosenSemesters(semesters);
                   }
                 } else if (value.includes('recent')) {
                   if (
-                    chosenSessions.length === recentSemesters.length &&
-                    chosenSessions.every((el) => recentSemesters.includes(el))
+                    chosenSemesters.length === recentSemesters.length &&
+                    chosenSemesters.every((el) => recentSemesters.includes(el))
                   ) {
-                    addChosenSessions(() => academicSessions);
+                    setChosenSemesters(semesters);
                   } else {
-                    addChosenSessions(() => recentSemesters);
+                    setChosenSemesters(recentSemesters);
                   }
                 } else {
-                  addChosenSessions(() => value as string[]);
+                  setChosenSemesters(value as string[]);
                 }
               }}
               renderValue={(selected) => {
-                if (chosenSessions.length === academicSessions.length) {
+                if (chosenSemesters.length === semesters.length) {
                   return 'All selected';
                 }
-                return selected
-                  .sort((a, b) => compareSemesters(a, b))
-                  .join(', ');
+                return selected.sort(compareSemesters).join(', ');
               }}
               MenuProps={{ autoFocus: false }}
             >
@@ -278,21 +301,23 @@ const Filters = ({
               <MenuItem className="h-10 items-center" value="select-all">
                 <Checkbox
                   checked={
-                    academicSessions.length > 0 &&
-                    chosenSessions.length === academicSessions.length
+                    semesters.length > 0 &&
+                    chosenSemesters.length === semesters.length
                   }
                   indeterminate={
-                    chosenSessions.length !== academicSessions.length &&
-                    chosenSessions.length !== 0 &&
+                    chosenSemesters.length !== semesters.length &&
+                    chosenSemesters.length !== 0 &&
                     !(
-                      chosenSessions.length === recentSemesters.length &&
-                      chosenSessions.every((el) => recentSemesters.includes(el))
+                      chosenSemesters.length === recentSemesters.length &&
+                      chosenSemesters.every((el) =>
+                        recentSemesters.includes(el),
+                      )
                     ) // select-all is not indeterminate when recent is checked
                   }
-                  disabled={academicSessions.length == 0}
+                  disabled={semesters.length == 0}
                 />
                 <ListItemText
-                  className={academicSessions.length > 0 ? '' : 'text-gray-400'}
+                  className={semesters.length > 0 ? '' : 'text-gray-400'}
                   primary="Select All"
                 />
               </MenuItem>
@@ -302,8 +327,8 @@ const Filters = ({
                 <Checkbox
                   checked={
                     recentSemesters.length > 0 &&
-                    chosenSessions.length === recentSemesters.length &&
-                    chosenSessions.every((el) => recentSemesters.includes(el))
+                    chosenSemesters.length === recentSemesters.length &&
+                    chosenSemesters.every((el) => recentSemesters.includes(el))
                   }
                   disabled={recentSemesters.length == 0}
                 />
@@ -314,14 +339,14 @@ const Filters = ({
               </MenuItem>
 
               {/* individual options */}
-              {academicSessions.map((session) => (
+              {semesters.map((session) => (
                 <MenuItem
                   className="h-10 items-center"
                   key={session}
                   value={session}
                 >
-                  <Checkbox checked={chosenSessions.includes(session)} />
-                  <ListItemText primary={displayAcademicSessionName(session)} />
+                  <Checkbox checked={chosenSemesters.includes(session)} />
+                  <ListItemText primary={displaySemesterName(session)} />
                 </MenuItem>
               ))}
             </Select>
@@ -336,8 +361,8 @@ const Filters = ({
             size="small"
             className={`${
               filterNextSem
-                ? '[&>.MuiInputBase-root]:bg-cornflower-50 [&>.MuiInputBase-root]:dark:bg-cornflower-900'
-                : '[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-black'
+                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
+                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
             }`}
           >
             <FormControlLabel
@@ -345,21 +370,17 @@ const Filters = ({
                 <Switch
                   checked={filterNextSem}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    if (router.isReady) {
-                      const newQuery = { ...router.query };
-                      if (event.target.checked) {
-                        newQuery.availability = 'true';
-                      } else {
-                        delete newQuery.availability;
-                      }
-                      router.replace(
-                        {
-                          query: newQuery,
-                        },
-                        undefined,
-                        { shallow: true },
-                      );
+                    const params = new URLSearchParams(searchParams.toString());
+                    if (event.target.checked) {
+                      params.set('availability', 'true');
+                    } else {
+                      params.delete('availability');
                     }
+                    window.history.replaceState(
+                      null,
+                      '',
+                      `${pathname}?${params.toString()}`,
+                    );
                   }}
                 />
               }
@@ -370,6 +391,4 @@ const Filters = ({
       </Grid>
     </Grid>
   );
-};
-
-export default Filters;
+}
