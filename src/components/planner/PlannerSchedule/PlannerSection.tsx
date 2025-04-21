@@ -1,17 +1,19 @@
 import React from 'react';
 
-import type { SectionsData } from '@/pages/api/sections';
+import {
+  DAYS,
+  START_HOUR,
+} from '@/components/planner/PlannerSchedule/PlannerSchedule';
+import type { Sections } from '@/modules/fetchSections';
 import { type SearchQuery } from '@/types/SearchQuery';
 
-import { DAYS, START_HOUR } from './PlannerSchedule';
-
-type PlannerSectionComponentProps = {
-  selectedSection: SectionsData[number] | undefined;
+interface PlannerSectionComponentProps {
+  selectedSection: Sections['all'][number] | undefined;
   course: SearchQuery;
   color: { fill: string; outline: string; font: string };
-};
+}
 
-const PlannerSection = (props: PlannerSectionComponentProps) => {
+export default function PlannerSection(props: PlannerSectionComponentProps) {
   const selectedSection = props.selectedSection;
   if (typeof selectedSection === 'undefined') {
     return null;
@@ -75,7 +77,7 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
   }
 
   return meetings.map((x: string[], i: number) => {
-    const height = parseInt(x[2]);
+    const makeBigger = parseInt(x[2]) > 100;
     return (
       <div
         key={selectedSection._id + i}
@@ -98,8 +100,8 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
       >
         <div
           className={
-            'font-semibold text-center font-inter ' +
-            (height > 100 ? 'text-sm' : 'text-xs leading-none')
+            'font-semibold text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+            (makeBigger ? 'text-sm' : 'text-xs leading-none')
           }
         >
           {props.course.prefix} {props.course.number}.
@@ -107,14 +109,16 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
         </div>
         <div
           className={
-            'text-xs text-center ' + (height > 100 ? '' : 'leading-none')
+            'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+            (makeBigger ? '' : 'leading-none')
           }
         >
           {props.course.profFirst} {props.course.profLast}
         </div>
         <div
           className={
-            'text-xs text-center ' + (height > 100 ? '' : 'leading-none')
+            'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+            (makeBigger ? '' : 'leading-none')
           }
         >
           {selectedSection.meetings[0]?.location?.building}{' '}
@@ -123,5 +127,4 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
       </div>
     );
   });
-};
-export default PlannerSection;
+}

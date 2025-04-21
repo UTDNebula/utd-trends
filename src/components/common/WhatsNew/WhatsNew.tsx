@@ -1,3 +1,5 @@
+'use client';
+
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Badge, IconButton, Popover, Tooltip } from '@mui/material';
 import Link from 'next/link';
@@ -22,92 +24,64 @@ interface Feature {
   releaseId: string;
 }
 
-/**
- * WhatsNewButton component that shows the latest feature from GitHub releases
- */
-export function WhatsNewButton() {
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [readFeatures, setReadFeatures] = usePersistantState<string[]>(
-    'readFeatures',
-    [],
-  );
-  const [latestFeatures, setLatestFeatures] = useState<Feature[]>([]);
-  const [state, setState] = useState('done');
+// Extract features from GitHub release content
+const extractFeaturesFromRelease = (releaseBody: string): string[] => {
+  const lines = releaseBody.split('\n');
+  const features: string[] = [];
 
-  // Check if the latest feature is unread
-  const unread = Boolean(
-    latestFeatures.find((feature) => !readFeatures.includes(feature.id)),
-  );
-  const open = Boolean(anchorEl);
+  let inOverviewSection = true;
 
-  // Fetch releases
-  useEffect(() => {
-    fetchReleases();
-  }, []);
+  for (const line of lines) {
+    const trimmedLine = line.trim();
 
-  // Extract features from GitHub release content
-  const extractFeaturesFromRelease = (releaseBody: string): string[] => {
-    const lines = releaseBody.split('\n');
-    const features: string[] = [];
+    if (trimmedLine.startsWith('## ')) {
+      inOverviewSection = false;
+      continue;
+    }
 
-    let inOverviewSection = true;
+    if (
+      inOverviewSection &&
+      (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* '))
+    ) {
+      const featureContent = trimmedLine.replace(/^[-*]\s+/, '').trim();
+      if (featureContent) {
+        features.push(featureContent);
+      }
+    }
+  }
 
+  if (features.length === 0) {
     for (const line of lines) {
-      const trimmedLine = line.trim();
-
-      if (trimmedLine.startsWith('## ')) {
-        inOverviewSection = false;
-        continue;
-      }
-
-      if (
-        inOverviewSection &&
-        (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* '))
-      ) {
-        const featureContent = trimmedLine.replace(/^[-*]\s+/, '').trim();
-        if (featureContent) {
-          features.push(featureContent);
-        }
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#')) {
+        features.push(trimmed);
+        break;
       }
     }
+  }
 
-    if (features.length === 0) {
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (trimmed && !trimmed.startsWith('#')) {
-          features.push(trimmed);
-          break;
-        }
-      }
-    }
+  return features;
+};
 
-    return features;
-  };
-
-  // Function to fetch only the 2 most recent releases
-  const fetchReleases = async () => {
-    if (state === 'loading') return;
-
-    setState('loading');
-
-    try {
-      const response = await fetch(
-        'https://api.github.com/repos/UTDNebula/utd-trends/releases?per_page=2',
-      );
-
+// Function to fetch only the 2 most recent releases
+const fetchReleases = async () => {
+  return fetch(
+    'https://api.github.com/repos/UTDNebula/utd-trends/releases?per_page=2',
+  )
+    .then((response) => {
       if (!response.ok) {
         throw new Error(`GitHub API responded with status: ${response.status}`);
       }
-
-      const releases = (await response.json()) as ReleaseData[];
-
-      if (!Array.isArray(releases) || releases.length === 0) {
-        return;
+      return response.json();
+    })
+    .then((response) => {
+      if (!Array.isArray(response) || response.length === 0) {
+        throw new Error('GitHub API responded with not known format');
       }
 
       const allFeatures: Feature[] = [];
 
-      releases.forEach((release: ReleaseData) => {
+      response.forEach((release: ReleaseData) => {
         if (release && release.body) {
           const extractedFeatures = extractFeaturesFromRelease(release.body);
           const featureVersion = release.name;
@@ -137,15 +111,38 @@ export function WhatsNewButton() {
         }
       });
 
-      if (allFeatures.length > 0) {
-        setLatestFeatures(allFeatures);
-      }
-    } catch {
-      setState('error');
-    } finally {
-      setState('done');
-    }
-  };
+      return allFeatures;
+    });
+};
+
+/**
+ * WhatsNewButton component that shows the latest feature from GitHub releases
+ */
+export default function WhatsNewButton() {
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [readFeatures, setReadFeatures] = usePersistantState<string[]>(
+    'readFeatures',
+    [],
+  );
+  const [latestFeatures, setLatestFeatures] = useState<Feature[]>([]);
+  const [state, setState] = useState('done');
+
+  // Check if the latest feature is unread
+  const unread = Boolean(
+    latestFeatures.find((feature) => !readFeatures.includes(feature.id)),
+  );
+  const open = Boolean(anchorEl);
+
+  // Fetch releases
+  useEffect(() => {
+    setState('loading');
+    fetchReleases()
+      .then((response) => {
+        setLatestFeatures(response);
+        setState('done');
+      })
+      .catch(() => setState('error'));
+  }, []);
 
   // Handle opening the popover
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -271,5 +268,3 @@ export function WhatsNewButton() {
     </>
   );
 }
-
-export default WhatsNewButton;

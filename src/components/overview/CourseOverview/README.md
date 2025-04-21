@@ -3,10 +3,10 @@ It fetches course data from the Nebula API and uses the `parseDescription` funct
 
 ## Prop Table
 
-| Parameter | Type                             | Description                                                               |
-| :-------- | :------------------------------- | :------------------------------------------------------------------------ |
-| `course`  | `searchQuery`                    | An object derived from a search query that holds basic course information |
-| `grades`  | `GenericFetchedData<GradesType>` | A structure that holds grade data associated with `course`                |
+| Parameter | Type                         | Description                                                               |
+| :-------- | :--------------------------- | :------------------------------------------------------------------------ |
+| `course`  | `searchQuery`                | An object derived from a search query that holds basic course information |
+| `grades`  | `GenericFetchedData<Grades>` | A structure that holds grade data associated with `course`                |
 
 ## Course Overview Example
 

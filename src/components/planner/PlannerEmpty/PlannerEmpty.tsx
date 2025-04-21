@@ -2,7 +2,7 @@ import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import { Typography } from '@mui/material';
 import React from 'react';
 
-function MyPlannerEmpty() {
+export default function MyPlannerEmpty() {
   return (
     <>
       <Typography variant="h2" className="leading-tight text-3xl font-bold p-4">
@@ -16,5 +16,3 @@ function MyPlannerEmpty() {
     </>
   );
 }
-
-export default MyPlannerEmpty;

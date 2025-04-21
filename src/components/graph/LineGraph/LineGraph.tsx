@@ -1,3 +1,5 @@
+'use client';
+
 import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
@@ -7,7 +9,7 @@ import React, { useState } from 'react';
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
 import { compareColors } from '@/modules/colors';
-import type { GradesData } from '@/pages/api/grades';
+import type { Grades } from '@/modules/fetchGrades';
 
 function sortSemesters(a: string, b: string) {
   let aNum = parseInt(a);
@@ -32,7 +34,7 @@ function sortSemesters(a: string, b: string) {
 function getSemesterGPAs(
   data: {
     name: string;
-    data: GradesData;
+    data: Grades['grades'];
   },
   allSemesters: string[],
 ) {
@@ -82,12 +84,12 @@ type Props = {
   xAxisLabels?: string[];
   series: {
     name: string;
-    data: GradesData;
+    data: Grades['grades'];
   }[];
   includedColors?: boolean[];
 };
 
-const LineGraph = (props: Props): JSX.Element => {
+export default function LineGraph(props: Props) {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
@@ -124,6 +126,7 @@ const LineGraph = (props: Props): JSX.Element => {
   );
 
   const theme = useTheme();
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
   const options: ApexOptions = {
     chart: {
@@ -152,7 +155,7 @@ const LineGraph = (props: Props): JSX.Element => {
       },
     },
     grid: {
-      borderColor: theme.palette.mode === 'dark' ? '#404040' : '#e0e0e0',
+      borderColor: prefersDarkMode ? '#404040' : '#e0e0e0',
     },
     legend: {
       show: series.length !== 1,
@@ -177,7 +180,7 @@ const LineGraph = (props: Props): JSX.Element => {
     },
     colors:
       series.length === 1
-        ? [theme.palette.primary.main]
+        ? [theme.vars.palette.primary.main]
         : compareColors.filter(
             (searchQuery, i) => props.includedColors?.[i] ?? 1,
           ),
@@ -203,7 +206,7 @@ const LineGraph = (props: Props): JSX.Element => {
       },
     },
     theme: {
-      mode: useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light',
+      mode: prefersDarkMode ? 'dark' : 'light',
     },
     markers: {
       size: 4,
@@ -230,6 +233,4 @@ const LineGraph = (props: Props): JSX.Element => {
       </Modal>
     </>
   );
-};
-
-export default LineGraph;
+}
