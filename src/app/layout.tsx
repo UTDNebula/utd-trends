@@ -89,7 +89,13 @@ export const metadata: Metadata = {
   },
   description:
     "Choose the perfect classes for you: Nebula Labs's data analytics platform to help you make informed decisions about your coursework with grade and Rate My Professors data.",
-  keywords: ['UT Dallas', 'schedule', 'planner', 'grades', 'Rate My Professors'],
+  keywords: [
+    'UT Dallas',
+    'schedule',
+    'planner',
+    'grades',
+    'Rate My Professors',
+  ],
   openGraph: {
     title: 'UTD TRENDS',
     description:
