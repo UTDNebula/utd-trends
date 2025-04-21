@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Autocomplete,
   Button,
@@ -7,8 +9,14 @@ import {
 } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
-import { useRouter } from 'next/router';
-import React, { type Key, useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import React, {
+  type Key,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
 
 import {
   decodeSearchQueryLabel,
@@ -17,17 +25,49 @@ import {
   searchQueryLabel,
 } from '@/types/SearchQuery';
 
+interface LoadingSearchBarProps {
+  className?: string;
+  input_className?: string;
+}
+
+export function LoadingSearchBar(props: LoadingSearchBarProps) {
+  return (
+    <div className={'flex items-center gap-2 ' + (props.className ?? '')}>
+      <Autocomplete
+        className="grow"
+        options={[]}
+        renderInput={(params) => {
+          return (
+            <TextField
+              {...params}
+              className={props.input_className}
+              placeholder="ex. GOVT 2306"
+            />
+          );
+        }}
+      />
+      <Button
+        variant="contained"
+        disableElevation
+        size="large"
+        className="h-11 w-[5.5rem] shrink-0 normal-case text-cornflower-200 dark:text-cornflower-700"
+      >
+        Search
+      </Button>
+    </div>
+  );
+}
+
 /**
  * Props type used by the SearchBar component
  */
-interface SearchProps {
+interface Props {
   manageQuery?: 'onSelect';
   onSelect?: (value: SearchQuery[]) => void;
-  resultsLoading?: 'loading' | 'done' | 'error';
-  setResultsLoading?: () => void;
   className?: string;
   input_className?: string;
   autoFocus?: boolean;
+  isPending?: boolean;
 }
 
 /**
@@ -36,15 +76,10 @@ interface SearchProps {
  *
  * Styled for the splash page
  */
-const SearchBar = ({
-  manageQuery,
-  onSelect,
-  resultsLoading,
-  setResultsLoading,
-  className,
-  input_className,
-  autoFocus,
-}: SearchProps) => {
+export default function SearchBar(props: Props) {
+  //for spinner after router.push
+  const [isPending, startTransition] = useTransition();
+
   //what you can choose from
   const [options, setOptions] = useState<SearchQuery[]>([]);
   //initial loading prop for first load
@@ -63,75 +98,69 @@ const SearchBar = ({
   const [value, setValue] = useState<SearchQuery[]>([]);
 
   //set value from query
-  const router = useRouter();
+  const searchParams = useSearchParams();
+  const searchTerms = searchParams.get('searchTerms');
   useEffect(() => {
-    if (router.isReady && typeof router.query.searchTerms !== 'undefined') {
-      let array = router.query.searchTerms;
-      if (!Array.isArray(array)) {
-        array = array.split(',');
-      }
+    if (searchTerms != null) {
+      const arrayParam = searchTerms;
+      const array = Array.isArray(arrayParam)
+        ? arrayParam
+        : arrayParam.split(',');
       setValue(array.map((el) => decodeSearchQueryLabel(el)));
     }
-  }, [router.isReady, router.query.searchTerms]); // useEffect is called every time the query changes
+  }, [searchTerms]); // useEffect is called every time the query changes
 
-  // updateValue -> onSelect_internal -> updateQueries - clicking enter on an autocomplete suggestion in TopMenu Searchbar
-  // updateValue -> onSelect_internal -> onSelect (custom function) - clicking enter on an autocomplete suggestion in home page SearchBar
-  // params.inputProps.onKeyDown -> handleKeyDown -> onSelect_internal -> updateQueries/onSelect - clicking enter in the SearchBar
-  // Button onClick -> onSelect_internal -> updateQueries/onSelect - Pressing the "Search" Button
+  // updateValue -> onSelect -> updateQueries - clicking enter on an autocomplete suggestion in TopMenu Searchbar
+  // updateValue -> onSelect -> props.onSelect (custom function) - clicking enter on an autocomplete suggestion in home page SearchBar
+  // params.inputProps.onKeyDown -> handleKeyDown -> onSelect -> updateQueries/props.onSelect - clicking enter in the SearchBar
+  // Button onClick -> onSelect -> updateQueries/props.onSelect - Pressing the "Search" Button
 
   //change all values
   function updateValue(newValue: SearchQuery[]) {
     setValue(newValue);
-    onSelect_internal(newValue); // clicking enter to select a autocomplete suggestion triggers a new search (it also 'Enters' for the searchbar)
+    onSelect(newValue); // clicking enter to select a autocomplete suggestion triggers a new search (it also 'Enters' for the searchbar)
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Enter' && inputValue === '') {
       event.preventDefault();
       event.stopPropagation();
-      onSelect_internal(value);
+      onSelect(value);
     }
   }
 
   //update parent and queries
-  function onSelect_internal(newValue: SearchQuery[]) {
-    if (
-      router.query.searchTerms ==
-      newValue.map((el) => searchQueryLabel(el)).join(',')
-    )
+  function onSelect(newValue: SearchQuery[]) {
+    if (searchTerms == newValue.map((el) => searchQueryLabel(el)).join(','))
       // do not initiate a new search when the searchTerms haven't changed
       return;
     setErrorTooltip(!newValue.length);
-    if (newValue.length && typeof setResultsLoading !== 'undefined') {
-      setResultsLoading();
+    if (typeof props.onSelect !== 'undefined') {
+      props.onSelect(newValue);
     }
-    if (typeof onSelect !== 'undefined') {
-      onSelect(newValue);
-    }
-    if (newValue.length && manageQuery === 'onSelect') {
+    if (newValue.length && props.manageQuery === 'onSelect') {
       updateQueries(newValue);
     }
   }
 
+  const router = useRouter();
+  const pathname = usePathname();
+
   //update url with what's in value
   async function updateQueries(newValue: SearchQuery[]) {
-    if (typeof manageQuery !== 'undefined' && router.isReady) {
-      const newQuery = router.query;
-      if (newValue.length > 0) {
-        newQuery.searchTerms = newValue
-          .map((el) => searchQueryLabel(el))
-          .join(',');
-      } else {
-        delete newQuery.searchTerms;
-      }
-      router.push(
-        {
-          query: router.query,
-        },
-        undefined,
-        { shallow: true },
+    const params = new URLSearchParams(searchParams.toString());
+    if (newValue.length > 0) {
+      params.set(
+        'searchTerms',
+        newValue.map((el) => searchQueryLabel(el)).join(','),
       );
+    } else {
+      params.delete('searchTerms');
     }
+    startTransition(() => {
+      console.log('hi');
+      router.push(`${pathname}?${params.toString()}`);
+    });
   }
 
   //fetch new options, add tags if valid
@@ -153,7 +182,7 @@ const SearchBar = ({
       .then((response) => response.json())
       .then((data) => {
         if (data.message !== 'success') {
-          throw new Error(data.message);
+          throw new Error(data.data ?? data.message);
         }
         //remove currently chosen values
         const filtered = data.data.filter(
@@ -198,7 +227,7 @@ const SearchBar = ({
 
   //add value
   function addValue(newValue: SearchQuery) {
-    setValue((old) => [...old, newValue]);
+    setValue((prev) => [...prev, newValue]);
   }
 
   useEffect(() => {
@@ -207,7 +236,7 @@ const SearchBar = ({
 
   return (
     <div
-      className={'flex items-center gap-2 ' + (className ?? '')}
+      className={'flex items-center gap-2 ' + (props.className ?? '')}
       data-tutorial-id="search"
     >
       <Autocomplete
@@ -238,8 +267,8 @@ const SearchBar = ({
           }
           //remove from options
           if (newValue.length > value.length) {
-            setOptions((old) =>
-              old.filter(
+            setOptions((prev) =>
+              prev.filter(
                 (item) =>
                   !searchQueryEqual(
                     newValue[newValue.length - 1] as SearchQuery,
@@ -261,10 +290,10 @@ const SearchBar = ({
             <TextField
               {...params}
               variant="outlined"
-              className={input_className}
+              className={props.input_className}
               placeholder="ex. GOVT 2306"
               //eslint-disable-next-line jsx-a11y/no-autofocus
-              autoFocus={autoFocus}
+              autoFocus={props.autoFocus}
             />
           );
         }}
@@ -350,10 +379,13 @@ const SearchBar = ({
               ? ' text-cornflower-200 dark:text-cornflower-700'
               : '')
           } //darkens the text when no valid search terms are entered (pseudo-disables the search button)
-          onClick={() => onSelect_internal(value)}
+          onClick={() => onSelect(value)}
         >
-          {resultsLoading === 'loading' ? (
-            <CircularProgress className="h-6 w-6 text-cornflower-50 dark:text-haiti" />
+          {isPending || props.isPending ? (
+            <CircularProgress
+              color="inherit"
+              className="h-6 w-6 text-cornflower-50 dark:text-haiti"
+            />
           ) : (
             'Search'
           )}
@@ -361,6 +393,4 @@ const SearchBar = ({
       </Tooltip>
     </div>
   );
-};
-
-export default SearchBar;
+}
