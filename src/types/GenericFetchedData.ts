@@ -1,6 +1,6 @@
 type GenericFetchedDataError = {
   message: 'error';
-  error?: string;
+  data?: string;
 };
 type GenericFetchedDataDone<T> = {
   message: 'success';

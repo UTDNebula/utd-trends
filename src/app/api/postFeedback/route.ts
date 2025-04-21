@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   const CREDENTIALS = process.env.REACT_APP_GOOGLE_CREDENTIALS;
   if (typeof CREDENTIALS !== 'string') {
     return NextResponse.json(
-      { message: 'error', error: 'API key is undefined' },
+      { message: 'error', data: 'API key is undefined' },
       { status: 500 },
     );
   }
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     body = await request.json();
   } catch {
     return NextResponse.json(
-      { message: 'error', error: 'Invalid JSON body' },
+      { message: 'error', data: 'Invalid JSON body' },
       { status: 400 },
     );
   }
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
 
   if (typeof rating !== 'number') {
     return NextResponse.json(
-      { message: 'error', error: 'Incorrect body parameters present' },
+      { message: 'error', data: 'Incorrect body parameters present' },
       { status: 400 },
     );
   }
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         message: 'error',
-        error:
+        data:
           error instanceof Error ? error.message : 'An unknown error occurred',
       },
       { status: 400 },

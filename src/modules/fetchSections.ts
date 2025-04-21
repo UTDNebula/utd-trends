@@ -87,7 +87,7 @@ async function fetchSingleSections(
 ): Promise<GenericFetchedData<SectionsData>> {
   const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
   if (typeof API_KEY !== 'string') {
-    return { message: 'error', error: 'API key is undefined' };
+    return { message: 'error', data: 'API key is undefined' };
   }
 
   try {
@@ -106,7 +106,7 @@ async function fetchSingleSections(
       url.searchParams.append('last_name', profLast);
     }
     if (typeof url === 'undefined') {
-      return { message: 'error', error: 'Incorrect query present' };
+      return { message: 'error', data: 'Incorrect query present' };
     }
 
     const data = await recursiveFetchSingleSections(url, 0);
@@ -118,7 +118,7 @@ async function fetchSingleSections(
   } catch (error) {
     return {
       message: 'error',
-      error:
+      data:
         error instanceof Error ? error.message : 'An unknown error occurred',
     };
   }
@@ -149,7 +149,7 @@ async function fetchLatestSemester(): Promise<GenericFetchedData<string>> {
   } catch (error) {
     return {
       message: 'error',
-      error:
+      data:
         error instanceof Error ? error.message : 'An unknown error occurred',
     };
   }
@@ -173,13 +173,13 @@ export default async function fetchSections(
     ]);
 
     if (latestSemester.message !== 'success') {
-      return { message: 'error', error: latestSemester.message };
+      return { message: 'error', data: latestSemester.message };
     }
     if (data[0].message !== 'success') {
-      return { message: 'error', error: data[0].message };
+      return { message: 'error', data: data[0].message };
     }
     if (data.length === 2 && data[1].message !== 'success') {
-      return { message: 'error', error: data[1].message };
+      return { message: 'error', data: data[1].message };
     }
 
     //Find intersection of all course sections and all professor sections
@@ -207,7 +207,7 @@ export default async function fetchSections(
   } catch (error) {
     return {
       message: 'error',
-      error:
+      data:
         error instanceof Error ? error.message : 'An unknown error occurred',
     };
   }

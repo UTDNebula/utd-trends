@@ -149,7 +149,7 @@ export default async function fetchRmp(
   } catch (error) {
     return {
       message: 'error',
-      error:
+      data:
         error instanceof Error ? error.message : 'An unknown error occurred',
     };
   }

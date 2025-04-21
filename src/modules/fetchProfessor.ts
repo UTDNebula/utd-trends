@@ -24,7 +24,7 @@ export default async function fetchProfessor(
 ): Promise<GenericFetchedData<Professor>> {
   const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
   if (typeof API_KEY !== 'string') {
-    return { message: 'error', error: 'API key is undefined' };
+    return { message: 'error', data: 'API key is undefined' };
   }
 
   try {
@@ -60,7 +60,7 @@ export default async function fetchProfessor(
   } catch (error) {
     return {
       message: 'error',
-      error:
+      data:
         error instanceof Error ? error.message : 'An unknown error occurred',
     };
   }

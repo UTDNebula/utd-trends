@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   const input = searchParams.get('input');
   if (typeof input !== 'string') {
     return NextResponse.json(
-      { message: false, error: 'Incorrect query parameters' },
+      { message: false, data: 'Incorrect query parameters' },
       { status: 400 },
     );
   }
