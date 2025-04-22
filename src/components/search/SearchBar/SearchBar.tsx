@@ -158,7 +158,6 @@ export default function SearchBar(props: Props) {
       params.delete('searchTerms');
     }
     startTransition(() => {
-      console.log('hi');
       router.push(`${pathname}?${params.toString()}`);
     });
   }
@@ -214,12 +213,7 @@ export default function SearchBar(props: Props) {
           setOptions(filtered);
         }
       })
-      .catch((error) => {
-        // ignore aborts
-        if (!(error instanceof DOMException)) {
-          console.error('Autocomplete', error);
-        }
-      })
+      .catch(() => {})
       .finally(() => {
         setLoading(false);
       });
