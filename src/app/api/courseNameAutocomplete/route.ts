@@ -75,13 +75,19 @@ export async function GET(request: Request) {
         distance: distances
           .map((dist, i) => {
             if (typeof result.prefix !== 'undefined') {
-              const distToPrefix = editDistance(inputArr[i], result.prefix.toLowerCase());
+              const distToPrefix = editDistance(
+                inputArr[i],
+                result.prefix.toLowerCase(),
+              );
               if (distToPrefix < dist) {
                 return distToPrefix;
               }
             }
             if (typeof result.number !== 'undefined') {
-              const distToNumber = editDistance(inputArr[i], result.number.toLowerCase());
+              const distToNumber = editDistance(
+                inputArr[i],
+                result.number.toLowerCase(),
+              );
               if (distToNumber < dist) {
                 return distToNumber;
               }
@@ -103,11 +109,7 @@ export async function GET(request: Request) {
       const place = results.findIndex((x) => x.distance > result.distance);
       if (place !== -1) {
         // replace if already hit limit
-        results.splice(
-          place,
-          results.length < LIMIT ? 0 : 1,
-          result,
-        );
+        results.splice(place, results.length < LIMIT ? 0 : 1, result);
       }
     });
   }
