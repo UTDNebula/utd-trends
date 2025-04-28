@@ -9,7 +9,7 @@ const courseNameTable = untypedCourseNameTable as {
 };
 
 // Edit distance between 2 strings
-function levenshtein(a: string, b: string) {
+function editDistance(a: string, b: string) {
   const dp = Array.from({ length: a.length + 1 }, () =>
     Array(b.length + 1).fill(0),
   );
@@ -30,6 +30,10 @@ function levenshtein(a: string, b: string) {
     }
   }
   return dp[a.length][b.length];
+}
+
+function minEditDistance(words: string[], query: string) {
+  return Math.min(...words.map((word) => editDistance(word, query)));
 }
 
 const LIMIT = 10;
@@ -59,20 +63,32 @@ export async function GET(request: Request) {
 
   // check each course name
   for (const title in courseNameTable) {
+    const titleWords = title.toLowerCase().split(' ');
+
     // for each word in query, find the word in the course name that is most similar
-    const distance = inputArr
-      .map((word) =>
-        Math.min(
-          ...title
-            .toLowerCase()
-            .split(' ')
-            .map((titleWord) => levenshtein(word, titleWord)),
-        ),
-      )
-      .reduce((partialSum, a) => partialSum + a, 0);
+    const distances = inputArr.map((word) => minEditDistance(titleWords, word));
+
+    // take the array of courses with the same title (generally different prefix)
+    // check if any search word is closer edit distance to the prefix or number, to sort better
     const newResults: ResultWDistance[] = courseNameTable[title].map(
       (result) => ({
-        distance: distance,
+        distance: distances
+          .map((dist, i) => {
+            if (typeof result.prefix !== 'undefined') {
+              const distToPrefix = editDistance(inputArr[i], result.prefix.toLowerCase());
+              if (distToPrefix < dist) {
+                return distToPrefix;
+              }
+            }
+            if (typeof result.number !== 'undefined') {
+              const distToNumber = editDistance(inputArr[i], result.number.toLowerCase());
+              if (distToNumber < dist) {
+                return distToNumber;
+              }
+            }
+            return dist;
+          })
+          .reduce((partialSum, a) => partialSum + a, 0),
         title: title,
         result: result,
       }),
@@ -80,18 +96,20 @@ export async function GET(request: Request) {
 
     if (!results.length) {
       results.push(...newResults);
+      results = results.slice(0, 10);
       continue;
     }
-    const place = results.findIndex((x) => x.distance > distance);
-    if (place !== -1) {
-      // replace if already hit limit
-      results.splice(
-        place,
-        results.length < LIMIT ? 0 : newResults.length,
-        ...newResults,
-      );
-      results = results.slice(0, 10);
-    }
+    newResults.forEach((result) => {
+      const place = results.findIndex((x) => x.distance > result.distance);
+      if (place !== -1) {
+        // replace if already hit limit
+        results.splice(
+          place,
+          results.length < LIMIT ? 0 : 1,
+          result,
+        );
+      }
+    });
   }
 
   const resultsWithoutDistance: Result[] = results.map((result) => ({
