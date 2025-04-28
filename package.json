@@ -6,6 +6,7 @@
     "build": "next build",
     "fetchdata": "ts-node -O \"{\\\"module\\\":\\\"commonjs\\\"}\" src/scripts/fetchAggregatedData.ts",
     "buildautocomplete": "ts-node -O \"{\\\"module\\\":\\\"commonjs\\\"}\" src/scripts/generateAutocompleteGraph.ts",
+    "buildcoursenames": "ts-node -O \"{\\\"module\\\":\\\"commonjs\\\"}\" src/scripts/generateCourseNameTable.ts",
     "buildcombos": "ts-node -O \"{\\\"module\\\":\\\"commonjs\\\"}\" src/scripts/generateCombosTable.ts",
     "start": "next start",
     "format": "prettier --write .",
