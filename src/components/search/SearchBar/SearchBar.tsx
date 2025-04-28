@@ -247,7 +247,8 @@ export default function SearchBar(props: Props) {
         );
         //remove currently chosen values
         const filtered = formatted.filter(
-          (item: SearchQueryWithTitle) => !value.some((el) => searchQueryEqual(el, item)),
+          (item: SearchQueryWithTitle) =>
+            !value.some((el) => searchQueryEqual(el, item)),
         );
         if (quickInputValue.current === newInputValue) {
           //still valid options
@@ -359,7 +360,11 @@ export default function SearchBar(props: Props) {
             }
           }
         }}
-        renderOption={(props: { key: Key }, option: string | SearchQueryWithTitle, { inputValue }) => {
+        renderOption={(
+          props: { key: Key },
+          option: string | SearchQueryWithTitle,
+          { inputValue },
+        ) => {
           let text = '';
           let subtext;
           if (typeof option === 'string') {
