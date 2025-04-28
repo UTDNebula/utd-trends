@@ -41,6 +41,9 @@ jobs:
       - name: Build autocomplete graph
         run: npm run buildautocomplete
 
+      - name: Build course name table
+        run: npm run buildcoursenames
+
       - name: Build combos table
         run: npm run buildcombos
 

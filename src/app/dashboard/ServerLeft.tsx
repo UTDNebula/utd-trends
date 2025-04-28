@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 
 import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
-import rawComboTable from '@/data/combo_table.json';
+import untypedComboTable from '@/data/combo_table.json';
 import fetchAll from '@/modules/fetchAll';
 import {
   convertToCourseOnly,
@@ -14,7 +14,7 @@ import {
 import ClientLeft from './ClientLeft';
 import SyncServerDataToContext from './SyncServerDataToContext';
 
-const comboTable = rawComboTable as { [key: string]: SearchQuery[] };
+const comboTable = untypedComboTable as { [key: string]: SearchQuery[] };
 
 //Get all course+prof combos for searchTerms and keep only the ones that match filterTerms
 //When filterTerms is blank, just gets all searchTerms
