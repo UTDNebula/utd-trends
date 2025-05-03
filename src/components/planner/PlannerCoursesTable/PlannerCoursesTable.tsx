@@ -55,6 +55,19 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
               return <LoadingRow key={index} />;
             }
           }
+          const allSections =
+            sectionData?.state === 'done' && Array.isArray(sectionData.data.all)
+              ? sectionData.data.all
+              : [];
+
+          const bestSyllabusUri = allSections
+            .filter((s) => !!s.syllabus_uri && !!s.academic_session?.start_date)
+            .sort(
+              (a, b) =>
+                new Date(b.academic_session.start_date).getTime() -
+                new Date(a.academic_session.start_date).getTime(),
+            )?.[0]?.syllabus_uri;
+          console.log('Best syllabi for PlannerCourseTable ', bestSyllabusUri);
           return (
             <PlannerCard
               key={index}
@@ -65,6 +78,7 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                   ? sectionData.data.latest
                   : undefined
               }
+              bestSyllabus={bestSyllabusUri}
               setPlannerSection={props.setPlannerSection}
               grades={props.grades[searchQueryLabel(removeSection(course))]}
               rmp={props.rmp[searchQueryLabel(convertToProfOnly(course))]}
