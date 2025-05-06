@@ -112,7 +112,7 @@ export function LoadingSearchResultsTable() {
               </TableCell>
               <TableCell align="center">
                 <Tooltip
-                  title="Average Letter Grade Across Course Sections"
+                  title="Median Letter Grade Across Course Sections"
                   placement="top"
                 >
                   <div>
