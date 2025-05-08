@@ -49,7 +49,9 @@ export default function ProfessorOverview({
   rmp,
 }: Props) {
   const [src, setSrc] = useState(
-    profData.message === 'success' ? profData.data.image_uri : '',
+    profData.message === 'success' && profData.data.image_uri !== ''
+      ? profData.data.image_uri
+      : fallbackSrc,
   );
 
   return (
