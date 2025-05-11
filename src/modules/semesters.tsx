@@ -12,3 +12,12 @@ export function compareSemesters(a: string, b: string) {
     return 0;
   } else return x;
 }
+
+export function displaySemesterName(id: string) {
+  return (
+    '20' +
+    id.slice(0, 2) +
+    ' ' +
+    { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)]
+  );
+}

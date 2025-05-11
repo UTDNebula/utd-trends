@@ -1,14 +1,15 @@
-import type { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
+'use client';
+
 import { Collapse, useMediaQuery } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import { TabNavMenu } from '@/components/navigation/TabNavMenu/TabNavMenu';
 
 interface CarouselProps {
-  names: string[] | string;
-  children: ReactJSXElement[] | ReactJSXElement;
-  compareLength: number;
+  names: React.ReactNode;
+  children: React.ReactNode;
 }
 
 /**
@@ -41,12 +42,14 @@ const variants = {
  * @param props the props passed from the parent component
  * @returns
  */
-const Carousel = ({ names, children, compareLength }: CarouselProps) => {
+export default function Carousel({ names, children }: CarouselProps) {
   // The card currently being displayed
   const [currentCard, setCurrentCard] = useState(0);
   // The Direction that the card is moving in
   const [direction, setDirection] = useState(0);
-  const lastCompareLength = useRef(compareLength);
+
+  const { compare } = useSharedState();
+  const lastCompareLength = useRef(compare.length);
 
   /**
    * On each re-render, ensure currentCard is within valid bounds
@@ -76,16 +79,18 @@ const Carousel = ({ names, children, compareLength }: CarouselProps) => {
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(!isSmallScreen), [isSmallScreen]);
   useEffect(() => {
-    if (lastCompareLength.current <= compareLength) {
-      setDirection(1);
-      setCurrentCard(Array.isArray(children) ? children.length - 1 : 0);
+    if (compare.length !== lastCompareLength.current) {
+      if (lastCompareLength.current <= compare.length) {
+        setDirection(1);
+        setCurrentCard(Array.isArray(children) ? children.length - 1 : 0);
+      }
+      if (lastCompareLength.current == 1 && compare.length == 0) {
+        setDirection(-1);
+        setCurrentCard(0);
+      }
+      lastCompareLength.current = compare.length;
     }
-    if (lastCompareLength.current == 1 && compareLength == 0) {
-      setDirection(-1);
-      setCurrentCard(0);
-    }
-    lastCompareLength.current = compareLength;
-  }, [compareLength]);
+  }, [compare.length, children]);
 
   return (
     <>
@@ -93,7 +98,7 @@ const Carousel = ({ names, children, compareLength }: CarouselProps) => {
         value={currentCard}
         options={Array.isArray(names) ? names : [names]}
         turner={turn}
-        compareLength={compareLength}
+        compareLength={compare.length}
         open={open}
         setOpen={setOpen}
       />
@@ -128,6 +133,4 @@ const Carousel = ({ names, children, compareLength }: CarouselProps) => {
       </Collapse>
     </>
   );
-};
-
-export default Carousel;
+}

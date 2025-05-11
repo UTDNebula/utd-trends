@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Alert,
   Button,
@@ -88,7 +90,7 @@ export default function FeedbackPopup() {
           );
           resolve();
         })
-        .catch((error) => {
+        .catch(() => {
           localStorage.setItem(
             'feedback',
             JSON.stringify({
@@ -96,7 +98,6 @@ export default function FeedbackPopup() {
               cacheIndex: cacheIndexFeedback,
             }),
           );
-          console.error('Feedback', error);
           reject();
         });
     });
