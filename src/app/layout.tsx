@@ -9,7 +9,6 @@ import { Inter } from 'next/font/google';
 import localFont from 'next/font/local';
 import React from 'react';
 
-import FeedbackPopup from '@/components/common/FeedbackPopup/FeedbackPopup';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
 import theme from '@/modules/theme';
 
@@ -135,7 +134,6 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
             <SharedStateProvider>{children}</SharedStateProvider>
-            <FeedbackPopup />
             <GitHubButton />
             <SpeedInsights />
           </ThemeProvider>
