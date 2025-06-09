@@ -36,7 +36,7 @@ function minEditDistance(words: string[], query: string) {
   return Math.min(...words.map((word) => editDistance(word, query)));
 }
 
-const LIMIT = 10;
+const LIMIT = 20;
 
 interface Result {
   title: string;
@@ -67,8 +67,17 @@ export async function GET(request: Request) {
     const titleWords = title.toLowerCase().split(' ');
 
     // for each word in query, find the word in the course name that is most similar
-    const distances = inputArr.map((word) => minEditDistance(titleWords, word));
-
+    // const distances = inputArr.map((word) => minEditDistance(titleWords, word));
+    //for each word in the course name, find the word in the query that is most similar
+    const distances = titleWords.map((word) => minEditDistance(inputArr, word));
+    if (titleWords.includes("machine") && titleWords.includes("learning")) {
+      console.log(title, 
+        titleWords.map((word) => ({word: word, dist: minEditDistance(inputArr, word)})), 
+        titleWords.map((word) => minEditDistance(inputArr, word)).sort((a, b) => a - b).reduce((partialSum, dist, i) => partialSum + Math.pow(.5, i) * dist, 0),
+        1 - inputArr.map((q) => titleWords.map((tw) => tw == q ? 1 : 0 as number).reduce((a, b) => a+b,0)).reduce((a,b) => a+b, 0) / (titleWords.length == 0 ? 1 : titleWords.length),
+        inputArr.map((word) => titleWords.some((tw) => tw.includes(word)) ? -10 : 0 as number).reduce((a, b) => a + b, 0)
+      );
+    }
     // take the array of courses with the same title (generally different prefix)
     // check if any search word is closer edit distance to the prefix or number, to sort better
     const newResults: ResultWDistance[] = courseNameTable[title].map(
@@ -76,30 +85,35 @@ export async function GET(request: Request) {
         distance:
           distances
             .map((dist, i) => {
-              if (typeof result.prefix !== 'undefined') {
-                const distToPrefix = editDistance(
-                  inputArr[i],
-                  result.prefix.toLowerCase(),
-                );
-                if (distToPrefix < dist) {
-                  return distToPrefix;
-                }
-              }
-              if (typeof result.number !== 'undefined') {
-                const distToNumber = editDistance(
-                  inputArr[i],
-                  result.number.toLowerCase(),
-                );
-                if (distToNumber < dist) {
-                  return distToNumber;
-                }
-              }
+              // if (typeof result.prefix !== 'undefined') {
+              //   const distToPrefix = editDistance(
+              //     inputArr[i],
+              //     result.prefix.toLowerCase(),
+              //   );
+              //   if (distToPrefix == 0) {
+              //     return -.01
+              //   }
+              //   if (distToPrefix < dist) {
+              //     return distToPrefix;
+              //   }
+              // }
+              // if (typeof result.number !== 'undefined') {
+              //   const distToNumber = editDistance(
+              //     inputArr[i],
+              //     result.number.toLowerCase(),
+              //   );
+              //   if (distToNumber < dist) {
+              //     return distToNumber;
+              //   }
+              // }
               return dist;
-            })
-            .reduce((partialSum, a) => partialSum + a, 0) +
-          (title.length >= input.length
-            ? 1 - input.length / (title.length == 0 ? 1 : title.length)
-            : 0),
+            }).sort((a, b) => a - b)
+            .reduce((partialSum, dist, i) => partialSum + Math.pow(.6, i) * dist, 0)/* / title.length * 0.6 */+
+          (titleWords.length >= inputArr.length
+            ? 1 - inputArr.map((q) => titleWords.map((tw) => tw == q ? 1 : 0 as number).reduce((a, b) => a+b,0)).reduce((a,b) => a+b, 0) / (titleWords.length == 0 ? 1 : titleWords.length)
+            : 0)
+            + inputArr.map((word) => titleWords.some((tw) => tw.includes(word)) ? -10 : 0 as number).reduce((a, b) => a + b, 0)
+            /*+ inputArr.map((word) => result.prefix?.toLowerCase() == word || result.number == word ? -1 : 0 as number).reduce((a, b) => a + b, 0) * 0.2*/,
         title: title,
         result: result,
       }),
@@ -107,7 +121,7 @@ export async function GET(request: Request) {
 
     const s = newResults.filter(
       (x) =>
-        x.title == 'Data Structures and Introduction to Algorithmic Analysis',
+        x.title == 'Introduction to Machine Learning',
     );
     if (s.length > 0) {
       str.push(...s);
@@ -115,7 +129,7 @@ export async function GET(request: Request) {
 
     if (!results.length) {
       results.push(...newResults);
-      results = results.slice(0, 10);
+      results = results.slice(0, LIMIT);
       continue;
     }
     newResults.forEach((result) => {
