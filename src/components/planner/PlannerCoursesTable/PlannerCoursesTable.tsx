@@ -67,7 +67,7 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
                 new Date(b.academic_session.start_date).getTime() -
                 new Date(a.academic_session.start_date).getTime(),
             )?.[0]?.syllabus_uri;
-          console.log('Best syllabi for PlannerCourseTable ', bestSyllabusUri);
+
           return (
             <PlannerCard
               key={index}
