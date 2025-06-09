@@ -164,16 +164,19 @@ export async function GET(request: Request) {
       str.push(...s);
     }
 
-    if (!results.length) {
-      results.push(...newResults);
-      results = results.slice(0, LIMIT);
-      continue;
-    }
+    
     newResults.forEach((result) => {
-      const place = results.findIndex((x) => x.distance > result.distance);
-      if (place !== -1) {
-        // replace if already hit limit
-        results.splice(place, results.length < LIMIT ? 0 : 1, result);
+      if (results.length < LIMIT) {
+        // If not at limit, just add it
+        results.push(result);
+        results.sort((a, b) => a.distance - b.distance);
+      } else {
+        // If at limit, replace worst result if this one is better
+        const worstIndex = results.length - 1;
+        if (result.distance < results[worstIndex].distance) {
+          results[worstIndex] = result;
+          results.sort((a, b) => a.distance - b.distance);
+        }
       }
     });
   }
