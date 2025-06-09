@@ -59,7 +59,7 @@ export async function GET(request: Request) {
   input = input.toLowerCase();
   const inputArr = input.split(' ');
 
-  let results: ResultWDistance[] = [];
+  const results: ResultWDistance[] = [];
 
   const str: ResultWDistance[] = [];
   // check each course name
@@ -164,7 +164,6 @@ export async function GET(request: Request) {
       str.push(...s);
     }
 
-    
     newResults.forEach((result) => {
       if (results.length < LIMIT) {
         // If not at limit, just add it
