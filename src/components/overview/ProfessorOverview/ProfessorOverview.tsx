@@ -70,6 +70,8 @@ export default function ProfessorOverview({
           onError={() => {
             setSrc(fallbackSrc);
           }}
+          //This image is always 450x450 from UTD Profiles and we don't want to exceed our Vercel Imange Optimization Transformation limit by optimizing it just to 280x280
+          unoptimized
         />
       )}
       <div className="flex flex-col items-center">
