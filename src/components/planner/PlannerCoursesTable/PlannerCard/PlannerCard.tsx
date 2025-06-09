@@ -314,7 +314,7 @@ function SectionTableRow(props: SectionTableRowProps) {
                 : 'View Previous Syllabus'}
             </Link>
           ) : (
-            'Nothing'
+            ''
           )}
         </div>
       </TableCell>
@@ -403,7 +403,6 @@ const PlannerCard = (props: PlannerCardProps) => {
               props.sections![0].meetings[0].end_date,
         )
       : false;
-  console.log('PlannerCard bestSyllabus:', props.bestSyllabus);
 
   return (
     <Box
