@@ -61,6 +61,7 @@ export async function GET(request: Request) {
 
   let results: ResultWDistance[] = [];
 
+  const str: ResultWDistance[] = [];
   // check each course name
   for (const title in courseNameTable) {
     const titleWords = title.toLowerCase().split(' ');
@@ -72,33 +73,45 @@ export async function GET(request: Request) {
     // check if any search word is closer edit distance to the prefix or number, to sort better
     const newResults: ResultWDistance[] = courseNameTable[title].map(
       (result) => ({
-        distance: distances
-          .map((dist, i) => {
-            if (typeof result.prefix !== 'undefined') {
-              const distToPrefix = editDistance(
-                inputArr[i],
-                result.prefix.toLowerCase(),
-              );
-              if (distToPrefix < dist) {
-                return distToPrefix;
+        distance:
+          distances
+            .map((dist, i) => {
+              if (typeof result.prefix !== 'undefined') {
+                const distToPrefix = editDistance(
+                  inputArr[i],
+                  result.prefix.toLowerCase(),
+                );
+                if (distToPrefix < dist) {
+                  return distToPrefix;
+                }
               }
-            }
-            if (typeof result.number !== 'undefined') {
-              const distToNumber = editDistance(
-                inputArr[i],
-                result.number.toLowerCase(),
-              );
-              if (distToNumber < dist) {
-                return distToNumber;
+              if (typeof result.number !== 'undefined') {
+                const distToNumber = editDistance(
+                  inputArr[i],
+                  result.number.toLowerCase(),
+                );
+                if (distToNumber < dist) {
+                  return distToNumber;
+                }
               }
-            }
-            return dist;
-          })
-          .reduce((partialSum, a) => partialSum + a, 0),
+              return dist;
+            })
+            .reduce((partialSum, a) => partialSum + a, 0) +
+          (title.length >= input.length
+            ? 1 - input.length / (title.length == 0 ? 1 : title.length)
+            : 0),
         title: title,
         result: result,
       }),
     );
+
+    const s = newResults.filter(
+      (x) =>
+        x.title == 'Data Structures and Introduction to Algorithmic Analysis',
+    );
+    if (s.length > 0) {
+      str.push(...s);
+    }
 
     if (!results.length) {
       results.push(...newResults);
@@ -114,6 +127,8 @@ export async function GET(request: Request) {
     });
   }
 
+  console.log(results);
+  console.log(str);
   const resultsWithoutDistance: Result[] = results.map((result) => ({
     title: result.title,
     result: result.result,
