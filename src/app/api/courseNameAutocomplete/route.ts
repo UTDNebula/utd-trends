@@ -106,7 +106,7 @@ export async function GET(request: Request) {
     );
   }
   input = input.toLowerCase();
-  const inputWords = input.split(' ');
+  const inputWords = input.split(' ').filter((word) => word.length > 0);
   const inputArr = inputWords.filter(
     (word) =>
       isPotentialPrefix(word).length == 0 &&
@@ -165,7 +165,7 @@ export async function GET(request: Request) {
         const distanceMetric = distances
           .sort((a, b) => a - b)
           .reduce(
-            (partialSum, dist, i) => partialSum + Math.pow(0.6, i) * dist,
+            (partialSum, dist, i) => partialSum + Math.pow(0.7, i) * dist,
             0,
           );
         const coverage =
@@ -191,6 +191,7 @@ export async function GET(request: Request) {
           (courseNumbers
             .map((number) => longestCommonPrefix(number, result.number ?? ''))
             .sort((a, b) => b - a)[0] ?? 0);
+        // const lengthPenalty = (titleWords.length - inputArr.length) * 0
         if (result.prefix == 'CS' && result.number == '4348')
           console.log(
             'abc',
