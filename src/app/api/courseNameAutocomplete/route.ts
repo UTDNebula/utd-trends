@@ -8,6 +8,23 @@ const courseNameTable = untypedCourseNameTable as {
   [key: string]: SearchQuery[];
 };
 
+//find all the prefixes in the course name table
+const coursePrefixes = Array.from(
+  new Set(
+    Object.values(courseNameTable)
+      .flat()
+      .map((query) => query.prefix),
+  ),
+).filter(
+  (prefix): prefix is string => typeof prefix === 'string' && prefix.length > 0,
+);
+
+function isPotentialPrefix(query: string): string[] {
+  return coursePrefixes.filter((prefix) =>
+    prefix.toLowerCase().startsWith(query.toLowerCase()),
+  );
+}
+
 // Edit distance between 2 strings
 function editDistance(a: string, b: string) {
   const dp = Array.from({ length: a.length + 1 }, () =>
@@ -57,7 +74,11 @@ export async function GET(request: Request) {
     );
   }
   input = input.toLowerCase();
-  const inputArr = input.split(' ');
+  const inputWords = input.split(' ');
+  const inputArr = inputWords.filter(
+    (word) => isPotentialPrefix(word).length == 0,
+  );
+  const prefixes = inputWords.map((word) => isPotentialPrefix(word)).flat();
 
   const results: ResultWDistance[] = [];
 
@@ -103,39 +124,15 @@ export async function GET(request: Request) {
     // take the array of courses with the same title (generally different prefix)
     // check if any search word is closer edit distance to the prefix or number, to sort better
     const newResults: ResultWDistance[] = courseNameTable[title].map(
-      (result) => ({
-        distance:
-          distances
-            .map((dist) => {
-              // if (typeof result.prefix !== 'undefined') {
-              //   const distToPrefix = editDistance(
-              //     inputArr[i],
-              //     result.prefix.toLowerCase(),
-              //   );
-              //   if (distToPrefix == 0) {
-              //     return -.01
-              //   }
-              //   if (distToPrefix < dist) {
-              //     return distToPrefix;
-              //   }
-              // }
-              // if (typeof result.number !== 'undefined') {
-              //   const distToNumber = editDistance(
-              //     inputArr[i],
-              //     result.number.toLowerCase(),
-              //   );
-              //   if (distToNumber < dist) {
-              //     return distToNumber;
-              //   }
-              // }
-              return dist;
-            })
-            .sort((a, b) => a - b)
-            .reduce(
-              (partialSum, dist, i) => partialSum + Math.pow(0.6, i) * dist,
-              0,
-            ) /* / title.length * 0.6 */ +
-          (titleWords.length >= inputArr.length
+      (result) => {
+        const distanceMetric = distances
+          .sort((a, b) => a - b)
+          .reduce(
+            (partialSum, dist, i) => partialSum + Math.pow(0.6, i) * dist,
+            0,
+          );
+        const coverage =
+          titleWords.length >= inputArr.length
             ? 1 -
               inputArr
                 .map((q) =>
@@ -145,16 +142,33 @@ export async function GET(request: Request) {
                 )
                 .reduce((a, b) => a + b, 0) /
                 (titleWords.length == 0 ? 1 : titleWords.length)
-            : 0) +
-          inputArr
-            .map((word) =>
-              titleWords.some((tw) => tw.includes(word)) ? -10 : (0 as number),
-            )
-            .reduce((a, b) => a + b, 0),
-        /*+ inputArr.map((word) => result.prefix?.toLowerCase() == word || result.number == word ? -1 : 0 as number).reduce((a, b) => a + b, 0) * 0.2*/ title:
-          title,
-        result: result,
-      }),
+            : 0;
+        const wordCapture = inputArr
+          .map((word) =>
+            titleWords.some((tw) => tw.includes(word)) ? -10 : (0 as number),
+          )
+          .reduce((a, b) => a + b, 0);
+        const prefixPriority = prefixes.includes(result.prefix ?? '') ? -10 : 0;
+        if (result.prefix == 'CS')
+          console.log('abc', title, prefixPriority, prefixes);
+        // distanceMetric += inputArr.map((term) => {
+        //   if (typeof result.number !== 'undefined') {
+        //     const distToNumber = editDistance(
+        //       term,
+        //       result.number.toLowerCase(),
+        //     );
+        //     return distToNumber / Math.max(result.number.length, term.length) - 1;
+        //   }
+        //   return 0;
+        // }).sort((a, b) => a - b)[0];
+
+        return {
+          distance: distanceMetric + coverage + wordCapture + prefixPriority,
+          /*+ inputArr.map((word) => result.prefix?.toLowerCase() == word || result.number == word ? -1 : 0 as number).reduce((a, b) => a + b, 0) * 0.2*/ title:
+            title,
+          result: result,
+        };
+      },
     );
 
     const s = newResults.filter(
