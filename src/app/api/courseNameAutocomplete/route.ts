@@ -191,7 +191,7 @@ export async function GET(request: Request) {
           (courseNumbers
             .map((number) => longestCommonPrefix(number, result.number ?? ''))
             .sort((a, b) => b - a)[0] ?? 0);
-        // const lengthPenalty = (titleWords.length - inputArr.length) * 0
+        const lengthPenalty = (titleWords.length - inputArr.length) * 0.7;
         if (result.prefix == 'CS' && result.number == '4348')
           console.log(
             'abc',
@@ -218,7 +218,8 @@ export async function GET(request: Request) {
             coverage +
             wordCapture +
             prefixPriority +
-            numberMatch,
+            numberMatch +
+            lengthPenalty,
           /*+ inputArr.map((word) => result.prefix?.toLowerCase() == word || result.number == word ? -1 : 0 as number).reduce((a, b) => a + b, 0) * 0.2*/ title:
             title,
           result: result,
