@@ -20,9 +20,41 @@ const coursePrefixes = Array.from(
 );
 
 function isPotentialPrefix(query: string): string[] {
+  const prefixMatch = query.match(/^[A-Za-z]+/);
+  if (!prefixMatch) return [];
+  const extractedPrefix = prefixMatch[0];
+
   return coursePrefixes.filter((prefix) =>
-    prefix.toLowerCase().startsWith(query.toLowerCase()),
+    prefix.toLowerCase().startsWith(extractedPrefix.toLowerCase()),
   );
+}
+
+function isPotentialCourseNumber(query: string): string {
+  // Extract numeric part with optional 'v' in second position (digits at the end or standalone)
+  const numberMatch = query.match(/\d+[vV]?\d*$/);
+  if (!numberMatch) return '';
+  const extractedNumber = numberMatch[0];
+
+  // Check if it's 1-4 characters and follows the pattern: digit + optional 'v' + digits
+  // Valid patterns: 1-4 digits OR digit + v + 1-2 digits (total 3-4 chars)
+  const isValid = /^(\d{1,4}|\d[vV]\d{1,2})$/.test(extractedNumber);
+
+  return isValid ? extractedNumber : '';
+}
+
+function longestCommonPrefix(str1: string, str2: string): number {
+  let count = 0;
+  const minLength = Math.min(str1.length, str2.length);
+
+  for (let i = 0; i < minLength; i++) {
+    if (str1.toLowerCase()[i] === str2.toLowerCase()[i]) {
+      count++;
+    } else {
+      break; // Stop at first mismatch
+    }
+  }
+
+  return count;
 }
 
 // Edit distance between 2 strings
@@ -76,9 +108,14 @@ export async function GET(request: Request) {
   input = input.toLowerCase();
   const inputWords = input.split(' ');
   const inputArr = inputWords.filter(
-    (word) => isPotentialPrefix(word).length == 0,
+    (word) =>
+      isPotentialPrefix(word).length == 0 &&
+      isPotentialCourseNumber(word).length == 0,
   );
   const prefixes = inputWords.map((word) => isPotentialPrefix(word)).flat();
+  const courseNumbers = inputWords
+    .map((word) => isPotentialCourseNumber(word))
+    .filter((word) => word.length > 0);
 
   const results: ResultWDistance[] = [];
 
@@ -149,8 +186,20 @@ export async function GET(request: Request) {
           )
           .reduce((a, b) => a + b, 0);
         const prefixPriority = prefixes.includes(result.prefix ?? '') ? -10 : 0;
-        if (result.prefix == 'CS')
-          console.log('abc', title, prefixPriority, prefixes);
+        const numberMatch =
+          -3 *
+          (courseNumbers
+            .map((number) => longestCommonPrefix(number, result.number ?? ''))
+            .sort((a, b) => b - a)[0] ?? 0);
+        if (result.prefix == 'CS' && result.number == '4348')
+          console.log(
+            'abc',
+            title,
+            prefixes,
+            prefixPriority,
+            courseNumbers,
+            numberMatch,
+          );
         // distanceMetric += inputArr.map((term) => {
         //   if (typeof result.number !== 'undefined') {
         //     const distToNumber = editDistance(
@@ -163,7 +212,12 @@ export async function GET(request: Request) {
         // }).sort((a, b) => a - b)[0];
 
         return {
-          distance: distanceMetric + coverage + wordCapture + prefixPriority,
+          distance:
+            distanceMetric +
+            coverage +
+            wordCapture +
+            prefixPriority +
+            numberMatch,
           /*+ inputArr.map((word) => result.prefix?.toLowerCase() == word || result.number == word ? -1 : 0 as number).reduce((a, b) => a + b, 0) * 0.2*/ title:
             title,
           result: result,
