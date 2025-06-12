@@ -168,24 +168,24 @@ export async function GET(request: Request) {
             (partialSum, dist, i) => partialSum + Math.pow(0.7, i) * dist,
             0,
           );
-        const coverage =
-          titleWords.length >= inputArr.length
-            ? 1 -
-              inputArr
-                .map((q) =>
-                  titleWords
-                    .map((tw) => (tw == q ? 1 : (0 as number)))
-                    // .map((tw) => (tw.startsWith(q) ? (q.length / tw.length): (0 as number)))
-                    .reduce((a, b) => a + b, 0),
-                )
-                .reduce((a, b) => a + b, 0) /
-                (titleWords.length == 0 ? 1 : titleWords.length)
-            : 0;
-        const wordCapture = inputArr
-          .map((word) =>
-            titleWords.some((tw) => tw.includes(word)) ? -10 : (0 as number),
-          )
-          .reduce((a, b) => a + b, 0);
+        // const coverage =
+        //   titleWords.length >= inputArr.length
+        //     ? 1 -
+        //       inputArr
+        //         .map((q) =>
+        //           titleWords
+        //             .map((tw) => (tw == q ? 1 : (0 as number)))
+        //             // .map((tw) => (tw.startsWith(q) ? (q.length / tw.length): (0 as number)))
+        //             .reduce((a, b) => a + b, 0),
+        //         )
+        //         .reduce((a, b) => a + b, 0) /
+        //         (titleWords.length == 0 ? 1 : titleWords.length)
+        //     : 0;
+        // const wordCapture = inputArr
+        //   .map((word) =>
+        //     titleWords.some((tw) => tw.includes(word)) ? -10 : (0 as number),
+        //   )
+        //   .reduce((a, b) => a + b, 0);
         const smartWordCapture = inputArr
           .map((word) => {
             let bestScore = 0;
@@ -222,7 +222,7 @@ export async function GET(request: Request) {
           (courseNumbers
             .map((number) => longestCommonPrefix(number, result.number ?? ''))
             .sort((a, b) => b - a)[0] ?? 0);
-        const lengthPenalty = (titleWords.length - inputArr.length) * 0.7;
+        // const lengthPenalty = (titleWords.length - inputArr.length) * 0.7;
         if (result.prefix == 'CS' && result.number == '4348')
           console.log(
             'abc',
@@ -257,7 +257,7 @@ export async function GET(request: Request) {
             distanceMetric +
             // coverage +
             // wordCapture +
-            2*smartWordCapture +
+            2 * smartWordCapture +
             prefixPriority +
             numberMatch +
             // lengthPenalty +
@@ -296,16 +296,20 @@ export async function GET(request: Request) {
   console.log(str);
   const cut = results[Math.floor(0)].distance;
   // Calculate variance
-  const variance = results.reduce((sum, d) => sum + Math.pow(d.distance - cut, 2), 0) / results.length;
+  const variance =
+    results.reduce((sum, d) => sum + Math.pow(d.distance - cut, 2), 0) /
+    results.length;
   // Calculate standard deviation
   const stdDev = Math.sqrt(variance);
   // 1 standard deviation cutoff
-  const oneStdCutoff = cut + 1*stdDev; // For your negative scoring system
+  const oneStdCutoff = cut + 1 * stdDev; // For your negative scoring system
   console.log(cut, oneStdCutoff);
-  const resultsWithoutDistance: Result[] = results.filter((r) => r.distance < oneStdCutoff).map((result) => ({
-    title: result.title,
-    result: result.result,
-  }));
+  const resultsWithoutDistance: Result[] = results
+    .filter((r) => r.distance < oneStdCutoff)
+    .map((result) => ({
+      title: result.title,
+      result: result.result,
+    }));
 
   return NextResponse.json(
     {
