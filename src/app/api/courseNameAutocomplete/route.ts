@@ -175,6 +175,7 @@ export async function GET(request: Request) {
                 .map((q) =>
                   titleWords
                     .map((tw) => (tw == q ? 1 : (0 as number)))
+                    // .map((tw) => (tw.startsWith(q) ? (q.length / tw.length): (0 as number)))
                     .reduce((a, b) => a + b, 0),
                 )
                 .reduce((a, b) => a + b, 0) /
@@ -184,6 +185,33 @@ export async function GET(request: Request) {
           .map((word) =>
             titleWords.some((tw) => tw.includes(word)) ? -10 : (0 as number),
           )
+          .reduce((a, b) => a + b, 0);
+        const smartWordCapture = inputArr
+          .map((word) => {
+            let bestScore = 0;
+
+            titleWords.forEach((tw) => {
+              // Exact inclusion (original behavior)
+              if (tw.includes(word)) {
+                bestScore = Math.min(bestScore, -10);
+                return;
+              }
+
+              // Fuzzy matching for typos
+              const distance = editDistance(
+                word.toLowerCase(),
+                tw.toLowerCase(),
+              );
+              const maxLen = Math.max(word.length, tw.length);
+              const similarity = 1 - distance / maxLen;
+
+              if (similarity > 0.7) {
+                bestScore = Math.min(bestScore, -8 * similarity);
+              }
+            });
+
+            return bestScore;
+          })
           .reduce((a, b) => a + b, 0);
         const prefixPriority = prefixes.includes(result.prefix ?? '') ? -10 : 0;
         const numberMatch =
@@ -213,13 +241,24 @@ export async function GET(request: Request) {
         // }).sort((a, b) => a - b)[0];
 
         return {
+          breakdown: {
+            distanceMetric: distanceMetric,
+            coverage: coverage,
+            wordCapture: wordCapture,
+            smartWordCapture: smartWordCapture,
+            prefixPriority: prefixPriority,
+            numberMatch: numberMatch,
+            lengthPenalty: lengthPenalty,
+          },
           distance:
             distanceMetric +
-            coverage +
-            wordCapture +
+            // coverage +
+            // wordCapture +
+            smartWordCapture +
             prefixPriority +
             numberMatch +
-            lengthPenalty,
+            // lengthPenalty +
+            0,
           /*+ inputArr.map((word) => result.prefix?.toLowerCase() == word || result.number == word ? -1 : 0 as number).reduce((a, b) => a + b, 0) * 0.2*/ title:
             title,
           result: result,
@@ -250,7 +289,7 @@ export async function GET(request: Request) {
     });
   }
 
-  console.log(results);
+  console.log('baweru', results);
   console.log(str);
   const resultsWithoutDistance: Result[] = results.map((result) => ({
     title: result.title,
