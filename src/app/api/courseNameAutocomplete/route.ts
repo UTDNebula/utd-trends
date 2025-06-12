@@ -82,7 +82,16 @@ function editDistance(a: string, b: string) {
 }
 
 function minEditDistance(words: string[], query: string) {
-  return Math.min(...words.map((word) => editDistance(word, query)));
+  return words.length > 0
+    ? Math.min(...words.map((word) => editDistance(word, query)))
+    : 10000;
+}
+
+function findSimilarity(word: string, target: string): number {
+  // Fuzzy matching for typos
+  const distance = editDistance(word.toLowerCase(), target.toLowerCase());
+  const maxLen = Math.max(word.length, target.length);
+  return 1 - distance / maxLen;
 }
 
 const LIMIT = 20;
@@ -197,13 +206,7 @@ export async function GET(request: Request) {
                 return;
               }
 
-              // Fuzzy matching for typos
-              const distance = editDistance(
-                word.toLowerCase(),
-                tw.toLowerCase(),
-              );
-              const maxLen = Math.max(word.length, tw.length);
-              const similarity = 1 - distance / maxLen;
+              const similarity = findSimilarity(word, tw);
 
               if (similarity > 0.7) {
                 bestScore = Math.min(bestScore, -8 * similarity);
@@ -222,6 +225,22 @@ export async function GET(request: Request) {
           (courseNumbers
             .map((number) => longestCommonPrefix(number, result.number ?? ''))
             .sort((a, b) => b - a)[0] ?? 0);
+        const smartNumberMatch =
+          courseNumbers
+            .map((number) => {
+              if (result.number) {
+                const similarity = findSimilarity(number, result.number);
+                if (similarity > 0.9) {
+                  return -10 * similarity;
+                } else if (similarity > 0.7) {
+                  return -8 * similarity;
+                } else if (similarity > 0.5) {
+                  return -3 * similarity;
+                }
+              }
+              return 0;
+            })
+            .sort((a, b) => b - a)[0] ?? 0;
         // const lengthPenalty = (titleWords.length - inputArr.length) * 0.7;
         if (result.prefix == 'CS' && result.number == '4348')
           console.log(
@@ -246,20 +265,22 @@ export async function GET(request: Request) {
         return {
           // breakdown: {
           //   distanceMetric: distanceMetric,
-          //   coverage: coverage,
-          //   wordCapture: wordCapture,
+          //   // coverage: coverage,
+          //   // wordCapture: wordCapture,
           //   smartWordCapture: smartWordCapture,
           //   prefixPriority: prefixPriority,
-          //   numberMatch: numberMatch,
-          //   lengthPenalty: lengthPenalty,
+          //   // numberMatch: numberMatch,
+          //   smartNumberMatch: smartNumberMatch,
+          //   // lengthPenalty: lengthPenalty,
           // },
           distance:
-            distanceMetric +
+            (smartNumberMatch < 0 ? 0 : distanceMetric) +
             // coverage +
             // wordCapture +
             2 * smartWordCapture +
             prefixPriority +
-            numberMatch +
+            // numberMatch +
+            smartNumberMatch +
             // lengthPenalty +
             0,
           /*+ inputArr.map((word) => result.prefix?.toLowerCase() == word || result.number == word ? -1 : 0 as number).reduce((a, b) => a + b, 0) * 0.2*/ title:
@@ -270,7 +291,7 @@ export async function GET(request: Request) {
     );
 
     const s = newResults.filter(
-      (x) => x.title == 'Introduction to Machine Learning',
+      (x) => x.title.toLowerCase() == 'computer science ii',
     );
     if (s.length > 0) {
       str.push(...s);
@@ -303,9 +324,9 @@ export async function GET(request: Request) {
   const stdDev = Math.sqrt(variance);
   // 1 standard deviation cutoff
   const oneStdCutoff = cut + 1 * stdDev; // For your negative scoring system
-  console.log(cut, oneStdCutoff);
+  console.log('std', cut, oneStdCutoff);
   const resultsWithoutDistance: Result[] = results
-    .filter((r) => r.distance < oneStdCutoff)
+    .filter((r) => r.distance <= oneStdCutoff)
     .map((result) => ({
       title: result.title,
       result: result.result,
