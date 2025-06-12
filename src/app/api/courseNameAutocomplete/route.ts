@@ -208,6 +208,9 @@ export async function GET(request: Request) {
               if (similarity > 0.7) {
                 bestScore = Math.min(bestScore, -8 * similarity);
               }
+              if (similarity > 0.5) {
+                bestScore = Math.min(bestScore, -3 * similarity);
+              }
             });
 
             return bestScore;
@@ -241,20 +244,20 @@ export async function GET(request: Request) {
         // }).sort((a, b) => a - b)[0];
 
         return {
-          breakdown: {
-            distanceMetric: distanceMetric,
-            coverage: coverage,
-            wordCapture: wordCapture,
-            smartWordCapture: smartWordCapture,
-            prefixPriority: prefixPriority,
-            numberMatch: numberMatch,
-            lengthPenalty: lengthPenalty,
-          },
+          // breakdown: {
+          //   distanceMetric: distanceMetric,
+          //   coverage: coverage,
+          //   wordCapture: wordCapture,
+          //   smartWordCapture: smartWordCapture,
+          //   prefixPriority: prefixPriority,
+          //   numberMatch: numberMatch,
+          //   lengthPenalty: lengthPenalty,
+          // },
           distance:
             distanceMetric +
             // coverage +
             // wordCapture +
-            smartWordCapture +
+            2*smartWordCapture +
             prefixPriority +
             numberMatch +
             // lengthPenalty +
@@ -291,7 +294,15 @@ export async function GET(request: Request) {
 
   console.log('baweru', results);
   console.log(str);
-  const resultsWithoutDistance: Result[] = results.map((result) => ({
+  const cut = results[Math.floor(0)].distance;
+  // Calculate variance
+  const variance = results.reduce((sum, d) => sum + Math.pow(d.distance - cut, 2), 0) / results.length;
+  // Calculate standard deviation
+  const stdDev = Math.sqrt(variance);
+  // 1 standard deviation cutoff
+  const oneStdCutoff = cut + 1*stdDev; // For your negative scoring system
+  console.log(cut, oneStdCutoff);
+  const resultsWithoutDistance: Result[] = results.filter((r) => r.distance < oneStdCutoff).map((result) => ({
     title: result.title,
     result: result.result,
   }));
