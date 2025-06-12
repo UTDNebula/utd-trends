@@ -229,13 +229,14 @@ export async function GET(request: Request) {
           courseNumbers
             .map((number) => {
               if (result.number) {
+                const prefixScore = longestCommonPrefix(number, result.number);
                 const similarity = findSimilarity(number, result.number);
                 if (similarity > 0.9) {
-                  return -10 * similarity;
+                  return -10 * similarity - prefixScore;
                 } else if (similarity > 0.7) {
-                  return -8 * similarity;
+                  return -8 * similarity - prefixScore;
                 } else if (similarity > 0.5) {
-                  return -3 * similarity;
+                  return -3 * similarity - prefixScore;
                 }
               }
               return 0;
