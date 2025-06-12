@@ -82,7 +82,7 @@ function editDistance(a: string, b: string) {
 }
 
 function minEditDistance(words: string[], query: string) {
-  return words.length > 0
+  return words.length > 0 && query.length > 0
     ? Math.min(...words.map((word) => editDistance(word, query)))
     : 10000;
 }
@@ -207,7 +207,9 @@ export async function GET(request: Request) {
               }
 
               const similarity = findSimilarity(word, tw);
-
+              // console.log(title)
+              if (title.toLowerCase().includes('local government'))
+                console.log('aww', title, similarity);
               if (similarity > 0.7) {
                 bestScore = Math.min(bestScore, -8 * similarity);
               }
@@ -264,16 +266,16 @@ export async function GET(request: Request) {
         // }).sort((a, b) => a - b)[0];
 
         return {
-          // breakdown: {
-          //   distanceMetric: distanceMetric,
-          //   // coverage: coverage,
-          //   // wordCapture: wordCapture,
-          //   smartWordCapture: smartWordCapture,
-          //   prefixPriority: prefixPriority,
-          //   // numberMatch: numberMatch,
-          //   smartNumberMatch: smartNumberMatch,
-          //   // lengthPenalty: lengthPenalty,
-          // },
+          breakdown: {
+            distanceMetric: distanceMetric,
+            // coverage: coverage,
+            // wordCapture: wordCapture,
+            smartWordCapture: smartWordCapture,
+            prefixPriority: prefixPriority,
+            // numberMatch: numberMatch,
+            smartNumberMatch: smartNumberMatch,
+            // lengthPenalty: lengthPenalty,
+          },
           distance:
             (smartNumberMatch < 0 ? 0 : distanceMetric) +
             // coverage +
@@ -291,8 +293,8 @@ export async function GET(request: Request) {
       },
     );
 
-    const s = newResults.filter(
-      (x) => x.title.toLowerCase() == 'computer science ii',
+    const s = newResults.filter((x) =>
+      x.title.toLowerCase().includes('local government'),
     );
     if (s.length > 0) {
       str.push(...s);
