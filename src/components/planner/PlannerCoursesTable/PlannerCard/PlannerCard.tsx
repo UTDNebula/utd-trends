@@ -27,7 +27,6 @@ import React, { useEffect, useState } from 'react';
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
-import type { CourseData } from '@/pages/api/course';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import { type SectionsData } from '@/pages/api/sections';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
@@ -341,7 +340,6 @@ function MeetingChip(props: {
 type PlannerCardProps = {
   query: SearchQueryMultiSection;
   sections?: SectionsData;
-  courseData?: CourseData;
   setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
   grades: GenericFetchedData<GradesType>;
   rmp: GenericFetchedData<RMPInterface>;
@@ -482,26 +480,9 @@ const PlannerCard = (props: PlannerCardProps) => {
             </ToggleButtonGroup>
           </Tooltip>
         </div>
-        <Tooltip
-          title={props.courseData ? props.courseData.title : ''}
-          placement="top-start"
-          slotProps={{
-            popper: {
-              modifiers: [
-                {
-                  name: 'offset',
-                  options: {
-                    offset: [-10, -5],
-                  },
-                },
-              ],
-            },
-          }}
-        >
-          <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit flex-grow">
-            {searchQueryLabel(removeSection(props.query))}
-          </Typography>
-        </Tooltip>
+        <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit flex-grow">
+          {searchQueryLabel(removeSection(props.query))}
+        </Typography>
         <MeetingChip
           color={props.color}
           meetings={

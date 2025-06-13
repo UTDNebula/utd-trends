@@ -1,6 +1,5 @@
 import React from 'react';
 
-import type { CourseData } from '@/pages/api/course';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToCourseOnly,
@@ -34,7 +33,6 @@ export const DAYS = [
 
 type PlannerScheduleProps = {
   courses: SearchQuery[];
-  courseData: { [key: string]: CourseData };
   sections: {
     [key: string]: GenericFetchedData<SectionsType>;
   };
@@ -72,11 +70,6 @@ const PlannerSchedule = (props: PlannerScheduleProps) => {
         return (
           <PlannerSection
             key={searchQueryLabel(course)}
-            courseData={
-              props.courseData &&
-              course &&
-              props.courseData[searchQueryLabel(convertToCourseOnly(course))]
-            }
             selectedSection={sections.data.latest.find(
               (section) => section.section_number === course.sectionNumber,
             )}
