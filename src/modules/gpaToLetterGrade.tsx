@@ -1,4 +1,4 @@
-function gpaToLetterGrade(gpa: number): string {
+export default function gpaToLetterGrade(gpa: number): string {
   if (gpa >= 4.0) return 'A';
   if (gpa >= 3.67) return 'A-';
   if (gpa >= 3.33) return 'B+';
@@ -12,5 +12,3 @@ function gpaToLetterGrade(gpa: number): string {
   if (gpa >= 0.67) return 'D-';
   return 'F';
 }
-
-export default gpaToLetterGrade;

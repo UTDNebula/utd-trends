@@ -1,15 +1,11 @@
-type GenericFetchedDataError<T> = {
-  state: 'error';
-  data?: T;
-};
-type GenericFetchedDataLoading = {
-  state: 'loading';
+type GenericFetchedDataError = {
+  message: 'error';
+  data?: string;
 };
 type GenericFetchedDataDone<T> = {
-  state: 'done';
+  message: 'success';
   data: T;
 };
 export type GenericFetchedData<T> =
-  | GenericFetchedDataError<T>
-  | GenericFetchedDataLoading
+  | GenericFetchedDataError
   | GenericFetchedDataDone<T>;
