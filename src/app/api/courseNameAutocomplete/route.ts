@@ -19,6 +19,7 @@ const coursePrefixes = Array.from(
   (prefix): prefix is string => typeof prefix === 'string' && prefix.length > 0,
 );
 
+/** Checks if the query word is/partially a prefix and @returns potential prefix matches */
 function isPotentialPrefix(query: string): string[] {
   const prefixMatch = query.match(/^[A-Za-z]+/);
   if (!prefixMatch) return [];
@@ -29,6 +30,7 @@ function isPotentialPrefix(query: string): string[] {
   );
 }
 
+/** Checks if query word is 1-4 digits and @returns the exctracted 4 digits if valid or a blank string */
 function isPotentialCourseNumber(query: string): string {
   // Extract numeric part with optional 'v' in second position (digits at the end or standalone)
   const numberMatch = query.match(/\d+[vV]?\d*$/);
@@ -36,12 +38,13 @@ function isPotentialCourseNumber(query: string): string {
   const extractedNumber = numberMatch[0];
 
   // Check if it's 1-4 characters and follows the pattern: digit + optional 'v' + digits
-  // Valid patterns: 1-4 digits OR digit + v + 1-2 digits (total 3-4 chars)
+  // Valid patterns: 1-4 digits OR digit + v + 1-2 digits
   const isValid = /^(\d{1,4}|\d[vV]\d{1,2})$/.test(extractedNumber);
 
   return isValid ? extractedNumber : '';
 }
 
+/** @returns length of the longest common substring between the 2 strings that starts at the beginning of str1 */
 function longestCommonPrefix(str1: string, str2: string): number {
   let count = 0;
   const minLength = Math.min(str1.length, str2.length);
@@ -81,12 +84,17 @@ function editDistance(a: string, b: string) {
   return dp[a.length][b.length];
 }
 
-function minEditDistance(words: string[], query: string) {
-  return words.length > 0 && query.length > 0
-    ? Math.min(...words.map((word) => editDistance(word, query)))
+/** @returns the distance to the closest query word to one title word
+ * @param queries - array of query words
+ * @param word - a single word from the course title
+ */
+function minEditDistance(queries: string[], word: string) {
+  return queries.length > 0 && word.length > 0
+    ? Math.min(...queries.map((query) => editDistance(query, word)))
     : 10000;
 }
 
+/** Fuzzy matches word with target by using editDistance */
 function findSimilarity(word: string, target: string): number {
   // Fuzzy matching for typos
   const distance = editDistance(word.toLowerCase(), target.toLowerCase());
@@ -116,6 +124,7 @@ export async function GET(request: Request) {
   }
   input = input.toLowerCase();
   const inputWords = input.split(' ').filter((word) => word.length > 0);
+  // isolate potential prefixes and course numbers so they aren't treated as words
   const inputArr = inputWords.filter(
     (word) =>
       isPotentialPrefix(word).length == 0 &&
@@ -128,78 +137,31 @@ export async function GET(request: Request) {
 
   const results: ResultWDistance[] = [];
 
-  const str: ResultWDistance[] = [];
   // check each course name
   for (const title in courseNameTable) {
     const titleWords = title.toLowerCase().split(' ');
 
-    // for each word in query, find the word in the course name that is most similar
-    // const distances = inputArr.map((word) => minEditDistance(titleWords, word));
     //for each word in the course name, find the word in the query that is most similar
     const distances = titleWords.map((word) => minEditDistance(inputArr, word));
-    if (titleWords.includes('machine') && titleWords.includes('learning')) {
-      console.log(
-        title,
-        titleWords.map((word) => ({
-          word: word,
-          dist: minEditDistance(inputArr, word),
-        })),
-        titleWords
-          .map((word) => minEditDistance(inputArr, word))
-          .sort((a, b) => a - b)
-          .reduce(
-            (partialSum, dist, i) => partialSum + Math.pow(0.5, i) * dist,
-            0,
-          ),
-        1 -
-          inputArr
-            .map((q) =>
-              titleWords
-                .map((tw) => (tw == q ? 1 : (0 as number)))
-                .reduce((a, b) => a + b, 0),
-            )
-            .reduce((a, b) => a + b, 0) /
-            (titleWords.length == 0 ? 1 : titleWords.length),
-        inputArr
-          .map((word) =>
-            titleWords.some((tw) => tw.includes(word)) ? -10 : (0 as number),
-          )
-          .reduce((a, b) => a + b, 0),
-      );
-    }
+
     // take the array of courses with the same title (generally different prefix)
-    // check if any search word is closer edit distance to the prefix or number, to sort better
+    // check metrics of distance, word capture, prefix priority, number match
     const newResults: ResultWDistance[] = courseNameTable[title].map(
       (result) => {
+        // edit distance between the course title and query words, with a discounted weight on more distant words
         const distanceMetric = distances
           .sort((a, b) => a - b)
           .reduce(
-            (partialSum, dist, i) => partialSum + Math.pow(0.7, i) * dist,
+            (partialSum, dist, i) => partialSum + Math.pow(0.7, i) * dist, // discount weight by 0.7^i
             0,
           );
-        // const coverage =
-        //   titleWords.length >= inputArr.length
-        //     ? 1 -
-        //       inputArr
-        //         .map((q) =>
-        //           titleWords
-        //             .map((tw) => (tw == q ? 1 : (0 as number)))
-        //             // .map((tw) => (tw.startsWith(q) ? (q.length / tw.length): (0 as number)))
-        //             .reduce((a, b) => a + b, 0),
-        //         )
-        //         .reduce((a, b) => a + b, 0) /
-        //         (titleWords.length == 0 ? 1 : titleWords.length)
-        //     : 0;
-        // const wordCapture = inputArr
-        //   .map((word) =>
-        //     titleWords.some((tw) => tw.includes(word)) ? -10 : (0 as number),
-        //   )
-        //   .reduce((a, b) => a + b, 0);
+        // How much of the query is captured by the title words
         const smartWordCapture = inputArr
           .map((word) => {
             let bestScore = 0;
 
             titleWords.forEach((tw) => {
+              // For each title word
               // Exact inclusion (original behavior)
               if (tw.includes(word)) {
                 bestScore = Math.min(bestScore, -10);
@@ -207,9 +169,6 @@ export async function GET(request: Request) {
               }
 
               const similarity = findSimilarity(word, tw);
-              // console.log(title)
-              if (title.toLowerCase().includes('local government'))
-                console.log('aww', title, similarity);
               if (similarity > 0.7) {
                 bestScore = Math.min(bestScore, -8 * similarity);
               }
@@ -221,17 +180,14 @@ export async function GET(request: Request) {
             return bestScore;
           })
           .reduce((a, b) => a + b, 0);
+        // boosts it if the prefix matches
         const prefixPriority = prefixes.includes(result.prefix ?? '') ? -10 : 0;
-        const numberMatch =
-          -3 *
-          (courseNumbers
-            .map((number) => longestCommonPrefix(number, result.number ?? ''))
-            .sort((a, b) => b - a)[0] ?? 0);
+        // boosts it if the course number matches (fuzzy - allows spelling mistakes)
         const smartNumberMatch =
           courseNumbers
             .map((number) => {
               if (result.number) {
-                const prefixScore = longestCommonPrefix(number, result.number);
+                const prefixScore = longestCommonPrefix(number, result.number); // show numbers that differ by the last digit higher
                 const similarity = findSimilarity(number, result.number);
                 if (similarity > 0.9) {
                   return -10 * similarity - prefixScore;
@@ -244,62 +200,20 @@ export async function GET(request: Request) {
               return 0;
             })
             .sort((a, b) => b - a)[0] ?? 0;
-        // const lengthPenalty = (titleWords.length - inputArr.length) * 0.7;
-        if (result.prefix == 'CS' && result.number == '4348')
-          console.log(
-            'abc',
-            title,
-            prefixes,
-            prefixPriority,
-            courseNumbers,
-            numberMatch,
-          );
-        // distanceMetric += inputArr.map((term) => {
-        //   if (typeof result.number !== 'undefined') {
-        //     const distToNumber = editDistance(
-        //       term,
-        //       result.number.toLowerCase(),
-        //     );
-        //     return distToNumber / Math.max(result.number.length, term.length) - 1;
-        //   }
-        //   return 0;
-        // }).sort((a, b) => a - b)[0];
 
         return {
-          breakdown: {
-            distanceMetric: distanceMetric,
-            // coverage: coverage,
-            // wordCapture: wordCapture,
-            smartWordCapture: smartWordCapture,
-            prefixPriority: prefixPriority,
-            // numberMatch: numberMatch,
-            smartNumberMatch: smartNumberMatch,
-            // lengthPenalty: lengthPenalty,
-          },
           distance:
-            (smartNumberMatch < 0 ? 0 : distanceMetric) +
-            // coverage +
-            // wordCapture +
-            2 * smartWordCapture +
+            (smartNumberMatch < 0 ? 0 : distanceMetric) + // if checking course number, ignore distance metric
+            2 * smartWordCapture + // double weight for word capture
             prefixPriority +
-            // numberMatch +
-            smartNumberMatch +
-            // lengthPenalty +
-            0,
-          /*+ inputArr.map((word) => result.prefix?.toLowerCase() == word || result.number == word ? -1 : 0 as number).reduce((a, b) => a + b, 0) * 0.2*/ title:
-            title,
+            smartNumberMatch,
+          title: title,
           result: result,
         };
       },
     );
 
-    const s = newResults.filter((x) =>
-      x.title.toLowerCase().includes('local government'),
-    );
-    if (s.length > 0) {
-      str.push(...s);
-    }
-
+    // add to results if it fits
     newResults.forEach((result) => {
       if (results.length < LIMIT) {
         // If not at limit, just add it
@@ -316,18 +230,13 @@ export async function GET(request: Request) {
     });
   }
 
-  console.log('baweru', results);
-  console.log(str);
+  // calculate cutoff for 1 standard deviation
   const cut = results[Math.floor(0)].distance;
-  // Calculate variance
   const variance =
     results.reduce((sum, d) => sum + Math.pow(d.distance - cut, 2), 0) /
-    results.length;
-  // Calculate standard deviation
-  const stdDev = Math.sqrt(variance);
-  // 1 standard deviation cutoff
-  const oneStdCutoff = cut + 1 * stdDev; // For your negative scoring system
-  console.log('std', cut, oneStdCutoff);
+    results.length; // Calculate variance
+  const stdDev = Math.sqrt(variance); // Calculate standard deviation
+  const oneStdCutoff = cut + 1 * stdDev; // 1 standard deviation cutoff
   const resultsWithoutDistance: Result[] = results
     .filter((r) => r.distance <= oneStdCutoff)
     .map((result) => ({
