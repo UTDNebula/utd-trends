@@ -16,15 +16,15 @@ module.exports = {
   sections: [
     {
       name: 'Introduction',
-      content: 'styleguidistDocs/introduction.md',
+      content: 'docs/introduction.md',
     },
     {
       name: 'Style Guide',
-      content: 'styleguidistDocs/styling.md',
+      content: 'docs/styling.md',
     },
     {
       name: 'Common Components',
-      content: 'styleguidistDocs/common.md',
+      content: 'docs/common.md',
       components: ['./src/components/common/**/*.tsx'],
     },
     {
@@ -45,7 +45,6 @@ module.exports = {
     },
     {
       name: 'Graph Components',
-      content: './src/components/graph/GraphProps.md',
       components: ['./src/components/graph/**/*.tsx'],
     },
     {

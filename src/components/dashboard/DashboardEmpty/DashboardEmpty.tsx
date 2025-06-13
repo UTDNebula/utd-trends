@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import React from 'react';
 
-function DashboardEmpty() {
+export default function DashboardEmpty() {
   return (
     <Typography
       variant="h2"
@@ -11,5 +11,3 @@ function DashboardEmpty() {
     </Typography>
   );
 }
-
-export default DashboardEmpty;

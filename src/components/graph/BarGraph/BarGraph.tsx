@@ -1,5 +1,6 @@
+'use client';
+
 import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
@@ -32,7 +33,7 @@ type Props = {
  * @param props
  * @returns vertical bar graph
  */
-function BarGraph(props: Props) {
+export default function BarGraph(props: Props) {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
@@ -53,7 +54,7 @@ function BarGraph(props: Props) {
   }
 
   const rainbowColors = useRainbowColors();
-  const theme = useTheme();
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
   const options: ApexOptions = {
     chart: {
@@ -79,7 +80,7 @@ function BarGraph(props: Props) {
       },
     },
     grid: {
-      borderColor: theme.palette.mode === 'dark' ? '#404040' : '#e0e0e0',
+      borderColor: prefersDarkMode ? '#404040' : '#e0e0e0',
     },
     plotOptions: {
       bar: {
@@ -129,7 +130,7 @@ function BarGraph(props: Props) {
       },
     },
     theme: {
-      mode: useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light',
+      mode: prefersDarkMode ? 'dark' : 'light',
     },
     tooltip: {
       y: {
@@ -166,5 +167,3 @@ function BarGraph(props: Props) {
     </>
   );
 }
-
-export default BarGraph;

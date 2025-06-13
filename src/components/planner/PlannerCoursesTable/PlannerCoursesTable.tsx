@@ -1,37 +1,48 @@
+'use client';
+
 import { Alert, Snackbar, Typography } from '@mui/material';
 import React, { useState } from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerCard, {
-  LoadingRow,
-} from '@/components/planner/PlannerCoursesTable/PlannerCard/PlannerCard';
-import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
-import { type GenericFetchedData } from '@/types/GenericFetchedData';
-import type { GradesType } from '@/types/GradesType';
+  LoadingPlannerCard,
+} from '@/components/planner/PlannerCoursesTable/PlannerCard';
 import {
   convertToCourseOnly,
   convertToProfOnly,
   removeSection,
-  type SearchQuery,
   searchQueryLabel,
-  type SearchQueryMultiSection,
   searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
-import type { SectionsType } from '@/types/SectionsType';
 
-type PlannerCoursesTableProps = {
-  courses: SearchQueryMultiSection[];
-  addToPlanner: (value: SearchQuery) => void;
-  removeFromPlanner: (value: SearchQuery) => void;
-  setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
-  sections: {
-    [key: string]: GenericFetchedData<SectionsType>;
-  };
-  grades: { [key: string]: GenericFetchedData<GradesType> };
-  rmp: { [key: string]: GenericFetchedData<RMPInterface> };
-  colorMap: { [key: string]: { fill: string; outline: string; font: string } };
-};
+export function LoadingPlannerCoursesTable() {
+  const { planner } = useSharedState();
 
-const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
+  return (
+    <>
+      <Typography variant="h2" className="leading-tight text-3xl font-bold p-4">
+        My Planner
+      </Typography>
+      <div className="flex flex-col gap-4 mb-4 sm:mb-0">
+        {planner.map((_, index) => (
+          <LoadingPlannerCard key={index} />
+        ))}
+      </div>
+    </>
+  );
+}
+
+export default function PlannerCoursesTable() {
+  const {
+    grades,
+    rmp,
+    sections,
+    planner,
+    removeFromPlanner,
+    setPlannerSection,
+    plannerColorMap,
+  } = useSharedState();
+
   const [openConflictMessage, setOpenConflictMessage] = useState(false);
   const conflictMessageClose = (_: unknown, reason?: string) => {
     if (reason === 'clickaway') {
@@ -46,17 +57,13 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
         My Planner
       </Typography>
       <div className="flex flex-col gap-4 mb-4 sm:mb-0">
-        {props.courses.map((course, index) => {
-          const sectionData =
-            props.sections[searchQueryLabel(removeSection(course))];
+        {planner.map((query, index) => {
+          const sectionData = sections[searchQueryLabel(removeSection(query))];
 
-          if (typeof sectionData !== 'undefined') {
-            if (sectionData.state === 'loading') {
-              return <LoadingRow key={index} />;
-            }
-          }
           const allSections =
-            sectionData?.state === 'done' && Array.isArray(sectionData.data.all)
+            typeof sectionData !== 'undefined' &&
+            sectionData.message === 'success' &&
+            Array.isArray(sectionData.data.all)
               ? sectionData.data.all
               : [];
 
@@ -71,42 +78,42 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
           return (
             <PlannerCard
               key={index}
-              query={course}
+              query={query}
               sections={
                 typeof sectionData !== 'undefined' &&
-                sectionData.state === 'done'
+                sectionData.message === 'success'
                   ? sectionData.data.latest
                   : undefined
               }
               bestSyllabus={bestSyllabusUri}
-              setPlannerSection={props.setPlannerSection}
-              grades={props.grades[searchQueryLabel(removeSection(course))]}
-              rmp={props.rmp[searchQueryLabel(convertToProfOnly(course))]}
+              setPlannerSection={setPlannerSection}
+              grades={grades[searchQueryLabel(removeSection(query))]}
+              rmp={rmp[searchQueryLabel(convertToProfOnly(query))]}
               removeFromPlanner={() => {
-                props.removeFromPlanner(course);
+                removeFromPlanner(query);
               }}
-              selectedSections={props.courses
+              selectedSections={planner
                 .flatMap((searchQuery) =>
                   searchQueryMultiSectionSplit(searchQuery),
                 )
-                .map((course) => {
-                  const sections =
-                    props.sections[searchQueryLabel(removeSection(course))];
+                .map((single) => {
+                  const singleSectionData =
+                    sections[searchQueryLabel(removeSection(single))];
                   if (
-                    typeof sections === 'undefined' ||
-                    sections.state !== 'done'
+                    typeof singleSectionData === 'undefined' ||
+                    singleSectionData.message !== 'success'
                   ) {
                     return undefined;
                   }
-                  return sections.data.latest.find(
+                  return singleSectionData.data?.latest.find(
                     (section) =>
-                      section.section_number === course.sectionNumber,
+                      section.section_number === single.sectionNumber,
                   );
                 })
                 .filter((section) => typeof section !== 'undefined')}
               openConflictMessage={() => setOpenConflictMessage(true)}
               color={
-                props.colorMap[searchQueryLabel(convertToCourseOnly(course))]
+                plannerColorMap[searchQueryLabel(convertToCourseOnly(query))]
               }
             />
           );
@@ -128,6 +135,4 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
       </Snackbar>
     </>
   );
-};
-
-export default PlannerCoursesTable;
+}
