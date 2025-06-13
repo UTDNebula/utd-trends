@@ -351,7 +351,20 @@ export default function SearchBar(props: Props) {
             // but if the user is deleting text, don't try to autocomplete
             (event.nativeEvent as InputEvent).inputType === 'insertText'
           ) {
-            if (value.length > 0 && options.length === 1) {
+            if (
+              value.length > 0 &&
+              options.length === 1 &&
+              ((typeof options[0].profFirst === 'undefined' &&
+                typeof options[0].profLast === 'undefined') ||
+                options[0].profFirst?.toLowerCase().trim() ===
+                  value.toLowerCase().trim() ||
+                options[0].profLast?.toLowerCase().trim() ===
+                  value.toLowerCase().trim() ||
+                options[0].profFirst?.toLowerCase() +
+                  ' ' +
+                  options[0].profLast?.toLowerCase() ===
+                  value.toLowerCase().trim())
+            ) {
               event.preventDefault();
               event.stopPropagation();
               addValue(options[0]);
