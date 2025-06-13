@@ -10,12 +10,18 @@ export type TableType = { [key: string]: SearchQuery[] };
 
 const table: TableType = {};
 
+function addBlank(prefix: string, number: string) {
+  const courseString = prefix + ' ' + number; //string representation
+  if (!Object.prototype.hasOwnProperty.call(table, courseString)) {
+    table[courseString] = [];
+  }
+}
+
 function addCombo( //variables
   prefix: string,
   number: string,
-  sectionNumber: string,
-  profFirst: string,
-  profLast: string,
+  profFirst?: string,
+  profLast?: string,
 ) {
   const courseString = prefix + ' ' + number; //string representation
   const profString = profFirst + ' ' + profLast;
@@ -74,6 +80,7 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
     courseNumberItr++
   ) {
     const courseNumberData = prefixData.course_numbers[courseNumberItr];
+    addBlank(prefixData.subject_prefix, courseNumberData.course_number);
     for (
       let academicSessionItr = 0;
       academicSessionItr < courseNumberData.academic_sessions.length;
@@ -102,7 +109,6 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
             addCombo(
               prefixData.subject_prefix,
               courseNumberData.course_number,
-              sectionData.section_number,
               professorData.first_name,
               professorData.last_name,
             );
