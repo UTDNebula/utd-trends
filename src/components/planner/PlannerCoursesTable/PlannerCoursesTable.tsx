@@ -5,7 +5,6 @@ import PlannerCard, {
   LoadingRow,
 } from '@/components/planner/PlannerCoursesTable/PlannerCard/PlannerCard';
 import { displayAcademicSessionName } from '@/components/search/Filters/Filters';
-import type { CourseData } from '@/pages/api/course';
 import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
 import { type GenericFetchedData } from '@/types/GenericFetchedData';
 import type { GradesType } from '@/types/GradesType';
@@ -23,7 +22,6 @@ import type { SectionsType } from '@/types/SectionsType';
 type PlannerCoursesTableProps = {
   latestSemester: string | null;
   courses: SearchQueryMultiSection[];
-  courseData: { [key: string]: CourseData };
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
   setPlannerSection: (searchQuery: SearchQuery, section: string) => boolean;
@@ -66,9 +64,6 @@ const PlannerCoursesTable = (props: PlannerCoursesTableProps) => {
             <PlannerCard
               key={index}
               query={course}
-              courseData={
-                props.courseData[searchQueryLabel(convertToCourseOnly(course))]
-              }
               sections={
                 typeof sectionData !== 'undefined' &&
                 sectionData.state === 'done'
