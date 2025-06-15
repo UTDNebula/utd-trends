@@ -6,6 +6,7 @@ import fetchRmp, { type RMP } from '@/modules/fetchRmp';
 import fetchSections, { type Sections } from '@/modules/fetchSections';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
+  convertToCourseOnly,
   convertToProfOnly,
   removeDuplicates,
   type SearchQuery,
@@ -75,9 +76,8 @@ export default async function fetchAll(queries: SearchQuery[]): Promise<{
 
   const courseNames = Object.fromEntries(
     queries.map((query) => {
-      const queryString = searchQueryLabel(convertToCourseOnly(query))[
-        (queryString, coursePrefixNumberTable[queryString])
-      ];
+      const queryString = searchQueryLabel(convertToCourseOnly(query));
+      return [queryString, coursePrefixNumberTable[queryString]];
     }),
   );
 
