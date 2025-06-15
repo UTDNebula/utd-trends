@@ -13,23 +13,36 @@ interface Props {
   grades: { [key: string]: GenericFetchedData<Grades> };
   rmp: { [key: string]: GenericFetchedData<RMP> };
   sections: { [key: string]: GenericFetchedData<Sections> };
+  courseNames: { [key: string]: string };
 }
 
 export default function SyncServerDataToContext({
   grades,
   rmp,
   sections,
+  courseNames,
 }: Props) {
   const hasHydrated = useHasHydrated();
-  const { setGrades, setRmp, setSections } = useSharedState();
+  const { setGrades, setRmp, setSections, setCourseNames } = useSharedState();
 
   useEffect(() => {
     if (hasHydrated) {
       setGrades(grades);
       setRmp(rmp);
       setSections(sections);
+      setCourseNames(courseNames);
     }
-  }, [hasHydrated, grades, rmp, sections, setGrades, setRmp, setSections]);
+  }, [
+    hasHydrated,
+    grades,
+    rmp,
+    sections,
+    courseNames,
+    setGrades,
+    setRmp,
+    setSections,
+    setCourseNames,
+  ]);
 
   return null;
 }

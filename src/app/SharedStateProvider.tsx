@@ -313,6 +313,10 @@ export function SharedStateProvider({
     ]),
   );
 
+  const [courseNames, setCourseNames] = useState<{
+    [key: string]: string;
+  }>({});
+
   return (
     <SharedStateContext.Provider
       value={{
@@ -336,6 +340,8 @@ export function SharedStateProvider({
         semesters,
         chosenSemesters,
         setChosenSemesters,
+        courseNames,
+        setCourseNames,
       }}
     >
       {children}

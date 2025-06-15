@@ -1,5 +1,6 @@
 'use server';
 
+import untypedCoursePrefixNumberTable from '@/data/course_prefix_number_table.json';
 import fetchGrades, { type Grades } from '@/modules/fetchGrades';
 import fetchRmp, { type RMP } from '@/modules/fetchRmp';
 import fetchSections, { type Sections } from '@/modules/fetchSections';
@@ -10,6 +11,10 @@ import {
   type SearchQuery,
   searchQueryLabel,
 } from '@/types/SearchQuery';
+
+const coursePrefixNumberTable = untypedCoursePrefixNumberTable as {
+  [key: string]: string;
+};
 
 export default async function fetchAll(queries: SearchQuery[]): Promise<{
   grades: { [key: string]: GenericFetchedData<Grades> };
@@ -68,9 +73,18 @@ export default async function fetchAll(queries: SearchQuery[]): Promise<{
     }),
   );
 
+  const courseNames = Object.fromEntries(
+    queries.map((query) => {
+      const queryString = searchQueryLabel(convertToCourseOnly(query))[
+        (queryString, coursePrefixNumberTable[queryString])
+      ];
+    }),
+  );
+
   return {
     grades,
     rmp,
     sections,
+    courseNames,
   };
 }

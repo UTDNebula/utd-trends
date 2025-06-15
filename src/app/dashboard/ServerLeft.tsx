@@ -59,11 +59,16 @@ export default async function ServerLeft(props: Props) {
     results = fetchSearchResults(props.professors, []);
   }
 
-  const { grades, rmp, sections } = await fetchAll(results);
+  const { grades, rmp, sections, courseNames } = await fetchAll(results);
 
   return (
     <>
-      <SyncServerDataToContext grades={grades} rmp={rmp} sections={sections} />
+      <SyncServerDataToContext
+        grades={grades}
+        rmp={rmp}
+        sections={sections}
+        courseNames={courseNames}
+      />
       <Suspense fallback={<LoadingSearchResultsTable />}>
         <ClientLeft
           numSearches={props.courses.length + props.professors.length}
