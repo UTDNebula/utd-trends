@@ -726,8 +726,9 @@ export default function SearchResultsTable({
                     <Divider className="grow" />
                     <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
                       {'Not teaching ' +
-                        (latestSemester
-                          ? 'in ' + displaySemesterName(latestSemester, false)
+                        ((typeof latestSemester !== 'undefined' && latestSemester.message === 'success')
+                          ? 'in ' +
+                            displaySemesterName(latestSemester.data, false)
                           : 'Next Semester')}
                     </Typography>
                     <Divider className="grow" />

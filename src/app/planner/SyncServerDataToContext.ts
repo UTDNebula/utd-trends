@@ -8,8 +8,14 @@ import useHasHydrated from '@/modules/useHasHydrated';
 
 export default function SyncServerDataToContext() {
   const hasHydrated = useHasHydrated();
-  const { setGrades, setRmp, setSections, setCourseNames, planner } =
-    useSharedState();
+  const {
+    setGrades,
+    setRmp,
+    setSections,
+    setCourseNames,
+    setLatestSemester,
+    planner,
+  } = useSharedState();
 
   useEffect(() => {
     if (hasHydrated) {

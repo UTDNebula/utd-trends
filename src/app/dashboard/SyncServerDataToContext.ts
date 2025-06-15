@@ -14,7 +14,7 @@ interface Props {
   rmp: { [key: string]: GenericFetchedData<RMP> };
   sections: { [key: string]: GenericFetchedData<Sections> };
   courseNames: { [key: string]: string | undefined };
-  latestSemester: string;
+  latestSemester: GenericFetchedData<string>;
 }
 
 export default function SyncServerDataToContext({

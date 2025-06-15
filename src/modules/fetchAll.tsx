@@ -25,6 +25,7 @@ export default async function fetchAll(queries: SearchQuery[]): Promise<{
   rmp: { [key: string]: GenericFetchedData<RMP> };
   sections: { [key: string]: GenericFetchedData<Sections> };
   courseNames: { [key: string]: string | undefined };
+  latestSemester: GenericFetchedData<string>;
 }> {
   //Grade data
   //Fetch each result
