@@ -19,18 +19,12 @@ import React, {
   useTransition,
 } from 'react';
 
-import untypedCoursePrefixNumberTable from '@/data/course_prefix_number_table.json';
 import {
-  convertToCourseOnly,
   decodeSearchQueryLabel,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
 } from '@/types/SearchQuery';
-
-const coursePrefixNumberTable = untypedCoursePrefixNumberTable as {
-  [key: string]: string;
-};
 
 interface LoadingSearchBarProps {
   className?: string;
@@ -67,6 +61,7 @@ export function LoadingSearchBar(props: LoadingSearchBarProps) {
 
 type SearchQueryWithTitle = SearchQuery & {
   title?: string;
+  subtitle?: string;
 };
 
 /**
@@ -391,12 +386,11 @@ export default function SearchBar(props: Props) {
           } else if (typeof option.title !== 'undefined') {
             text = option.title;
             subtext = searchQueryLabel(option);
+          } else if (typeof option.subtitle !== 'undefined') {
+            text = searchQueryLabel(option);
+            subtext = option.subtitle;
           } else {
             text = searchQueryLabel(option);
-            subtext =
-              coursePrefixNumberTable[
-                searchQueryLabel(convertToCourseOnly(option))
-              ];
           }
           //add spaces between prefix and course number
           const matches = match(
