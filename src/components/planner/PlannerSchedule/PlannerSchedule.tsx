@@ -1,15 +1,13 @@
 import React from 'react';
 
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import { useSharedState } from '@/app/SharedStateProvider';
+import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection';
 import {
   convertToCourseOnly,
   removeSection,
-  type SearchQuery,
   searchQueryLabel,
+  searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
-import type { SectionsType } from '@/types/SectionsType';
-
-import PlannerSection from './PlannerSection';
 
 // hours shown (24-hour time)
 export const START_HOUR = 8;
@@ -31,65 +29,12 @@ export const DAYS = [
   'Saturday',
 ];
 
-type PlannerScheduleProps = {
-  courses: SearchQuery[];
-  sections: {
-    [key: string]: GenericFetchedData<SectionsType>;
-  };
-  colorMap: { [key: string]: { fill: string; outline: string; font: string } };
-};
-
-const PlannerSchedule = (props: PlannerScheduleProps) => {
-  return (
-    <div
-      className={`w-full h-[calc(100vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[max-content_repeat(14,minmax(0,1fr))]`}
-    >
-      {/*Weekday Headers*/}
-      <div className="grid col-span-full grid-flow-row bg-cornflower-500 grid-cols-subgrid grid-rows-subgrid">
-        <div className="col-span-1 h-min"></div>
-        {DAYS.slice(START_DAY, END_DAY + 1).map((x, i) => (
-          <p
-            key={i}
-            className="text-sm text-white col-span-1 border-l text-center h-min overflow-hidden"
-          >
-            {x}
-          </p>
-        ))}
-      </div>
-      {/*Times on the side*/}
-      {[...Array(numHours)].map((x, i) => (
-        <HourRow key={i} hour={i + START_HOUR} />
-      ))}
-
-      {props.courses.map((course) => {
-        const sections =
-          props.sections[searchQueryLabel(removeSection(course))];
-        if (typeof sections === 'undefined' || sections.state !== 'done') {
-          return null;
-        }
-        return (
-          <PlannerSection
-            key={searchQueryLabel(course)}
-            selectedSection={sections.data.latest.find(
-              (section) => section.section_number === course.sectionNumber,
-            )}
-            course={course}
-            color={
-              props.colorMap[searchQueryLabel(convertToCourseOnly(course))]
-            }
-          />
-        );
-      })}
-    </div>
-  );
-};
-
-type HourRowProps = {
+interface HourRowProps {
   key: number;
   hour: number;
-};
+}
 
-const HourRow = (props: HourRowProps) => {
+function HourRow(props: HourRowProps) {
   return (
     <div
       style={
@@ -112,6 +57,61 @@ const HourRow = (props: HourRowProps) => {
       </div>
     </div>
   );
-};
+}
 
-export default PlannerSchedule;
+export default function PlannerSchedule() {
+  const { sections, planner, plannerColorMap, courseNames } = useSharedState();
+
+  const courses = planner.flatMap((searchQuery) =>
+    searchQueryMultiSectionSplit(searchQuery),
+  );
+
+  return (
+    <div
+      className={`w-full h-[calc(100vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[max-content_repeat(14,minmax(0,1fr))]`}
+    >
+      {/*Weekday Headers*/}
+      <div className="grid col-span-full grid-flow-row bg-cornflower-500 grid-cols-subgrid grid-rows-subgrid">
+        <div className="col-span-1 h-min"></div>
+        {DAYS.slice(START_DAY, END_DAY + 1).map((x, i) => (
+          <p
+            key={i}
+            className="text-sm text-white col-span-1 border-l text-center h-min overflow-hidden"
+          >
+            {x}
+          </p>
+        ))}
+      </div>
+      {/*Times on the side*/}
+      {[...Array(numHours)].map((x, i) => (
+        <HourRow key={i} hour={i + START_HOUR} />
+      ))}
+
+      {courses.map((course) => {
+        const courseSections =
+          sections[searchQueryLabel(removeSection(course))];
+        if (
+          typeof courseSections === 'undefined' ||
+          courseSections.message !== 'success'
+        ) {
+          return null;
+        }
+        return (
+          <PlannerSection
+            key={searchQueryLabel(course)}
+            selectedSection={courseSections.data.latest.find(
+              (section) => section.section_number === course.sectionNumber,
+            )}
+            course={course}
+            color={
+              plannerColorMap[searchQueryLabel(convertToCourseOnly(course))]
+            }
+            courseName={
+              courseNames[searchQueryLabel(convertToCourseOnly(course))]
+            }
+          />
+        );
+      })}
+    </div>
+  );
+}

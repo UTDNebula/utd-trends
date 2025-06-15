@@ -1,36 +1,32 @@
+'use client';
+
 import BookIcon from '@mui/icons-material/Book';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ShareIcon from '@mui/icons-material/Share';
 import { Button, IconButton, Snackbar, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useState } from 'react';
 
 import Background from '@/../public/background.png';
 import WhatsNew from '@/components/common/WhatsNew/WhatsNew';
 import Tutorial from '@/components/dashboard/Tutorial/Tutorial';
-import SearchBar from '@/components/search/SearchBar/SearchBar';
+import SearchBar, {
+  LoadingSearchBar,
+} from '@/components/search/SearchBar/SearchBar';
 
 /**
  * Props type used by the TopMenu component
  */
-type DashboardTopMenuProps = {
-  resultsLoading: 'loading' | 'done' | 'error';
-  setResultsLoading: () => void;
-  isPlanner: false;
+type Props = {
+  isPlanner: boolean;
 };
-type PlannerTopMenuProps = {
-  isPlanner: true;
-};
-type TopMenuProps = DashboardTopMenuProps | PlannerTopMenuProps;
 
 /**
  * This is a component to hold UTD Trends branding and basic navigation
  * @returns
  */
-export function TopMenu(props: TopMenuProps) {
-  const router = useRouter();
+export default function TopMenu(props: Props) {
   const [openCopied, setOpenCopied] = useState(false);
 
   function shareLink(url: string) {
@@ -78,9 +74,18 @@ export function TopMenu(props: TopMenuProps) {
   }, []);
   const cacheIndex = 0; //Increment this to open the popup for all users on next deployment
 
+  const [dashboardSearchTerms, setDashboardSearchTerms] = useState<
+    null | string
+  >(null);
+  useEffect(() => {
+    setDashboardSearchTerms(
+      window.sessionStorage.getItem('dashboardSearchTerms'),
+    );
+  }, []);
+
   return (
     <>
-      <div className="relative overflow-hidden flex items-center gap-y-0 gap-x-4 md:gap-x-8 lg:gap-x-16 py-1 md:py-2 px-4 md:px-8 lg:px-16 bg-lighten dark:bg-darken flex-wrap sm:flex-nowrap">
+      <div className="relative overflow-hidden flex items-center gap-y-0 gap-x-2 md:gap-x-4 lg:gap-x-8 py-1 md:py-2 px-4 md:px-8 lg:px-16 bg-lighten dark:bg-darken flex-wrap sm:flex-nowrap">
         <Image
           src={Background}
           alt="gradient background"
@@ -95,20 +100,26 @@ export function TopMenu(props: TopMenuProps) {
           UTD TRENDS
         </Link>
         {!props.isPlanner && (
-          <SearchBar
-            manageQuery="onSelect"
-            resultsLoading={props.resultsLoading}
-            setResultsLoading={props.setResultsLoading}
-            className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
-            input_className="[&>.MuiInputBase-root]:bg-white [&>.MuiInputBase-root]:dark:bg-haiti"
-          />
+          <Suspense
+            fallback={
+              <LoadingSearchBar
+                className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
+                input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
+              />
+            }
+          >
+            <SearchBar
+              manageQuery="onSelect"
+              className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
+              input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
+            />
+          </Suspense>
         )}
         <Link
           href={
             props.isPlanner
-              ? typeof sessionStorage !== 'undefined' &&
-                sessionStorage.getItem('dashboardSearchTerms')
-                ? '/dashboard?' + sessionStorage.getItem('dashboardSearchTerms')
+              ? dashboardSearchTerms != null
+                ? '/dashboard?' + dashboardSearchTerms
                 : '/dashboard?availability=true'
               : '/planner'
           }
@@ -116,14 +127,7 @@ export function TopMenu(props: TopMenuProps) {
             !props.isPlanner
               ? sessionStorage.setItem(
                   'dashboardSearchTerms',
-                  Object.entries(router.query)
-                    .map(([key, value]) => {
-                      if (typeof value === 'string') {
-                        return key + '=' + encodeURIComponent(value);
-                      }
-                      return '';
-                    })
-                    .join('&') ?? '',
+                  new URLSearchParams(window.location.search).toString(),
                 )
               : null
           }
@@ -187,9 +191,7 @@ export function TopMenu(props: TopMenuProps) {
               onClick={() => {
                 let url = window.location.href;
                 if (
-                  router.query &&
-                  Object.keys(router.query).length === 0 &&
-                  Object.getPrototypeOf(router.query) === Object.prototype
+                  new URLSearchParams(window.location.search).toString() === ''
                 ) {
                   url = 'https://trends.utdnebula.com/';
                 }
@@ -211,5 +213,3 @@ export function TopMenu(props: TopMenuProps) {
     </>
   );
 }
-
-export default TopMenu;

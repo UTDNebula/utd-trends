@@ -1,3 +1,5 @@
+'use client';
+
 import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -19,15 +21,19 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
+import type { Grades } from '@/modules/fetchGrades';
+import type { RMP } from '@/modules/fetchRmp';
+import type { Sections } from '@/modules/fetchSections';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import type { RMPInterface } from '@/pages/api/ratemyprofessorScraper';
+import { displaySemesterName } from '@/modules/semesters';
+import useHasHydrated from '@/modules/useHasHydrated';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
-import type { GradesType } from '@/types/GradesType';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -36,9 +42,6 @@ import {
   searchQueryLabel,
   sectionCanOverlap,
 } from '@/types/SearchQuery';
-import type { SectionsType } from '@/types/SectionsType';
-
-import { displayAcademicSessionName } from '../Filters/Filters';
 
 function LoadingRow() {
   const nameCell = (
@@ -64,11 +67,7 @@ function LoadingRow() {
             <KeyboardArrowIcon />
           </IconButton>
           <Checkbox disabled />
-          <Checkbox
-            disabled
-            icon={<BookOutlinedIcon />}
-            className="animate-pulse"
-          />
+          <Checkbox disabled icon={<BookOutlinedIcon />} />
         </TableCell>
         <TableCell
           component="th"
@@ -95,11 +94,63 @@ function LoadingRow() {
   );
 }
 
+export function LoadingSearchResultsTable() {
+  return (
+    //TODO: sticky header
+    <>
+      <Typography className="leading-tight text-3xl font-bold p-4">
+        Search Results
+      </Typography>
+      <TableContainer component={Paper}>
+        <Table stickyHeader aria-label="collapsible table">
+          <TableHead>
+            <TableRow>
+              <TableCell className="hidden sm:table-cell">Actions</TableCell>
+              <TableCell>
+                <TableSortLabel active direction="asc">
+                  Name
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="center">
+                <Tooltip
+                  title="Median Letter Grade Across Course Sections"
+                  placement="top"
+                >
+                  <div>
+                    <TableSortLabel direction="desc">Grades</TableSortLabel>
+                  </div>
+                </Tooltip>
+              </TableCell>
+              <TableCell align="center">
+                <Tooltip
+                  title="Average Professor Rating from Rate My Professors"
+                  placement="top"
+                >
+                  <div>
+                    <TableSortLabel direction="desc">Rating</TableSortLabel>
+                  </div>
+                </Tooltip>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {Array(20)
+              .fill(0)
+              .map((_, index) => (
+                <LoadingRow key={index} />
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
+  );
+}
+
 type RowProps = {
-  section: GenericFetchedData<SectionsType>;
+  section: GenericFetchedData<Sections>;
   course: SearchQuery;
-  grades: GenericFetchedData<GradesType>;
-  rmp: GenericFetchedData<RMPInterface>;
+  grades: GenericFetchedData<Grades>;
+  rmp: GenericFetchedData<RMP>;
   inCompare: boolean;
   addToCompare: (arg0: SearchQuery) => void;
   removeFromCompare: (arg0: SearchQuery) => void;
@@ -109,6 +160,7 @@ type RowProps = {
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
   showTutorial: boolean;
+  courseName: string | undefined;
 };
 
 function Row({
@@ -125,47 +177,62 @@ function Row({
   addToPlanner,
   removeFromPlanner,
   showTutorial,
+  courseName,
 }: RowProps) {
   // Check if the course section has the latest semester data
   const hasLatestSemester = !!(
-    section.state === 'done' && section.data.latest.length
+    typeof section !== 'undefined' &&
+    section.message === 'success' &&
+    section.data.latest.length
   );
 
   const [open, setOpen] = useState(false);
   const canOpen =
-    !(typeof grades === 'undefined' || grades.state === 'error') ||
-    !(typeof rmp === 'undefined' || rmp.state === 'error');
+    !(typeof grades === 'undefined' || grades.message !== 'success') ||
+    !(typeof rmp === 'undefined' || rmp.message !== 'success');
 
   const rainbowColors = useRainbowColors();
 
   const nameCell = (
-    <Tooltip
-      title={
-        typeof course.profFirst !== 'undefined' &&
+    <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit">
+      <Tooltip
+        title={
+          typeof course.prefix !== 'undefined' &&
+          typeof course.number !== 'undefined' &&
+          courseName
+        }
+        placement="top"
+      >
+        <span>{searchQueryLabel(convertToCourseOnly(course))}</span>
+      </Tooltip>
+      {typeof course.profFirst !== 'undefined' &&
         typeof course.profLast !== 'undefined' &&
-        (rmp !== undefined &&
-        rmp.state === 'done' &&
-        rmp.data.teacherRatingTags.length > 0
-          ? 'Tags: ' +
-            rmp.data.teacherRatingTags
-              .sort((a, b) => b.tagCount - a.tagCount)
-              .slice(0, 3)
-              .map((tag) => tag.tagName)
-              .join(', ')
-          : 'No Tags Available')
-      }
-      placement="top"
-    >
-      <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit">
-        {searchQueryLabel(course) +
-          ((typeof course.profFirst === 'undefined' &&
-            typeof course.profLast === 'undefined') ||
-          (typeof course.prefix === 'undefined' &&
-            typeof course.number === 'undefined')
-            ? ' (Overall)'
-            : '')}
-      </Typography>
-    </Tooltip>
+        typeof course.prefix !== 'undefined' &&
+        typeof course.number !== 'undefined' && <span> </span>}
+      <Tooltip
+        title={
+          typeof course.profFirst !== 'undefined' &&
+          typeof course.profLast !== 'undefined' &&
+          (rmp !== undefined &&
+          rmp.message === 'success' &&
+          rmp.data.teacherRatingTags.length > 0
+            ? 'Tags: ' +
+              rmp.data.teacherRatingTags
+                .sort((a, b) => b.tagCount - a.tagCount)
+                .slice(0, 3)
+                .map((tag) => tag.tagName)
+                .join(', ')
+            : 'No Tags Available')
+        }
+        placement="top"
+      >
+        <span>{searchQueryLabel(convertToProfOnly(course))}</span>
+      </Tooltip>
+      {((typeof course.profFirst === 'undefined' &&
+        typeof course.profLast === 'undefined') ||
+        (typeof course.prefix === 'undefined' &&
+          typeof course.number === 'undefined')) && <span> (Overall)</span>}
+    </Typography>
   );
 
   return (
@@ -197,23 +264,30 @@ function Row({
           data-tutorial-id={showTutorial && 'actions'}
         >
           <div className="flex items-center gap-1">
-            <Tooltip
-              title={open ? 'Minimize Result' : 'Expand Result'}
-              placement="top"
-            >
-              <IconButton
-                aria-label="expand row"
-                size="medium"
-                disabled={!canOpen}
-                onClick={(e) => {
-                  e.stopPropagation(); // prevents double opening/closing
-                  if (canOpen) setOpen(!open);
-                }}
-                className={'transition-transform' + (open ? ' rotate-90' : '')}
+            {canOpen ? (
+              <Tooltip
+                title={open ? 'Minimize Result' : 'Expand Result'}
+                placement="top"
               >
+                <IconButton
+                  aria-label="expand row"
+                  size="medium"
+                  onClick={(e) => {
+                    e.stopPropagation(); // prevents double opening/closing
+                    if (canOpen) setOpen(!open);
+                  }}
+                  className={
+                    'transition-transform' + (open ? ' rotate-90' : '')
+                  }
+                >
+                  <KeyboardArrowIcon fontSize="inherit" />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <IconButton aria-label="expand row" size="medium" disabled>
                 <KeyboardArrowIcon fontSize="inherit" />
               </IconButton>
-            </Tooltip>
+            )}
             <Tooltip
               title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
               placement="top"
@@ -228,11 +302,6 @@ function Row({
                     addToCompare(course);
                   }
                 }}
-                disabled={
-                  (typeof grades !== 'undefined' &&
-                    grades.state === 'loading') ||
-                  (typeof rmp !== 'undefined' && rmp.state === 'loading')
-                }
                 sx={
                   color
                     ? {
@@ -250,9 +319,7 @@ function Row({
                   ? inPlanner
                     ? 'Remove from Planner'
                     : 'Add to Planner'
-                  : section.state === 'loading'
-                    ? undefined
-                    : 'Not being taught'
+                  : 'Not being taught'
               }
               placement="top"
             >
@@ -270,7 +337,6 @@ function Row({
                       }
                     }
                   }}
-                  className={section.state === 'loading' ? 'animate-pulse' : ''}
                   icon={<BookOutlinedIcon />}
                   checkedIcon={<BookIcon />}
                   disabled={!hasLatestSemester}
@@ -287,18 +353,10 @@ function Row({
           {nameCell}
         </TableCell>
         <TableCell align="center" className="border-b-0">
-          {((typeof grades === 'undefined' || grades.state === 'error') && (
+          {((typeof grades === 'undefined' || grades.message !== 'success') && (
             <></>
           )) ||
-            (grades.state === 'loading' && (
-              <Skeleton
-                variant="rounded"
-                className="rounded-full px-5 py-2 w-16 block mx-auto"
-              >
-                <Typography className="text-base w-6">A+</Typography>
-              </Skeleton>
-            )) ||
-            (grades.state === 'done' && grades.data.filtered.gpa >= 0 && (
+            (grades.message === 'success' && grades.data.filtered.gpa >= 0 && (
               <Tooltip
                 title={
                   'Median GPA: ' +
@@ -324,14 +382,11 @@ function Row({
             null}
         </TableCell>
         <TableCell align="center" className="border-b-0">
-          {((typeof rmp === 'undefined' || rmp.state === 'error') && <></>) ||
-            (rmp.state === 'loading' && (
-              <Skeleton variant="rounded" className="rounded-full">
-                <Rating sx={{ fontSize: 25 }} readOnly />
-              </Skeleton>
-            )) ||
-            (rmp.state === 'done' && rmp.data.numRatings == 0 && <></>) ||
-            (rmp.state === 'done' && rmp.data.numRatings != 0 && (
+          {((typeof rmp === 'undefined' || rmp.message !== 'success') && (
+            <></>
+          )) ||
+            (rmp.message === 'success' && rmp.data.numRatings == 0 && <></>) ||
+            (rmp.message === 'success' && rmp.data.numRatings != 0 && (
               <Tooltip
                 title={'Professor rating: ' + rmp.data.avgRating}
                 placement="top"
@@ -368,40 +423,31 @@ function Row({
 }
 
 type SearchResultsTableProps = {
-  latestSemester: string | null;
-  sections: { [key: string]: GenericFetchedData<SectionsType> };
-  resultsLoading: 'loading' | 'done';
   numSearches: number;
   includedResults: SearchQuery[];
   unIncludedResults: SearchQuery[];
-  grades: { [key: string]: GenericFetchedData<GradesType> };
-  rmp: { [key: string]: GenericFetchedData<RMPInterface> };
-  compare: SearchQuery[];
-  addToCompare: (arg0: SearchQuery) => void;
-  removeFromCompare: (arg0: SearchQuery) => void;
-  colorMap: { [key: string]: string };
-  planner: SearchQuery[];
-  addToPlanner: (value: SearchQuery) => void;
-  removeFromPlanner: (value: SearchQuery) => void;
 };
 
-const SearchResultsTable = ({
-  latestSemester,
-  sections,
-  resultsLoading,
+export default function SearchResultsTable({
   numSearches,
   includedResults,
   unIncludedResults,
-  grades,
-  rmp,
-  compare,
-  addToCompare,
-  removeFromCompare,
-  colorMap,
-  planner,
-  addToPlanner,
-  removeFromPlanner,
-}: SearchResultsTableProps) => {
+}: SearchResultsTableProps) {
+  const {
+    grades,
+    rmp,
+    sections,
+    compare,
+    addToCompare,
+    removeFromCompare,
+    compareColorMap,
+    planner,
+    addToPlanner,
+    removeFromPlanner,
+    courseNames,
+    latestSemester,
+  } = useSharedState();
+
   //Table sorting category
   const [orderBy, setOrderBy] = useState<'name' | 'gpa' | 'rating'>('name');
   //Table sorting direction
@@ -422,11 +468,13 @@ const SearchResultsTable = ({
     }
   }
 
-  if (
-    resultsLoading !== 'loading' &&
-    includedResults.length === 0 &&
-    unIncludedResults.length === 0
-  ) {
+  // To avoid hydration errors
+  const hasHydrated = useHasHydrated();
+  if (!hasHydrated) {
+    return <LoadingSearchResultsTable />;
+  }
+
+  if (includedResults.length === 0 && unIncludedResults.length === 0) {
     return (
       <div className="p-4">
         <Typography
@@ -521,16 +569,16 @@ const SearchResultsTable = ({
       const aGrades = grades[searchQueryLabel(a)];
       const bGrades = grades[searchQueryLabel(b)];
       if (
-        (!aGrades || aGrades.state !== 'done') &&
-        (!bGrades || bGrades.state !== 'done')
+        (!aGrades || aGrades.message !== 'success') &&
+        (!bGrades || bGrades.message !== 'success')
       ) {
         return 0;
       }
 
-      if (!aGrades || aGrades.state !== 'done') {
+      if (!aGrades || aGrades.message !== 'success') {
         return 9999;
       }
-      if (!bGrades || bGrades.state !== 'done') {
+      if (!bGrades || bGrades.message !== 'success') {
         return -9999;
       }
 
@@ -544,16 +592,16 @@ const SearchResultsTable = ({
       const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
       //drop loading/error rows to bottom
       if (
-        (!aRmp || aRmp.state !== 'done' || aRmp.data.numRatings == 0) &&
-        (!bRmp || bRmp.state !== 'done' || bRmp.data.numRatings == 0)
+        (!aRmp || aRmp.message !== 'success' || aRmp.data.numRatings == 0) &&
+        (!bRmp || bRmp.message !== 'success' || bRmp.data.numRatings == 0)
       ) {
         // If both aRmp and bRmp are not done, treat them as equal and return 0
         return 0;
       }
-      if (!aRmp || aRmp.state !== 'done' || aRmp.data.numRatings == 0) {
+      if (!aRmp || aRmp.message !== 'success' || aRmp.data.numRatings == 0) {
         return 9999;
       }
-      if (!bRmp || bRmp.state !== 'done' || bRmp.data.numRatings == 0) {
+      if (!bRmp || bRmp.message !== 'success' || bRmp.data.numRatings == 0) {
         return -9999;
       }
       const aRating = aRmp?.data?.avgRating ?? 0; // Fallback to 0 if undefined
@@ -631,109 +679,105 @@ const SearchResultsTable = ({
           </TableHead>
           <TableBody>
             {/* Included Results */}
-            {resultsLoading === 'done'
-              ? sortedResults.map((result, index) => {
-                  const courseOnlySections =
-                    sections[searchQueryLabel(convertToCourseOnly(result))];
-                  const canAddCourseOnlyToPlanner =
-                    typeof courseOnlySections !== 'undefined' &&
-                    courseOnlySections.state === 'done' &&
-                    courseOnlySections.data.latest.some((section) =>
-                      sectionCanOverlap(section.section_number),
-                    );
-                  return (
-                    <Row
-                      section={sections[searchQueryLabel(result)]}
-                      key={searchQueryLabel(result)}
-                      course={result}
-                      grades={grades[searchQueryLabel(result)]}
-                      rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
-                      inCompare={compare.some((obj) =>
-                        searchQueryEqual(obj, result),
-                      )}
-                      addToCompare={addToCompare}
-                      removeFromCompare={removeFromCompare}
-                      color={colorMap[searchQueryLabel(result)]}
-                      inPlanner={planner.some((obj) =>
-                        searchQueryEqual(obj, result),
-                      )}
-                      addJustCourseToo={
-                        !searchQueryEqual(
-                          result,
-                          convertToCourseOnly(result),
-                        ) && canAddCourseOnlyToPlanner
-                      }
-                      addToPlanner={addToPlanner}
-                      removeFromPlanner={removeFromPlanner}
-                      showTutorial={index === numSearches}
-                    />
-                  );
-                })
-              : Array(10)
-                  .fill(0)
-                  .map((_, index) => <LoadingRow key={index} />)}
+            {sortedResults.map((result, index) => {
+              const courseOnlySections =
+                sections[searchQueryLabel(convertToCourseOnly(result))];
+              const canAddCourseOnlyToPlanner =
+                typeof courseOnlySections !== 'undefined' &&
+                courseOnlySections.message === 'success' &&
+                courseOnlySections.data.latest.some((section) =>
+                  sectionCanOverlap(section.section_number),
+                );
+              return (
+                <Row
+                  section={sections[searchQueryLabel(result)]}
+                  key={searchQueryLabel(result)}
+                  course={result}
+                  grades={grades[searchQueryLabel(result)]}
+                  rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
+                  inCompare={compare.some((obj) =>
+                    searchQueryEqual(obj, result),
+                  )}
+                  addToCompare={addToCompare}
+                  removeFromCompare={removeFromCompare}
+                  color={compareColorMap[searchQueryLabel(result)]}
+                  inPlanner={planner.some((obj) =>
+                    searchQueryEqual(obj, result),
+                  )}
+                  addJustCourseToo={
+                    !searchQueryEqual(result, convertToCourseOnly(result)) &&
+                    canAddCourseOnlyToPlanner
+                  }
+                  addToPlanner={addToPlanner}
+                  removeFromPlanner={removeFromPlanner}
+                  showTutorial={index === numSearches}
+                  courseName={
+                    courseNames[searchQueryLabel(convertToCourseOnly(result))]
+                  }
+                />
+              );
+            })}
 
             {/* Divider row */}
             {sortedUnIncludedResults.length > 0 && (
               <TableRow className="bg-gray-200 dark:bg-gray-700">
                 <TableCell colSpan={5} className="p-0">
                   <div className="flex items-center py-2 my-2">
-                    <Divider className="flex-grow" />
+                    <Divider className="grow" />
                     <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
                       {'Not teaching ' +
                         (latestSemester
-                          ? 'in ' +
-                            displayAcademicSessionName(latestSemester, false)
+                          ? 'in ' + displaySemesterName(latestSemester, false)
                           : 'Next Semester')}
                     </Typography>
-                    <Divider className="flex-grow" />
+                    <Divider className="grow" />
                   </div>
                 </TableCell>
               </TableRow>
             )}
 
             {/* Unincluded Results (Unavailable courses) */}
-            {resultsLoading === 'done' &&
-              sortedUnIncludedResults.map((result) => {
-                const courseOnlySections =
-                  sections[searchQueryLabel(convertToCourseOnly(result))];
-                const canAddCourseOnlyToPlanner =
-                  typeof courseOnlySections !== 'undefined' &&
-                  courseOnlySections.state === 'done' &&
-                  courseOnlySections.data.latest.some((section) =>
-                    sectionCanOverlap(section.section_number),
-                  );
-                return (
-                  <Row
-                    section={sections[searchQueryLabel(result)]}
-                    key={searchQueryLabel(result)}
-                    course={result}
-                    grades={grades[searchQueryLabel(result)]}
-                    rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
-                    inCompare={compare.some((obj) =>
-                      searchQueryEqual(obj, result),
-                    )}
-                    addToCompare={addToCompare}
-                    removeFromCompare={removeFromCompare}
-                    color={colorMap[searchQueryLabel(result)]}
-                    inPlanner={planner.some((obj) =>
-                      searchQueryEqual(obj, result),
-                    )}
-                    addJustCourseToo={
-                      !searchQueryEqual(result, convertToCourseOnly(result)) &&
-                      canAddCourseOnlyToPlanner
-                    }
-                    addToPlanner={addToPlanner}
-                    removeFromPlanner={removeFromPlanner}
-                    showTutorial={false}
-                  />
+            {sortedUnIncludedResults.map((result) => {
+              const courseOnlySections =
+                sections[searchQueryLabel(convertToCourseOnly(result))];
+              const canAddCourseOnlyToPlanner =
+                typeof courseOnlySections !== 'undefined' &&
+                courseOnlySections.message === 'success' &&
+                courseOnlySections.data.latest.some((section) =>
+                  sectionCanOverlap(section.section_number),
                 );
-              })}
+              return (
+                <Row
+                  section={sections[searchQueryLabel(result)]}
+                  key={searchQueryLabel(result)}
+                  course={result}
+                  grades={grades[searchQueryLabel(result)]}
+                  rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
+                  inCompare={compare.some((obj) =>
+                    searchQueryEqual(obj, result),
+                  )}
+                  addToCompare={addToCompare}
+                  removeFromCompare={removeFromCompare}
+                  color={compareColorMap[searchQueryLabel(result)]}
+                  inPlanner={planner.some((obj) =>
+                    searchQueryEqual(obj, result),
+                  )}
+                  addJustCourseToo={
+                    !searchQueryEqual(result, convertToCourseOnly(result)) &&
+                    canAddCourseOnlyToPlanner
+                  }
+                  addToPlanner={addToPlanner}
+                  removeFromPlanner={removeFromPlanner}
+                  showTutorial={false}
+                  courseName={
+                    courseNames[searchQueryLabel(convertToCourseOnly(result))]
+                  }
+                />
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
     </>
   );
-};
-
-export default SearchResultsTable;
+}

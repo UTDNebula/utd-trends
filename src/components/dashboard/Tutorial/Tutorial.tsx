@@ -1,4 +1,5 @@
-import type { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
+'use client';
+
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import { Backdrop, Button, Checkbox, IconButton, Popover } from '@mui/material';
@@ -19,7 +20,7 @@ type TutorialPopupProps = {
     vertical: 'center' | 'bottom' | 'top';
     horizontal: 'center' | 'left' | 'right';
   };
-  children: ReactJSXElement | string;
+  children: React.ReactNode;
 };
 
 const TutorialPopup = ({
@@ -92,7 +93,7 @@ type StepTemplate = {
   id: string;
   element?: Element;
   title: string;
-  content: ReactJSXElement | string;
+  content: React.ReactNode;
   anchorOrigin: {
     vertical: 'center' | 'bottom' | 'top';
     horizontal: 'center' | 'left' | 'right';
@@ -173,7 +174,7 @@ type TutorialProps = {
   close: () => void;
 };
 
-const Tutorial = ({ open, close }: TutorialProps) => {
+export default function Tutorial({ open, close }: TutorialProps) {
   const [steps, setSteps] = useState<Step[]>([]);
   const [place, setPlace] = useState(0);
 
@@ -224,6 +225,4 @@ const Tutorial = ({ open, close }: TutorialProps) => {
       ))}
     </>
   );
-};
-
-export default Tutorial;
+}
