@@ -6,7 +6,8 @@ import { writeFileSync } from 'fs';
 import { DirectedGraph } from 'graphology';
 
 import aggregatedData from '../data/aggregated_data.json';
-import { type SearchQuery } from '../types/SearchQuery';
+import professor_to_alias from '../data/professor_to_alias.json';
+import { decodeSearchQueryLabel, type SearchQuery } from '../types/SearchQuery';
 
 export type NodeAttributes = {
   c: string;
@@ -167,6 +168,17 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
   }
 }
 
+const alias_to_professor: { [key: string]: string } = {};
+for (const [professor, alias] of Object.entries(
+  professor_to_alias as { [key: string]: string },
+)) {
+  const aliasQuery = decodeSearchQueryLabel(alias);
+  if (aliasQuery.profFirst && aliasQuery.profLast)
+    addProfessor(aliasQuery.profFirst, aliasQuery.profLast);
+  if (typeof alias_to_professor[alias] === 'undefined')
+    alias_to_professor[alias] = professor;
+}
+
 //Radix tree: reduces graph size by compressing chains of nodes each with only one child to a single node with a character value of several characters.
 function checkForSingleChild(parent: string) {
   if (graph.getNodeAttribute(parent, 'visited')) {
@@ -223,5 +235,10 @@ writeFileSync(
   'src/data/autocomplete_graph.json',
   JSON.stringify(graph.export()),
 );
-
 console.log('Autocomplete graph generation done.');
+
+writeFileSync(
+  'src/data/alias_to_professor.json',
+  JSON.stringify(alias_to_professor),
+);
+console.log('alias_to_professor mapping done');
