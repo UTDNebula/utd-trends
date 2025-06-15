@@ -34,6 +34,8 @@ import type { RMP } from '@/modules/fetchRmp';
 import type { Sections } from '@/modules/fetchSections';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
+  convertToCourseOnly,
+  convertToProfOnly,
   removeSection,
   type SearchQuery,
   searchQueryLabel,
@@ -360,6 +362,7 @@ type PlannerCardProps = {
   selectedSections: Sections['all'];
   openConflictMessage: () => void;
   color: { fill: string; outline: string; font: string };
+  courseName: string | undefined;
 };
 
 export default function PlannerCard(props: PlannerCardProps) {
@@ -493,8 +496,46 @@ export default function PlannerCard(props: PlannerCardProps) {
             </ToggleButtonGroup>
           </Tooltip>
         </div>
-        <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit grow">
-          {searchQueryLabel(removeSection(props.query))}
+        <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit grow">
+          <Tooltip
+            title={
+              typeof props.query.prefix !== 'undefined' &&
+              typeof props.query.number !== 'undefined' &&
+              props.courseName
+            }
+            placement="top"
+          >
+            <span>{searchQueryLabel(convertToCourseOnly(props.query))}</span>
+          </Tooltip>
+          {typeof props.query.profFirst !== 'undefined' &&
+            typeof props.query.profLast !== 'undefined' &&
+            typeof props.query.prefix !== 'undefined' &&
+            typeof props.query.number !== 'undefined' && <span> </span>}
+          <Tooltip
+            title={
+              typeof props.query.profFirst !== 'undefined' &&
+              typeof props.query.profLast !== 'undefined' &&
+              (props.rmp !== undefined &&
+              props.rmp.message === 'success' &&
+              props.rmp.data.teacherRatingTags.length > 0
+                ? 'Tags: ' +
+                  props.rmp.data.teacherRatingTags
+                    .sort((a, b) => b.tagCount - a.tagCount)
+                    .slice(0, 3)
+                    .map((tag) => tag.tagName)
+                    .join(', ')
+                : 'No Tags Available')
+            }
+            placement="top"
+          >
+            <span>{searchQueryLabel(convertToProfOnly(props.query))}</span>
+          </Tooltip>
+          {((typeof props.query.profFirst === 'undefined' &&
+            typeof props.query.profLast === 'undefined') ||
+            (typeof props.query.prefix === 'undefined' &&
+              typeof props.query.number === 'undefined')) && (
+            <span> (Overall)</span>
+          )}
         </Typography>
         <MeetingChip
           color={props.color}

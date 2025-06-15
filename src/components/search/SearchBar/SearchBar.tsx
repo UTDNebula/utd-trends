@@ -3,6 +3,7 @@
 import {
   Autocomplete,
   Button,
+  Chip,
   CircularProgress,
   TextField,
   Tooltip,
@@ -19,6 +20,7 @@ import React, {
   useTransition,
 } from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import {
   decodeSearchQueryLabel,
   type SearchQuery,
@@ -83,6 +85,8 @@ interface Props {
  * Styled for the splash page
  */
 export default function SearchBar(props: Props) {
+  const { courseNames } = useSharedState();
+
   //for spinner after router.push
   const [isPending, startTransition] = useTransition();
 
@@ -432,6 +436,18 @@ export default function SearchBar(props: Props) {
             </li>
           );
         }}
+        renderValue={(value: readonly (string | SearchQuery)[], getItemProps) =>
+          value.map((option: string | SearchQuery, index: number) => {
+            const { key, ...itemProps } = getItemProps({ index });
+            const optionString =
+              typeof option === 'string' ? option : searchQueryLabel(option);
+            return (
+              <Tooltip key={key} title={courseNames[optionString]}>
+                <Chip label={optionString} {...itemProps} />
+              </Tooltip>
+            );
+          })
+        }
       />
       <Tooltip
         title="Select a course or professor before searching"

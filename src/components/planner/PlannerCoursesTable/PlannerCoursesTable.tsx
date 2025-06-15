@@ -41,6 +41,7 @@ export default function PlannerCoursesTable() {
     removeFromPlanner,
     setPlannerSection,
     plannerColorMap,
+    courseNames,
   } = useSharedState();
 
   const [openConflictMessage, setOpenConflictMessage] = useState(false);
@@ -114,6 +115,9 @@ export default function PlannerCoursesTable() {
               openConflictMessage={() => setOpenConflictMessage(true)}
               color={
                 plannerColorMap[searchQueryLabel(convertToCourseOnly(query))]
+              }
+              courseName={
+                courseNames[searchQueryLabel(convertToCourseOnly(query))]
               }
             />
           );
