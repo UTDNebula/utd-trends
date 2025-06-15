@@ -485,18 +485,7 @@ const PlannerCard = (props: PlannerCardProps) => {
         <Tooltip
           title={props.courseData ? props.courseData.title : ''}
           placement="top-start"
-          slotProps={{
-            popper: {
-              modifiers: [
-                {
-                  name: 'offset',
-                  options: {
-                    offset: [-10, -5],
-                  },
-                },
-              ],
-            },
-          }}
+          className=""
         >
           <Typography className="leading-tight text-lg text-gray-500 dark:text-gray-200 w-fit flex-grow">
             {searchQueryLabel(removeSection(props.query))}

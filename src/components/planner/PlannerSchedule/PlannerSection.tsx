@@ -84,18 +84,6 @@ const PlannerSection = (props: PlannerSectionComponentProps) => {
         title={props.courseData ? props.courseData.title : ''}
         placement="top"
         key={selectedSection._id + i}
-        slotProps={{
-          popper: {
-            modifiers: [
-              {
-                name: 'offset',
-                options: {
-                  offset: [0, -10],
-                },
-              },
-            ],
-          },
-        }}
       >
         <div
           key={selectedSection._id + i}
