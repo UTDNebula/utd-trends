@@ -13,7 +13,7 @@ interface Props {
   grades: { [key: string]: GenericFetchedData<Grades> };
   rmp: { [key: string]: GenericFetchedData<RMP> };
   sections: { [key: string]: GenericFetchedData<Sections> };
-  courseNames: { [key: string]: string };
+  courseNames: { [key: string]: string | undefined };
 }
 
 export default function SyncServerDataToContext({

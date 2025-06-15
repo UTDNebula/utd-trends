@@ -54,6 +54,8 @@ const SharedStateContext = createContext<
       semesters: string[];
       chosenSemesters: string[];
       setChosenSemesters: Setter<string[]>;
+      courseNames: { [key: string]: string | undefined };
+      setCourseNames: Setter<{ [key: string]: string | undefined }>;
     }
   | undefined
 >(undefined);
@@ -314,7 +316,7 @@ export function SharedStateProvider({
   );
 
   const [courseNames, setCourseNames] = useState<{
-    [key: string]: string;
+    [key: string]: string | undefined;
   }>({});
 
   return (

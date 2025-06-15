@@ -12,7 +12,7 @@ interface PlannerSectionComponentProps {
   selectedSection: Sections['all'][number] | undefined;
   course: SearchQuery;
   color: { fill: string; outline: string; font: string };
-  courseName: string;
+  courseName: string | undefined;
 }
 
 export default function PlannerSection(props: PlannerSectionComponentProps) {

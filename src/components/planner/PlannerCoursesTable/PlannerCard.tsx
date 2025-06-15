@@ -351,7 +351,7 @@ type PlannerCardProps = {
   selectedSections: Sections['all'];
   openConflictMessage: () => void;
   color: { fill: string; outline: string; font: string };
-  courseName: string;
+  courseName: string | undefined;
 };
 
 export default function PlannerCard(props: PlannerCardProps) {

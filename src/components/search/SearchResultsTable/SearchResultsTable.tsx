@@ -159,7 +159,7 @@ type RowProps = {
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
   showTutorial: boolean;
-  courseName: string;
+  courseName: string | undefined;
 };
 
 function Row({

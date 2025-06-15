@@ -436,10 +436,11 @@ export default function SearchBar(props: Props) {
             </li>
           );
         }}
-        renderValue={(value: readonly string[], getItemProps) =>
-          value.map((option: string, index: number) => {
+        renderValue={(value: readonly (string | SearchQuery)[], getItemProps) =>
+          value.map((option: string | SearchQuery, index: number) => {
             const { key, ...itemProps } = getItemProps({ index });
-            const optionString = searchQueryLabel(option);
+            const optionString =
+              typeof option === 'string' ? option : searchQueryLabel(option);
             return (
               <Tooltip key={key} title={courseNames[optionString]}>
                 <Chip label={optionString} {...itemProps} />
