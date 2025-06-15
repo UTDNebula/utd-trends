@@ -387,7 +387,8 @@ export default function Filters() {
               }
               label={
                 'Teaching ' +
-                ((typeof latestSemester !== 'undefined' && latestSemester.message === 'success')
+                (typeof latestSemester !== 'undefined' &&
+                latestSemester.message === 'success'
                   ? 'in ' + displaySemesterName(latestSemester.data, false)
                   : 'Next Semester')
               }
