@@ -204,6 +204,7 @@ function parseMeeting(meeting: Sections['all'][number]['meetings'][number]) {
 
 type SectionTableRowProps = {
   data: Sections['all'][number];
+  bestSyllabus: string;
   course: SearchQueryMultiSection;
   lastRow: boolean;
   setPlannerSection: (searchQuery: SearchQuery, section: string) => void;
@@ -215,7 +216,10 @@ type SectionTableRowProps = {
 function SectionTableRow(props: SectionTableRowProps) {
   const isSelected =
     props.course.sectionNumbers?.includes(props.data.section_number) ?? false;
-
+  let syllabusToShow = props.data.syllabus_uri ?? props.bestSyllabus;
+  if (syllabusToShow == '') {
+    syllabusToShow = props.bestSyllabus;
+  }
   return (
     <TableRow>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
@@ -299,15 +303,21 @@ function SectionTableRow(props: SectionTableRowProps) {
         </TableCell>
       )}
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-        {props.data.syllabus_uri && (
-          <Link
-            href={props.data.syllabus_uri}
-            target="_blank"
-            className="underline text-xs text-blue-600 hover:text-blue-800 visited:text-purple-600"
-          >
-            View Syllabus
-          </Link>
-        )}
+        <div style={{ fontSize: '10px', color: 'gray' }}>
+          {syllabusToShow ? (
+            <Link
+              href={syllabusToShow}
+              target="_blank"
+              className="underline text-xs text-blue-600 hover:text-blue-800 visited:text-purple-600"
+            >
+              {syllabusToShow === props.data.syllabus_uri
+                ? 'View Syllabus'
+                : 'View Previous Syllabus'}
+            </Link>
+          ) : (
+            ''
+          )}
+        </div>
       </TableCell>
     </TableRow>
   );
@@ -342,6 +352,7 @@ function MeetingChip(props: {
 type PlannerCardProps = {
   query: SearchQueryMultiSection;
   sections?: Sections['all'];
+  bestSyllabus: string;
   setPlannerSection: (searchQuery: SearchQuery, section: string) => void;
   grades: GenericFetchedData<Grades>;
   rmp: GenericFetchedData<RMP>;
@@ -515,6 +526,7 @@ export default function PlannerCard(props: PlannerCardProps) {
                   <SectionTableRow
                     key={section.section_number}
                     data={section}
+                    bestSyllabus={props.bestSyllabus}
                     course={props.query}
                     lastRow={index === sections.length - 1}
                     setPlannerSection={props.setPlannerSection}

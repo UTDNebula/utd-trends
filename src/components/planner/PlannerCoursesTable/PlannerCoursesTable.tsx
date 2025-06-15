@@ -60,6 +60,21 @@ export default function PlannerCoursesTable() {
         {planner.map((query, index) => {
           const sectionData = sections[searchQueryLabel(removeSection(query))];
 
+          const allSections =
+            typeof sectionData !== 'undefined' &&
+            sectionData.message === 'success' &&
+            Array.isArray(sectionData.data.all)
+              ? sectionData.data.all
+              : [];
+
+          const bestSyllabusUri = allSections
+            .filter((s) => !!s.syllabus_uri && !!s.academic_session?.start_date)
+            .sort(
+              (a, b) =>
+                new Date(b.academic_session.start_date).getTime() -
+                new Date(a.academic_session.start_date).getTime(),
+            )?.[0]?.syllabus_uri;
+
           return (
             <PlannerCard
               key={index}
@@ -70,6 +85,7 @@ export default function PlannerCoursesTable() {
                   ? sectionData.data.latest
                   : undefined
               }
+              bestSyllabus={bestSyllabusUri}
               setPlannerSection={setPlannerSection}
               grades={grades[searchQueryLabel(removeSection(query))]}
               rmp={rmp[searchQueryLabel(convertToProfOnly(query))]}
