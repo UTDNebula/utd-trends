@@ -7,11 +7,15 @@ import DashboardEmpty from '@/components/dashboard/DashboardEmpty/DashboardEmpty
 import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import Filters, { LoadingFilters } from '@/components/search/Filters/Filters';
 import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
-import { decodeSearchQueryLabel } from '@/types/SearchQuery';
+import untyped_alias_to_professor from '@/data/alias_to_professor.json';
+import { decodeSearchQueryLabel, searchQueryLabel } from '@/types/SearchQuery';
 
 import Right, { LoadingRight } from './Right';
 import ServerLeft from './ServerLeft';
 
+const alias_to_professor = untyped_alias_to_professor as {
+  [key: string]: string;
+};
 interface Props {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
@@ -75,10 +79,15 @@ export default async function Page({ searchParams }: Props) {
   const courses = decodedSearchTerms.filter(
     (query) => typeof query.prefix !== 'undefined',
   );
-  const professors = decodedSearchTerms.filter(
+  const aliasedProfessors = decodedSearchTerms.filter(
     (query) => typeof query.profLast !== 'undefined',
   );
-
+  // Except searchbar and rmp (alias), everything will use professor name
+  const professors = aliasedProfessors.map((prof) => {
+    const professor = alias_to_professor[searchQueryLabel(prof)];
+    if (professor) return decodeSearchQueryLabel(professor);
+    return prof;
+  });
   return (
     <>
       <TopMenu isPlanner={false} />
