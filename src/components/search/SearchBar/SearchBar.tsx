@@ -20,9 +20,9 @@ import React, {
   useTransition,
 } from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import untyped_alias_to_professor from '@/data/alias_to_professor.json';
 import untyped_professor_to_alias from '@/data/professor_to_alias.json';
-import { useSharedState } from '@/app/SharedStateProvider';
 import {
   decodeSearchQueryLabel,
   type SearchQuery,
