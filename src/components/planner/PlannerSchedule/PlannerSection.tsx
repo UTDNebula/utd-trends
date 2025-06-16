@@ -1,3 +1,4 @@
+import { Tooltip } from '@mui/material';
 import React from 'react';
 
 import {
@@ -11,6 +12,7 @@ interface PlannerSectionComponentProps {
   selectedSection: Sections['all'][number] | undefined;
   course: SearchQuery;
   color: { fill: string; outline: string; font: string };
+  courseName: string | undefined;
 }
 
 export default function PlannerSection(props: PlannerSectionComponentProps) {
@@ -79,52 +81,69 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
   return meetings.map((x: string[], i: number) => {
     const makeBigger = parseInt(x[2]) > 100;
     return (
-      <div
+      <Tooltip
         key={selectedSection._id + i}
-        style={
-          {
-            '--start-col': x[0],
-            '--start-row': x[1],
-            '--offset': x[3] + '%',
-            '--height': x[2] + '%',
-            backgroundColor: props.color.fill,
-            borderColor: props.color.outline,
-            color: props.color.font,
-          } as React.CSSProperties
-        }
-        className={`col-start-[var(--start-col)] col-span-1 
-          row-start-[var(--start-row)] row-span-1 relative 
-          top-[var(--offset)] h-[var(--height)] overflow-hidden 
-          rounded-xl border-2
-          ml-1 leading-relaxed`}
+        title={props.courseName}
+        placement="top"
+        slotProps={{
+          popper: {
+            modifiers: [
+              {
+                name: 'offset',
+                options: {
+                  offset: [0, -10],
+                },
+              },
+            ],
+          },
+        }}
       >
         <div
-          className={
-            'font-semibold text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
-            (makeBigger ? 'text-sm' : 'text-xs leading-none')
+          style={
+            {
+              '--start-col': x[0],
+              '--start-row': x[1],
+              '--offset': x[3] + '%',
+              '--height': x[2] + '%',
+              backgroundColor: props.color.fill,
+              borderColor: props.color.outline,
+              color: props.color.font,
+            } as React.CSSProperties
           }
+          className={`col-start-[var(--start-col)] col-span-1 
+            row-start-[var(--start-row)] row-span-1 relative 
+            top-[var(--offset)] h-[var(--height)] overflow-hidden 
+            rounded-xl border-2
+            ml-1 leading-relaxed`}
         >
-          {props.course.prefix} {props.course.number}.
-          {selectedSection.section_number}
+          <div
+            className={
+              'font-semibold text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+              (makeBigger ? 'text-sm' : 'text-xs leading-none')
+            }
+          >
+            {props.course.prefix} {props.course.number}.
+            {selectedSection.section_number}
+          </div>
+          <div
+            className={
+              'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+              (makeBigger ? '' : 'leading-none')
+            }
+          >
+            {props.course.profFirst} {props.course.profLast}
+          </div>
+          <div
+            className={
+              'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+              (makeBigger ? '' : 'leading-none')
+            }
+          >
+            {selectedSection.meetings[0]?.location?.building}{' '}
+            {selectedSection.meetings[0]?.location?.room}
+          </div>
         </div>
-        <div
-          className={
-            'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
-            (makeBigger ? '' : 'leading-none')
-          }
-        >
-          {props.course.profFirst} {props.course.profLast}
-        </div>
-        <div
-          className={
-            'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
-            (makeBigger ? '' : 'leading-none')
-          }
-        >
-          {selectedSection.meetings[0]?.location?.building}{' '}
-          {selectedSection.meetings[0]?.location?.room}
-        </div>
-      </div>
+      </Tooltip>
     );
   });
 }

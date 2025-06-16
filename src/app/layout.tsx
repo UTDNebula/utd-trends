@@ -9,7 +9,6 @@ import { Inter } from 'next/font/google';
 import localFont from 'next/font/local';
 import React from 'react';
 
-import FeedbackPopup from '@/components/common/FeedbackPopup/FeedbackPopup';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
 import theme from '@/modules/theme';
 
@@ -89,6 +88,13 @@ export const metadata: Metadata = {
   },
   description:
     "Choose the perfect classes for you: Nebula Labs's data analytics platform to help you make informed decisions about your coursework with grade and Rate My Professors data.",
+  keywords: [
+    'UT Dallas',
+    'schedule',
+    'planner',
+    'grades',
+    'Rate My Professors',
+  ],
   openGraph: {
     title: 'UTD TRENDS',
     description:
@@ -97,6 +103,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary',
+  },
+  other: {
+    'geo.region': 'US-TX',
+    'geo.placename': 'Richardson',
   },
 };
 
@@ -124,7 +134,6 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
             <SharedStateProvider>{children}</SharedStateProvider>
-            <FeedbackPopup />
             <GitHubButton />
             <SpeedInsights />
           </ThemeProvider>
