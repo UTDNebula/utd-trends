@@ -18,12 +18,21 @@ import React, {
   useTransition,
 } from 'react';
 
+import untyped_alias_to_professor from '@/data/alias_to_professor.json';
+import untyped_professor_to_alias from '@/data/professor_to_alias.json';
 import {
   decodeSearchQueryLabel,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
 } from '@/types/SearchQuery';
+
+const alias_to_professor = untyped_alias_to_professor as {
+  [key: string]: string;
+};
+const professor_to_alias = untyped_professor_to_alias as {
+  [key: string]: string;
+};
 
 interface LoadingSearchBarProps {
   className?: string;
@@ -187,7 +196,29 @@ export default function SearchBar(props: Props) {
         //remove currently chosen values
         const filtered = data.data.filter(
           (item: SearchQuery) =>
-            value.findIndex((el) => searchQueryEqual(el, item)) === -1,
+            value.findIndex((el) => searchQueryEqual(el, item)) === -1 &&
+            // remove professor of alias used
+            (alias_to_professor[searchQueryLabel(item)]
+              ? value.findIndex((el) =>
+                  searchQueryEqual(
+                    el,
+                    decodeSearchQueryLabel(
+                      alias_to_professor[searchQueryLabel(item)],
+                    ),
+                  ),
+                ) === -1
+              : true) &&
+            // remove alias of professor used
+            (professor_to_alias[searchQueryLabel(item)]
+              ? value.findIndex((el) =>
+                  searchQueryEqual(
+                    el,
+                    decodeSearchQueryLabel(
+                      professor_to_alias[searchQueryLabel(item)],
+                    ),
+                  ),
+                ) === -1
+              : true),
         );
         //add to chosen values if only one option and space
         const noSections = filtered.filter(
