@@ -1,6 +1,6 @@
+import professor_to_alias from '@/data/professor_to_alias.json';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery } from '@/types/SearchQuery';
-import professor_to_alias from '@/data/professor_to_alias.json'
 
 const RMP_GRAPHQL_URL = 'https://www.ratemyprofessors.com/graphql';
 const SCHOOL_ID = '1273';
@@ -57,7 +57,7 @@ const PROFESSOR_SEARCH_QUERY = {
     },
   },
 };
-const OVERWRITES = professor_to_alias as { [key: string]: string }
+const OVERWRITES = professor_to_alias as { [key: string]: string };
 
 function getGraphQlUrlProp(name: string) {
   PROFESSOR_SEARCH_QUERY.variables.query.text = name;
