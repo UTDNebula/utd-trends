@@ -125,7 +125,7 @@ function addProfessor(
     nodes.unshift(addSearchQueryCharacter(nodes[0], name + ' '));
   }
   // if it is an alias, map the alias path to the original professor, else, just insert the professor as graph data
-  const data = originalProf || {
+  const data = originalProf ?? {
     profFirst: profFirst,
     profLast: profLast,
   };

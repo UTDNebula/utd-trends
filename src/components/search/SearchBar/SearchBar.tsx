@@ -417,7 +417,22 @@ export default function SearchBar(props: Props) {
                 '$1 $2',
               ),
           );
+          const subTextMatches = match(
+            subtext ?? '',
+            inputValue
+              .replace(
+                //CS1200 -> CS 1200
+                /([a-zA-Z]{2,4})([0-9][0-9V]?[0-9]{0,2})/,
+                '$1 $2',
+              )
+              .replace(
+                //1200CS -> 1200 CS
+                /([0-9][0-9V][0-9]{2})([a-zA-Z]{1,4})/,
+                '$1 $2',
+              ),
+          );
           const parts = parse(text, matches);
+          const subtextParts = subtext ? parse(subtext, subTextMatches) : [];
           const { key, ...otherProps } = props;
           return (
             <li key={key} {...otherProps}>
@@ -436,7 +451,19 @@ export default function SearchBar(props: Props) {
                   ))}
                 </div>
                 {subtext && (
-                  <Typography variant="caption">{subtext}</Typography>
+                  <Typography variant="caption">
+                    {subtextParts.map((part, index) => (
+                      <span
+                        key={index}
+                        className={
+                          'whitespace-pre-wrap' +
+                          (part.highlight ? ' font-bold' : '')
+                        }
+                      >
+                        {part.text}
+                      </span>
+                    ))}
+                  </Typography>
                 )}
               </div>
             </li>
