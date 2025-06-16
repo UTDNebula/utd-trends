@@ -426,6 +426,7 @@ export default function SearchBar(props: Props) {
             subtext = option.subtitle;
           } else {
             text = searchQueryLabel(option);
+            subtext = professor_to_alias[searchQueryLabel(option)] ?? '';
           }
           //add spaces between prefix and course number
           const matches = match(

@@ -112,7 +112,11 @@ function addCourse(prefix: string, number: string) {
 }
 
 //Add nodes in format: (<professorLast>|<professorFirst> <professorLast>)
-function addProfessor(profFirst: string, profLast: string) {
+function addProfessor(
+  profFirst: string,
+  profLast: string,
+  originalProf?: SearchQuery,
+) {
   //seperate first names so you can skip them when searching
   const firstNames = profFirst.split(' ');
   const nodes = [root];
@@ -120,10 +124,12 @@ function addProfessor(profFirst: string, profLast: string) {
     //push to start, order is specific for addWithParents
     nodes.unshift(addSearchQueryCharacter(nodes[0], name + ' '));
   }
-  addWithParents(nodes, profLast, {
+  // if it is an alias, map the alias path to the original professor, else, just insert the professor as graph data
+  const data = originalProf || {
     profFirst: profFirst,
     profLast: profLast,
-  });
+  };
+  addWithParents(nodes, profLast, data);
 }
 
 for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
@@ -168,15 +174,18 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
   }
 }
 
-const alias_to_professor: { [key: string]: string } = {};
 for (const [professor, alias] of Object.entries(
   professor_to_alias as { [key: string]: string },
 )) {
+  const originalQuery = decodeSearchQueryLabel(professor);
   const aliasQuery = decodeSearchQueryLabel(alias);
-  if (aliasQuery.profFirst && aliasQuery.profLast)
-    addProfessor(aliasQuery.profFirst, aliasQuery.profLast);
-  if (typeof alias_to_professor[alias] === 'undefined')
-    alias_to_professor[alias] = professor;
+  if (
+    aliasQuery.profFirst &&
+    aliasQuery.profLast &&
+    originalQuery.profFirst &&
+    originalQuery.profLast
+  )
+    addProfessor(aliasQuery.profFirst, aliasQuery.profLast, originalQuery); // add alias path to professor (don't add alias to graph)
 }
 
 //Radix tree: reduces graph size by compressing chains of nodes each with only one child to a single node with a character value of several characters.
@@ -236,9 +245,3 @@ writeFileSync(
   JSON.stringify(graph.export()),
 );
 console.log('Autocomplete graph generation done.');
-
-writeFileSync(
-  'src/data/alias_to_professor.json',
-  JSON.stringify(alias_to_professor),
-);
-console.log('alias_to_professor mapping done');
