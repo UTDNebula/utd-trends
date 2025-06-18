@@ -139,7 +139,10 @@ export async function GET(request: Request) {
 
   // check each course name
   for (const title in courseNameTable) {
-    const titleWords = title.toLowerCase().split(' ');
+    const titleWords = title
+      .toLowerCase()
+      .split(' ')
+      .filter((word) => word.length > 0);
 
     //for each word in the course name, find the word in the query that is most similar
     const distances = titleWords.map((word) => minEditDistance(inputArr, word));
@@ -229,7 +232,7 @@ export async function GET(request: Request) {
       }
     });
   }
-
+  console.log(results);
   // calculate cutoff for 1 standard deviation
   const cut = results[Math.floor(0)].distance;
   const variance =
