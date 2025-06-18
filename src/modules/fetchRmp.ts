@@ -1,3 +1,4 @@
+import professor_to_alias from '@/data/professor_to_alias.json';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery } from '@/types/SearchQuery';
 
@@ -56,6 +57,7 @@ const PROFESSOR_SEARCH_QUERY = {
     },
   },
 };
+const OVERWRITES = professor_to_alias as { [key: string]: string };
 
 function getGraphQlUrlProp(name: string) {
   PROFESSOR_SEARCH_QUERY.variables.query.text = name;
@@ -109,7 +111,15 @@ export default async function fetchRmp(
     const profLast = query.profLast;
 
     const singleProfFirst = profFirst.split(' ')[0];
-    const name = singleProfFirst + ' ' + profLast;
+    let name = singleProfFirst + ' ' + profLast;
+
+    // check for overwrite
+    const overwrittenName = OVERWRITES[profFirst + ' ' + profLast];
+    let overwrite = false;
+    if (typeof overwrittenName !== 'undefined') {
+      name = overwrittenName;
+      overwrite = true;
+    }
 
     // create fetch object for professor
     const graphQlUrlProp = getGraphQlUrlProp(name);
@@ -129,11 +139,14 @@ export default async function fetchRmp(
       throw new Error('Data for professor not found');
     }
     //Remove profs not at UTD and with bad name match
+    const splitName = name.split(' ');
+    const checkFirst = overwrite ? splitName[0] : singleProfFirst;
+    const checkLast = overwrite ? splitName[splitName.length - 1] : profLast;
     const professors = data.data.newSearch.teachers.edges.filter(
       (prof: { node: RMP }) =>
         prof.node.school.name === SCHOOL_NAME &&
-        prof.node.firstName.includes(singleProfFirst) &&
-        prof.node.lastName.includes(profLast),
+        prof.node.firstName.includes(checkFirst) &&
+        prof.node.lastName.includes(checkLast),
     );
     //Pick prof instance with most ratings
     let maxRatingsProfessor = professors[0];
