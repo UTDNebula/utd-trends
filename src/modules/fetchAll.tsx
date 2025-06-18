@@ -3,7 +3,10 @@
 import untypedCoursePrefixNumberTable from '@/data/course_prefix_number_table.json';
 import fetchGrades, { type Grades } from '@/modules/fetchGrades';
 import fetchRmp, { type RMP } from '@/modules/fetchRmp';
-import fetchSections, { type Sections } from '@/modules/fetchSections';
+import fetchSections, {
+  fetchLatestSemester,
+  type Sections,
+} from '@/modules/fetchSections';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToCourseOnly,
@@ -22,6 +25,7 @@ export default async function fetchAll(queries: SearchQuery[]): Promise<{
   rmp: { [key: string]: GenericFetchedData<RMP> };
   sections: { [key: string]: GenericFetchedData<Sections> };
   courseNames: { [key: string]: string | undefined };
+  latestSemester: GenericFetchedData<string>;
 }> {
   //Grade data
   //Fetch each result
@@ -46,11 +50,15 @@ export default async function fetchAll(queries: SearchQuery[]): Promise<{
     queries.map((result) => [searchQueryLabel(result), fetchSections(result)]),
   );
 
-  const [gradesResults, rmpResults, sectionsResults] = await Promise.all([
-    Promise.allSettled(Object.values(gradesPromises)),
-    Promise.allSettled(Object.values(rmpPromises)),
-    Promise.allSettled(Object.values(sectionsPromises)),
-  ]);
+  const latestSemesterPromise = fetchLatestSemester();
+
+  const [gradesResults, rmpResults, sectionsResults, latestSemester] =
+    await Promise.all([
+      Promise.allSettled(Object.values(gradesPromises)),
+      Promise.allSettled(Object.values(rmpPromises)),
+      Promise.allSettled(Object.values(sectionsPromises)),
+      latestSemesterPromise,
+    ]);
 
   const gradesKeys = Object.keys(gradesPromises);
   const rmpKeys = Object.keys(rmpPromises);
@@ -87,5 +95,6 @@ export default async function fetchAll(queries: SearchQuery[]): Promise<{
     rmp,
     sections,
     courseNames,
+    latestSemester,
   };
 }

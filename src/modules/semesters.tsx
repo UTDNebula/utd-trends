@@ -13,11 +13,19 @@ export function compareSemesters(a: string, b: string) {
   } else return x;
 }
 
-export function displaySemesterName(id: string) {
-  return (
-    '20' +
-    id.slice(0, 2) +
-    ' ' +
-    { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)]
-  );
+export function displaySemesterName(id: string, yearFirst = true) {
+  if (yearFirst)
+    return (
+      '20' +
+      id.slice(0, 2) +
+      ' ' +
+      { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)]
+    );
+  else
+    return (
+      { U: 'Summer', F: 'Fall', S: 'Spring' }[id.slice(2)] +
+      ' ' +
+      '20' +
+      id.slice(0, 2)
+    );
 }

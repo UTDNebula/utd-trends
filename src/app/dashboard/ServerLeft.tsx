@@ -59,7 +59,8 @@ export default async function ServerLeft(props: Props) {
     results = fetchSearchResults(props.professors, []);
   }
 
-  const { grades, rmp, sections, courseNames } = await fetchAll(results);
+  const { grades, rmp, sections, courseNames, latestSemester } =
+    await fetchAll(results);
 
   return (
     <>
@@ -68,6 +69,7 @@ export default async function ServerLeft(props: Props) {
         rmp={rmp}
         sections={sections}
         courseNames={courseNames}
+        latestSemester={latestSemester}
       />
       <Suspense fallback={<LoadingSearchResultsTable />}>
         <ClientLeft

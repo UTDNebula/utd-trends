@@ -14,6 +14,7 @@ interface Props {
   rmp: { [key: string]: GenericFetchedData<RMP> };
   sections: { [key: string]: GenericFetchedData<Sections> };
   courseNames: { [key: string]: string | undefined };
+  latestSemester: GenericFetchedData<string>;
 }
 
 export default function SyncServerDataToContext({
@@ -21,9 +22,11 @@ export default function SyncServerDataToContext({
   rmp,
   sections,
   courseNames,
+  latestSemester,
 }: Props) {
   const hasHydrated = useHasHydrated();
-  const { setGrades, setRmp, setSections, setCourseNames } = useSharedState();
+  const { setGrades, setRmp, setSections, setCourseNames, setLatestSemester } =
+    useSharedState();
 
   useEffect(() => {
     if (hasHydrated) {
@@ -31,6 +34,7 @@ export default function SyncServerDataToContext({
       setRmp(rmp);
       setSections(sections);
       setCourseNames(courseNames);
+      setLatestSemester(latestSemester);
     }
   }, [
     hasHydrated,
@@ -38,10 +42,12 @@ export default function SyncServerDataToContext({
     rmp,
     sections,
     courseNames,
+    latestSemester,
     setGrades,
     setRmp,
     setSections,
     setCourseNames,
+    setLatestSemester,
   ]);
 
   return null;

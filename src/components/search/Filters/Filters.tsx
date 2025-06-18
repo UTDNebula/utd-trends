@@ -81,7 +81,8 @@ export function LoadingFilters() {
  * This component returns a set of filters with which to sort results.
  */
 export default function Filters() {
-  const { semesters, chosenSemesters, setChosenSemesters } = useSharedState();
+  const { semesters, chosenSemesters, setChosenSemesters, latestSemester } =
+    useSharedState();
 
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
@@ -384,7 +385,13 @@ export default function Filters() {
                   }}
                 />
               }
-              label="Teaching Next Semester"
+              label={
+                'Teaching ' +
+                (typeof latestSemester !== 'undefined' &&
+                latestSemester.message === 'success'
+                  ? 'in ' + displaySemesterName(latestSemester.data, false)
+                  : 'Next Semester')
+              }
             />
           </FormControl>
         </Tooltip>

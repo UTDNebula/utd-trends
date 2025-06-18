@@ -31,6 +31,7 @@ import type { Grades } from '@/modules/fetchGrades';
 import type { RMP } from '@/modules/fetchRmp';
 import type { Sections } from '@/modules/fetchSections';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import { displaySemesterName } from '@/modules/semesters';
 import useHasHydrated from '@/modules/useHasHydrated';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
@@ -444,6 +445,7 @@ export default function SearchResultsTable({
     addToPlanner,
     removeFromPlanner,
     courseNames,
+    latestSemester,
   } = useSharedState();
 
   //Table sorting category
@@ -723,7 +725,12 @@ export default function SearchResultsTable({
                   <div className="flex items-center py-2 my-2">
                     <Divider className="grow" />
                     <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
-                      Not teaching next semester
+                      {'Not teaching ' +
+                        (typeof latestSemester !== 'undefined' &&
+                        latestSemester.message === 'success'
+                          ? 'in ' +
+                            displaySemesterName(latestSemester.data, false)
+                          : 'Next Semester')}
                     </Typography>
                     <Divider className="grow" />
                   </div>

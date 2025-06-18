@@ -56,6 +56,8 @@ const SharedStateContext = createContext<
       setChosenSemesters: Setter<string[]>;
       courseNames: { [key: string]: string | undefined };
       setCourseNames: Setter<{ [key: string]: string | undefined }>;
+      latestSemester: GenericFetchedData<string> | undefined;
+      setLatestSemester: Setter<GenericFetchedData<string> | undefined>;
     }
   | undefined
 >(undefined);
@@ -319,6 +321,10 @@ export function SharedStateProvider({
     [key: string]: string | undefined;
   }>({});
 
+  const [latestSemester, setLatestSemester] = useState<
+    GenericFetchedData<string> | undefined
+  >();
+
   return (
     <SharedStateContext.Provider
       value={{
@@ -344,6 +350,8 @@ export function SharedStateProvider({
         setChosenSemesters,
         courseNames,
         setCourseNames,
+        latestSemester,
+        setLatestSemester,
       }}
     >
       {children}

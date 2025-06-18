@@ -7,6 +7,7 @@ import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerCard, {
   LoadingPlannerCard,
 } from '@/components/planner/PlannerCoursesTable/PlannerCard';
+import { displaySemesterName } from '@/modules/semesters';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -42,6 +43,7 @@ export default function PlannerCoursesTable() {
     setPlannerSection,
     plannerColorMap,
     courseNames,
+    latestSemester,
   } = useSharedState();
 
   const [openConflictMessage, setOpenConflictMessage] = useState(false);
@@ -55,7 +57,11 @@ export default function PlannerCoursesTable() {
   return (
     <>
       <Typography variant="h2" className="leading-tight text-3xl font-bold p-4">
-        My Planner
+        {'My Planner' +
+          (typeof latestSemester !== 'undefined' &&
+          latestSemester.message === 'success'
+            ? ' — ' + displaySemesterName(latestSemester.data, false)
+            : '')}
       </Typography>
       <div className="flex flex-col gap-4 mb-4 sm:mb-0">
         {planner.map((query, index) => {
