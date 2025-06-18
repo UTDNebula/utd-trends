@@ -361,10 +361,6 @@ export default function SearchBar(props: Props) {
               options.length === 1 &&
               ((typeof options[0].profFirst === 'undefined' &&
                 typeof options[0].profLast === 'undefined') ||
-                options[0].profFirst?.toLowerCase().trim() ===
-                  value.toLowerCase().trim() ||
-                options[0].profLast?.toLowerCase().trim() ===
-                  value.toLowerCase().trim() ||
                 options[0].profFirst?.toLowerCase() +
                   ' ' +
                   options[0].profLast?.toLowerCase() ===
