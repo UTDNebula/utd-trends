@@ -1,9 +1,19 @@
 import { DirectedGraph } from 'graphology';
 
+import untypedCoursePrefixNumberTable from '@/data/course_prefix_number_table.json';
 import type { NodeAttributes } from '@/scripts/generateAutocompleteGraph';
-import { type SearchQuery, searchQueryEqual } from '@/types/SearchQuery';
+import {
+  convertToCourseOnly,
+  type SearchQuery,
+  searchQueryEqual,
+  searchQueryLabel,
+} from '@/types/SearchQuery';
 
 const root = '0';
+
+const coursePrefixNumberTable = untypedCoursePrefixNumberTable as {
+  [key: string]: string;
+};
 
 export function getGraph(data: object) {
   const graph: DirectedGraph<NodeAttributes> = new DirectedGraph({
@@ -240,7 +250,13 @@ export function searchAutocomplete(
       },
     });
   });
-  const results: SearchQuery[] = [];
+
+  type SearchQueryWithTitle = SearchQuery & {
+    title?: string;
+    subtitle?: string;
+  };
+
+  let results: SearchQueryWithTitle[] = [];
   while (!queue.isEmpty() && results.length < limit) {
     let response: bfsReturn;
     if (queue.front()?.data?.toNext) {
@@ -252,6 +268,15 @@ export function searchAutocomplete(
       results.push(response);
     }
   }
+
+  results = results.map((result) => {
+    return {
+      ...result,
+      subtitle:
+        coursePrefixNumberTable[searchQueryLabel(convertToCourseOnly(result))],
+    };
+  });
+
   return results.filter(
     (option, index, self) =>
       index === self.findIndex((t) => searchQueryEqual(t, option)),

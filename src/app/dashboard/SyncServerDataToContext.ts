@@ -13,23 +13,42 @@ interface Props {
   grades: { [key: string]: GenericFetchedData<Grades> };
   rmp: { [key: string]: GenericFetchedData<RMP> };
   sections: { [key: string]: GenericFetchedData<Sections> };
+  courseNames: { [key: string]: string | undefined };
+  latestSemester: GenericFetchedData<string>;
 }
 
 export default function SyncServerDataToContext({
   grades,
   rmp,
   sections,
+  courseNames,
+  latestSemester,
 }: Props) {
   const hasHydrated = useHasHydrated();
-  const { setGrades, setRmp, setSections } = useSharedState();
+  const { setGrades, setRmp, setSections, setCourseNames, setLatestSemester } =
+    useSharedState();
 
   useEffect(() => {
     if (hasHydrated) {
       setGrades(grades);
       setRmp(rmp);
       setSections(sections);
+      setCourseNames(courseNames);
+      setLatestSemester(latestSemester);
     }
-  }, [hasHydrated, grades, rmp, sections, setGrades, setRmp, setSections]);
+  }, [
+    hasHydrated,
+    grades,
+    rmp,
+    sections,
+    courseNames,
+    latestSemester,
+    setGrades,
+    setRmp,
+    setSections,
+    setCourseNames,
+    setLatestSemester,
+  ]);
 
   return null;
 }

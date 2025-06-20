@@ -60,7 +60,7 @@ This project utilizes [React Styleguidist](https://github.com/styleguidist/react
 to generate component documentation and provide a isolated development environment
 with hot-reloading support. View the doumentation for the develop branch at
 [utdnebula.github.io/utd-trends](https://utdnebula.github.io/utd-trends/) or run
-`npm run documentation` to launch a local development server at
+`npm run docs` to launch a local development server at
 [`localhost:6060`](http://localhost:6060).
 
 ### Contact

@@ -104,7 +104,9 @@ async function fetchSingleSections(
   }
 }
 
-async function fetchLatestSemester(): Promise<GenericFetchedData<string>> {
+export async function fetchLatestSemester(): Promise<
+  GenericFetchedData<string>
+> {
   try {
     const sections = await fetchSingleSections({
       prefix: 'GOVT',

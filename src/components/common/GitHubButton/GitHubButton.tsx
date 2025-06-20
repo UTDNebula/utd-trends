@@ -22,7 +22,7 @@ export default function GitHubButton() {
         }
         rel="noreferrer"
         target="_blank"
-        className="w-fit h-fit bg-white fixed bottom-2 right-2 rounded-full"
+        className="w-fit h-fit bg-white fixed bottom-2 left-2 rounded-full"
       >
         <IconButton size="large">
           <GitHub className="fill-black text-3xl" />

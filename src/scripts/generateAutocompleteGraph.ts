@@ -133,6 +133,7 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
     courseNumberItr++
   ) {
     const courseNumberData = prefixData.course_numbers[courseNumberItr];
+    addCourse(prefixData.subject_prefix, courseNumberData.course_number);
     for (
       let academicSessionItr = 0;
       academicSessionItr < courseNumberData.academic_sessions.length;
@@ -140,7 +141,6 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
     ) {
       const academicSessionData =
         courseNumberData.academic_sessions[academicSessionItr];
-      addCourse(prefixData.subject_prefix, courseNumberData.course_number);
       for (
         let sectionItr = 0;
         sectionItr < academicSessionData.sections.length;
