@@ -213,12 +213,23 @@ export default function SearchBar(props: Props) {
           // so it should autocomplete then when this is realized
           quickInputValue.current.charAt(newInputValue.length) === ' '
         ) {
-          addValue(filtered[0]);
-          const rest = quickInputValue.current
-            .slice(newInputValue.length)
-            .trimStart();
-          setInputValue(rest);
-          loadNewOptions(rest.trimEnd());
+          if (
+            quickInputValue.current.length > 0 &&
+            filtered.length === 1 &&
+            ((typeof filtered[0].profFirst === 'undefined' &&
+              typeof filtered[0].profLast === 'undefined') ||
+              filtered[0].profFirst?.toLowerCase() +
+                ' ' +
+                filtered[0].profLast?.toLowerCase() ===
+                quickInputValue.current.toLowerCase().trim()) // only add chip on space when it matches the full prof name
+          ) {
+            addValue(filtered[0]);
+            const rest = quickInputValue.current
+              .slice(newInputValue.length)
+              .trimStart();
+            setInputValue(rest);
+            loadNewOptions(rest.trimEnd());
+          }
         } else if (quickInputValue.current === newInputValue) {
           //still valid options
           if (!filtered.length) {
@@ -364,7 +375,7 @@ export default function SearchBar(props: Props) {
                 options[0].profFirst?.toLowerCase() +
                   ' ' +
                   options[0].profLast?.toLowerCase() ===
-                  value.toLowerCase().trim())
+                  value.toLowerCase().trim()) // only add chip on space when it matches the full prof name
             ) {
               event.preventDefault();
               event.stopPropagation();

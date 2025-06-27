@@ -232,7 +232,6 @@ export async function GET(request: Request) {
       }
     });
   }
-  console.log(results);
   // calculate cutoff for 1 standard deviation
   const cut = results[Math.floor(0)].distance;
   const variance =
