@@ -64,6 +64,7 @@ const TutorialPopup = ({
       className="pointer-events-auto"
       disableScrollLock={true}
       marginThreshold={0}
+      onClose={close}
     >
       <div
         className="p-2 flex flex-col items-start min-w-32 max-w-96"
