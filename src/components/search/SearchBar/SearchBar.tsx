@@ -214,8 +214,6 @@ export default function SearchBar(props: Props) {
           quickInputValue.current.charAt(newInputValue.length) === ' '
         ) {
           if (
-            quickInputValue.current.length > 0 &&
-            filtered.length === 1 &&
             ((typeof filtered[0].profFirst === 'undefined' &&
               typeof filtered[0].profLast === 'undefined') ||
               filtered[0].profFirst?.toLowerCase() +
