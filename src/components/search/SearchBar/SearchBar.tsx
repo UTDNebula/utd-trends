@@ -198,7 +198,7 @@ export default function SearchBar(props: Props) {
           throw new Error(data.data ?? data.message);
         }
         //remove currently chosen values
-        const filtered = data.data.filter(
+        const filtered: SearchQuery[] = data.data.filter(
           (item: SearchQuery) =>
             !value.some((el) => searchQueryEqual(el, item)),
         );
@@ -213,13 +213,19 @@ export default function SearchBar(props: Props) {
           // so it should autocomplete then when this is realized
           quickInputValue.current.charAt(newInputValue.length) === ' '
         ) {
+          // only add chip on space when it matches the full prof name
           if (
-            ((typeof filtered[0].profFirst === 'undefined' &&
+            (typeof filtered[0].profFirst === 'undefined' &&
               typeof filtered[0].profLast === 'undefined') ||
-              filtered[0].profFirst?.toLowerCase() +
-                ' ' +
-                filtered[0].profLast?.toLowerCase() ===
-                quickInputValue.current.toLowerCase().trim()) // only add chip on space when it matches the full prof name
+            searchQueryEqual(
+              {
+                profFirst: filtered[0].profFirst?.toLowerCase(),
+                profLast: filtered[0].profLast?.toLowerCase(),
+              },
+              decodeSearchQueryLabel(
+                quickInputValue.current.toLowerCase().trim(),
+              ),
+            )
           ) {
             addValue(filtered[0]);
             const rest = quickInputValue.current
@@ -365,15 +371,19 @@ export default function SearchBar(props: Props) {
             // but if the user is deleting text, don't try to autocomplete
             (event.nativeEvent as InputEvent).inputType === 'insertText'
           ) {
+            // only add chip on space when it matches the full prof name
             if (
               value.length > 0 &&
               options.length === 1 &&
               ((typeof options[0].profFirst === 'undefined' &&
                 typeof options[0].profLast === 'undefined') ||
-                options[0].profFirst?.toLowerCase() +
-                  ' ' +
-                  options[0].profLast?.toLowerCase() ===
-                  value.toLowerCase().trim()) // only add chip on space when it matches the full prof name
+                searchQueryEqual(
+                  {
+                    profFirst: options[0].profFirst?.toLowerCase(),
+                    profLast: options[0].profLast?.toLowerCase(),
+                  },
+                  decodeSearchQueryLabel(value.toLowerCase().trim()),
+                ))
             ) {
               event.preventDefault();
               event.stopPropagation();
