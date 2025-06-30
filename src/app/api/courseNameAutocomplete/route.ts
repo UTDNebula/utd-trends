@@ -139,10 +139,7 @@ export async function GET(request: Request) {
 
   // check each course name
   for (const title in courseNameTable) {
-    const titleWords = title
-      .toLowerCase()
-      .split(' ')
-      .filter((word) => word.length > 0);
+    const titleWords = title.toLowerCase().split(/\s+/); // split by any whitespace (even continuous spaces)
 
     //for each word in the course name, find the word in the query that is most similar
     const distances = titleWords.map((word) => minEditDistance(inputArr, word));
