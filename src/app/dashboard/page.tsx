@@ -9,6 +9,7 @@ import Filters, { LoadingFilters } from '@/components/search/Filters/Filters';
 import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
 import {
   decodeSearchQueryLabel,
+  type SearchQuery,
   searchQueryLabel,
   searchQuerySort,
 } from '@/types/SearchQuery';
@@ -32,7 +33,7 @@ export async function generateMetadata({
     // Take first if duplicated queries
     searchTerms = searchTerms[0];
   }
-  let decodedSearchTerms = [];
+  let decodedSearchTerms: SearchQuery[] = [];
   if (typeof searchTerms !== 'undefined') {
     const queries = searchTerms.split(',');
     decodedSearchTerms = queries.map(decodeSearchQueryLabel);
