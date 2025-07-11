@@ -43,7 +43,7 @@ export default function Loading() {
             NEBULA LABS
           </a>
         </h2>
-        <h1 className="text-6xl font-extrabold font-kallisto mb-6">
+        <h1 className="text-6xl font-extrabold font-display mb-6">
           UTD TRENDS
         </h1>
         <p className="mb-10 text-gray-700 dark:text-gray-300 leading-7">
