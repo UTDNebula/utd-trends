@@ -1,6 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
-@import url('https://use.typekit.net/jfb1uzn.css');
-
 @import 'tailwindcss' important;
 
 /*If changing be sure to update in layout.tsx too*/
@@ -31,8 +28,8 @@
   --color-periwinkle: #c2c8ff; /* brand secondary (light)*/
   --color-shade: #101828; /* drop shadow color from shipfaster ui*/
 
-  --font-kallisto: Kallisto, Roboto, sans-serif;
-  --font-inter: Inter, Roboto, sans-serif;
+  --font-display: Bai Jamjuree, Roboto, sans-serif;
+  --font-main: Inter, Roboto, sans-serif;
 }
 
 @utility bg-lighten {
