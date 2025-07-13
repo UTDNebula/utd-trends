@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 
 import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
-import rawComboTable from '@/data/combo_table.json';
+import untypedComboTable from '@/data/combo_table.json';
 import fetchAll from '@/modules/fetchAll';
 import {
   convertToCourseOnly,
@@ -14,7 +14,7 @@ import {
 import ClientLeft from './ClientLeft';
 import SyncServerDataToContext from './SyncServerDataToContext';
 
-const comboTable = rawComboTable as { [key: string]: SearchQuery[] };
+const comboTable = untypedComboTable as { [key: string]: SearchQuery[] };
 
 //Get all course+prof combos for searchTerms and keep only the ones that match filterTerms
 //When filterTerms is blank, just gets all searchTerms
@@ -59,11 +59,18 @@ export default async function ServerLeft(props: Props) {
     results = fetchSearchResults(props.professors, []);
   }
 
-  const { grades, rmp, sections } = await fetchAll(results);
+  const { grades, rmp, sections, courseNames, latestSemester } =
+    await fetchAll(results);
 
   return (
     <>
-      <SyncServerDataToContext grades={grades} rmp={rmp} sections={sections} />
+      <SyncServerDataToContext
+        grades={grades}
+        rmp={rmp}
+        sections={sections}
+        courseNames={courseNames}
+        latestSemester={latestSemester}
+      />
       <Suspense fallback={<LoadingSearchResultsTable />}>
         <ClientLeft
           numSearches={props.courses.length + props.professors.length}

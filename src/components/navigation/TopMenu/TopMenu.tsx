@@ -95,7 +95,7 @@ export default function TopMenu(props: Props) {
         />
         <Link
           href="/"
-          className="lext-lg md:text-xl font-kallisto font-medium md:font-bold"
+          className="lext-lg md:text-xl font-display font-medium md:font-bold"
         >
           UTD TRENDS
         </Link>
@@ -120,7 +120,7 @@ export default function TopMenu(props: Props) {
             props.isPlanner
               ? dashboardSearchTerms != null
                 ? '/dashboard?' + dashboardSearchTerms
-                : '/dashboard'
+                : '/dashboard?availability=true'
               : '/planner'
           }
           onClick={() =>

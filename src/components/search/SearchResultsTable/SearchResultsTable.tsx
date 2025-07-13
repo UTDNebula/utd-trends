@@ -31,6 +31,7 @@ import type { Grades } from '@/modules/fetchGrades';
 import type { RMP } from '@/modules/fetchRmp';
 import type { Sections } from '@/modules/fetchSections';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import { displaySemesterName } from '@/modules/semesters';
 import useHasHydrated from '@/modules/useHasHydrated';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
@@ -159,6 +160,7 @@ type RowProps = {
   addToPlanner: (value: SearchQuery) => void;
   removeFromPlanner: (value: SearchQuery) => void;
   showTutorial: boolean;
+  courseName: string | undefined;
 };
 
 function Row({
@@ -175,6 +177,7 @@ function Row({
   addToPlanner,
   removeFromPlanner,
   showTutorial,
+  courseName,
 }: RowProps) {
   // Check if the course section has the latest semester data
   const hasLatestSemester = !!(
@@ -191,33 +194,45 @@ function Row({
   const rainbowColors = useRainbowColors();
 
   const nameCell = (
-    <Tooltip
-      title={
-        typeof course.profFirst !== 'undefined' &&
+    <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit">
+      <Tooltip
+        title={
+          typeof course.prefix !== 'undefined' &&
+          typeof course.number !== 'undefined' &&
+          courseName
+        }
+        placement="top"
+      >
+        <span>{searchQueryLabel(convertToCourseOnly(course))}</span>
+      </Tooltip>
+      {typeof course.profFirst !== 'undefined' &&
         typeof course.profLast !== 'undefined' &&
-        (rmp !== undefined &&
-        rmp.message === 'success' &&
-        rmp.data.teacherRatingTags.length > 0
-          ? 'Tags: ' +
-            rmp.data.teacherRatingTags
-              .sort((a, b) => b.tagCount - a.tagCount)
-              .slice(0, 3)
-              .map((tag) => tag.tagName)
-              .join(', ')
-          : 'No Tags Available')
-      }
-      placement="top"
-    >
-      <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit">
-        {searchQueryLabel(course) +
-          ((typeof course.profFirst === 'undefined' &&
-            typeof course.profLast === 'undefined') ||
-          (typeof course.prefix === 'undefined' &&
-            typeof course.number === 'undefined')
-            ? ' (Overall)'
-            : '')}
-      </Typography>
-    </Tooltip>
+        typeof course.prefix !== 'undefined' &&
+        typeof course.number !== 'undefined' && <span> </span>}
+      <Tooltip
+        title={
+          typeof course.profFirst !== 'undefined' &&
+          typeof course.profLast !== 'undefined' &&
+          (rmp !== undefined &&
+          rmp.message === 'success' &&
+          rmp.data.teacherRatingTags.length > 0
+            ? 'Tags: ' +
+              rmp.data.teacherRatingTags
+                .sort((a, b) => b.tagCount - a.tagCount)
+                .slice(0, 3)
+                .map((tag) => tag.tagName)
+                .join(', ')
+            : 'No Tags Available')
+        }
+        placement="top"
+      >
+        <span>{searchQueryLabel(convertToProfOnly(course))}</span>
+      </Tooltip>
+      {((typeof course.profFirst === 'undefined' &&
+        typeof course.profLast === 'undefined') ||
+        (typeof course.prefix === 'undefined' &&
+          typeof course.number === 'undefined')) && <span> (Overall)</span>}
+    </Typography>
   );
 
   return (
@@ -429,6 +444,8 @@ export default function SearchResultsTable({
     planner,
     addToPlanner,
     removeFromPlanner,
+    courseNames,
+    latestSemester,
   } = useSharedState();
 
   //Table sorting category
@@ -694,6 +711,9 @@ export default function SearchResultsTable({
                   addToPlanner={addToPlanner}
                   removeFromPlanner={removeFromPlanner}
                   showTutorial={index === numSearches}
+                  courseName={
+                    courseNames[searchQueryLabel(convertToCourseOnly(result))]
+                  }
                 />
               );
             })}
@@ -705,7 +725,12 @@ export default function SearchResultsTable({
                   <div className="flex items-center py-2 my-2">
                     <Divider className="grow" />
                     <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
-                      Not teaching next semester
+                      {'Not teaching ' +
+                        (typeof latestSemester !== 'undefined' &&
+                        latestSemester.message === 'success'
+                          ? 'in ' +
+                            displaySemesterName(latestSemester.data, false)
+                          : 'Next Semester')}
                     </Typography>
                     <Divider className="grow" />
                   </div>
@@ -746,6 +771,9 @@ export default function SearchResultsTable({
                   addToPlanner={addToPlanner}
                   removeFromPlanner={removeFromPlanner}
                   showTutorial={false}
+                  courseName={
+                    courseNames[searchQueryLabel(convertToCourseOnly(result))]
+                  }
                 />
               );
             })}

@@ -8,19 +8,29 @@ import useHasHydrated from '@/modules/useHasHydrated';
 
 export default function SyncServerDataToContext() {
   const hasHydrated = useHasHydrated();
-  const { setGrades, setRmp, setSections, planner } = useSharedState();
+  const {
+    setGrades,
+    setRmp,
+    setSections,
+    setCourseNames,
+    setLatestSemester,
+    planner,
+  } = useSharedState();
 
   useEffect(() => {
     if (hasHydrated) {
       let isCancelled = false;
 
       const fetchData = async () => {
-        const { grades, rmp, sections } = await fetchAll(planner);
+        const { grades, rmp, sections, courseNames, latestSemester } =
+          await fetchAll(planner);
         if (isCancelled) return;
 
         setGrades(grades);
         setRmp(rmp);
         setSections(sections);
+        setCourseNames(courseNames);
+        setLatestSemester(latestSemester);
       };
 
       fetchData();
@@ -29,7 +39,15 @@ export default function SyncServerDataToContext() {
         isCancelled = true;
       };
     }
-  }, [hasHydrated, setGrades, setRmp, setSections, planner]);
+  }, [
+    hasHydrated,
+    setGrades,
+    setRmp,
+    setSections,
+    setCourseNames,
+    setLatestSemester,
+    planner,
+  ]);
 
   return null;
 }
