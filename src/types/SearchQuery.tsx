@@ -194,3 +194,30 @@ export function removeDuplicates(array: SearchQuery[]) {
       index === self.findIndex((obj2) => searchQueryEqual(obj1, obj2)),
   );
 }
+
+export function searchQuerySort(a: SearchQuery, b: SearchQuery) {
+  if ('profLast' in a && 'profLast' in b) {
+    //handle undefined variables based on searchQueryLabel
+    const aFirstName = a.profFirst ?? '';
+    const bFirstName = b.profFirst ?? '';
+    const aLastName = a.profLast ?? '';
+    const bLastName = b.profLast ?? '';
+
+    return (
+      aLastName.localeCompare(bLastName) || aFirstName.localeCompare(bFirstName) //sort by last name then first name
+    );
+  }
+  if ('prefix' in a && 'prefix' in b) {
+    const aPrefix = a.prefix ?? ''; //make sure the is no empty input for prefix and number
+    const bPrefix = b.prefix ?? '';
+    const aNumber = a.number ?? '';
+    const bNumber = b.number ?? '';
+
+    return aPrefix.localeCompare(bPrefix) || aNumber.localeCompare(bNumber); //sort by prefix then number
+  }
+  if ('prefix' in a) {
+    // Courses first
+    return -1;
+  }
+  return 1;
+}

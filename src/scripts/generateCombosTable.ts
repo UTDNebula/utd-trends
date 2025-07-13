@@ -4,7 +4,11 @@ Build the combos table
 import { writeFileSync } from 'fs';
 
 import aggregatedData from '../data/aggregated_data.json';
-import { type SearchQuery, searchQueryEqual } from '../types/SearchQuery';
+import {
+  type SearchQuery,
+  searchQueryEqual,
+  searchQuerySort,
+} from '../types/SearchQuery';
 
 export type TableType = { [key: string]: SearchQuery[] };
 
@@ -47,28 +51,7 @@ function addCombo( //variables
 
 function sortResults(key: string) {
   if (Object.prototype.hasOwnProperty.call(table, key)) {
-    table[key].sort((a, b) => {
-      if ('profLast' in a && 'profLast' in b) {
-        //handle undefined variables based on searchQueryLabel
-        const aFirstName = a.profFirst ?? '';
-        const bFirstName = b.profFirst ?? '';
-        const aLastName = a.profLast ?? '';
-        const bLastName = b.profLast ?? '';
-
-        return (
-          aLastName.localeCompare(bLastName) ||
-          aFirstName.localeCompare(bFirstName) //sort by last name then first name
-        );
-      } else if ('prefix' in a && 'prefix' in b) {
-        const aPrefix = a.prefix ?? ''; //make sure the is no empty input for prefix and number
-        const bPrefix = b.prefix ?? '';
-        const aNumber = a.number ?? '';
-        const bNumber = b.number ?? '';
-
-        return aPrefix.localeCompare(bPrefix) || aNumber.localeCompare(bNumber); //sort by prefix then number
-      }
-      return 0;
-    });
+    table[key].sort(searchQuerySort);
   }
 }
 
