@@ -354,6 +354,7 @@ function MeetingChip(props: {
 type PlannerCardProps = {
   query: SearchQueryMultiSection;
   sections?: Sections['all'];
+  extraSections?: Sections['all'];
   bestSyllabus: string;
   setPlannerSection: (searchQuery: SearchQuery, section: string) => void;
   grades: GenericFetchedData<Grades>;
@@ -370,6 +371,10 @@ export default function PlannerCard(props: PlannerCardProps) {
 
   //appease the typescript gods
   const sections = props.sections;
+  const extraSections = (props.extraSections ?? []).filter((section) =>
+    /^[23678]/.test(section.section_number),
+  );
+
   const canOpenSections =
     typeof sections !== 'undefined' && sections.length !== 0;
   const canOpenGrades =
@@ -570,6 +575,19 @@ export default function PlannerCard(props: PlannerCardProps) {
                     bestSyllabus={props.bestSyllabus}
                     course={props.query}
                     lastRow={index === sections.length - 1}
+                    setPlannerSection={props.setPlannerSection}
+                    selectedSections={props.selectedSections}
+                    openConflictMessage={props.openConflictMessage}
+                    hasMultipleDateRanges={hasMultipleDateRanges}
+                  />
+                ))}
+                {extraSections.map((section, index) => (
+                  <SectionTableRow
+                    key={section.section_number}
+                    data={section}
+                    bestSyllabus={props.bestSyllabus}
+                    course={props.query}
+                    lastRow={index === extraSections.length - 1}
                     setPlannerSection={props.setPlannerSection}
                     selectedSections={props.selectedSections}
                     openConflictMessage={props.openConflictMessage}

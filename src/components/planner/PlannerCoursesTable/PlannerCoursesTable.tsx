@@ -54,6 +54,8 @@ export default function PlannerCoursesTable() {
     setOpenConflictMessage(false);
   };
 
+  console.log(sections);
+
   return (
     <>
       <Typography variant="h2" className="leading-tight text-3xl font-bold p-4">
@@ -66,6 +68,8 @@ export default function PlannerCoursesTable() {
       <div className="flex flex-col gap-4 mb-4 sm:mb-0">
         {planner.map((query, index) => {
           const sectionData = sections[searchQueryLabel(removeSection(query))];
+          const extraSectionData =
+            sections[searchQueryLabel(convertToCourseOnly(query))];
 
           const allSections =
             typeof sectionData !== 'undefined' &&
@@ -73,7 +77,7 @@ export default function PlannerCoursesTable() {
             Array.isArray(sectionData.data.all)
               ? sectionData.data.all
               : [];
-
+          console.log(query, allSections);
           const bestSyllabusUri = allSections
             .filter((s) => !!s.syllabus_uri && !!s.academic_session?.start_date)
             .sort(
@@ -90,6 +94,12 @@ export default function PlannerCoursesTable() {
                 typeof sectionData !== 'undefined' &&
                 sectionData.message === 'success'
                   ? sectionData.data.latest
+                  : undefined
+              }
+              extraSections={
+                typeof extraSectionData !== 'undefined' &&
+                extraSectionData.message === 'success'
+                  ? extraSectionData.data.latest
                   : undefined
               }
               bestSyllabus={bestSyllabusUri}
