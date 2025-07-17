@@ -121,7 +121,9 @@ export function searchQueryEqual(
 }
 
 export function decodeSearchQueryLabel(encodedSearchTerm: string): SearchQuery {
-  const encodedSearchTermParts = encodedSearchTerm.split(' ');
+  const encodedSearchTermParts = decodeURIComponent(encodedSearchTerm)
+    .replaceAll('+', ' ')
+    .split(' ');
   // Does it start with prefix
   if (/^([A-Z]{2,4})$/.test(encodedSearchTermParts[0])) {
     // If it is just the prefix, return that
