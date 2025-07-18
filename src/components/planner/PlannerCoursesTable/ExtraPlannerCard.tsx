@@ -2,7 +2,6 @@
 
 import BarChartIcon from '@mui/icons-material/BarChart';
 import BookIcon from '@mui/icons-material/Book';
-import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import EventIcon from '@mui/icons-material/Event';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
@@ -25,20 +24,11 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
-import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
-import type { Grades } from '@/modules/fetchGrades';
-import type { RMP } from '@/modules/fetchRmp';
 import type { Sections } from '@/modules/fetchSections';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
-  convertToCourseOnly,
-  convertToProfOnly,
-  removeSection,
   type SearchQuery,
-  searchQueryLabel,
   type SearchQueryMultiSection,
   sectionCanOverlap,
 } from '@/types/SearchQuery';
@@ -204,7 +194,7 @@ function parseMeeting(meeting: Sections['all'][number]['meetings'][number]) {
   return [schedule, location, meeting.location.map_uri];
 }
 
-type SectionTableRowProps = {
+type ExtraSectionTableRowProps = {
   data: Sections['all'][number];
   bestSyllabus: string;
   course: SearchQueryMultiSection;
@@ -215,7 +205,7 @@ type SectionTableRowProps = {
   openConflictMessage: () => void;
 };
 
-function SectionTableRow(props: SectionTableRowProps) {
+function ExtraSectionTableRow(props: ExtraSectionTableRowProps) {
   const isSelected =
     props.course.sectionNumbers?.includes(props.data.section_number) ?? false;
   let syllabusToShow = props.data.syllabus_uri ?? props.bestSyllabus;
@@ -353,11 +343,9 @@ function MeetingChip(props: {
 
 type PlannerCardProps = {
   query: SearchQueryMultiSection;
-  extraSections?: Sections['all'];
+  extraSections: Sections['all'];
   bestSyllabus: string;
   setPlannerSection: (searchQuery: SearchQuery, section: string) => void;
-  grades: GenericFetchedData<Grades>;
-  rmp: GenericFetchedData<RMP>;
   removeFromPlanner: () => void;
   selectedSections: Sections['all'];
   openConflictMessage: () => void;
@@ -375,17 +363,16 @@ export default function ExtraPlannerCard(props: PlannerCardProps) {
 
   const canOpenSections =
     typeof extraSections !== 'undefined' && extraSections.length !== 0;
-  
+
   function handleOpen() {
-    if (
-      canOpenSections
-    ) {
+    if (canOpenSections) {
       setOpen(!open);
     }
   }
 
   const hasMultipleDateRanges =
-    typeof props.extraSections !== 'undefined' && props.extraSections.length >= 1
+    typeof props.extraSections !== 'undefined' &&
+    props.extraSections.length >= 1
       ? props.extraSections.some(
           (section) =>
             section.meetings[0].start_date !==
@@ -416,21 +403,21 @@ export default function ExtraPlannerCard(props: PlannerCardProps) {
       >
         {/* Left-side Content */}
         <Tooltip
-        title={`${open ? 'Minimize' : 'Expand'} Supplemental Sections`}
-        placement="top"
+          title={`${open ? 'Minimize' : 'Expand'} Supplemental Sections`}
+          placement="top"
         >
-        <IconButton
+          <IconButton
             aria-label="expand row"
             size="medium"
             onClick={(e) => {
-            e.stopPropagation(); // prevents double opening/closing
-            handleOpen();
+              e.stopPropagation(); // prevents double opening/closing
+              handleOpen();
             }}
             disabled={!canOpenSections}
             className={'transition-transform' + (open ? ' rotate-90' : '')}
-        >
+          >
             <KeyboardArrowIcon fontSize="inherit" />
-        </IconButton>
+          </IconButton>
         </Tooltip>
         <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit grow">
           <Tooltip
@@ -441,7 +428,7 @@ export default function ExtraPlannerCard(props: PlannerCardProps) {
             }
             placement="top"
           >
-            <span>{"Lab/Exam Section"}</span>
+            <span>{'Lab/Exam Section'}</span>
           </Tooltip>
         </Typography>
         <MeetingChip
@@ -457,11 +444,7 @@ export default function ExtraPlannerCard(props: PlannerCardProps) {
       </div>
 
       {canOpenSections && (
-        <Collapse
-          in={open}
-          timeout="auto"
-          unmountOnExit
-        >
+        <Collapse in={open} timeout="auto" unmountOnExit>
           <TableContainer className="rounded-t-none">
             <Table>
               <TableHead>
@@ -471,7 +454,7 @@ export default function ExtraPlannerCard(props: PlannerCardProps) {
               </TableHead>
               <TableBody>
                 {extraSections.map((section, index) => (
-                  <SectionTableRow
+                  <ExtraSectionTableRow
                     key={section.section_number}
                     data={section}
                     bestSyllabus={props.bestSyllabus}

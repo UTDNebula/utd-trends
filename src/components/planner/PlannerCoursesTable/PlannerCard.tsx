@@ -590,8 +590,6 @@ export default function PlannerCard(props: PlannerCardProps) {
             extraSections={extraSections}
             bestSyllabus={props.bestSyllabus}
             setPlannerSection={props.setPlannerSection}
-            grades={props.grades}
-            rmp={props.rmp}
             removeFromPlanner={props.removeFromPlanner}
             selectedSections={props.selectedSections}
             openConflictMessage={props.openConflictMessage}

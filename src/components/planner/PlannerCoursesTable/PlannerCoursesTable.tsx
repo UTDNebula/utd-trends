@@ -54,7 +54,7 @@ export default function PlannerCoursesTable() {
     setOpenConflictMessage(false);
   };
 
-  console.log(sections);
+  // console.log(sections);
 
   return (
     <>
@@ -77,7 +77,7 @@ export default function PlannerCoursesTable() {
             Array.isArray(sectionData.data.all)
               ? sectionData.data.all
               : [];
-          console.log(query, allSections);
+          // console.log(query, allSections);
           const bestSyllabusUri = allSections
             .filter((s) => !!s.syllabus_uri && !!s.academic_session?.start_date)
             .sort(
