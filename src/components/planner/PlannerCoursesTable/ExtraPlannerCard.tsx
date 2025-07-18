@@ -2,7 +2,6 @@
 
 import BarChartIcon from '@mui/icons-material/BarChart';
 import BookIcon from '@mui/icons-material/Book';
-import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import EventIcon from '@mui/icons-material/Event';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
@@ -25,21 +24,11 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
-import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
-import ExtraPlannerCard from '@/components/planner/PlannerCoursesTable/ExtraPlannerCard';
-import type { Grades } from '@/modules/fetchGrades';
-import type { RMP } from '@/modules/fetchRmp';
 import type { Sections } from '@/modules/fetchSections';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
-  convertToCourseOnly,
-  convertToProfOnly,
-  removeSection,
   type SearchQuery,
-  searchQueryLabel,
   type SearchQueryMultiSection,
   sectionCanOverlap,
 } from '@/types/SearchQuery';
@@ -205,7 +194,7 @@ function parseMeeting(meeting: Sections['all'][number]['meetings'][number]) {
   return [schedule, location, meeting.location.map_uri];
 }
 
-type SectionTableRowProps = {
+type ExtraSectionTableRowProps = {
   data: Sections['all'][number];
   bestSyllabus: string;
   course: SearchQueryMultiSection;
@@ -216,7 +205,7 @@ type SectionTableRowProps = {
   openConflictMessage: () => void;
 };
 
-function SectionTableRow(props: SectionTableRowProps) {
+function ExtraSectionTableRow(props: ExtraSectionTableRowProps) {
   const isSelected =
     props.course.sectionNumbers?.includes(props.data.section_number) ?? false;
   let syllabusToShow = props.data.syllabus_uri ?? props.bestSyllabus;
@@ -354,12 +343,9 @@ function MeetingChip(props: {
 
 type PlannerCardProps = {
   query: SearchQueryMultiSection;
-  sections?: Sections['all'];
-  extraSections?: Sections['all'];
+  extraSections: Sections['all'];
   bestSyllabus: string;
   setPlannerSection: (searchQuery: SearchQuery, section: string) => void;
-  grades: GenericFetchedData<Grades>;
-  rmp: GenericFetchedData<RMP>;
   removeFromPlanner: () => void;
   selectedSections: Sections['all'];
   openConflictMessage: () => void;
@@ -367,49 +353,32 @@ type PlannerCardProps = {
   courseName: string | undefined;
 };
 
-export default function PlannerCard(props: PlannerCardProps) {
+export default function ExtraPlannerCard(props: PlannerCardProps) {
   const [open, setOpen] = useState(false);
 
   //appease the typescript gods
-  const sections = props.sections;
   const extraSections = (props.extraSections ?? []).filter((section) =>
     /^[23678]/.test(section.section_number),
   );
 
   const canOpenSections =
-    typeof sections !== 'undefined' && sections.length !== 0;
-  const canOpenGrades =
-    !(
-      typeof props.grades === 'undefined' || props.grades.message !== 'success'
-    ) || !(typeof props.rmp === 'undefined' || props.rmp.message === 'success');
-  const [whichOpen, setWhichOpen] = useState<'sections' | 'grades' | null>(
-    canOpenSections ? 'sections' : canOpenGrades ? 'grades' : null,
-  );
-  useEffect(() => {
-    setWhichOpen((prev) => {
-      if (prev === null) {
-        return canOpenSections ? 'sections' : canOpenGrades ? 'grades' : null;
-      }
-      return prev;
-    });
-  }, [canOpenSections, canOpenGrades]);
+    typeof extraSections !== 'undefined' && extraSections.length !== 0;
+
   function handleOpen() {
-    if (
-      (whichOpen === 'sections' && canOpenSections) ||
-      (whichOpen === 'grades' && canOpenGrades)
-    ) {
+    if (canOpenSections) {
       setOpen(!open);
     }
   }
 
   const hasMultipleDateRanges =
-    typeof props.sections !== 'undefined' && props.sections.length >= 1
-      ? props.sections.some(
+    typeof props.extraSections !== 'undefined' &&
+    props.extraSections.length >= 1
+      ? props.extraSections.some(
           (section) =>
             section.meetings[0].start_date !==
-              props.sections![0].meetings[0].start_date ||
+              props.extraSections![0].meetings[0].start_date ||
             section.meetings[0].end_date !==
-              props.sections![0].meetings[0].end_date,
+              props.extraSections![0].meetings[0].end_date,
         )
       : false;
 
@@ -429,79 +398,27 @@ export default function PlannerCard(props: PlannerCardProps) {
         }}
         className={
           'p-4 flex items-center gap-4' +
-          (canOpenSections || canOpenGrades ? ' cursor-pointer' : '')
+          (canOpenSections ? ' cursor-pointer' : '')
         }
       >
         {/* Left-side Content */}
-        <div className="flex items-center">
-          <Tooltip
-            title={`${open ? 'Minimize' : 'Expand'} ${whichOpen === 'sections' ? 'Sections' : 'Grades and RMP'}`}
-            placement="top"
+        <Tooltip
+          title={`${open ? 'Minimize' : 'Expand'} Supplemental Sections`}
+          placement="top"
+        >
+          <IconButton
+            aria-label="expand row"
+            size="medium"
+            onClick={(e) => {
+              e.stopPropagation(); // prevents double opening/closing
+              handleOpen();
+            }}
+            disabled={!canOpenSections}
+            className={'transition-transform' + (open ? ' rotate-90' : '')}
           >
-            <IconButton
-              aria-label="expand row"
-              size="medium"
-              onClick={(e) => {
-                e.stopPropagation(); // prevents double opening/closing
-                handleOpen();
-              }}
-              disabled={!canOpenSections && !canOpenGrades}
-              className={'transition-transform' + (open ? ' rotate-90' : '')}
-            >
-              <KeyboardArrowIcon fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={'Remove from Planner'} placement="top">
-            <Checkbox
-              checked={true /*inPlanner?*/}
-              onClick={(e) => {
-                e.stopPropagation();
-                props.removeFromPlanner();
-              }}
-              icon={<BookOutlinedIcon />}
-              checkedIcon={<BookIcon />}
-              sx={{
-                '&.Mui-checked': {
-                  color: props.color.fill,
-                },
-              }}
-            />
-          </Tooltip>
-          <Tooltip title="Switch Opening Sections/Grades" placement="top">
-            <ToggleButtonGroup
-              value={whichOpen}
-              exclusive
-              onChange={(_, newValue) => {
-                if (newValue === 'sections' && canOpenSections) {
-                  setWhichOpen('sections');
-                }
-                if (newValue === 'grades' && canOpenGrades) {
-                  setWhichOpen('grades');
-                }
-                setOpen(true);
-              }}
-              size="small"
-              aria-label="dropdown switch"
-              onClick={(e) => e.stopPropagation()}
-              className="ml-2"
-            >
-              <ToggleButton
-                value="sections"
-                aria-label="sections"
-                disabled={!canOpenSections}
-              >
-                <EventIcon />
-              </ToggleButton>
-              <ToggleButton
-                value="grades"
-                aria-label="grades and rmp"
-                disabled={!canOpenGrades}
-              >
-                <BarChartIcon />
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Tooltip>
-        </div>
+            <KeyboardArrowIcon fontSize="inherit" />
+          </IconButton>
+        </Tooltip>
         <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit grow">
           <Tooltip
             title={
@@ -511,42 +428,13 @@ export default function PlannerCard(props: PlannerCardProps) {
             }
             placement="top"
           >
-            <span>{searchQueryLabel(convertToCourseOnly(props.query))}</span>
+            <span>{'Lab/Exam Section'}</span>
           </Tooltip>
-          {typeof props.query.profFirst !== 'undefined' &&
-            typeof props.query.profLast !== 'undefined' &&
-            typeof props.query.prefix !== 'undefined' &&
-            typeof props.query.number !== 'undefined' && <span> </span>}
-          <Tooltip
-            title={
-              typeof props.query.profFirst !== 'undefined' &&
-              typeof props.query.profLast !== 'undefined' &&
-              (props.rmp !== undefined &&
-              props.rmp.message === 'success' &&
-              props.rmp.data.teacherRatingTags.length > 0
-                ? 'Tags: ' +
-                  props.rmp.data.teacherRatingTags
-                    .sort((a, b) => b.tagCount - a.tagCount)
-                    .slice(0, 3)
-                    .map((tag) => tag.tagName)
-                    .join(', ')
-                : 'No Tags Available')
-            }
-            placement="top"
-          >
-            <span>{searchQueryLabel(convertToProfOnly(props.query))}</span>
-          </Tooltip>
-          {((typeof props.query.profFirst === 'undefined' &&
-            typeof props.query.profLast === 'undefined') ||
-            (typeof props.query.prefix === 'undefined' &&
-              typeof props.query.number === 'undefined')) && (
-            <span> (Overall)</span>
-          )}
         </Typography>
         <MeetingChip
           color={props.color}
           meetings={
-            sections?.find(
+            extraSections?.find(
               (section) =>
                 !sectionCanOverlap(section.section_number) &&
                 props.query.sectionNumbers?.includes(section.section_number),
@@ -556,11 +444,7 @@ export default function PlannerCard(props: PlannerCardProps) {
       </div>
 
       {canOpenSections && (
-        <Collapse
-          in={open && whichOpen === 'sections'}
-          timeout="auto"
-          unmountOnExit
-        >
+        <Collapse in={open} timeout="auto" unmountOnExit>
           <TableContainer className="rounded-t-none">
             <Table>
               <TableHead>
@@ -569,13 +453,13 @@ export default function PlannerCard(props: PlannerCardProps) {
                 />
               </TableHead>
               <TableBody>
-                {sections.map((section, index) => (
-                  <SectionTableRow
+                {extraSections.map((section, index) => (
+                  <ExtraSectionTableRow
                     key={section.section_number}
                     data={section}
                     bestSyllabus={props.bestSyllabus}
                     course={props.query}
-                    lastRow={index === sections.length - 1}
+                    lastRow={index === extraSections.length - 1}
                     setPlannerSection={props.setPlannerSection}
                     selectedSections={props.selectedSections}
                     openConflictMessage={props.openConflictMessage}
@@ -585,34 +469,6 @@ export default function PlannerCard(props: PlannerCardProps) {
               </TableBody>
             </Table>
           </TableContainer>
-          <ExtraPlannerCard
-            query={props.query}
-            extraSections={extraSections}
-            bestSyllabus={props.bestSyllabus}
-            setPlannerSection={props.setPlannerSection}
-            removeFromPlanner={props.removeFromPlanner}
-            selectedSections={props.selectedSections}
-            openConflictMessage={props.openConflictMessage}
-            color={props.color}
-            courseName={props.courseName}
-          />
-        </Collapse>
-      )}
-
-      {canOpenGrades && (
-        <Collapse
-          in={open && whichOpen === 'grades'}
-          timeout="auto"
-          unmountOnExit
-        >
-          <div className="p-2 md:p-4 flex flex-col gap-2">
-            <SingleGradesInfo
-              course={removeSection(props.query)}
-              grades={props.grades}
-              gradesToUse="unfiltered"
-            />
-            <SingleProfInfo rmp={props.rmp} />
-          </div>
         </Collapse>
       )}
     </Box>
