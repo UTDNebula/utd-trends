@@ -43,7 +43,7 @@ export async function generateMetadata({
           queries.slice(-1)) +
       " on Nebula Labs's data analytics platform to help you make informed decisions about your coursework with UT Dallas grade and Rate My Professors data.";
   }
-  console.log(title);
+
   return {
     title: 'Results' + title,
     description: description,
