@@ -7,7 +7,12 @@ import DashboardEmpty from '@/components/dashboard/DashboardEmpty/DashboardEmpty
 import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import Filters, { LoadingFilters } from '@/components/search/Filters/Filters';
 import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
-import { decodeSearchQueryLabel } from '@/types/SearchQuery';
+import {
+  decodeSearchQueryLabel,
+  type SearchQuery,
+  searchQueryLabel,
+  searchQuerySort,
+} from '@/types/SearchQuery';
 
 import Right, { LoadingRight } from './Right';
 import ServerLeft from './ServerLeft';
@@ -25,12 +30,14 @@ export async function generateMetadata({
 
   let searchTerms = (await searchParams).searchTerms;
   if (Array.isArray(searchTerms)) {
+    // Take first if duplicated queries
     searchTerms = searchTerms[0];
   }
+  let decodedSearchTerms: SearchQuery[] = [];
   if (typeof searchTerms !== 'undefined') {
     const queries = searchTerms.split(',');
-    const firstIsCourse =
-      typeof decodeSearchQueryLabel(queries[0]).prefix !== 'undefined';
+    decodedSearchTerms = queries.map(decodeSearchQueryLabel);
+    const firstIsCourse = typeof decodedSearchTerms[0].prefix !== 'undefined';
     title = ' - ' + queries.join(', ');
     description =
       'Choose the perfect classes for you: Compare ' +
@@ -49,6 +56,17 @@ export async function generateMetadata({
     openGraph: {
       url: 'https://trends.utdnebula.com/dashboard',
     },
+    alternates: {
+      canonical:
+        'https://trends.utdnebula.com/dashboard' +
+        (decodedSearchTerms.length
+          ? '?searchTerms=' +
+            decodedSearchTerms
+              .toSorted(searchQuerySort)
+              .map((term) => searchQueryLabel(term).split(' ').join('+'))
+              .join(',')
+          : ''),
+    },
   };
 }
 
@@ -58,6 +76,7 @@ export async function generateMetadata({
 export default async function Page({ searchParams }: Props) {
   let searchTerms = (await searchParams).searchTerms;
   if (Array.isArray(searchTerms)) {
+    // Take first if duplicated queries
     searchTerms = searchTerms[0];
   }
   if (typeof searchTerms === 'undefined') {
