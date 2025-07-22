@@ -269,10 +269,12 @@ export function SharedStateProvider({
   function setPlannerSection(query: SearchQuery, section: string) {
     setPlanner((prev: SearchQueryMultiSection[]) =>
       prev.map((course) => {
+        // if no other section is selected for a course-prof, select this one
         if (searchQueryEqual(removeSection(course), removeSection(query))) {
           if (typeof course.sectionNumbers === 'undefined') {
             return { ...course, sectionNumbers: [section] };
           }
+          // unselect section
           if (course.sectionNumbers.includes(section)) {
             return {
               ...course,
