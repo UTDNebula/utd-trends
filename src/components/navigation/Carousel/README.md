@@ -3,24 +3,27 @@ It uses the `framer-motion` library to provide sliding carousel animations when 
 
 ### Props Table
 
-| Prop            | Type               | Description                                                    | Required |
-| :-------------- | :----------------- | :------------------------------------------------------------- | -------- |
-| `names`         | `string, string[]` | The name(s) of the children element(s)                         | Yes      |
-| `children`      | `React.ReactNode`  | The element(s) that will be rendered in the carousel           | Yes      |
-| `compareLength` | `number`           | The number of element(s) that will be rendered in the carousel | Yes      |
+| Prop       | Type              | Description                                                 | Required |
+| :--------- | :---------------- | :---------------------------------------------------------- | -------- |
+| `names`    | `React.ReactNode` | The name(s) of the tabs, can be strings or react components | Yes      |
+| `children` | `React.ReactNode` | The element(s) that will be rendered in the carousel        | Yes      |
 
 ### Carousel Example
 
 ```tsx
-<Carousel names = { ['Tab 1', 'Tab 2']}>
-    <div > Content for Tab 1 < /div>
+import { useSharedState } from '@/app/SharedStateProvider';
+const ShardStateSetter = () => {
+  const { addToCompare } = useSharedState();
+  React.useEffect(() => {
+    addToCompare({ profFirst: 'John', profLast: 'Cole' });
+  }, []);
+  return null;
+};
+<>
+  <ShardStateSetter />
+  <Carousel names={['Tab 1', 'Tab 2']}>
+    <div>Content for Tab 1</div>
     <div>Content for Tab 2</div>
-</Carousel>
-```
-
-```tsx
-<Carousel names={['Tab 1', 'Tab 2']} compareLength={1}>
-  <div>Content for Tab 1</div>
-  <div>Content for Tab 2</div>
-</Carousel>
+  </Carousel>
+</>;
 ```

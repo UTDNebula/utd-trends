@@ -86,7 +86,7 @@ export function SharedStateProvider({
     [key: string]: GenericFetchedData<Grades>;
   }>({});
   const compareGradesRef = useRef(compareGrades);
-  //Uupdate ref for setGrades
+  //Update ref for setGrades
   const setCompareGrades = useCallback(
     (value: SetterValue<{ [key: string]: GenericFetchedData<Grades> }>) => {
       internalSetCompareGrades((prev) => {

@@ -5,6 +5,9 @@ const dotenv = require('dotenv').config({ path: __dirname + '/.env' });
 module.exports = {
   pagePerSection: true,
   title: 'UTD Trends Documentation',
+  styleguideComponents: {
+    Wrapper: path.join(__dirname, './src/components/DocsWrapper.tsx'),
+  },
   template: {
     links: [
       {
