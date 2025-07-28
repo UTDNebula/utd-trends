@@ -35,6 +35,7 @@ export async function generateMetadata({
   }
   let decodedSearchTerms: SearchQuery[] = [];
   if (typeof searchTerms !== 'undefined') {
+    searchTerms = decodeURIComponent(searchTerms).replaceAll('+', ' ');
     const queries = searchTerms.split(',');
     decodedSearchTerms = queries.map(decodeSearchQueryLabel);
     const firstIsCourse = typeof decodedSearchTerms[0].prefix !== 'undefined';
@@ -89,6 +90,7 @@ export default async function Page({ searchParams }: Props) {
       </>
     );
   }
+  searchTerms = decodeURIComponent(searchTerms);
 
   const decodedSearchTerms = searchTerms.split(',').map(decodeSearchQueryLabel);
   const courses = decodedSearchTerms.filter(
