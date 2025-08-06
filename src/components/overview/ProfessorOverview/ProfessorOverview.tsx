@@ -3,7 +3,7 @@
 import { Skeleton } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import SingleGradesInfo, {
   LoadingSingleGradesInfo,
@@ -49,8 +49,18 @@ export default function ProfessorOverview({
   rmp,
 }: Props) {
   const [src, setSrc] = useState(
-    profData.message === 'success' ? profData.data.image_uri : '',
+    profData.message === 'success' && profData.data.image_uri !== ''
+      ? profData.data.image_uri
+      : fallbackSrc,
   );
+
+  useEffect(() => {
+    setSrc(
+      profData.message === 'success' && profData.data.image_uri !== ''
+        ? profData.data.image_uri
+        : fallbackSrc,
+    );
+  }, [profData]); // sets the image instantly without reloading the page
 
   return (
     <div className="flex flex-col gap-2">
