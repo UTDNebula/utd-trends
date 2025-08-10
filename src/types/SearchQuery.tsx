@@ -125,7 +125,13 @@ export function decodeSearchQueryLabel(encodedSearchTerm: string): SearchQuery {
     .replaceAll('+', ' ')
     .split(' ');
   // Does it start with prefix
-  if (/^([A-Z]{2,4})$/.test(encodedSearchTermParts[0])) {
+  if (
+    /^([A-Z]{2,4})$/.test(encodedSearchTermParts[0]) &&
+    // If it has only 2 parts, make sure the second is a course number
+    // Otherwise the name SV Randall will decode as { prefix: 'SV', profFirst: '', profLast: 'Randall' }
+    (encodedSearchTermParts.length != 2 ||
+      /^([0-9A-Z]{4})$/.test(encodedSearchTermParts[1]))
+  ) {
     // If it is just the prefix, return that
     if (encodedSearchTermParts.length == 1) {
       return { prefix: encodedSearchTermParts[0] };
