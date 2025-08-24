@@ -1,3 +1,4 @@
+import professor_to_alias from '@/data/professor_to_alias.json';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery } from '@/types/SearchQuery';
 
@@ -11,58 +12,72 @@ const HEADERS = {
   'Content-Type': 'application/json',
   Referer: 'https://www.ratemyprofessors.com/',
 };
-const PROFESSOR_SEARCH_QUERY = {
-  query: `
-    query TeacherSearchQuery($query: TeacherSearchQuery!) {
-      newSearch {
-        teachers(query: $query) {
-          edges {
-            node {
-              id
-              legacyId
-              firstName
-              lastName
-              school {
+const OVERWRITES = professor_to_alias as { [key: string]: string };
+
+function buildProfessorSearchQuery(names: string[]) {
+  // Generate the query string with N aliased queries
+  const queries = names
+    .map((_, i) => {
+      return `
+        prof${i}: newSearch {
+          teachers(query: $query${i}) {
+            edges {
+              node {
                 id
-                name
-              }
-              department
-              avgRating
-              numRatings
-              avgDifficulty
-              wouldTakeAgainPercent
-              teacherRatingTags {
-                tagName
-                tagCount
-              }
-              ratingsDistribution {
-                total
-                r1
-                r2
-                r3
-                r4
-                r5
+                legacyId
+                firstName
+                lastName
+                school { id name }
+                department
+                avgRating
+                numRatings
+                avgDifficulty
+                wouldTakeAgainPercent
+                teacherRatingTags { tagName tagCount }
+                ratingsDistribution { total r1 r2 r3 r4 r5 }
               }
             }
           }
         }
-      }
-    }
-  `,
-  variables: {
-    query: {
-      text: '',
-      schoolID: btoa('School-' + SCHOOL_ID),
-    },
-  },
-};
+      `;
+    })
+    .join('\n');
 
-function getGraphQlUrlProp(name: string) {
-  PROFESSOR_SEARCH_QUERY.variables.query.text = name;
+  // Build the variable definitions
+  const varDefs = names
+    .map((_, i) => `$query${i}: TeacherSearchQuery!`)
+    .join(', ');
+
+  // Build the final GraphQL document
+  const query = `
+    query TeacherSearchQuery(${varDefs}) {
+      ${queries}
+    }
+  `;
+
+  // Build the variables object
+  const variables = Object.fromEntries(
+    names.map((name, i) => [
+      `query${i}`,
+      {
+        text: name,
+        schoolID: btoa('School-' + SCHOOL_ID),
+      },
+    ]),
+  );
+
+  return {
+    query,
+    variables,
+  };
+}
+
+function getGraphQlUrlProp(names: string[]) {
+  const query = buildProfessorSearchQuery(names);
   return {
     method: 'POST',
     headers: HEADERS,
-    body: JSON.stringify(PROFESSOR_SEARCH_QUERY),
+    body: JSON.stringify(query),
     next: { revalidate: 3600 },
   };
 }
@@ -95,6 +110,29 @@ export interface RMP {
   };
 }
 
+type TeacherSearchResponse = {
+  teachers?: {
+    edges: { node: RMP }[];
+  };
+};
+
+function checkProfData(
+  data: TeacherSearchResponse | null | undefined,
+  checkFirst: string,
+  checkLast: string,
+) {
+  if (!data?.teachers?.edges) {
+    return [];
+  }
+
+  return data.teachers.edges.filter(
+    (prof: { node: RMP }) =>
+      prof.node.school.name === SCHOOL_NAME &&
+      prof.node.firstName.includes(checkFirst) &&
+      prof.node.lastName.includes(checkLast),
+  );
+}
+
 export default async function fetchRmp(
   query: SearchQuery,
 ): Promise<GenericFetchedData<RMP>> {
@@ -105,37 +143,50 @@ export default async function fetchRmp(
     ) {
       throw new Error('Incorrect query present');
     }
+
     const profFirst = query.profFirst;
     const profLast = query.profLast;
 
     const singleProfFirst = profFirst.split(' ')[0];
     const name = singleProfFirst + ' ' + profLast;
 
-    // create fetch object for professor
-    const graphQlUrlProp = getGraphQlUrlProp(name);
+    // Check for alias
+    const aliasName = OVERWRITES[profFirst + ' ' + profLast];
 
-    // fetch professor info by name with graphQL
+    // Create fetch object for professor
+    const graphQlUrlProp = getGraphQlUrlProp(
+      aliasName ? [name, aliasName] : [name],
+    );
+
+    // Fetch professor info by name with graphQL
     const res = await fetch(RMP_GRAPHQL_URL, graphQlUrlProp);
 
+    // Check data
     const data = await res.json();
-
-    if (
-      data == null ||
-      !Object.hasOwn(data, 'data') ||
-      !Object.hasOwn(data.data, 'newSearch') ||
-      !Object.hasOwn(data.data.newSearch, 'teachers') ||
-      !Object.hasOwn(data.data.newSearch.teachers, 'edges')
-    ) {
+    if (!data?.data?.prof0) {
       throw new Error('Data for professor not found');
     }
-    //Remove profs not at UTD and with bad name match
-    const professors = data.data.newSearch.teachers.edges.filter(
-      (prof: { node: RMP }) =>
-        prof.node.school.name === SCHOOL_NAME &&
-        prof.node.firstName.includes(singleProfFirst) &&
-        prof.node.lastName.includes(profLast),
+
+    // Remove profs not at UTD and with bad name match
+    const aliasNameSplit = aliasName ? aliasName.split(' ') : '';
+    const professors = checkProfData(
+      data.data.prof0,
+      singleProfFirst,
+      profLast,
+    ).concat(
+      aliasName && data?.data?.prof1
+        ? checkProfData(
+            data.data.prof1,
+            aliasNameSplit[0],
+            aliasNameSplit[aliasNameSplit.length - 1],
+          )
+        : [],
     );
-    //Pick prof instance with most ratings
+    if (!professors.length) {
+      throw new Error('Data for professor not found');
+    }
+
+    // Pick prof instance with most ratings
     let maxRatingsProfessor = professors[0];
     for (let i = 1; i < professors.length; i++) {
       if (professors[i].node.numRatings > maxRatingsProfessor.node.numRatings) {

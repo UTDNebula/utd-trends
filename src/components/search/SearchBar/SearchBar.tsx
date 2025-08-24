@@ -21,12 +21,17 @@ import React, {
 } from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
+import untyped_professor_to_alias from '@/data/professor_to_alias.json';
 import {
   decodeSearchQueryLabel,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
 } from '@/types/SearchQuery';
+
+const professor_to_alias = untyped_professor_to_alias as {
+  [key: string]: string;
+};
 
 interface LoadingSearchBarProps {
   className?: string;
@@ -200,7 +205,7 @@ export default function SearchBar(props: Props) {
         //remove currently chosen values
         const filtered: SearchQuery[] = data.data.filter(
           (item: SearchQuery) =>
-            !value.some((el) => searchQueryEqual(el, item)),
+            value.findIndex((el) => searchQueryEqual(el, item)) === -1,
         );
         //add to chosen values if only one option and space
         if (
@@ -410,6 +415,7 @@ export default function SearchBar(props: Props) {
             subtext = option.subtitle;
           } else {
             text = searchQueryLabel(option);
+            subtext = professor_to_alias[searchQueryLabel(option)] ?? '';
           }
           //add spaces between prefix and course number
           const matches = match(
@@ -426,7 +432,22 @@ export default function SearchBar(props: Props) {
                 '$1 $2',
               ),
           );
+          const subTextMatches = match(
+            subtext ?? '',
+            inputValue
+              .replace(
+                //CS1200 -> CS 1200
+                /([a-zA-Z]{2,4})([0-9][0-9V]?[0-9]{0,2})/,
+                '$1 $2',
+              )
+              .replace(
+                //1200CS -> 1200 CS
+                /([0-9][0-9V][0-9]{2})([a-zA-Z]{1,4})/,
+                '$1 $2',
+              ),
+          );
           const parts = parse(text, matches);
+          const subtextParts = subtext ? parse(subtext, subTextMatches) : [];
           const { key, ...otherProps } = props;
           return (
             <li key={key} {...otherProps}>
@@ -445,7 +466,19 @@ export default function SearchBar(props: Props) {
                   ))}
                 </div>
                 {subtext && (
-                  <Typography variant="caption">{subtext}</Typography>
+                  <Typography variant="caption">
+                    {subtextParts.map((part, index) => (
+                      <span
+                        key={index}
+                        className={
+                          'whitespace-pre-wrap' +
+                          (part.highlight ? ' font-bold' : '')
+                        }
+                      >
+                        {part.text}
+                      </span>
+                    ))}
+                  </Typography>
                 )}
               </div>
             </li>
