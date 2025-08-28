@@ -3,8 +3,8 @@ export type SentimentLabel = 'positive' | 'negative' | 'neutral';
 
 export interface SentimentResult {
   sentiment: SentimentLabel;
-  score: number;        // -1..1
-  confidence: number;   // 0..1
+  score: number; // -1..1
+  confidence: number; // 0..1
   breakdown: {
     positive_words: string[];
     negative_words: string[];
@@ -13,31 +13,112 @@ export interface SentimentResult {
 }
 
 const POSITIVE_WORDS = [
-  'amazing','awesome','excellent','fantastic','great','good','wonderful',
-  'outstanding','brilliant','superb','helpful','clear','easy','love',
-  'best','perfect','incredible','recommended','enjoy','favorite',
-  'passionate','engaging','inspiring','thorough','organized','fair',
-  'understanding','patient','knowledgeable','respectful','caring',
-  'approachable','effective','interesting','fun','cool','nice'
+  'amazing',
+  'awesome',
+  'excellent',
+  'fantastic',
+  'great',
+  'good',
+  'wonderful',
+  'outstanding',
+  'brilliant',
+  'superb',
+  'helpful',
+  'clear',
+  'easy',
+  'love',
+  'best',
+  'perfect',
+  'incredible',
+  'recommended',
+  'enjoy',
+  'favorite',
+  'passionate',
+  'engaging',
+  'inspiring',
+  'thorough',
+  'organized',
+  'fair',
+  'understanding',
+  'patient',
+  'knowledgeable',
+  'respectful',
+  'caring',
+  'approachable',
+  'effective',
+  'interesting',
+  'fun',
+  'cool',
+  'nice',
 ];
 
 const NEGATIVE_WORDS = [
-  'awful','terrible','horrible','bad','worst','hate','boring',
-  'confusing','unclear','difficult','hard','impossible','unfair',
-  'rude','disrespectful','unhelpful','unprepared','disorganized',
-  'harsh','strict','mean','arrogant','condescending','frustrating',
-  'disappointing','waste','avoid','regret','struggled','failed',
-  'biased','unprofessional','lazy','careless','useless'
+  'awful',
+  'terrible',
+  'horrible',
+  'bad',
+  'worst',
+  'hate',
+  'boring',
+  'confusing',
+  'unclear',
+  'difficult',
+  'hard',
+  'impossible',
+  'unfair',
+  'rude',
+  'disrespectful',
+  'unhelpful',
+  'unprepared',
+  'disorganized',
+  'harsh',
+  'strict',
+  'mean',
+  'arrogant',
+  'condescending',
+  'frustrating',
+  'disappointing',
+  'waste',
+  'avoid',
+  'regret',
+  'struggled',
+  'failed',
+  'biased',
+  'unprofessional',
+  'lazy',
+  'careless',
+  'useless',
 ];
 
 const INTENSIFIERS: Record<string, number> = {
-  very: 1.5, extremely: 2.0, incredibly: 1.8, really: 1.3, so: 1.2,
-  absolutely: 1.7, totally: 1.4, completely: 1.6, quite: 1.1, rather: 1.1
+  very: 1.5,
+  extremely: 2.0,
+  incredibly: 1.8,
+  really: 1.3,
+  so: 1.2,
+  absolutely: 1.7,
+  totally: 1.4,
+  completely: 1.6,
+  quite: 1.1,
+  rather: 1.1,
 };
 
 const NEGATION_WORDS = [
-  'not','no','never','nothing','nowhere','nobody','none',
-  "don't","doesn't","didn't","won't","wouldn't","can't","couldn't","shouldn't"
+  'not',
+  'no',
+  'never',
+  'nothing',
+  'nowhere',
+  'nobody',
+  'none',
+  "don't",
+  "doesn't",
+  "didn't",
+  "won't",
+  "wouldn't",
+  "can't",
+  "couldn't",
+  "shouldn't",
 ];
 
 function preprocessText(text: string): string[] {
@@ -54,7 +135,7 @@ export function analyzeSingleComment(comment: string): SentimentResult {
       sentiment: 'neutral',
       score: 0,
       confidence: 0,
-      breakdown: { positive_words: [], negative_words: [], total_words: 0 }
+      breakdown: { positive_words: [], negative_words: [], total_words: 0 },
     };
   }
 
@@ -83,9 +164,15 @@ export function analyzeSingleComment(comment: string): SentimentResult {
     }
   }
 
-  const normalizedScore = Math.max(-1, Math.min(1, score / Math.sqrt(words.length)));
+  const normalizedScore = Math.max(
+    -1,
+    Math.min(1, score / Math.sqrt(words.length)),
+  );
   const totalSentimentWords = positiveMatches.length + negativeMatches.length;
-  const confidence = Math.min(1, totalSentimentWords / Math.max(5, words.length * 0.3));
+  const confidence = Math.min(
+    1,
+    totalSentimentWords / Math.max(5, words.length * 0.3),
+  );
 
   let sentiment: SentimentLabel = 'neutral';
   if (normalizedScore > 0.1) sentiment = 'positive';
@@ -98,22 +185,28 @@ export function analyzeSingleComment(comment: string): SentimentResult {
     breakdown: {
       positive_words: [...new Set(positiveMatches)],
       negative_words: [...new Set(negativeMatches)],
-      total_words: words.length
-    }
+      total_words: words.length,
+    },
   };
 }
 
 export function analyzeMany(comments: string[]) {
   const results = comments.map(analyzeSingleComment);
-  const avg = results.reduce((a, r) => a + r.score, 0) / Math.max(1, results.length);
-  const pos = results.filter(r => r.sentiment === 'positive').length;
-  const neg = results.filter(r => r.sentiment === 'negative').length;
+  const avg =
+    results.reduce((a, r) => a + r.score, 0) / Math.max(1, results.length);
+  const pos = results.filter((r) => r.sentiment === 'positive').length;
+  const neg = results.filter((r) => r.sentiment === 'negative').length;
   const neu = results.length - pos - neg;
 
   return {
     overall_score: Math.round(avg * 100) / 100,
     overall_label: avg > 0.1 ? 'positive' : avg < -0.1 ? 'negative' : 'neutral',
-    counts: { positive: pos, negative: neg, neutral: neu, total: results.length },
-    results
+    counts: {
+      positive: pos,
+      negative: neg,
+      neutral: neu,
+      total: results.length,
+    },
+    results,
   };
 }

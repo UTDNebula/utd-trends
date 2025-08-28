@@ -1,18 +1,21 @@
 // src/pages/api/professor-sentiment.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { analyzeSingleComment } from '../../modules/sentiment/sentiment';
 
 // --- helpers -----------------------------------------------------------------
 
 function decodeEntities(s: string) {
-  return s
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&#39;/g, "'")
-    .replace(/&quot;/g, '"')
-    // numeric entities like &#8212; (em dash)
-    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(parseInt(n, 10)));
+  return (
+    s
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&#39;/g, "'")
+      .replace(/&quot;/g, '"')
+      // numeric entities like &#8212; (em dash)
+      .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(parseInt(n, 10)))
+  );
 }
 
 // RMP dates look like "2025-03-06 19:36:52 +0000 UTC".
@@ -27,7 +30,7 @@ function parseRmpDate(dateStr?: string | null): Date | undefined {
   // Fallback: "YYYY-MM-DD HH:mm:ss +0000 UTC" -> ISO
   const m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/.exec(dateStr);
   if (m) {
-    const [_, Y, M, D, h, mnt, s] = m;
+    const [, Y, M, D, h, mnt, s] = m;
     const iso = `${Y}-${M}-${D}T${h}:${mnt}:${s}Z`;
     const d2 = new Date(iso);
     if (!Number.isNaN(d2.getTime())) return d2;
@@ -56,8 +59,8 @@ type ScraperResp = {
     firstName: string;
     lastName: string;
     numRatings: number;
-    avgRating?: number;                 // 1..5
-    wouldTakeAgainPercent?: number;     // 0..100
+    avgRating?: number; // 1..5
+    wouldTakeAgainPercent?: number; // 0..100
     teacherRatingTags?: { tagName: string; tagCount: number }[];
     ratings?: {
       edges?: {
@@ -65,8 +68,8 @@ type ScraperResp = {
           comment?: string | null;
           wouldTakeAgain?: number | null; // 1 | 0 | null
           date?: string | null;
-        }
-      }[]
+        };
+      }[];
     };
   };
 };
@@ -84,7 +87,12 @@ type Out =
         overall_label: 'positive' | 'negative' | 'neutral';
         blended_overall?: number;
         blended_label?: 'positive' | 'negative' | 'neutral';
-        counts: { positive: number; negative: number; neutral: number; total: number };
+        counts: {
+          positive: number;
+          negative: number;
+          neutral: number;
+          total: number;
+        };
         results: SentimentResult[];
         meta: {
           limit: number;
@@ -98,11 +106,16 @@ type Out =
 
 // --- route -------------------------------------------------------------------
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<Out>) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Out>,
+) {
   const { profFirst, profLast, limit, sinceMonths, blend } = req.query;
 
   if (typeof profFirst !== 'string' || typeof profLast !== 'string') {
-    res.status(400).json({ message: 'error', error: 'Missing profFirst/profLast' });
+    res
+      .status(400)
+      .json({ message: 'error', error: 'Missing profFirst/profLast' });
     return;
   }
 
@@ -117,11 +130,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     u.searchParams.set('profFirst', profFirst.split(' ')[0]); // scraper expects first token
     u.searchParams.set('profLast', profLast);
 
-    const r = await fetch(u.toString(), { headers: { accept: 'application/json' } });
+    const r = await fetch(u.toString(), {
+      headers: { accept: 'application/json' },
+    });
     const json: ScraperResp = await r.json();
 
     if (json.message !== 'success' || !json.data) {
-      res.status(404).json({ message: 'error', error: 'Professor not found or scraper failed' });
+      res
+        .status(404)
+        .json({
+          message: 'error',
+          error: 'Professor not found or scraper failed',
+        });
       return;
     }
 
@@ -131,40 +151,59 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
     const now = new Date();
     const cutoff = months
-      ? new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - months, now.getUTCDate()))
+      ? new Date(
+          Date.UTC(
+            now.getUTCFullYear(),
+            now.getUTCMonth() - months,
+            now.getUTCDate(),
+          ),
+        )
       : undefined;
 
     const edges = json.data.ratings?.edges ?? [];
     const items = edges
-      .map(e => {
+      .map((e) => {
         const raw = (e.node?.comment ?? '').trim();
         const comment = decodeEntities(raw).replace(/\s+/g, ' ').trim();
         const wouldTakeAgain = e.node?.wouldTakeAgain ?? null;
         const parsedDate = parseRmpDate(e.node?.date ?? undefined);
         return { comment, wouldTakeAgain, parsedDate };
       })
-      .filter(i => i.comment.length > 0)
-      .filter(i => (cutoff ? (i.parsedDate ? i.parsedDate >= cutoff : false) : true))
+      .filter((i) => i.comment.length > 0)
+      .filter((i) =>
+        cutoff ? (i.parsedDate ? i.parsedDate >= cutoff : false) : true,
+      )
       .slice(0, cap);
 
     // --- analyze comments ----------------------------------------------------
-    const analyzed: SentimentResult[] = items.map(i => analyzeSingleComment(i.comment));
+    const analyzed: SentimentResult[] = items.map((i) =>
+      analyzeSingleComment(i.comment),
+    );
 
     // Weight per comment: small tilt using wouldTakeAgain (±10%)
     const weighted: SentimentResult[] = analyzed.map((r, idx) => {
       const wta = items[idx].wouldTakeAgain;
       const factor = wta === 1 ? 1.1 : wta === 0 ? 0.9 : 1.0;
-      const newScore = Math.max(-1, Math.min(1, Math.round(r.score * factor * 100) / 100));
+      const newScore = Math.max(
+        -1,
+        Math.min(1, Math.round(r.score * factor * 100) / 100),
+      );
       return { ...r, score: newScore }; // keep label/confidence as-is (optional: recompute label if you want)
     });
 
     // --- aggregate -----------------------------------------------------------
-    const avg = weighted.reduce((a, r) => a + r.score, 0) / Math.max(1, weighted.length);
+    const avg =
+      weighted.reduce((a, r) => a + r.score, 0) / Math.max(1, weighted.length);
 
     // Tag-based negative nudge (uses RMP tags to bias overall slightly negative if community flags)
     const NEG_TAGS = new Set([
-      'Tough grader', 'Test heavy', 'Lots of homework', 'Graded by few things',
-      'Beware of pop quizzes', 'Tests are tough', 'Lecture heavy'
+      'Tough grader',
+      'Test heavy',
+      'Lots of homework',
+      'Graded by few things',
+      'Beware of pop quizzes',
+      'Tests are tough',
+      'Lecture heavy',
     ]);
     const tagNudgeRaw = (json.data.teacherRatingTags ?? []).reduce((sum, t) => {
       const name = (t.tagName || '').trim();
@@ -181,12 +220,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const THRESH = 0.05;
     const overall_score = Math.round(avgWithTags * 100) / 100;
     const overall_label: 'positive' | 'negative' | 'neutral' =
-      overall_score > THRESH ? 'positive' : overall_score < -THRESH ? 'negative' : 'neutral';
+      overall_score > THRESH
+        ? 'positive'
+        : overall_score < -THRESH
+          ? 'negative'
+          : 'neutral';
 
     const counts = {
-      positive: weighted.filter(r => r.sentiment === 'positive').length,
-      negative: weighted.filter(r => r.sentiment === 'negative').length,
-      neutral:  weighted.filter(r => r.sentiment === 'neutral').length,
+      positive: weighted.filter((r) => r.sentiment === 'positive').length,
+      negative: weighted.filter((r) => r.sentiment === 'negative').length,
+      neutral: weighted.filter((r) => r.sentiment === 'neutral').length,
       total: weighted.length,
     };
 
@@ -196,17 +239,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
     if (String(blend).toLowerCase() === 'true') {
       const starNorm = normalizeStars(json.data.avgRating);
-      const wtaPct = typeof json.data.wouldTakeAgainPercent === 'number'
-        ? Math.max(0, Math.min(100, json.data.wouldTakeAgainPercent))
-        : undefined;
+      const wtaPct =
+        typeof json.data.wouldTakeAgainPercent === 'number'
+          ? Math.max(0, Math.min(100, json.data.wouldTakeAgainPercent))
+          : undefined;
       // map 0..100 → -0.2..+0.2 (centered at 50%)
-      const wtaNudge = typeof wtaPct === 'number' ? (wtaPct / 100) * 0.4 - 0.2 : 0;
+      const wtaNudge =
+        typeof wtaPct === 'number' ? (wtaPct / 100) * 0.4 - 0.2 : 0;
 
       // 70% comments, 30% stars, then nudge
-      const baseBlend = (0.7 * overall_score) + (0.3 * (starNorm ?? overall_score));
-      blended_overall = Math.max(-1, Math.min(1, Math.round((baseBlend + wtaNudge) * 100) / 100));
+      const baseBlend = 0.7 * overall_score + 0.3 * (starNorm ?? overall_score);
+      blended_overall = Math.max(
+        -1,
+        Math.min(1, Math.round((baseBlend + wtaNudge) * 100) / 100),
+      );
       blended_label =
-        blended_overall > THRESH ? 'positive' : blended_overall < -THRESH ? 'negative' : 'neutral';
+        blended_overall > THRESH
+          ? 'positive'
+          : blended_overall < -THRESH
+            ? 'negative'
+            : 'neutral';
     }
 
     // Cache for 10 minutes (works on Vercel); safe to keep locally.
@@ -220,7 +272,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         numRatings: json.data.numRatings,
         overall_score,
         overall_label,
-        ...(blended_overall !== undefined ? { blended_overall, blended_label } : {}),
+        ...(blended_overall !== undefined
+          ? { blended_overall, blended_label }
+          : {}),
         counts,
         results: weighted,
         meta: {
@@ -231,7 +285,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         },
       },
     });
-  } catch (e: any) {
-    res.status(500).json({ message: 'error', error: e?.message ?? 'Internal error' });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : 'Internal error';
+    res.status(500).json({ message: 'error', error: msg });
   }
 }
