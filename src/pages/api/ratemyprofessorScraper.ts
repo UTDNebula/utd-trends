@@ -42,9 +42,9 @@ const PROFESSOR_SEARCH_QUERY = {
                 r4
                 r5
               }
-              ratings (first: 10) {
+              ratings (first: 200) {
                 edges {
-                node { 
+                node {
                   comment
                   grade
                   date
