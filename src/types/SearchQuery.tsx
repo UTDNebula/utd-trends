@@ -121,9 +121,17 @@ export function searchQueryEqual(
 }
 
 export function decodeSearchQueryLabel(encodedSearchTerm: string): SearchQuery {
-  const encodedSearchTermParts = encodedSearchTerm.split(' ');
+  const encodedSearchTermParts = decodeURIComponent(encodedSearchTerm)
+    .replaceAll('+', ' ')
+    .split(' ');
   // Does it start with prefix
-  if (/^([A-Z]{2,4})$/.test(encodedSearchTermParts[0])) {
+  if (
+    /^([A-Z]{2,4})$/.test(encodedSearchTermParts[0]) &&
+    // If it has only 2 parts, make sure the second is a course number
+    // Otherwise the name SV Randall will decode as { prefix: 'SV', profFirst: '', profLast: 'Randall' }
+    (encodedSearchTermParts.length != 2 ||
+      /^([0-9A-Z]{4})$/.test(encodedSearchTermParts[1]))
+  ) {
     // If it is just the prefix, return that
     if (encodedSearchTermParts.length == 1) {
       return { prefix: encodedSearchTermParts[0] };
@@ -193,4 +201,31 @@ export function removeDuplicates(array: SearchQuery[]) {
     (obj1, index, self) =>
       index === self.findIndex((obj2) => searchQueryEqual(obj1, obj2)),
   );
+}
+
+export function searchQuerySort(a: SearchQuery, b: SearchQuery) {
+  if ('profLast' in a && 'profLast' in b) {
+    //handle undefined variables based on searchQueryLabel
+    const aFirstName = a.profFirst ?? '';
+    const bFirstName = b.profFirst ?? '';
+    const aLastName = a.profLast ?? '';
+    const bLastName = b.profLast ?? '';
+
+    return (
+      aLastName.localeCompare(bLastName) || aFirstName.localeCompare(bFirstName) //sort by last name then first name
+    );
+  }
+  if ('prefix' in a && 'prefix' in b) {
+    const aPrefix = a.prefix ?? ''; //make sure the is no empty input for prefix and number
+    const bPrefix = b.prefix ?? '';
+    const aNumber = a.number ?? '';
+    const bNumber = b.number ?? '';
+
+    return aPrefix.localeCompare(bPrefix) || aNumber.localeCompare(bNumber); //sort by prefix then number
+  }
+  if ('prefix' in a) {
+    // Courses first
+    return -1;
+  }
+  return 1;
 }
