@@ -117,6 +117,14 @@ export default function Home(props: Props) {
           </FormControl>
         </Tooltip>
       </div>
+      <a
+        href="https://discord.utdnebula.com/"
+        target="_blank"
+        rel="noreferrer"
+        className="bg-royal dark:bg-cornflower-300 text-cornflower-50 dark:text-haiti py-3 px-5 rounded transition hover:scale-[1.01] text-center"
+      >
+        Want to contribute? <b>Kickoff</b> Sept 4th 7pm
+      </a>
     </div>
   );
 }
