@@ -54,12 +54,35 @@ export default function Home(props: Props) {
         fill
         className="object-cover -z-20"
       />
-      <Link href="/planner" className="absolute top-4 right-4 rounded-xl">
-        <Button className="bg-cornflower-500 rounded-xl text-white dark:bg-cornflower-400 text p-2 px-4 normal-case">
-          <BookIcon className="mr-2" />
-          My Planner
-        </Button>
-      </Link>
+      <div className="absolute top-4 left-4 right-4 flex gap-2 place-content-between flex-wrap-reverse">
+        <a
+          href="https://discord.utdnebula.com/"
+          target="_blank"
+          rel="noreferrer"
+          className="bg-royal dark:bg-cornflower-300 text-cornflower-50 dark:text-haiti py-3 px-5 rounded transition hover:scale-[1.01] text-center flex gap-2 items-center mr-auto"
+        >
+          <img
+            className="h-8 -my-1 -ml-2 hidden dark:block"
+            src="/icon-black.svg"
+            alt=""
+          />
+          <img
+            className="h-8 -my-1 -ml-2 block dark:hidden"
+            src="/icon-white.svg"
+            alt=""
+          />
+          <span>
+            Want to contribute? Come to the <b>Nebula Labs Kickoff</b> on Sept
+            4th 7pm.
+          </span>
+        </a>
+        <Link href="/planner" className="ml-auto rounded-xl">
+          <Button className="bg-cornflower-500 rounded-xl text-white dark:bg-cornflower-400 text p-2 px-4 normal-case">
+            <BookIcon className="mr-2" />
+            My Planner
+          </Button>
+        </Link>
+      </div>
       <div className="max-w-xl grow flex flex-col justify-center">
         <h2 className="text-sm font-semibold mb-3 text-cornflower-600 dark:text-cornflower-400 tracking-wider">
           POWERED BY {/*eslint-disable-next-line react/jsx-no-target-blank*/}
