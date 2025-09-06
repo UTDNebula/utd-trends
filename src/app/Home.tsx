@@ -55,7 +55,8 @@ export default function Home(props: Props) {
         className="object-cover -z-20"
       />
       <div className="absolute top-4 left-4 right-4 flex gap-2 place-content-between flex-wrap-reverse">
-        <a
+        {/*Ad for Kickoff*/}
+        {/*<a
           href="https://discord.utdnebula.com/"
           target="_blank"
           rel="noreferrer"
@@ -75,7 +76,7 @@ export default function Home(props: Props) {
             Want to contribute? Come to the <b>Nebula Labs Kickoff</b> on Sept
             4th 7pm.
           </span>
-        </a>
+        </a>*/}
         <Link href="/planner" className="ml-auto rounded-xl">
           <Button className="bg-cornflower-500 rounded-xl text-white dark:bg-cornflower-400 text p-2 px-4 normal-case">
             <BookIcon className="mr-2" />
