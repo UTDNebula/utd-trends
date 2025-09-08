@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import React, { useState, useTransition } from 'react';
 
 import Background from '@/../public/background.png';
+import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
 import SearchBar from '@/components/search/SearchBar/SearchBar';
 import { displaySemesterName } from '@/modules/semesters';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
@@ -85,15 +86,17 @@ export default function Home(props: Props) {
         </Link>
       </div>
       <div className="max-w-xl grow flex flex-col justify-center">
-        <h2 className="text-sm font-semibold mb-3 text-cornflower-600 dark:text-cornflower-400 tracking-wider">
-          POWERED BY {/*eslint-disable-next-line react/jsx-no-target-blank*/}
+        <h2 className="text-sm font-semibold mb-3 text-cornflower-600 dark:text-cornflower-400 tracking-wider flex gap-1 items-center">
+          <span className="leading-none">POWERED BY</span>
+          {/*eslint-disable-next-line react/jsx-no-target-blank*/}
           <a
             href="https://www.utdnebula.com/"
             target="_blank"
             rel="noopener"
-            className="underline decoration-transparent hover:decoration-inherit transition"
+            className="underline decoration-transparent hover:decoration-inherit transition flex gap-1 items-center"
           >
-            NEBULA LABS
+            <NebulaLogo className="h-4 w-auto fill-cornflower-600 dark:fill-cornflower-400" />
+            <span className="leading-none">NEBULA LABS</span>
           </a>
         </h2>
         <h1 className="text-6xl font-extrabold font-display mb-6">
