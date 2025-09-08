@@ -11,6 +11,7 @@ import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import Background from '@/../public/background.png';
 import WhatsNew from '@/components/common/WhatsNew/WhatsNew';
 import Tutorial from '@/components/dashboard/Tutorial/Tutorial';
+import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
 import SearchBar, {
   LoadingSearchBar,
 } from '@/components/search/SearchBar/SearchBar';
@@ -95,8 +96,9 @@ export default function TopMenu(props: Props) {
         />
         <Link
           href="/"
-          className="lext-lg md:text-xl font-display font-medium md:font-bold"
+          className="lext-lg md:text-xl font-display font-medium md:font-bold flex gap-2 items-center"
         >
+          <NebulaLogo className="h-6 w-auto fill-haiti dark:fill-white" />
           UTD TRENDS
         </Link>
         {!props.isPlanner && (
