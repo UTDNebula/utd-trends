@@ -11,6 +11,7 @@ import Link from 'next/link';
 import React from 'react';
 
 import Background from '@/../public/background.png';
+import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
 import { LoadingSearchBar } from '@/components/search/SearchBar/SearchBar';
 
 /**
