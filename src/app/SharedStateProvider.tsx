@@ -1,15 +1,13 @@
 'use client';
 
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useRef,
-  useState,
-} from 'react';
+import React, { createContext, useContext, useMemo, useState } from 'react';
 
 import { compareColors, plannerColors } from '@/modules/colors';
-import { calculateGrades, type Grades } from '@/modules/fetchGrades';
+import {
+  calculateGrades,
+  type Grades,
+  type GradesSummary,
+} from '@/modules/fetchGrades';
 import type { RMP } from '@/modules/fetchRmp';
 import type { Sections } from '@/modules/fetchSections';
 import { compareSemesters } from '@/modules/semesters';
@@ -33,6 +31,7 @@ type Setter<T> = (value: SetterValue<T>) => void;
 const SharedStateContext = createContext<
   | {
       grades: { [key: string]: GenericFetchedData<Grades> };
+      filteredGrades: Record<string, GradesSummary>;
       setGrades: Setter<{ [key: string]: GenericFetchedData<Grades> }>;
       rmp: { [key: string]: GenericFetchedData<RMP> };
       setRmp: Setter<{ [key: string]: GenericFetchedData<RMP> }>;
@@ -67,11 +66,9 @@ export function SharedStateProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [grades, internalSetGrades] = useState<{
+  const [grades, setGrades] = useState<{
     [key: string]: GenericFetchedData<Grades>;
   }>({});
-  const [semesters, setSemesters] = useState<string[]>([]);
-  const [chosenSemesters, internalSetChosenSemesters] = useState<string[]>([]);
 
   const [rmp, setRmp] = useState<{ [key: string]: GenericFetchedData<RMP> }>(
     {},
@@ -82,100 +79,56 @@ export function SharedStateProvider({
   }>({});
 
   const [compare, setCompare] = useState<SearchQuery[]>([]);
-  const [compareGrades, internalSetCompareGrades] = useState<{
-    [key: string]: GenericFetchedData<Grades>;
-  }>({});
-  const compareGradesRef = useRef(compareGrades);
-  //Update ref for setGrades
-  const setCompareGrades = useCallback(
-    (value: SetterValue<{ [key: string]: GenericFetchedData<Grades> }>) => {
-      internalSetCompareGrades((prev) => {
-        const newValue = typeof value === 'function' ? value(prev) : value;
 
-        compareGradesRef.current = newValue;
+  const [chosenSemesters, setChosenSemesters] = useState<string[]>([]);
+  const semesters = useMemo(() => {
+    const allSemesters = Object.values(grades)
+      // remove errored
+      .filter((grade) => grade.message === 'success')
+      //remove grade data, just semesters
+      .flatMap((grade) =>
+        grade.data.grades.map((gradeSemester) => gradeSemester._id),
+      )
+      .sort((a, b) => compareSemesters(b, a));
+    setChosenSemesters(allSemesters);
+    return allSemesters;
+  }, [grades]);
 
-        return newValue;
-      });
-    },
-    [internalSetCompareGrades],
-  );
-  const [compareRmp, setCompareRmp] = useState<{
-    [key: string]: GenericFetchedData<RMP>;
-  }>({});
-
-  //Set grades and update semesters
-  const setGrades = useCallback(
-    (value: SetterValue<{ [key: string]: GenericFetchedData<Grades> }>) => {
-      internalSetGrades((prev) => {
-        const newValue = typeof value === 'function' ? value(prev) : value;
-
-        const newSemesters = Object.values(newValue)
-          // remove errored
-          .filter((grade) => grade.message === 'success')
-          //remove grade data, just semesters
-          .flatMap((grade) =>
-            grade.data.grades.map((gradeSemester) => gradeSemester._id),
-          );
-        // add semesters from compare grades
-        const semestersFromCompare = Object.values(compareGradesRef.current)
-          // remove errored
-          .filter((grade) => grade.message === 'success')
-          //remove grade data, just semesters
-          .flatMap((grade) =>
-            grade.data.grades.map((gradeSemester) => gradeSemester._id),
-          );
-        const allSemesters = newSemesters
-          .concat(semestersFromCompare)
-          // remove duplicates
-          .filter((value, index, array) => array.indexOf(value) === index)
-          // display the semesters in order of recency (most recent first)
-          .sort((a, b) => compareSemesters(b, a));
-
-        setSemesters(allSemesters);
-        internalSetChosenSemesters(allSemesters);
-
-        return newValue;
-      });
-    },
-    [internalSetGrades, setSemesters, internalSetChosenSemesters],
-  );
-
+  const filteredGrades = useMemo(() => {
+    const build: Record<string, GradesSummary> = {};
+    for (const key of Object.keys(grades)) {
+      if (grades[key].message === 'success') {
+        build[key] = calculateGrades(grades[key].data.grades, chosenSemesters);
+      }
+    }
+    return build;
+  }, [grades, chosenSemesters]);
   //Set chosen semesters and update grades and compare grades
-  const setChosenSemesters = useCallback(
-    (value: SetterValue<string[]>) => {
-      internalSetChosenSemesters((prev) => {
-        const newValue = typeof value === 'function' ? value(prev) : value;
+  const compareGrades = useMemo(() => {
+    const build: Record<string, GenericFetchedData<Grades>> = {};
+    for (const query of Object.values(compare)) {
+      const label = searchQueryLabel(query);
+      if (grades[label].message === 'success') {
+        build[label] = { ...grades[label] };
+        build[label].data.filtered = calculateGrades(
+          grades[label].data.grades,
+          chosenSemesters,
+        );
+      }
+    }
+    return build;
+  }, [grades, compare, chosenSemesters]);
 
-        // recalc filtered grades
-        internalSetGrades((prev) => {
-          for (const grade of Object.values(prev)) {
-            if (grade.message === 'success') {
-              grade.data.filtered = calculateGrades(
-                grade.data.grades,
-                newValue,
-              );
-            }
-          }
-          return prev;
-        });
-        setCompareGrades((prev) => {
-          for (const grade of Object.values(prev)) {
-            if (grade.message === 'success') {
-              grade.data.filtered = calculateGrades(
-                grade.data.grades,
-                newValue,
-              );
-            }
-          }
-          return prev;
-        });
-
-        return newValue;
-      });
-    },
-    [internalSetGrades, internalSetChosenSemesters, setCompareGrades],
-  );
-
+  const compareRmp = useMemo(() => {
+    const build: Record<string, GenericFetchedData<RMP>> = {};
+    for (const query of Object.values(compare)) {
+      const label = searchQueryLabel(convertToProfOnly(query));
+      if (label !== '' && rmp[label].message === 'success') {
+        build[label] = rmp[label];
+      }
+    }
+    return build;
+  }, [rmp, compare, chosenSemesters]);
   //Add a course+prof combo to compare (happens from search results)
   //copy over data basically
   function addToCompare(query: SearchQuery) {
@@ -183,23 +136,6 @@ export function SharedStateProvider({
     if (compare.every((obj) => !searchQueryEqual(obj, query))) {
       //Add to list
       setCompare((prev) => prev.concat([query]));
-      //Save grade data
-      setCompareGrades((prev) => {
-        return {
-          ...prev,
-          [searchQueryLabel(query)]: grades[searchQueryLabel(query)],
-        };
-      });
-      //Save prof data
-      if (typeof query.profLast !== 'undefined') {
-        setCompareRmp((prev) => {
-          return {
-            ...prev,
-            [searchQueryLabel(convertToProfOnly(query))]:
-              rmp[searchQueryLabel(convertToProfOnly(query))],
-          };
-        });
-      }
     }
   }
 
@@ -209,23 +145,6 @@ export function SharedStateProvider({
     if (compare.some((obj) => searchQueryEqual(obj, query))) {
       //Remove from list
       setCompare((prev) => prev.filter((el) => !searchQueryEqual(el, query)));
-      //Remove from saved grade data
-      setCompareGrades((prev) => {
-        delete prev[searchQueryLabel(query)];
-        return prev;
-      });
-      //If no other courses in compare have the same professor
-      if (
-        !compare
-          .filter((el) => !searchQueryEqual(el, query))
-          .some((el) => searchQueryEqual(el, convertToProfOnly(query)))
-      ) {
-        //Remove from saved rmp data
-        setCompareRmp((prev) => {
-          delete prev[searchQueryLabel(convertToProfOnly(query))];
-          return prev;
-        });
-      }
     }
   }
 
@@ -329,6 +248,7 @@ export function SharedStateProvider({
     <SharedStateContext.Provider
       value={{
         grades,
+        filteredGrades,
         setGrades,
         rmp,
         setRmp,

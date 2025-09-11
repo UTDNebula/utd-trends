@@ -1,7 +1,7 @@
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery } from '@/types/SearchQuery';
 
-type GradesSummary = {
+export type GradesSummary = {
   mean_gpa: number;
   gpa: number;
   total: number;
