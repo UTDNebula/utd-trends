@@ -15,6 +15,7 @@ export default function SyncServerDataToContext() {
     setCourseNames,
     setLatestSemester,
     planner,
+    compare,
   } = useSharedState();
 
   useEffect(() => {
@@ -23,7 +24,7 @@ export default function SyncServerDataToContext() {
 
       const fetchData = async () => {
         const { grades, rmp, sections, courseNames, latestSemester } =
-          await fetchAll(planner);
+          await fetchAll(planner.concat(compare));
         if (isCancelled) return;
 
         setGrades(grades);
@@ -47,6 +48,7 @@ export default function SyncServerDataToContext() {
     setCourseNames,
     setLatestSemester,
     planner,
+    compare,
   ]);
 
   return null;
