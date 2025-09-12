@@ -143,7 +143,7 @@ const stepsTemplate: StepTemplate[] = [
           </p>
         </div>
         <div className="flex items-center">
-          <Checkbox icon={<BookOutlinedIcon />}  checked={false} />
+          <Checkbox icon={<BookOutlinedIcon />} checked={false} />
           <p>
             add an item to the <b>My Planner</b> page.
           </p>
