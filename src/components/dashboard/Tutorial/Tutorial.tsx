@@ -137,13 +137,13 @@ const stepsTemplate: StepTemplate[] = [
       <>
         <p>Open a result for more detailed information.</p>
         <div className="flex items-center">
-          <Checkbox />
+          <Checkbox checked={false} />
           <p>
             add an item to the <b>compare</b> tab.
           </p>
         </div>
         <div className="flex items-center">
-          <Checkbox icon={<BookOutlinedIcon />} />
+          <Checkbox icon={<BookOutlinedIcon />}  checked={false} />
           <p>
             add an item to the <b>My Planner</b> page.
           </p>
