@@ -128,7 +128,7 @@ export function SharedStateProvider({
       }
     }
     return build;
-  }, [rmp, compare, chosenSemesters]);
+  }, [rmp, compare]);
   //Add a course+prof combo to compare (happens from search results)
   //copy over data basically
   function addToCompare(query: SearchQuery) {
@@ -248,8 +248,8 @@ export function SharedStateProvider({
     <SharedStateContext.Provider
       value={{
         grades,
-        filteredGrades,
         setGrades,
+        filteredGrades,
         rmp,
         setRmp,
         sections,
