@@ -140,10 +140,25 @@ export default function SearchBar(props: Props) {
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter' && inputValue === '') {
+    if (event.key === 'Enter') {
       event.preventDefault();
       event.stopPropagation();
-      onSelect(value);
+      if (inputValue === "") {
+        onSelect(value);
+      }
+      else if (options.length > 0) {
+        addValue(options[0]);
+        setOptions([]);
+        setInputValue("")
+        onSelect([...value, options[0]])
+      } else if (inputValue !== "") {
+        const searchQuery: SearchQuery = decodeSearchQueryLabel(inputValue)
+        addValue(searchQuery)
+        setInputValue("")
+        onSelect([...value, searchQuery])
+      }
+      
+      
     }
   }
 
