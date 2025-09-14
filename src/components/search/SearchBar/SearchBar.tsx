@@ -24,6 +24,7 @@ import { useSharedState } from '@/app/SharedStateProvider';
 import untyped_professor_to_alias from '@/data/professor_to_alias.json';
 import {
   decodeSearchQueryLabel,
+  removeDuplicates,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
@@ -112,6 +113,10 @@ export default function SearchBar(props: Props) {
     quickInputValue.current = newValue;
     _setInputValue(newValue);
   }
+
+  //Recent searches
+  const recentSearches = useRef<SearchQuery[]>([]);
+
   //chosen values
   const [value, setValue] = useState<SearchQuery[]>([]);
 
@@ -172,6 +177,7 @@ export default function SearchBar(props: Props) {
         'searchTerms',
         newValue.map((el) => searchQueryLabel(el)).join(','),
       );
+      updateRecentSearches(newValue)
     } else {
       params.delete('searchTerms');
     }
@@ -180,6 +186,14 @@ export default function SearchBar(props: Props) {
     });
   }
 
+  //When new queries are made, compare them to the existing 3 recent query cache
+  function updateRecentSearches(newValue: SearchQuery[]){
+    console.log(newValue);
+    var concatArray = [...recentSearches.current, ...newValue];
+    var dedupArray = removeDuplicates(concatArray);
+    recentSearches.current = dedupArray;
+    console.log(recentSearches.current);
+  }
   //fetch new options, add tags if valid
   function loadNewOptions(newInputValue: string) {
     if (noResult !== null && newInputValue.startsWith(noResult)) {
