@@ -154,7 +154,9 @@ function GradeOrRmpRow<T>({
           {((typeof value === 'undefined' || value.message !== 'success') && (
             <></>
           )) ||
-            (value.message === 'success' && getValue(value.data) !== -1 && getValue(value.data) !== undefined ? (
+            (value.message === 'success' &&
+            getValue(value.data) !== -1 &&
+            getValue(value.data) !== undefined ? (
               (name !== 'GPA' ? (value.data as RMP).numRatings > 0 : true) && ( // do not display RMP data (non-GPA data) if there are no reviews
                 <Tooltip
                   title={`${name}: ${formatValue(getValue(value.data))}`}
