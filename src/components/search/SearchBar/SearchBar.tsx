@@ -140,10 +140,17 @@ export default function SearchBar(props: Props) {
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter' && inputValue === '') {
+    if (event.key === 'Enter') {
       event.preventDefault();
       event.stopPropagation();
-      onSelect(value);
+
+      if (loading) {
+        return;
+      }
+      if (inputValue === '') {
+        onSelect(value);
+        return;
+      }
     }
   }
 
