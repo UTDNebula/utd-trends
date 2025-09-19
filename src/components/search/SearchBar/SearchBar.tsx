@@ -143,22 +143,14 @@ export default function SearchBar(props: Props) {
     if (event.key === 'Enter') {
       event.preventDefault();
       event.stopPropagation();
-      if (inputValue === "") {
+
+      if (loading) {
+        return;
+      }
+      if (inputValue === '') {
         onSelect(value);
+        return;
       }
-      else if (options.length > 0) {
-        addValue(options[0]);
-        setOptions([]);
-        setInputValue("")
-        onSelect([...value, options[0]])
-      } else if (inputValue !== "") {
-        const searchQuery: SearchQuery = decodeSearchQueryLabel(inputValue)
-        addValue(searchQuery)
-        setInputValue("")
-        onSelect([...value, searchQuery])
-      }
-      
-      
     }
   }
 
