@@ -167,6 +167,10 @@ export default function SearchBar(props: Props) {
     if (newValue.length && props.manageQuery === 'onSelect') {
       updateQueries(newValue);
     }
+
+    if (newValue.length > 0) {
+      updateRecentSearches(newValue);
+    }
   }
 
   const router = useRouter();
@@ -180,7 +184,7 @@ export default function SearchBar(props: Props) {
         'searchTerms',
         newValue.map((el) => searchQueryLabel(el)).join(','),
       );
-      updateRecentSearches(newValue);
+      // updateRecentSearches(newValue);
     } else {
       params.delete('searchTerms');
     }
