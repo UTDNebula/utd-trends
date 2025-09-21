@@ -1,5 +1,7 @@
 'use client';
 
+import HistoryToggleOffIcon from '@mui/icons-material/HistoryToggleOff';
+import SearchIcon from '@mui/icons-material/Search';
 import {
   Autocomplete,
   Button,
@@ -8,11 +10,6 @@ import {
   TextField,
   Tooltip,
   Typography,
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import HistoryToggleOffIcon from '@mui/icons-material/HistoryToggleOff';
-
-import {
 } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
@@ -183,7 +180,7 @@ export default function SearchBar(props: Props) {
         'searchTerms',
         newValue.map((el) => searchQueryLabel(el)).join(','),
       );
-      updateRecentSearches(newValue)
+      updateRecentSearches(newValue);
     } else {
       params.delete('searchTerms');
     }
@@ -193,18 +190,21 @@ export default function SearchBar(props: Props) {
   }
 
   //When new queries are made, compare them to the existing recent query cache
-  function updateRecentSearches(newValue: SearchQuery[]){
+  function updateRecentSearches(newValue: SearchQuery[]) {
     console.log(newValue);
-    var searchesText = window.localStorage.getItem("UTDTrendsRecent");
-    var recSearches: SearchQuery[] = [];
+    const searchesText = window.localStorage.getItem('UTDTrendsRecent');
+    let recSearches: SearchQuery[] = [];
     if (searchesText != null) {
       recSearches = JSON.parse(searchesText);
     }
     // Add new searches to the beginning of the array
     const concatArray = [...newValue, ...recSearches];
-    const dedupArray = removeDuplicates(concatArray).slice(0,3);
+    const dedupArray = removeDuplicates(concatArray).slice(0, 3);
     recentSearches.current = dedupArray;
-    window.localStorage.setItem("UTDTrendsRecent", JSON.stringify(recentSearches.current));
+    window.localStorage.setItem(
+      'UTDTrendsRecent',
+      JSON.stringify(recentSearches.current),
+    );
   }
   //fetch new options, add tags if valid
   function loadNewOptions(newInputValue: string) {
@@ -214,9 +214,9 @@ export default function SearchBar(props: Props) {
     }
     setLoading(true);
     if (newInputValue.trim() === '') {
-      const recentWithFlag = recentSearches.current.map(search => ({
+      const recentWithFlag = recentSearches.current.map((search) => ({
         ...search,
-        isRecent: true
+        isRecent: true,
       }));
       console.log(recentWithFlag);
       setOptions(recentWithFlag);
@@ -237,7 +237,7 @@ export default function SearchBar(props: Props) {
         //remove currently chosen values
         const filtered: SearchQuery[] = data.data.filter(
           (item: SearchQuery) =>
-            (value.findIndex((el) => searchQueryEqual(el, item)) === -1)
+            value.findIndex((el) => searchQueryEqual(el, item)) === -1,
         );
         if (
           // if the returned options minus already selected values is 1, then this
@@ -324,8 +324,8 @@ export default function SearchBar(props: Props) {
 
   useEffect(() => {
     fetch('/api/autocomplete?input=someSearchTerm');
-    var searchesText = window.localStorage.getItem("UTDTrendsRecent");
-    if(searchesText != null){
+    const searchesText = window.localStorage.getItem('UTDTrendsRecent');
+    if (searchesText != null) {
       recentSearches.current = JSON.parse(searchesText);
     }
   }, []);
@@ -485,14 +485,19 @@ export default function SearchBar(props: Props) {
           const subtextParts = subtext ? parse(subtext, subTextMatches) : [];
           const { key, ...otherProps } = props;
           return (
-            <li key={key} {...otherProps} className="flex items-center gap-2 p-2">
-              
-              { //If option isSearchQuery and isRecent is declared & is true
-              typeof option !== 'string' && option.isRecent == true  ? (
-                <HistoryToggleOffIcon className="text-gray-400" />
-              ) : (
-                <SearchIcon className="text-gray-400" />
-              )}
+            <li
+              key={key}
+              {...otherProps}
+              className="flex items-center gap-2 p-2"
+            >
+              {
+                //If option isSearchQuery and isRecent is declared & is true
+                typeof option !== 'string' && option.isRecent == true ? (
+                  <HistoryToggleOffIcon className="text-gray-400" />
+                ) : (
+                  <SearchIcon className="text-gray-400" />
+                )
+              }
               <div>
                 <div>
                   {parts.map((part, index) => (
