@@ -9,6 +9,11 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import HistoryToggleOffIcon from '@mui/icons-material/HistoryToggleOff';
+
+import {
+} from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -70,6 +75,7 @@ export function LoadingSearchBar(props: LoadingSearchBarProps) {
 type SearchQueryWithTitle = SearchQuery & {
   title?: string;
   subtitle?: string;
+  isRecent?: boolean;
 };
 
 /**
@@ -115,7 +121,7 @@ export default function SearchBar(props: Props) {
   }
 
   //Recent searches
-  const recentSearches = useRef<SearchQuery[]>([]);
+  const recentSearches = useRef<SearchQueryWithTitle[]>([]);
 
   //chosen values
   const [value, setValue] = useState<SearchQuery[]>([]);
@@ -186,13 +192,19 @@ export default function SearchBar(props: Props) {
     });
   }
 
-  //When new queries are made, compare them to the existing 3 recent query cache
+  //When new queries are made, compare them to the existing recent query cache
   function updateRecentSearches(newValue: SearchQuery[]){
     console.log(newValue);
-    var concatArray = [...recentSearches.current, ...newValue];
-    var dedupArray = removeDuplicates(concatArray);
+    var searchesText = window.localStorage.getItem("UTDTrendsRecent");
+    var recSearches: SearchQuery[] = [];
+    if (searchesText != null) {
+      recSearches = JSON.parse(searchesText);
+    }
+    // Add new searches to the beginning of the array
+    const concatArray = [...newValue, ...recSearches];
+    const dedupArray = removeDuplicates(concatArray).slice(0,3);
     recentSearches.current = dedupArray;
-    console.log(recentSearches.current);
+    window.localStorage.setItem("UTDTrendsRecent", JSON.stringify(recentSearches.current));
   }
   //fetch new options, add tags if valid
   function loadNewOptions(newInputValue: string) {
@@ -202,7 +214,12 @@ export default function SearchBar(props: Props) {
     }
     setLoading(true);
     if (newInputValue.trim() === '') {
-      setOptions([]);
+      const recentWithFlag = recentSearches.current.map(search => ({
+        ...search,
+        isRecent: true
+      }));
+      console.log(recentWithFlag);
+      setOptions(recentWithFlag);
       setLoading(false);
       return;
     }
@@ -216,12 +233,12 @@ export default function SearchBar(props: Props) {
         if (data.message !== 'success') {
           throw new Error(data.data ?? data.message);
         }
+        console.log(newInputValue);
         //remove currently chosen values
         const filtered: SearchQuery[] = data.data.filter(
           (item: SearchQuery) =>
-            value.findIndex((el) => searchQueryEqual(el, item)) === -1,
+            (value.findIndex((el) => searchQueryEqual(el, item)) === -1)
         );
-        //add to chosen values if only one option and space
         if (
           // if the returned options minus already selected values is 1, then this
           // means a space following should autocomplete the previous stuff to a chip
@@ -259,7 +276,7 @@ export default function SearchBar(props: Props) {
             setNoResults(newInputValue);
             loadNewCourseNameOptions(newInputValue);
           }
-          setOptions(filtered);
+          setOptions([...filtered]);
         }
       })
       .catch(() => {})
@@ -307,6 +324,10 @@ export default function SearchBar(props: Props) {
 
   useEffect(() => {
     fetch('/api/autocomplete?input=someSearchTerm');
+    var searchesText = window.localStorage.getItem("UTDTrendsRecent");
+    if(searchesText != null){
+      recentSearches.current = JSON.parse(searchesText);
+    }
   }, []);
 
   return (
@@ -464,7 +485,14 @@ export default function SearchBar(props: Props) {
           const subtextParts = subtext ? parse(subtext, subTextMatches) : [];
           const { key, ...otherProps } = props;
           return (
-            <li key={key} {...otherProps}>
+            <li key={key} {...otherProps} className="flex items-center gap-2 p-2">
+              
+              { //If option isSearchQuery and isRecent is declared & is true
+              typeof option !== 'string' && option.isRecent == true  ? (
+                <HistoryToggleOffIcon className="text-gray-400" />
+              ) : (
+                <SearchIcon className="text-gray-400" />
+              )}
               <div>
                 <div>
                   {parts.map((part, index) => (
