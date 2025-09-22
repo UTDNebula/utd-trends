@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
 import React from 'react';
 
-import TopMenu from '@/components/navigation/TopMenu/TopMenu';
-
-import Planner from './Planner';
+import PlannerPage from './PlannerPage'
 import SyncServerDataToContext from './SyncServerDataToContext';
 
 export const metadata: Metadata = {
@@ -21,10 +19,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <>
-      <TopMenu isPlanner={true} />
-      <main className="p-4">
-        <Planner />
-      </main>
+      <PlannerPage />
       <SyncServerDataToContext />
     </>
   );
