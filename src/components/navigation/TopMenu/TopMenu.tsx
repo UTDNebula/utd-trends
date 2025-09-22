@@ -24,7 +24,7 @@ type Props = {
 };
 
 /**
- * This component is located at the topic of the page. From left to right, it holds the UTD Trends logo (component name NebulaLogo), a search box (component name SearchBar), a "Search" button, the "My Planner" button if you are on the Search Results pahe (or "Search Results" if you are on the Planner page), a button to see what is new in Trends, a help button, and a share button.
+ * This component is located at the top of the page. From left to right, it holds the UTD Trends logo (component name NebulaLogo), a search box (component name SearchBar), a "Search" button, the "My Planner" button if you are on the Search Results page (or "Search Results" if you are on the Planner page), a button to see what is new in Trends, a help button, and a share button.
  * @returns
  */
 export default function TopMenu(props: Props) {
