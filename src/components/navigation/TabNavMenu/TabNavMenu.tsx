@@ -23,6 +23,7 @@ type TabNavMenuProps = {
  * and one for the Detailed view. This is connected to the parent component with the value and setValue functions,
  * which are held by the parent and passed to this component to be manipulated by the Tabs component.
  */
+
 export const TabNavMenu = (props: TabNavMenuProps) => {
   return (
     <div className="w-full flex items-center">

@@ -11,6 +11,12 @@ type Props = {
   line?: React.ReactNode;
 };
 
+/**
+ *
+ * This component displays either the `bar` or `line` node and provides a toggle to switch between a bar and line graph when viewing grade distributions.
+ * If `state == 'loading'`, a Skeleton placeholder is rendered.
+ */
+
 export default function GraphToggle(props: Props) {
   const [chartType, setChartType] = useState<'line' | 'bar'>('bar');
 
