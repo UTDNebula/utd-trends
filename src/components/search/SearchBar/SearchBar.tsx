@@ -140,19 +140,24 @@ export default function SearchBar(props: Props) {
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      event.stopPropagation();
-
-      if (loading) {
+      if (event.key !== 'Enter') {
         return;
       }
+
+      if (loading) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+
       if (inputValue === '') {
+        event.preventDefault();
+        event.stopPropagation();
         onSelect(value);
         return;
       }
-    }
   }
+  
 
   //update parent and queries
   function onSelect(newValue: SearchQuery[]) {
