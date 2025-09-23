@@ -2,14 +2,14 @@ This component is used only in the carousel.
 
 ### Props Table
 
-| Prop          | Type             | Description                                                                                                                                                                                 | Required |
-| :------------ | :--------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
-| value         | number           | The index of the current tab                                                                                                                                                                | Yes      |
-| options       | array of strings | Labels for each tab in the carousel, where each entry in the array is the text label for a tab                                                                                              | Yes      |
-| turner        | (displacement: number) => void           | Function provided by the parent to animate/shift the carousel when the tab is changed, function must accept a signed number that tells the magnitude and direction the carousel should move | Yes      |
-| compareLength | number           | When rendering the last tab, if compareLength is non-zero, the component shows a badge with this number next to the label                                                                   | Yes      |
-| open          | boolean          | Controls the open/closed state                                                                                                                                                              | Yes      |
-| setOpen       | (arg0: boolean) => void          | Function to set the open boolean in the parent component, function must accept a boolean and updates parent state                                                                           | Yes      |
+| Prop          | Type                           | Description                                                                                                                                                                                 | Required |
+| :------------ | :----------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
+| value         | number                         | The index of the current tab                                                                                                                                                                | Yes      |
+| options       | array of strings               | Labels for each tab in the carousel, where each entry in the array is the text label for a tab                                                                                              | Yes      |
+| turner        | (displacement: number) => void | Function provided by the parent to animate/shift the carousel when the tab is changed, function must accept a signed number that tells the magnitude and direction the carousel should move | Yes      |
+| compareLength | number                         | When rendering the last tab, if compareLength is non-zero, the component shows a badge with this number next to the label                                                                   | Yes      |
+| open          | boolean                        | Controls the open/closed state                                                                                                                                                              | Yes      |
+| setOpen       | (arg0: boolean) => void        | Function to set the open boolean in the parent component, function must accept a boolean and updates parent state                                                                           | Yes      |
 
 ### TabNavMenu Example
 
