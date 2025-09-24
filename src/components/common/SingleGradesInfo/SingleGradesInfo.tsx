@@ -4,10 +4,9 @@ import React from 'react';
 import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
-import type { Grades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
+import type { GradesData, GradesSummary } from '@/modules/fetchGrades2';
 
 export function LoadingSingleGradesInfo() {
   return (
@@ -28,12 +27,9 @@ export function LoadingSingleGradesInfo() {
   );
 }
 
-function convertNumbersToPercents(
-  distribution: Grades,
-  gradesToUse: 'filtered' | 'unfiltered',
-): number[] {
-  const total = distribution[gradesToUse].total;
-  return distribution[gradesToUse].grade_distribution.map(
+function convertNumbersToPercents(distribution: GradesSummary): number[] {
+  const total = distribution.total;
+  return distribution.grade_distribution.map(
     (frequencyOfLetterGrade) => (frequencyOfLetterGrade / total) * 100,
   );
 }
@@ -41,25 +37,22 @@ function convertNumbersToPercents(
 type Props = {
   title?: string;
   course: SearchQuery;
-  grades: GenericFetchedData<Grades>;
-  gradesToUse: 'filtered' | 'unfiltered';
+  grades: GradesData;
+  filteredGrades: GradesSummary;
 };
 
 export default function SingleGradesInfo({
   title,
   course,
   grades,
-  gradesToUse,
+  filteredGrades,
 }: Props) {
-  if (typeof grades === 'undefined' || grades.message !== 'success') {
-    return null;
-  }
-
-  const percents = convertNumbersToPercents(grades.data, gradesToUse);
+  const percents = convertNumbersToPercents(filteredGrades);
 
   return (
     <div className="p-2">
-      {grades.data[gradesToUse].gpa !== -1 ? (
+      {/* check that Grade data exists*/}
+      {filteredGrades.gpa !== -1 ? (
         <GraphToggle
           state="done"
           bar={
@@ -96,7 +89,7 @@ export default function SingleGradesInfo({
               series={[
                 {
                   name: searchQueryLabel(course),
-                  data: grades.data[gradesToUse].grade_distribution,
+                  data: filteredGrades.grade_distribution,
                 },
               ]}
             />
@@ -104,9 +97,7 @@ export default function SingleGradesInfo({
           line={
             <LineGraph
               title="GPA Trend"
-              series={[
-                { name: searchQueryLabel(course), data: grades.data.grades },
-              ]}
+              series={[{ name: searchQueryLabel(course), data: grades }]}
             />
           }
         />
@@ -119,22 +110,22 @@ export default function SingleGradesInfo({
       )}
       <div className="flex flex-wrap justify-around">
         <p>
-          Grades: <b>{grades.data[gradesToUse].total.toLocaleString()}</b>
+          Grades: <b>{filteredGrades.total.toLocaleString()}</b>
         </p>
         <p>
           Median GPA:{' '}
           <b>
-            {grades.data[gradesToUse].gpa === -1
+            {filteredGrades.gpa === -1
               ? 'None'
-              : gpaToLetterGrade(grades.data[gradesToUse].gpa)}
+              : gpaToLetterGrade(filteredGrades.gpa)}
           </b>
         </p>
         <p>
           Mean GPA:{' '}
           <b>
-            {grades.data[gradesToUse].mean_gpa === -1
+            {filteredGrades.mean_gpa === -1
               ? 'None'
-              : grades.data[gradesToUse].mean_gpa.toFixed(3)}
+              : filteredGrades.mean_gpa.toFixed(3)}
           </b>
         </p>
       </div>

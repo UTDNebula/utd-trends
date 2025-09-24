@@ -1,7 +1,6 @@
 import { Card } from '@mui/material';
 import React from 'react';
 
-import Compare from '@/components/compare/Compare/Compare';
 import Carousel from '@/components/navigation/Carousel/Carousel';
 import CourseOverview, {
   LoadingCourseOverview,
@@ -10,10 +9,11 @@ import ProfessorOverview, {
   LoadingProfessorOverview,
 } from '@/components/overview/ProfessorOverview/ProfessorOverview';
 import fetchCourse from '@/modules/fetchCourse';
-import fetchGrades from '@/modules/fetchGrades';
-import fetchProfessor from '@/modules/fetchProfessor';
-import fetchRmp from '@/modules/fetchRmp';
-import { type SearchQuery } from '@/types/SearchQuery';
+import fetchGrades from '@/modules/fetchGrades2';
+import fetchProfessor from '@/modules/fetchProfessor2';
+import fetchRmp from '@/modules/fetchRmp2';
+import { type SearchQuery, type SearchResult } from '@/types/SearchQuery';
+import Compare from '@/components/compare/Compare/Compare';
 
 interface LoadingRightProps {
   courses?: SearchQuery[];
@@ -39,8 +39,8 @@ export function LoadingRight(props: LoadingRightProps) {
     names.push('Class');
     tabs.push(<LoadingCourseOverview key="course" />);
   }
-  names.push('Compare');
-  tabs.push(<Compare key="compare" />);
+  // names.push('Compare');
+  // tabs.push(<Compare key="compare" />);
 
   return (
     <Card>
@@ -52,6 +52,7 @@ export function LoadingRight(props: LoadingRightProps) {
 interface Props {
   courses: SearchQuery[];
   professors: SearchQuery[];
+  searchResultsPromise: Promise<SearchResult[]>;
 }
 
 /**
@@ -112,7 +113,9 @@ export default async function Right(props: Props) {
   }
 
   names.push('Compare');
-  tabs.push(<Compare key="compare" />);
+  tabs.push(
+    <Compare key="compare" searchResults={await props.searchResultsPromise} />,
+  );
 
   return (
     <Card>

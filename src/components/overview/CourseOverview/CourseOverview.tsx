@@ -7,9 +7,9 @@ import SingleGradesInfo, {
   LoadingSingleGradesInfo,
 } from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import type { Course } from '@/modules/fetchCourse';
-import type { Grades } from '@/modules/fetchGrades';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
+import { calculateGrades, type GradesData } from '@/modules/fetchGrades2';
 
 export function LoadingCourseOverview() {
   const courseComponent = (
@@ -231,7 +231,7 @@ function parseDescription(course: Course): {
 interface Props {
   course: SearchQuery;
   courseData: GenericFetchedData<Course>;
-  grades: GenericFetchedData<Grades>;
+  grades: GradesData;
 }
 
 export default function CourseOverview({ course, courseData, grades }: Props) {
@@ -290,7 +290,7 @@ export default function CourseOverview({ course, courseData, grades }: Props) {
         title="# of Students (Overall)"
         course={course}
         grades={grades}
-        gradesToUse="unfiltered"
+        filteredGrades={calculateGrades(grades)}
       />
     </div>
   );

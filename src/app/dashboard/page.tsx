@@ -14,12 +14,20 @@ import {
   searchQuerySort,
 } from '@/types/SearchQuery';
 
-import Right, { LoadingRight } from './Right';
 import ServerLeft from './ServerLeft';
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from '@tanstack/react-query';
+import { fetchSearchResults } from '@/modules/fetchSearchResult';
+import { createSearchQuery } from '@/modules/createSearchQuery';
+import ChosenSemesterProvider from './SemesterContext';
+import Right, { LoadingRight } from './Right';
 
-interface Props {
+type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
+};
 
 export async function generateMetadata({
   searchParams,
@@ -92,43 +100,65 @@ export default async function Page({ searchParams }: Props) {
   }
   searchTerms = decodeURIComponent(searchTerms);
 
+  // this maps each searchTerm into SearchQuery object
   const decodedSearchTerms = searchTerms.split(',').map(decodeSearchQueryLabel);
+  console.log(decodedSearchTerms);
   const courses = decodedSearchTerms.filter(
     (query) => typeof query.prefix !== 'undefined',
   );
   const professors = decodedSearchTerms.filter(
     (query) => typeof query.profLast !== 'undefined',
   );
-
+  let results: SearchQuery[] = [];
+  if (courses.length > 0) {
+    results = createSearchQuery(courses, professors);
+  } else if (professors.length > 0) {
+    results = createSearchQuery(professors, []);
+  }
+  console.log(JSON.stringify(results));
+  const queryClient = new QueryClient();
+  const searchResults = fetchSearchResults(results);
   return (
     <>
-      <TopMenu isPlanner={false} />
-      <main className="p-4">
-        <Suspense fallback={<LoadingFilters />}>
-          <Filters />
-        </Suspense>
-        <Split
-          left={
-            <Suspense fallback={<LoadingSearchResultsTable />}>
-              <ServerLeft courses={courses} professors={professors} />
+      <ChosenSemesterProvider>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <TopMenu isPlanner={false} />
+          <main className="p-4">
+            <Suspense fallback={<LoadingFilters />}>
+              <Filters searchResultsPromise={searchResults} />
             </Suspense>
-          }
-          right={
-            <StickySide>
-              <Suspense
-                fallback={
-                  <LoadingRight courses={courses} professors={professors} />
-                }
-              >
-                <Right courses={courses} professors={professors} />
-              </Suspense>
-            </StickySide>
-          }
-          minLeft={40}
-          minRight={30}
-          defaultLeft={50}
-        />
-      </main>
+            <Split
+              left={
+                <Suspense fallback={<LoadingSearchResultsTable />}>
+                  <ServerLeft
+                    searchResultsPromise={searchResults}
+                    courses={courses}
+                    professors={professors}
+                  />
+                </Suspense>
+              }
+              right={
+                <StickySide>
+                  <Suspense
+                    fallback={
+                      <LoadingRight courses={courses} professors={professors} />
+                    }
+                  >
+                    <Right
+                      courses={courses}
+                      professors={professors}
+                      searchResultsPromise={searchResults}
+                    />
+                  </Suspense>
+                </StickySide>
+              }
+              minLeft={40}
+              minRight={30}
+              defaultLeft={50}
+            />
+          </main>
+        </HydrationBoundary>
+      </ChosenSemesterProvider>
     </>
   );
 }

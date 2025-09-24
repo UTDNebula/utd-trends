@@ -12,6 +12,8 @@ import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
 import theme from '@/modules/theme';
 
 import { SharedStateProvider } from './SharedStateProvider';
+import QueryProvider from './QueryProvider';
+import { fetchLatestSemester } from '@/modules/fetchSections2';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -62,11 +64,12 @@ export const viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const latestSemester = await fetchLatestSemester();
   return (
     <html lang="en">
       {process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' && (
@@ -75,9 +78,13 @@ export default function RootLayout({
       <body
         className={`bg-white dark:bg-black ${inter.variable} font-main ${baiJamjuree.variable} text-haiti dark:text-white`}
       >
-        <AppRouterCacheProvider>
+        <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>
-            <SharedStateProvider>{children}</SharedStateProvider>
+            <QueryProvider>
+              <SharedStateProvider latestSemester={latestSemester}>
+                {children}
+              </SharedStateProvider>
+            </QueryProvider>
             <GitHubButton />
             <SpeedInsights />
           </ThemeProvider>

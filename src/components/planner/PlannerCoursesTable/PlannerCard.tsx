@@ -365,6 +365,7 @@ type PlannerCardProps = {
   courseName: string | undefined;
 };
 
+//TODO: add route to get the data
 export default function PlannerCard(props: PlannerCardProps) {
   const [open, setOpen] = useState(false);
 

@@ -15,13 +15,13 @@ import usePersistantState from '@/modules/usePersistantState';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToCourseOnly,
-  convertToProfOnly,
   removeDuplicates,
   removeSection,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
   type SearchQueryMultiSection,
+  type SearchResult,
   sectionCanOverlap,
 } from '@/types/SearchQuery';
 
@@ -37,11 +37,9 @@ const SharedStateContext = createContext<
       setRmp: Setter<{ [key: string]: GenericFetchedData<RMP> }>;
       sections: { [key: string]: GenericFetchedData<Sections> };
       setSections: Setter<{ [key: string]: GenericFetchedData<Sections> }>;
-      compare: SearchQuery[];
-      addToCompare: (query: SearchQuery) => void;
-      removeFromCompare: (query: SearchQuery) => void;
-      compareGrades: { [key: string]: GenericFetchedData<Grades> };
-      compareRmp: { [key: string]: GenericFetchedData<RMP> };
+      compare: SearchResult[];
+      addToCompare: (query: SearchResult) => void;
+      removeFromCompare: (query: SearchResult) => void;
       compareColorMap: { [key: string]: string };
       planner: SearchQueryMultiSection[];
       addToPlanner: (query: SearchQuery) => void;
@@ -55,16 +53,17 @@ const SharedStateContext = createContext<
       setChosenSemesters: Setter<string[]>;
       courseNames: { [key: string]: string | undefined };
       setCourseNames: Setter<{ [key: string]: string | undefined }>;
-      latestSemester: GenericFetchedData<string> | undefined;
-      setLatestSemester: Setter<GenericFetchedData<string> | undefined>;
+      latestSemester: string;
     }
   | undefined
 >(undefined);
 
 export function SharedStateProvider({
   children,
+  latestSemester,
 }: {
   children: React.ReactNode;
+  latestSemester: string;
 }) {
   const [grades, setGrades] = useState<{
     [key: string]: GenericFetchedData<Grades>;
@@ -78,18 +77,22 @@ export function SharedStateProvider({
     [key: string]: GenericFetchedData<Sections>;
   }>({});
 
-  const [compare, setCompare] = useState<SearchQuery[]>([]);
+  const [compare, setCompare] = useState<SearchResult[]>([]);
 
   const [chosenSemesters, setChosenSemesters] = useState<string[]>([]);
   const semesters = useMemo(() => {
-    const allSemesters = Object.values(grades)
-      // remove errored
-      .filter((grade) => grade.message === 'success')
-      //remove grade data, just semesters
-      .flatMap((grade) =>
-        grade.data.grades.map((gradeSemester) => gradeSemester._id),
-      )
-      .sort((a, b) => compareSemesters(b, a));
+    const allSemesters = [
+      ...new Set(
+        Object.values(grades)
+          // remove errored
+          .filter((grade) => grade.message === 'success')
+          //remove grade data, just semesters
+          .flatMap((grade) =>
+            grade.data.grades.map((gradeSemester) => gradeSemester._id),
+          )
+          .sort((a, b) => compareSemesters(b, a)),
+      ),
+    ];
     setChosenSemesters(allSemesters);
     return allSemesters;
   }, [grades]);
@@ -103,54 +106,41 @@ export function SharedStateProvider({
     }
     return build;
   }, [grades, chosenSemesters]);
-  //Set chosen semesters and update grades and compare grades
-  const compareGrades = useMemo(() => {
-    const build: Record<string, GenericFetchedData<Grades>> = {};
-    for (const query of Object.values(compare)) {
-      const label = searchQueryLabel(query);
-      if (grades[label].message === 'success') {
-        build[label] = { ...grades[label] };
-        build[label].data.filtered = calculateGrades(
-          grades[label].data.grades,
-          chosenSemesters,
-        );
-      }
-    }
-    return build;
-  }, [grades, compare, chosenSemesters]);
 
-  const compareRmp = useMemo(() => {
-    const build: Record<string, GenericFetchedData<RMP>> = {};
-    for (const query of Object.values(compare)) {
-      const label = searchQueryLabel(convertToProfOnly(query));
-      if (label !== '' && rmp[label].message === 'success') {
-        build[label] = rmp[label];
-      }
-    }
-    return build;
-  }, [rmp, compare]);
   //Add a course+prof combo to compare (happens from search results)
   //copy over data basically
-  function addToCompare(query: SearchQuery) {
+  function addToCompare(result: SearchResult) {
     //If not already there
-    if (compare.every((obj) => !searchQueryEqual(obj, query))) {
+    if (
+      compare.every(
+        (obj) => !searchQueryEqual(obj.searchQuery, result.searchQuery),
+      )
+    ) {
       //Add to list
-      setCompare((prev) => prev.concat([query]));
+      setCompare((prev) => [...prev, result]);
     }
   }
 
   //Remove a course+prof combo from compare
-  function removeFromCompare(query: SearchQuery) {
+  function removeFromCompare(result: SearchResult) {
     //If already there
-    if (compare.some((obj) => searchQueryEqual(obj, query))) {
+    if (
+      compare.some((obj) =>
+        searchQueryEqual(obj.searchQuery, result.searchQuery),
+      )
+    ) {
       //Remove from list
-      setCompare((prev) => prev.filter((el) => !searchQueryEqual(el, query)));
+      setCompare((prev) => [
+        ...prev.filter(
+          (el) => !searchQueryEqual(el.searchQuery, result.searchQuery),
+        ),
+      ]);
     }
   }
 
   const compareColorMap = Object.fromEntries(
     compare.map((key, index) => [
-      searchQueryLabel(key),
+      searchQueryLabel(key.searchQuery),
       compareColors[index % compareColors.length],
     ]),
   );
@@ -240,10 +230,6 @@ export function SharedStateProvider({
     [key: string]: string | undefined;
   }>({});
 
-  const [latestSemester, setLatestSemester] = useState<
-    GenericFetchedData<string> | undefined
-  >();
-
   return (
     <SharedStateContext.Provider
       value={{
@@ -257,8 +243,6 @@ export function SharedStateProvider({
         compare,
         addToCompare,
         removeFromCompare,
-        compareGrades,
-        compareRmp,
         compareColorMap,
         planner,
         addToPlanner,
@@ -271,7 +255,6 @@ export function SharedStateProvider({
         courseNames,
         setCourseNames,
         latestSemester,
-        setLatestSemester,
       }}
     >
       {children}

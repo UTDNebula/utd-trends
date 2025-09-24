@@ -1,32 +1,31 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import React from 'react';
+import React, { use, useMemo } from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import SearchResultsTable from '@/components/search/SearchResultsTable/SearchResultsTable';
-import {
-  convertToProfOnly,
-  type SearchQuery,
-  searchQueryLabel,
-} from '@/types/SearchQuery';
+import { type SearchResult } from '@/types/SearchQuery';
+import { calculateGrades } from '@/modules/fetchGrades2';
+import { ChosenSemesterContext } from './SemesterContext';
+import { getSemestersFromSearchResults } from '@/modules/semesters';
 
 interface Props {
   numSearches: number;
-  results: SearchQuery[];
+  resultsPromise: Promise<SearchResult[]>;
 }
 
 /**
  * Returns the left side
  */
 export default function ClientLeft(props: Props) {
-  const { grades, rmp, sections } = useSharedState();
+  const { latestSemester } = useSharedState();
 
   const searchParams = useSearchParams();
 
   //Filtered results
-  let includedResults: SearchQuery[] = [];
-  let unIncludedResults: SearchQuery[] = [];
+  let includedResults: SearchResult[] = [];
+  let unIncludedResults: SearchResult[] = [];
 
   //Filters
   const minGPA = searchParams.get('minGPA');
@@ -34,108 +33,64 @@ export default function ClientLeft(props: Props) {
   const maxDiff = searchParams.get('maxDiff');
   const availability = searchParams.get('availability') === 'true';
 
+  const results = use(props.resultsPromise);
+
+  const chosenSemesters =
+    use(ChosenSemesterContext).chosenSemesters ??
+    getSemestersFromSearchResults(results);
+  const filteredResults = useMemo(
+    () =>
+      results.filter((result) => {
+        if (
+          typeof minGPA === 'string' &&
+          calculateGrades(result.grades, chosenSemesters).gpa <
+            parseFloat(minGPA)
+        )
+          return false;
+
+        // check if this search result should have RMP data
+        if (result.type !== 'course') {
+          if (
+            typeof minRating === 'string' &&
+            result.RMP &&
+            result.RMP.avgRating < parseFloat(minRating)
+          )
+            return false;
+          if (
+            typeof maxDiff === 'string' &&
+            result.RMP &&
+            result.RMP.avgDifficulty < parseFloat(maxDiff)
+          )
+            return false;
+        }
+        return true;
+      }),
+    [results, minGPA, minRating, maxDiff, chosenSemesters],
+  );
   //Filter results based on gpa, rmp, and rmp difficulty
-  includedResults = props.results.filter((result) => {
-    //Remove if over threshold
-    const courseGrades = grades[searchQueryLabel(result)];
-    const courseSection = sections[searchQueryLabel(result)];
-    if (
-      typeof courseGrades !== 'undefined' &&
-      courseGrades.message === 'success' &&
-      courseGrades.data.filtered.gpa === -1 &&
-      !(
-        typeof courseSection !== 'undefined' &&
-        courseSection.message === 'success' &&
-        availability &&
-        courseSection.data.latest.length
-      )
-    ) {
+  includedResults = filteredResults.filter((result) => {
+    const availableThisSemester = result.sections.some(
+      (section) => section.academic_session.name === latestSemester,
+    );
+    if (availability && !availableThisSemester) return false;
+    const hasChosenSemester = result.sections.some((s) =>
+      chosenSemesters.includes(s.academic_session.name),
+    );
+    if (!availability && !hasChosenSemester && result.grades.length !== 0)
       return false;
-    }
-    if (
-      typeof minGPA === 'string' &&
-      typeof courseGrades !== 'undefined' &&
-      courseGrades.message === 'success' &&
-      courseGrades.data.filtered.gpa < parseFloat(minGPA)
-    ) {
-      return false;
-    }
-    const courseRmp = rmp[searchQueryLabel(convertToProfOnly(result))];
-    if (
-      typeof minRating === 'string' &&
-      typeof courseRmp !== 'undefined' &&
-      courseRmp.message === 'success' &&
-      courseRmp.data.avgRating < parseFloat(minRating)
-    ) {
-      return false;
-    }
-    if (
-      typeof maxDiff === 'string' &&
-      typeof courseRmp !== 'undefined' &&
-      courseRmp.message === 'success' &&
-      courseRmp.data.avgDifficulty > parseFloat(maxDiff)
-    ) {
-      return false;
-    }
-
-    if (
-      typeof courseSection !== 'undefined' &&
-      courseSection.message === 'success' &&
-      availability &&
-      !courseSection.data.latest.length
-    ) {
-      return false;
-    }
-
     return true;
   });
-  unIncludedResults = props.results.filter((result) => {
-    //Remove if over threshold
-    const courseGrades = grades[searchQueryLabel(result)];
-    if (
-      typeof courseGrades !== 'undefined' &&
-      courseGrades.message === 'success' &&
-      courseGrades.data.filtered.gpa === -1
-    ) {
-      return false;
-    }
-    if (
-      typeof minGPA === 'string' &&
-      typeof courseGrades !== 'undefined' &&
-      courseGrades.message === 'success' &&
-      courseGrades.data.filtered.gpa < parseFloat(minGPA)
-    ) {
-      return false;
-    }
-    const courseRmp = rmp[searchQueryLabel(convertToProfOnly(result))];
-    if (
-      typeof minRating === 'string' &&
-      typeof courseRmp !== 'undefined' &&
-      courseRmp.message === 'success' &&
-      courseRmp.data.avgRating < parseFloat(minRating)
-    ) {
-      return false;
-    }
-    if (
-      typeof maxDiff === 'string' &&
-      typeof courseRmp !== 'undefined' &&
-      courseRmp.message === 'success' &&
-      courseRmp.data.avgDifficulty > parseFloat(maxDiff)
-    ) {
-      return false;
-    }
-    const courseSection = sections[searchQueryLabel(result)];
-    if (
-      !(
-        typeof courseSection !== 'undefined' &&
-        courseSection.message === 'success' &&
-        availability &&
-        !courseSection.data.latest.length
-      )
-    ) {
-      return false;
-    }
-
+  unIncludedResults = filteredResults.filter((result) => {
+    if (!availability) return false;
+    const availableThisSemester =
+      result.sections.filter(
+        (section) => section.academic_session.name === latestSemester,
+      ).length > 0;
+    if (availability && availableThisSemester) return false;
+    const hasChosenSemester = result.sections.some((s) =>
+      chosenSemesters.includes(s.academic_session.name),
+    );
+    if (!hasChosenSemester && result.grades.length !== 0) return false;
     return true;
   });
 

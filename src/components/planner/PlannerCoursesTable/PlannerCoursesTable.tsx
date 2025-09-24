@@ -59,9 +59,7 @@ export default function PlannerCoursesTable() {
       <Typography variant="h2" className="leading-tight text-3xl font-bold p-4">
         {'My Planner' +
           (typeof latestSemester !== 'undefined' &&
-          latestSemester.message === 'success'
-            ? ' — ' + displaySemesterName(latestSemester.data, false)
-            : '')}
+            ' — ' + displaySemesterName(latestSemester, false))}
       </Typography>
       <div className="flex flex-col gap-4 mb-4 sm:mb-0">
         {planner.map((query, index) => {

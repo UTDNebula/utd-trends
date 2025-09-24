@@ -14,13 +14,18 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { usePathname, useSearchParams } from 'next/navigation';
-import React from 'react';
+import React, { use, useMemo } from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import { compareSemesters, displaySemesterName } from '@/modules/semesters';
-import useHasHydrated from '@/modules/useHasHydrated';
+import {
+  compareSemesters,
+  displaySemesterName,
+  getSemestersFromSearchResults,
+} from '@/modules/semesters';
+import type { SearchResult } from '@/types/SearchQuery';
+import { ChosenSemesterContext } from '@/app/dashboard/SemesterContext';
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
@@ -80,21 +85,25 @@ export function LoadingFilters() {
 /**
  * This component returns a set of filters with which to sort results.
  */
-export default function Filters() {
-  const { semesters, chosenSemesters, setChosenSemesters, latestSemester } =
-    useSharedState();
+export default function Filters({
+  searchResultsPromise,
+}: {
+  searchResultsPromise: Promise<SearchResult[]>;
+}) {
+  const { latestSemester, compare } = useSharedState();
+  const searchResults = use(searchResultsPromise);
+  const semesters = useMemo(() => {
+    return getSemestersFromSearchResults(searchResults.concat(compare));
+  }, [searchResults, compare]);
+  const chosenSemesters =
+    use(ChosenSemesterContext).chosenSemesters ?? semesters;
+  const setChosenSemesters = use(ChosenSemesterContext).setChosenSemesters;
 
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
-
-  // To avoid hydration errors
-  const hasHydrated = useHasHydrated();
-  if (!hasHydrated) {
-    return <LoadingFilters />;
-  }
 
   let minGPA = searchParams.get('minGPA') ?? '';
   if (Array.isArray(minGPA)) {
@@ -267,7 +276,7 @@ export default function Filters() {
               labelId="Semesters"
               multiple
               value={chosenSemesters}
-              onChange={(event: SelectChangeEvent<string[]>) => {
+              onChange={(event) => {
                 const {
                   target: { value },
                 } = event;
@@ -386,11 +395,7 @@ export default function Filters() {
                 />
               }
               label={
-                'Teaching ' +
-                (typeof latestSemester !== 'undefined' &&
-                latestSemester.message === 'success'
-                  ? 'in ' + displaySemesterName(latestSemester.data, false)
-                  : 'Next Semester')
+                'Teaching in ' + displaySemesterName(latestSemester, false)
               }
             />
           </FormControl>
