@@ -27,10 +27,9 @@ function getSemesterGPAs(
     name: string;
     data: Grades['grades'];
   },
-  semesterIndex: Map<string, number>,
+  semesterMapping: Map<string, number>,
 ) {
-  const regular: { x: number; y: number }[] = [];
-  const summer: { x: number; y: number }[] = [];
+  const allPoints: { x: number; y: number }[] = [];
 
   data.data
     .toSorted((a, b) => sortSemesters(a._id, b._id))
@@ -53,13 +52,13 @@ function getSemesterGPAs(
             ]);
       }
 
-      const idx = semesterIndex.get(semester._id)!;
-      const point = { x: idx, y: gpa };
-      if (semester._id.includes('U')) summer.push(point);
-      else regular.push(point);
+      const xValue = semesterMapping.get(semester._id);
+      if (xValue !== undefined) {
+        allPoints.push({ x: xValue, y: gpa });
+      }
     });
 
-  return { regular, summer };
+  return allPoints;
 }
 
 // Dynamically import react-apexcharts with SSR disabled.
@@ -82,35 +81,58 @@ export default function LineGraph(props: Props) {
     (fullScreenOpen ? FullscreenCloseIcon : FullscreenOpenIcon) +
     '</div>';
 
-  // Build full semester list dynamically
-  const combined = Array.from(
+  // Get all unique semesters that actually have data
+  const actualSemesters = Array.from(
     new Set(props.series.flatMap((s) => s.data.map((sem) => sem._id))),
   ).toSorted(sortSemesters);
 
   // Detect if any summer semesters exist in the raw data
-  const hasSummer = combined.some((code) => code.includes('U'));
+  const summerSemestersWithData = new Set(
+    actualSemesters.filter((code) => code.includes('U')),
+  );
 
-  const minYear = parseInt(combined[0]);
-  const maxYear = parseInt(combined[combined.length - 1]);
+  const minYear = parseInt(actualSemesters[0]);
+  const maxYear = parseInt(actualSemesters[actualSemesters.length - 1]);
 
-  const allSemesters: string[] = [];
+  const allSemesterCodes: string[] = [];
+  const labeledPositions = new Set<number>(); // Track which positions should have labels
+
+  let position = 0;
   for (let y = minYear; y <= maxYear; y++) {
-    allSemesters.push(`${y}S`);
-    if (hasSummer) allSemesters.push(`${y}U`);
-    allSemesters.push(`${y}F`);
+    // Spring
+    const springCode = `${y}S`;
+    allSemesterCodes.push(springCode);
+    labeledPositions.add(position);
+    position++;
+
+    const summerCode = `${y}U`;
+    if (summerSemestersWithData.has(summerCode)) {
+      allSemesterCodes.push(summerCode);
+      position++;
+    }
+
+    const fallCode = `${y}F`;
+    allSemesterCodes.push(fallCode);
+    labeledPositions.add(position);
+    position++;
   }
 
-  const semesterIndex = new Map<string, number>();
-  allSemesters.forEach((code, i) => semesterIndex.set(code, i));
-
-  const series = props.series.flatMap((single) => {
-    const { regular, summer } = getSemesterGPAs(single, semesterIndex);
-    const arr = [{ name: single.name, data: regular }];
-    if (summer.length > 0) {
-      arr.push({ name: `${single.name} (Summer)`, data: summer });
-    }
-    return arr;
+  const semesterMapping = new Map<string, number>();
+  allSemesterCodes.forEach((code, index) => {
+    semesterMapping.set(code, index);
   });
+
+  const series = props.series.map((single) => {
+    const allPoints = getSemesterGPAs(single, semesterMapping);
+    return { name: single.name, data: allPoints };
+  });
+
+  const allXValues = series.flatMap((s) => s.data.map((d) => d.x));
+  const minX = allXValues.length > 0 ? Math.min(...allXValues) : 0;
+  const maxX =
+    allXValues.length > 0
+      ? Math.max(...allXValues)
+      : allSemesterCodes.length - 1;
 
   const theme = useTheme();
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -141,16 +163,24 @@ export default function LineGraph(props: Props) {
     legend: { show: series.length !== 1 },
     xaxis: {
       type: 'numeric',
-      min: 0,
-      max: allSemesters.length - 1,
-      tickAmount: allSemesters.length - 1,
+      min: minX,
+      max: maxX,
+      tickAmount: maxX - minX,
+      tickPlacement: 'on',
       labels: {
         formatter: (val: string | number) => {
-          const idx = Math.round(Number(val));
-          return allSemesters[idx] ?? '';
+          const index = Math.round(Number(val));
+          if (labeledPositions.has(index) && index < allSemesterCodes.length) {
+            return allSemesterCodes[index];
+          }
+          return '';
         },
         rotate: -45,
         style: { fontSize: '12px' },
+        hideOverlappingLabels: false,
+      },
+      axisTicks: {
+        show: true,
       },
     },
     yaxis: {
@@ -167,7 +197,6 @@ export default function LineGraph(props: Props) {
     stroke: {
       curve: 'straight',
       width: 5,
-      dashArray: series.map((s) => (s.name.includes('(Summer)') ? 5 : 0)),
     },
     title: {
       text: props.title,
@@ -183,7 +212,13 @@ export default function LineGraph(props: Props) {
     markers: { size: 4 },
     tooltip: {
       x: {
-        formatter: (val) => allSemesters[Math.round(val)] ?? '',
+        formatter: (val) => {
+          const index = Math.round(val);
+          if (index >= 0 && index < allSemesterCodes.length) {
+            return allSemesterCodes[index];
+          }
+          return '';
+        },
       },
     },
   };
