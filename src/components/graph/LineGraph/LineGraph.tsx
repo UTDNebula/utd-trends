@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
+import { useSharedState } from '@/app/SharedStateProvider';
 import { compareColors } from '@/modules/colors';
 import type { Grades } from '@/modules/fetchGrades';
 
@@ -90,6 +91,7 @@ type Props = {
 };
 
 export default function LineGraph(props: Props) {
+  const { setChosenSemesters } = useSharedState();
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
@@ -153,6 +155,12 @@ export default function LineGraph(props: Props) {
           // disable if only one data point cause it look weird
           !series.every((single) => single.data.length === 1),
       },
+      events: {
+        dataPointSelection: (event, chartContext, config) => {
+          const semesterClicked = allSemesters[config.dataPointIndex];
+          setChosenSemesters([semesterClicked]);
+        },
+      },
     },
     grid: {
       borderColor: prefersDarkMode ? '#404040' : '#e0e0e0',
@@ -177,6 +185,10 @@ export default function LineGraph(props: Props) {
       labels: {
         formatter: (value: number) => value.toFixed(2),
       },
+    },
+    tooltip: {
+      intersect: true,
+      shared: false,
     },
     colors:
       series.length === 1
@@ -209,7 +221,7 @@ export default function LineGraph(props: Props) {
       mode: prefersDarkMode ? 'dark' : 'light',
     },
     markers: {
-      size: 4,
+      size: 6,
     },
   };
 
