@@ -158,7 +158,6 @@ export default async function fetchRmp(
 
   // Fetch professor info by name with graphQL
   const res = await fetch(RMP_GRAPHQL_URL, graphQlUrlProp);
-  console.log(`${profFirst} ${profLast}:${res.status}`);
   if (!res.ok) throw new Error('RMP Request Failed');
 
   // Check data

@@ -102,7 +102,6 @@ export default async function Page({ searchParams }: Props) {
 
   // this maps each searchTerm into SearchQuery object
   const decodedSearchTerms = searchTerms.split(',').map(decodeSearchQueryLabel);
-  console.log(decodedSearchTerms);
   const courses = decodedSearchTerms.filter(
     (query) => typeof query.prefix !== 'undefined',
   );
@@ -115,7 +114,6 @@ export default async function Page({ searchParams }: Props) {
   } else if (professors.length > 0) {
     results = createSearchQuery(professors, []);
   }
-  console.log(JSON.stringify(results));
   const queryClient = new QueryClient();
   const searchResults = fetchSearchResults(results);
   return (
