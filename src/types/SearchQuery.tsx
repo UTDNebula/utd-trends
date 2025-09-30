@@ -94,12 +94,18 @@ export function convertToCourseOnly(
   };
 }
 
-export function isProfessorQuery(searchQuery: SearchQuery) {
-  return searchQuery.profFirst && searchQuery.profLast;
+export function isProfessorQuery(
+  searchQuery: SearchQuery,
+): searchQuery is SearchQuery & { profFirst: string; profLast: string } {
+  return (
+    searchQuery.profFirst !== undefined && searchQuery.profLast !== undefined
+  );
 }
 
-export function isCourseQuery(searchQuery: SearchQuery) {
-  return searchQuery.prefix && searchQuery.number;
+export function isCourseQuery(
+  searchQuery: SearchQuery,
+): searchQuery is SearchQuery & { prefix: string; number: string } {
+  return searchQuery.prefix !== undefined && searchQuery.number !== undefined;
 }
 
 export function removeSection(

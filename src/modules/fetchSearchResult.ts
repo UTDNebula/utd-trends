@@ -46,6 +46,9 @@ export async function fetchSearchResult(
       searchQuery: searchQuery,
     };
   }
+  if (!isCourseQuery(searchQuery)) {
+    throw new Error('Invalid query');
+  }
   const [grades, sections] = await Promise.all([
     gradesPromise,
     sectionsPromise,
