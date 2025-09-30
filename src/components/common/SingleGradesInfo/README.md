@@ -1,4 +1,4 @@
-This component allows data from the Nebula API (grade distribution data for each search criteria) to be displayed as a graph. To show the graphs, Trends uses the GraphToggle component to toggle between the bar graph and line graph formats. It also shows some more data below the graph for each search: the total number of students who have taken the course/professor, the median gpa, and the mean gpa.
+This component allows data from the Nebula API (grade distribution data from search criteria) to be displayed as a graph. To show the graphs, Trends uses the GraphToggle component to toggle between the bar graph and line graph formats. It also shows some more data (right below the graph) for each search: the total number of students who have taken the course/professor, the median gpa, and the mean gpa.
 
 ### Props Table
 
@@ -20,27 +20,51 @@ import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
 import { Skeleton } from '@mui/material';
 
+const sampleSeries = [
+  {
+    name: 'Sample Course',
+    data: [],
+  },
+];
 const barNode = (
-  <div className="w-full h-64 flex items-center justify-center bg-slate-50">
-    Bar chart placeholder
-  </div>
+  // <div className="w-full h-64 flex items-center justify-center bg-slate-50">
+  //   Bar chart placeholder
+  // </div>
+  <BarGraph
+    series={sampleSeries}
+    xaxisLabels={[
+      'A+',
+      'A',
+      'A-',
+      'B+',
+      'B',
+      'B-',
+      'C+',
+      'C',
+      'C-',
+      'D+',
+      'D',
+      'D-',
+      'F',
+      'W',
+    ]}
+    title="# of Overall Students"
+  ></BarGraph>
 );
 const lineNode = (
-  <div className="w-full h-64 flex items-center justify-center bg-slate-50">
-    Line chart placeholder
-  </div>
+  <LineGraph title="GPA Trend" series={sampleSeries}></LineGraph>
 );
 <>
   <GraphToggle state="ready" bar={barNode} line={lineNode} />
   <div className="flex flex-wrap justify-around">
     <p>
-      Grades: <Skeleton className="inline-block w-[5ch]" />
+      Grades: <b>0</b>
     </p>
     <p>
-      Median GPA: <Skeleton className="inline-block w-[5ch]" />
+      Median GPA: <b>0</b>
     </p>
     <p>
-      Mean GPA: <Skeleton className="inline-block w-[5ch]" />
+      Mean GPA: <b>0</b>
     </p>
   </div>
 </>;
