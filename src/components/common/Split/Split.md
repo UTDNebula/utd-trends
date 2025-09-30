@@ -13,5 +13,21 @@ Split component to make a draggable left and right side. It divides the page int
 ### Split Example
 
 ```jsx
+import React from 'react';
 
+const leftSide = (
+  <h1 className="text-white bg-purple-500 text-center ml-5 my-5">Left Side</h1>
+);
+const rightSide = (
+  <h1 className="text-white bg-purple-500 text-center mr-5 my-5">Right Side</h1>
+);
+
+<Split
+  left={leftSide}
+  right={rightSide}
+  minLeft={30}
+  minRight={30}
+  defaultLeft={40}
+  className=""
+></Split>;
 ```

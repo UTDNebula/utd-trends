@@ -11,12 +11,11 @@ This component allows RateMyProfessor data to be displayed for each course and/o
 ```jsx
 const sampleTag = ['Sample (1)'];
 
-import { Chip, Collapse, Grid, IconButton, Skeleton } from '@mui/material';
+import { Chip, Grid, IconButton } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 <>
   <Grid container spacing={2} className="p-4">
-    {/* Loading skeletons for each metric */}
     <Grid size={6}>
       <p className="text-xl font-bold">5.0</p>
       <p>Professor rating</p>
