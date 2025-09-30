@@ -43,6 +43,7 @@ import {
 } from '@/types/SearchQuery';
 import { calculateGrades } from '@/modules/fetchGrades';
 import { ChosenSemesterContext } from '@/app/dashboard/SemesterContext';
+import { useQueryClient } from '@tanstack/react-query';
 
 function LoadingRow() {
   const nameCell = (
@@ -190,6 +191,7 @@ function Row({
     () => calculateGrades(searchResult.grades, chosenSemesters),
     [searchResult.grades, chosenSemesters],
   );
+  const queryClient = useQueryClient();
 
   const canOpen = searchResult.type === 'course' || searchResult.RMP;
   const nameCell = (
@@ -334,6 +336,10 @@ function Row({
                       if (addJustCourseToo) {
                         addToPlanner(convertToCourseOnly(course));
                       }
+                      queryClient.setQueryData(
+                        ['result', searchQueryLabel(searchResult.searchQuery)],
+                        searchResult,
+                      );
                     }
                   }}
                   icon={<BookOutlinedIcon />}
