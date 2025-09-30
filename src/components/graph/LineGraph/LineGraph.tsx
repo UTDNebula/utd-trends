@@ -6,9 +6,9 @@ import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
-import { useSharedState } from '@/app/SharedStateProvider';
 import { compareColors } from '@/modules/colors';
 import type { Grades } from '@/modules/fetchGrades';
 
