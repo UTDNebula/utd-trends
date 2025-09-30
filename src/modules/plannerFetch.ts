@@ -5,7 +5,7 @@ import {
   type SearchQuery,
   type SearchResult,
 } from '@/types/SearchQuery';
-import { useQuery } from '@tanstack/react-query';
+import { useQueries, useQuery } from '@tanstack/react-query';
 
 async function fetchSearchResult(query: SearchQuery) {
   const params = new URLSearchParams();
@@ -35,4 +35,17 @@ export function useSearchResult(query: SearchQuery) {
     },
   });
   return queryHook;
+}
+export function useSearchresults(queries: SearchQuery[]) {
+  const queriesHook = useQueries({
+    queries: queries.map((q) => {
+      return {
+        queryKey: ['results', searchQueryLabel(q)],
+        queryFn: async () => {
+          return await fetchSearchResult(q);
+        },
+      };
+    }),
+  });
+  return queriesHook;
 }

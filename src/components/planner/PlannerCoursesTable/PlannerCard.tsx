@@ -39,8 +39,9 @@ import {
   type SearchQueryMultiSection,
   sectionCanOverlap,
 } from '@/types/SearchQuery';
-import { useSearchResult } from '@/modules/plannerFetch';
+import { useSearchResult, useSearchresults } from '@/modules/plannerFetch';
 import { calculateGrades } from '@/modules/fetchGrades';
+import { useSharedState } from '@/app/SharedStateProvider';
 
 export function LoadingPlannerCard() {
   return (
@@ -361,6 +362,8 @@ type PlannerCardProps = {
 };
 
 export default function PlannerCard(props: PlannerCardProps) {
+  const { planner } = useSharedState();
+  const allResults = useSearchresults(planner);
   const [open, setOpen] = useState(false);
   const { isSuccess, data: result } = useSearchResult(props.query);
   const [whichOpen, setWhichOpen] = useState<'sections' | 'grades'>('sections');

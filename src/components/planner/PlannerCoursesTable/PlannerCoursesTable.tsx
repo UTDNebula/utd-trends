@@ -10,10 +10,10 @@ import PlannerCard, {
 import { displaySemesterName } from '@/modules/semesters';
 import {
   convertToCourseOnly,
-  removeSection,
   searchQueryLabel,
   searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
+import { useSearchresults } from '@/modules/plannerFetch';
 
 export function LoadingPlannerCoursesTable() {
   const { planner } = useSharedState();
@@ -49,7 +49,14 @@ export default function PlannerCoursesTable() {
     }
     setOpenConflictMessage(false);
   };
-
+  const allResults = useSearchresults(planner);
+  const latestSections = allResults.map((r) =>
+    r.isSuccess
+      ? r.data.sections.filter(
+          (s) => s.academic_session.name === latestSemester,
+        )
+      : [],
+  );
   return (
     <>
       <Typography variant="h2" className="leading-tight text-3xl font-bold p-4">
@@ -68,22 +75,14 @@ export default function PlannerCoursesTable() {
                 removeFromPlanner(query);
               }}
               selectedSections={planner
-                .flatMap((searchQuery) =>
-                  searchQueryMultiSectionSplit(searchQuery),
-                )
-                .map((single) => {
-                  const singleSectionData =
-                    sections[searchQueryLabel(removeSection(single))];
-                  if (
-                    typeof singleSectionData === 'undefined' ||
-                    singleSectionData.message !== 'success'
-                  ) {
-                    return undefined;
-                  }
-                  return singleSectionData.data?.latest.find(
-                    (section) =>
-                      section.section_number === single.sectionNumber,
-                  );
+                .map((searchQuery) => searchQueryMultiSectionSplit(searchQuery))
+                .flatMap((queries, idx) => {
+                  return queries.map((query) => {
+                    return latestSections[idx].find(
+                      (section) =>
+                        section.section_number === query.sectionNumber,
+                    );
+                  });
                 })
                 .filter((section) => typeof section !== 'undefined')}
               openConflictMessage={() => setOpenConflictMessage(true)}
