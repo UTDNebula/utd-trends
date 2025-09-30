@@ -362,7 +362,6 @@ export default function SearchBar(props: Props) {
               variant="outlined"
               className={props.input_className}
               placeholder="ex. GOVT 2306"
-               
               autoFocus={props.autoFocus}
             />
           );

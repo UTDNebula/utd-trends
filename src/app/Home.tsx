@@ -87,7 +87,7 @@ export default function Home(props: Props) {
       <div className="max-w-xl grow flex flex-col justify-center">
         <h2 className="text-sm font-semibold mb-3 text-cornflower-600 dark:text-cornflower-400 tracking-wider flex gap-1 items-center">
           <span className="leading-none">POWERED BY</span>
-          { }
+          {}
           <a
             href="https://www.utdnebula.com/"
             target="_blank"
@@ -106,7 +106,6 @@ export default function Home(props: Props) {
           find the perfect class.
         </p>
         <SearchBar
-           
           autoFocus={true}
           onSelect={searchOptionChosen}
           input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
