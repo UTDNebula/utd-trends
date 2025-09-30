@@ -115,9 +115,6 @@ const fetchReleases = async () => {
     });
 };
 
-/**
- * WhatsNewButton component that shows the latest feature from GitHub releases
- */
 export default function WhatsNewButton() {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [readFeatures, setReadFeatures] = usePersistantState<string[]>(

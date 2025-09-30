@@ -16,9 +16,6 @@ interface Props {
   defaultLeft: number;
 }
 
-/**
- * Split component to make a draggable left and right side
- */
 export default function Split(props: Props) {
   const panelLRef = useRef<ImperativePanelHandle>(null);
   const panelRRef = useRef<ImperativePanelHandle>(null);
