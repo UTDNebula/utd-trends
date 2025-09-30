@@ -9,7 +9,7 @@ import SingleGradesInfo, {
 import type { Course } from '@/modules/fetchCourse';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
-import { calculateGrades, type GradesData } from '@/modules/fetchGrades2';
+import { calculateGrades, type GradesData } from '@/modules/fetchGrades';
 
 export function LoadingCourseOverview() {
   const courseComponent = (

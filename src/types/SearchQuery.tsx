@@ -1,6 +1,6 @@
-import type { GradesData } from '@/modules/fetchGrades2';
-import type { RMP } from '@/modules/fetchRmp2';
-import type { SectionsData } from '@/modules/fetchSections2';
+import type { GradesData } from '@/modules/fetchGrades';
+import type { RMP } from '@/modules/fetchRmp';
+import type { SectionsData } from '@/modules/fetchSections';
 
 export type SearchQuery = {
   prefix?: string;
@@ -95,11 +95,11 @@ export function convertToCourseOnly(
 }
 
 export function isProfessorQuery(searchQuery: SearchQuery) {
-  return 'profFirst' in searchQuery && 'profLast' in searchQuery;
+  return searchQuery.profFirst && searchQuery.profLast;
 }
 
 export function isCourseQuery(searchQuery: SearchQuery) {
-  return 'prefix' in searchQuery && 'number' in searchQuery;
+  return searchQuery.prefix && searchQuery.number;
 }
 
 export function removeSection(

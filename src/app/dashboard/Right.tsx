@@ -9,9 +9,9 @@ import ProfessorOverview, {
   LoadingProfessorOverview,
 } from '@/components/overview/ProfessorOverview/ProfessorOverview';
 import fetchCourse from '@/modules/fetchCourse';
-import fetchGrades from '@/modules/fetchGrades2';
-import fetchProfessor from '@/modules/fetchProfessor2';
-import fetchRmp from '@/modules/fetchRmp2';
+import fetchGrades from '@/modules/fetchGrades';
+import fetchProfessor from '@/modules/fetchProfessor';
+import fetchRmp from '@/modules/fetchRmp';
 import { type SearchQuery, type SearchResult } from '@/types/SearchQuery';
 import Compare from '@/components/compare/Compare/Compare';
 

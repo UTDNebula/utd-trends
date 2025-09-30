@@ -8,7 +8,7 @@ import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
 import { searchQueryLabel, type SearchResult } from '@/types/SearchQuery';
-import { calculateGrades, type GradesSummary } from '@/modules/fetchGrades2';
+import { calculateGrades, type GradesSummary } from '@/modules/fetchGrades';
 import { getSemestersFromSearchResults } from '@/modules/semesters';
 import { ChosenSemesterContext } from '@/app/dashboard/SemesterContext';
 

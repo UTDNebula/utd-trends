@@ -11,10 +11,10 @@ import SingleGradesInfo, {
 import SingleProfInfo, {
   LoadingSingleProfInfo,
 } from '@/components/common/SingleProfInfo/SingleProfInfo';
-import type { Professor } from '@/modules/fetchProfessor2';
-import type { RMP } from '@/modules/fetchRmp2';
+import type { Professor } from '@/modules/fetchProfessor';
+import type { RMP } from '@/modules/fetchRmp';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
-import { calculateGrades, type GradesData } from '@/modules/fetchGrades2';
+import { calculateGrades, type GradesData } from '@/modules/fetchGrades';
 
 export function LoadingProfessorOverview() {
   return (

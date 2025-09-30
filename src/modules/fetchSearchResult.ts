@@ -7,9 +7,9 @@ import {
   type SearchQuery,
   type SearchResult,
 } from '@/types/SearchQuery';
-import fetchGrades from './fetchGrades2';
-import fetchRmp from './fetchRmp2';
-import fetchSections from './fetchSections2';
+import fetchGrades from './fetchGrades';
+import fetchRmp from './fetchRmp';
+import fetchSections from './fetchSections';
 const coursePrefixNumberTable = untypedCoursePrefixNumberTable as {
   [key: string]: string;
 };

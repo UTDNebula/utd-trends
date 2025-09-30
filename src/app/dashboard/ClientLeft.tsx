@@ -6,7 +6,7 @@ import React, { use, useMemo } from 'react';
 import { useSharedState } from '@/app/SharedStateProvider';
 import SearchResultsTable from '@/components/search/SearchResultsTable/SearchResultsTable';
 import { type SearchResult } from '@/types/SearchQuery';
-import { calculateGrades } from '@/modules/fetchGrades2';
+import { calculateGrades } from '@/modules/fetchGrades';
 import { ChosenSemesterContext } from './SemesterContext';
 import { getSemestersFromSearchResults } from '@/modules/semesters';
 

@@ -10,7 +10,6 @@ import PlannerCard, {
 import { displaySemesterName } from '@/modules/semesters';
 import {
   convertToCourseOnly,
-  convertToProfOnly,
   removeSection,
   searchQueryLabel,
   searchQueryMultiSectionSplit,
@@ -35,9 +34,6 @@ export function LoadingPlannerCoursesTable() {
 
 export default function PlannerCoursesTable() {
   const {
-    grades,
-    rmp,
-    sections,
     planner,
     removeFromPlanner,
     setPlannerSection,
@@ -62,38 +58,12 @@ export default function PlannerCoursesTable() {
             ' — ' + displaySemesterName(latestSemester, false))}
       </Typography>
       <div className="flex flex-col gap-4 mb-4 sm:mb-0">
-        {planner.map((query, index) => {
-          const sectionData = sections[searchQueryLabel(removeSection(query))];
-
-          const allSections =
-            typeof sectionData !== 'undefined' &&
-            sectionData.message === 'success' &&
-            Array.isArray(sectionData.data.all)
-              ? sectionData.data.all
-              : [];
-
-          const bestSyllabusUri = allSections
-            .filter((s) => !!s.syllabus_uri && !!s.academic_session?.start_date)
-            .sort(
-              (a, b) =>
-                new Date(b.academic_session.start_date).getTime() -
-                new Date(a.academic_session.start_date).getTime(),
-            )?.[0]?.syllabus_uri;
-
+        {planner.map((query) => {
           return (
             <PlannerCard
-              key={index}
+              key={searchQueryLabel(query)}
               query={query}
-              sections={
-                typeof sectionData !== 'undefined' &&
-                sectionData.message === 'success'
-                  ? sectionData.data.latest
-                  : undefined
-              }
-              bestSyllabus={bestSyllabusUri}
               setPlannerSection={setPlannerSection}
-              grades={grades[searchQueryLabel(removeSection(query))]}
-              rmp={rmp[searchQueryLabel(convertToProfOnly(query))]}
               removeFromPlanner={() => {
                 removeFromPlanner(query);
               }}

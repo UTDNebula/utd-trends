@@ -25,14 +25,11 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
-import type { Grades } from '@/modules/fetchGrades';
-import type { RMP } from '@/modules/fetchRmp';
 import type { Sections } from '@/modules/fetchSections';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -42,6 +39,8 @@ import {
   type SearchQueryMultiSection,
   sectionCanOverlap,
 } from '@/types/SearchQuery';
+import { useSearchResult } from '@/modules/plannerFetch';
+import { calculateGrades } from '@/modules/fetchGrades';
 
 export function LoadingPlannerCard() {
   return (
@@ -353,11 +352,7 @@ function MeetingChip(props: {
 
 type PlannerCardProps = {
   query: SearchQueryMultiSection;
-  sections?: Sections['all'];
-  bestSyllabus: string;
   setPlannerSection: (searchQuery: SearchQuery, section: string) => void;
-  grades: GenericFetchedData<Grades>;
-  rmp: GenericFetchedData<RMP>;
   removeFromPlanner: () => void;
   selectedSections: Sections['all'];
   openConflictMessage: () => void;
@@ -365,49 +360,37 @@ type PlannerCardProps = {
   courseName: string | undefined;
 };
 
-//TODO: add route to get the data
 export default function PlannerCard(props: PlannerCardProps) {
   const [open, setOpen] = useState(false);
+  const { isSuccess, data: result } = useSearchResult(props.query);
+  const [whichOpen, setWhichOpen] = useState<'sections' | 'grades'>('sections');
 
-  //appease the typescript gods
-  const sections = props.sections;
-  const canOpenSections =
-    typeof sections !== 'undefined' && sections.length !== 0;
-  const canOpenGrades =
-    !(
-      typeof props.grades === 'undefined' || props.grades.message !== 'success'
-    ) || !(typeof props.rmp === 'undefined' || props.rmp.message === 'success');
-  const [whichOpen, setWhichOpen] = useState<'sections' | 'grades' | null>(
-    canOpenSections ? 'sections' : canOpenGrades ? 'grades' : null,
-  );
-  useEffect(() => {
-    setWhichOpen((prev) => {
-      if (prev === null) {
-        return canOpenSections ? 'sections' : canOpenGrades ? 'grades' : null;
-      }
-      return prev;
-    });
-  }, [canOpenSections, canOpenGrades]);
+  if (!isSuccess) {
+    return <LoadingPlannerCard />;
+  }
   function handleOpen() {
-    if (
-      (whichOpen === 'sections' && canOpenSections) ||
-      (whichOpen === 'grades' && canOpenGrades)
-    ) {
+    if (whichOpen === 'sections' || whichOpen === 'grades') {
       setOpen(!open);
     }
   }
-
+  const allSections = result.sections;
+  const bestSyllabus = allSections
+    .filter((s) => !!s.syllabus_uri && !!s.academic_session?.start_date)
+    .sort(
+      (a, b) =>
+        new Date(b.academic_session.start_date).getTime() -
+        new Date(a.academic_session.start_date).getTime(),
+    )?.[0]?.syllabus_uri;
   const hasMultipleDateRanges =
-    typeof props.sections !== 'undefined' && props.sections.length >= 1
-      ? props.sections.some(
+    typeof result.sections !== 'undefined' && result.sections.length >= 1
+      ? result.sections.some(
           (section) =>
             section.meetings[0].start_date !==
-              props.sections![0].meetings[0].start_date ||
+              result.sections![0].meetings[0].start_date ||
             section.meetings[0].end_date !==
-              props.sections![0].meetings[0].end_date,
+              result.sections![0].meetings[0].end_date,
         )
       : false;
-
   return (
     <Box
       component={Paper}
@@ -422,10 +405,7 @@ export default function PlannerCard(props: PlannerCardProps) {
             handleOpen();
           }
         }}
-        className={
-          'p-4 flex items-center gap-4' +
-          (canOpenSections || canOpenGrades ? ' cursor-pointer' : '')
-        }
+        className={'p-4 flex items-center gap-4 cursor-pointer'}
       >
         {/* Left-side Content */}
         <div className="flex items-center">
@@ -440,7 +420,6 @@ export default function PlannerCard(props: PlannerCardProps) {
                 e.stopPropagation(); // prevents double opening/closing
                 handleOpen();
               }}
-              disabled={!canOpenSections && !canOpenGrades}
               className={'transition-transform' + (open ? ' rotate-90' : '')}
             >
               <KeyboardArrowIcon fontSize="inherit" />
@@ -467,10 +446,10 @@ export default function PlannerCard(props: PlannerCardProps) {
               value={whichOpen}
               exclusive
               onChange={(_, newValue) => {
-                if (newValue === 'sections' && canOpenSections) {
+                if (newValue === 'sections') {
                   setWhichOpen('sections');
                 }
-                if (newValue === 'grades' && canOpenGrades) {
+                if (newValue === 'grades') {
                   setWhichOpen('grades');
                 }
                 setOpen(true);
@@ -480,18 +459,10 @@ export default function PlannerCard(props: PlannerCardProps) {
               onClick={(e) => e.stopPropagation()}
               className="ml-2"
             >
-              <ToggleButton
-                value="sections"
-                aria-label="sections"
-                disabled={!canOpenSections}
-              >
+              <ToggleButton value="sections" aria-label="sections">
                 <EventIcon />
               </ToggleButton>
-              <ToggleButton
-                value="grades"
-                aria-label="grades and rmp"
-                disabled={!canOpenGrades}
-              >
+              <ToggleButton value="grades" aria-label="grades and rmp">
                 <BarChartIcon />
               </ToggleButton>
             </ToggleButtonGroup>
@@ -516,11 +487,11 @@ export default function PlannerCard(props: PlannerCardProps) {
             title={
               typeof props.query.profFirst !== 'undefined' &&
               typeof props.query.profLast !== 'undefined' &&
-              (props.rmp !== undefined &&
-              props.rmp.message === 'success' &&
-              props.rmp.data.teacherRatingTags.length > 0
+              ((result.type === 'professor' || result.type === 'combo') &&
+              result.RMP &&
+              result.RMP.teacherRatingTags.length > 0
                 ? 'Tags: ' +
-                  props.rmp.data.teacherRatingTags
+                  result.RMP.teacherRatingTags
                     .sort((a, b) => b.tagCount - a.tagCount)
                     .slice(0, 3)
                     .map((tag) => tag.tagName)
@@ -541,7 +512,7 @@ export default function PlannerCard(props: PlannerCardProps) {
         <MeetingChip
           color={props.color}
           meetings={
-            sections?.find(
+            result.sections.find(
               (section) =>
                 !sectionCanOverlap(section.section_number) &&
                 props.query.sectionNumbers?.includes(section.section_number),
@@ -550,7 +521,7 @@ export default function PlannerCard(props: PlannerCardProps) {
         />
       </div>
 
-      {canOpenSections && (
+      {
         <Collapse
           in={open && whichOpen === 'sections'}
           timeout="auto"
@@ -564,13 +535,13 @@ export default function PlannerCard(props: PlannerCardProps) {
                 />
               </TableHead>
               <TableBody>
-                {sections.map((section, index) => (
+                {result.sections.map((section, index) => (
                   <SectionTableRow
-                    key={section.section_number}
+                    key={section._id}
                     data={section}
-                    bestSyllabus={props.bestSyllabus}
+                    bestSyllabus={bestSyllabus}
                     course={props.query}
-                    lastRow={index === sections.length - 1}
+                    lastRow={index === result.sections.length - 1}
                     setPlannerSection={props.setPlannerSection}
                     selectedSections={props.selectedSections}
                     openConflictMessage={props.openConflictMessage}
@@ -581,9 +552,9 @@ export default function PlannerCard(props: PlannerCardProps) {
             </Table>
           </TableContainer>
         </Collapse>
-      )}
+      }
 
-      {canOpenGrades && (
+      {
         <Collapse
           in={open && whichOpen === 'grades'}
           timeout="auto"
@@ -592,13 +563,14 @@ export default function PlannerCard(props: PlannerCardProps) {
           <div className="p-2 md:p-4 flex flex-col gap-2">
             <SingleGradesInfo
               course={removeSection(props.query)}
-              grades={props.grades}
-              gradesToUse="unfiltered"
+              grades={result.grades}
+              filteredGrades={calculateGrades(result.grades)}
             />
-            <SingleProfInfo rmp={props.rmp} />
+            {(result.type === 'professor' || result.type === 'combo') &&
+              result.RMP && <SingleProfInfo rmp={result.RMP} />}
           </div>
         </Collapse>
-      )}
+      }
     </Box>
   );
 }

@@ -6,7 +6,7 @@ import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
-import type { GradesData, GradesSummary } from '@/modules/fetchGrades2';
+import type { GradesData, GradesSummary } from '@/modules/fetchGrades';
 
 export function LoadingSingleGradesInfo() {
   return (

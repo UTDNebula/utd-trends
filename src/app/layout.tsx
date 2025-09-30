@@ -13,7 +13,8 @@ import theme from '@/modules/theme';
 
 import { SharedStateProvider } from './SharedStateProvider';
 import QueryProvider from './QueryProvider';
-import { fetchLatestSemester } from '@/modules/fetchSections2';
+import { fetchLatestSemester } from '@/modules/fetchSections';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -83,6 +84,7 @@ export default async function RootLayout({
             <QueryProvider>
               <SharedStateProvider latestSemester={latestSemester}>
                 {children}
+                <ReactQueryDevtools initialIsOpen={false} />
               </SharedStateProvider>
             </QueryProvider>
             <GitHubButton />

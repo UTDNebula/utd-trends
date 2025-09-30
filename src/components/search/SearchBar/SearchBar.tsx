@@ -362,7 +362,7 @@ export default function SearchBar(props: Props) {
               variant="outlined"
               className={props.input_className}
               placeholder="ex. GOVT 2306"
-              //eslint-disable-next-line jsx-a11y/no-autofocus
+               
               autoFocus={props.autoFocus}
             />
           );

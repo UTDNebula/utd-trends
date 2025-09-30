@@ -18,7 +18,7 @@ import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
 import type { RMP } from '@/modules/fetchRmp';
 import { searchQueryLabel, type SearchResult } from '@/types/SearchQuery';
-import { calculateGrades, type GradesData } from '@/modules/fetchGrades2';
+import { calculateGrades, type GradesData } from '@/modules/fetchGrades';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(

@@ -1,18 +1,9 @@
 'use client';
 
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 import { compareColors, plannerColors } from '@/modules/colors';
-import {
-  calculateGrades,
-  type Grades,
-  type GradesSummary,
-} from '@/modules/fetchGrades';
-import type { RMP } from '@/modules/fetchRmp';
-import type { Sections } from '@/modules/fetchSections';
-import { compareSemesters } from '@/modules/semesters';
 import usePersistantState from '@/modules/usePersistantState';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToCourseOnly,
   removeDuplicates,
@@ -30,13 +21,6 @@ type Setter<T> = (value: SetterValue<T>) => void;
 
 const SharedStateContext = createContext<
   | {
-      grades: { [key: string]: GenericFetchedData<Grades> };
-      filteredGrades: Record<string, GradesSummary>;
-      setGrades: Setter<{ [key: string]: GenericFetchedData<Grades> }>;
-      rmp: { [key: string]: GenericFetchedData<RMP> };
-      setRmp: Setter<{ [key: string]: GenericFetchedData<RMP> }>;
-      sections: { [key: string]: GenericFetchedData<Sections> };
-      setSections: Setter<{ [key: string]: GenericFetchedData<Sections> }>;
       compare: SearchResult[];
       addToCompare: (query: SearchResult) => void;
       removeFromCompare: (query: SearchResult) => void;
@@ -48,7 +32,6 @@ const SharedStateContext = createContext<
       plannerColorMap: {
         [key: string]: { fill: string; outline: string; font: string };
       };
-      semesters: string[];
       chosenSemesters: string[];
       setChosenSemesters: Setter<string[]>;
       courseNames: { [key: string]: string | undefined };
@@ -65,47 +48,9 @@ export function SharedStateProvider({
   children: React.ReactNode;
   latestSemester: string;
 }) {
-  const [grades, setGrades] = useState<{
-    [key: string]: GenericFetchedData<Grades>;
-  }>({});
-
-  const [rmp, setRmp] = useState<{ [key: string]: GenericFetchedData<RMP> }>(
-    {},
-  );
-
-  const [sections, setSections] = useState<{
-    [key: string]: GenericFetchedData<Sections>;
-  }>({});
-
   const [compare, setCompare] = useState<SearchResult[]>([]);
 
   const [chosenSemesters, setChosenSemesters] = useState<string[]>([]);
-  const semesters = useMemo(() => {
-    const allSemesters = [
-      ...new Set(
-        Object.values(grades)
-          // remove errored
-          .filter((grade) => grade.message === 'success')
-          //remove grade data, just semesters
-          .flatMap((grade) =>
-            grade.data.grades.map((gradeSemester) => gradeSemester._id),
-          )
-          .sort((a, b) => compareSemesters(b, a)),
-      ),
-    ];
-    setChosenSemesters(allSemesters);
-    return allSemesters;
-  }, [grades]);
-
-  const filteredGrades = useMemo(() => {
-    const build: Record<string, GradesSummary> = {};
-    for (const key of Object.keys(grades)) {
-      if (grades[key].message === 'success') {
-        build[key] = calculateGrades(grades[key].data.grades, chosenSemesters);
-      }
-    }
-    return build;
-  }, [grades, chosenSemesters]);
 
   //Add a course+prof combo to compare (happens from search results)
   //copy over data basically
@@ -233,13 +178,6 @@ export function SharedStateProvider({
   return (
     <SharedStateContext.Provider
       value={{
-        grades,
-        setGrades,
-        filteredGrades,
-        rmp,
-        setRmp,
-        sections,
-        setSections,
         compare,
         addToCompare,
         removeFromCompare,
@@ -249,7 +187,6 @@ export function SharedStateProvider({
         removeFromPlanner,
         setPlannerSection,
         plannerColorMap,
-        semesters,
         chosenSemesters,
         setChosenSemesters,
         courseNames,

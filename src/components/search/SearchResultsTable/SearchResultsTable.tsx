@@ -41,7 +41,7 @@ import {
   type SearchResult,
   sectionCanOverlap,
 } from '@/types/SearchQuery';
-import { calculateGrades } from '@/modules/fetchGrades2';
+import { calculateGrades } from '@/modules/fetchGrades';
 import { ChosenSemesterContext } from '@/app/dashboard/SemesterContext';
 
 function LoadingRow() {
