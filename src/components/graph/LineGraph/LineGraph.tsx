@@ -156,11 +156,7 @@ export default function LineGraph(props: Props) {
           !series.every((single) => single.data.length === 1),
       },
       events: {
-        markerClick: (
-          event,
-          chartContext,
-          { seriesIndex, dataPointIndex, w },
-        ) => {
+        markerClick: (event, chartContext, { dataPointIndex }) => {
           const semester = allSemesters[dataPointIndex];
           setChosenSemesters([semester]);
         },
