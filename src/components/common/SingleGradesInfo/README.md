@@ -1,4 +1,4 @@
-This component allows data from the Nebula API (grade distribution data from search criteria) to be displayed as a graph. To show the graphs, Trends uses the GraphToggle component to toggle between the bar graph and line graph formats. It also shows some more data (right below the graph) for each search: the total number of students who have taken the course/professor, the median gpa, and the mean gpa.
+This component allows grade distribution data to be displayed as a graph. To show the graphs, Trends uses the GraphToggle component to toggle between the bar graph and line graph formats. It also shows some more data (right below the graph): the total number of students who have taken the course/professor, the median gpa, and the mean gpa.
 
 ### Props Table
 
