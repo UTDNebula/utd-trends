@@ -156,9 +156,13 @@ export default function LineGraph(props: Props) {
           !series.every((single) => single.data.length === 1),
       },
       events: {
-        dataPointSelection: (event, chartContext, config) => {
-          const semesterClicked = allSemesters[config.dataPointIndex];
-          setChosenSemesters([semesterClicked]);
+        markerClick: (
+          event,
+          chartContext,
+          { seriesIndex, dataPointIndex, w },
+        ) => {
+          const semester = allSemesters[dataPointIndex];
+          setChosenSemesters([semester]);
         },
       },
     },
@@ -185,10 +189,6 @@ export default function LineGraph(props: Props) {
       labels: {
         formatter: (value: number) => value.toFixed(2),
       },
-    },
-    tooltip: {
-      intersect: true,
-      shared: false,
     },
     colors:
       series.length === 1
