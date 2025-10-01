@@ -1,6 +1,7 @@
 'use client';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
+  removeSection,
   searchQueryLabel,
   type SearchQuery,
   type SearchResult,
@@ -28,11 +29,12 @@ async function fetchSearchResult(query: SearchQuery) {
 
 export function useSearchResult(query: SearchQuery) {
   const queryHook = useQuery({
-    queryKey: ['results', searchQueryLabel(query)],
+    queryKey: ['results', searchQueryLabel(removeSection(query))],
     queryFn: async () => {
       const data = await fetchSearchResult(query);
       return data;
     },
+    staleTime: 1000 * 60 * 60,
   });
   return queryHook;
 }
@@ -40,10 +42,11 @@ export function useSearchresults(queries: SearchQuery[]) {
   const queriesHook = useQueries({
     queries: queries.map((q) => {
       return {
-        queryKey: ['results', searchQueryLabel(q)],
+        queryKey: ['results', searchQueryLabel(removeSection(q))],
         queryFn: async () => {
           return await fetchSearchResult(q);
         },
+        staleTime: 1000 * 60 * 60,
       };
     }),
   });

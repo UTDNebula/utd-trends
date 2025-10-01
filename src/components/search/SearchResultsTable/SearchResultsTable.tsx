@@ -337,7 +337,7 @@ function Row({
                         addToPlanner(convertToCourseOnly(course));
                       }
                       queryClient.setQueryData(
-                        ['result', searchQueryLabel(searchResult.searchQuery)],
+                        ['results', searchQueryLabel(searchResult.searchQuery)],
                         searchResult,
                       );
                     }
