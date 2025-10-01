@@ -12,7 +12,9 @@ This component allows React components on Trends to be formatted as sticky (when
 import React from 'react';
 
 const sampleNode = (
-  <h1 className="text-white bg-purple-400 text-center mx-5">Sample Content</h1>
+  <h1 className="text-white bg-cornflower-400 rounded-md text-center mx-5 font-display">
+    Sample Content
+  </h1>
 );
 
 <>

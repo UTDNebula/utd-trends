@@ -16,10 +16,14 @@ Split component to make a draggable left and right side. It divides the page int
 import React from 'react';
 
 const leftSide = (
-  <h1 className="text-white bg-purple-500 text-center ml-5 my-5">Left Side</h1>
+  <h1 className="text-white bg-cornflower-400 rounded-md text-center font-display ml-5 my-5">
+    Left Side
+  </h1>
 );
 const rightSide = (
-  <h1 className="text-white bg-purple-500 text-center mr-5 my-5">Right Side</h1>
+  <h1 className="text-white bg-cornflower-400 rounded-md text-center font-display mr-5 my-5">
+    Right Side
+  </h1>
 );
 
 <Split
