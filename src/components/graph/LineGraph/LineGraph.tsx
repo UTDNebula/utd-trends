@@ -29,7 +29,7 @@ function getSemesterGPAs(
   },
   semesterMapping: Map<string, number>,
 ) {
-  const allPoints: { x: number; y: number }[] = [];
+  const allPoints: { x: number; y: number; semester: string }[] = [];
 
   data.data
     .toSorted((a, b) => sortSemesters(a._id, b._id))
@@ -54,14 +54,13 @@ function getSemesterGPAs(
 
       const xValue = semesterMapping.get(semester._id);
       if (xValue !== undefined) {
-        allPoints.push({ x: xValue, y: gpa });
+        allPoints.push({ x: xValue, y: gpa, semester: semester._id });
       }
     });
 
   return allPoints;
 }
 
-// Dynamically import react-apexcharts with SSR disabled.
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 type Props = {
@@ -81,58 +80,47 @@ export default function LineGraph(props: Props) {
     (fullScreenOpen ? FullscreenCloseIcon : FullscreenOpenIcon) +
     '</div>';
 
-  // Get all unique semesters that actually have data
-  const actualSemesters = Array.from(
-    new Set(props.series.flatMap((s) => s.data.map((sem) => sem._id))),
-  ).toSorted(sortSemesters);
-
-  // Detect if any summer semesters exist in the raw data
-  const summerSemestersWithData = new Set(
-    actualSemesters.filter((code) => code.includes('U')),
+  const allYearsSet = new Set<number>();
+  props.series.forEach((s) =>
+    s.data.forEach((sem) => allYearsSet.add(parseInt(sem._id))),
   );
-
-  const minYear = parseInt(actualSemesters[0]);
-  const maxYear = parseInt(actualSemesters[actualSemesters.length - 1]);
-
-  const allSemesterCodes: string[] = [];
-  const labeledPositions = new Set<number>(); // Track which positions should have labels
-
-  let position = 0;
-  for (let y = minYear; y <= maxYear; y++) {
-    // Spring
-    const springCode = `${y}S`;
-    allSemesterCodes.push(springCode);
-    labeledPositions.add(position);
-    position++;
-
-    const summerCode = `${y}U`;
-    if (summerSemestersWithData.has(summerCode)) {
-      allSemesterCodes.push(summerCode);
-      position++;
-    }
-
-    const fallCode = `${y}F`;
-    allSemesterCodes.push(fallCode);
-    labeledPositions.add(position);
-    position++;
-  }
+  const allYears = Array.from(allYearsSet).sort((a, b) => a - b);
 
   const semesterMapping = new Map<string, number>();
-  allSemesterCodes.forEach((code, index) => {
-    semesterMapping.set(code, index);
+  const categories: string[] = []; // only labels for Spring/Fall
+  let idx = 0;
+
+  allYears.forEach((year) => {
+    const spring = `${year}S`;
+    const summer = `${year}U`;
+    const fall = `${year}F`;
+
+    semesterMapping.set(spring, idx);
+    categories.push(spring);
+
+    semesterMapping.set(summer, idx + 0.5); // summer between spring & fall
+
+    semesterMapping.set(fall, idx + 1);
+    categories.push(fall);
+
+    idx += 2;
   });
 
-  const series = props.series.map((single) => {
-    const allPoints = getSemesterGPAs(single, semesterMapping);
-    return { name: single.name, data: allPoints };
-  });
+  const series = props.series.map((single) => ({
+    name: single.name,
+    data: getSemesterGPAs(single, semesterMapping).map((p) => ({
+      x: p.x,
+      y: p.y,
+      semester: p.semester,
+    })),
+  }));
 
-  const allXValues = series.flatMap((s) => s.data.map((d) => d.x));
-  const minX = allXValues.length > 0 ? Math.min(...allXValues) : 0;
-  const maxX =
-    allXValues.length > 0
-      ? Math.max(...allXValues)
-      : allSemesterCodes.length - 1;
+  const xValues = Array.from(semesterMapping.values());
+  const minX = Math.min(...xValues);
+  const maxX = Math.max(...xValues);
+  const tickAmount = Math.round(maxX - minX);
+
+  const isInteger = (v: number) => Math.abs(v - Math.round(v)) < 1e-8;
 
   const theme = useTheme();
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -165,23 +153,19 @@ export default function LineGraph(props: Props) {
       type: 'numeric',
       min: minX,
       max: maxX,
-      tickAmount: maxX - minX,
+      tickAmount,
       tickPlacement: 'on',
       labels: {
-        formatter: (val: string | number) => {
-          const index = Math.round(Number(val));
-          if (labeledPositions.has(index) && index < allSemesterCodes.length) {
-            return allSemesterCodes[index];
-          }
-          return '';
-        },
         rotate: -45,
         style: { fontSize: '12px' },
-        hideOverlappingLabels: false,
+        formatter: (val) => {
+          const n = Number(val);
+          if (!isInteger(n)) return '';
+          const idx = Math.round(n);
+          return categories[idx] ?? '';
+        },
       },
-      axisTicks: {
-        show: true,
-      },
+      axisTicks: { show: true },
     },
     yaxis: {
       min: 1,
@@ -194,10 +178,7 @@ export default function LineGraph(props: Props) {
       series.length === 1
         ? [theme.vars.palette.primary.main]
         : compareColors.filter((_, i) => props.includedColors?.[i] ?? 1),
-    stroke: {
-      curve: 'straight',
-      width: 5,
-    },
+    stroke: { curve: 'straight', width: 5 },
     title: {
       text: props.title,
       align: 'left',
@@ -212,10 +193,12 @@ export default function LineGraph(props: Props) {
     markers: { size: 4 },
     tooltip: {
       x: {
-        formatter: (val) => {
-          const index = Math.round(val);
-          if (index >= 0 && index < allSemesterCodes.length) {
-            return allSemesterCodes[index];
+        formatter: (val, opts) => {
+          const seriesIndex = opts?.seriesIndex;
+          const dataPointIndex = opts?.dataPointIndex;
+          if (seriesIndex != null && dataPointIndex != null) {
+            const dataPoint = series[seriesIndex].data[dataPointIndex];
+            return dataPoint?.semester ?? '';
           }
           return '';
         },
