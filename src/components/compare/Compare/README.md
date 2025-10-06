@@ -35,6 +35,7 @@ const SampleProps = {
   colors: ['#0e60e6', '#e60e2e'],
 };
 
+// Makes a colored rectangle that holds all the data for a SearchQuery
 function RowStart(props) {
   return (
     <>
@@ -53,6 +54,7 @@ function RowStart(props) {
   );
 }
 
+// Shows the categories to the left and finishes the border for each SearchQuery
 function GradeOrRmpRow(props) {
   return (
     <>
@@ -121,6 +123,7 @@ const sampleSeries = [
     data: [],
   },
 ];
+// empty bar graph
 const barNode = (
   <BarGraph
     series={sampleSeries}
@@ -144,6 +147,7 @@ const barNode = (
     title="% of Students"
   ></BarGraph>
 );
+// empty line graph
 const lineNode = (
   <LineGraph title="GPA Trend" series={sampleSeries}></LineGraph>
 );
@@ -152,9 +156,11 @@ const lineNode = (
 <>
   <div className="w-full py-5">
     {/* Code from SingleGradesInfo (only one line) */}
+    {/* Shows a sample with an empty bar graph and line graph */}
     <GraphToggle state="ready" bar={barNode} line={lineNode} />
 
     {/* Code from CompareTable */}
+    {/* Shows a sample with 2 classes */}
     <TableContainer className="w-fit h-full mb-4">
       <Table size="small" className="border-spacing-x-2 border-separate">
         <TableHead>

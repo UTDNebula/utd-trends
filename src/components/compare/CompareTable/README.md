@@ -38,6 +38,7 @@ const SampleProps = {
   colors: ['#0e60e6', '#e60e2e'],
 };
 
+// Makes a colored rectangle that holds all the data for a SearchQuery
 function RowStart(props) {
   return (
     <>
@@ -56,6 +57,7 @@ function RowStart(props) {
   );
 }
 
+// Shows the categories to the left and finishes the border for each SearchQuery
 function GradeOrRmpRow(props) {
   return (
     <>
@@ -116,6 +118,7 @@ function GradeOrRmpRow(props) {
 }
 
 <>
+  {/* Shows a sample with 2 classes */}
   <div className="w-full py-5">
     <TableContainer className="w-fit h-full mb-4">
       <Table size="small" className="border-spacing-x-2 border-separate">
