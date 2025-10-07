@@ -14,6 +14,7 @@ interface PlannerSectionComponentProps {
   color: { fill: string; outline: string; font: string };
   courseName: string | undefined;
   isPreview?: boolean;
+  onSectionClick?: (course: SearchQuery, sectionNumber: string) => void;
 }
 
 const previewColor = (color: {
@@ -139,6 +140,14 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
             ml-1 leading-relaxed ${props.isPreview ? 'cursor-pointer' : ''}`}
           onMouseEnter={() => props.isPreview && setIsHovered(true)}
           onMouseLeave={() => props.isPreview && setIsHovered(false)}
+          onClick={() => {
+            if (props.isPreview && props.onSectionClick && selectedSection) {
+              props.onSectionClick(
+                props.course,
+                selectedSection.section_number,
+              );
+            }
+          }}
         >
           <div
             className={

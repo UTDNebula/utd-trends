@@ -60,8 +60,14 @@ function HourRow(props: HourRowProps) {
 }
 
 export default function PlannerSchedule() {
-  const { sections, planner, plannerColorMap, courseNames, previewCourses } =
-    useSharedState();
+  const {
+    sections,
+    planner,
+    plannerColorMap,
+    courseNames,
+    previewCourses,
+    setPlannerSection,
+  } = useSharedState();
 
   const courses = planner.flatMap((searchQuery) =>
     searchQueryMultiSectionSplit(searchQuery),
@@ -158,6 +164,9 @@ export default function PlannerSchedule() {
                 color={color}
                 courseName={properCourseName}
                 isPreview={true}
+                onSectionClick={(course, sectionNumber) => {
+                  setPlannerSection(course, sectionNumber);
+                }}
               />
             );
           });
