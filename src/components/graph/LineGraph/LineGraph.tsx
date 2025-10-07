@@ -23,10 +23,7 @@ function sortSemesters(a: string, b: string) {
 }
 
 function getSemesterGPAs(
-  data: {
-    name: string;
-    data: Grades['grades'];
-  },
+  data: { name: string; data: Grades['grades'] },
   semesterMapping: Map<string, number>,
 ) {
   const allPoints: { x: number; y: number; semester: string }[] = [];
@@ -65,10 +62,7 @@ const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 type Props = {
   title: string;
-  series: {
-    name: string;
-    data: Grades['grades'];
-  }[];
+  series: { name: string; data: Grades['grades'] }[];
   includedColors?: boolean[];
 };
 
@@ -118,12 +112,37 @@ export default function LineGraph(props: Props) {
   const xValues = Array.from(semesterMapping.values());
   const minX = Math.min(...xValues);
   const maxX = Math.max(...xValues);
-  const tickAmount = Math.round(maxX - minX);
-
-  const isInteger = (v: number) => Math.abs(v - Math.round(v)) < 1e-8;
 
   const theme = useTheme();
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+
+  const multiplePoints = series.reduce((acc, s) => acc + s.data.length, 0) > 1;
+  const isInteger = (v: number) => Math.abs(v - Math.round(v)) < 1e-8;
+
+  let customMin = minX;
+  let customMax = maxX;
+  let customCategories = [...categories];
+  let singleLabelMode = false;
+  let tickAmount = multiplePoints ? Math.round(maxX - minX) : undefined;
+
+  if (!multiplePoints) {
+    singleLabelMode = true;
+    const point = series[0].data[0];
+    const sem = point.semester;
+
+    point.x = 0.5;
+    customMin = 0;
+    customMax = 1;
+
+    if (sem.includes('U')) {
+      const year = sem.slice(0, -1);
+      customCategories = [`${year}S`, `${year}F`];
+      tickAmount = 2;
+    } else {
+      customCategories = [sem];
+      tickAmount = 0;
+    }
+  }
 
   const options: ApexOptions = {
     chart: {
@@ -144,21 +163,31 @@ export default function LineGraph(props: Props) {
       },
       background: 'transparent',
       animations: {
-        enabled: !fullScreenOpen && !series.every((s) => s.data.length === 1),
+        enabled: !fullScreenOpen && !singleLabelMode && multiplePoints,
       },
     },
     grid: { borderColor: prefersDarkMode ? '#404040' : '#e0e0e0' },
     legend: { show: series.length !== 1 },
     xaxis: {
       type: 'numeric',
-      min: minX,
-      max: maxX,
-      tickAmount,
+      min: customMin,
+      max: customMax,
+      tickAmount: tickAmount,
       tickPlacement: 'on',
       labels: {
         rotate: -45,
         style: { fontSize: '12px' },
         formatter: (val) => {
+          if (singleLabelMode) {
+            const numVal = Number(val);
+            if (customCategories.length === 1) {
+              return customCategories[0];
+            } else {
+              if (numVal === 0) return customCategories[0];
+              if (numVal === 1) return customCategories[1];
+              return '';
+            }
+          }
           const n = Number(val);
           if (!isInteger(n)) return '';
           const idx = Math.round(n);
@@ -170,9 +199,7 @@ export default function LineGraph(props: Props) {
     yaxis: {
       min: 1,
       max: 4,
-      labels: {
-        formatter: (v) => (typeof v === 'number' ? v.toFixed(2) : ''),
-      },
+      labels: { formatter: (v) => (typeof v === 'number' ? v.toFixed(2) : '') },
     },
     colors:
       series.length === 1
@@ -184,26 +211,24 @@ export default function LineGraph(props: Props) {
       align: 'left',
       style: { fontFamily: 'inherit' },
     },
+    markers: { size: 4 },
+    tooltip: {
+      x: {
+        formatter: (val, opts) => {
+          const sIndex = opts?.seriesIndex;
+          const dpIndex = opts?.dataPointIndex;
+          if (sIndex != null && dpIndex != null)
+            return series[sIndex].data[dpIndex]?.semester ?? '';
+          return '';
+        },
+      },
+    },
     noData: {
       text: 'Please select a class to add',
       align: 'center',
       style: { fontSize: '14px', fontFamily: 'inherit' },
     },
     theme: { mode: prefersDarkMode ? 'dark' : 'light' },
-    markers: { size: 4 },
-    tooltip: {
-      x: {
-        formatter: (val, opts) => {
-          const seriesIndex = opts?.seriesIndex;
-          const dataPointIndex = opts?.dataPointIndex;
-          if (seriesIndex != null && dataPointIndex != null) {
-            const dataPoint = series[seriesIndex].data[dataPointIndex];
-            return dataPoint?.semester ?? '';
-          }
-          return '';
-        },
-      },
-    },
   };
 
   const graph = (
