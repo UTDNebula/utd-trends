@@ -11,7 +11,7 @@ import { type SearchQuery } from '@/types/SearchQuery';
 interface PlannerSectionComponentProps {
   selectedSection: Sections['all'][number] | undefined;
   course: SearchQuery;
-  color: { fill: string; outline: string; font: string };
+  color: { fill: string; outline: string; font: string; filter?: string };
   courseName: string | undefined;
   isPreview?: boolean;
   onSectionClick?: (course: SearchQuery, sectionNumber: string) => void;
@@ -120,7 +120,8 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
           },
         }}
       >
-        <div
+        <button
+          type="button"
           style={
             {
               '--start-col': x[0],
@@ -175,7 +176,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
             {selectedSection.meetings[0]?.location?.building}{' '}
             {selectedSection.meetings[0]?.location?.room}
           </div>
-        </div>
+        </button>
       </Tooltip>
     );
   });

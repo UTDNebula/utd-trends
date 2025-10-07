@@ -368,7 +368,7 @@ type PlannerCardProps = {
 };
 
 export default function PlannerCard(props: PlannerCardProps) {
-  const { previewCourses, setPreviewCourses } = useSharedState();
+  const { setPreviewCourses } = useSharedState();
   const [open, setOpen] = useState(false);
 
   //appease the typescript gods
