@@ -58,6 +58,8 @@ const SharedStateContext = createContext<
       setCourseNames: Setter<{ [key: string]: string | undefined }>;
       latestSemester: GenericFetchedData<string> | undefined;
       setLatestSemester: Setter<GenericFetchedData<string> | undefined>;
+      previewCourses: SearchQueryMultiSection[];
+      setPreviewCourses: Setter<SearchQueryMultiSection[]>;
     }
   | undefined
 >(undefined);
@@ -80,6 +82,10 @@ export function SharedStateProvider({
   const [sections, setSections] = useState<{
     [key: string]: GenericFetchedData<Sections>;
   }>({});
+
+  const [previewCourses, setPreviewCourses] = useState<
+    SearchQueryMultiSection[]
+  >([]);
 
   const [compare, setCompare] = useState<SearchQuery[]>([]);
   const [compareGrades, internalSetCompareGrades] = useState<{
@@ -352,6 +358,8 @@ export function SharedStateProvider({
         setCourseNames,
         latestSemester,
         setLatestSemester,
+        previewCourses,
+        setPreviewCourses,
       }}
     >
       {children}

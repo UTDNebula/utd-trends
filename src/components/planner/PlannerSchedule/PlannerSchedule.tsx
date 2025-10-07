@@ -60,7 +60,8 @@ function HourRow(props: HourRowProps) {
 }
 
 export default function PlannerSchedule() {
-  const { sections, planner, plannerColorMap, courseNames } = useSharedState();
+  const { sections, planner, plannerColorMap, courseNames, previewCourses } =
+    useSharedState();
 
   const courses = planner.flatMap((searchQuery) =>
     searchQueryMultiSectionSplit(searchQuery),
@@ -111,6 +112,55 @@ export default function PlannerSchedule() {
             }
           />
         );
+      })}
+
+      {/* Preview Sessions Overlay */}
+      {previewCourses.flatMap((previewCourse) => {
+        const courseSections =
+          sections[searchQueryLabel(removeSection(previewCourse))];
+        if (
+          typeof courseSections === 'undefined' ||
+          courseSections.message !== 'success'
+        ) {
+          return [];
+        }
+
+        const selectedSectionNumbers = planner
+          .flatMap((searchQuery) => searchQueryMultiSectionSplit(searchQuery))
+          .map((course) => course.sectionNumber)
+          .filter(Boolean);
+
+        return courseSections.data.latest
+          .filter(
+            (section) =>
+              !selectedSectionNumbers.includes(section.section_number),
+          )
+          .map((section, index) => {
+            const previewCourseWithSection = {
+              ...previewCourse,
+              sectionNumber: section.section_number,
+            };
+            const courseKey = searchQueryLabel(
+              convertToCourseOnly(previewCourseWithSection),
+            );
+            const properCourseName = courseNames[courseKey];
+
+            const color =
+              plannerColorMap[
+                searchQueryLabel(convertToCourseOnly(previewCourseWithSection))
+              ];
+
+            return (
+              <PlannerSection
+                key={`preview-${searchQueryLabel(removeSection(previewCourse))}-${section._id}-${index}`}
+                selectedSection={section}
+                course={previewCourseWithSection}
+                color={color}
+                courseName={properCourseName}
+                isPreview={true}
+              />
+            );
+          });
       })}
     </div>
   );

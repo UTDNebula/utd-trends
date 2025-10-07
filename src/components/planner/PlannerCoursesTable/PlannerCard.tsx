@@ -27,6 +27,7 @@ import {
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import type { Grades } from '@/modules/fetchGrades';
@@ -38,6 +39,7 @@ import {
   convertToProfOnly,
   removeSection,
   type SearchQuery,
+  searchQueryEqual,
   searchQueryLabel,
   type SearchQueryMultiSection,
   sectionCanOverlap,
@@ -366,6 +368,7 @@ type PlannerCardProps = {
 };
 
 export default function PlannerCard(props: PlannerCardProps) {
+  const { previewCourses, setPreviewCourses } = useSharedState();
   const [open, setOpen] = useState(false);
 
   //appease the typescript gods
@@ -392,7 +395,35 @@ export default function PlannerCard(props: PlannerCardProps) {
       (whichOpen === 'sections' && canOpenSections) ||
       (whichOpen === 'grades' && canOpenGrades)
     ) {
-      setOpen(!open);
+      const newOpen = !open;
+      setOpen(newOpen);
+
+      // Update previewCourses
+      if (newOpen) {
+        setPreviewCourses((prev) => {
+          if (
+            prev.some((course) =>
+              searchQueryEqual(
+                removeSection(course),
+                removeSection(props.query),
+              ),
+            )
+          ) {
+            return prev;
+          }
+          return [...prev, props.query];
+        });
+      } else {
+        setPreviewCourses((prev) =>
+          prev.filter(
+            (course) =>
+              !searchQueryEqual(
+                removeSection(course),
+                removeSection(props.query),
+              ),
+          ),
+        );
+      }
     }
   }
 

@@ -1,5 +1,5 @@
 import { Tooltip } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   DAYS,
@@ -13,13 +13,34 @@ interface PlannerSectionComponentProps {
   course: SearchQuery;
   color: { fill: string; outline: string; font: string };
   courseName: string | undefined;
+  isPreview?: boolean;
 }
 
+const previewColor = (color: {
+  fill: string;
+  outline: string;
+  font: string;
+}) => {
+  return {
+    fill: color.fill,
+    outline: color.outline,
+    font: color.font,
+    filter: 'saturate(0.2) opacity(0.7)',
+  };
+};
+
 export default function PlannerSection(props: PlannerSectionComponentProps) {
+  const [isHovered, setIsHovered] = useState(false);
   const selectedSection = props.selectedSection;
   if (typeof selectedSection === 'undefined') {
     return null;
   }
+
+  const currentColor = props.isPreview
+    ? isHovered
+      ? props.color
+      : previewColor(props.color)
+    : props.color;
 
   const meetings: string[][] = [];
   for (let j = 0; j < selectedSection.meetings.length; j++) {
@@ -105,16 +126,19 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               '--start-row': x[1],
               '--offset': x[3] + '%',
               '--height': x[2] + '%',
-              backgroundColor: props.color.fill,
-              borderColor: props.color.outline,
-              color: props.color.font,
+              backgroundColor: currentColor.fill,
+              borderColor: currentColor.outline,
+              color: currentColor.font,
+              filter: currentColor.filter,
             } as React.CSSProperties
           }
           className={`col-start-[var(--start-col)] col-span-1 
             row-start-[var(--start-row)] row-span-1 relative 
             top-[var(--offset)] h-[var(--height)] overflow-hidden 
             rounded-xl border-2
-            ml-1 leading-relaxed`}
+            ml-1 leading-relaxed ${props.isPreview ? 'cursor-pointer' : ''}`}
+          onMouseEnter={() => props.isPreview && setIsHovered(true)}
+          onMouseLeave={() => props.isPreview && setIsHovered(false)}
         >
           <div
             className={
