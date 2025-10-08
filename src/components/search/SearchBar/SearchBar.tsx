@@ -144,7 +144,7 @@ export default function SearchBar(props: Props) {
       return;
     }
 
-    if (loading) {
+    if (options.length == 0 || loading) {
       event.preventDefault();
       event.stopPropagation();
       return;
@@ -360,6 +360,8 @@ export default function SearchBar(props: Props) {
           }
           updateValue(newValue as SearchQuery[]);
         }}
+        selectOnFocus={false}
+        handleHomeEndKeys={false}
         inputValue={inputValue}
         onInputChange={(event, newInputValue) => {
           setInputValue(newInputValue);
