@@ -68,6 +68,8 @@ export default function PlannerSchedule() {
     courseNames,
     previewCourses,
     setPlannerSection,
+    hasConflict,
+    getSelectedSections,
   } = useSharedState();
   const { showConflictMessage } = useSnackbar();
 
@@ -143,6 +145,10 @@ export default function PlannerSchedule() {
             (section) =>
               !selectedSectionNumbers.includes(section.section_number),
           )
+          .filter((section) => {
+            const selectedSections = getSelectedSections(planner, sections);
+            return !hasConflict(section, selectedSections);
+          })
           .map((section, index) => {
             const previewCourseWithSection = {
               ...previewCourse,

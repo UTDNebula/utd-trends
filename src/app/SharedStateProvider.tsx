@@ -142,6 +142,14 @@ const SharedStateContext = createContext<
       setLatestSemester: Setter<GenericFetchedData<string> | undefined>;
       previewCourses: SearchQueryMultiSection[];
       setPreviewCourses: Setter<SearchQueryMultiSection[]>;
+      hasConflict: (
+        newSection: Sections['all'][number],
+        selectedSections: Sections['all'],
+      ) => boolean;
+      getSelectedSections: (
+        planner: SearchQueryMultiSection[],
+        sections: { [key: string]: GenericFetchedData<Sections> },
+      ) => Sections['all'];
     }
   | undefined
 >(undefined);
@@ -463,6 +471,8 @@ export function SharedStateProvider({
         setLatestSemester,
         previewCourses,
         setPreviewCourses,
+        hasConflict,
+        getSelectedSections,
       }}
     >
       {children}
