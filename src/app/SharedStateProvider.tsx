@@ -23,8 +23,8 @@ import {
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
-  searchQueryMultiSectionSplit,
   type SearchQueryMultiSection,
+  searchQueryMultiSectionSplit,
   sectionCanOverlap,
 } from '@/types/SearchQuery';
 

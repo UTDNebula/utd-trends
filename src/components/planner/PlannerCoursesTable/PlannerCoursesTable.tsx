@@ -4,17 +4,16 @@ import { Typography } from '@mui/material';
 import React from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
-import { useSnackbar } from '@/contexts/SnackbarContext';
 import PlannerCard, {
   LoadingPlannerCard,
 } from '@/components/planner/PlannerCoursesTable/PlannerCard';
+import { useSnackbar } from '@/contexts/SnackbarContext';
 import { displaySemesterName } from '@/modules/semesters';
 import {
   convertToCourseOnly,
   convertToProfOnly,
   removeSection,
   searchQueryLabel,
-  searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
 
 export function LoadingPlannerCoursesTable() {

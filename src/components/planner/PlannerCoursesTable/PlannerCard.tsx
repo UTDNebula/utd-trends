@@ -78,7 +78,6 @@ export function LoadingPlannerCard() {
   );
 }
 
-
 function SectionTableHead(props: { hasMultipleDateRanges: boolean }) {
   return (
     <TableRow className="bg-cornflower-600">

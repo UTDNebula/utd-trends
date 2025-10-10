@@ -9,10 +9,10 @@ import { Bai_Jamjuree, Inter } from 'next/font/google';
 import React from 'react';
 
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
+import { SnackbarProvider } from '@/contexts/SnackbarContext';
 import theme from '@/modules/theme';
 
 import { SharedStateProvider } from './SharedStateProvider';
-import { SnackbarProvider } from '@/contexts/SnackbarContext';
 
 const inter = Inter({
   subsets: ['latin'],

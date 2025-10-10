@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
-import { useSnackbar } from '@/contexts/SnackbarContext';
 import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection';
+import { useSnackbar } from '@/contexts/SnackbarContext';
 import {
   convertToCourseOnly,
   removeSection,
