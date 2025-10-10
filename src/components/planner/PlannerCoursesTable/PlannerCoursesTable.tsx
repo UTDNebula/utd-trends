@@ -108,25 +108,6 @@ export default function PlannerCoursesTable() {
                 removeFromPlanner={() => {
                   removeFromPlanner(query);
                 }}
-                selectedSections={planner
-                  .flatMap((searchQuery) =>
-                    searchQueryMultiSectionSplit(searchQuery),
-                  )
-                  .map((single) => {
-                    const singleSectionData =
-                      sections[searchQueryLabel(removeSection(single))];
-                    if (
-                      typeof singleSectionData === 'undefined' ||
-                      singleSectionData.message !== 'success'
-                    ) {
-                      return undefined;
-                    }
-                    return singleSectionData.data?.latest.find(
-                      (section) =>
-                        section.section_number === single.sectionNumber,
-                    );
-                  })
-                  .filter((section) => typeof section !== 'undefined')}
                 openConflictMessage={() => setOpenConflictMessage(true)}
                 color={
                   plannerColorMap[searchQueryLabel(convertToCourseOnly(query))]

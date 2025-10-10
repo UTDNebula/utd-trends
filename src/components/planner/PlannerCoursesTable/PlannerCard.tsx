@@ -162,11 +162,9 @@ type SectionTableRowProps = {
     searchQuery: SearchQuery,
     section: string,
     newSection?: Sections['all'][number],
-    selectedSections?: Sections['all'],
     openConflictMessage?: () => void,
   ) => void;
   hasMultipleDateRanges: boolean;
-  selectedSections: Sections['all'];
   openConflictMessage: () => void;
 };
 
@@ -188,7 +186,6 @@ function SectionTableRow(props: SectionTableRowProps) {
                 props.course,
                 props.data.section_number,
                 props.data,
-                props.selectedSections,
                 props.openConflictMessage,
               );
             }}
@@ -201,7 +198,6 @@ function SectionTableRow(props: SectionTableRowProps) {
                 props.course,
                 props.data.section_number,
                 props.data,
-                props.selectedSections,
                 props.openConflictMessage,
               );
             }}
@@ -310,7 +306,6 @@ type PlannerCardProps = {
   grades: GenericFetchedData<Grades>;
   rmp: GenericFetchedData<RMP>;
   removeFromPlanner: () => void;
-  selectedSections: Sections['all'];
   openConflictMessage: () => void;
   color: { fill: string; outline: string; font: string };
   courseName: string | undefined;
@@ -551,7 +546,6 @@ export default function PlannerCard(props: PlannerCardProps) {
                     course={props.query}
                     lastRow={index === sections.length - 1}
                     setPlannerSection={props.setPlannerSection}
-                    selectedSections={props.selectedSections}
                     openConflictMessage={props.openConflictMessage}
                     hasMultipleDateRanges={hasMultipleDateRanges}
                   />

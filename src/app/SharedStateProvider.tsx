@@ -23,6 +23,7 @@ import {
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
+  searchQueryMultiSectionSplit,
   type SearchQueryMultiSection,
   sectionCanOverlap,
 } from '@/types/SearchQuery';
@@ -37,6 +38,28 @@ function parseTime(time: string): number {
     hourNum = 0; // Midnight case
   }
   return hourNum + minute / 60;
+}
+
+function getSelectedSections(
+  planner: SearchQueryMultiSection[],
+  sections: { [key: string]: GenericFetchedData<Sections> },
+): Sections['all'] {
+  return planner
+    .flatMap((searchQuery) => searchQueryMultiSectionSplit(searchQuery))
+    .map((single) => {
+      const singleSectionData =
+        sections[searchQueryLabel(removeSection(single))];
+      if (
+        typeof singleSectionData === 'undefined' ||
+        singleSectionData.message !== 'success'
+      ) {
+        return undefined;
+      }
+      return singleSectionData.data?.latest.find(
+        (s) => s.section_number === single.sectionNumber,
+      );
+    })
+    .filter((s): s is NonNullable<typeof s> => typeof s !== 'undefined');
 }
 
 function hasConflict(
@@ -105,7 +128,6 @@ const SharedStateContext = createContext<
         query: SearchQuery,
         section: string,
         newSection?: Sections['all'][number],
-        selectedSections?: Sections['all'],
         openConflictMessage?: () => void,
       ) => void;
       plannerColorMap: {
@@ -336,17 +358,19 @@ export function SharedStateProvider({
     query: SearchQuery,
     section: string,
     newSection?: Sections['all'][number],
-    selectedSections?: Sections['all'],
     openConflictMessage?: () => void,
   ) {
-    if (newSection && selectedSections && openConflictMessage) {
+    if (newSection && openConflictMessage) {
       const courseInPlanner = planner.find((course) =>
         searchQueryEqual(removeSection(course), removeSection(query)),
       );
       const isSelected =
         courseInPlanner?.sectionNumbers?.includes(section) ?? false;
       // Check for conflicts
-      if (!isSelected && hasConflict(newSection, selectedSections)) {
+      if (
+        !isSelected &&
+        hasConflict(newSection, getSelectedSections(planner, sections))
+      ) {
         openConflictMessage();
         return; // Prevent section selection
       }
