@@ -12,6 +12,7 @@ import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
 import theme from '@/modules/theme';
 
 import { SharedStateProvider } from './SharedStateProvider';
+import { SnackbarProvider } from '@/contexts/SnackbarContext';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -77,7 +78,9 @@ export default function RootLayout({
       >
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
-            <SharedStateProvider>{children}</SharedStateProvider>
+            <SharedStateProvider>
+              <SnackbarProvider>{children}</SnackbarProvider>
+            </SharedStateProvider>
             <GitHubButton />
             <SpeedInsights />
           </ThemeProvider>

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
+import { useSnackbar } from '@/contexts/SnackbarContext';
 import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection';
 import {
   convertToCourseOnly,
@@ -68,6 +69,7 @@ export default function PlannerSchedule() {
     previewCourses,
     setPlannerSection,
   } = useSharedState();
+  const { showConflictMessage } = useSnackbar();
 
   const courses = planner.flatMap((searchQuery) =>
     searchQueryMultiSectionSplit(searchQuery),
@@ -165,7 +167,12 @@ export default function PlannerSchedule() {
                 courseName={properCourseName}
                 isPreview={true}
                 onSectionClick={(course, sectionNumber) => {
-                  setPlannerSection(course, sectionNumber);
+                  setPlannerSection(
+                    course,
+                    sectionNumber,
+                    section, // newSection - the section being clicked
+                    showConflictMessage,
+                  );
                 }}
               />
             );
