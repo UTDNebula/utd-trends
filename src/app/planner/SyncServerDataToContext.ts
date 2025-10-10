@@ -14,8 +14,14 @@ export default function SyncServerDataToContext() {
     setSections,
     setCourseNames,
     setLatestSemester,
+    setPreviewCourses,
     planner,
   } = useSharedState();
+
+  // Clear preview courses on component mount, because the tabs will be closed
+  useEffect(() => {
+    setPreviewCourses([]);
+  }, []);
 
   useEffect(() => {
     if (hasHydrated) {
