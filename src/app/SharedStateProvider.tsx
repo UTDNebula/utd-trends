@@ -27,6 +27,60 @@ import {
   sectionCanOverlap,
 } from '@/types/SearchQuery';
 
+function parseTime(time: string): number {
+  const [hour, minute] = time.split(':').map((s) => parseInt(s));
+  const isPM = time.includes('pm');
+  let hourNum = hour;
+  if (isPM && hour !== 12) {
+    hourNum += 12;
+  } else if (!isPM && hour === 12) {
+    hourNum = 0; // Midnight case
+  }
+  return hourNum + minute / 60;
+}
+
+function hasConflict(
+  newSection: Sections['all'][number],
+  selectedSections: Sections['all'],
+): boolean {
+  if (!newSection || !selectedSections) return false;
+
+  for (const selectedSection of selectedSections) {
+    for (const newMeeting of newSection.meetings) {
+      if (!newMeeting || !newMeeting.meeting_days) continue;
+
+      for (const existingMeeting of selectedSection.meetings) {
+        if (!existingMeeting || !existingMeeting.meeting_days) continue;
+
+        // Check if days overlap
+        const overlappingDays = newMeeting.meeting_days.some((day) =>
+          existingMeeting.meeting_days.includes(day),
+        );
+
+        if (overlappingDays) {
+          // Convert times to comparable values
+          const newStart = parseTime(newMeeting.start_time);
+          const newEnd = parseTime(newMeeting.end_time);
+          const existingStart = parseTime(existingMeeting.start_time);
+          const existingEnd = parseTime(existingMeeting.end_time);
+
+          // Check if times overlap
+          if (
+            (newStart < existingEnd && newStart >= existingStart) ||
+            (newEnd > existingStart && newEnd <= existingEnd) ||
+            (newStart <= existingStart && newEnd >= existingEnd) ||
+            (newStart >= existingStart && newEnd <= existingEnd)
+          ) {
+            return true; // Conflict detected
+          }
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
 type SetterValue<T> = T | ((prev: T) => T);
 type Setter<T> = (value: SetterValue<T>) => void;
 
@@ -47,7 +101,13 @@ const SharedStateContext = createContext<
       planner: SearchQueryMultiSection[];
       addToPlanner: (query: SearchQuery) => void;
       removeFromPlanner: (query: SearchQuery) => void;
-      setPlannerSection: (query: SearchQuery, section: string) => void;
+      setPlannerSection: (
+        query: SearchQuery,
+        section: string,
+        newSection?: Sections['all'][number],
+        selectedSections?: Sections['all'],
+        openConflictMessage?: () => void,
+      ) => void;
       plannerColorMap: {
         [key: string]: { fill: string; outline: string; font: string };
       };
@@ -272,7 +332,26 @@ export function SharedStateProvider({
     });
   }
 
-  function setPlannerSection(query: SearchQuery, section: string) {
+  function setPlannerSection(
+    query: SearchQuery,
+    section: string,
+    newSection?: Sections['all'][number],
+    selectedSections?: Sections['all'],
+    openConflictMessage?: () => void,
+  ) {
+    if (newSection && selectedSections && openConflictMessage) {
+      const courseInPlanner = planner.find((course) =>
+        searchQueryEqual(removeSection(course), removeSection(query)),
+      );
+      const isSelected =
+        courseInPlanner?.sectionNumbers?.includes(section) ?? false;
+      // Check for conflicts
+      if (!isSelected && hasConflict(newSection, selectedSections)) {
+        openConflictMessage();
+        return; // Prevent section selection
+      }
+    }
+
     setPlanner((prev: SearchQueryMultiSection[]) =>
       prev.map((course) => {
         if (searchQueryEqual(removeSection(course), removeSection(query))) {

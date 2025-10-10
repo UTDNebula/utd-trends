@@ -78,59 +78,6 @@ export function LoadingPlannerCard() {
   );
 }
 
-function parseTime(time: string): number {
-  const [hour, minute] = time.split(':').map((s) => parseInt(s));
-  const isPM = time.includes('pm');
-  let hourNum = hour;
-  if (isPM && hour !== 12) {
-    hourNum += 12;
-  } else if (!isPM && hour === 12) {
-    hourNum = 0; // Midnight case
-  }
-  return hourNum + minute / 60;
-}
-
-function hasConflict(
-  newSection: Sections['all'][number],
-  selectedSections: Sections['all'],
-): boolean {
-  if (!newSection || !selectedSections) return false;
-
-  for (const selectedSection of selectedSections) {
-    for (const newMeeting of newSection.meetings) {
-      if (!newMeeting || !newMeeting.meeting_days) continue;
-
-      for (const existingMeeting of selectedSection.meetings) {
-        if (!existingMeeting || !existingMeeting.meeting_days) continue;
-
-        // Check if days overlap
-        const overlappingDays = newMeeting.meeting_days.some((day) =>
-          existingMeeting.meeting_days.includes(day),
-        );
-
-        if (overlappingDays) {
-          // Convert times to comparable values
-          const newStart = parseTime(newMeeting.start_time);
-          const newEnd = parseTime(newMeeting.end_time);
-          const existingStart = parseTime(existingMeeting.start_time);
-          const existingEnd = parseTime(existingMeeting.end_time);
-
-          // Check if times overlap
-          if (
-            (newStart < existingEnd && newStart >= existingStart) ||
-            (newEnd > existingStart && newEnd <= existingEnd) ||
-            (newStart <= existingStart && newEnd >= existingEnd) ||
-            (newStart >= existingStart && newEnd <= existingEnd)
-          ) {
-            return true; // Conflict detected
-          }
-        }
-      }
-    }
-  }
-
-  return false;
-}
 
 function SectionTableHead(props: { hasMultipleDateRanges: boolean }) {
   return (
@@ -211,7 +158,13 @@ type SectionTableRowProps = {
   bestSyllabus: string;
   course: SearchQueryMultiSection;
   lastRow: boolean;
-  setPlannerSection: (searchQuery: SearchQuery, section: string) => void;
+  setPlannerSection: (
+    searchQuery: SearchQuery,
+    section: string,
+    newSection?: Sections['all'][number],
+    selectedSections?: Sections['all'],
+    openConflictMessage?: () => void,
+  ) => void;
   hasMultipleDateRanges: boolean;
   selectedSections: Sections['all'];
   openConflictMessage: () => void;
@@ -231,30 +184,26 @@ function SectionTableRow(props: SectionTableRowProps) {
           <Checkbox
             checked={isSelected}
             onClick={() => {
-              if (
-                !isSelected &&
-                hasConflict(props.data, props.selectedSections)
-              ) {
-                // Check for conflict
-                props.openConflictMessage();
-                return; // Prevent section selection
-              }
-              props.setPlannerSection(props.course, props.data.section_number);
+              props.setPlannerSection(
+                props.course,
+                props.data.section_number,
+                props.data,
+                props.selectedSections,
+                props.openConflictMessage,
+              );
             }}
           />
         ) : (
           <Radio
             checked={isSelected}
             onClick={() => {
-              if (
-                !isSelected &&
-                hasConflict(props.data, props.selectedSections)
-              ) {
-                // Check for conflict
-                props.openConflictMessage();
-                return; // Prevent section selection
-              }
-              props.setPlannerSection(props.course, props.data.section_number);
+              props.setPlannerSection(
+                props.course,
+                props.data.section_number,
+                props.data,
+                props.selectedSections,
+                props.openConflictMessage,
+              );
             }}
           />
         )}
