@@ -218,7 +218,10 @@ export default function SearchBar(props: Props) {
     }
     setLoading(true);
     if (newInputValue.trim() === '') {
-      const recentWithFlag = recentSearches.current.map((search) => ({
+      const recentWithFlag = recentSearches.current.filter(
+        (item: SearchQueryWithTitle)=>
+            value.findIndex((el) => searchQueryEqual(el, item)) === -1,
+        ).map((search) => ({
         ...search,
         isRecent: true,
       }));
@@ -492,18 +495,17 @@ export default function SearchBar(props: Props) {
             <li
               key={key}
               {...otherProps}
-              className="flex items-center gap-2 p-2"
             >
+              <div>
+                <div>
               {
                 //If option isSearchQuery and isRecent is declared & is true
                 typeof option !== 'string' && option.isRecent == true ? (
-                  <HistoryToggleOffIcon className="text-gray-400" />
+                  <HistoryToggleOffIcon className="text-gray-400 self-center" />
                 ) : (
-                  <SearchIcon className="text-gray-400" />
+                  <SearchIcon className="text-gray-400 self-center" />
                 )
               }
-              <div>
-                <div>
                   {parts.map((part, index) => (
                     <span
                       key={index}
