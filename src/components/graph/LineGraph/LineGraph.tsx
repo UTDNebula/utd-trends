@@ -91,7 +91,12 @@ type Props = {
 };
 
 export default function LineGraph(props: Props) {
-  const { setChosenSemesters } = useSharedState();
+  const {
+    chosenSemesters,
+    setChosenSemesters,
+    firstClickDone,
+    setFirstClickDone,
+  } = useSharedState();
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
@@ -159,7 +164,19 @@ export default function LineGraph(props: Props) {
         markerClick: (event, chartContext, { seriesIndex, dataPointIndex }) => {
           const semester =
             allSemesters[series[seriesIndex].data[dataPointIndex].x - 1];
-          setChosenSemesters([semester]);
+
+          let newSemesters = chosenSemesters;
+
+          if (!firstClickDone) {
+            newSemesters = [semester];
+            setFirstClickDone(true);
+          } else if (chosenSemesters.includes(semester)) {
+            newSemesters = chosenSemesters.filter((s) => s !== semester);
+          } else {
+            newSemesters = [...chosenSemesters, semester];
+          }
+
+          setChosenSemesters(newSemesters);
         },
       },
     },
@@ -218,8 +235,33 @@ export default function LineGraph(props: Props) {
       mode: prefersDarkMode ? 'dark' : 'light',
     },
     markers: {
-      size: 6,
+      size: 4,
     },
+  };
+
+  const highlightedMarkers: ApexDiscretePoint[] = (chosenSemesters?.flatMap(
+    (sem) => {
+      return series.flatMap((s, seriesIndex) => {
+        const dataPointIndex = s.data.findIndex(
+          (d) => allSemesters[d.x - 1] === sem,
+        );
+        if (dataPointIndex === -1) return [];
+        return [
+          {
+            seriesIndex,
+            dataPointIndex,
+            fillColor: theme.palette.secondary.main,
+            strokeColor: '#fff',
+            size: 8,
+          },
+        ];
+      });
+    },
+  ) ?? []) as ApexDiscretePoint[];
+
+  options.markers = {
+    ...options.markers,
+    discrete: highlightedMarkers,
   };
 
   const graph = (

@@ -58,6 +58,8 @@ const SharedStateContext = createContext<
       setCourseNames: Setter<{ [key: string]: string | undefined }>;
       latestSemester: GenericFetchedData<string> | undefined;
       setLatestSemester: Setter<GenericFetchedData<string> | undefined>;
+      firstClickDone: boolean;
+      setFirstClickDone: Setter<boolean>;
     }
   | undefined
 >(undefined);
@@ -72,7 +74,7 @@ export function SharedStateProvider({
   }>({});
   const [semesters, setSemesters] = useState<string[]>([]);
   const [chosenSemesters, internalSetChosenSemesters] = useState<string[]>([]);
-
+  const [firstClickDone, setFirstClickDone] = useState<boolean>(false);
   const [rmp, setRmp] = useState<{ [key: string]: GenericFetchedData<RMP> }>(
     {},
   );
@@ -352,6 +354,8 @@ export function SharedStateProvider({
         setCourseNames,
         latestSemester,
         setLatestSemester,
+        firstClickDone,
+        setFirstClickDone,
       }}
     >
       {children}
