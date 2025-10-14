@@ -1,11 +1,13 @@
 This Component allows the `React` components to stick at the top of the page while the user scrolls down.
 
 ### Props Table
-| Prop | Type | Description | Required |
-| :- | :- | :- | -- |
-| children | `React.ReactNode` | The displayed component of any React kind | Yes |
+
+| Prop     | Type              | Description                               | Required |
+| :------- | :---------------- | :---------------------------------------- | -------- |
+| children | `React.ReactNode` | The displayed component of any React kind | Yes      |
 
 ### Sticky Side Example
+
 ```jsx
 import React from 'react';
 

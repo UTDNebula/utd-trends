@@ -1,9 +1,10 @@
 This component is to import various pieces of information from a professor's RateMyProfessor profile. It uses the `GenericFetchedData` type to grab directly from the website and then format it to fit into UTD Trends.
 
 ### Props Table
-| Prop  | Type                      | Description | Required |
-| :---- | :------------------------ | :--------------- | --------------- |
-| `rmp` | `GenericFetchedData<RMP>` | A variable with multiple data points from a professor's RateMyProfessor profile, such as the number of students rated, the average ratings, and what percentage of students who rated would take the class again | Yes |
+
+| Prop  | Type                      | Description                                                                                                                                                                                                      | Required |
+| :---- | :------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `rmp` | `GenericFetchedData<RMP>` | A variable with multiple data points from a professor's RateMyProfessor profile, such as the number of students rated, the average ratings, and what percentage of students who rated would take the class again | Yes      |
 
 ### Single Prof Info Example
 

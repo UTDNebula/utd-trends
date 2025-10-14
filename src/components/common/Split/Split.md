@@ -1,13 +1,14 @@
 This component is there to split the page between the left and right using `useRefImperativePanelHandle>(NULL)`.
 
 ### Props Table
-| Prop | Type | Description | Required |
-| :-- | :-- | :-- | --- |
-| left | `React.ReactNode` | The rendered content shown in the LHS | Yes |
-| right |`React.ReactNode` | The rendered content shown in the RHS | Yes |
-| minLeft | `number` | Describes the minumum size of the left panel | Yes |
-| minRight | `number` | Describes the minimum size of the right panel | Yes |
-| defaultLeft | `number` | Used to reset the panels when double-clicking and to set the default size of the panel | Yes |
+
+| Prop        | Type              | Description                                                                            | Required |
+| :---------- | :---------------- | :------------------------------------------------------------------------------------- | -------- |
+| left        | `React.ReactNode` | The rendered content shown in the LHS                                                  | Yes      |
+| right       | `React.ReactNode` | The rendered content shown in the RHS                                                  | Yes      |
+| minLeft     | `number`          | Describes the minumum size of the left panel                                           | Yes      |
+| minRight    | `number`          | Describes the minimum size of the right panel                                          | Yes      |
+| defaultLeft | `number`          | Used to reset the panels when double-clicking and to set the default size of the panel | Yes      |
 
 ### Split Example
 

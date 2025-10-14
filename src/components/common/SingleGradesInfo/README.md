@@ -2,15 +2,17 @@ This component allows the display of the grades of a single course during a seme
 The page will also display the total amount of grades, the median GPA, and the mean GPA.
 
 ### Props Table
-| Prop         | Type                        | Description                                                                                    | Required |
-| :----------- | :---------------------------| :----------------------------------------------------------------------------------------------| -------- |
-|`title`       |`string`                     |The name of the class subject                                                                   | Yes      |
-|`course`      |`SearchQuery`                |The official course code and number                                                             | Yes      |
-|`grades`      |`GenericFetchedData<Grades>` |The total data of letter grades achieved by students in this class                              | Yes      |
-|`gradesToUse` |`'filtered' \| 'unfiltered'` |The data of letter grades to use, possibly excluding certain terms (like summer or COVID terms) | Yes      |
+
+| Prop          | Type                         | Description                                                                                     | Required |
+| :------------ | :--------------------------- | :---------------------------------------------------------------------------------------------- | -------- |
+| `title`       | `string`                     | The name of the class subject                                                                   | Yes      |
+| `course`      | `SearchQuery`                | The official course code and number                                                             | Yes      |
+| `grades`      | `GenericFetchedData<Grades>` | The total data of letter grades achieved by students in this class                              | Yes      |
+| `gradesToUse` | `'filtered' \| 'unfiltered'` | The data of letter grades to use, possibly excluding certain terms (like summer or COVID terms) | Yes      |
 
 ### SingleGradesInfo Example
-``` jsx
+
+```jsx
 // import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import React from 'react';
 
@@ -67,3 +69,4 @@ const lineNode = (
     </p>
   </div>
 </>;
+```
