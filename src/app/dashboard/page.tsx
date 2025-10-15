@@ -105,7 +105,7 @@ export default async function Page({ searchParams }: Props) {
       <TopMenu isPlanner={false} />
       <main className="p-4">
         <Suspense fallback={<LoadingFilters />}>
-          <Filters />
+          <Filters courses={courses} professors={professors} />
         </Suspense>
         <Split
           left={
