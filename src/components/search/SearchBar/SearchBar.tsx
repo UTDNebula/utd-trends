@@ -241,10 +241,21 @@ export default function SearchBar(props: Props) {
           throw new Error(data.data ?? data.message);
         }
         console.log(newInputValue);
+        const recentMatches: SearchQueryWithTitle[] = recentSearches.current.filter(
+          (item: SearchQueryWithTitle) => {
+            if(value.findIndex((el) => searchQueryEqual(el, item)) !== -1){ return false;}
+            if(!(searchQueryLabel(item).toLowerCase().includes(newInputValue.toLowerCase()))){ return false;}
+            return true;
+          }
+        ).map((search) => ({
+        ...search,
+        isRecent: true,
+      }));
         //remove currently chosen values
         const filtered: SearchQuery[] = data.data.filter(
           (item: SearchQuery) =>
-            value.findIndex((el) => searchQueryEqual(el, item)) === -1,
+            value.findIndex((el) => searchQueryEqual(el, item)) === -1 && 
+            recentMatches.findIndex((el) => searchQueryEqual(el, item)) === -1,
         );
         if (
           // if the returned options minus already selected values is 1, then this
@@ -283,7 +294,7 @@ export default function SearchBar(props: Props) {
             setNoResults(newInputValue);
             loadNewCourseNameOptions(newInputValue);
           }
-          setOptions([...filtered]);
+          setOptions([...recentMatches,...filtered]);
         }
       })
       .catch(() => {})
