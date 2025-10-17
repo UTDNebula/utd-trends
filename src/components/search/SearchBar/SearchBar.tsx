@@ -195,7 +195,6 @@ export default function SearchBar(props: Props) {
 
   //When new queries are made, compare them to the existing recent query cache
   function updateRecentSearches(newValue: SearchQuery[]) {
-    console.log(newValue);
     const searchesText = window.localStorage.getItem('UTDTrendsRecent');
     let recSearches: SearchQuery[] = [];
     if (searchesText != null) {
@@ -210,6 +209,17 @@ export default function SearchBar(props: Props) {
       JSON.stringify(recentSearches.current),
     );
   }
+  
+  function getRecent() {
+    return recentSearches.current.filter(
+        (item: SearchQueryWithTitle)=>
+            value.findIndex((el) => searchQueryEqual(el, item)) === -1,
+        ).map((search) => ({
+        ...search,
+        isRecent: true,
+      }));
+  }
+
   //fetch new options, add tags if valid
   function loadNewOptions(newInputValue: string) {
     if (noResult !== null && newInputValue.startsWith(noResult)) {
@@ -218,14 +228,7 @@ export default function SearchBar(props: Props) {
     }
     setLoading(true);
     if (newInputValue.trim() === '') {
-      const recentWithFlag = recentSearches.current.filter(
-        (item: SearchQueryWithTitle)=>
-            value.findIndex((el) => searchQueryEqual(el, item)) === -1,
-        ).map((search) => ({
-        ...search,
-        isRecent: true,
-      }));
-      console.log(recentWithFlag);
+      const recentWithFlag = getRecent();
       setOptions(recentWithFlag);
       setLoading(false);
       return;
@@ -240,7 +243,6 @@ export default function SearchBar(props: Props) {
         if (data.message !== 'success') {
           throw new Error(data.data ?? data.message);
         }
-        console.log(newInputValue);
         const recentMatches: SearchQueryWithTitle[] = recentSearches.current.filter(
           (item: SearchQueryWithTitle) => {
             if(value.findIndex((el) => searchQueryEqual(el, item)) !== -1){ return false;}
@@ -358,6 +360,13 @@ export default function SearchBar(props: Props) {
         freeSolo
         loading={loading}
         //highlight first option to add with enter
+        onFocus={()=>{
+          if (inputValue.trim() === '') {
+            const recentWithFlag = getRecent();
+            setOptions(recentWithFlag);
+            return;
+          }
+        }}
         autoHighlight={true}
         clearOnBlur={false}
         className="grow"
@@ -512,9 +521,9 @@ export default function SearchBar(props: Props) {
               {
                 //If option isSearchQuery and isRecent is declared & is true
                 typeof option !== 'string' && option.isRecent == true ? (
-                  <HistoryToggleOffIcon className="text-gray-400 self-center" />
+                  <HistoryToggleOffIcon className="text-gray-400 self-center mr-1" />
                 ) : (
-                  <SearchIcon className="text-gray-400 self-center" />
+                  <SearchIcon className="text-gray-400 self-center mr-1" />
                 )
               }
                   {parts.map((part, index) => (
