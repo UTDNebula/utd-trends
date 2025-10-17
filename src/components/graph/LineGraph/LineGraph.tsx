@@ -110,23 +110,27 @@ export default function LineGraph(props: Props) {
     })),
   }));
 
-  const xValues = Array.from(semesterMapping.values());
-  const minX = Math.min(...xValues);
-  const maxX = Math.max(...xValues);
-
   const theme = useTheme();
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
   const multiplePoints = series.reduce((acc, s) => acc + s.data.length, 0) > 1;
   const isInteger = (v: number) => Math.abs(v - Math.round(v)) < 1e-8;
 
-  let customMin = minX;
-  let customMax = maxX;
+  // Compute min/max of data points (integer indices)
+  const dataIndices = series.flatMap((s) => s.data.map((p) => Math.round(p.x)));
+  const hasData = dataIndices.length > 0;
+  const allIndicesWithData = series.flatMap((s) =>
+    s.data.map((p) => Math.round(p.x)),
+  );
+  const firstIdxWithData = Math.min(...allIndicesWithData);
+  const lastIdxWithData = Math.max(...allIndicesWithData);
+  let customMin = 0;
+  let customMax = 0;
   let customCategories = [...categories];
   let singleLabelMode = false;
-  let tickAmount = multiplePoints ? Math.round(maxX - minX) : undefined;
+  let tickAmount = multiplePoints ? undefined : 0;
 
-  if (!multiplePoints) {
+  if (!multiplePoints && hasData) {
     singleLabelMode = true;
     const point = series[0].data[0];
     const sem = point.semester;
@@ -143,6 +147,10 @@ export default function LineGraph(props: Props) {
       customCategories = [sem];
       tickAmount = 0;
     }
+  } else if (multiplePoints && hasData) {
+    customMin = firstIdxWithData;
+    customMax = lastIdxWithData;
+    tickAmount = lastIdxWithData - firstIdxWithData;
   }
 
   const options: ApexOptions = {
@@ -181,17 +189,19 @@ export default function LineGraph(props: Props) {
         formatter: (val) => {
           if (singleLabelMode) {
             const numVal = Number(val);
-            if (customCategories.length === 1) {
-              return customCategories[0];
-            } else {
-              if (numVal === 0) return customCategories[0];
-              if (numVal === 1) return customCategories[1];
-              return '';
-            }
+            if (customCategories.length === 1) return customCategories[0];
+            if (numVal === 0) return customCategories[0];
+            if (numVal === 1) return customCategories[1];
+            return '';
           }
+
           const n = Number(val);
           if (!isInteger(n)) return '';
+
           const idx = Math.round(n);
+          if (idx < firstIdxWithData || idx > lastIdxWithData) return '';
+          return categories[idx] ?? '';
+
           return categories[idx] ?? '';
         },
       },
