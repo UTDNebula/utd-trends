@@ -10,6 +10,7 @@ import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/full
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
 import { compareColors } from '@/modules/colors';
 import type { Grades } from '@/modules/fetchGrades';
+import { displaySemesterName } from '@/modules/semesters';
 
 function sortSemesters(a: string, b: string) {
   const rank = (code: string) => {
@@ -218,7 +219,12 @@ export default function LineGraph(props: Props) {
           const sIndex = opts?.seriesIndex;
           const dpIndex = opts?.dataPointIndex;
           if (sIndex != null && dpIndex != null)
-            return series[sIndex].data[dpIndex]?.semester ?? '';
+            return (
+              displaySemesterName(
+                series[sIndex].data[dpIndex]?.semester,
+                false,
+              ) ?? ''
+            );
           return '';
         },
       },
