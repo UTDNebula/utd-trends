@@ -205,7 +205,13 @@ export default function SearchBar(props: Props) {
     const dedupArray = removeDuplicates(concatArray).slice(0, 3);
     window.localStorage.setItem(
       'UTDTrendsRecent',
-      JSON.stringify(dedupArray),
+      JSON.stringify(dedupArray.map(({ prefix, number, profFirst, profLast, sectionNumber }) => ({
+        prefix,
+        number,
+        profFirst,
+        profLast,
+        sectionNumber,
+      }))), // ensure no title/subtitle/isRecent fields are stored
     );
   }
 
