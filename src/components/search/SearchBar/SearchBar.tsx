@@ -232,17 +232,40 @@ export default function SearchBar(props: Props) {
     setOptions(recents);
   }
 
-  //remove currently chosen values
-  function removeChosenValues(options: SearchQueryWithTitle[]) {
+  // returns the filtered options after removing chosen values and adding recent searches that match the input
+  function filterOptions(
+    options: SearchQueryWithTitle[],
+    newInputValue: string,
+  ): SearchQueryWithTitle[] {
     const recents: SearchQueryWithTitle[] = getRecentSearches();
+    const matchedRecents = recents.filter((item: SearchQueryWithTitle) => {
+      if (value.some((el) => searchQueryEqual(el, item))) {
+        return false;
+      } // remove currently chosen values
+      if (
+        !(
+          searchQueryLabel(item)
+            .toLowerCase()
+            .includes(newInputValue.toLowerCase()) ||
+          item.subtitle?.toLowerCase().includes(newInputValue.toLowerCase()) ||
+          item.title?.toLowerCase().includes(newInputValue.toLowerCase())
+        )
+      ) {
+        return false;
+      } // remove non-matching recent options
+      return true;
+    });
+
     const filtered: SearchQueryWithTitle[] = options.filter(
       (item: SearchQueryWithTitle) =>
-        !value.some((el) => searchQueryEqual(el, item)),
+        !value.some((el) => searchQueryEqual(el, item)) && // item must not be currently chosen
+        !matchedRecents.some((rec) => searchQueryEqual(rec, item)), // remove from filtered if it's a recent option (will add back in the return)
     );
+
     filtered.forEach((el) => {
       el.isRecent = recents.some((rec) => searchQueryEqual(el, rec)); // deals with removals from recents
     });
-    return filtered;
+    return [...matchedRecents, ...filtered];
   }
 
   //fetch new options, add tags if valid
@@ -267,7 +290,10 @@ export default function SearchBar(props: Props) {
         if (data.message !== 'success') {
           throw new Error(data.data ?? data.message);
         }
-        const filtered: SearchQueryWithTitle[] = removeChosenValues(data.data);
+        const filtered: SearchQueryWithTitle[] = filterOptions(
+          data.data,
+          newInputValue,
+        );
         if (
           // if the returned options minus already selected values is 1, then this
           // means a space following should autocomplete the previous stuff to a chip
@@ -334,7 +360,10 @@ export default function SearchBar(props: Props) {
           }),
         );
         //remove currently chosen values
-        const filtered: SearchQueryWithTitle[] = removeChosenValues(formatted);
+        const filtered: SearchQueryWithTitle[] = filterOptions(
+          formatted,
+          newInputValue,
+        );
         if (quickInputValue.current === newInputValue) {
           //still valid options
           setOptions([
