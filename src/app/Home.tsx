@@ -15,7 +15,9 @@ import React, { useState, useTransition } from 'react';
 
 import Background from '@/../public/background.png';
 import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
-import SearchBar from '@/components/search/SearchBar/SearchBar';
+import SearchBar, {
+  updateRecentSearches,
+} from '@/components/search/SearchBar/SearchBar';
 import { displaySemesterName } from '@/modules/semesters';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
@@ -44,6 +46,11 @@ export default function Home(props: Props) {
       startTransition(() => {
         router.push(`/dashboard?${searchParams.toString()}`);
       });
+      const chosenRecentOptions = chosenOptions.map((option) => ({
+        ...option,
+        isRecent: true,
+      }));
+      updateRecentSearches(chosenRecentOptions);
     }
   }
 
