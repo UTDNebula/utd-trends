@@ -532,16 +532,16 @@ export default function SearchBar(props: Props) {
           const { key, ...otherProps } = props;
           return (
             <li key={key} {...otherProps}>
+              {
+                //If option isSearchQuery and isRecent is declared & is true
+                typeof option !== 'string' && option.isRecent == true ? (
+                  <HistoryToggleOffIcon className="text-gray-400 self-start mr-2 mt-0.5" />
+                ) : (
+                  <SearchIcon className="text-gray-400 self-start mr-2 mt-0.5" />
+                )
+              }
               <div>
                 <div>
-                  {
-                    //If option isSearchQuery and isRecent is declared & is true
-                    typeof option !== 'string' && option.isRecent == true ? (
-                      <HistoryToggleOffIcon className="text-gray-400 self-center mr-1" />
-                    ) : (
-                      <SearchIcon className="text-gray-400 self-center mr-1" />
-                    )
-                  }
                   {parts.map((part, index) => (
                     <span
                       key={index}
