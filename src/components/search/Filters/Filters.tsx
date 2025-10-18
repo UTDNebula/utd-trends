@@ -78,7 +78,7 @@ export function LoadingFilters() {
 }
 
 /**
- * This component returns a set of filters with which to sort results.
+ * This component returns filters that users can use to filter by minimum letter grade, minimum RMP rating, semesters for grade data, and a toggle for whether profs are teaching next semester.
  */
 export default function Filters() {
   const { semesters, chosenSemesters, setChosenSemesters, latestSemester } =
