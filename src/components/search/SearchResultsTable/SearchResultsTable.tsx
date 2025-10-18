@@ -262,7 +262,7 @@ function Row({
         data-tutorial-id={showTutorial && 'result'}
       >
         <TableCell
-          className={"yborder-b-0i" + (availableThisSemestr ? "bg-[#BEBEBE]" : '')}
+          className={"yborder-b-0i" + (availableThisSemester ? "bg-[#BEBEBE]" : '')}
           data-tutorial-id={showTutorial && 'actions'}
         >
           <div className="flex items-center gap-1">
