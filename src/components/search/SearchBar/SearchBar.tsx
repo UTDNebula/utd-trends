@@ -118,7 +118,7 @@ export default function SearchBar(props: Props) {
   }
 
   //Recent searches
-  const recentSearches = useRef<SearchQueryWithTitle[]>([]);
+  // const recentSearches = useRef<SearchQueryWithTitle[]>([]);
 
   //chosen values
   const [value, setValue] = useState<SearchQuery[]>([]);
@@ -203,24 +203,23 @@ export default function SearchBar(props: Props) {
     // Add new searches to the beginning of the array
     const concatArray = [...newValue, ...recSearches];
     const dedupArray = removeDuplicates(concatArray).slice(0, 3);
-    recentSearches.current = dedupArray;
     window.localStorage.setItem(
       'UTDTrendsRecent',
-      JSON.stringify(recentSearches.current),
+      JSON.stringify(dedupArray),
     );
   }
 
-  function getRecent() {
-    return recentSearches.current
-      .filter(
-        (item: SearchQueryWithTitle) =>
-          value.findIndex((el) => searchQueryEqual(el, item)) === -1,
-      )
-      .map((search) => ({
-        ...search,
-        isRecent: true,
-      }));
-  }
+  // function getRecent() {
+  //   return recentSearches.current
+  //     .filter(
+  //       (item: SearchQueryWithTitle) =>
+  //         value.findIndex((el) => searchQueryEqual(el, item)) === -1,
+  //     )
+  //     .map((search) => ({
+  //       ...search,
+  //       isRecent: true,
+  //     }));
+  // }
 
   //fetch new options, add tags if valid
   function loadNewOptions(newInputValue: string) {
@@ -230,9 +229,9 @@ export default function SearchBar(props: Props) {
     }
     setLoading(true);
     if (newInputValue.trim() === '') {
-      const recentWithFlag = getRecent();
-      setOptions(recentWithFlag);
-      setLoading(false);
+      // const recentWithFlag = getRecent();
+      // setOptions(recentWithFlag);
+      // setLoading(false);
       return;
     }
     fetch(
@@ -245,30 +244,38 @@ export default function SearchBar(props: Props) {
         if (data.message !== 'success') {
           throw new Error(data.data ?? data.message);
         }
-        const recentMatches: SearchQueryWithTitle[] = recentSearches.current
-          .filter((item: SearchQueryWithTitle) => {
-            if (value.findIndex((el) => searchQueryEqual(el, item)) !== -1) {
-              return false;
-            }
-            if (
-              !searchQueryLabel(item)
-                .toLowerCase()
-                .includes(newInputValue.toLowerCase())
-            ) {
-              return false;
-            }
-            return true;
-          })
-          .map((search) => ({
-            ...search,
-            isRecent: true,
-          }));
+        // const recentMatches: SearchQueryWithTitle[] = recentSearches.current
+        //   .filter((item: SearchQueryWithTitle) => {
+        //     if (value.findIndex((el) => searchQueryEqual(el, item)) !== -1) {
+        //       return false;
+        //     }
+        //     if (
+        //       !searchQueryLabel(item)
+        //         .toLowerCase()
+        //         .includes(newInputValue.toLowerCase())
+        //     ) {
+        //       return false;
+        //     }
+        //     return true;
+        //   })
+        //   .map((search) => ({
+        //     ...search,
+        //     isRecent: true,
+        //   }));
         //remove currently chosen values
-        const filtered: SearchQuery[] = data.data.filter(
-          (item: SearchQuery) =>
-            value.findIndex((el) => searchQueryEqual(el, item)) === -1 &&
-            recentMatches.findIndex((el) => searchQueryEqual(el, item)) === -1,
+        const searchesText = window.localStorage.getItem('UTDTrendsRecent');
+        let recents: SearchQueryWithTitle[] = [];
+        if (searchesText != null) {
+          recents = JSON.parse(searchesText);
+        }
+        const filtered: SearchQueryWithTitle[] = data.data.filter(
+          (item: SearchQueryWithTitle) =>
+            value.findIndex((el) => searchQueryEqual(el, item)) === -1 
+            // && recentMatches.findIndex((el) => searchQueryEqual(el, item)) === -1,
         );
+        filtered.forEach(el => {
+          el.isRecent = recents.some(rec => searchQueryEqual(el, rec)); // deals with removals from recents
+        });
         if (
           // if the returned options minus already selected values is 1, then this
           // means a space following should autocomplete the previous stuff to a chip
@@ -306,7 +313,7 @@ export default function SearchBar(props: Props) {
             setNoResults(newInputValue);
             loadNewCourseNameOptions(newInputValue);
           }
-          setOptions([...recentMatches, ...filtered]);
+          setOptions([...filtered.filter(res => res.isRecent), ...filtered.filter(res => !res.isRecent)]); // recents first
         }
       })
       .catch(() => {})
@@ -332,10 +339,18 @@ export default function SearchBar(props: Props) {
           }),
         );
         //remove currently chosen values
-        const filtered = formatted.filter(
+        const searchesText = window.localStorage.getItem('UTDTrendsRecent');
+        let recents: SearchQueryWithTitle[] = [];
+        if (searchesText != null) {
+          recents = JSON.parse(searchesText);
+        }
+        const filtered: SearchQueryWithTitle[] = formatted.filter(
           (item: SearchQueryWithTitle) =>
             !value.some((el) => searchQueryEqual(el, item)),
         );
+        filtered.forEach(el => {
+          el.isRecent = recents.some(rec => searchQueryEqual(el, rec)); // deals with removals from recents
+        });
         if (quickInputValue.current === newInputValue) {
           //still valid options
           setOptions(filtered);
@@ -356,7 +371,7 @@ export default function SearchBar(props: Props) {
     fetch('/api/autocomplete?input=someSearchTerm');
     const searchesText = window.localStorage.getItem('UTDTrendsRecent');
     if (searchesText != null) {
-      recentSearches.current = JSON.parse(searchesText);
+      // recentSearches.current = JSON.parse(searchesText);
     }
   }, []);
 
@@ -372,8 +387,8 @@ export default function SearchBar(props: Props) {
         //highlight first option to add with enter
         onFocus={() => {
           if (inputValue.trim() === '') {
-            const recentWithFlag = getRecent();
-            setOptions(recentWithFlag);
+            // const recentWithFlag = getRecent();
+            // setOptions(recentWithFlag);
             return;
           }
         }}
