@@ -12,17 +12,23 @@ import {
   Switch,
   Tooltip,
 } from '@mui/material';
-
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { usePathname, useSearchParams } from 'next/navigation';
 import React from 'react';
-import untypedComboTable from '@/data/combo_table.json';
+
 import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
+import untypedComboTable from '@/data/combo_table.json';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 import { compareSemesters, displaySemesterName } from '@/modules/semesters';
 import useHasHydrated from '@/modules/useHasHydrated';
-import { convertToCourseOnly, convertToProfOnly, searchQueryEqual, searchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
+import {
+  convertToCourseOnly,
+  convertToProfOnly,
+  type SearchQuery,
+  searchQueryEqual,
+  searchQueryLabel,
+} from '@/types/SearchQuery';
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
@@ -89,8 +95,14 @@ const comboTable = untypedComboTable as { [key: string]: SearchQuery[] };
  * This component returns a set of filters with which to sort results.
  */
 export default function Filters(props: Props) {
-  const { semesters, chosenSemesters, setChosenSemesters, latestSemester, grades, rmp } =
-    useSharedState();
+  const {
+    semesters,
+    chosenSemesters,
+    setChosenSemesters,
+    latestSemester,
+    grades,
+    rmp,
+  } = useSharedState();
 
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
@@ -144,9 +156,9 @@ export default function Filters(props: Props) {
     return recentSemesters.filter((value) => semesters.includes(value));
   }
 
-  function fetchSearchResults(  // took from clientleft.tsx so I didn't need to pass it in as a prop
+  function fetchSearchResults( // took from clientleft.tsx so I didn't need to pass it in as a prop
     searchTerms: SearchQuery[],
-    filterTerms: SearchQuery[], 
+    filterTerms: SearchQuery[],
   ) {
     return searchTerms
       .flatMap((searchTerm) =>
@@ -174,28 +186,8 @@ export default function Filters(props: Props) {
   } else if (props.professors.length > 0) {
     results = fetchSearchResults(props.professors, []);
   }
-
-
-    const fullyFiltered = results.filter((result) => {
-    const courseGrades = grades[searchQueryLabel(result)];
-    const profRatings = rmp?.[searchQueryLabel(convertToProfOnly(result))];
-
-    const passesGPA =
-      !minGPA ||
-      (courseGrades?.message === 'success' &&
-        courseGrades.data.filtered.gpa >= parseFloat(minGPA));
-
-    const passesRating =
-      !minRating ||
-      (profRatings?.message === 'success' &&
-        profRatings.data.avgRating >= parseFloat(minRating));
-
-    return passesGPA && passesRating;
-  });
   const gradeCounts: Record<string, number> = {};
   const rmpCount: Record<string, number> = {};
-
-
 
   minGPAs.forEach((gpaString) => {
     const gpaNum = parseFloat(gpaString);
@@ -204,11 +196,11 @@ export default function Filters(props: Props) {
       const profRatings = rmp?.[searchQueryLabel(convertToProfOnly(result))];
       const passesRating =
         !minRating ||
-        (profRatings?.message === "success" &&
+        (profRatings?.message === 'success' &&
           profRatings.data.avgRating >= parseFloat(minRating));
       return (
         courseGrades &&
-        courseGrades.message === "success" &&
+        courseGrades.message === 'success' &&
         courseGrades.data.filtered.gpa >= gpaNum &&
         passesRating
       );
@@ -222,20 +214,17 @@ export default function Filters(props: Props) {
       const courseGrades = grades[searchQueryLabel(result)];
       const passesGPA =
         !minGPA ||
-        (courseGrades?.message === "success" &&
+        (courseGrades?.message === 'success' &&
           courseGrades.data.filtered.gpa >= parseFloat(minGPA));
       return (
         profRatings &&
-        profRatings.message === "success" &&
+        profRatings.message === 'success' &&
         profRatings.data.avgRating >= ratingNum &&
         passesGPA
       );
     }).length;
   });
 
-
-
-  
   return (
     <Grid
       container
@@ -279,10 +268,10 @@ export default function Filters(props: Props) {
               </MenuItem>
               {/* dropdown options*/}
               {minGPAs.map((value) => (
-              <MenuItem className="h-10" key={value} value={value}>
-                {gpaToLetterGrade(Number(value))} ({gradeCounts[value] ?? 0})
-              </MenuItem>
-            ))}
+                <MenuItem className="h-10" key={value} value={value}>
+                  {gpaToLetterGrade(Number(value))} ({gradeCounts[value] ?? 0})
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Tooltip>
@@ -339,7 +328,8 @@ export default function Filters(props: Props) {
                     precision={0.5}
                     sx={{ fontSize: 25 }}
                     readOnly
-                  /> ({rmpCount[value] ?? 0})
+                  />{' '}
+                  ({rmpCount[value] ?? 0})
                 </MenuItem>
               ))}
             </Select>
