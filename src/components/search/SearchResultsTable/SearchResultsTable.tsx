@@ -26,6 +26,7 @@ import Rating from '@/components/common/Rating/Rating';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
+import PlannerCheckbox from '@/components/common/PlannerCheckbox/PlannerCheckbox';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
 import type { Grades } from '@/modules/fetchGrades';
 import type { RMP } from '@/modules/fetchRmp';
@@ -313,36 +314,14 @@ function Row({
                 } // Apply color if defined
               />
             </Tooltip>
-            <Tooltip
-              title={
-                hasLatestSemester
-                  ? inPlanner
-                    ? 'Remove from Planner'
-                    : 'Add to Planner'
-                  : 'Not being taught'
-              }
-              placement="top"
-            >
-              <span>
-                <Checkbox
-                  checked={inPlanner}
-                  onClick={(e) => {
-                    e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
-                    if (inPlanner) {
-                      removeFromPlanner(course);
-                    } else {
-                      addToPlanner(course);
-                      if (addJustCourseToo) {
-                        addToPlanner(convertToCourseOnly(course));
-                      }
-                    }
-                  }}
-                  icon={<BookOutlinedIcon />}
-                  checkedIcon={<BookIcon />}
-                  disabled={!hasLatestSemester}
-                />
-              </span>
-            </Tooltip>
+            <PlannerCheckbox 
+              section={section}
+              course={course}
+              inPlanner={inPlanner}
+              addToPlanner={addToPlanner}
+              removeFromPlanner={removeFromPlanner}
+              addJustCourseToo={addJustCourseToo} 
+            />
           </div>
         </TableCell>
         <TableCell

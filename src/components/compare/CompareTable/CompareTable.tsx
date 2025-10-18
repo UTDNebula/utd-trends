@@ -14,8 +14,12 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
+import BookIcon from '@mui/icons-material/Book';
+import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
+import PlannerCheckbox from '@/components/common/PlannerCheckbox/PlannerCheckbox';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
+import type { Sections } from '@/modules/fetchSections';
 import type { Grades } from '@/modules/fetchGrades';
 import type { RMP } from '@/modules/fetchRmp';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
@@ -23,7 +27,11 @@ import {
   convertToProfOnly,
   type SearchQuery,
   searchQueryLabel,
+  searchQueryEqual,
+  convertToCourseOnly,
+  sectionCanOverlap,
 } from '@/types/SearchQuery';
+import { useSharedState } from '@/app/SharedStateProvider';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(
@@ -373,6 +381,15 @@ export default function CompareTable({
   removeFromCompare,
   colorMap,
 }: CompareTableProps) {
+
+  const {
+    sections,
+    planner,
+    addToPlanner,
+    removeFromPlanner,
+  } = useSharedState()
+
+  
   //Table sorting category
   const [orderBy, setOrderBy] = useState<string>('Color');
   //Table sorting direction
@@ -475,6 +492,7 @@ export default function CompareTable({
 
   return (
     <div className="overflow-x-auto">
+
       <TableContainer className="w-fit mb-4">
         <Table size="small" className="border-spacing-x-2 border-separate">
           <TableHead>
@@ -486,7 +504,16 @@ export default function CompareTable({
                 Compare
               </TableCell>
               {/*the course names along the top*/}
-              {sortedResults.map((result, index) => (
+              {sortedResults.map((result, index) => {
+                const courseOnlySections =
+                  sections[searchQueryLabel(convertToCourseOnly(result))];
+                const canAddCourseOnlyToPlanner =
+                  typeof courseOnlySections !== 'undefined' &&
+                  courseOnlySections.message === 'success' &&
+                  courseOnlySections.data.latest.some((section) =>
+                    sectionCanOverlap(section.section_number),
+                );
+                return (
                 <TableCell
                   key={searchQueryLabel(result)}
                   className="text-center py-3 border-x-2 border-t-2 rounded-t-lg w-min"
@@ -496,9 +523,25 @@ export default function CompareTable({
                     backgroundColor: mappedColors[index] + '10', // add transparency
                   }}
                 >
-                  {searchQueryLabel(result)}
+                  <div className="flex flex-row place-content-evenly">
+                    {searchQueryLabel(result)}
+                    <PlannerCheckbox
+                      section={sections[searchQueryLabel(result)]}
+                      course={result}
+                      inPlanner={planner.some((obj) =>
+                        searchQueryEqual(obj, result),
+                      )}
+                      addToPlanner={addToPlanner}
+                      removeFromPlanner={removeFromPlanner}
+                      addJustCourseToo={
+                        !searchQueryEqual(result, convertToCourseOnly(result)) &&
+                        canAddCourseOnlyToPlanner
+                      }
+                    />
+                  </div>
                 </TableCell>
-              ))}
+              )}
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
