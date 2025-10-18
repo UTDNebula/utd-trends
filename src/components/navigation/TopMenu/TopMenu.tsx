@@ -23,7 +23,7 @@ import SearchBar, {
  */
 type Props = {
   isPlanner: boolean;
-  downloadRef: React.RefObject<HTMLDivElement | null>;
+  downloadRef?: React.RefObject<HTMLDivElement | null>;
 };
 
 /**
@@ -197,7 +197,7 @@ export default function TopMenu(props: Props) {
               size="medium"
               onClick={() => {
                 const refObj = props.downloadRef
-
+                if (!refObj) {return}
                 if (!refObj.current) {return}
                 
                 html2canvas(refObj.current).then((canvasImg : HTMLCanvasElement) => {
