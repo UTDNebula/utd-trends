@@ -166,7 +166,14 @@ export default function SearchBar(props: Props) {
     }
 
     if (newValue.length > 0) {
-      updateRecentSearches(newValue);
+      let onlyNewValues: SearchQuery[] = [];
+      if (searchTerms != null) {
+        onlyNewValues = newValue.filter(
+          // extracts only the search terms that weren't there before
+          (el) => !searchTerms.includes(searchQueryLabel(el)),
+        );
+      }
+      updateRecentSearches(onlyNewValues);
     }
   }
 
