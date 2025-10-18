@@ -148,9 +148,38 @@ export default function LineGraph(props: Props) {
       tickAmount = 0;
     }
   } else if (multiplePoints && hasData) {
-    customMin = firstIdxWithData;
-    customMax = lastIdxWithData;
-    tickAmount = lastIdxWithData - firstIdxWithData;
+    const allSemestersWithData = series.flatMap((s) =>
+      s.data.map((p) => p.semester),
+    );
+
+    // Find all semesters at the first and last indices
+    const firstSemesters = allSemestersWithData.filter(
+      (sem) => Math.round(semesterMapping.get(sem)!) === firstIdxWithData,
+    );
+    const lastSemesters = allSemestersWithData.filter(
+      (sem) => Math.round(semesterMapping.get(sem)!) === lastIdxWithData,
+    );
+
+    // Check if ANY of the first semesters is summer
+    const firstIsSummer = firstSemesters.some((sem) => sem.includes('U'));
+    // Check if ANY of the last semesters is summer
+    const lastIsSummer = lastSemesters.some((sem) => sem.includes('U'));
+
+    // Add padding at start if no summer semester at start
+    let startPadding = 0;
+    if (!firstIsSummer) {
+      startPadding = 1;
+    }
+
+    // Add padding at end if no summer semester at end
+    let endPadding = 0;
+    if (!lastIsSummer) {
+      endPadding = 1;
+    }
+
+    customMin = firstIdxWithData - startPadding;
+    customMax = lastIdxWithData + endPadding;
+    tickAmount = customMax - customMin;
   }
 
   const options: ApexOptions = {
@@ -199,8 +228,34 @@ export default function LineGraph(props: Props) {
           if (!isInteger(n)) return '';
 
           const idx = Math.round(n);
-          if (idx < firstIdxWithData || idx > lastIdxWithData) return '';
-          return categories[idx] ?? '';
+          if (idx < customMin || idx > customMax) return '';
+          if (idx < 0 || idx >= categories.length) {
+            if (idx < 0) {
+              const firstCategory = categories[0];
+              if (firstCategory) {
+                const year = parseInt(firstCategory);
+                const semType = firstCategory.slice(-1);
+                if (semType === 'S') {
+                  return `${year - 1}F`;
+                } else if (semType === 'F') {
+                  return `${year}S`;
+                }
+              }
+            } else if (idx >= categories.length) {
+              // After the end - get the year and generate next semester
+              const lastCategory = categories[categories.length - 1];
+              if (lastCategory) {
+                const year = parseInt(lastCategory);
+                const semType = lastCategory.slice(-1);
+                if (semType === 'S') {
+                  return `${year}F`;
+                } else if (semType === 'F') {
+                  return `${year + 1}S`;
+                }
+              }
+            }
+            return '';
+          }
 
           return categories[idx] ?? '';
         },
