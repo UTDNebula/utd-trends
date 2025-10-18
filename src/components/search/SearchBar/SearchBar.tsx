@@ -212,7 +212,6 @@ export default function SearchBar(props: Props) {
         'searchTerms',
         newValue.map((el) => searchQueryLabel(el)).join(','),
       );
-      // updateRecentSearches(newValue);
     } else {
       params.delete('searchTerms');
     }
@@ -221,6 +220,7 @@ export default function SearchBar(props: Props) {
     });
   }
 
+  // set options to recent searches only (at the start)
   function prePopulateRecents() {
     let recents: SearchQueryWithTitle[] = getRecentSearches();
     recents = recents.filter(
@@ -230,6 +230,19 @@ export default function SearchBar(props: Props) {
       el.isRecent = true;
     });
     setOptions(recents);
+  }
+
+  //remove currently chosen values
+  function removeChosenValues(options: SearchQueryWithTitle[]) {
+    const recents: SearchQueryWithTitle[] = getRecentSearches();
+    const filtered: SearchQueryWithTitle[] = options.filter(
+      (item: SearchQueryWithTitle) =>
+        !value.some((el) => searchQueryEqual(el, item)),
+    );
+    filtered.forEach((el) => {
+      el.isRecent = recents.some((rec) => searchQueryEqual(el, rec)); // deals with removals from recents
+    });
+    return filtered;
   }
 
   //fetch new options, add tags if valid
@@ -254,16 +267,7 @@ export default function SearchBar(props: Props) {
         if (data.message !== 'success') {
           throw new Error(data.data ?? data.message);
         }
-
-        //remove currently chosen values
-        const recents: SearchQueryWithTitle[] = getRecentSearches();
-        const filtered: SearchQueryWithTitle[] = data.data.filter(
-          (item: SearchQueryWithTitle) =>
-            value.findIndex((el) => searchQueryEqual(el, item)) === -1,
-        );
-        filtered.forEach((el) => {
-          el.isRecent = recents.some((rec) => searchQueryEqual(el, rec)); // deals with removals from recents
-        });
+        const filtered: SearchQueryWithTitle[] = removeChosenValues(data.data);
         if (
           // if the returned options minus already selected values is 1, then this
           // means a space following should autocomplete the previous stuff to a chip
@@ -330,14 +334,7 @@ export default function SearchBar(props: Props) {
           }),
         );
         //remove currently chosen values
-        const recents: SearchQueryWithTitle[] = getRecentSearches();
-        const filtered: SearchQueryWithTitle[] = formatted.filter(
-          (item: SearchQueryWithTitle) =>
-            !value.some((el) => searchQueryEqual(el, item)),
-        );
-        filtered.forEach((el) => {
-          el.isRecent = recents.some((rec) => searchQueryEqual(el, rec)); // deals with removals from recents
-        });
+        const filtered: SearchQueryWithTitle[] = removeChosenValues(formatted);
         if (quickInputValue.current === newInputValue) {
           //still valid options
           setOptions([
@@ -359,10 +356,7 @@ export default function SearchBar(props: Props) {
 
   useEffect(() => {
     fetch('/api/autocomplete?input=someSearchTerm');
-    const searchesText = window.localStorage.getItem('UTDTrendsRecent');
-    if (searchesText != null) {
-      // recentSearches.current = JSON.parse(searchesText);
-    }
+    prePopulateRecents();
   }, []);
 
   const [highlightedOption, setHighlightedOption] = useState<boolean>(false);

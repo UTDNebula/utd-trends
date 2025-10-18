@@ -46,6 +46,7 @@ export default function Home(props: Props) {
       startTransition(() => {
         router.push(`/dashboard?${searchParams.toString()}`);
       });
+      // add to recent searches
       const chosenRecentOptions = chosenOptions.map((option) => ({
         ...option,
         isRecent: true,
