@@ -161,6 +161,7 @@ type RowProps = {
   removeFromPlanner: (value: SearchQuery) => void;
   showTutorial: boolean;
   courseName: string | undefined;
+  availableThisSemester: boolean;
 };
 
 function Row({
@@ -178,6 +179,7 @@ function Row({
   removeFromPlanner,
   showTutorial,
   courseName,
+  availableThisSemester,
 }: RowProps) {
   // Check if the course section has the latest semester data
   const hasLatestSemester = !!(
@@ -246,7 +248,7 @@ function Row({
         <TableCell
           component="th"
           scope="row"
-          className="w-full border-b-0 pb-0"
+          className={"w-full border-b-0 pb-0" + (availableThisSemester ? " bg-[#BEBEBE]" : '')}
           colSpan={3}
         >
           {nameCell}
@@ -260,7 +262,7 @@ function Row({
         data-tutorial-id={showTutorial && 'result'}
       >
         <TableCell
-          className="border-b-0"
+          className={"yborder-b-0i" + (availableThisSemestr ? "bg-[#BEBEBE]" : '')}
           data-tutorial-id={showTutorial && 'actions'}
         >
           <div className="flex items-center gap-1">
@@ -714,6 +716,7 @@ export default function SearchResultsTable({
                   courseName={
                     courseNames[searchQueryLabel(convertToCourseOnly(result))]
                   }
+                  availableThisSemester={true}
                 />
               );
             })}
@@ -774,6 +777,7 @@ export default function SearchResultsTable({
                   courseName={
                     courseNames[searchQueryLabel(convertToCourseOnly(result))]
                   }
+                  availableThisSemester={false}
                 />
               );
             })}
