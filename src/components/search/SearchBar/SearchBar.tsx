@@ -122,7 +122,7 @@ export default function SearchBar(props: Props) {
 
   //set value from query
   const searchParams = useSearchParams();
-  const searchTerms = searchParams.get('searchTerms');
+  const searchTerms = searchParams ? searchParams.get('searchTerms') : null;
   useEffect(() => {
     if (searchTerms != null) {
       const arrayParam = searchTerms;
