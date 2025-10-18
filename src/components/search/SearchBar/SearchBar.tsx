@@ -117,9 +117,6 @@ export default function SearchBar(props: Props) {
     _setInputValue(newValue);
   }
 
-  //Recent searches
-  // const recentSearches = useRef<SearchQueryWithTitle[]>([]);
-
   //chosen values
   const [value, setValue] = useState<SearchQuery[]>([]);
 
@@ -214,18 +211,6 @@ export default function SearchBar(props: Props) {
       }))), // ensure no title/subtitle/isRecent fields are stored
     );
   }
-
-  // function getRecent() {
-  //   return recentSearches.current
-  //     .filter(
-  //       (item: SearchQueryWithTitle) =>
-  //         value.findIndex((el) => searchQueryEqual(el, item)) === -1,
-  //     )
-  //     .map((search) => ({
-  //       ...search,
-  //       isRecent: true,
-  //     }));
-  // }
 
   //fetch new options, add tags if valid
   function loadNewOptions(newInputValue: string) {
