@@ -183,7 +183,7 @@ export default function SearchBar(props: Props) {
 
   //update url with what's in value
   async function updateQueries(newValue: SearchQuery[]) {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams ? searchParams.toString() : '');
     if (newValue.length > 0) {
       params.set(
         'searchTerms',
