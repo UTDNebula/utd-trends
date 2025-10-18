@@ -122,7 +122,7 @@ export default function TopMenu(props: Props) {
             props.isPlanner
               ? dashboardSearchTerms != null
                 ? '/dashboard?' + dashboardSearchTerms
-                : '/dashboard?availability=true'
+                : '/'
               : '/planner'
           }
           onClick={() =>
