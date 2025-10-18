@@ -166,13 +166,13 @@ export default function SearchBar(props: Props) {
     }
 
     if (newValue.length > 0) {
-      let onlyNewValues: SearchQuery[] = [];
-      if (searchTerms != null) {
-        onlyNewValues = newValue.filter(
-          // extracts only the search terms that weren't there before
-          (el) => !searchTerms.includes(searchQueryLabel(el)),
-        );
-      }
+      const recents: SearchQueryWithTitle[] = getRecentSearches();
+      // extracts only the search terms that are new (not already in recents)
+      const onlyNewValues: SearchQueryWithTitle[] = newValue
+        .filter(
+          (el) => recents.findIndex((rec) => searchQueryEqual(rec, el)) === -1,
+        )
+        .map((el) => ({ ...el, isRecent: true }));
       updateRecentSearches(onlyNewValues);
     }
   }
@@ -182,7 +182,9 @@ export default function SearchBar(props: Props) {
 
   //update url with what's in value
   async function updateQueries(newValue: SearchQuery[]) {
-    const params = new URLSearchParams(searchParams ? searchParams.toString() : '');
+    const params = new URLSearchParams(
+      searchParams ? searchParams.toString() : '',
+    );
     if (newValue.length > 0) {
       params.set(
         'searchTerms',
@@ -218,24 +220,14 @@ export default function SearchBar(props: Props) {
   }
 
   //When new queries are made, compare them to the existing recent query cache
-  function updateRecentSearches(newValue: SearchQuery[]) {
+  function updateRecentSearches(newValue: SearchQueryWithTitle[]) {
     const recSearches: SearchQueryWithTitle[] = getRecentSearches();
     // Add new searches to the beginning of the array
     const concatArray = [...newValue, ...recSearches];
     const dedupArray = removeDuplicates(concatArray).slice(0, 3);
     window.localStorage.setItem(
       'UTDTrendsRecent',
-      JSON.stringify(
-        dedupArray.map(
-          ({ prefix, number, profFirst, profLast, sectionNumber }) => ({
-            prefix,
-            number,
-            profFirst,
-            profLast,
-            sectionNumber,
-          }),
-        ),
-      ), // ensure no title/subtitle/isRecent fields are stored
+      JSON.stringify(dedupArray), // ensure no title/subtitle/isRecent fields are stored
     );
   }
 
