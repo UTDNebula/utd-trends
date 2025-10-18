@@ -80,7 +80,7 @@ export default async function Page({ searchParams }: Props) {
     // Take first if duplicated queries
     searchTerms = searchTerms[0];
   }
-  if (typeof searchTerms === 'undefined') {
+  if (typeof searchTerms === 'undefined' || searchTerms.length === 0) {
     return (
       <>
         <TopMenu isPlanner={false} />
