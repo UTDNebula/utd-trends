@@ -69,6 +69,27 @@ export function LoadingSearchBar(props: LoadingSearchBarProps) {
   );
 }
 
+export function getRecentSearches() {
+  const searchesText = window.localStorage.getItem('UTDTrendsRecent');
+  let recSearches: SearchQueryWithTitle[] = [];
+  if (searchesText != null) {
+    recSearches = JSON.parse(searchesText);
+  }
+  return recSearches;
+}
+
+//When new queries are made, compare them to the existing recent query cache
+export function updateRecentSearches(newValue: SearchQueryWithTitle[]) {
+  const recSearches: SearchQueryWithTitle[] = getRecentSearches();
+  // Add new searches to the beginning of the array
+  const concatArray = [...newValue, ...recSearches];
+  const dedupArray = removeDuplicates(concatArray).slice(0, 3);
+  window.localStorage.setItem(
+    'UTDTrendsRecent',
+    JSON.stringify(dedupArray), // ensure no title/subtitle/isRecent fields are stored
+  );
+}
+
 type SearchQueryWithTitle = SearchQuery & {
   title?: string;
   subtitle?: string;
@@ -166,13 +187,13 @@ export default function SearchBar(props: Props) {
     }
 
     if (newValue.length > 0) {
-      const recents: SearchQueryWithTitle[] = getRecentSearches();
-      // extracts only the search terms that are new (not already in recents)
-      const onlyNewValues: SearchQueryWithTitle[] = newValue
-        .filter(
-          (el) => recents.findIndex((rec) => searchQueryEqual(rec, el)) === -1,
-        )
-        .map((el) => ({ ...el, isRecent: true }));
+      let onlyNewValues: SearchQuery[] = [];
+      if (searchTerms != null) {
+        onlyNewValues = newValue.filter(
+          // extracts only the search terms that weren't there before
+          (el) => !searchTerms.includes(searchQueryLabel(el)),
+        );
+      }
       updateRecentSearches(onlyNewValues);
     }
   }
@@ -199,15 +220,6 @@ export default function SearchBar(props: Props) {
     });
   }
 
-  function getRecentSearches() {
-    const searchesText = window.localStorage.getItem('UTDTrendsRecent');
-    let recSearches: SearchQueryWithTitle[] = [];
-    if (searchesText != null) {
-      recSearches = JSON.parse(searchesText);
-    }
-    return recSearches;
-  }
-
   function prePopulateRecents() {
     let recents: SearchQueryWithTitle[] = getRecentSearches();
     recents = recents.filter(
@@ -217,18 +229,6 @@ export default function SearchBar(props: Props) {
       el.isRecent = true;
     });
     setOptions(recents);
-  }
-
-  //When new queries are made, compare them to the existing recent query cache
-  function updateRecentSearches(newValue: SearchQueryWithTitle[]) {
-    const recSearches: SearchQueryWithTitle[] = getRecentSearches();
-    // Add new searches to the beginning of the array
-    const concatArray = [...newValue, ...recSearches];
-    const dedupArray = removeDuplicates(concatArray).slice(0, 3);
-    window.localStorage.setItem(
-      'UTDTrendsRecent',
-      JSON.stringify(dedupArray), // ensure no title/subtitle/isRecent fields are stored
-    );
   }
 
   //fetch new options, add tags if valid
