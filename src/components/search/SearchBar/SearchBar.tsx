@@ -209,12 +209,14 @@ export default function SearchBar(props: Props) {
       JSON.stringify(recentSearches.current),
     );
   }
-  
+
   function getRecent() {
-    return recentSearches.current.filter(
-        (item: SearchQueryWithTitle)=>
-            value.findIndex((el) => searchQueryEqual(el, item)) === -1,
-        ).map((search) => ({
+    return recentSearches.current
+      .filter(
+        (item: SearchQueryWithTitle) =>
+          value.findIndex((el) => searchQueryEqual(el, item)) === -1,
+      )
+      .map((search) => ({
         ...search,
         isRecent: true,
       }));
@@ -243,20 +245,28 @@ export default function SearchBar(props: Props) {
         if (data.message !== 'success') {
           throw new Error(data.data ?? data.message);
         }
-        const recentMatches: SearchQueryWithTitle[] = recentSearches.current.filter(
-          (item: SearchQueryWithTitle) => {
-            if(value.findIndex((el) => searchQueryEqual(el, item)) !== -1){ return false;}
-            if(!(searchQueryLabel(item).toLowerCase().includes(newInputValue.toLowerCase()))){ return false;}
+        const recentMatches: SearchQueryWithTitle[] = recentSearches.current
+          .filter((item: SearchQueryWithTitle) => {
+            if (value.findIndex((el) => searchQueryEqual(el, item)) !== -1) {
+              return false;
+            }
+            if (
+              !searchQueryLabel(item)
+                .toLowerCase()
+                .includes(newInputValue.toLowerCase())
+            ) {
+              return false;
+            }
             return true;
-          }
-        ).map((search) => ({
-        ...search,
-        isRecent: true,
-      }));
+          })
+          .map((search) => ({
+            ...search,
+            isRecent: true,
+          }));
         //remove currently chosen values
         const filtered: SearchQuery[] = data.data.filter(
           (item: SearchQuery) =>
-            value.findIndex((el) => searchQueryEqual(el, item)) === -1 && 
+            value.findIndex((el) => searchQueryEqual(el, item)) === -1 &&
             recentMatches.findIndex((el) => searchQueryEqual(el, item)) === -1,
         );
         if (
@@ -296,7 +306,7 @@ export default function SearchBar(props: Props) {
             setNoResults(newInputValue);
             loadNewCourseNameOptions(newInputValue);
           }
-          setOptions([...recentMatches,...filtered]);
+          setOptions([...recentMatches, ...filtered]);
         }
       })
       .catch(() => {})
@@ -360,7 +370,7 @@ export default function SearchBar(props: Props) {
         freeSolo
         loading={loading}
         //highlight first option to add with enter
-        onFocus={()=>{
+        onFocus={() => {
           if (inputValue.trim() === '') {
             const recentWithFlag = getRecent();
             setOptions(recentWithFlag);
@@ -512,20 +522,17 @@ export default function SearchBar(props: Props) {
           const subtextParts = subtext ? parse(subtext, subTextMatches) : [];
           const { key, ...otherProps } = props;
           return (
-            <li
-              key={key}
-              {...otherProps}
-            >
+            <li key={key} {...otherProps}>
               <div>
                 <div>
-              {
-                //If option isSearchQuery and isRecent is declared & is true
-                typeof option !== 'string' && option.isRecent == true ? (
-                  <HistoryToggleOffIcon className="text-gray-400 self-center mr-1" />
-                ) : (
-                  <SearchIcon className="text-gray-400 self-center mr-1" />
-                )
-              }
+                  {
+                    //If option isSearchQuery and isRecent is declared & is true
+                    typeof option !== 'string' && option.isRecent == true ? (
+                      <HistoryToggleOffIcon className="text-gray-400 self-center mr-1" />
+                    ) : (
+                      <SearchIcon className="text-gray-400 self-center mr-1" />
+                    )
+                  }
                   {parts.map((part, index) => (
                     <span
                       key={index}
