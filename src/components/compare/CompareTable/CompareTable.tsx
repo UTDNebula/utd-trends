@@ -301,12 +301,12 @@ function GradeAndRmpRow({
 type CheckboxRowProps = {
   name: string;
   courses: SearchQuery[];
-  removeFromCompare: (arg0: SearchQuery) => void;
+  removeFromCompare?: (arg0: SearchQuery) => void;
   cell_className: string;
   colors: string[];
   orderBy: string;
   order: 'asc' | 'desc';
-  handleClick: (arg0: string) => void;
+  handleClick?: (arg0: string) => void;
 };
 // This is for checkboxes to remove courses from the compare table
 function CheckboxRow({
@@ -326,7 +326,12 @@ function CheckboxRow({
           active={orderBy === name}
           direction={orderBy === name ? order : 'desc'}
           onClick={() => {
-            handleClick(name);
+            if (handleClick) {
+              handleClick(name);
+            } else {
+              console.log("Error, handleClick not specified");
+            }
+            
           }}
           sx={{
             '& .MuiTableSortLabel-icon': {
@@ -351,7 +356,11 @@ function CheckboxRow({
             <Checkbox
               checked={true}
               onClick={() => {
-                removeFromCompare(course);
+                if (removeFromCompare) {
+                  removeFromCompare(course);
+                } else {
+                  console.log("Error, removeFromCompare function not specified!");
+                }
               }}
               sx={{
                 '&.Mui-checked': {
@@ -362,6 +371,65 @@ function CheckboxRow({
           </Tooltip>
         </TableCell>
       ))}
+    </TableRow>
+  );
+}
+
+function PlannerRow({
+  name,
+  courses,
+  cell_className, // for specifying border mostly
+  colors, // border colors
+  orderBy, // for controlling sorting
+  order,
+}: CheckboxRowProps) {
+  const {
+    sections,
+    planner,
+    addToPlanner,
+    removeFromPlanner,
+  } = useSharedState();
+
+
+  return (
+    <TableRow sx={{ '& td': { border: 0 } }}>
+      <TableCell align="right" className="pl-0">
+        {name}
+      </TableCell>
+      {courses.map((course, index) => {
+        const courseOnlySections =
+          sections[searchQueryLabel(convertToCourseOnly(course))];
+        const canAddCourseOnlyToPlanner =
+          typeof courseOnlySections !== 'undefined' &&
+          courseOnlySections.message === 'success' &&
+          courseOnlySections.data.latest.some((section) =>
+            sectionCanOverlap(section.section_number),
+        );
+        return (
+          <TableCell
+            align="center"
+            key={index}
+            className={cell_className}
+            style={{
+              borderColor: colors[index],
+              backgroundColor: colors[index] + '10', // add transparency
+            }}
+          >
+            <PlannerCheckbox
+              section={sections[searchQueryLabel(course)]}
+              course={course}
+              inPlanner={planner.some((obj) =>
+                searchQueryEqual(obj, course),
+              )}
+              addToPlanner={addToPlanner}
+              removeFromPlanner={removeFromPlanner}
+              addJustCourseToo={
+                !searchQueryEqual(course, convertToCourseOnly(course)) &&
+                canAddCourseOnlyToPlanner
+              }
+            />
+          </TableCell>
+        )})}
     </TableRow>
   );
 }
@@ -504,16 +572,7 @@ export default function CompareTable({
                 Compare
               </TableCell>
               {/*the course names along the top*/}
-              {sortedResults.map((result, index) => {
-                const courseOnlySections =
-                  sections[searchQueryLabel(convertToCourseOnly(result))];
-                const canAddCourseOnlyToPlanner =
-                  typeof courseOnlySections !== 'undefined' &&
-                  courseOnlySections.message === 'success' &&
-                  courseOnlySections.data.latest.some((section) =>
-                    sectionCanOverlap(section.section_number),
-                );
-                return (
+              {sortedResults.map((result, index) => (
                 <TableCell
                   key={searchQueryLabel(result)}
                   className="text-center py-3 border-x-2 border-t-2 rounded-t-lg w-min"
@@ -523,25 +582,9 @@ export default function CompareTable({
                     backgroundColor: mappedColors[index] + '10', // add transparency
                   }}
                 >
-                  <div className="flex flex-row place-content-evenly">
-                    {searchQueryLabel(result)}
-                    <PlannerCheckbox
-                      section={sections[searchQueryLabel(result)]}
-                      course={result}
-                      inPlanner={planner.some((obj) =>
-                        searchQueryEqual(obj, result),
-                      )}
-                      addToPlanner={addToPlanner}
-                      removeFromPlanner={removeFromPlanner}
-                      addJustCourseToo={
-                        !searchQueryEqual(result, convertToCourseOnly(result)) &&
-                        canAddCourseOnlyToPlanner
-                      }
-                    />
-                  </div>
+                  {searchQueryLabel(result)}
                 </TableCell>
-              )}
-              )}
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -628,11 +671,19 @@ export default function CompareTable({
               name="Color"
               courses={sortedResults}
               removeFromCompare={removeFromCompare}
-              cell_className="pt-0 pb-1 border-x-2 border-b-2 rounded-b-lg"
+              cell_className="pt-0 pb-1 border-x-2"
               colors={mappedColors}
               orderBy={orderBy}
               order={order}
               handleClick={handleClick}
+            />
+            <PlannerRow
+              name="Add to Planner"
+              courses={sortedResults}
+              cell_className="pt-0 pb-1 border-x-2 border-b-2 rounded-b-lg"
+              colors={mappedColors}
+              orderBy={orderBy}
+              order={order}
             />
           </TableBody>
         </Table>
