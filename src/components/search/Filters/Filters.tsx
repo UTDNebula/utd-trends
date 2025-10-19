@@ -88,7 +88,7 @@ export default function Filters() {
     sectionTypes,
     chosenSectionTypes,
     setChosenSectionTypes,
-    latestSemester
+    latestSemester,
   } = useSharedState();
 
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
@@ -386,70 +386,70 @@ export default function Filters() {
       {/* section type dropdown */}
       <Grid size={{ xs: 6, sm: 3 }} className="px-2">
         <Tooltip
-            title={'Select Section Types to Include Grades from'}
-            placement="top"
+          title={'Select Section Types to Include Grades from'}
+          placement="top"
         >
           <FormControl
-              size="small"
-              className={`w-full ${
-                  chosenSectionTypes.length !== sectionTypes.length
-                      ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
-                      : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
-              }`}
+            size="small"
+            className={`w-full ${
+              chosenSectionTypes.length !== sectionTypes.length
+                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
+                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
+            }`}
           >
             <InputLabel id="SectionTypes">Section Types</InputLabel>
             <Select
-                label="Section Types"
-                labelId="SectionTypes"
-                multiple
-                value={chosenSectionTypes}
-                onChange={(event: SelectChangeEvent<string[]>) => {
-                  const {
-                    target: { value },
-                  } = event;
-                  if (value.includes('select-all')) {
-                    if (chosenSectionTypes.length === sectionTypes.length) {
-                      setChosenSectionTypes([]);
-                    } else {
-                      setChosenSectionTypes(sectionTypes);
-                    }
-                  } else {
-                    setChosenSectionTypes(value as string[]);
-                  }
-                }}
-                renderValue={(selected) => {
+              label="Section Types"
+              labelId="SectionTypes"
+              multiple
+              value={chosenSectionTypes}
+              onChange={(event: SelectChangeEvent<string[]>) => {
+                const {
+                  target: { value },
+                } = event;
+                if (value.includes('select-all')) {
                   if (chosenSectionTypes.length === sectionTypes.length) {
-                    return 'All selected';
+                    setChosenSectionTypes([]);
+                  } else {
+                    setChosenSectionTypes(sectionTypes);
                   }
-                  return selected.sort().join(', ');
-                }}
-                MenuProps={{ autoFocus: false }}
+                } else {
+                  setChosenSectionTypes(value as string[]);
+                }
+              }}
+              renderValue={(selected) => {
+                if (chosenSectionTypes.length === sectionTypes.length) {
+                  return 'All selected';
+                }
+                return selected.sort().join(', ');
+              }}
+              MenuProps={{ autoFocus: false }}
             >
               {/* select all section types */}
               <MenuItem className="h-10 items-center" value="select-all">
                 <Checkbox
-                    checked={
-                        sectionTypes.length > 0 &&
-                        chosenSectionTypes.length === sectionTypes.length
-                    }
-                    indeterminate={
-                        chosenSectionTypes.length !== sectionTypes.length &&
-                        chosenSectionTypes.length !== 0
-                    }
-                    disabled={sectionTypes.length == 0}
+                  checked={
+                    sectionTypes.length > 0 &&
+                    chosenSectionTypes.length === sectionTypes.length
+                  }
+                  indeterminate={
+                    chosenSectionTypes.length !== sectionTypes.length &&
+                    chosenSectionTypes.length !== 0
+                  }
+                  disabled={sectionTypes.length == 0}
                 />
                 <ListItemText
-                    className={sectionTypes.length > 0 ? '' : 'text-gray-400'}
-                    primary="Select All"
+                  className={sectionTypes.length > 0 ? '' : 'text-gray-400'}
+                  primary="Select All"
                 />
               </MenuItem>
 
               {/* individual options */}
               {sectionTypes.map((t) => (
-                  <MenuItem className="h-10 items-center" key={t} value={t}>
-                    <Checkbox checked={chosenSectionTypes.includes(t)} />
-                    <ListItemText primary={displaySectionTypeName(t)} />
-                  </MenuItem>
+                <MenuItem className="h-10 items-center" key={t} value={t}>
+                  <Checkbox checked={chosenSectionTypes.includes(t)} />
+                  <ListItemText primary={displaySectionTypeName(t)} />
+                </MenuItem>
               ))}
             </Select>
           </FormControl>

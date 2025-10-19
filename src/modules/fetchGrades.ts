@@ -24,17 +24,20 @@ export type Grades = {
 
 //Find GPA, total, and grade_distribution based on including some set of semesters and section types
 export function calculateGrades(
-    grades: GradesData,
-    semesters?: string[],
-    sectionTypes?: string[],
+  grades: GradesData,
+  semesters?: string[],
+  sectionTypes?: string[],
 ) {
   let grade_distribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   for (const session of grades) {
     if (typeof semesters === 'undefined' || semesters.includes(session._id)) {
       for (const sectionData of session.data) {
-        if (typeof sectionTypes === 'undefined' || sectionTypes.includes(sectionData.type)) {
+        if (
+          typeof sectionTypes === 'undefined' ||
+          sectionTypes.includes(sectionData.type)
+        ) {
           grade_distribution = grade_distribution.map(
-              (item, i) => item + sectionData.grade_distribution[i],
+            (item, i) => item + sectionData.grade_distribution[i],
           );
         }
       }
@@ -88,7 +91,9 @@ export default async function fetchGrades(
   }
 
   try {
-    const url = new URL('https://api.utdnebula.com/grades/semester/sectionType');
+    const url = new URL(
+      'https://api.utdnebula.com/grades/semester/sectionType',
+    );
     if (typeof query.prefix === 'string') {
       url.searchParams.append('prefix', query.prefix);
     }

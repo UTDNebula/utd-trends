@@ -77,7 +77,9 @@ export function SharedStateProvider({
   const [chosenSemesters, internalSetChosenSemesters] = useState<string[]>([]);
 
   const [sectionTypes, setSectionTypes] = useState<string[]>([]);
-  const [chosenSectionTypes, internalSetChosenSectionTypes] = useState<string[]>([]);
+  const [chosenSectionTypes, internalSetChosenSectionTypes] = useState<
+    string[]
+  >([]);
 
   const [rmp, setRmp] = useState<{ [key: string]: GenericFetchedData<RMP> }>(
     {},
@@ -175,7 +177,13 @@ export function SharedStateProvider({
         return newValue;
       });
     },
-    [internalSetGrades, setSemesters, internalSetChosenSemesters, setSectionTypes, internalSetChosenSectionTypes],
+    [
+      internalSetGrades,
+      setSemesters,
+      internalSetChosenSemesters,
+      setSectionTypes,
+      internalSetChosenSectionTypes,
+    ],
   );
 
   //Set chosen semesters and update grades and compare grades
