@@ -10,7 +10,7 @@ import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedul
 export default function PlannerDownloadUI({ downloadRef } : { downloadRef : React.RefObject<HTMLDivElement | null> }) {
   
     return (    
-        <div className='bg-black p-4 absolute' ref={downloadRef}>
+        <div className='bg-black p-4 absolute left-[-9999px] top-0' ref={downloadRef}>
             <div className='flex flex-row mb-4 justify-start'>
                 <NebulaLogo className="h-6 w-auto fill-haiti dark:fill-white mr-2 ml-2" />
                 UTD TRENDS
