@@ -187,7 +187,7 @@ export default function Filters(props: Props) {
     results = fetchSearchResults(props.professors, []);
   }
   const gradeCounts: Record<string, number> = {};
-  const rmpCount: Record<string, number> = {};
+  const rmpCounts: Record<string, number> = {};
 
   minGPAs.forEach((gpaString) => {
     const gpaNum = parseFloat(gpaString);
@@ -209,7 +209,7 @@ export default function Filters(props: Props) {
 
   minRatings.forEach((ratingString) => {
     const ratingNum = parseFloat(ratingString);
-    rmpCount[ratingString] = results.filter((result) => {
+    rmpCounts[ratingString] = results.filter((result) => {
       const profRatings = rmp?.[searchQueryLabel(convertToProfOnly(result))];
       const courseGrades = grades[searchQueryLabel(result)];
       const passesGPA =
@@ -262,6 +262,7 @@ export default function Filters(props: Props) {
                   `${pathname}?${params.toString()}`,
                 );
               }}
+              renderValue={(value) => gpaToLetterGrade(Number(value))}
             >
               <MenuItem className="h-10" value="">
                 <em>None</em>
@@ -269,7 +270,10 @@ export default function Filters(props: Props) {
               {/* dropdown options*/}
               {minGPAs.map((value) => (
                 <MenuItem className="h-10" key={value} value={value}>
-                  {gpaToLetterGrade(Number(value))} ({gradeCounts[value] ?? 0})
+                  <span className="w-5">{gpaToLetterGrade(Number(value))}</span>
+                  <span className="text-sm text-gray-400 ml-1">
+                    ({gradeCounts[value] ?? 0})
+                  </span>
                 </MenuItem>
               ))}
             </Select>
@@ -329,7 +333,9 @@ export default function Filters(props: Props) {
                     sx={{ fontSize: 25 }}
                     readOnly
                   />{' '}
-                  ({rmpCount[value] ?? 0})
+                  <span className="text-sm text-gray-400 ml-2">
+                    ({rmpCounts[value] ?? 0})
+                  </span>
                 </MenuItem>
               ))}
             </Select>
