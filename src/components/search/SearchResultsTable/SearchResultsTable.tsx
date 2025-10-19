@@ -46,7 +46,6 @@ import {
 
 // sets the color for the table head cells
 function getCellSx(theme: Theme) {
-  console.log('Theme mode:', theme.palette.mode);
   return {
     backgroundColor: 'rgb(252,252,252)',
     '@media (prefers-color-scheme: dark)': {
@@ -641,13 +640,10 @@ export default function SearchResultsTable({
         <Table stickyHeader aria-label="collapsible table">
           <TableHead>
             <TableRow>
-              <TableCell
-                className="hidden sm:table-cell"
-                sx={(theme) => getCellSx(theme)}
-              >
+              <TableCell className="hidden sm:table-cell" sx={getCellSx}>
                 Actions
               </TableCell>
-              <TableCell sx={(theme) => getCellSx(theme)}>
+              <TableCell sx={getCellSx}>
                 <TableSortLabel
                   active={orderBy === 'name'}
                   direction={orderBy === 'name' ? order : 'asc'}
@@ -658,7 +654,7 @@ export default function SearchResultsTable({
                   Name
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="center" sx={(theme) => getCellSx(theme)}>
+              <TableCell align="center" sx={getCellSx}>
                 <Tooltip
                   title="Average Letter Grade Across Course Sections"
                   placement="top"
@@ -676,7 +672,7 @@ export default function SearchResultsTable({
                   </div>
                 </Tooltip>
               </TableCell>
-              <TableCell align="center" sx={(theme) => getCellSx(theme)}>
+              <TableCell align="center" sx={getCellSx}>
                 <Tooltip
                   title="Average Professor Rating from Rate My Professors"
                   placement="top"
