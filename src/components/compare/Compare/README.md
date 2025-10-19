@@ -1,18 +1,10 @@
-This component shows a comparison between different courses. It is part of the Compare component and compares one or more courses based on average GPA, professor rating, percentage of students who would take the professor again, and the difficulty of the professor. It also allows the order of the courses to change (can be ordered based on the 4 categories listed above in either ascending or descending order). Courses can also be removed by de-selecting the checkbox.
+This component allows different courses to be compared with 3 different components: a CompareTable, a LineGraph, and a BarGraph. If the 'Add to Compare' button is clicked on search results, the course gets added to the 'Compare' tab on the right. Each component shows data from two or more search queries side-by-side.
 
-### Props Table
-
-| Prop                | Type                                        | Description                                                                           | Required |
-| :------------------ | :------------------------------------------ | :------------------------------------------------------------------------------------ | -------- |
-| `includedResults`   | `SearchQuery[]`                             | The search queries that are used for comparing (for ex. 'GOVT 2306' or 'Euel Elliot') | Yes      |
-| `grades`            | `[key: string]: GenericFetchedData<Grades>` | A mapping of grade data for each search query                                         | Yes      |
-| `rmp`               | `[key: string]: GenericFetchedData<RMP>`    | A mapping of RateMyProfessor data for each search query                               | Yes      |
-| `removeFromCompare` | `function with (arg0: SearchQuery)`         | Defines the function for removing a search query from the compare section             | Yes      |
-| `colorMap`          | `[key: string]: string`                     | A mapping of a color to each course for comparison purposes                           | Yes      |
-
-### CompareTable Example
+### Compare Example
 
 ```jsx
+// code is basically a combination of sample code from common/SingleGradesInfo and compare/CompareTable
+
 import CloseIcon from '@mui/icons-material/Close';
 import {
   Table,
@@ -22,10 +14,15 @@ import {
   TableHead,
   TableRow,
   Tooltip,
+  Skeleton,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React from 'react';
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
+import BarGraph from '@/components/graph/BarGraph/BarGraph';
+import LineGraph from '@/components/graph/LineGraph/LineGraph';
+import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
 
+// code from CompareTable
 const SampleProps = {
   name: [
     'GPA',
@@ -117,9 +114,53 @@ function GradeOrRmpRow(props) {
   );
 }
 
+// end of code from CompareTable
+
+// code from SingleGradesInfo
+const sampleSeries = [
+  {
+    name: 'Sample Course',
+    data: [],
+  },
+];
+// empty bar graph
+const barNode = (
+  <BarGraph
+    series={sampleSeries}
+    yaxisFormatter={(value) => Number(value).toFixed(0).toLocaleString() + '%'}
+    xaxisLabels={[
+      'A+',
+      'A',
+      'A-',
+      'B+',
+      'B',
+      'B-',
+      'C+',
+      'C',
+      'C-',
+      'D+',
+      'D',
+      'D-',
+      'F',
+      'W',
+    ]}
+    title="% of Students"
+  ></BarGraph>
+);
+// empty line graph
+const lineNode = (
+  <LineGraph title="GPA Trend" series={sampleSeries}></LineGraph>
+);
+// end of code from SingleGradesInfo
+
 <>
-  {/* Shows a sample with 2 classes */}
   <div className="w-full py-5">
+    {/* Code from SingleGradesInfo (only one line) */}
+    {/* Shows a sample with an empty bar graph and line graph */}
+    <GraphToggle state="ready" bar={barNode} line={lineNode} />
+
+    {/* Code from CompareTable */}
+    {/* Shows a sample with 2 classes */}
     <TableContainer className="w-fit h-full mb-4">
       <Table size="small" className="border-spacing-x-2 border-separate">
         <TableHead>
