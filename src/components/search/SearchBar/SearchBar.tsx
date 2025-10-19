@@ -168,7 +168,8 @@ export default function SearchBar(props: Props) {
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter' && inputValue === '') {
+    if (event.key === 'Enter' && inputValue === '' && !highlightedOption) {
+      // if input is '' but selecting a recent search, allow it
       event.preventDefault();
       event.stopPropagation();
       onSelect(value);
@@ -386,6 +387,8 @@ export default function SearchBar(props: Props) {
     prePopulateRecents();
   }, []);
 
+  const [highlightedOption, setHighlightedOption] = useState<boolean>(false);
+
   return (
     <div
       className={'flex items-center gap-2 ' + (props.className ?? '')}
@@ -405,6 +408,9 @@ export default function SearchBar(props: Props) {
         autoHighlight={true}
         clearOnBlur={false}
         className="grow"
+        onHighlightChange={(option) => {
+          setHighlightedOption(option !== null); // whether an option is highlighted
+        }}
         getOptionLabel={(option) => {
           if (typeof option === 'string') {
             return option;
