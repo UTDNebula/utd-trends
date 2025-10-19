@@ -381,10 +381,12 @@ export default function SearchBar(props: Props) {
   function addValue(newValue: SearchQuery) {
     setValue((prev) => [...prev, newValue]);
   }
-
+  
   useEffect(() => {
     fetch('/api/autocomplete?input=someSearchTerm');
     prePopulateRecents();
+    // disable warning fpr prePopulateRecents because we only want this to run at the start
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [highlightedOption, setHighlightedOption] = useState<boolean>(false);
