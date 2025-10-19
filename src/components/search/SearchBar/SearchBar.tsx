@@ -168,11 +168,21 @@ export default function SearchBar(props: Props) {
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter' && inputValue === '' && !highlightedOption) {
-      // if input is '' but selecting a recent search, allow it
+    if (event.key !== 'Enter') {
+      return;
+    }
+
+    if (options.length == 0 || loading) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    if (inputValue === '' && !highlightedOption) {
       event.preventDefault();
       event.stopPropagation();
       onSelect(value);
+      return;
     }
   }
 
@@ -454,6 +464,8 @@ export default function SearchBar(props: Props) {
           }
           updateValue(newValue as SearchQuery[]);
         }}
+        selectOnFocus={false}
+        handleHomeEndKeys={false}
         inputValue={inputValue}
         onInputChange={(event, newInputValue) => {
           setInputValue(newInputValue);
