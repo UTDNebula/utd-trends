@@ -235,9 +235,14 @@ interface Props {
 }
 
 function link(linkText: string) {
-  return <a href={`dashboard?searchTerms=${linkText.replace(/\s+/g, '+')}&availability=true`} className="underline">
-                    {linkText}
-                  </a>;
+  return (
+    <a
+      href={`dashboard?searchTerms=${linkText.replace(/\s+/g, '+')}&availability=true`}
+      className="underline"
+    >
+      {linkText}
+    </a>
+  );
 }
 
 export default function CourseOverview({ course, courseData, grades }: Props) {
@@ -256,10 +261,7 @@ export default function CourseOverview({ course, courseData, grades }: Props) {
     } = parseDescription(courseData.data);
 
     // takes the courses that are the same as this course
-    const splitSameAsText = sameAsText
-      .substring(sameAsText.indexOf('(Same as ') + 9, sameAsText.indexOf(')'))
-      .split(/ (?:,|and) /);
-    const splittingRegex = /[a-zA-Z]{2,4} [0-9][0-9V]?[0-9]{0,2}/g
+    const splittingRegex = /[a-zA-Z]{2,4} [0-9][0-9V]?[0-9]{0,2}/g;
     const splitText = sameAsText.split(splittingRegex);
     const linkText = sameAsText.match(splittingRegex);
 
@@ -279,10 +281,9 @@ export default function CourseOverview({ course, courseData, grades }: Props) {
                 </span>
               );
             }
-              
-            return <span key={i}>{text}</span>
+
+            return <span key={i}>{text}</span>;
           })}
-          
         </div>
         <p className="font-semibold">{courseData.data.school}</p>
         <p>{formattedDescription + ' ' + creditHours + ' credit hours.'}</p>
