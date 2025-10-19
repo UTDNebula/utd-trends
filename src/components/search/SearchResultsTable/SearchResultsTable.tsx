@@ -20,13 +20,13 @@ import {
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
-
 import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
+import type { Theme } from '@mui/material/styles';
 import type { Grades } from '@/modules/fetchGrades';
 import type { RMP } from '@/modules/fetchRmp';
 import type { Sections } from '@/modules/fetchSections';
@@ -42,6 +42,17 @@ import {
   searchQueryLabel,
   sectionCanOverlap,
 } from '@/types/SearchQuery';
+
+// sets the color for the table head cells
+function getCellSx(theme: Theme) {
+  console.log('Theme mode:', theme.palette.mode);
+  return {
+    backgroundColor: 'rgb(252,252,252)',
+    '@media (prefers-color-scheme: dark)': {
+      backgroundColor: 'var(--mui-palette-background-default)',
+    },
+  };
+}
 
 function LoadingRow() {
   const nameCell = (
@@ -105,13 +116,15 @@ export function LoadingSearchResultsTable() {
         <Table stickyHeader aria-label="collapsible table">
           <TableHead>
             <TableRow>
-              <TableCell className="hidden sm:table-cell">Actions</TableCell>
-              <TableCell>
+              <TableCell className="hidden sm:table-cell" sx={getCellSx}>
+                Actions
+              </TableCell>
+              <TableCell sx={getCellSx}>
                 <TableSortLabel active direction="asc">
                   Name
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="center">
+              <TableCell align="center" sx={getCellSx}>
                 <Tooltip
                   title="Median Letter Grade Across Course Sections"
                   placement="top"
@@ -121,7 +134,7 @@ export function LoadingSearchResultsTable() {
                   </div>
                 </Tooltip>
               </TableCell>
-              <TableCell align="center">
+              <TableCell align="center" sx={getCellSx}>
                 <Tooltip
                   title="Average Professor Rating from Rate My Professors"
                   placement="top"
@@ -627,8 +640,13 @@ export default function SearchResultsTable({
         <Table stickyHeader aria-label="collapsible table">
           <TableHead>
             <TableRow>
-              <TableCell className="hidden sm:table-cell">Actions</TableCell>
-              <TableCell>
+              <TableCell
+                className="hidden sm:table-cell"
+                sx={(theme) => getCellSx(theme)}
+              >
+                Actions
+              </TableCell>
+              <TableCell sx={(theme) => getCellSx(theme)}>
                 <TableSortLabel
                   active={orderBy === 'name'}
                   direction={orderBy === 'name' ? order : 'asc'}
@@ -639,7 +657,7 @@ export default function SearchResultsTable({
                   Name
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="center">
+              <TableCell align="center" sx={(theme) => getCellSx(theme)}>
                 <Tooltip
                   title="Average Letter Grade Across Course Sections"
                   placement="top"
@@ -657,7 +675,7 @@ export default function SearchResultsTable({
                   </div>
                 </Tooltip>
               </TableCell>
-              <TableCell align="center">
+              <TableCell align="center" sx={(theme) => getCellSx(theme)}>
                 <Tooltip
                   title="Average Professor Rating from Rate My Professors"
                   placement="top"
