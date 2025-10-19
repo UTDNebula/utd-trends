@@ -237,6 +237,9 @@ export default function SearchBar(props: Props) {
     options: SearchQueryWithTitle[],
     newInputValue: string,
   ): SearchQueryWithTitle[] {
+    if (options.length == 0)
+      // no autocomplete options, don't waste time prepending matchedRecents (force it to call loadNewCourseNameOptions() )
+      return [];
     const recents: SearchQueryWithTitle[] = getRecentSearches();
     const matchedRecents = recents.filter((item: SearchQueryWithTitle) => {
       if (value.some((el) => searchQueryEqual(el, item))) {
@@ -331,10 +334,7 @@ export default function SearchBar(props: Props) {
             setNoResults(newInputValue);
             loadNewCourseNameOptions(newInputValue);
           }
-          setOptions([
-            ...filtered.filter((res) => res.isRecent),
-            ...filtered.filter((res) => !res.isRecent),
-          ]); // recents first
+          setOptions(filtered);
         }
       })
       .catch(() => {})
@@ -366,10 +366,7 @@ export default function SearchBar(props: Props) {
         );
         if (quickInputValue.current === newInputValue) {
           //still valid options
-          setOptions([
-            ...filtered.filter((res) => res.isRecent),
-            ...filtered.filter((res) => !res.isRecent),
-          ]); // recents first
+          setOptions(filtered);
         }
       })
       .catch(() => {})
