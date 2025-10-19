@@ -6,6 +6,7 @@ import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
 import { compareColors } from '@/modules/colors';
@@ -37,6 +38,7 @@ function getSemesterGPAs(
     data: Grades['grades'];
   },
   allSemesters: string[],
+  chosenSectionTypes: string[] | undefined,
 ) {
   const semesters = data.data
     //remove summer
@@ -44,7 +46,24 @@ function getSemesterGPAs(
     .toSorted((a, b) => sortSemesters(a._id, b._id))
     //get gpa and place in allSemesters
     .map((semester) => {
-      const total: number = semester.grade_distribution.reduce(
+      // Aggregate grade_distribution across selected section types for this semester
+      const aggregate = (semester.data ?? []).reduce(
+        (acc, section) => {
+          if (
+            !chosenSectionTypes ||
+            chosenSectionTypes.length === 0 ||
+            chosenSectionTypes.includes(section.type)
+          ) {
+            return acc.map(
+              (v, i) => v + (section.grade_distribution?.[i] ?? 0),
+            );
+          }
+          return acc;
+        },
+        Array(14).fill(0) as number[],
+      );
+
+      const total: number = aggregate.reduce(
         (accumulator, currentValue) => accumulator + currentValue,
         0,
       );
@@ -57,13 +76,10 @@ function getSemesterGPAs(
         gpa =
           GPALookup.reduce(
             (accumulator, currentValue, index) =>
-              accumulator + currentValue * semester.grade_distribution[index],
+              accumulator + currentValue * aggregate[index],
             0,
           ) /
-          (total -
-            semester.grade_distribution[
-              semester.grade_distribution.length - 1
-            ]);
+          (total - aggregate[aggregate.length - 1]);
       }
       return {
         x: allSemesters.indexOf(semester._id) + 1,
@@ -91,6 +107,7 @@ type Props = {
 
 export default function LineGraph(props: Props) {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
+  const { chosenSectionTypes } = useSharedState();
 
   const icon =
     '<div class="apexcharts-menu-icon">' +
@@ -122,7 +139,7 @@ export default function LineGraph(props: Props) {
   }
   // format series with gpas and semester places
   const series = props.series.map((single) =>
-    getSemesterGPAs(single, allSemesters),
+    getSemesterGPAs(single, allSemesters, chosenSectionTypes),
   );
 
   const theme = useTheme();
