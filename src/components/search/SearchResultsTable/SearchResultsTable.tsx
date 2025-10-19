@@ -19,14 +19,15 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import type { Theme } from '@mui/material/styles';
 import React, { useState } from 'react';
+
 import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
-import type { Theme } from '@mui/material/styles';
 import type { Grades } from '@/modules/fetchGrades';
 import type { RMP } from '@/modules/fetchRmp';
 import type { Sections } from '@/modules/fetchSections';
