@@ -69,12 +69,7 @@ type Props = {
 };
 
 export default function LineGraph(props: Props) {
-  const {
-    chosenSemesters,
-    setChosenSemesters,
-    firstClickDone,
-    setFirstClickDone,
-  } = useSharedState();
+  const { semesters, chosenSemesters, setChosenSemesters } = useSharedState();
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
@@ -190,15 +185,19 @@ export default function LineGraph(props: Props) {
       events: {
         markerClick: (event, chartContext, { seriesIndex, dataPointIndex }) => {
           const semester =
-            allSemesters[series[seriesIndex].data[dataPointIndex].x - 1];
+            chartContext.w.config?.series[seriesIndex]?.data[dataPointIndex]
+              .semester;
 
           let newSemesters = chosenSemesters;
 
-          if (!firstClickDone) {
+          if (semester === null) return;
+          if (chosenSemesters?.length === semesters.length) {
             newSemesters = [semester];
-            setFirstClickDone(true);
           } else if (chosenSemesters.includes(semester)) {
             newSemesters = chosenSemesters.filter((s) => s !== semester);
+            if (newSemesters.length == 0) {
+              newSemesters = semesters;
+            }
           } else {
             newSemesters = [...chosenSemesters, semester];
           }
@@ -305,25 +304,24 @@ export default function LineGraph(props: Props) {
     theme: { mode: prefersDarkMode ? 'dark' : 'light' },
   };
 
-  const highlightedMarkers: ApexDiscretePoint[] = (chosenSemesters?.flatMap(
-    (sem) => {
-      return series.flatMap((s, seriesIndex) => {
-        const dataPointIndex = s.data.findIndex(
-          (d) => allSemesters[d.x - 1] === sem,
-        );
-        if (dataPointIndex === -1) return [];
-        return [
-          {
-            seriesIndex,
-            dataPointIndex,
-            fillColor: theme.palette.secondary.main,
-            strokeColor: '#fff',
-            size: 8,
-          },
-        ];
-      });
-    },
-  ) ?? []) as ApexDiscretePoint[];
+  const highlightedMarkers: ApexDiscretePoint[] =
+    chosenSemesters.length === semesters.length
+      ? []
+      : ((chosenSemesters?.flatMap((sem) => {
+          return series.flatMap((s, seriesIndex) => {
+            const dataPointIndex = s.data.findIndex((d) => d.semester === sem);
+            if (dataPointIndex === -1) return [];
+            return [
+              {
+                seriesIndex,
+                dataPointIndex,
+                fillColor: theme.palette.secondary.main,
+                strokeColor: '#fff',
+                size: 8,
+              },
+            ];
+          });
+        }) ?? []) as ApexDiscretePoint[]);
 
   options.markers = {
     ...options.markers,
