@@ -18,15 +18,12 @@ import React from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
-import untypedComboTable from '@/data/combo_table.json';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 import { compareSemesters, displaySemesterName } from '@/modules/semesters';
 import useHasHydrated from '@/modules/useHasHydrated';
 import {
-  convertToCourseOnly,
   convertToProfOnly,
-  type SearchQuery,
-  searchQueryEqual,
+  decodeSearchQueryLabel,
   searchQueryLabel,
 } from '@/types/SearchQuery';
 
@@ -85,16 +82,10 @@ export function LoadingFilters() {
   );
 }
 
-interface Props {
-  courses: SearchQuery[];
-  professors: SearchQuery[];
-}
-const comboTable = untypedComboTable as { [key: string]: SearchQuery[] };
-
 /**
  * This component returns a set of filters with which to sort results.
  */
-export default function Filters(props: Props) {
+export default function Filters() {
   const {
     semesters,
     chosenSemesters,
@@ -156,44 +147,15 @@ export default function Filters(props: Props) {
     return recentSemesters.filter((value) => semesters.includes(value));
   }
 
-  function fetchSearchResults( // took from clientleft.tsx so I didn't need to pass it in as a prop
-    searchTerms: SearchQuery[],
-    filterTerms: SearchQuery[],
-  ) {
-    return searchTerms
-      .flatMap((searchTerm) =>
-        [searchTerm].concat(
-          comboTable[searchQueryLabel(searchTerm)].map((combo) => ({
-            ...searchTerm,
-            ...combo,
-          })),
-        ),
-      )
-      .filter(
-        (searchTerm) =>
-          !filterTerms.length ||
-          filterTerms.find(
-            (filterTerm) =>
-              searchQueryEqual(convertToCourseOnly(searchTerm), filterTerm) ||
-              searchQueryEqual(convertToProfOnly(searchTerm), filterTerm),
-          ),
-      );
-  }
-
-  let results: SearchQuery[] = [];
-  if (props.courses.length > 0) {
-    results = fetchSearchResults(props.courses, props.professors);
-  } else if (props.professors.length > 0) {
-    results = fetchSearchResults(props.professors, []);
-  }
   const gradeCounts: Record<string, number> = {};
   const rmpCounts: Record<string, number> = {};
 
   minGPAs.forEach((gpaString) => {
     const gpaNum = parseFloat(gpaString);
-    gradeCounts[gpaString] = results.filter((result) => {
-      const courseGrades = grades[searchQueryLabel(result)];
-      const profRatings = rmp?.[searchQueryLabel(convertToProfOnly(result))];
+    gradeCounts[gpaString] = Object.entries(grades).filter(([key, value]) => {
+      const courseGrades = value;
+      const profRatings =
+        rmp?.[searchQueryLabel(convertToProfOnly(decodeSearchQueryLabel(key)))];
       const passesRating =
         !minRating ||
         (profRatings?.message === 'success' &&
@@ -209,9 +171,10 @@ export default function Filters(props: Props) {
 
   minRatings.forEach((ratingString) => {
     const ratingNum = parseFloat(ratingString);
-    rmpCounts[ratingString] = results.filter((result) => {
-      const profRatings = rmp?.[searchQueryLabel(convertToProfOnly(result))];
-      const courseGrades = grades[searchQueryLabel(result)];
+    rmpCounts[ratingString] = Object.entries(grades).filter(([key, value]) => {
+      const profRatings =
+        rmp?.[searchQueryLabel(convertToProfOnly(decodeSearchQueryLabel(key)))];
+      const courseGrades = value;
       const passesGPA =
         !minGPA ||
         (courseGrades?.message === 'success' &&
