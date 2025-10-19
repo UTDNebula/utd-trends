@@ -33,7 +33,7 @@ export async function GET(request: Request) {
     Accept: 'application/json',
   };
 
-  const url = new URL('https://api.utdnebula.com/grades/semester');
+  const url = new URL('https://api.utdnebula.com/grades/semester/sectionType');
   if (typeof prefix === 'string') {
     url.searchParams.append('prefix', prefix);
   }

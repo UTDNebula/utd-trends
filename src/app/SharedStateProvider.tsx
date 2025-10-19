@@ -54,6 +54,9 @@ const SharedStateContext = createContext<
       semesters: string[];
       chosenSemesters: string[];
       setChosenSemesters: Setter<string[]>;
+      sectionTypes: string[];
+      chosenSectionTypes: string[];
+      setChosenSectionTypes: Setter<string[]>;
       courseNames: { [key: string]: string | undefined };
       setCourseNames: Setter<{ [key: string]: string | undefined }>;
       latestSemester: GenericFetchedData<string> | undefined;
@@ -72,6 +75,9 @@ export function SharedStateProvider({
   }>({});
   const [semesters, setSemesters] = useState<string[]>([]);
   const [chosenSemesters, internalSetChosenSemesters] = useState<string[]>([]);
+
+  const [sectionTypes, setSectionTypes] = useState<string[]>([]);
+  const [chosenSectionTypes, internalSetChosenSectionTypes] = useState<string[]>([]);
 
   const [rmp, setRmp] = useState<{ [key: string]: GenericFetchedData<RMP> }>(
     {},
@@ -99,11 +105,14 @@ export function SharedStateProvider({
     },
     [internalSetCompareGrades],
   );
+
+  const chosenSectionTypesRef = useRef(chosenSectionTypes);
+
   const [compareRmp, setCompareRmp] = useState<{
     [key: string]: GenericFetchedData<RMP>;
   }>({});
 
-  //Set grades and update semesters
+  //Set grades and update semesters and semester types
   const setGrades = useCallback(
     (value: SetterValue<{ [key: string]: GenericFetchedData<Grades> }>) => {
       internalSetGrades((prev) => {
@@ -131,13 +140,42 @@ export function SharedStateProvider({
           // display the semesters in order of recency (most recent first)
           .sort((a, b) => compareSemesters(b, a));
 
+        // Extract section types
+        const newSectionTypes = Object.values(newValue)
+          // remove errored
+          .filter((grade) => grade.message === 'success')
+          //remove grade data, just section types
+          .flatMap((grade) =>
+            grade.data.grades.flatMap((gradeSemester) =>
+              gradeSemester.data.map((sectionData) => sectionData.type),
+            ),
+          );
+        // add section types from compare grades
+        const sectionTypesFromCompare = Object.values(compareGradesRef.current)
+          // remove errored
+          .filter((grade) => grade.message === 'success')
+          //remove grade data, just section types
+          .flatMap((grade) =>
+            grade.data.grades.flatMap((gradeSemester) =>
+              gradeSemester.data.map((sectionData) => sectionData.type),
+            ),
+          );
+        const allSectionTypes = newSectionTypes
+          .concat(sectionTypesFromCompare)
+          // remove duplicates
+          .filter((value, index, array) => array.indexOf(value) === index)
+          // sort alphabetically
+          .sort();
+
         setSemesters(allSemesters);
         internalSetChosenSemesters(allSemesters);
+        setSectionTypes(allSectionTypes);
+        internalSetChosenSectionTypes(allSectionTypes);
 
         return newValue;
       });
     },
-    [internalSetGrades, setSemesters, internalSetChosenSemesters],
+    [internalSetGrades, setSemesters, internalSetChosenSemesters, setSectionTypes, internalSetChosenSectionTypes],
   );
 
   //Set chosen semesters and update grades and compare grades
@@ -153,6 +191,7 @@ export function SharedStateProvider({
               grade.data.filtered = calculateGrades(
                 grade.data.grades,
                 newValue,
+                chosenSectionTypesRef.current,
               );
             }
           }
@@ -164,6 +203,7 @@ export function SharedStateProvider({
               grade.data.filtered = calculateGrades(
                 grade.data.grades,
                 newValue,
+                chosenSectionTypesRef.current,
               );
             }
           }
@@ -174,6 +214,52 @@ export function SharedStateProvider({
       });
     },
     [internalSetGrades, internalSetChosenSemesters, setCompareGrades],
+  );
+
+  //Set chosen section types and update grades and compare grades
+  const setChosenSectionTypes = useCallback(
+    (value: SetterValue<string[]>) => {
+      internalSetChosenSectionTypes((prev) => {
+        const newValue = typeof value === 'function' ? value(prev) : value;
+
+        // Update ref
+        chosenSectionTypesRef.current = newValue;
+
+        // recalc filtered grades
+        internalSetGrades((prev) => {
+          for (const grade of Object.values(prev)) {
+            if (grade.message === 'success') {
+              grade.data.filtered = calculateGrades(
+                grade.data.grades,
+                chosenSemesters,
+                newValue,
+              );
+            }
+          }
+          return prev;
+        });
+        setCompareGrades((prev) => {
+          for (const grade of Object.values(prev)) {
+            if (grade.message === 'success') {
+              grade.data.filtered = calculateGrades(
+                grade.data.grades,
+                chosenSemesters,
+                newValue,
+              );
+            }
+          }
+          return prev;
+        });
+
+        return newValue;
+      });
+    },
+    [
+      internalSetGrades,
+      internalSetChosenSectionTypes,
+      setCompareGrades,
+      chosenSemesters,
+    ],
   );
 
   //Add a course+prof combo to compare (happens from search results)
@@ -352,6 +438,9 @@ export function SharedStateProvider({
         setCourseNames,
         latestSemester,
         setLatestSemester,
+        sectionTypes,
+        chosenSectionTypes,
+        setChosenSectionTypes,
       }}
     >
       {children}
