@@ -271,7 +271,7 @@ export default function Filters(props: Props) {
               {minGPAs.map((value) => (
                 <MenuItem className="h-10" key={value} value={value}>
                   <span className="w-5">{gpaToLetterGrade(Number(value))}</span>
-                  <span className="text-sm text-gray-400 ml-1">
+                  <span className="text-sm text-gray-400 ml-2">
                     ({gradeCounts[value] ?? 0})
                   </span>
                 </MenuItem>
