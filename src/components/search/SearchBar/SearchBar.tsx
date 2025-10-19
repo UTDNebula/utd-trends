@@ -83,7 +83,9 @@ export function updateRecentSearches(newValue: SearchQueryWithTitle[]) {
   const recSearches: SearchQueryWithTitle[] = getRecentSearches();
   // Add new searches to the beginning of the array
   const concatArray = [...newValue, ...recSearches];
-  const dedupArray = removeDuplicates(concatArray).slice(0, 3);
+  const dedupArray = removeDuplicates(concatArray)
+    .slice(0, 3)
+    .map((el) => ({ ...el, isRecent: true }));
   window.localStorage.setItem(
     'UTDTrendsRecent',
     JSON.stringify(dedupArray), // ensure no title/subtitle/isRecent fields are stored
