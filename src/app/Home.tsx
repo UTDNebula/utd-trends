@@ -131,7 +131,10 @@ export default function Home(props: Props) {
                 />
               }
               label={
-                'Teaching in' + displaySemesterName(props.latestSemester, false)
+                props.latestSemester == ''
+                  ? 'Teaching Next Semester'
+                  : 'Teaching in' +
+                    displaySemesterName(props.latestSemester, false)
               }
             />
           </FormControl>
