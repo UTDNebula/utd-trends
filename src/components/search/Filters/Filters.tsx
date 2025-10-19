@@ -395,7 +395,9 @@ export default function Filters({
                 />
               }
               label={
-                'Teaching in ' + displaySemesterName(latestSemester, false)
+                latestSemester == ''
+                  ? 'Teaching Next Semester'
+                  : 'Teaching in' + displaySemesterName(latestSemester, false)
               }
             />
           </FormControl>
