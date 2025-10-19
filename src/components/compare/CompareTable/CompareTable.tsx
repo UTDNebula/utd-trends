@@ -14,24 +14,21 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
-import BookIcon from '@mui/icons-material/Book';
-import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
-import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
+import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerCheckbox from '@/components/common/PlannerCheckbox/PlannerCheckbox';
+import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
-import type { Sections } from '@/modules/fetchSections';
 import type { Grades } from '@/modules/fetchGrades';
 import type { RMP } from '@/modules/fetchRmp';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
+  convertToCourseOnly,
   convertToProfOnly,
   type SearchQuery,
-  searchQueryLabel,
   searchQueryEqual,
-  convertToCourseOnly,
+  searchQueryLabel,
   sectionCanOverlap,
 } from '@/types/SearchQuery';
-import { useSharedState } from '@/app/SharedStateProvider';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(
@@ -329,9 +326,8 @@ function CheckboxRow({
             if (handleClick) {
               handleClick(name);
             } else {
-              console.log("Error, handleClick not specified");
+              console.log('Error, handleClick not specified');
             }
-            
           }}
           sx={{
             '& .MuiTableSortLabel-icon': {
@@ -359,7 +355,9 @@ function CheckboxRow({
                 if (removeFromCompare) {
                   removeFromCompare(course);
                 } else {
-                  console.log("Error, removeFromCompare function not specified!");
+                  console.log(
+                    'Error, removeFromCompare function not specified!',
+                  );
                 }
               }}
               sx={{
@@ -380,16 +378,9 @@ function PlannerRow({
   courses,
   cell_className, // for specifying border mostly
   colors, // border colors
-  orderBy, // for controlling sorting
-  order,
 }: CheckboxRowProps) {
-  const {
-    sections,
-    planner,
-    addToPlanner,
-    removeFromPlanner,
-  } = useSharedState();
-
+  const { sections, planner, addToPlanner, removeFromPlanner } =
+    useSharedState();
 
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
@@ -404,7 +395,7 @@ function PlannerRow({
           courseOnlySections.message === 'success' &&
           courseOnlySections.data.latest.some((section) =>
             sectionCanOverlap(section.section_number),
-        );
+          );
         return (
           <TableCell
             align="center"
@@ -418,9 +409,7 @@ function PlannerRow({
             <PlannerCheckbox
               section={sections[searchQueryLabel(course)]}
               course={course}
-              inPlanner={planner.some((obj) =>
-                searchQueryEqual(obj, course),
-              )}
+              inPlanner={planner.some((obj) => searchQueryEqual(obj, course))}
               addToPlanner={addToPlanner}
               removeFromPlanner={removeFromPlanner}
               addJustCourseToo={
@@ -429,7 +418,8 @@ function PlannerRow({
               }
             />
           </TableCell>
-        )})}
+        );
+      })}
     </TableRow>
   );
 }
@@ -449,15 +439,6 @@ export default function CompareTable({
   removeFromCompare,
   colorMap,
 }: CompareTableProps) {
-
-  const {
-    sections,
-    planner,
-    addToPlanner,
-    removeFromPlanner,
-  } = useSharedState()
-
-  
   //Table sorting category
   const [orderBy, setOrderBy] = useState<string>('Color');
   //Table sorting direction
@@ -560,7 +541,6 @@ export default function CompareTable({
 
   return (
     <div className="overflow-x-auto">
-
       <TableContainer className="w-fit mb-4">
         <Table size="small" className="border-spacing-x-2 border-separate">
           <TableHead>

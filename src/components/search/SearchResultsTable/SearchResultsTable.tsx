@@ -1,6 +1,5 @@
 'use client';
 
-import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
@@ -22,11 +21,11 @@ import {
 import React, { useState } from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
+import PlannerCheckbox from '@/components/common/PlannerCheckbox/PlannerCheckbox';
 import Rating from '@/components/common/Rating/Rating';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
-import PlannerCheckbox from '@/components/common/PlannerCheckbox/PlannerCheckbox';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
 import type { Grades } from '@/modules/fetchGrades';
 import type { RMP } from '@/modules/fetchRmp';
@@ -180,13 +179,6 @@ function Row({
   showTutorial,
   courseName,
 }: RowProps) {
-  // Check if the course section has the latest semester data
-  const hasLatestSemester = !!(
-    typeof section !== 'undefined' &&
-    section.message === 'success' &&
-    section.data.latest.length
-  );
-
   const [open, setOpen] = useState(false);
   const canOpen =
     !(typeof grades === 'undefined' || grades.message !== 'success') ||
@@ -314,13 +306,13 @@ function Row({
                 } // Apply color if defined
               />
             </Tooltip>
-            <PlannerCheckbox 
+            <PlannerCheckbox
               section={section}
               course={course}
               inPlanner={inPlanner}
               addToPlanner={addToPlanner}
               removeFromPlanner={removeFromPlanner}
-              addJustCourseToo={addJustCourseToo} 
+              addJustCourseToo={addJustCourseToo}
             />
           </div>
         </TableCell>
