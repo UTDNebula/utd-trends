@@ -149,11 +149,14 @@ export default function LineGraph(props: Props) {
     customMin = Math.floor(firstIdxWithData);
     customMax = Math.ceil(lastIdxWithData);
 
-    if (isInteger(firstIdxWithData)) {
-      customMin = firstIdxWithData - 1;
-    }
-    if (isInteger(lastIdxWithData)) {
-      customMax = lastIdxWithData + 1;
+    if (
+      isInteger(lastIdxWithData) != isInteger(firstIdxWithData)
+    ) {
+      if (isInteger(firstIdxWithData)) {
+        customMin = firstIdxWithData - 1;
+      } else {
+        customMax = lastIdxWithData + 1;
+      }
     }
     tickAmount = customMax - customMin;
   }
