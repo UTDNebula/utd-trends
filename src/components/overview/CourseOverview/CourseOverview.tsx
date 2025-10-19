@@ -163,7 +163,7 @@ function parseDescription(course: Course): {
     formattedDescription.lastIndexOf('(Same as ') != -1
       ? formattedDescription.substring(
           formattedDescription.lastIndexOf('(Same as '),
-          formattedDescription.lastIndexOf(')') + 1, // was initially: formattedDescription.lastIndexOf(' ('),
+          formattedDescription.lastIndexOf(' ('),
         )
       : '';
 
@@ -234,6 +234,12 @@ interface Props {
   grades: GenericFetchedData<Grades>;
 }
 
+function link(linkText: string) {
+  return <a href={`dashboard?searchTerms=${linkText.replace(/\s+/g, '+')}&availability=true`} className="underline">
+                    {linkText}
+                  </a>;
+}
+
 export default function CourseOverview({ course, courseData, grades }: Props) {
   let courseComponent = null;
   if (
@@ -253,34 +259,30 @@ export default function CourseOverview({ course, courseData, grades }: Props) {
     const splitSameAsText = sameAsText
       .substring(sameAsText.indexOf('(Same as ') + 9, sameAsText.indexOf(')'))
       .split(/ (?:,|and) /);
+    const splittingRegex = /[a-zA-Z]{2,4} [0-9][0-9V]?[0-9]{0,2}/g
+    const splitText = sameAsText.split(splittingRegex);
+    const linkText = sameAsText.match(splittingRegex);
 
     courseComponent = (
       <>
         <p className="text-2xl font-bold text-center">{courseTitle}</p>
         {/* Displays the courses that are the same as this course  */}
         <div className="text-lg font-semibold text-center">
-          {searchQueryLabel(course) +
-            ' ' +
-            (sameAsText.indexOf('Same as') >= 0 ? '(Same as ' : '')}
-          {/* Maps each link (the href is a placeholder, I am not sure if it is appropriate to have this)*/}
-          {sameAsText.indexOf('Same as') >= 0 ? (
-            <span>
-              {splitSameAsText.map((course, idx) => {
-                const hrefCourse = `dashboard?searchTerms=${course.replace(/\s+/g, '+')}&availability=true`;
-                return (
-                  <a
-                    key={idx}
-                    href={hrefCourse}
-                    className="text-blue-500 underline"
-                  >
-                    {course}
-                  </a>
-                );
-              })}
-            </span>
-          ) : (
-            <></>
-          )}
+          {searchQueryLabel(course) + ' '}
+          {/* Maps each chunk of text and link*/}
+          {splitText.flatMap((text, i) => {
+            if (linkText && i < linkText.length) {
+              return (
+                <span key={i}>
+                  {text}
+                  {link(linkText[i])}
+                </span>
+              );
+            }
+              
+            return <span key={i}>{text}</span>
+          })}
+          
         </div>
         <p className="font-semibold">{courseData.data.school}</p>
         <p>{formattedDescription + ' ' + creditHours + ' credit hours.'}</p>
