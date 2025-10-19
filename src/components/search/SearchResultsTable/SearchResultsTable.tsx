@@ -19,7 +19,6 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import type { Theme } from '@mui/material/styles';
 import React, { useState } from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
@@ -45,7 +44,7 @@ import {
 } from '@/types/SearchQuery';
 
 // sets the color for the table head cells
-function getCellSx(theme: Theme) {
+function getCellSx() {
   return {
     backgroundColor: 'rgb(252,252,252)',
     '@media (prefers-color-scheme: dark)': {
@@ -116,15 +115,15 @@ export function LoadingSearchResultsTable() {
         <Table stickyHeader aria-label="collapsible table">
           <TableHead>
             <TableRow>
-              <TableCell className="hidden sm:table-cell" sx={getCellSx}>
+              <TableCell className="hidden sm:table-cell" sx={getCellSx()}>
                 Actions
               </TableCell>
-              <TableCell sx={getCellSx}>
+              <TableCell sx={getCellSx()}>
                 <TableSortLabel active direction="asc">
                   Name
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="center" sx={getCellSx}>
+              <TableCell align="center" sx={getCellSx()}>
                 <Tooltip
                   title="Median Letter Grade Across Course Sections"
                   placement="top"
@@ -134,7 +133,7 @@ export function LoadingSearchResultsTable() {
                   </div>
                 </Tooltip>
               </TableCell>
-              <TableCell align="center" sx={getCellSx}>
+              <TableCell align="center" sx={getCellSx()}>
                 <Tooltip
                   title="Average Professor Rating from Rate My Professors"
                   placement="top"
@@ -640,10 +639,10 @@ export default function SearchResultsTable({
         <Table stickyHeader aria-label="collapsible table">
           <TableHead>
             <TableRow>
-              <TableCell className="hidden sm:table-cell" sx={getCellSx}>
+              <TableCell className="hidden sm:table-cell" sx={getCellSx()}>
                 Actions
               </TableCell>
-              <TableCell sx={getCellSx}>
+              <TableCell sx={getCellSx()}>
                 <TableSortLabel
                   active={orderBy === 'name'}
                   direction={orderBy === 'name' ? order : 'asc'}
@@ -654,7 +653,7 @@ export default function SearchResultsTable({
                   Name
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="center" sx={getCellSx}>
+              <TableCell align="center" sx={getCellSx()}>
                 <Tooltip
                   title="Average Letter Grade Across Course Sections"
                   placement="top"
@@ -672,7 +671,7 @@ export default function SearchResultsTable({
                   </div>
                 </Tooltip>
               </TableCell>
-              <TableCell align="center" sx={getCellSx}>
+              <TableCell align="center" sx={getCellSx()}>
                 <Tooltip
                   title="Average Professor Rating from Rate My Professors"
                   placement="top"
