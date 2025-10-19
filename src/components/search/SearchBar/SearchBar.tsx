@@ -145,7 +145,8 @@ export default function SearchBar(props: Props) {
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter' && inputValue === '') {
+    if (event.key === 'Enter' && inputValue === '' && !highlightedOption) {
+      // if input is '' but selecting a recent search, allow it
       event.preventDefault();
       event.stopPropagation();
       onSelect(value);
@@ -202,13 +203,17 @@ export default function SearchBar(props: Props) {
     const dedupArray = removeDuplicates(concatArray).slice(0, 3);
     window.localStorage.setItem(
       'UTDTrendsRecent',
-      JSON.stringify(dedupArray.map(({ prefix, number, profFirst, profLast, sectionNumber }) => ({
-        prefix,
-        number,
-        profFirst,
-        profLast,
-        sectionNumber,
-      }))), // ensure no title/subtitle/isRecent fields are stored
+      JSON.stringify(
+        dedupArray.map(
+          ({ prefix, number, profFirst, profLast, sectionNumber }) => ({
+            prefix,
+            number,
+            profFirst,
+            profLast,
+            sectionNumber,
+          }),
+        ),
+      ), // ensure no title/subtitle/isRecent fields are stored
     );
   }
 
@@ -225,10 +230,12 @@ export default function SearchBar(props: Props) {
       if (searchesText != null) {
         recents = JSON.parse(searchesText);
       }
-      recents = recents.filter(item => !value.some(el => searchQueryEqual(el, item))); // remove currently chosen values
-      recents.forEach(el => {
+      recents = recents.filter(
+        (item) => !value.some((el) => searchQueryEqual(el, item)),
+      ); // remove currently chosen values
+      recents.forEach((el) => {
         el.isRecent = true;
-      })
+      });
       setOptions(recents);
       setLoading(false);
       return;
@@ -269,11 +276,11 @@ export default function SearchBar(props: Props) {
         }
         const filtered: SearchQueryWithTitle[] = data.data.filter(
           (item: SearchQueryWithTitle) =>
-            value.findIndex((el) => searchQueryEqual(el, item)) === -1 
-            // && recentMatches.findIndex((el) => searchQueryEqual(el, item)) === -1,
+            value.findIndex((el) => searchQueryEqual(el, item)) === -1,
+          // && recentMatches.findIndex((el) => searchQueryEqual(el, item)) === -1,
         );
-        filtered.forEach(el => {
-          el.isRecent = recents.some(rec => searchQueryEqual(el, rec)); // deals with removals from recents
+        filtered.forEach((el) => {
+          el.isRecent = recents.some((rec) => searchQueryEqual(el, rec)); // deals with removals from recents
         });
         if (
           // if the returned options minus already selected values is 1, then this
@@ -312,7 +319,10 @@ export default function SearchBar(props: Props) {
             setNoResults(newInputValue);
             loadNewCourseNameOptions(newInputValue);
           }
-          setOptions([...filtered.filter(res => res.isRecent), ...filtered.filter(res => !res.isRecent)]); // recents first
+          setOptions([
+            ...filtered.filter((res) => res.isRecent),
+            ...filtered.filter((res) => !res.isRecent),
+          ]); // recents first
         }
       })
       .catch(() => {})
@@ -347,12 +357,15 @@ export default function SearchBar(props: Props) {
           (item: SearchQueryWithTitle) =>
             !value.some((el) => searchQueryEqual(el, item)),
         );
-        filtered.forEach(el => {
-          el.isRecent = recents.some(rec => searchQueryEqual(el, rec)); // deals with removals from recents
+        filtered.forEach((el) => {
+          el.isRecent = recents.some((rec) => searchQueryEqual(el, rec)); // deals with removals from recents
         });
         if (quickInputValue.current === newInputValue) {
           //still valid options
-          setOptions([...filtered.filter(res => res.isRecent), ...filtered.filter(res => !res.isRecent)]); // recents first
+          setOptions([
+            ...filtered.filter((res) => res.isRecent),
+            ...filtered.filter((res) => !res.isRecent),
+          ]); // recents first
         }
       })
       .catch(() => {})
@@ -374,6 +387,8 @@ export default function SearchBar(props: Props) {
     }
   }, []);
 
+  const [highlightedOption, setHighlightedOption] = useState<boolean>(false);
+
   return (
     <div
       className={'flex items-center gap-2 ' + (props.className ?? '')}
@@ -391,10 +406,12 @@ export default function SearchBar(props: Props) {
             if (searchesText != null) {
               recents = JSON.parse(searchesText);
             }
-            recents = recents.filter(item => !value.some(el => searchQueryEqual(el, item))); // remove currently chosen values
-            recents.forEach(el => {
+            recents = recents.filter(
+              (item) => !value.some((el) => searchQueryEqual(el, item)),
+            ); // remove currently chosen values
+            recents.forEach((el) => {
               el.isRecent = true;
-            })
+            });
             setOptions(recents);
             return;
           }
@@ -402,6 +419,9 @@ export default function SearchBar(props: Props) {
         autoHighlight={true}
         clearOnBlur={false}
         className="grow"
+        onHighlightChange={(event, option, reason) => {
+          setHighlightedOption(typeof option !== null); // whether an option is highlighted
+        }}
         getOptionLabel={(option) => {
           if (typeof option === 'string') {
             return option;
