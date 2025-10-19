@@ -315,7 +315,11 @@ export default function LineGraph(props: Props) {
               {
                 seriesIndex,
                 dataPointIndex,
-                fillColor: theme.palette.secondary.main,
+                fillColor: prefersDarkMode
+                  ? theme.palette.secondary.main
+                  : getComputedStyle(document.documentElement)
+                      .getPropertyValue('--color-cornflower-400')
+                      .trim(),
                 strokeColor: '#fff',
                 size: 8,
               },
