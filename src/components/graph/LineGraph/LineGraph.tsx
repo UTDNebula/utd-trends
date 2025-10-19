@@ -119,9 +119,7 @@ export default function LineGraph(props: Props) {
   // Compute min/max of data points (integer indices)
   const dataIndices = series.flatMap((s) => s.data.map((p) => Math.round(p.x)));
   const hasData = dataIndices.length > 0;
-  const allIndicesWithData = series.flatMap((s) =>
-    s.data.map((p) => Math.round(p.x)),
-  );
+  const allIndicesWithData = series.flatMap((s) => s.data.map((p) => p.x));
   const firstIdxWithData = Math.min(...allIndicesWithData);
   const lastIdxWithData = Math.max(...allIndicesWithData);
   let customMin = 0;
@@ -148,37 +146,15 @@ export default function LineGraph(props: Props) {
       tickAmount = 0;
     }
   } else if (multiplePoints && hasData) {
-    const allSemestersWithData = series.flatMap((s) =>
-      s.data.map((p) => p.semester),
-    );
+    customMin = Math.floor(firstIdxWithData);
+    customMax = Math.ceil(lastIdxWithData);
 
-    // Find all semesters at the first and last indices
-    const firstSemesters = allSemestersWithData.filter(
-      (sem) => Math.round(semesterMapping.get(sem)!) === firstIdxWithData,
-    );
-    const lastSemesters = allSemestersWithData.filter(
-      (sem) => Math.round(semesterMapping.get(sem)!) === lastIdxWithData,
-    );
-
-    // Check if ANY of the first semesters is summer
-    const firstIsSummer = firstSemesters.some((sem) => sem.includes('U'));
-    // Check if ANY of the last semesters is summer
-    const lastIsSummer = lastSemesters.some((sem) => sem.includes('U'));
-
-    // Add padding at start if no summer semester at start
-    let startPadding = 0;
-    if (!firstIsSummer) {
-      startPadding = 1;
+    if (isInteger(firstIdxWithData)) {
+      customMin = firstIdxWithData - 1;
     }
-
-    // Add padding at end if no summer semester at end
-    let endPadding = 0;
-    if (!lastIsSummer) {
-      endPadding = 1;
+    if (isInteger(lastIdxWithData)) {
+      customMax = lastIdxWithData + 1;
     }
-
-    customMin = firstIdxWithData - startPadding;
-    customMax = lastIdxWithData + endPadding;
     tickAmount = customMax - customMin;
   }
 
