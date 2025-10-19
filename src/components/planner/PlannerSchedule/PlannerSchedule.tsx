@@ -2,7 +2,9 @@ import React from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection';
+import PreviewSectionGroup from '@/components/planner/PlannerSchedule/PreviewSectionGroup';
 import { useSnackbar } from '@/contexts/SnackbarContext';
+import type { SectionsData } from '@/modules/fetchSections';
 import {
   convertToCourseOnly,
   removeSection,
@@ -134,55 +136,60 @@ export default function PlannerSchedule() {
         ) {
           return [];
         }
-
+        // filter out sections that are already in the planner
         const selectedSectionNumbers = planner
           .flatMap((searchQuery) => searchQueryMultiSectionSplit(searchQuery))
           .map((course) => course.sectionNumber)
           .filter(Boolean);
 
-        return courseSections.data.latest
-          .filter(
-            (section) =>
-              !selectedSectionNumbers.includes(section.section_number),
-          )
-          .filter((section) => {
-            const selectedSections = getSelectedSections(planner, sections);
-            return !hasConflict(section, selectedSections);
-          })
-          .map((section, index) => {
-            const previewCourseWithSection = {
-              ...previewCourse,
-              sectionNumber: section.section_number,
-            };
-            const courseKey = searchQueryLabel(
-              convertToCourseOnly(previewCourseWithSection),
-            );
-            const properCourseName = courseNames[courseKey];
+        const filteredSections = Object.values(
+          courseSections.data.latest
+            .filter(
+              (section) =>
+                !selectedSectionNumbers.includes(section.section_number),
+            )
+            .filter((section) => {
+              const selectedSections = getSelectedSections(planner, sections);
+              return !hasConflict(section, selectedSections);
+            })
+            // group sections by the same meeting times
+            .reduce(
+              (acc, section) => {
+                const key = section.meetings
+                  .map(
+                    (meeting) =>
+                      meeting.meeting_days.sort().join(',') +
+                      meeting.start_time +
+                      meeting.end_time,
+                  )
+                  .join('-');
+                if (!acc[key]) {
+                  acc[key] = [];
+                }
+                acc[key].push(section);
+                return acc;
+              },
+              {} as Record<string, SectionsData>,
+            ),
+        );
 
-            const color =
-              plannerColorMap[
-                searchQueryLabel(convertToCourseOnly(previewCourseWithSection))
-              ];
-
+        const individualSections = filteredSections.flatMap(
+          (sectionGroup, index) => {
             return (
-              <PlannerSection
-                key={`preview-${searchQueryLabel(removeSection(previewCourse))}-${section._id}-${index}`}
-                selectedSection={section}
-                course={previewCourseWithSection}
-                color={color}
-                courseName={properCourseName}
-                isPreview={true}
-                onSectionClick={(course, sectionNumber) => {
-                  setPlannerSection(
-                    course,
-                    sectionNumber,
-                    section, // newSection - the section being clicked
-                    showConflictMessage,
-                  );
-                }}
+              <PreviewSectionGroup
+                key={`preview-group-${searchQueryLabel(removeSection(previewCourse))}-${index}`}
+                sectionGroup={sectionGroup}
+                previewCourse={previewCourse}
+                courseNames={courseNames}
+                plannerColorMap={plannerColorMap}
+                setPlannerSection={setPlannerSection}
+                showConflictMessage={showConflictMessage}
+                index={index}
               />
             );
-          });
+          },
+        );
+        return individualSections;
       })}
     </div>
   );

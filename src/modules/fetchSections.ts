@@ -6,7 +6,7 @@ import {
   type SearchQuery,
 } from '@/types/SearchQuery';
 
-type SectionsData = {
+export type SectionsData = {
   _id: string;
   section_number: string;
   course_reference: string;

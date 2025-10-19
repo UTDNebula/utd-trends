@@ -14,7 +14,14 @@ interface PlannerSectionComponentProps {
   color: { fill: string; outline: string; font: string; filter?: string };
   courseName: string | undefined;
   isPreview?: boolean;
+  nooffset?: boolean;
+  placeholder?: boolean;
   onSectionClick?: (course: SearchQuery, sectionNumber: string) => void;
+  onSectionHover?: (
+    course: SearchQuery,
+    sectionNumber: string,
+    isHovered: boolean,
+  ) => void;
 }
 
 const previewColor = (color: {
@@ -35,6 +42,64 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
   const selectedSection = props.selectedSection;
   if (typeof selectedSection === 'undefined') {
     return null;
+  }
+
+  // If nooffset is true, return a simple non-positioned element
+  if (props.nooffset) {
+    const currentColor = props.isPreview
+      ? isHovered
+        ? props.color
+        : previewColor(props.color)
+      : props.color;
+
+    return (
+      <div
+        className="p-2 rounded-xl border-2 m-1 cursor-pointer"
+        style={{
+          backgroundColor: currentColor.fill,
+          borderColor: currentColor.outline,
+          color: currentColor.font,
+          filter: currentColor.filter,
+        }}
+        onMouseEnter={() => {
+          if (props.isPreview) {
+            setIsHovered(true);
+            props.onSectionHover?.(
+              props.course,
+              selectedSection.section_number,
+              true,
+            );
+          }
+        }}
+        onMouseLeave={() => {
+          if (props.isPreview) {
+            setIsHovered(false);
+            props.onSectionHover?.(
+              props.course,
+              selectedSection.section_number,
+              false,
+            );
+          }
+        }}
+        onClick={() => {
+          if (props.isPreview && props.onSectionClick && selectedSection) {
+            props.onSectionClick(props.course, selectedSection.section_number);
+          }
+        }}
+      >
+        <div className="font-semibold text-center text-sm">
+          {props.course.prefix} {props.course.number}.
+          {selectedSection.section_number}
+        </div>
+        <div className="text-xs text-center">
+          {props.course.profFirst} {props.course.profLast}
+        </div>
+        <div className="text-xs text-center">
+          {selectedSection.meetings[0]?.location?.building}{' '}
+          {selectedSection.meetings[0]?.location?.room}
+        </div>
+      </div>
+    );
   }
 
   const currentColor = props.isPreview
@@ -139,8 +204,26 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
             top-[var(--offset)] h-[var(--height)] overflow-hidden 
             rounded-xl border-2
             ml-1 leading-relaxed ${props.isPreview ? 'cursor-pointer' : ''}`}
-          onMouseEnter={() => props.isPreview && setIsHovered(true)}
-          onMouseLeave={() => props.isPreview && setIsHovered(false)}
+          onMouseEnter={() => {
+            if (props.isPreview) {
+              setIsHovered(true);
+              props.onSectionHover?.(
+                props.course,
+                selectedSection.section_number,
+                true,
+              );
+            }
+          }}
+          onMouseLeave={() => {
+            if (props.isPreview) {
+              setIsHovered(false);
+              props.onSectionHover?.(
+                props.course,
+                selectedSection.section_number,
+                false,
+              );
+            }
+          }}
           onClick={() => {
             if (props.isPreview && props.onSectionClick && selectedSection) {
               props.onSectionClick(
@@ -156,8 +239,15 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               (makeBigger ? 'text-sm' : 'text-xs leading-none')
             }
           >
-            {props.course.prefix} {props.course.number}.
-            {selectedSection.section_number}
+            {props.placeholder ? (
+              <>
+                MULTIPLE
+                <br />
+                SECTIONS
+              </>
+            ) : (
+              `${props.course.prefix} ${props.course.number}.${selectedSection.section_number}`
+            )}
           </div>
           <div
             className={
@@ -173,8 +263,12 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               (makeBigger ? '' : 'leading-none')
             }
           >
-            {selectedSection.meetings[0]?.location?.building}{' '}
-            {selectedSection.meetings[0]?.location?.room}
+            {props.placeholder
+              ? ''
+              : `${selectedSection.meetings[0]?.location?.building} ${selectedSection.meetings[0]?.location?.room}`}
+            {props.placeholder
+              ? ''
+              : selectedSection.meetings[0]?.location?.room}
           </div>
         </button>
       </Tooltip>
