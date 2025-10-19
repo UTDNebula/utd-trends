@@ -391,7 +391,7 @@ export default function SearchBar(props: Props) {
   function addValue(newValue: SearchQuery) {
     setValue((prev) => [...prev, newValue]);
   }
-  
+
   useEffect(() => {
     fetch('/api/autocomplete?input=someSearchTerm');
     prePopulateRecents();
