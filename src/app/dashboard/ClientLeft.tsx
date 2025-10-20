@@ -7,8 +7,7 @@ import { useSharedState } from '@/app/SharedStateProvider';
 import SearchResultsTable from '@/components/search/SearchResultsTable/SearchResultsTable';
 import { type SearchResult } from '@/types/SearchQuery';
 import { calculateGrades } from '@/modules/fetchGrades';
-import { ChosenSemesterContext } from './SemesterContext';
-import { getSemestersFromSearchResults } from '@/modules/semesters';
+import { FiltersContext } from './FilterContext';
 
 interface Props {
   numSearches: number;
@@ -35,9 +34,7 @@ export default function ClientLeft(props: Props) {
 
   const results = use(props.resultsPromise);
 
-  const chosenSemesters =
-    use(ChosenSemesterContext).chosenSemesters ??
-    getSemestersFromSearchResults(results);
+  const chosenSemesters = use(FiltersContext).chosenSemesters;
   const filteredResults = useMemo(
     () =>
       results.filter((result) => {

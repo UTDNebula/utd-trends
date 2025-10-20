@@ -357,7 +357,6 @@ type PlannerCardProps = {
   selectedSections: Sections['all'];
   openConflictMessage: () => void;
   color: { fill: string; outline: string; font: string };
-  courseName: string | undefined;
 };
 
 export default function PlannerCard(props: PlannerCardProps) {
@@ -472,8 +471,7 @@ export default function PlannerCard(props: PlannerCardProps) {
           <Tooltip
             title={
               typeof props.query.prefix !== 'undefined' &&
-              typeof props.query.number !== 'undefined' &&
-              props.courseName
+              typeof props.query.number !== 'undefined'
             }
             placement="top"
           >

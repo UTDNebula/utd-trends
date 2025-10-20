@@ -25,7 +25,7 @@ import {
   getSemestersFromSearchResults,
 } from '@/modules/semesters';
 import type { SearchResult } from '@/types/SearchQuery';
-import { ChosenSemesterContext } from '@/app/dashboard/SemesterContext';
+import { FiltersContext } from '@/app/dashboard/FilterContext';
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
@@ -95,9 +95,8 @@ export default function Filters({
   const semesters = useMemo(() => {
     return getSemestersFromSearchResults(searchResults.concat(compare));
   }, [searchResults, compare]);
-  const chosenSemesters =
-    use(ChosenSemesterContext).chosenSemesters ?? semesters;
-  const setChosenSemesters = use(ChosenSemesterContext).setChosenSemesters;
+  const chosenSemesters = use(FiltersContext).chosenSemesters;
+  const setChosenSemesters = use(FiltersContext).setChosenSemesters;
 
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range

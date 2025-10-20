@@ -28,10 +28,7 @@ import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import {
-  displaySemesterName,
-  getSemestersFromSearchResult,
-} from '@/modules/semesters';
+import { displaySemesterName } from '@/modules/semesters';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -42,7 +39,7 @@ import {
   sectionCanOverlap,
 } from '@/types/SearchQuery';
 import { calculateGrades } from '@/modules/fetchGrades';
-import { ChosenSemesterContext } from '@/app/dashboard/SemesterContext';
+import { FiltersContext } from '@/app/dashboard/FilterContext';
 import { useQueryClient } from '@tanstack/react-query';
 
 function LoadingRow() {
@@ -181,9 +178,7 @@ function Row({
   const hasLatestSemester = sections.some(
     (s) => s.academic_session.name === latestSemester,
   );
-  const chosenSemesters =
-    use(ChosenSemesterContext).chosenSemesters ??
-    getSemestersFromSearchResult(searchResult);
+  const chosenSemesters = use(FiltersContext).chosenSemesters;
   const [open, setOpen] = useState(false);
 
   const rainbowColors = useRainbowColors();

@@ -7,10 +7,9 @@ import CompareTable from '@/components/compare/CompareTable/CompareTable';
 import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
-import { searchQueryLabel, type SearchResult } from '@/types/SearchQuery';
+import { searchQueryLabel } from '@/types/SearchQuery';
 import { calculateGrades, type GradesSummary } from '@/modules/fetchGrades';
-import { getSemestersFromSearchResults } from '@/modules/semesters';
-import { ChosenSemesterContext } from '@/app/dashboard/SemesterContext';
+import { FiltersContext } from '@/app/dashboard/FilterContext';
 
 function convertNumbersToPercents(distribution: GradesSummary): number[] {
   const total = distribution.total;
@@ -19,15 +18,9 @@ function convertNumbersToPercents(distribution: GradesSummary): number[] {
   );
 }
 
-export default function Compare({
-  searchResults,
-}: {
-  searchResults: SearchResult[];
-}) {
+export default function Compare() {
   const { compare, removeFromCompare, compareColorMap } = useSharedState();
-  const chosenSemesters =
-    use(ChosenSemesterContext).chosenSemesters ??
-    getSemestersFromSearchResults(searchResults);
+  const chosenSemesters = use(FiltersContext).chosenSemesters;
   if (compare.length === 0) {
     return <p>Click a checkbox to add something to compare.</p>;
   }

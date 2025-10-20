@@ -38,7 +38,6 @@ export default function PlannerCoursesTable() {
     removeFromPlanner,
     setPlannerSection,
     plannerColorMap,
-    courseNames,
     latestSemester,
   } = useSharedState();
 
@@ -88,9 +87,6 @@ export default function PlannerCoursesTable() {
               openConflictMessage={() => setOpenConflictMessage(true)}
               color={
                 plannerColorMap[searchQueryLabel(convertToCourseOnly(query))]
-              }
-              courseName={
-                courseNames[searchQueryLabel(convertToCourseOnly(query))]
               }
             />
           );

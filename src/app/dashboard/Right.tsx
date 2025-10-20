@@ -113,9 +113,7 @@ export default async function Right(props: Props) {
   }
 
   names.push('Compare');
-  tabs.push(
-    <Compare key="compare" searchResults={await props.searchResultsPromise} />,
-  );
+  tabs.push(<Compare key="compare" />);
 
   return (
     <Card>

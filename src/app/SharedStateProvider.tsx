@@ -32,8 +32,6 @@ const SharedStateContext = createContext<
       plannerColorMap: {
         [key: string]: { fill: string; outline: string; font: string };
       };
-      chosenSemesters: string[];
-      setChosenSemesters: Setter<string[]>;
       courseNames: { [key: string]: string | undefined };
       setCourseNames: Setter<{ [key: string]: string | undefined }>;
       latestSemester: string;
@@ -49,8 +47,6 @@ export function SharedStateProvider({
   latestSemester: string;
 }) {
   const [compare, setCompare] = useState<SearchResult[]>([]);
-
-  const [chosenSemesters, setChosenSemesters] = useState<string[]>([]);
 
   //Add a course+prof combo to compare (happens from search results)
   //copy over data basically
@@ -187,8 +183,6 @@ export function SharedStateProvider({
         removeFromPlanner,
         setPlannerSection,
         plannerColorMap,
-        chosenSemesters,
-        setChosenSemesters,
         courseNames,
         setCourseNames,
         latestSemester,

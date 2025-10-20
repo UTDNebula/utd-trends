@@ -22,7 +22,7 @@ import {
 } from '@tanstack/react-query';
 import { fetchSearchResults } from '@/modules/fetchSearchResult';
 import { createSearchQuery } from '@/modules/createSearchQuery';
-import ChosenSemesterProvider from './SemesterContext';
+import FiltersProvider from './FilterContext';
 import Right, { LoadingRight } from './Right';
 
 type Props = {
@@ -118,7 +118,7 @@ export default async function Page({ searchParams }: Props) {
   const searchResults = fetchSearchResults(results);
   return (
     <>
-      <ChosenSemesterProvider>
+      <FiltersProvider searchResults={await searchResults}>
         <HydrationBoundary state={dehydrate(queryClient)}>
           <TopMenu isPlanner={false} />
           <main className="p-4">
@@ -156,7 +156,7 @@ export default async function Page({ searchParams }: Props) {
             />
           </main>
         </HydrationBoundary>
-      </ChosenSemesterProvider>
+      </FiltersProvider>
     </>
   );
 }
