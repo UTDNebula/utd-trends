@@ -64,14 +64,15 @@ export default function ClientLeft(props: Props) {
       }),
     [results, minGPA, minRating, maxDiff, chosenSemesters],
   );
+  console.log(filteredResults);
   //Filter results based on gpa, rmp, and rmp difficulty
   includedResults = filteredResults.filter((result) => {
-    const availableThisSemester = result.sections.some(
-      (section) => section.academic_session.name === latestSemester,
+    const availableThisSemester = result.grades.some(
+      (grade) => grade._id === latestSemester,
     );
     if (availability && !availableThisSemester) return false;
-    const hasChosenSemester = result.sections.some((s) =>
-      chosenSemesters.includes(s.academic_session.name),
+    const hasChosenSemester = result.grades.some((s) =>
+      chosenSemesters.includes(s._id),
     );
     if (!availability && !hasChosenSemester && result.grades.length !== 0)
       return false;
@@ -84,8 +85,8 @@ export default function ClientLeft(props: Props) {
         (section) => section.academic_session.name === latestSemester,
       ).length > 0;
     if (availability && availableThisSemester) return false;
-    const hasChosenSemester = result.sections.some((s) =>
-      chosenSemesters.includes(s.academic_session.name),
+    const hasChosenSemester = result.grades.some((s) =>
+      chosenSemesters.includes(s._id),
     );
     if (!hasChosenSemester && result.grades.length !== 0) return false;
     return true;
