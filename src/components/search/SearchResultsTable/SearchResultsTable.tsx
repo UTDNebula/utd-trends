@@ -248,7 +248,7 @@ function Row({
         <TableCell
           component="th"
           scope="row"
-          className={"w-full border-b-0 pb-0" + (availableThisSemester ? " bg-[#BEBEBE]" : '')}
+          className="w-full border-b-0 pb-0"
           colSpan={3}
         >
           {nameCell}
@@ -258,11 +258,11 @@ function Row({
         onClick={() => {
           if (canOpen) setOpen(!open);
         }} // opens/closes the card by clicking anywhere on the row
-        className={canOpen ? 'cursor-pointer' : ''}
+        className={"" + (!availableThisSemester ? " bg-gray-100" : '') + (canOpen ? ' cursor-pointer' : '')}
         data-tutorial-id={showTutorial && 'result'}
       >
         <TableCell
-          className={"yborder-b-0i" + (availableThisSemester ? "bg-[#BEBEBE]" : '')}
+          className={"border-b-0i" + (availableThisSemester ? "bg-red-500" : '')}
           data-tutorial-id={showTutorial && 'actions'}
         >
           <div className="flex items-center gap-1">
@@ -350,7 +350,7 @@ function Row({
         <TableCell
           component="th"
           scope="row"
-          className="w-full border-b-0 hidden sm:table-cell"
+          className={"w-full border-b-0 hidden sm:table-cell"}
         >
           {nameCell}
         </TableCell>
@@ -407,7 +407,7 @@ function Row({
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell className="p-0" colSpan={6}>
+        <TableCell className={"p-0" + (!availableThisSemester ? " bg-gray-100" : '')} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <div className="p-2 md:p-4 flex flex-col gap-2">
               <SingleGradesInfo
@@ -723,7 +723,7 @@ export default function SearchResultsTable({
 
             {/* Divider row */}
             {sortedUnIncludedResults.length > 0 && (
-              <TableRow className="bg-gray-200 dark:bg-gray-700">
+              <TableRow className="bg-gray-200 dark:bg-gray-700 border-0">
                 <TableCell colSpan={5} className="p-0">
                   <div className="flex items-center py-2 my-2">
                     <Divider className="grow" />
