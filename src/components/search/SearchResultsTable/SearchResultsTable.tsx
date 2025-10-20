@@ -723,7 +723,7 @@ export default function SearchResultsTable({
 
             {/* Divider row */}
             {sortedUnIncludedResults.length > 0 && (
-              <TableRow className="bg-gray-200 dark:bg-gray-700 border-0">
+              <TableRow className="bg-gray-200 dark:bg-gray-700">
                 <TableCell colSpan={5} className="p-0">
                   <div className="flex items-center py-2 my-2">
                     <Divider className="grow" />
