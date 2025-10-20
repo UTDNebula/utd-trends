@@ -37,14 +37,17 @@ export async function GET(request: Request) {
       profLast: profLast,
     });
     const latest = await fetchLatestSemester();
-    result.sections = result.sections.filter(
-      (s) => s.academic_session.name === latest,
-    );
+    const filteredResult = {
+      ...result,
+      sections: result.sections.filter(
+        (s) => s.academic_session.name === latest,
+      ),
+    };
 
     return NextResponse.json(
       {
         message: 'success',
-        data: result,
+        data: filteredResult,
       },
       { status: 200 },
     );
