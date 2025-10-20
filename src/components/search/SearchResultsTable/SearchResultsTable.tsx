@@ -338,7 +338,12 @@ function Row({
                       }
                       queryClient.setQueryData(
                         ['results', searchQueryLabel(searchResult.searchQuery)],
-                        searchResult,
+                        {
+                          ...searchResult,
+                          sections: searchResult.sections.filter(
+                            (s) => s.academic_session.name === latestSemester,
+                          ),
+                        },
                       );
                     }
                   }}
