@@ -258,7 +258,7 @@ function Row({
         onClick={() => {
           if (canOpen) setOpen(!open);
         }} // opens/closes the card by clicking anywhere on the row
-        className={"" + (!availableThisSemester ? " bg-gray-100" : '') + (canOpen ? ' cursor-pointer' : '')}
+        className={(!availableThisSemester ? " bg-gray-100" : '') + (canOpen ? ' cursor-pointer' : '')}
         data-tutorial-id={showTutorial && 'result'}
       >
         <TableCell
