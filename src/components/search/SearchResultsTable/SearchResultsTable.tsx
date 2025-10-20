@@ -1,6 +1,5 @@
 'use client';
 
-import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
@@ -36,11 +35,14 @@ import {
   searchQueryEqual,
   searchQueryLabel,
   type SearchResult,
-  sectionCanOverlap,
 } from '@/types/SearchQuery';
 import { calculateGrades } from '@/modules/fetchGrades';
 import { FiltersContext } from '@/app/dashboard/FilterContext';
-import { useQueryClient } from '@tanstack/react-query';
+import dynamic from 'next/dynamic';
+const AddToPlanner = dynamic(() => import('./AddToPlanner'), {
+  ssr: false,
+  loading: () => <Checkbox disabled icon={<BookOutlinedIcon />} />,
+});
 
 function LoadingRow() {
   const nameCell = (
@@ -152,10 +154,6 @@ type RowProps = {
   addToCompare: (arg0: SearchResult) => void;
   removeFromCompare: (arg0: SearchResult) => void;
   color?: string;
-  inPlanner: boolean;
-  addJustCourseToo: boolean;
-  addToPlanner: (value: SearchQuery) => void;
-  removeFromPlanner: (value: SearchQuery) => void;
   showTutorial: boolean;
 };
 
@@ -166,18 +164,8 @@ function Row({
   addToCompare,
   removeFromCompare,
   color,
-  inPlanner,
-  addJustCourseToo,
-  addToPlanner,
-  removeFromPlanner,
   showTutorial,
 }: RowProps) {
-  const sections = searchResult.sections;
-  const { latestSemester } = useSharedState();
-  // Check if the course section has the latest semester data
-  const hasLatestSemester = sections.some(
-    (s) => s.academic_session.name === latestSemester,
-  );
   const chosenSemesters = use(FiltersContext).chosenSemesters;
   const [open, setOpen] = useState(false);
 
@@ -186,7 +174,6 @@ function Row({
     () => calculateGrades(searchResult.grades, chosenSemesters),
     [searchResult.grades, chosenSemesters],
   );
-  const queryClient = useQueryClient();
 
   const canOpen = searchResult.type === 'course' || searchResult.RMP;
   const nameCell = (
@@ -309,45 +296,7 @@ function Row({
                 } // Apply color if defined
               />
             </Tooltip>
-            <Tooltip
-              title={
-                hasLatestSemester
-                  ? inPlanner
-                    ? 'Remove from Planner'
-                    : 'Add to Planner'
-                  : 'Not being taught'
-              }
-              placement="top"
-            >
-              <span>
-                <Checkbox
-                  checked={inPlanner}
-                  onClick={(e) => {
-                    e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
-                    if (inPlanner) {
-                      removeFromPlanner(course);
-                    } else {
-                      addToPlanner(course);
-                      if (addJustCourseToo) {
-                        addToPlanner(convertToCourseOnly(course));
-                      }
-                      queryClient.setQueryData(
-                        ['results', searchQueryLabel(searchResult.searchQuery)],
-                        {
-                          ...searchResult,
-                          sections: searchResult.sections.filter(
-                            (s) => s.academic_session.name === latestSemester,
-                          ),
-                        },
-                      );
-                    }
-                  }}
-                  icon={<BookOutlinedIcon />}
-                  checkedIcon={<BookIcon />}
-                  disabled={!hasLatestSemester}
-                />
-              </span>
-            </Tooltip>
+            <AddToPlanner searchResult={searchResult} />
           </div>
         </TableCell>
         <TableCell
@@ -441,9 +390,6 @@ export default function SearchResultsTable({
     addToCompare,
     removeFromCompare,
     compareColorMap,
-    planner,
-    addToPlanner,
-    removeFromPlanner,
     latestSemester,
   } = useSharedState();
 
@@ -665,14 +611,6 @@ export default function SearchResultsTable({
           <TableBody>
             {/* Included Results */}
             {sortedResults.map((result, index) => {
-              const courseOnlySections = result.sections.filter(
-                (s) => s.academic_session.name === latestSemester,
-              );
-              const canAddCourseOnlyToPlanner =
-                typeof courseOnlySections !== 'undefined' &&
-                courseOnlySections.some((section) =>
-                  sectionCanOverlap(section.section_number),
-                );
               return (
                 <Row
                   searchResult={result}
@@ -684,17 +622,6 @@ export default function SearchResultsTable({
                   addToCompare={addToCompare}
                   removeFromCompare={removeFromCompare}
                   color={compareColorMap[searchQueryLabel(result.searchQuery)]}
-                  inPlanner={planner.some((obj) =>
-                    searchQueryEqual(obj, result.searchQuery),
-                  )}
-                  addJustCourseToo={
-                    !searchQueryEqual(
-                      result.searchQuery,
-                      convertToCourseOnly(result.searchQuery),
-                    ) && canAddCourseOnlyToPlanner
-                  }
-                  addToPlanner={addToPlanner}
-                  removeFromPlanner={removeFromPlanner}
                   showTutorial={index === numSearches}
                 />
               );
@@ -720,14 +647,6 @@ export default function SearchResultsTable({
 
             {/* Unincluded Results (Unavailable courses) */}
             {sortedUnIncludedResults.map((result) => {
-              const courseOnlySections = result.sections.filter(
-                (s) => s.academic_session.name === latestSemester,
-              );
-              const canAddCourseOnlyToPlanner =
-                typeof courseOnlySections !== 'undefined' &&
-                courseOnlySections.some((section) =>
-                  sectionCanOverlap(section.section_number),
-                );
               return (
                 <Row
                   searchResult={result}
@@ -739,17 +658,6 @@ export default function SearchResultsTable({
                   addToCompare={addToCompare}
                   removeFromCompare={removeFromCompare}
                   color={compareColorMap[searchQueryLabel(result.searchQuery)]}
-                  inPlanner={planner.some((obj) =>
-                    searchQueryEqual(obj, result.searchQuery),
-                  )}
-                  addJustCourseToo={
-                    !searchQueryEqual(
-                      result.searchQuery,
-                      convertToCourseOnly(result.searchQuery),
-                    ) && canAddCourseOnlyToPlanner
-                  }
-                  addToPlanner={addToPlanner}
-                  removeFromPlanner={removeFromPlanner}
                   showTutorial={false}
                 />
               );
