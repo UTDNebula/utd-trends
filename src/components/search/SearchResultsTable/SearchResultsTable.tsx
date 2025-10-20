@@ -262,7 +262,7 @@ function Row({
         data-tutorial-id={showTutorial && 'result'}
       >
         <TableCell
-          className={"border-b-0i" + (availableThisSemester ? "bg-red-500" : '')}
+          className="border-b-0i"
           data-tutorial-id={showTutorial && 'actions'}
         >
           <div className="flex items-center gap-1">
