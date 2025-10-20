@@ -133,7 +133,7 @@ export default function Home(props: Props) {
               label={
                 props.latestSemester == ''
                   ? 'Teaching Next Semester'
-                  : 'Teaching in' +
+                  : 'Teaching in ' +
                     displaySemesterName(props.latestSemester, false)
               }
             />
