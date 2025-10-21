@@ -149,13 +149,13 @@ export async function GET(request: Request) {
     const newResults: ResultWDistance[] = courseNameTable[title].map(
       (result) => {
         // edit distance between the course title and query words, with a discounted weight on more distant words
-       const distanceMetric = distances
-      .filter(dist => dist < 4) // Only consider title words that are "close" to a query word
-      .sort((a, b) => a - b)
-      .reduce(
-        (partialSum, dist, i) => partialSum + Math.pow(0.7, i) * dist,
-        0,
-      );
+        const distanceMetric = distances
+          .filter((dist) => dist < 4) // Only consider title words that are "close" to a query word
+          .sort((a, b) => a - b)
+          .reduce(
+            (partialSum, dist, i) => partialSum + Math.pow(0.7, i) * dist,
+            0,
+          );
         // How much of the query is captured by the title words
         const smartWordCapture = inputArr
           .map((word) => {
