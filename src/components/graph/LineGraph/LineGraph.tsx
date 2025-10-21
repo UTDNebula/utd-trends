@@ -68,24 +68,28 @@ function getSemesterGPAs(
         0,
       );
 
+      const totalGrades = total - aggregate[aggregate.length - 1];
+      // No valid grades to compute GPA
+      if (totalGrades <= 0) {
+        return null;
+      }
+
       const GPALookup = [
         4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
       ];
-      let gpa = 0;
-      if (total !== 0) {
-        gpa =
-          GPALookup.reduce(
-            (accumulator, currentValue, index) =>
-              accumulator + currentValue * aggregate[index],
-            0,
-          ) /
-          (total - aggregate[aggregate.length - 1]);
-      }
+      const gpa =
+        GPALookup.reduce(
+          (accumulator, currentValue, index) =>
+            accumulator + currentValue * aggregate[index],
+          0,
+        ) / totalGrades;
       return {
         x: allSemesters.indexOf(semester._id) + 1,
         y: gpa,
       };
-    });
+    })
+    // Remove any null entries (invalid/zero GPA points)
+    .filter((pt): pt is { x: number; y: number } => pt !== null);
   return {
     name: data.name,
     data: semesters,
