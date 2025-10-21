@@ -64,11 +64,11 @@ export default function ClientLeft(props: Props) {
       }),
     [results, minGPA, minRating, maxDiff, chosenSemesters],
   );
-  console.log(filteredResults);
+
   //Filter results based on gpa, rmp, and rmp difficulty
   includedResults = filteredResults.filter((result) => {
-    const availableThisSemester = result.grades.some(
-      (grade) => grade._id === latestSemester,
+    const availableThisSemester = result.sections.some(
+      (section) => section.academic_session.name === latestSemester,
     );
     if (availability && !availableThisSemester) return false;
     const hasChosenSemester = result.grades.some((s) =>
