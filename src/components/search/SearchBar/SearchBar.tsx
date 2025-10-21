@@ -256,7 +256,7 @@ export default function SearchBar(props: Props) {
             setNoResults(newInputValue);
             loadNewCourseNameOptions(newInputValue);
           }
-          setOptions(filtered);
+          setOptions(filtered.sort(sortByPrefixAndNumber));
         }
       })
       .catch(() => {})
@@ -288,7 +288,7 @@ export default function SearchBar(props: Props) {
         );
         if (quickInputValue.current === newInputValue) {
           //still valid options
-          setOptions(filtered);
+          setOptions(filtered.sort(sortByPrefixAndNumber));
         }
       })
       .catch(() => {})
@@ -544,4 +544,15 @@ export default function SearchBar(props: Props) {
       </Tooltip>
     </div>
   );
+}
+
+function sortByPrefixAndNumber(a: SearchQuery, b: SearchQuery) {
+  const aPrefix = a.prefix ?? '';
+  const bPrefix = b.prefix ?? '';
+  if (aPrefix !== bPrefix) {
+    return aPrefix.localeCompare(bPrefix);
+  }
+  const aNum = a.number ? parseInt(a.number.replace(/[^\d]/g, '')) : Infinity;
+  const bNum = b.number ? parseInt(b.number.replace(/[^\d]/g, '')) : Infinity;
+  return aNum - bNum;
 }

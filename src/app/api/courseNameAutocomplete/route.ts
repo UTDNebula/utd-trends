@@ -139,7 +139,7 @@ export async function GET(request: Request) {
 
   // check each course name
   for (const title in courseNameTable) {
-    const titleWords = title.toLowerCase().split(/\s+/); // split by any whitespace (even continuous spaces)
+    const titleWords = title.toLowerCase().split(/\s+/); // split by whitespace
 
     //for each word in the course name, find the word in the query that is most similar
     const distances = titleWords.map((word) => minEditDistance(inputArr, word));
@@ -149,12 +149,13 @@ export async function GET(request: Request) {
     const newResults: ResultWDistance[] = courseNameTable[title].map(
       (result) => {
         // edit distance between the course title and query words, with a discounted weight on more distant words
-        const distanceMetric = distances
-          .sort((a, b) => a - b)
-          .reduce(
-            (partialSum, dist, i) => partialSum + Math.pow(0.7, i) * dist, // discount weight by 0.7^i
-            0,
-          );
+       const distanceMetric = distances
+      .filter(dist => dist < 4) // Only consider title words that are "close" to a query word
+      .sort((a, b) => a - b)
+      .reduce(
+        (partialSum, dist, i) => partialSum + Math.pow(0.7, i) * dist,
+        0,
+      );
         // How much of the query is captured by the title words
         const smartWordCapture = inputArr
           .map((word) => {

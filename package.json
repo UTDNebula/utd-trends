@@ -33,7 +33,7 @@
     "framer-motion": "^12.6.5",
     "google-auth-library": "^9.15.1",
     "graphology": "^0.26.0",
-    "next": "^15.3.0",
+    "next": "^16.0.0-canary.16",
     "react": "^19.1.0",
     "react-apexcharts": "^1.7.0",
     "react-dom": "^19.1.0",
