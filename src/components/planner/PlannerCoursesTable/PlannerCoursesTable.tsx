@@ -10,6 +10,7 @@ import PlannerCard, {
 import { displaySemesterName } from '@/modules/semesters';
 import {
   convertToCourseOnly,
+  removeSection,
   searchQueryLabel,
   searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
@@ -64,33 +65,41 @@ export default function PlannerCoursesTable() {
             ' — ' + displaySemesterName(latestSemester, false))}
       </Typography>
       <div className="flex flex-col gap-4 mb-4 sm:mb-0">
-        {planner.map((query) => {
-          return (
-            <PlannerCard
-              key={searchQueryLabel(query)}
-              query={query}
-              setPlannerSection={setPlannerSection}
-              removeFromPlanner={() => {
-                removeFromPlanner(query);
-              }}
-              selectedSections={planner
-                .map((searchQuery) => searchQueryMultiSectionSplit(searchQuery))
-                .flatMap((queries, idx) => {
-                  return queries.map((query) => {
-                    return latestSections[idx].find(
-                      (section) =>
-                        section.section_number === query.sectionNumber,
-                    );
-                  });
-                })
-                .filter((section) => typeof section !== 'undefined')}
-              openConflictMessage={() => setOpenConflictMessage(true)}
-              color={
-                plannerColorMap[searchQueryLabel(convertToCourseOnly(query))]
-              }
-            />
-          );
-        })}
+        {planner
+          .toSorted((query1, query2) => {
+            return searchQueryLabel(removeSection(query1)).localeCompare(
+              searchQueryLabel(removeSection(query2)),
+            );
+          })
+          .map((query) => {
+            return (
+              <PlannerCard
+                key={searchQueryLabel(query)}
+                query={query}
+                setPlannerSection={setPlannerSection}
+                removeFromPlanner={() => {
+                  removeFromPlanner(query);
+                }}
+                selectedSections={planner
+                  .map((searchQuery) =>
+                    searchQueryMultiSectionSplit(searchQuery),
+                  )
+                  .flatMap((queries, idx) => {
+                    return queries.map((query) => {
+                      return latestSections[idx].find(
+                        (section) =>
+                          section.section_number === query.sectionNumber,
+                      );
+                    });
+                  })
+                  .filter((section) => typeof section !== 'undefined')}
+                openConflictMessage={() => setOpenConflictMessage(true)}
+                color={
+                  plannerColorMap[searchQueryLabel(convertToCourseOnly(query))]
+                }
+              />
+            );
+          })}
       </div>
       <Snackbar
         open={openConflictMessage}

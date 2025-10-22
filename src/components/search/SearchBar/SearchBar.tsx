@@ -141,10 +141,21 @@ export default function SearchBar(props: Props) {
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter' && inputValue === '') {
+    if (event.key !== 'Enter') {
+      return;
+    }
+
+    if (options.length == 0 || loading) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    if (inputValue === '') {
       event.preventDefault();
       event.stopPropagation();
       onSelect(value);
+      return;
     }
   }
 
@@ -358,6 +369,8 @@ export default function SearchBar(props: Props) {
           }
           updateValue(newValue as SearchQuery[]);
         }}
+        selectOnFocus={false}
+        handleHomeEndKeys={false}
         inputValue={inputValue}
         onInputChange={(event, newInputValue) => {
           setInputValue(newInputValue);
