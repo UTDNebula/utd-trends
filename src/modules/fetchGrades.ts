@@ -1,18 +1,16 @@
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery } from '@/types/SearchQuery';
 
-type GradesSummary = {
+export type GradesSummary = {
   mean_gpa: number;
   gpa: number;
   total: number;
   grade_distribution: number[];
 };
 
-type GradesData = {
+export type GradesData = {
   _id: string;
   grade_distribution: number[];
 }[];
-
 export type Grades = {
   filtered: GradesSummary;
   unfiltered: GradesSummary;
@@ -70,10 +68,10 @@ export function calculateGrades(grades: GradesData, semesters?: string[]) {
 
 export default async function fetchGrades(
   query: SearchQuery,
-): Promise<GenericFetchedData<Grades>> {
+): Promise<GradesData> {
   const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
   if (typeof API_KEY !== 'string') {
-    return { message: 'error', data: 'API key is undefined' };
+    throw new Error('API key is undefined');
   }
 
   try {
@@ -106,21 +104,10 @@ export default async function fetchGrades(
       throw new Error(data.data ?? data.message);
     }
 
-    const calculated = calculateGrades(data.data);
-
-    return {
-      message: 'success',
-      data: {
-        filtered: calculated,
-        unfiltered: calculated,
-        grades: data.data, //type GradesData
-      },
-    };
+    return data.data !== null ? data.data : [];
   } catch (error) {
-    return {
-      message: 'error',
-      data:
-        error instanceof Error ? error.message : 'An unknown error occurred',
-    };
+    throw new Error(
+      error instanceof Error ? error.message : 'An unknown error occurred',
+    );
   }
 }

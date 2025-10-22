@@ -16,14 +16,9 @@ import React, { useState } from 'react';
 
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
-import type { Grades } from '@/modules/fetchGrades';
 import type { RMP } from '@/modules/fetchRmp';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
-import {
-  convertToProfOnly,
-  type SearchQuery,
-  searchQueryLabel,
-} from '@/types/SearchQuery';
+import { searchQueryLabel, type SearchResult } from '@/types/SearchQuery';
+import { calculateGrades, type GradesData } from '@/modules/fetchGrades';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(
@@ -66,10 +61,9 @@ function colorMidpoint(
     .toString(16)
     .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
-
 type GradeOrRmpRowProps<T> = {
   name: string;
-  values: GenericFetchedData<T>[];
+  values: (T | undefined)[];
   getValue: (arg0: T) => number;
   formatValue: (arg0: number) => string;
   goodValue: number;
@@ -151,13 +145,11 @@ function GradeOrRmpRow<T>({
             backgroundColor: colors[index] + '10', // add transparency
           }}
         >
-          {((typeof value === 'undefined' || value.message !== 'success') && (
-            <></>
-          )) ||
-            (value.message === 'success' && getValue(value.data) !== -1 ? (
-              (name !== 'GPA' ? (value.data as RMP).numRatings > 0 : true) && ( // do not display RMP data (non-GPA data) if there are no reviews
+          {value === undefined ||
+            (getValue(value) !== -1 ? (
+              (name !== 'GPA' ? (value as RMP).numRatings > 0 : true) && ( // do not display RMP data (non-GPA data) if there are no reviews
                 <Tooltip
-                  title={`${name}: ${formatValue(getValue(value.data))}`}
+                  title={`${name}: ${formatValue(getValue(value))}`}
                   placement="top"
                 >
                   <Typography
@@ -165,11 +157,11 @@ function GradeOrRmpRow<T>({
                     style={{
                       backgroundColor:
                         name === 'GPA'
-                          ? gpaToColor(rainbowColors, getValue(value.data))
+                          ? gpaToColor(rainbowColors, getValue(value))
                           : colorMidpoint(
                               goodValue,
                               badValue,
-                              getValue(value.data),
+                              getValue(value),
                               rainbowColors[12],
                               rainbowColors[0],
                             ),
@@ -178,7 +170,7 @@ function GradeOrRmpRow<T>({
                     {/*value.data is all the data past the state of loading, done, or error.
                 getValue returns the specific value from the data structure, like gpa.
                 formatValue makes it look pretty like 3.7216373 displaying as 3.72.*/}
-                    {formatValue(getValue(value.data))}
+                    {formatValue(getValue(value))}
                   </Typography>
                 </Tooltip>
               )
@@ -194,9 +186,9 @@ function GradeOrRmpRow<T>({
 
 type GradeAndRmpRowProps = {
   name: string;
-  gradeValues: GenericFetchedData<Grades>[];
-  rmpValues: GenericFetchedData<RMP>[];
-  getGradeValue: (arg0: Grades) => number;
+  gradeValues: GradesData[];
+  rmpValues: (RMP | undefined)[];
+  getGradeValue: (arg0: GradesData) => number;
   getRmpValue: (arg0: RMP) => number;
   cell_className: string;
   colors: string[];
@@ -233,17 +225,12 @@ function GradeAndRmpRow({
       </TableCell>
       {gradeValues
         // Combine values
-        .map((x, i) => [x, rmpValues[i]])
+        .map((x, i) => [x, rmpValues[i]] as const)
         // so ts can remember the type of rmp (which it can't do for rmpValues[index]) and know's that when its state is done, you can access its data value
         .map(([grade, rmp], index) => {
-          const gradeValue =
-            typeof grade !== 'undefined' && grade.message === 'success'
-              ? getGradeValue(grade.data as Grades)
-              : null;
+          const gradeValue = getGradeValue(grade);
           const rmpValue =
-            typeof rmp !== 'undefined' && rmp.message === 'success'
-              ? getRmpValue(rmp.data as RMP)
-              : null;
+            typeof rmp !== 'undefined' ? getRmpValue(rmp) : undefined;
 
           return (
             <TableCell
@@ -260,21 +247,16 @@ function GradeAndRmpRow({
                 placement="top"
               >
                 <span>
-                  {((typeof grade === 'undefined' ||
-                    grade.message !== 'success') && <CloseIcon />) ||
-                    (grade.message === 'success' && (
+                  {(typeof grade === 'undefined' && <CloseIcon />) || (
                       <Typography className="text-base inline">
                         {gradeValue}
                       </Typography>
-                    )) ||
+                    ) ||
                     null}
                   {' / '}
-                  {((typeof rmp === 'undefined' ||
-                    rmp.message !== 'success') && <CloseIcon />) ||
-                    (rmp.message === 'success' && rmpValue == 0 && (
-                      <CloseIcon />
-                    )) ||
-                    (rmp.message === 'success' && rmpValue != 0 && (
+                  {((rmp === undefined || !rmp) && <CloseIcon />) ||
+                    (rmpValue == 0 && <CloseIcon />) ||
+                    (rmpValue != 0 && (
                       <Typography className="text-base inline">
                         {rmpValue}
                       </Typography>
@@ -290,8 +272,8 @@ function GradeAndRmpRow({
 }
 type CheckboxRowProps = {
   name: string;
-  courses: SearchQuery[];
-  removeFromCompare: (arg0: SearchQuery) => void;
+  courses: SearchResult[];
+  removeFromCompare: (arg0: SearchResult) => void;
   cell_className: string;
   colors: string[];
   orderBy: string;
@@ -357,18 +339,16 @@ function CheckboxRow({
 }
 
 type CompareTableProps = {
-  includedResults: SearchQuery[];
-  grades: { [key: string]: GenericFetchedData<Grades> };
-  rmp: { [key: string]: GenericFetchedData<RMP> };
-  removeFromCompare: (arg0: SearchQuery) => void;
+  includedResults: SearchResult[];
+  removeFromCompare: (arg0: SearchResult) => void;
   colorMap: { [key: string]: string };
+  chosenSemesters: string[];
 };
 
 export default function CompareTable({
   includedResults,
-  grades,
-  rmp,
   removeFromCompare,
+  chosenSemesters,
   colorMap,
 }: CompareTableProps) {
   //Table sorting category
@@ -399,68 +379,40 @@ export default function CompareTable({
   //Sort
   const sortedResults = [...includedResults].sort((a, b) => {
     if (orderBy === 'GPA') {
-      const aGrades = grades[searchQueryLabel(a)];
-      const bGrades = grades[searchQueryLabel(b)];
-      //drop loading/error rows to bottom
-      if (
-        (!aGrades || aGrades.message !== 'success') &&
-        (!bGrades || bGrades.message !== 'success')
-      ) {
-        return 0;
-      }
-      if (!aGrades || aGrades.message !== 'success') {
-        return 9999;
-      }
-      if (!bGrades || bGrades.message !== 'success') {
-        return -9999;
-      }
+      const aGrades = calculateGrades(a.grades, chosenSemesters);
+      const bGrades = calculateGrades(b.grades, chosenSemesters);
       if (order === 'asc') {
-        return aGrades.data.filtered.gpa - bGrades.data.filtered.gpa;
+        return aGrades.gpa - bGrades.gpa;
       }
-      return bGrades.data.filtered.gpa - aGrades.data.filtered.gpa;
+      return bGrades.gpa - aGrades.gpa;
     }
     if (
       orderBy === 'Rating' ||
       orderBy === 'Would Take Again' ||
       orderBy === 'Difficulty'
     ) {
-      const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
-      const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
-      //drop loading/error rows to bottom
-      if (
-        (!aRmp || aRmp.message !== 'success') &&
-        (!bRmp || bRmp.message !== 'success')
-      ) {
-        // If both aRmp and bRmp are not done, treat them as equal and return 0
-        return 0;
-      }
-      if (!aRmp || aRmp.message !== 'success') {
-        return 9999;
-      }
-      if (!bRmp || bRmp.message !== 'success') {
-        return -9999;
-      }
+      if (a.type === 'course' || !a.RMP) return 9999;
+      if (b.type === 'course' || !b.RMP) return -9999;
+      const aRmp = a.RMP;
+      const bRmp = b.RMP;
+
       if (orderBy === 'Rating') {
         if (order === 'asc') {
-          return aRmp.data.avgRating - bRmp.data.avgRating;
+          return aRmp.avgRating - bRmp.avgRating;
         }
-        return bRmp.data.avgRating - aRmp.data.avgRating;
+        return bRmp.avgRating - aRmp.avgRating;
       }
       if (orderBy === 'Would Take Again') {
         if (order === 'asc') {
-          return (
-            aRmp.data.wouldTakeAgainPercent - bRmp.data.wouldTakeAgainPercent
-          );
+          return aRmp.wouldTakeAgainPercent - bRmp.wouldTakeAgainPercent;
         }
-        return (
-          bRmp.data.wouldTakeAgainPercent - aRmp.data.wouldTakeAgainPercent
-        );
+        return bRmp.wouldTakeAgainPercent - aRmp.wouldTakeAgainPercent;
       }
       if (orderBy === 'Difficulty') {
         if (order === 'asc') {
-          return aRmp.data.avgDifficulty - bRmp.data.avgDifficulty;
+          return aRmp.avgDifficulty - bRmp.avgDifficulty;
         }
-        return bRmp.data.avgDifficulty - aRmp.data.avgDifficulty;
+        return bRmp.avgDifficulty - aRmp.avgDifficulty;
       }
     }
     return 0;
@@ -468,7 +420,7 @@ export default function CompareTable({
 
   // Update mappedColors to use the passed colorMap
   const mappedColors = sortedResults.map(
-    (result) => colorMap[searchQueryLabel(result)],
+    (result) => colorMap[searchQueryLabel(result.searchQuery)],
   );
 
   return (
@@ -486,7 +438,7 @@ export default function CompareTable({
               {/*the course names along the top*/}
               {sortedResults.map((result, index) => (
                 <TableCell
-                  key={searchQueryLabel(result)}
+                  key={searchQueryLabel(result.searchQuery)}
                   className="text-center py-3 border-x-2 border-t-2 rounded-t-lg w-min"
                   sx={{ borderBottom: 'none' }}
                   style={{
@@ -494,18 +446,18 @@ export default function CompareTable({
                     backgroundColor: mappedColors[index] + '10', // add transparency
                   }}
                 >
-                  {searchQueryLabel(result)}
+                  {searchQueryLabel(result.searchQuery)}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            <GradeOrRmpRow<Grades>
+            <GradeOrRmpRow<GradesData>
               name="GPA"
-              values={sortedResults.map(
-                (result) => grades[searchQueryLabel(result)],
-              )}
-              getValue={(data: Grades) => data.filtered.gpa}
+              values={sortedResults.map((result) => result.grades)}
+              getValue={(data) => {
+                return calculateGrades(data, chosenSemesters).gpa;
+              }}
               formatValue={(value: number) => value.toFixed(2)}
               goodValue={4}
               badValue={0}
@@ -519,10 +471,10 @@ export default function CompareTable({
 
             <GradeOrRmpRow<RMP>
               name="Rating"
-              values={sortedResults.map(
-                (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
+              values={sortedResults.map((result) =>
+                result.type !== 'course' ? result.RMP : undefined,
               )}
-              getValue={(data: RMP) => data.avgRating}
+              getValue={(data) => data.avgRating}
               formatValue={(value: number) => value.toFixed(1)}
               goodValue={5}
               badValue={0}
@@ -535,8 +487,8 @@ export default function CompareTable({
             />
             <GradeOrRmpRow<RMP>
               name="Would Take Again"
-              values={sortedResults.map(
-                (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
+              values={sortedResults.map((result) =>
+                result.type !== 'course' ? result.RMP : undefined,
               )}
               getValue={(data: RMP) => data.wouldTakeAgainPercent}
               formatValue={(value: number) => value.toFixed(0) + '%'}
@@ -551,8 +503,8 @@ export default function CompareTable({
             />
             <GradeOrRmpRow<RMP>
               name="Difficulty"
-              values={sortedResults.map(
-                (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
+              values={sortedResults.map((result) =>
+                result.type !== 'course' ? result.RMP : undefined,
               )}
               getValue={(data: RMP) => data.avgDifficulty}
               formatValue={(value: number) => value.toFixed(1)}
@@ -568,13 +520,13 @@ export default function CompareTable({
             />
             <GradeAndRmpRow
               name="# of Grades / Ratings"
-              gradeValues={sortedResults.map(
-                (result) => grades[searchQueryLabel(result)],
+              gradeValues={sortedResults.map((result) => result.grades)}
+              rmpValues={sortedResults.map((result) =>
+                result.type !== 'course' ? result.RMP : undefined,
               )}
-              rmpValues={sortedResults.map(
-                (result) => rmp[searchQueryLabel(convertToProfOnly(result))],
-              )}
-              getGradeValue={(data: Grades) => data.filtered.total}
+              getGradeValue={(data) =>
+                calculateGrades(data, chosenSemesters).total
+              }
               getRmpValue={(data: RMP) => data.numRatings}
               cell_className="pt-3 pb-2 border-x-2"
               colors={mappedColors}

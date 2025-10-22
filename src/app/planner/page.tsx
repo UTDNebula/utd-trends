@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import React from 'react';
 
 import PlannerPage from './PlannerPage'
-import SyncServerDataToContext from './SyncServerDataToContext';
 
 export const metadata: Metadata = {
   title: 'My Planner',
@@ -20,7 +19,6 @@ export default function Page() {
   return (
     <>
       <PlannerPage />
-      <SyncServerDataToContext />
     </>
   );
 }

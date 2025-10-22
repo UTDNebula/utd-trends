@@ -15,13 +15,14 @@ import React, { useState, useTransition } from 'react';
 
 import Background from '@/../public/background.png';
 import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
-import SearchBar from '@/components/search/SearchBar/SearchBar';
+import SearchBar, {
+  updateRecentSearches,
+} from '@/components/search/SearchBar/SearchBar';
 import { displaySemesterName } from '@/modules/semesters';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 
 interface Props {
-  latestSemester: GenericFetchedData<string>;
+  latestSemester: string;
 }
 
 /**
@@ -44,6 +45,12 @@ export default function Home(props: Props) {
       startTransition(() => {
         router.push(`/dashboard?${searchParams.toString()}`);
       });
+      // add to recent searches
+      const chosenRecentOptions = chosenOptions.map((option) => ({
+        ...option,
+        isRecent: true,
+      }));
+      updateRecentSearches(chosenRecentOptions);
     }
   }
 
@@ -88,7 +95,7 @@ export default function Home(props: Props) {
       <div className="max-w-xl grow flex flex-col justify-center">
         <h2 className="text-sm font-semibold mb-3 text-cornflower-600 dark:text-cornflower-400 tracking-wider flex gap-1 items-center">
           <span className="leading-none">POWERED BY</span>
-          {/*eslint-disable-next-line react/jsx-no-target-blank*/}
+          {}
           <a
             href="https://www.utdnebula.com/"
             target="_blank"
@@ -107,7 +114,6 @@ export default function Home(props: Props) {
           find the perfect class.
         </p>
         <SearchBar
-          // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus={true}
           onSelect={searchOptionChosen}
           input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
@@ -133,12 +139,10 @@ export default function Home(props: Props) {
                 />
               }
               label={
-                'Teaching ' +
-                (typeof props.latestSemester !== 'undefined' &&
-                props.latestSemester.message === 'success'
-                  ? 'in ' +
-                    displaySemesterName(props.latestSemester.data, false)
-                  : 'Next Semester')
+                props.latestSemester == ''
+                  ? 'Teaching Next Semester'
+                  : 'Teaching in ' +
+                    displaySemesterName(props.latestSemester, false)
               }
             />
           </FormControl>

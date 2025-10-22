@@ -1,3 +1,7 @@
+import type { GradesData } from '@/modules/fetchGrades';
+import type { RMP } from '@/modules/fetchRmp';
+import type { SectionsData } from '@/modules/fetchSections';
+
 export type SearchQuery = {
   prefix?: string;
   number?: string;
@@ -24,6 +28,48 @@ export type SearchQueryMultiSection = {
   sectionNumbers?: string[];
 };
 
+export type SearchResult =
+  | {
+      type: 'course';
+      grades: GradesData;
+      searchQuery: {
+        prefix: string;
+        number: string;
+        profFirst?: string;
+        profLast?: string;
+        sectionNumber?: string;
+      };
+      sections: SectionsData;
+      courseName: string;
+    }
+  | {
+      type: 'professor';
+      grades: GradesData;
+      RMP?: RMP;
+      searchQuery: {
+        prefix?: string;
+        number?: string;
+        profFirst: string;
+        profLast: string;
+        sectionNumber?: string;
+      };
+      sections: SectionsData;
+    }
+  | {
+      type: 'combo';
+      grades: GradesData;
+      RMP?: RMP;
+      searchQuery: {
+        prefix: string;
+        number: string;
+        profFirst: string;
+        profLast: string;
+        sectionNumber?: string;
+      };
+      sections: SectionsData;
+      courseName: string;
+    };
+
 export function convertToProfOnly(
   searchQuery: SearchQuery,
 ): Professor | Record<string, never> {
@@ -46,6 +92,20 @@ export function convertToCourseOnly(
     prefix: searchQuery.prefix as string,
     number: searchQuery.number as string,
   };
+}
+
+export function isProfessorQuery(
+  searchQuery: SearchQuery,
+): searchQuery is SearchQuery & { profFirst: string; profLast: string } {
+  return (
+    searchQuery.profFirst !== undefined && searchQuery.profLast !== undefined
+  );
+}
+
+export function isCourseQuery(
+  searchQuery: SearchQuery,
+): searchQuery is SearchQuery & { prefix: string; number: string } {
+  return searchQuery.prefix !== undefined && searchQuery.number !== undefined;
 }
 
 export function removeSection(

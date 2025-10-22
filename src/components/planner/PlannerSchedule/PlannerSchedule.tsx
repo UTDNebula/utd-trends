@@ -4,7 +4,6 @@ import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection';
 import {
   convertToCourseOnly,
-  removeSection,
   searchQueryLabel,
   searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
@@ -60,7 +59,7 @@ function HourRow(props: HourRowProps) {
 }
 
 export default function PlannerSchedule() {
-  const { sections, planner, plannerColorMap, courseNames } = useSharedState();
+  const { planner, plannerColorMap } = useSharedState();
 
   const courses = planner.flatMap((searchQuery) =>
     searchQueryMultiSectionSplit(searchQuery),
@@ -88,26 +87,14 @@ export default function PlannerSchedule() {
       ))}
 
       {courses.map((course) => {
-        const courseSections =
-          sections[searchQueryLabel(removeSection(course))];
-        if (
-          typeof courseSections === 'undefined' ||
-          courseSections.message !== 'success'
-        ) {
-          return null;
-        }
+        if (!course.sectionNumber) return null;
         return (
           <PlannerSection
             key={searchQueryLabel(course)}
-            selectedSection={courseSections.data.latest.find(
-              (section) => section.section_number === course.sectionNumber,
-            )}
+            selectedSection={course.sectionNumber}
             course={course}
             color={
               plannerColorMap[searchQueryLabel(convertToCourseOnly(course))]
-            }
-            courseName={
-              courseNames[searchQueryLabel(convertToCourseOnly(course))]
             }
           />
         );
