@@ -5,21 +5,29 @@ import {
   DAYS,
   START_HOUR,
 } from '@/components/planner/PlannerSchedule/PlannerSchedule';
-import type { Sections } from '@/modules/fetchSections';
 import { type SearchQuery } from '@/types/SearchQuery';
+import { useSearchResult } from '@/modules/plannerFetch';
+import { useSharedState } from '@/app/SharedStateProvider';
 
 interface PlannerSectionComponentProps {
-  selectedSection: Sections['all'][number] | undefined;
+  selectedSection: string;
   course: SearchQuery;
   color: { fill: string; outline: string; font: string };
-  courseName: string | undefined;
 }
 
 export default function PlannerSection(props: PlannerSectionComponentProps) {
-  const selectedSection = props.selectedSection;
-  if (typeof selectedSection === 'undefined') {
+  const { latestSemester } = useSharedState();
+  const result = useSearchResult(props.course);
+  if (!result.isSuccess || result.data.type === 'professor') {
     return null;
   }
+  const selectedSection = result.data.sections.find(
+    (s) =>
+      s.section_number === props.selectedSection &&
+      s.academic_session.name === latestSemester,
+  );
+  if (selectedSection === undefined) return null;
+  const courseName = result.data.courseName;
 
   const meetings: string[][] = [];
   for (let j = 0; j < selectedSection.meetings.length; j++) {
@@ -83,7 +91,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
     return (
       <Tooltip
         key={selectedSection._id + i}
-        title={props.courseName}
+        title={courseName}
         placement="top"
         slotProps={{
           popper: {

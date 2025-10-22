@@ -18,7 +18,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { use, useMemo, useState } from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerCheckbox from '@/components/common/PlannerCheckbox/PlannerCheckbox';
@@ -27,21 +27,23 @@ import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesI
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
-import type { Grades } from '@/modules/fetchGrades';
-import type { RMP } from '@/modules/fetchRmp';
-import type { Sections } from '@/modules/fetchSections';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 import { displaySemesterName } from '@/modules/semesters';
-import useHasHydrated from '@/modules/useHasHydrated';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToCourseOnly,
   convertToProfOnly,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
-  sectionCanOverlap,
+  type SearchResult,
 } from '@/types/SearchQuery';
+import { calculateGrades } from '@/modules/fetchGrades';
+import { FiltersContext } from '@/app/dashboard/FilterContext';
+import dynamic from 'next/dynamic';
+const AddToPlanner = dynamic(() => import('./AddToPlanner'), {
+  ssr: false,
+  loading: () => <Checkbox disabled icon={<BookOutlinedIcon />} />,
+});
 
 function LoadingRow() {
   const nameCell = (
@@ -147,80 +149,69 @@ export function LoadingSearchResultsTable() {
 }
 
 type RowProps = {
-  section: GenericFetchedData<Sections>;
+  searchResult: SearchResult;
   course: SearchQuery;
-  grades: GenericFetchedData<Grades>;
-  rmp: GenericFetchedData<RMP>;
   inCompare: boolean;
-  addToCompare: (arg0: SearchQuery) => void;
-  removeFromCompare: (arg0: SearchQuery) => void;
+  addToCompare: (arg0: SearchResult) => void;
+  removeFromCompare: (arg0: SearchResult) => void;
   color?: string;
-  inPlanner: boolean;
-  addJustCourseToo: boolean;
-  addToPlanner: (value: SearchQuery) => void;
-  removeFromPlanner: (value: SearchQuery) => void;
   showTutorial: boolean;
-  courseName: string | undefined;
 };
 
 function Row({
-  section,
+  searchResult,
   course,
-  grades,
-  rmp,
   inCompare,
   addToCompare,
   removeFromCompare,
   color,
-  inPlanner,
-  addJustCourseToo,
-  addToPlanner,
-  removeFromPlanner,
   showTutorial,
-  courseName,
 }: RowProps) {
+  const chosenSemesters = use(FiltersContext).chosenSemesters;
   const [open, setOpen] = useState(false);
-  const canOpen =
-    !(typeof grades === 'undefined' || grades.message !== 'success') ||
-    !(typeof rmp === 'undefined' || rmp.message !== 'success');
 
   const rainbowColors = useRainbowColors();
+  const filteredGrades = useMemo(
+    () => calculateGrades(searchResult.grades, chosenSemesters),
+    [searchResult.grades, chosenSemesters],
+  );
 
+  const canOpen = searchResult.type === 'course' || searchResult.RMP;
   const nameCell = (
     <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit">
       <Tooltip
         title={
           typeof course.prefix !== 'undefined' &&
           typeof course.number !== 'undefined' &&
-          courseName
+          searchResult.type !== 'professor' &&
+          searchResult.courseName
         }
         placement="top"
       >
         <span>{searchQueryLabel(convertToCourseOnly(course))}</span>
       </Tooltip>
-      {typeof course.profFirst !== 'undefined' &&
-        typeof course.profLast !== 'undefined' &&
-        typeof course.prefix !== 'undefined' &&
-        typeof course.number !== 'undefined' && <span> </span>}
-      <Tooltip
-        title={
-          typeof course.profFirst !== 'undefined' &&
-          typeof course.profLast !== 'undefined' &&
-          (rmp !== undefined &&
-          rmp.message === 'success' &&
-          rmp.data.teacherRatingTags.length > 0
-            ? 'Tags: ' +
-              rmp.data.teacherRatingTags
-                .sort((a, b) => b.tagCount - a.tagCount)
-                .slice(0, 3)
-                .map((tag) => tag.tagName)
-                .join(', ')
-            : 'No Tags Available')
-        }
-        placement="top"
-      >
-        <span>{searchQueryLabel(convertToProfOnly(course))}</span>
-      </Tooltip>
+      {searchResult.type === 'combo' && <span> </span>}
+      {(searchResult.type === 'professor' || searchResult.type === 'combo') && (
+        <Tooltip
+          title={
+            typeof course.profFirst !== 'undefined' &&
+            typeof course.profLast !== 'undefined' &&
+            searchResult.RMP &&
+            (searchResult.RMP.teacherRatingTags.length > 0
+              ? 'Tags: ' +
+                searchResult.RMP.teacherRatingTags
+                  .sort((a, b) => b.tagCount - a.tagCount)
+                  .slice(0, 3)
+                  .map((tag) => tag.tagName)
+                  .join(', ')
+              : 'No Tags Available')
+          }
+          placement="top"
+        >
+          <span>{searchQueryLabel(convertToProfOnly(course))}</span>
+        </Tooltip>
+      )}
+
       {((typeof course.profFirst === 'undefined' &&
         typeof course.profLast === 'undefined') ||
         (typeof course.prefix === 'undefined' &&
@@ -290,9 +281,9 @@ function Row({
                 onClick={(e) => {
                   e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
                   if (inCompare) {
-                    removeFromCompare(course);
+                    removeFromCompare(searchResult);
                   } else {
-                    addToCompare(course);
+                    addToCompare(searchResult);
                   }
                 }}
                 sx={
@@ -306,14 +297,7 @@ function Row({
                 } // Apply color if defined
               />
             </Tooltip>
-            <PlannerCheckbox
-              section={section}
-              course={course}
-              inPlanner={inPlanner}
-              addToPlanner={addToPlanner}
-              removeFromPlanner={removeFromPlanner}
-              addJustCourseToo={addJustCourseToo}
-            />
+            <AddToPlanner searchResult={searchResult} />
           </div>
         </TableCell>
         <TableCell
@@ -324,54 +308,50 @@ function Row({
           {nameCell}
         </TableCell>
         <TableCell align="center" className="border-b-0">
-          {((typeof grades === 'undefined' || grades.message !== 'success') && (
-            <></>
-          )) ||
-            (grades.message === 'success' && grades.data.filtered.gpa >= 0 && (
-              <Tooltip
-                title={
-                  'Median GPA: ' +
-                  grades.data.filtered.gpa.toFixed(2) +
-                  ' | Mean GPA: ' +
-                  grades.data.filtered.mean_gpa.toFixed(2)
-                }
-                placement="top"
+          {(filteredGrades.gpa >= 0 && (
+            <Tooltip
+              title={
+                'Median GPA: ' +
+                filteredGrades.gpa.toFixed(2) +
+                ' | Mean GPA: ' +
+                filteredGrades.mean_gpa.toFixed(2)
+              }
+              placement="top"
+            >
+              <Typography
+                className="text-base text-black text-center rounded-full px-5 py-2 w-16 block mx-auto"
+                sx={{
+                  backgroundColor: gpaToColor(
+                    rainbowColors,
+                    filteredGrades.gpa,
+                  ),
+                }}
               >
-                <Typography
-                  className="text-base text-black text-center rounded-full px-5 py-2 w-16 block mx-auto"
-                  sx={{
-                    backgroundColor: gpaToColor(
-                      rainbowColors,
-                      grades.data.filtered.gpa,
-                    ),
-                  }}
-                >
-                  {gpaToLetterGrade(grades.data.filtered.gpa)}
-                </Typography>
-              </Tooltip>
-            )) ||
+                {gpaToLetterGrade(filteredGrades.gpa)}
+              </Typography>
+            </Tooltip>
+          )) ||
             null}
         </TableCell>
         <TableCell align="center" className="border-b-0">
-          {((typeof rmp === 'undefined' || rmp.message !== 'success') && (
-            <></>
-          )) ||
-            (rmp.message === 'success' && rmp.data.numRatings == 0 && <></>) ||
-            (rmp.message === 'success' && rmp.data.numRatings != 0 && (
-              <Tooltip
-                title={'Professor rating: ' + rmp.data.avgRating}
-                placement="top"
-              >
-                <div>
-                  <Rating
-                    defaultValue={rmp.data.avgRating}
-                    precision={0.1}
-                    sx={{ fontSize: 25 }}
-                    readOnly
-                  />
-                </div>
-              </Tooltip>
-            )) ||
+          {(searchResult.type !== 'course' &&
+            searchResult.RMP &&
+            ((searchResult.RMP.numRatings == 0 && <></>) ||
+              (searchResult.RMP.numRatings != 0 && (
+                <Tooltip
+                  title={'Professor rating: ' + searchResult.RMP.avgRating}
+                  placement="top"
+                >
+                  <div>
+                    <Rating
+                      defaultValue={searchResult.RMP.avgRating}
+                      precision={0.1}
+                      sx={{ fontSize: 25 }}
+                      readOnly
+                    />
+                  </div>
+                </Tooltip>
+              )))) ||
             null}
         </TableCell>
       </TableRow>
@@ -381,10 +361,12 @@ function Row({
             <div className="p-2 md:p-4 flex flex-col gap-2">
               <SingleGradesInfo
                 course={course}
-                grades={grades}
-                gradesToUse="filtered"
+                grades={searchResult.grades}
+                filteredGrades={filteredGrades}
               />
-              <SingleProfInfo rmp={rmp} />
+              {searchResult.type !== 'course' && searchResult.RMP && (
+                <SingleProfInfo rmp={searchResult.RMP} />
+              )}
             </div>
           </Collapse>
         </TableCell>
@@ -395,8 +377,8 @@ function Row({
 
 type SearchResultsTableProps = {
   numSearches: number;
-  includedResults: SearchQuery[];
-  unIncludedResults: SearchQuery[];
+  includedResults: SearchResult[];
+  unIncludedResults: SearchResult[];
 };
 
 export default function SearchResultsTable({
@@ -405,17 +387,10 @@ export default function SearchResultsTable({
   unIncludedResults,
 }: SearchResultsTableProps) {
   const {
-    grades,
-    rmp,
-    sections,
     compare,
     addToCompare,
     removeFromCompare,
     compareColorMap,
-    planner,
-    addToPlanner,
-    removeFromPlanner,
-    courseNames,
     latestSemester,
   } = useSharedState();
 
@@ -439,12 +414,6 @@ export default function SearchResultsTable({
     }
   }
 
-  // To avoid hydration errors
-  const hasHydrated = useHasHydrated();
-  if (!hasHydrated) {
-    return <LoadingSearchResultsTable />;
-  }
-
   if (includedResults.length === 0 && unIncludedResults.length === 0) {
     return (
       <div className="p-4">
@@ -463,31 +432,35 @@ export default function SearchResultsTable({
   }
 
   //Sort
-  function sortResults(a: SearchQuery, b: SearchQuery) {
+  function sortResults(a: SearchResult, b: SearchResult) {
+    const aSearchQuery = a.searchQuery;
+    const bSearchQuery = b.searchQuery;
     if (orderBy === 'name') {
       //same logic as in generateCombosTable.ts
       //handle undefined variables based on searchQueryLabel
-      const aFirstName = a.profFirst ?? '';
-      const bFirstName = b.profFirst ?? '';
-      const aLastName = a.profLast ?? '';
-      const bLastName = b.profLast ?? '';
-      const aPrefix = a.prefix ?? ''; //make sure the is no empty input for prefix and number
-      const bPrefix = b.prefix ?? '';
-      const aNumber = a.number ?? '';
-      const bNumber = b.number ?? '';
+      const aFirstName = aSearchQuery.profFirst ?? '';
+      const bFirstName = bSearchQuery.profFirst ?? '';
+      const aLastName = aSearchQuery.profLast ?? '';
+      const bLastName = bSearchQuery.profLast ?? '';
+      const aPrefix = aSearchQuery.prefix ?? ''; //make sure the is no empty input for prefix and number
+      const bPrefix = bSearchQuery.prefix ?? '';
+      const aNumber = aSearchQuery.number ?? '';
+      const bNumber = bSearchQuery.number ?? '';
 
       if (order === 'asc') {
         //ascending alphabetical automatically sorts Overall results correctly
         if (
-          (typeof a.profFirst === 'undefined' &&
-            typeof a.profLast === 'undefined') ||
-          (typeof a.prefix === 'undefined' && typeof a.number === 'undefined')
+          (typeof aSearchQuery.profFirst === 'undefined' &&
+            typeof aSearchQuery.profLast === 'undefined') ||
+          (typeof aSearchQuery.prefix === 'undefined' &&
+            typeof aSearchQuery.number === 'undefined')
         )
           return -1;
         if (
-          (typeof b.profFirst === 'undefined' &&
-            typeof b.profLast === 'undefined') ||
-          (typeof b.prefix === 'undefined' && typeof b.number === 'undefined')
+          (typeof bSearchQuery.profFirst === 'undefined' &&
+            typeof bSearchQuery.profLast === 'undefined') ||
+          (typeof bSearchQuery.prefix === 'undefined' &&
+            typeof bSearchQuery.number === 'undefined')
         )
           return 1;
         return (
@@ -501,14 +474,14 @@ export default function SearchResultsTable({
       else {
         // catches the case where a is an Overall result AND b is an Overall result
         if (
-          ((typeof a.profFirst === 'undefined' &&
-            typeof a.profLast === 'undefined') ||
-            (typeof a.prefix === 'undefined' &&
-              typeof a.number === 'undefined')) &&
-          ((typeof b.profFirst === 'undefined' &&
-            typeof b.profLast === 'undefined') ||
-            (typeof b.prefix === 'undefined' &&
-              typeof b.number === 'undefined'))
+          ((typeof aSearchQuery.profFirst === 'undefined' &&
+            typeof aSearchQuery.profLast === 'undefined') ||
+            (typeof aSearchQuery.prefix === 'undefined' &&
+              typeof aSearchQuery.number === 'undefined')) &&
+          ((typeof bSearchQuery.profFirst === 'undefined' &&
+            typeof bSearchQuery.profLast === 'undefined') ||
+            (typeof bSearchQuery.prefix === 'undefined' &&
+              typeof bSearchQuery.number === 'undefined'))
         )
           return (
             bLastName.localeCompare(aLastName) || //sort by last name then first name
@@ -517,15 +490,17 @@ export default function SearchResultsTable({
             bNumber.localeCompare(aNumber)
           );
         if (
-          (typeof a.profFirst === 'undefined' &&
-            typeof a.profLast === 'undefined') ||
-          (typeof a.prefix === 'undefined' && typeof a.number === 'undefined')
+          (typeof aSearchQuery.profFirst === 'undefined' &&
+            typeof aSearchQuery.profLast === 'undefined') ||
+          (typeof aSearchQuery.prefix === 'undefined' &&
+            typeof aSearchQuery.number === 'undefined')
         )
           return -1;
         if (
-          (typeof b.profFirst === 'undefined' &&
-            typeof b.profLast === 'undefined') ||
-          (typeof b.prefix === 'undefined' && typeof b.number === 'undefined')
+          (typeof bSearchQuery.profFirst === 'undefined' &&
+            typeof bSearchQuery.profLast === 'undefined') ||
+          (typeof bSearchQuery.prefix === 'undefined' &&
+            typeof bSearchQuery.number === 'undefined')
         )
           return 1;
         return (
@@ -537,46 +512,32 @@ export default function SearchResultsTable({
       }
     }
     if (orderBy === 'gpa') {
-      const aGrades = grades[searchQueryLabel(a)];
-      const bGrades = grades[searchQueryLabel(b)];
-      if (
-        (!aGrades || aGrades.message !== 'success') &&
-        (!bGrades || bGrades.message !== 'success')
-      ) {
-        return 0;
-      }
-
-      if (!aGrades || aGrades.message !== 'success') {
-        return 9999;
-      }
-      if (!bGrades || bGrades.message !== 'success') {
-        return -9999;
-      }
+      const aGrades = calculateGrades(a.grades);
+      const bGrades = calculateGrades(b.grades);
 
       if (order === 'asc') {
-        return aGrades.data.filtered.gpa - bGrades.data.filtered.gpa;
+        return aGrades.gpa - bGrades.gpa;
       }
-      return bGrades.data.filtered.gpa - aGrades.data.filtered.gpa;
+      return bGrades.gpa - aGrades.gpa;
     }
     if (orderBy === 'rating') {
-      const aRmp = rmp[searchQueryLabel(convertToProfOnly(a))];
-      const bRmp = rmp[searchQueryLabel(convertToProfOnly(b))];
+      if (a.type === 'course' || !a.RMP) return 9999;
+      if (b.type === 'course' || !b.RMP) return -9999;
+      const aRmp = a.RMP;
+      const bRmp = b.RMP;
       //drop loading/error rows to bottom
-      if (
-        (!aRmp || aRmp.message !== 'success' || aRmp.data.numRatings == 0) &&
-        (!bRmp || bRmp.message !== 'success' || bRmp.data.numRatings == 0)
-      ) {
+      if (aRmp.numRatings == 0 && bRmp.numRatings == 0) {
         // If both aRmp and bRmp are not done, treat them as equal and return 0
         return 0;
       }
-      if (!aRmp || aRmp.message !== 'success' || aRmp.data.numRatings == 0) {
+      if (aRmp.numRatings == 0) {
         return 9999;
       }
-      if (!bRmp || bRmp.message !== 'success' || bRmp.data.numRatings == 0) {
+      if (bRmp.numRatings == 0) {
         return -9999;
       }
-      const aRating = aRmp?.data?.avgRating ?? 0; // Fallback to 0 if undefined
-      const bRating = bRmp?.data?.avgRating ?? 0; // Fallback to 0 if undefined
+      const aRating = aRmp.avgRating ?? 0; // Fallback to 0 if undefined
+      const bRating = bRmp.avgRating ?? 0; // Fallback to 0 if undefined
       if (order === 'asc') {
         return aRating - bRating;
       }
@@ -651,56 +612,32 @@ export default function SearchResultsTable({
           <TableBody>
             {/* Included Results */}
             {sortedResults.map((result, index) => {
-              const courseOnlySections =
-                sections[searchQueryLabel(convertToCourseOnly(result))];
-              const canAddCourseOnlyToPlanner =
-                typeof courseOnlySections !== 'undefined' &&
-                courseOnlySections.message === 'success' &&
-                courseOnlySections.data.latest.some((section) =>
-                  sectionCanOverlap(section.section_number),
-                );
               return (
                 <Row
-                  section={sections[searchQueryLabel(result)]}
-                  key={searchQueryLabel(result)}
-                  course={result}
-                  grades={grades[searchQueryLabel(result)]}
-                  rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
+                  searchResult={result}
+                  key={searchQueryLabel(result.searchQuery)}
+                  course={result.searchQuery}
                   inCompare={compare.some((obj) =>
-                    searchQueryEqual(obj, result),
+                    searchQueryEqual(obj.searchQuery, result.searchQuery),
                   )}
                   addToCompare={addToCompare}
                   removeFromCompare={removeFromCompare}
-                  color={compareColorMap[searchQueryLabel(result)]}
-                  inPlanner={planner.some((obj) =>
-                    searchQueryEqual(obj, result),
-                  )}
-                  addJustCourseToo={
-                    !searchQueryEqual(result, convertToCourseOnly(result)) &&
-                    canAddCourseOnlyToPlanner
-                  }
-                  addToPlanner={addToPlanner}
-                  removeFromPlanner={removeFromPlanner}
+                  color={compareColorMap[searchQueryLabel(result.searchQuery)]}
                   showTutorial={index === numSearches}
-                  courseName={
-                    courseNames[searchQueryLabel(convertToCourseOnly(result))]
-                  }
                 />
               );
             })}
 
             {/* Divider row */}
             {sortedUnIncludedResults.length > 0 && (
-              <TableRow className="bg-gray-200 dark:bg-gray-700">
+              <TableRow>
                 <TableCell colSpan={5} className="p-0">
                   <div className="flex items-center py-2 my-2">
                     <Divider className="grow" />
                     <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
                       {'Not teaching ' +
-                        (typeof latestSemester !== 'undefined' &&
-                        latestSemester.message === 'success'
-                          ? 'in ' +
-                            displaySemesterName(latestSemester.data, false)
+                        (latestSemester !== ''
+                          ? 'in ' + displaySemesterName(latestSemester, false)
                           : 'Next Semester')}
                     </Typography>
                     <Divider className="grow" />
@@ -711,40 +648,18 @@ export default function SearchResultsTable({
 
             {/* Unincluded Results (Unavailable courses) */}
             {sortedUnIncludedResults.map((result) => {
-              const courseOnlySections =
-                sections[searchQueryLabel(convertToCourseOnly(result))];
-              const canAddCourseOnlyToPlanner =
-                typeof courseOnlySections !== 'undefined' &&
-                courseOnlySections.message === 'success' &&
-                courseOnlySections.data.latest.some((section) =>
-                  sectionCanOverlap(section.section_number),
-                );
               return (
                 <Row
-                  section={sections[searchQueryLabel(result)]}
-                  key={searchQueryLabel(result)}
-                  course={result}
-                  grades={grades[searchQueryLabel(result)]}
-                  rmp={rmp[searchQueryLabel(convertToProfOnly(result))]}
+                  searchResult={result}
+                  key={searchQueryLabel(result.searchQuery)}
+                  course={result.searchQuery}
                   inCompare={compare.some((obj) =>
-                    searchQueryEqual(obj, result),
+                    searchQueryEqual(obj.searchQuery, result.searchQuery),
                   )}
                   addToCompare={addToCompare}
                   removeFromCompare={removeFromCompare}
-                  color={compareColorMap[searchQueryLabel(result)]}
-                  inPlanner={planner.some((obj) =>
-                    searchQueryEqual(obj, result),
-                  )}
-                  addJustCourseToo={
-                    !searchQueryEqual(result, convertToCourseOnly(result)) &&
-                    canAddCourseOnlyToPlanner
-                  }
-                  addToPlanner={addToPlanner}
-                  removeFromPlanner={removeFromPlanner}
+                  color={compareColorMap[searchQueryLabel(result.searchQuery)]}
                   showTutorial={false}
-                  courseName={
-                    courseNames[searchQueryLabel(convertToCourseOnly(result))]
-                  }
                 />
               );
             })}
