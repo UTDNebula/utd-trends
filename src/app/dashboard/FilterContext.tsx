@@ -35,7 +35,9 @@ export default function FiltersProvider({
     useState<SearchResult[]>(searchResults);
   if (searchResults != prevSearchResults) {
     setPrevSearchResults(searchResults);
-    setChosenSemesters(getSemestersFromSearchResults(searchResults));
+    setChosenSemesters(
+      getSemestersFromSearchResults(searchResults.concat(compare)),
+    );
   }
 
   return (
