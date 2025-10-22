@@ -4,14 +4,14 @@ import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 
-import { useSharedState } from '@/app/SharedStateProvider';
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
 import { compareColors } from '@/modules/colors';
 import type { Grades } from '@/modules/fetchGrades';
 import { displaySemesterName } from '@/modules/semesters';
+import { FiltersContext } from '@/app/dashboard/FilterContext';
 
 function sortSemesters(a: string, b: string) {
   const rank = (code: string) => {
@@ -69,7 +69,8 @@ type Props = {
 };
 
 export default function LineGraph(props: Props) {
-  const { semesters, chosenSemesters, setChosenSemesters } = useSharedState();
+  const { semesters, chosenSemesters, setChosenSemesters } =
+    use(FiltersContext);
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =

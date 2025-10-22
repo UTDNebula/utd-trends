@@ -4,7 +4,6 @@ import React from 'react';
 import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 
 import Planner from './Planner';
-import SyncServerDataToContext from './SyncServerDataToContext';
 
 export const metadata: Metadata = {
   title: 'My Planner',
@@ -25,7 +24,6 @@ export default function Page() {
       <main className="p-4">
         <Planner />
       </main>
-      <SyncServerDataToContext />
     </>
   );
 }

@@ -10,11 +10,11 @@ import PlannerCard, {
 import { displaySemesterName } from '@/modules/semesters';
 import {
   convertToCourseOnly,
-  convertToProfOnly,
   removeSection,
   searchQueryLabel,
   searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
+import { useSearchresults } from '@/modules/plannerFetch';
 
 export function LoadingPlannerCoursesTable() {
   const { planner } = useSharedState();
@@ -35,14 +35,10 @@ export function LoadingPlannerCoursesTable() {
 
 export default function PlannerCoursesTable() {
   const {
-    grades,
-    rmp,
-    sections,
     planner,
     removeFromPlanner,
     setPlannerSection,
     plannerColorMap,
-    courseNames,
     latestSemester,
   } = useSharedState();
 
@@ -53,15 +49,20 @@ export default function PlannerCoursesTable() {
     }
     setOpenConflictMessage(false);
   };
-
+  const allResults = useSearchresults(planner);
+  const latestSections = allResults.map((r) =>
+    r.isSuccess
+      ? r.data.sections.filter(
+          (s) => s.academic_session.name === latestSemester,
+        )
+      : [],
+  );
   return (
     <>
       <Typography variant="h2" className="leading-tight text-3xl font-bold p-4">
         {'My Planner' +
           (typeof latestSemester !== 'undefined' &&
-          latestSemester.message === 'success'
-            ? ' — ' + displaySemesterName(latestSemester.data, false)
-            : '')}
+            ' — ' + displaySemesterName(latestSemester, false))}
       </Typography>
       <div className="flex flex-col gap-4 mb-4 sm:mb-0">
         {planner
@@ -70,69 +71,31 @@ export default function PlannerCoursesTable() {
               searchQueryLabel(removeSection(query2)),
             );
           })
-          .map((query, index) => {
-            const sectionData =
-              sections[searchQueryLabel(removeSection(query))];
-
-            const allSections =
-              typeof sectionData !== 'undefined' &&
-              sectionData.message === 'success' &&
-              Array.isArray(sectionData.data.all)
-                ? sectionData.data.all
-                : [];
-
-            const bestSyllabusUri = allSections
-              .filter(
-                (s) => !!s.syllabus_uri && !!s.academic_session?.start_date,
-              )
-              .sort(
-                (a, b) =>
-                  new Date(b.academic_session.start_date).getTime() -
-                  new Date(a.academic_session.start_date).getTime(),
-              )?.[0]?.syllabus_uri;
-
+          .map((query) => {
             return (
               <PlannerCard
-                key={index}
+                key={searchQueryLabel(query)}
                 query={query}
-                sections={
-                  typeof sectionData !== 'undefined' &&
-                  sectionData.message === 'success'
-                    ? sectionData.data.latest
-                    : undefined
-                }
-                bestSyllabus={bestSyllabusUri}
                 setPlannerSection={setPlannerSection}
-                grades={grades[searchQueryLabel(removeSection(query))]}
-                rmp={rmp[searchQueryLabel(convertToProfOnly(query))]}
                 removeFromPlanner={() => {
                   removeFromPlanner(query);
                 }}
                 selectedSections={planner
-                  .flatMap((searchQuery) =>
+                  .map((searchQuery) =>
                     searchQueryMultiSectionSplit(searchQuery),
                   )
-                  .map((single) => {
-                    const singleSectionData =
-                      sections[searchQueryLabel(removeSection(single))];
-                    if (
-                      typeof singleSectionData === 'undefined' ||
-                      singleSectionData.message !== 'success'
-                    ) {
-                      return undefined;
-                    }
-                    return singleSectionData.data?.latest.find(
-                      (section) =>
-                        section.section_number === single.sectionNumber,
-                    );
+                  .flatMap((queries, idx) => {
+                    return queries.map((query) => {
+                      return latestSections[idx].find(
+                        (section) =>
+                          section.section_number === query.sectionNumber,
+                      );
+                    });
                   })
                   .filter((section) => typeof section !== 'undefined')}
                 openConflictMessage={() => setOpenConflictMessage(true)}
                 color={
                   plannerColorMap[searchQueryLabel(convertToCourseOnly(query))]
-                }
-                courseName={
-                  courseNames[searchQueryLabel(convertToCourseOnly(query))]
                 }
               />
             );
