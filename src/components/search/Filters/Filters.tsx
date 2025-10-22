@@ -14,16 +14,12 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { usePathname, useSearchParams } from 'next/navigation';
-import React, { use, useMemo } from 'react';
+import React, { use } from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import {
-  compareSemesters,
-  displaySemesterName,
-  getSemestersFromSearchResults,
-} from '@/modules/semesters';
+import { compareSemesters, displaySemesterName } from '@/modules/semesters';
 import type { SearchResult } from '@/types/SearchQuery';
 import { FiltersContext } from '@/app/dashboard/FilterContext';
 import { calculateGrades } from '@/modules/fetchGrades';
@@ -91,11 +87,9 @@ export default function Filters({
 }: {
   searchResultsPromise: Promise<SearchResult[]>;
 }) {
-  const { latestSemester, compare } = useSharedState();
+  const { latestSemester } = useSharedState();
   const searchResults = use(searchResultsPromise);
-  const semesters = useMemo(() => {
-    return getSemestersFromSearchResults(searchResults.concat(compare));
-  }, [searchResults, compare]);
+  const semesters = use(FiltersContext).semesters;
   const chosenSemesters = use(FiltersContext).chosenSemesters;
   const setChosenSemesters = use(FiltersContext).setChosenSemesters;
 
