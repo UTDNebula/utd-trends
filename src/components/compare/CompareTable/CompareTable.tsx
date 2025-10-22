@@ -274,7 +274,7 @@ function GradeAndRmpRow({
 type CheckboxRowProps = {
   name: string;
   courses: SearchResult[];
-  removeFromCompare: (arg0: SearchResult) => void;
+  removeFromCompare?: (arg0: SearchResult) => void;
   cell_className: string;
   colors: string[];
   orderBy: string;
