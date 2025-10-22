@@ -21,7 +21,6 @@ import {
 import React, { use, useMemo, useState } from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
-import PlannerCheckbox from '@/components/common/PlannerCheckbox/PlannerCheckbox';
 import Rating from '@/components/common/Rating/Rating';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
