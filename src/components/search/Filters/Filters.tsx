@@ -65,10 +65,7 @@ export function LoadingFilters() {
 
       {/* Teaching Next Semester switch*/}
       <Grid size={{ xs: 6, sm: 3 }} className="px-2">
-        <FormControl
-          size="small"
-          className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
-        >
+        <FormControl size="small">
           <FormControlLabel
             control={<Switch checked={true} />}
             label="Teaching Next Semester"

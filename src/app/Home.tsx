@@ -77,15 +77,20 @@ export default function Home(props: Props) {
             4th 7pm.
           </span>
         </a>*/}
-        <Link href="/planner" className="ml-auto rounded-xl">
-          <Button className="bg-cornflower-500 rounded-xl text-white dark:bg-cornflower-400 text p-2 px-4 normal-case">
+        <Link href="/planner" className="ml-auto">
+          <Button
+            variant="contained"
+            disableElevation
+            size="large"
+            className="px-4 normal-case"
+          >
             <BookIcon className="mr-2" />
             My Planner
           </Button>
         </Link>
       </div>
       <div className="max-w-xl grow flex flex-col justify-center">
-        <h2 className="text-sm font-semibold mb-3 text-cornflower-600 dark:text-cornflower-400 tracking-wider flex gap-1 items-center">
+        <h2 className="text-sm font-semibold mb-3 text-royal dark:text-cornflower-300 tracking-wider flex gap-1 items-center">
           <span className="leading-none">POWERED BY</span>
           {}
           <a
@@ -94,7 +99,7 @@ export default function Home(props: Props) {
             rel="noopener"
             className="underline decoration-transparent hover:decoration-inherit transition flex gap-1 items-center"
           >
-            <NebulaLogo className="h-4 w-auto fill-cornflower-600 dark:fill-cornflower-400" />
+            <NebulaLogo className="h-4 w-auto fill-royal dark:fill-cornflower-300" />
             <span className="leading-none">NEBULA LABS</span>
           </a>
         </h2>
@@ -113,14 +118,7 @@ export default function Home(props: Props) {
         />
         {/* Teaching Next Semester switch*/}
         <Tooltip title="Select Availability" placement="bottom-start">
-          <FormControl
-            size="small"
-            className={`min-w-max flex-row items-center ${
-              filterNextSem == 'true'
-                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
-                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
-            }`}
-          >
+          <FormControl size="small" className="min-w-max flex-row items-center">
             <FormControlLabel
               control={
                 <Switch

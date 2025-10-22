@@ -135,7 +135,12 @@ export default function TopMenu(props: Props) {
           }
           className="ml-auto rounded-xl"
         >
-          <Button className="bg-cornflower-500 rounded-xl text-white dark:bg-cornflower-400 text p-2 px-4 normal-case">
+          <Button
+            variant="contained"
+            disableElevation
+            size="large"
+            className="px-4 normal-case"
+          >
             <BookIcon className="mr-2" />
             {props.isPlanner ? 'Search Results' : 'My Planner'}
           </Button>
@@ -149,14 +154,14 @@ export default function TopMenu(props: Props) {
               <div
                 className={
                   tutorialHint
-                    ? 'absolute w-11 h-11 rounded-full bg-royal dark:bg-cornflower-400 animate-ping'
+                    ? 'absolute w-11 h-11 rounded-full bg-royal dark:bg-cornflower-300 animate-ping'
                     : 'hidden'
                 }
               />
               <div
                 className={
                   tutorialHint
-                    ? ' rounded-full bg-royal dark:bg-cornflower-400'
+                    ? ' rounded-full bg-royal dark:bg-cornflower-300'
                     : ''
                 }
               >
