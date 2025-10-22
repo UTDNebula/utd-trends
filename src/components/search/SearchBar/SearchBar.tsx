@@ -26,6 +26,7 @@ import { useSharedState } from '@/app/SharedStateProvider';
 import untyped_professor_to_alias from '@/data/professor_to_alias.json';
 import {
   decodeSearchQueryLabel,
+  isCourseQuery,
   removeDuplicates,
   type SearchQuery,
   searchQueryEqual,
@@ -117,7 +118,7 @@ interface Props {
  * Styled for the splash page
  */
 export default function SearchBar(props: Props) {
-  const { courseNames } = useSharedState();
+  const { courseNames, setCourseNames } = useSharedState();
 
   //for spinner after router.push
   const [isPending, startTransition] = useTransition();
@@ -192,6 +193,14 @@ export default function SearchBar(props: Props) {
       // do not initiate a new search when the searchTerms haven't changed
       return;
     setErrorTooltip(!newValue.length);
+    newValue.forEach((v) => {
+      if (isCourseQuery(v)) {
+        courseNames[searchQueryLabel(v)] =
+          options.find((o) => o.prefix === v.prefix && o.number === v.number)
+            ?.subtitle ?? courseNames[searchQueryLabel(v)];
+      }
+    });
+    setCourseNames({ ...courseNames });
     if (typeof props.onSelect !== 'undefined') {
       props.onSelect(newValue);
     }
@@ -479,7 +488,6 @@ export default function SearchBar(props: Props) {
               variant="outlined"
               className={props.input_className}
               placeholder="ex. GOVT 2306"
-              //eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus={props.autoFocus}
             />
           );
