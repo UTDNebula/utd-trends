@@ -11,6 +11,7 @@ import { displaySemesterName } from '@/modules/semesters';
 import {
   convertToCourseOnly,
   removeSection,
+  searchQueryEqual,
   searchQueryLabel,
   searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
@@ -49,11 +50,28 @@ export default function PlannerCoursesTable() {
     }
     setOpenConflictMessage(false);
   };
-  const allResults = useSearchresults(planner);
+  const allCourseResults = useSearchresults(planner);
+  const allResults = planner.map((p) => {
+  const found = allCourseResults.find((course) => 
+      course.isSuccess && searchQueryEqual(course.data?.searchQuery, convertToCourseOnly(p))
+    );
+    
+    if (!found || !found.data) return found;
+    
+    return {
+      ...found,
+      data: {
+        ...found.data,
+        searchQuery: p
+      }
+    };
+  });
+
   const latestSections = allResults.map((r) =>
-    r.isSuccess
+    r && r.isSuccess
       ? r.data.sections.filter(
-          (s) => s.academic_session.name === latestSemester,
+          (s) => s.academic_session.name === latestSemester 
+          && s.professor_details && s.professor_details.last_name == r.data.searchQuery.profLast && s.professor_details.first_name == r.data.searchQuery.profFirst, // filter only sections of that prof
         )
       : [],
   );

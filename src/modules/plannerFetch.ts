@@ -1,7 +1,9 @@
 'use client';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
+  convertToCourseOnly,
   removeSection,
+  searchQueryEqual,
   searchQueryLabel,
   type SearchQuery,
   type SearchResult,
@@ -40,7 +42,12 @@ export function useSearchResult(query: SearchQuery) {
 }
 export function useSearchresults(queries: SearchQuery[]) {
   const queriesHook = useQueries({
-    queries: queries.map((q) => {
+    queries: queries.map((q) => convertToCourseOnly(q)).filter( // only call each course once, api will get all the sections for that course
+      (q, index, self) =>
+        index === self.findIndex((query) => 
+          searchQueryEqual(q, query)
+        )
+    ).map((q) => {
       return {
         queryKey: ['results', searchQueryLabel(removeSection(q))],
         queryFn: async () => {
