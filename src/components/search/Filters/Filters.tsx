@@ -14,18 +14,19 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { usePathname, useSearchParams } from 'next/navigation';
-import React from 'react';
+import React, { use, useMemo } from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import { compareSemesters, displaySemesterName } from '@/modules/semesters';
-import useHasHydrated from '@/modules/useHasHydrated';
 import {
-  convertToProfOnly,
-  decodeSearchQueryLabel,
-  searchQueryLabel,
-} from '@/types/SearchQuery';
+  compareSemesters,
+  displaySemesterName,
+  getSemestersFromSearchResults,
+} from '@/modules/semesters';
+import type { SearchResult } from '@/types/SearchQuery';
+import { FiltersContext } from '@/app/dashboard/FilterContext';
+import { calculateGrades } from '@/modules/fetchGrades';
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
@@ -85,27 +86,24 @@ export function LoadingFilters() {
 /**
  * This component returns a set of filters with which to sort results.
  */
-export default function Filters() {
-  const {
-    semesters,
-    chosenSemesters,
-    setChosenSemesters,
-    latestSemester,
-    grades,
-    rmp,
-  } = useSharedState();
+export default function Filters({
+  searchResultsPromise,
+}: {
+  searchResultsPromise: Promise<SearchResult[]>;
+}) {
+  const { latestSemester, compare } = useSharedState();
+  const searchResults = use(searchResultsPromise);
+  const semesters = useMemo(() => {
+    return getSemestersFromSearchResults(searchResults.concat(compare));
+  }, [searchResults, compare]);
+  const chosenSemesters = use(FiltersContext).chosenSemesters;
+  const setChosenSemesters = use(FiltersContext).setChosenSemesters;
 
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
-
-  // To avoid hydration errors
-  const hasHydrated = useHasHydrated();
-  if (!hasHydrated) {
-    return <LoadingFilters />;
-  }
 
   let minGPA = searchParams.get('minGPA') ?? '';
   if (Array.isArray(minGPA)) {
@@ -152,38 +150,32 @@ export default function Filters() {
 
   minGPAs.forEach((gpaString) => {
     const gpaNum = parseFloat(gpaString);
-    gradeCounts[gpaString] = Object.entries(grades).filter(([key, value]) => {
-      const courseGrades = value;
-      const profRatings =
-        rmp?.[searchQueryLabel(convertToProfOnly(decodeSearchQueryLabel(key)))];
-      const passesRating =
-        !minRating ||
-        (profRatings?.message === 'success' &&
-          profRatings.data.avgRating >= parseFloat(minRating));
-      return (
-        courseGrades &&
-        courseGrades.message === 'success' &&
-        courseGrades.data.filtered.gpa >= gpaNum &&
-        passesRating
-      );
+    gradeCounts[gpaString] = searchResults.filter((result) => {
+      if (result.type !== 'course') {
+        if (
+          typeof minRating === 'string' &&
+          result.RMP &&
+          result.RMP.avgRating < parseFloat(minRating)
+        )
+          return false;
+      }
+      const courseGrades = result.grades;
+      return courseGrades && calculateGrades(courseGrades).gpa >= gpaNum;
     }).length;
   });
 
   minRatings.forEach((ratingString) => {
     const ratingNum = parseFloat(ratingString);
-    rmpCounts[ratingString] = Object.entries(grades).filter(([key, value]) => {
-      const profRatings =
-        rmp?.[searchQueryLabel(convertToProfOnly(decodeSearchQueryLabel(key)))];
-      const courseGrades = value;
-      const passesGPA =
-        !minGPA ||
-        (courseGrades?.message === 'success' &&
-          courseGrades.data.filtered.gpa >= parseFloat(minGPA));
+    rmpCounts[ratingString] = searchResults.filter((result) => {
+      if (
+        typeof minGPA === 'string' &&
+        calculateGrades(result.grades, chosenSemesters).gpa < parseFloat(minGPA)
+      )
+        return false;
       return (
-        profRatings &&
-        profRatings.message === 'success' &&
-        profRatings.data.avgRating >= ratingNum &&
-        passesGPA
+        result.type !== 'course' &&
+        result.RMP &&
+        result.RMP.avgRating >= ratingNum
       );
     }).length;
   });
@@ -326,7 +318,7 @@ export default function Filters() {
               labelId="Semesters"
               multiple
               value={chosenSemesters}
-              onChange={(event: SelectChangeEvent<string[]>) => {
+              onChange={(event) => {
                 const {
                   target: { value },
                 } = event;
@@ -445,11 +437,9 @@ export default function Filters() {
                 />
               }
               label={
-                'Teaching ' +
-                (typeof latestSemester !== 'undefined' &&
-                latestSemester.message === 'success'
-                  ? 'in ' + displaySemesterName(latestSemester.data, false)
-                  : 'Next Semester')
+                latestSemester == ''
+                  ? 'Teaching Next Semester'
+                  : 'Teaching in ' + displaySemesterName(latestSemester, false)
               }
             />
           </FormControl>

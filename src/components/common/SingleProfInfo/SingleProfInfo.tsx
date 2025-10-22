@@ -6,7 +6,6 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 
 import type { RMP } from '@/modules/fetchRmp';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 
 export function LoadingSingleProfInfo() {
   const loadingTags = [
@@ -69,30 +68,22 @@ export function LoadingSingleProfInfo() {
 }
 
 type Props = {
-  rmp: GenericFetchedData<RMP>;
+  rmp: RMP;
 };
 
 export default function SingleProfInfo({ rmp }: Props) {
   const [showMore, setShowMore] = useState(false);
 
-  if (typeof rmp === 'undefined' || rmp.message !== 'success') {
-    return null;
-  }
-
-  if (rmp.data.numRatings == 0) {
+  if (rmp.numRatings == 0) {
     return (
       <Grid container spacing={2} className="p-4">
         <Grid size={6}>
-          <p className="text-xl font-bold">
-            {rmp.data.numRatings.toLocaleString()}
-          </p>
+          <p className="text-xl font-bold">{rmp.numRatings.toLocaleString()}</p>
           <p>Ratings given</p>
         </Grid>
         <Grid size={12}>
           <Link
-            href={
-              'https://www.ratemyprofessors.com/professor/' + rmp.data.legacyId
-            }
+            href={'https://www.ratemyprofessors.com/professor/' + rmp.legacyId}
             target="_blank"
             className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
           >
@@ -103,9 +94,7 @@ export default function SingleProfInfo({ rmp }: Props) {
     );
   }
 
-  const topTags = rmp.data.teacherRatingTags.sort(
-    (a, b) => b.tagCount - a.tagCount,
-  );
+  const topTags = rmp.teacherRatingTags.sort((a, b) => b.tagCount - a.tagCount);
   const first5 = topTags.slice(0, 5);
   const next5 = topTags.slice(5, 10);
 
@@ -113,26 +102,24 @@ export default function SingleProfInfo({ rmp }: Props) {
     <Grid container spacing={2} className="p-4">
       <Grid size={6}>
         <p className="text-xl font-bold">
-          {rmp.data.avgRating > 0 ? rmp.data.avgRating : 'N/A'}
+          {rmp.avgRating > 0 ? rmp.avgRating : 'N/A'}
         </p>
         <p>Professor rating</p>
       </Grid>
       <Grid size={6}>
         <p className="text-xl font-bold">
-          {rmp.data.avgDifficulty > 0 ? rmp.data.avgDifficulty : 'N/A'}
+          {rmp.avgDifficulty > 0 ? rmp.avgDifficulty : 'N/A'}
         </p>
         <p>Difficulty</p>
       </Grid>
       <Grid size={6}>
-        <p className="text-xl font-bold">
-          {rmp.data.numRatings.toLocaleString()}
-        </p>
+        <p className="text-xl font-bold">{rmp.numRatings.toLocaleString()}</p>
         <p>Ratings given</p>
       </Grid>
       <Grid size={6}>
         <p className="text-xl font-bold">
-          {rmp.data.wouldTakeAgainPercent > 0
-            ? rmp.data.wouldTakeAgainPercent.toFixed(0) + '%'
+          {rmp.wouldTakeAgainPercent > 0
+            ? rmp.wouldTakeAgainPercent.toFixed(0) + '%'
             : 'N/A'}
         </p>
         <p>Would take again</p>
@@ -179,9 +166,7 @@ export default function SingleProfInfo({ rmp }: Props) {
 
       <Grid size={12}>
         <Link
-          href={
-            'https://www.ratemyprofessors.com/professor/' + rmp.data.legacyId
-          }
+          href={'https://www.ratemyprofessors.com/professor/' + rmp.legacyId}
           target="_blank"
           className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
         >
