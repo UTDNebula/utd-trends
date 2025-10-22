@@ -271,16 +271,20 @@ function GradeAndRmpRow({
     </TableRow>
   );
 }
-type CheckboxRowProps = {
+
+type PlannerRowProps = {
   name: string;
   courses: SearchResult[];
-  removeFromCompare?: (arg0: SearchResult) => void;
   cell_className: string;
   colors: string[];
   orderBy: string;
   order: 'asc' | 'desc';
-  handleClick?: (arg0: string) => void;
 };
+type CheckboxRowProps = PlannerRowProps & {
+  removeFromCompare: (arg0: SearchResult) => void;
+  handleClick: (arg0: string) => void;
+};
+
 // This is for checkboxes to remove courses from the compare table
 function CheckboxRow({
   name,
@@ -299,11 +303,7 @@ function CheckboxRow({
           active={orderBy === name}
           direction={orderBy === name ? order : 'desc'}
           onClick={() => {
-            if (handleClick) {
-              handleClick(name);
-            } else {
-              console.log('Error, handleClick not specified');
-            }
+            handleClick(name);
           }}
           sx={{
             '& .MuiTableSortLabel-icon': {
@@ -328,13 +328,7 @@ function CheckboxRow({
             <Checkbox
               checked={true}
               onClick={() => {
-                if (removeFromCompare) {
-                  removeFromCompare(course);
-                } else {
-                  console.log(
-                    'Error, removeFromCompare function not specified!',
-                  );
-                }
+                removeFromCompare(course);
               }}
               sx={{
                 '&.Mui-checked': {
@@ -354,7 +348,7 @@ function PlannerRow({
   courses,
   cell_className, // for specifying border mostly
   colors, // border colors
-}: CheckboxRowProps) {
+}: PlannerRowProps) {
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
       <TableCell align="right" className="pl-0">
