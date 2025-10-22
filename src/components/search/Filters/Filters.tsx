@@ -115,29 +115,6 @@ export default function Filters({
   }
   const filterNextSem = searchParams.get('availability') === 'true';
 
-  const filteredResults = useMemo(
-    () =>
-      searchResults.filter((result) => {
-        if (
-          typeof minGPA === 'string' &&
-          calculateGrades(result.grades, chosenSemesters).gpa <
-            parseFloat(minGPA)
-        )
-          return false;
-
-        // check if this search result should have RMP data
-        if (result.type !== 'course') {
-          if (
-            typeof minRating === 'string' &&
-            result.RMP &&
-            result.RMP.avgRating < parseFloat(minRating)
-          )
-            return false;
-        }
-        return true;
-      }),
-    [searchResults, minGPA, minRating, chosenSemesters],
-  );
   function getRecentSemesters() {
     // get current month and year
     const today = new Date();
@@ -173,15 +150,28 @@ export default function Filters({
 
   minGPAs.forEach((gpaString) => {
     const gpaNum = parseFloat(gpaString);
-    gradeCounts[gpaString] = filteredResults.filter((value) => {
-      const courseGrades = value.grades;
+    gradeCounts[gpaString] = searchResults.filter((result) => {
+      if (result.type !== 'course') {
+        if (
+          typeof minRating === 'string' &&
+          result.RMP &&
+          result.RMP.avgRating < parseFloat(minRating)
+        )
+          return false;
+      }
+      const courseGrades = result.grades;
       return courseGrades && calculateGrades(courseGrades).gpa >= gpaNum;
     }).length;
   });
 
   minRatings.forEach((ratingString) => {
     const ratingNum = parseFloat(ratingString);
-    rmpCounts[ratingString] = filteredResults.filter((result) => {
+    rmpCounts[ratingString] = searchResults.filter((result) => {
+      if (
+        typeof minGPA === 'string' &&
+        calculateGrades(result.grades, chosenSemesters).gpa < parseFloat(minGPA)
+      )
+        return false;
       return (
         result.type !== 'course' &&
         result.RMP &&
