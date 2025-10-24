@@ -63,9 +63,9 @@ export default function Home(props: Props) {
         className="object-cover -z-20"
       />
       <div className="absolute top-4 left-4 right-4 flex gap-2 place-content-between flex-wrap-reverse">
-        {/*Ad for Kickoff*/}
-        {/*<a
-          href="https://discord.utdnebula.com/"
+        {/*Banner for Spring 2026*/}
+        <a
+          href="https://dacs-prd.utshare.utsystem.edu/psp/DACSPRD/?cmd=start"
           target="_blank"
           rel="noreferrer"
           className="bg-royal dark:bg-cornflower-300 text-cornflower-50 dark:text-haiti py-3 px-5 rounded transition hover:scale-[1.01] text-center flex gap-2 items-center mr-auto"
@@ -80,11 +80,13 @@ export default function Home(props: Props) {
             src="/icon-white.svg"
             alt=""
           />
-          <span>
-            Want to contribute? Come to the <b>Nebula Labs Kickoff</b> on Sept
-            4th 7pm.
-          </span>
-        </a>*/}
+          <div className="flex flex-col">
+            <span className="text-left">
+              <b>Spring 2026</b> courses are now in Trends!
+            </span>
+            <span>Make sure you clear your holds in Orion :)</span>
+          </div>
+        </a>
         <Link href="/planner" className="ml-auto rounded-xl">
           <Button className="bg-cornflower-500 rounded-xl text-white dark:bg-cornflower-400 text p-2 px-4 normal-case">
             <BookIcon className="mr-2" />
