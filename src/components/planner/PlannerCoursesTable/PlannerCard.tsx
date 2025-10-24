@@ -373,6 +373,9 @@ export default function PlannerCard(props: PlannerCardProps) {
     }
   }
   const allSections = result.sections;
+  console.log("a", result.sections)
+  const latestMatchedSections = {...result, sections: result.sections.filter((section) => section.professor_details && section.professor_details[0]?.first_name == props.query.profFirst && section.professor_details[0]?.last_name == props.query.profLast)}
+  console.log("b", props.query.profFirst, props.query.profLast, latestMatchedSections.sections)
   const bestSyllabus = allSections
     .filter((s) => !!s.syllabus_uri && !!s.academic_session?.start_date)
     .sort(
@@ -381,13 +384,13 @@ export default function PlannerCard(props: PlannerCardProps) {
         new Date(a.academic_session.start_date).getTime(),
     )?.[0]?.syllabus_uri;
   const hasMultipleDateRanges =
-    typeof result.sections !== 'undefined' && result.sections.length >= 1
-      ? result.sections.some(
+    typeof latestMatchedSections.sections !== 'undefined' && latestMatchedSections.sections.length >= 1
+      ? latestMatchedSections.sections.some(
           (section) =>
             section.meetings[0].start_date !==
-              result.sections![0].meetings[0].start_date ||
+              latestMatchedSections.sections![0].meetings[0].start_date ||
             section.meetings[0].end_date !==
-              result.sections![0].meetings[0].end_date,
+              latestMatchedSections.sections![0].meetings[0].end_date,
         )
       : false;
   return (
@@ -510,7 +513,7 @@ export default function PlannerCard(props: PlannerCardProps) {
         <MeetingChip
           color={props.color}
           meetings={
-            result.sections.find(
+            latestMatchedSections.sections.find(
               (section) =>
                 !sectionCanOverlap(section.section_number) &&
                 props.query.sectionNumbers?.includes(section.section_number),
@@ -533,13 +536,13 @@ export default function PlannerCard(props: PlannerCardProps) {
                 />
               </TableHead>
               <TableBody>
-                {result.sections.map((section, index) => (
+                {latestMatchedSections.sections.map((section, index) => (
                   <SectionTableRow
                     key={section._id}
                     data={section}
                     bestSyllabus={bestSyllabus}
                     course={props.query}
-                    lastRow={index === result.sections.length - 1}
+                    lastRow={index === latestMatchedSections.sections.length - 1}
                     setPlannerSection={props.setPlannerSection}
                     selectedSections={props.selectedSections}
                     openConflictMessage={props.openConflictMessage}

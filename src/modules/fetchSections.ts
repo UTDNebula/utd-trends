@@ -43,8 +43,8 @@ export type SectionsData = {
   syllabus_uri: string;
   grade_distribution: number[];
   attributes: unknown;
-  course_details?: Course
-  professor_details?: Professor
+  course_details?: Course[]
+  professor_details?: Professor[]
 }[];
 
 export type Sections = {

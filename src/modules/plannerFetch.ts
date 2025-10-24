@@ -31,7 +31,7 @@ async function fetchSearchResult(query: SearchQuery) {
 
 export function useSearchResult(query: SearchQuery) {
   const queryHook = useQuery({
-    queryKey: ['results', searchQueryLabel(removeSection(query))],
+    queryKey: ['results', searchQueryLabel(convertToCourseOnly(removeSection(query)))],
     queryFn: async () => {
       const data = await fetchSearchResult(query);
       return data;
@@ -42,14 +42,9 @@ export function useSearchResult(query: SearchQuery) {
 }
 export function useSearchresults(queries: SearchQuery[]) {
   const queriesHook = useQueries({
-    queries: queries.map((q) => convertToCourseOnly(q)).filter( // only call each course once, api will get all the sections for that course
-      (q, index, self) =>
-        index === self.findIndex((query) => 
-          searchQueryEqual(q, query)
-        )
-    ).map((q) => {
+    queries: queries.map((q) => {
       return {
-        queryKey: ['results', searchQueryLabel(removeSection(q))],
+        queryKey: ['results', searchQueryLabel(convertToCourseOnly(removeSection(q)))],
         queryFn: async () => {
           return await fetchSearchResult(q);
         },
