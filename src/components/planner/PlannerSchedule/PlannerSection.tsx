@@ -1,4 +1,5 @@
 import { Tooltip } from '@mui/material';
+import { KeyboardArrowDown } from '@mui/icons-material';
 import React, { useState } from 'react';
 
 import {
@@ -280,12 +281,11 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               (makeBigger ? '' : 'leading-none')
             }
           >
-            {props.placeholder
-              ? 'MULTIPLE SECTIONS'
-              : `${selectedSection.meetings[0]?.location?.building} ${selectedSection.meetings[0]?.location?.room}`}
-            {props.placeholder
-              ? ''
-              : selectedSection.meetings[0]?.location?.room}
+            {props.placeholder ? (
+              <KeyboardArrowDown className="mx-auto -my-1" />
+            ) : (
+              `${selectedSection.meetings[0]?.location?.building} ${selectedSection.meetings[0]?.location?.room}`
+            )}
           </div>
         </button>
       </Tooltip>
