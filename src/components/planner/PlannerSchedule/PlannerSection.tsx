@@ -9,6 +9,7 @@ import type { Sections } from '@/modules/fetchSections';
 import { type SearchQuery } from '@/types/SearchQuery';
 
 interface PlannerSectionComponentProps {
+  scoot?: number;
   selectedSection: Sections['all'][number] | undefined;
   course: SearchQuery;
   color: { fill: string; outline: string; font: string; filter?: string };
@@ -16,7 +17,11 @@ interface PlannerSectionComponentProps {
   isPreview?: boolean;
   nooffset?: boolean;
   placeholder?: boolean;
-  onSectionClick?: (course: SearchQuery, sectionNumber: string) => void;
+  onSectionClick?: (
+    course: SearchQuery,
+    sectionNumber: string,
+    event?: React.MouseEvent,
+  ) => void;
   onSectionHover?: (
     course: SearchQuery,
     sectionNumber: string,
@@ -61,6 +66,8 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
           color: currentColor.font,
           filter: currentColor.filter,
         }}
+        role="button"
+        tabIndex={0}
         onMouseEnter={() => {
           if (props.isPreview) {
             setIsHovered(true);
@@ -81,9 +88,24 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
             );
           }
         }}
-        onClick={() => {
+        onClick={(event) => {
           if (props.isPreview && props.onSectionClick && selectedSection) {
-            props.onSectionClick(props.course, selectedSection.section_number);
+            props.onSectionClick(
+              props.course,
+              selectedSection.section_number,
+              event,
+            );
+          }
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            if (props.isPreview && props.onSectionClick && selectedSection) {
+              props.onSectionClick(
+                props.course,
+                selectedSection.section_number,
+              );
+            }
           }
         }}
       >
@@ -224,11 +246,12 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               );
             }
           }}
-          onClick={() => {
+          onClick={(event) => {
             if (props.isPreview && props.onSectionClick && selectedSection) {
               props.onSectionClick(
                 props.course,
                 selectedSection.section_number,
+                event,
               );
             }
           }}
@@ -239,15 +262,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               (makeBigger ? 'text-sm' : 'text-xs leading-none')
             }
           >
-            {props.placeholder ? (
-              <>
-                MULTIPLE
-                <br />
-                SECTIONS
-              </>
-            ) : (
-              `${props.course.prefix} ${props.course.number}.${selectedSection.section_number}`
-            )}
+            {`${props.course.prefix} ${props.course.number}.${selectedSection.section_number}`}
           </div>
           <div
             className={
@@ -264,7 +279,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
             }
           >
             {props.placeholder
-              ? ''
+              ? 'MULTIPLE SECTIONS'
               : `${selectedSection.meetings[0]?.location?.building} ${selectedSection.meetings[0]?.location?.room}`}
             {props.placeholder
               ? ''

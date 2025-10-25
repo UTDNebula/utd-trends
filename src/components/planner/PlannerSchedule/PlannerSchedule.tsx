@@ -111,6 +111,7 @@ export default function PlannerSchedule() {
         }
         return (
           <PlannerSection
+            scoot={0}
             key={searchQueryLabel(course)}
             selectedSection={courseSections.data.latest.find(
               (section) => section.section_number === course.sectionNumber,
@@ -175,18 +176,52 @@ export default function PlannerSchedule() {
 
         const individualSections = filteredSections.flatMap(
           (sectionGroup, index) => {
-            return (
-              <PreviewSectionGroup
-                key={`preview-group-${searchQueryLabel(removeSection(previewCourse))}-${index}`}
-                sectionGroup={sectionGroup}
-                previewCourse={previewCourse}
-                courseNames={courseNames}
-                plannerColorMap={plannerColorMap}
-                setPlannerSection={setPlannerSection}
-                showConflictMessage={showConflictMessage}
-                index={index}
-              />
-            );
+            const courseKey = searchQueryLabel(removeSection(previewCourse));
+
+            if (sectionGroup.length > 1) {
+              return (
+                <PreviewSectionGroup
+                  key={`preview-group-${courseKey}-${index}`}
+                  sectionGroup={sectionGroup}
+                  previewCourse={previewCourse}
+                  courseNames={courseNames}
+                  plannerColorMap={plannerColorMap}
+                  setPlannerSection={setPlannerSection}
+                  showConflictMessage={showConflictMessage}
+                  index={index}
+                />
+              );
+            } else {
+              const section = sectionGroup[0];
+              const previewCourseWithSection = {
+                ...previewCourse,
+                sectionNumber: section.section_number,
+              };
+              const courseKey = searchQueryLabel(
+                convertToCourseOnly(previewCourseWithSection),
+              );
+              const properCourseName = courseNames[courseKey];
+              const color = plannerColorMap[courseKey];
+
+              return (
+                <PlannerSection
+                  key={`preview-single-${searchQueryLabel(removeSection(previewCourse))}-${section._id}-${index}`}
+                  selectedSection={section}
+                  course={previewCourseWithSection}
+                  color={color}
+                  courseName={properCourseName}
+                  isPreview={true}
+                  onSectionClick={(course, sectionNumber) => {
+                    setPlannerSection(
+                      course,
+                      sectionNumber,
+                      section,
+                      showConflictMessage,
+                    );
+                  }}
+                />
+              );
+            }
           },
         );
         return individualSections;

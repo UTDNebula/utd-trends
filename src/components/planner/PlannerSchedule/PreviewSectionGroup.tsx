@@ -1,13 +1,14 @@
+import { Popover } from '@mui/material';
 import React, { useState } from 'react';
 
 import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection';
 import type { SectionsData } from '@/modules/fetchSections';
+import type { SearchQuery } from '@/types/SearchQuery';
 import {
   convertToCourseOnly,
   removeSection,
   searchQueryLabel,
 } from '@/types/SearchQuery';
-import type { SearchQuery } from '@/types/SearchQuery';
 
 interface PreviewSectionGroupProps {
   sectionGroup: SectionsData;
@@ -36,9 +37,8 @@ export default function PreviewSectionGroup({
   showConflictMessage,
   index,
 }: PreviewSectionGroupProps) {
-  const [isHovered, setIsHovered] = useState(false);
+  const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null);
 
-  // Only display the first section in the group
   const firstSection = sectionGroup[0];
   if (!firstSection) {
     return null;
@@ -64,49 +64,64 @@ export default function PreviewSectionGroup({
         color={color}
         courseName={properCourseName}
         isPreview={true}
-        onSectionClick={() => {
-          setIsHovered(!isHovered);
+        onSectionClick={(course, sectionNumber, event) => {
+          const targetElement = event?.currentTarget as HTMLElement;
+          setPopoverAnchor(targetElement);
         }}
-        // onSectionHover={() => {
-        //   setIsHovered(!isHovered);
-        // }}
       />
 
-      {isHovered && (
-        <>
-          {sectionGroup.map((section) => {
-            const previewCourseWithSection = {
-              ...previewCourse,
-              sectionNumber: section.section_number,
-            };
-            const courseKey = searchQueryLabel(
-              convertToCourseOnly(previewCourseWithSection),
-            );
-            const properCourseName = courseNames[courseKey];
-            const color = plannerColorMap[courseKey];
+      <Popover
+        open={Boolean(popoverAnchor)}
+        anchorEl={popoverAnchor}
+        onClose={() => setPopoverAnchor(null)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        PaperProps={{
+          style: {
+            backgroundColor: 'black',
+          },
+        }}
+      >
+        {sectionGroup.map((section) => {
+          const previewCourseWithSection = {
+            ...previewCourse,
+            sectionNumber: section.section_number,
+          };
+          const courseKey = searchQueryLabel(
+            convertToCourseOnly(previewCourseWithSection),
+          );
+          const properCourseName = courseNames[courseKey];
+          const color = plannerColorMap[courseKey];
 
-            return (
-              <PlannerSection
-                key={`preview-${searchQueryLabel(removeSection(previewCourse))}-${section._id}-${index}`}
-                nooffset={sectionGroup.length > 1 ? true : false}
-                selectedSection={section}
-                course={previewCourseWithSection}
-                color={color}
-                courseName={properCourseName}
-                isPreview={true}
-                onSectionClick={(course, sectionNumber) => {
-                  setPlannerSection(
-                    course,
-                    sectionNumber,
-                    section,
-                    showConflictMessage,
-                  );
-                }}
-              />
-            );
-          })}
-        </>
-      )}
+          return (
+            <PlannerSection
+              scoot={1}
+              key={`preview-${searchQueryLabel(removeSection(previewCourse))}-${section._id}-${index}`}
+              nooffset={true}
+              selectedSection={section}
+              course={previewCourseWithSection}
+              color={color}
+              courseName={properCourseName}
+              isPreview={true}
+              onSectionClick={(course, sectionNumber) => {
+                setPlannerSection(
+                  course,
+                  sectionNumber,
+                  section,
+                  showConflictMessage,
+                );
+                setPopoverAnchor(null); // Close popover after selection
+              }}
+            />
+          );
+        })}
+      </Popover>
     </>
   );
 }

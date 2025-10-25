@@ -21,7 +21,7 @@ export default function SyncServerDataToContext() {
   // Clear preview courses on component mount, because the tabs will be closed
   useEffect(() => {
     setPreviewCourses([]);
-  }, []);
+  }, [setPreviewCourses]);
 
   useEffect(() => {
     if (hasHydrated) {
