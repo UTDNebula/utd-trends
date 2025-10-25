@@ -9,9 +9,9 @@ import { parseTime } from '@/modules/timeUtils';
 import {
   convertToCourseOnly,
   removeSection,
+  type SearchQuery,
   searchQueryLabel,
   searchQueryMultiSectionSplit,
-  type SearchQuery,
 } from '@/types/SearchQuery';
 
 // hours shown (24-hour time)
