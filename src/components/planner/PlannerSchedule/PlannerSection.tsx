@@ -215,17 +215,19 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               '--start-row': x[1],
               '--offset': x[3] + '%',
               '--height': x[2] + '%',
+              '--left-offset': props.scoot ? `${props.scoot * 8}%` : '0%',
               backgroundColor: currentColor.fill,
               borderColor: currentColor.outline,
               color: currentColor.font,
               filter: currentColor.filter,
+              zIndex: props.scoot || 0,
             } as React.CSSProperties
           }
           className={`col-start-[var(--start-col)] col-span-1 
             row-start-[var(--start-row)] row-span-1 relative 
             top-[var(--offset)] h-[var(--height)] overflow-hidden 
             rounded-xl border-2
-            ml-1 leading-relaxed ${props.isPreview ? 'cursor-pointer' : ''}`}
+            ml-[var(--left-offset)] leading-relaxed ${props.isPreview ? 'cursor-pointer' : ''}`}
           onMouseEnter={() => {
             if (props.isPreview) {
               setIsHovered(true);

@@ -10,6 +10,7 @@ import {
   removeSection,
   searchQueryLabel,
   searchQueryMultiSectionSplit,
+  type SearchQuery,
 } from '@/types/SearchQuery';
 
 // hours shown (24-hour time)
@@ -128,23 +129,29 @@ export default function PlannerSchedule() {
       })}
 
       {/* Preview Sessions Overlay */}
-      {previewCourses.flatMap((previewCourse) => {
-        const courseSections =
-          sections[searchQueryLabel(removeSection(previewCourse))];
-        if (
-          typeof courseSections === 'undefined' ||
-          courseSections.message !== 'success'
-        ) {
-          return [];
-        }
-        // filter out sections that are already in the planner
-        const selectedSectionNumbers = planner
-          .flatMap((searchQuery) => searchQueryMultiSectionSplit(searchQuery))
-          .map((course) => course.sectionNumber)
-          .filter(Boolean);
+      {(() => {
+        // Collect all sections from all courses into a flat array
+        const allSections: Array<{
+          section: SectionsData[number];
+          previewCourse: SearchQuery;
+        }> = [];
 
-        const filteredSections = Object.values(
-          courseSections.data.latest
+        previewCourses.forEach((previewCourse) => {
+          const courseSections =
+            sections[searchQueryLabel(removeSection(previewCourse))];
+          if (
+            typeof courseSections === 'undefined' ||
+            courseSections.message !== 'success'
+          ) {
+            return;
+          }
+          // filter out sections that are already in the planner
+          const selectedSectionNumbers = planner
+            .flatMap((searchQuery) => searchQueryMultiSectionSplit(searchQuery))
+            .map((course) => course.sectionNumber)
+            .filter(Boolean);
+
+          const filteredSections = courseSections.data.latest
             .filter(
               (section) =>
                 !selectedSectionNumbers.includes(section.section_number),
@@ -152,80 +159,96 @@ export default function PlannerSchedule() {
             .filter((section) => {
               const selectedSections = getSelectedSections(planner, sections);
               return !hasConflict(section, selectedSections);
-            })
-            // group sections by the same meeting times
-            .reduce(
-              (acc, section) => {
-                const key = section.meetings
-                  .map(
-                    (meeting) =>
-                      meeting.meeting_days.sort().join(',') +
-                      meeting.start_time +
-                      meeting.end_time,
-                  )
-                  .join('-');
-                if (!acc[key]) {
-                  acc[key] = [];
-                }
-                acc[key].push(section);
-                return acc;
-              },
-              {} as Record<string, SectionsData>,
-            ),
+            });
+
+          // Add all sections to the flat array
+          filteredSections.forEach((section) => {
+            allSections.push({
+              section,
+              previewCourse,
+            });
+          });
+        });
+
+        // Now group the flat array by meeting times
+        const groupedSections = Object.values(
+          allSections.reduce(
+            (acc, { section, previewCourse }) => {
+              const key = section.meetings
+                .map(
+                  (meeting) =>
+                    meeting.meeting_days.sort().join(',') +
+                    meeting.start_time +
+                    meeting.end_time,
+                )
+                .join('-');
+              if (!acc[key]) {
+                acc[key] = [];
+              }
+              acc[key].push({ section, previewCourse });
+              return acc;
+            },
+            {} as Record<
+              string,
+              Array<{
+                section: SectionsData[number];
+                previewCourse: SearchQuery;
+              }>
+            >,
+          ),
         );
 
-        const individualSections = filteredSections.flatMap(
-          (sectionGroup, index) => {
-            const courseKey = searchQueryLabel(removeSection(previewCourse));
+        return groupedSections.flatMap((sectionGroup, index) => {
+          const firstItem = sectionGroup[0];
+          const previewCourse = firstItem?.previewCourse;
+          const courseKey = searchQueryLabel(removeSection(previewCourse));
 
-            if (sectionGroup.length > 1) {
-              return (
-                <PreviewSectionGroup
-                  key={`preview-group-${courseKey}-${index}`}
-                  sectionGroup={sectionGroup}
-                  previewCourse={previewCourse}
-                  courseNames={courseNames}
-                  plannerColorMap={plannerColorMap}
-                  setPlannerSection={setPlannerSection}
-                  showConflictMessage={showConflictMessage}
-                  index={index}
-                />
-              );
-            } else {
-              const section = sectionGroup[0];
-              const previewCourseWithSection = {
-                ...previewCourse,
-                sectionNumber: section.section_number,
-              };
-              const courseKey = searchQueryLabel(
-                convertToCourseOnly(previewCourseWithSection),
-              );
-              const properCourseName = courseNames[courseKey];
-              const color = plannerColorMap[courseKey];
+          if (sectionGroup.length > 1) {
+            return (
+              <PreviewSectionGroup
+                key={`preview-group-${courseKey}-${index}`}
+                sectionGroup={sectionGroup.map((item) => item.section)}
+                previewCourse={previewCourse}
+                courseNames={courseNames}
+                plannerColorMap={plannerColorMap}
+                setPlannerSection={setPlannerSection}
+                showConflictMessage={showConflictMessage}
+                index={index}
+              />
+            );
+          } else {
+            const section = sectionGroup[0]?.section;
+            const previewCourseWithSection = {
+              ...previewCourse,
+              sectionNumber: section?.section_number,
+            };
+            const courseKey = searchQueryLabel(
+              convertToCourseOnly(previewCourseWithSection),
+            );
+            const properCourseName = courseNames[courseKey];
+            const color = plannerColorMap[courseKey];
 
-              return (
-                <PlannerSection
-                  key={`preview-single-${searchQueryLabel(removeSection(previewCourse))}-${section._id}-${index}`}
-                  selectedSection={section}
-                  course={previewCourseWithSection}
-                  color={color}
-                  courseName={properCourseName}
-                  isPreview={true}
-                  onSectionClick={(course, sectionNumber) => {
-                    setPlannerSection(
-                      course,
-                      sectionNumber,
-                      section,
-                      showConflictMessage,
-                    );
-                  }}
-                />
-              );
-            }
-          },
-        );
-        return individualSections;
-      })}
+            return (
+              <PlannerSection
+                key={`preview-single-${searchQueryLabel(removeSection(previewCourse))}-${section?._id}-${index}`}
+                selectedSection={section}
+                course={previewCourseWithSection}
+                color={color}
+                courseName={properCourseName}
+                isPreview={true}
+                onSectionClick={(course, sectionNumber) => {
+                  setPlannerSection(
+                    course,
+                    sectionNumber,
+                    section,
+                    showConflictMessage,
+                  );
+                }}
+              />
+            );
+          }
+        });
+      })()}
     </div>
   );
 }
