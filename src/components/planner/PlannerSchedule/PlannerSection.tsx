@@ -62,7 +62,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
         className="p-2 rounded-xl border-2 m-1 cursor-pointer"
         style={{
           backgroundColor: currentColor.fill,
-          borderColor: currentColor.outline,
+          borderColor: isHovered ? 'red' : currentColor.outline,
           color: currentColor.font,
           filter: currentColor.filter,
         }}
@@ -215,9 +215,9 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               '--start-row': x[1],
               '--offset': x[3] + '%',
               '--height': x[2] + '%',
-              '--left-offset': props.scoot ? `${props.scoot * 8}%` : '0%',
+              '--left-offset': props.scoot ? `${props.scoot * 15}%` : '0%',
               backgroundColor: currentColor.fill,
-              borderColor: currentColor.outline,
+              borderColor: isHovered ? 'red' : currentColor.outline,
               color: currentColor.font,
               filter: currentColor.filter,
               zIndex: props.scoot || 0,

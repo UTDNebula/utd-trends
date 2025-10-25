@@ -26,6 +26,7 @@ interface PreviewSectionGroupProps {
   ) => void;
   showConflictMessage: () => void;
   index: number;
+  scoot?: number;
 }
 
 export default function PreviewSectionGroup({
@@ -36,6 +37,7 @@ export default function PreviewSectionGroup({
   setPlannerSection,
   showConflictMessage,
   index,
+  scoot = 0,
 }: PreviewSectionGroupProps) {
   const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null);
 
@@ -64,6 +66,7 @@ export default function PreviewSectionGroup({
         color={color}
         courseName={properCourseName}
         isPreview={true}
+        scoot={scoot}
         onSectionClick={(course, sectionNumber, event) => {
           const targetElement = event?.currentTarget as HTMLElement;
           setPopoverAnchor(targetElement);
@@ -101,7 +104,6 @@ export default function PreviewSectionGroup({
 
           return (
             <PlannerSection
-              scoot={1}
               key={`preview-${searchQueryLabel(removeSection(previewCourse))}-${section._id}-${index}`}
               nooffset={true}
               selectedSection={section}

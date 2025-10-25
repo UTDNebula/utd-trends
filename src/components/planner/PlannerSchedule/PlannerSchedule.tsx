@@ -5,6 +5,7 @@ import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection'
 import PreviewSectionGroup from '@/components/planner/PlannerSchedule/PreviewSectionGroup';
 import { useSnackbar } from '@/contexts/SnackbarContext';
 import type { SectionsData } from '@/modules/fetchSections';
+import { parseTime } from '@/modules/timeUtils';
 import {
   convertToCourseOnly,
   removeSection,
@@ -198,7 +199,61 @@ export default function PlannerSchedule() {
           ),
         );
 
-        return groupedSections.flatMap((sectionGroup, index) => {
+        // Add scoot logic: scoot later sections right.
+        const sectionsWithScoot = groupedSections
+          .sort((a, b) => {
+            const timeA = a[0]?.section?.meetings[0]?.start_time || '';
+            const timeB = b[0]?.section?.meetings[0]?.start_time || '';
+            const daysA = a[0]?.section?.meetings[0]?.meeting_days || [];
+            const daysB = b[0]?.section?.meetings[0]?.meeting_days || [];
+
+            // Convert to comparable format (24-hour) with weekday consideration
+
+            return parseTime(timeA, daysA) - parseTime(timeB, daysB);
+          })
+          .map((sectionGroup, index) => {
+            // Calculate scoot value based on overlapping times
+            let scootCounter = 0;
+
+            const currentSection = sectionGroup[0]?.section;
+            const currentStartTime = currentSection?.meetings[0]?.start_time;
+            const currentDays = currentSection?.meetings[0]?.meeting_days || [];
+
+            // iterate through sections by start time.
+            // basically scoot ="number of sections overlapping with the current section"
+            // when we come across a start, scootCounter++
+            // when we come across an end, scootCounter--
+            for (let i = 0; i < index; i++) {
+              const prevSection = groupedSections[i][0]?.section;
+              const prevEndTime = prevSection?.meetings[0]?.end_time;
+              const prevDays = prevSection?.meetings[0]?.meeting_days || [];
+
+              if (prevEndTime && currentStartTime) {
+                const prevEndMinutes = parseTime(prevEndTime, prevDays);
+                const currentStartMinutes = parseTime(
+                  currentStartTime,
+                  currentDays,
+                );
+
+                // Check if sections meet on the same day and if there's overlap
+                const hasCommonDay = prevDays.some((day) =>
+                  currentDays.includes(day),
+                );
+
+                // If previous section hasn't ended yet and they meet on the same day, increment scoot
+                if (hasCommonDay && prevEndMinutes > currentStartMinutes) {
+                  scootCounter++;
+                }
+              }
+            }
+
+            return {
+              sectionGroup,
+              scoot: scootCounter,
+            };
+          });
+
+        return sectionsWithScoot.flatMap(({ sectionGroup, scoot }, index) => {
           const firstItem = sectionGroup[0];
           const previewCourse = firstItem?.previewCourse;
           const courseKey = searchQueryLabel(removeSection(previewCourse));
@@ -214,6 +269,7 @@ export default function PlannerSchedule() {
                 setPlannerSection={setPlannerSection}
                 showConflictMessage={showConflictMessage}
                 index={index}
+                scoot={scoot}
               />
             );
           } else {
@@ -236,6 +292,7 @@ export default function PlannerSchedule() {
                 color={color}
                 courseName={properCourseName}
                 isPreview={true}
+                scoot={scoot}
                 onSectionClick={(course, sectionNumber) => {
                   setPlannerSection(
                     course,
