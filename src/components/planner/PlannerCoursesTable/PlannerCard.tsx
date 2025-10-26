@@ -373,9 +373,7 @@ export default function PlannerCard(props: PlannerCardProps) {
     }
   }
   const allSections = result.sections;
-  console.log("a", result.sections)
-  const latestMatchedSections = {...result, sections: result.sections.filter((section) => section.professor_details && section.professor_details[0]?.first_name == props.query.profFirst && section.professor_details[0]?.last_name == props.query.profLast)}
-  console.log("b", props.query.profFirst, props.query.profLast, latestMatchedSections.sections)
+  const latestMatchedSections = {...result, sections: result.sections.filter((section) => (!props.query.profFirst && !props.query.profLast) || section.professor_details && section.professor_details[0]?.first_name == props.query.profFirst && section.professor_details[0]?.last_name == props.query.profLast)}
   const bestSyllabus = allSections
     .filter((s) => !!s.syllabus_uri && !!s.academic_session?.start_date)
     .sort(
