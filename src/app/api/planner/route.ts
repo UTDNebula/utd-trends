@@ -36,18 +36,18 @@ export async function GET(request: Request) {
       profFirst: profFirst,
       profLast: profLast,
     });
-    const latest = await fetchLatestSemester();
-    const filteredResult = {
-      ...result,
-      sections: result.sections.filter(
-        (s) => s.academic_session.name === latest,
-      ),
-    };
+    // const latest = await fetchLatestSemester();
+    // const filteredResult = {
+    //   ...result,
+    //   sections: result.sections.filter(
+    //     (s) => s.academic_session.name === latest,
+    //   ),
+    // };
 
     return NextResponse.json(
       {
         message: 'success',
-        data: filteredResult,
+        data: result,
       },
       { status: 200 },
     );
