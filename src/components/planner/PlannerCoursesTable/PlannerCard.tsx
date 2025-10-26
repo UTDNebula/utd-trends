@@ -215,8 +215,15 @@ type SectionTableRowProps = {
 };
 
 function SectionTableRow(props: SectionTableRowProps) {
-  const isSelected =
-    props.course.sectionNumbers?.includes(props.data.section_number) ?? false;
+  const isSelected = props.selectedSections.some(
+    (el) =>
+      el.section_number == props.data.section_number && // check the section number
+      el.course_details?.some( // and also if the course is the same
+        (c) =>
+          c.subject_prefix == props.course.prefix &&
+          c.course_number == props.course.number,
+      ),
+  );
   let syllabusToShow = props.data.syllabus_uri ?? props.bestSyllabus;
   if (syllabusToShow == '') {
     syllabusToShow = props.bestSyllabus;
