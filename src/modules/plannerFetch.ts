@@ -13,6 +13,7 @@ import {
 } from '@/types/SearchQuery';
 import { useQueries, useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { useMemo } from 'react';
+import type { GradesData } from './fetchGrades';
 
 async function fetchSearchResult(query: SearchQuery) {
   const params = new URLSearchParams();
@@ -54,7 +55,7 @@ function mergeHooks(sectionHook : UseQueryResult<SearchResult, Error>, rmpHook :
 }
 
 export function useSearchResult(query: SearchQuery) {
-  const sectionHook = useQuery({
+  let sectionHook = useQuery({
     queryKey: ['results', searchQueryLabel(convertToCourseOnly(removeSection(query)))],
     queryFn: async () => {
       const data = await fetchSearchResult(convertToCourseOnly(query));
@@ -62,7 +63,34 @@ export function useSearchResult(query: SearchQuery) {
     },
     staleTime: 1000 * 60 * 60,
   });
-  
+  if (sectionHook.data)
+    sectionHook = {...sectionHook, data: {...sectionHook.data, grades: sectionHook.data?.sections
+    .filter((section) => (query.profFirst == null && query.profLast == null) || section.professor_details?.find((p) => p.first_name == query.profFirst && p.last_name == query.profLast)) // filter to the professor (or overall)
+    .map((section) => ({ // convert to GradesData form
+      _id: section.academic_session.name,
+      grade_distribution: section.grade_distribution,
+    }))
+    .reduce((acc, curr) => { // group by semester _id
+      const existing = acc.find(item => item._id === curr._id);
+      
+      if (existing) {
+            existing.grade_distribution = existing.grade_distribution.map(
+              (val, idx) => {
+                const currVal = curr.grade_distribution[idx];
+                // check for valid numbers otheriwise it NaN'd
+                return (typeof val === 'number' && typeof currVal === 'number') 
+                  ? val + currVal 
+                  : val;
+              }
+            );
+          } else {
+            acc.push({ ...curr });
+          }
+      
+      return acc;
+    }, [] as GradesData)
+    .filter(d => d.grade_distribution.length != 0) // knock out the semesters with no disributions (like perhaps the upcoming one)
+    }};
   if (isProfessorQuery(query)) {
     const rmpHook = useQuery({
       queryKey: ['rmp', searchQueryLabel(convertToProfOnly(removeSection(query)))],
@@ -73,7 +101,7 @@ export function useSearchResult(query: SearchQuery) {
       staleTime: 1000 * 60 * 60,
     });
     
-    if (isCourseQuery(query))
+    if (isCourseQuery(query)) // combo
     {
       const combinedHook = useMemo(() => {
         const isLoading = sectionHook.isLoading || rmpHook.isLoading;
@@ -101,9 +129,9 @@ export function useSearchResult(query: SearchQuery) {
 
       return combinedHook;
     }
-    return rmpHook;
+    return rmpHook; // professor only
   }
-  return sectionHook;
+  return sectionHook; // course only
 }
 
 export function useSearchresults(queries: SearchQuery[]) {
