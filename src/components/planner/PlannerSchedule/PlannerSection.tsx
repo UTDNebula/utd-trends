@@ -139,7 +139,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               (makeBigger ? '' : 'leading-none')
             }
           >
-            {props.course.profFirst} {props.course.profLast}
+            {selectedSection.professor_details ? selectedSection.professor_details[0].first_name + ' ' + selectedSection.professor_details[0].last_name : ''}
           </div>
           <div
             className={
