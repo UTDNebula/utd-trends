@@ -29,7 +29,7 @@ import React, { useState } from 'react';
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
-import type { Sections } from '@/modules/fetchSections';
+import type { Sections, SectionsData } from '@/modules/fetchSections';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -205,7 +205,7 @@ function parseMeeting(meeting: Sections['all'][number]['meetings'][number]) {
 
 type SectionTableRowProps = {
   data: Sections['all'][number];
-  bestSyllabus: string;
+  syllabusSections: SectionsData;
   course: SearchQueryMultiSection;
   lastRow: boolean;
   setPlannerSection: (searchQuery: SearchQuery, section: string) => void;
@@ -224,9 +224,11 @@ function SectionTableRow(props: SectionTableRowProps) {
           c.course_number == props.course.number,
       ),
   );
-  let syllabusToShow = props.data.syllabus_uri ?? props.bestSyllabus;
+  const allSectionsOfProfWithSyllabus = props.syllabusSections.filter((s) => s.professor_details?.find((p) => props.data.professor_details && props.data.professor_details.find((prof) => prof.first_name == p.first_name && prof.last_name == p.last_name)));
+  const bestSyllabus = allSectionsOfProfWithSyllabus && allSectionsOfProfWithSyllabus[0] ? allSectionsOfProfWithSyllabus[0].syllabus_uri : props.syllabusSections[0].syllabus_uri ?? ''; // try to get latest syllabus of professor, else the latest syllabus
+  let syllabusToShow = props.data.syllabus_uri ?? bestSyllabus; // either selected section's (for next sem) or the best one overall
   if (syllabusToShow == '') {
-    syllabusToShow = props.bestSyllabus;
+    syllabusToShow = bestSyllabus;
   }
   return (
     <TableRow>
@@ -379,15 +381,13 @@ export default function PlannerCard(props: PlannerCardProps) {
       setOpen(!open);
     }
   }
-  const allSections = result.sections;
-  const latestMatchedSections = {...result, sections: result.sections.filter((section) => (!props.query.profFirst && !props.query.profLast) || section.professor_details && section.professor_details[0]?.first_name == props.query.profFirst && section.professor_details[0]?.last_name == props.query.profLast)}
-  const bestSyllabus = allSections
-    .filter((s) => !!s.syllabus_uri && !!s.academic_session?.start_date)
+  const allSectionsWithSyllabus = result.sections.filter((s) => !!s.syllabus_uri && !!s.academic_session?.start_date)
     .sort(
       (a, b) =>
         new Date(b.academic_session.start_date).getTime() -
         new Date(a.academic_session.start_date).getTime(),
-    )?.[0]?.syllabus_uri;
+    ); // all sections of the course, sorted by most recent syllabus
+  const latestMatchedSections = {...result, sections: result.sections.filter((section) => (!props.query.profFirst && !props.query.profLast) || section.professor_details && section.professor_details[0]?.first_name == props.query.profFirst && section.professor_details[0]?.last_name == props.query.profLast)}
   const hasMultipleDateRanges =
     typeof latestMatchedSections.sections !== 'undefined' && latestMatchedSections.sections.length >= 1
       ? latestMatchedSections.sections.some(
@@ -545,7 +545,7 @@ export default function PlannerCard(props: PlannerCardProps) {
                   <SectionTableRow
                     key={section._id}
                     data={section}
-                    bestSyllabus={bestSyllabus}
+                    syllabusSections={allSectionsWithSyllabus}
                     course={props.query}
                     lastRow={index === latestMatchedSections.sections.length - 1}
                     setPlannerSection={props.setPlannerSection}

@@ -130,7 +130,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               (makeBigger ? 'text-sm' : 'text-xs leading-none')
             }
           >
-            {props.course.prefix} {props.course.number}.
+            {selectedSection.course_details ? selectedSection.course_details[0].subject_prefix + ' ' + selectedSection.course_details[0].course_number : ''}.
             {selectedSection.section_number}
           </div>
           <div
