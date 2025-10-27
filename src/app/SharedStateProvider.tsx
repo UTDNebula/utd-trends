@@ -119,6 +119,7 @@ export function SharedStateProvider({
   function setPlannerSection(query: SearchQuery, section: string) {
     setPlanner((prev: SearchQueryMultiSection[]) =>
       prev.map((course) => {
+        console.log(course, query)
         if (searchQueryEqual(removeSection(course), removeSection(query))) {
           if (typeof course.sectionNumbers === 'undefined') {
             return { ...course, sectionNumbers: [section] };

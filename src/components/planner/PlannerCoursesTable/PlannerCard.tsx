@@ -94,6 +94,8 @@ function hasConflict(
   if (!newSection || !selectedSections) return false;
 
   for (const selectedSection of selectedSections) {
+    if (selectedSection.course_details && newSection.course_details && selectedSection.course_details[0].subject_prefix == newSection.course_details[0].subject_prefix && selectedSection.course_details[0].course_number == newSection.course_details[0].course_number) // if same course, allow switching at all costs
+      return false;
     for (const newMeeting of newSection.meetings) {
       if (!newMeeting || !newMeeting.meeting_days) continue;
 
@@ -225,7 +227,7 @@ function SectionTableRow(props: SectionTableRowProps) {
       ),
   );
   const allSectionsOfProfWithSyllabus = props.syllabusSections.filter((s) => s.professor_details?.find((p) => props.data.professor_details && props.data.professor_details.find((prof) => prof.first_name == p.first_name && prof.last_name == p.last_name)));
-  const bestSyllabus = allSectionsOfProfWithSyllabus && allSectionsOfProfWithSyllabus[0] ? allSectionsOfProfWithSyllabus[0].syllabus_uri : props.syllabusSections[0].syllabus_uri ?? ''; // try to get latest syllabus of professor, else the latest syllabus
+  const bestSyllabus = allSectionsOfProfWithSyllabus && allSectionsOfProfWithSyllabus[0] ? allSectionsOfProfWithSyllabus[0].syllabus_uri : (props.syllabusSections && props.syllabusSections[0] ? props.syllabusSections[0].syllabus_uri : ''); // try to get latest syllabus of professor, else the latest syllabus
   let syllabusToShow = props.data.syllabus_uri ?? bestSyllabus; // either selected section's (for next sem) or the best one overall
   if (syllabusToShow == '') {
     syllabusToShow = bestSyllabus;
@@ -246,10 +248,10 @@ function SectionTableRow(props: SectionTableRowProps) {
                 return; // Prevent section selection
               }
               props.setPlannerSection({
-                prefix: props.data.course_details![0].subject_prefix,
-                number: props.data.course_details![0].course_number,
-                profFirst: props.data.professor_details![0].first_name,
-                profLast: props.data.professor_details![0].last_name,
+                prefix: props.data.course_details && props.data.course_details[0] ? props.data.course_details[0].subject_prefix : null,
+                number: props.data.course_details && props.data.course_details[0] ? props.data.course_details[0].course_number : null,
+                profFirst: props.data.professor_details && props.data.professor_details[0] ? props.data.professor_details[0].first_name : null,
+                profLast: props.data.professor_details && props.data.professor_details[0] ? props.data.professor_details[0].last_name : null,
               } as SearchQuery, props.data.section_number); // using the section's course and prof details every time ensures overall matches de/selection behavior
             }}
           />
