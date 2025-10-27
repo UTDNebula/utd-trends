@@ -419,6 +419,7 @@ type PlannerCardProps = {
   color: { fill: string; outline: string; font: string };
   latestSemester: string;
   extraSections?: SearchResult;
+  extraLabel?: string;
 };
 
 export default function PlannerCard(props: PlannerCardProps) {
@@ -516,89 +517,103 @@ export default function PlannerCard(props: PlannerCardProps) {
               <KeyboardArrowIcon fontSize="inherit" />
             </IconButton>
           </Tooltip>
-          <Tooltip title={'Remove from Planner'} placement="top">
-            <Checkbox
-              checked={true /*inPlanner?*/}
-              onClick={(e) => {
-                e.stopPropagation();
-                props.removeFromPlanner();
-              }}
-              icon={<BookOutlinedIcon />}
-              checkedIcon={<BookIcon />}
-              sx={{
-                '&.Mui-checked': {
-                  color: props.color.fill,
-                },
-              }}
-            />
-          </Tooltip>
-          <Tooltip title="Switch Opening Sections/Grades" placement="top">
-            <ToggleButtonGroup
-              value={whichOpen}
-              exclusive
-              onChange={(_, newValue) => {
-                if (newValue === 'sections') {
-                  setWhichOpen('sections');
-                }
-                if (newValue === 'grades') {
-                  setWhichOpen('grades');
-                }
-                setOpen(true);
-              }}
-              size="small"
-              aria-label="dropdown switch"
-              onClick={(e) => e.stopPropagation()}
-              className="ml-2"
-            >
-              <ToggleButton value="sections" aria-label="sections">
-                <EventIcon />
-              </ToggleButton>
-              <ToggleButton value="grades" aria-label="grades and rmp">
-                <BarChartIcon />
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Tooltip>
+          {!props.extraSections && 
+            <Tooltip title={'Remove from Planner'} placement="top">
+              <Checkbox
+                checked={true /*inPlanner?*/}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.removeFromPlanner();
+                }}
+                icon={<BookOutlinedIcon />}
+                checkedIcon={<BookIcon />}
+                sx={{
+                  '&.Mui-checked': {
+                    color: props.color.fill,
+                  },
+                }}
+              />
+            </Tooltip>
+          }
+          {!props.extraSections && 
+            <Tooltip title="Switch Opening Sections/Grades" placement="top">
+              <ToggleButtonGroup
+                value={whichOpen}
+                exclusive
+                onChange={(_, newValue) => {
+                  if (newValue === 'sections') {
+                    setWhichOpen('sections');
+                  }
+                  if (newValue === 'grades') {
+                    setWhichOpen('grades');
+                  }
+                  setOpen(true);
+                }}
+                size="small"
+                aria-label="dropdown switch"
+                onClick={(e) => e.stopPropagation()}
+                className="ml-2"
+              >
+                <ToggleButton value="sections" aria-label="sections">
+                  <EventIcon />
+                </ToggleButton>
+                <ToggleButton value="grades" aria-label="grades and rmp">
+                  <BarChartIcon />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Tooltip>
+          }
         </div>
-        <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit grow">
-          <Tooltip
-            title={
-              typeof props.query.prefix !== 'undefined' &&
-              typeof props.query.number !== 'undefined'
-            }
-            placement="top"
-          >
-            <span>{searchQueryLabel(convertToCourseOnly(props.query))}</span>
-          </Tooltip>
-          {typeof props.query.profFirst !== 'undefined' &&
-            typeof props.query.profLast !== 'undefined' &&
-            typeof props.query.prefix !== 'undefined' &&
-            typeof props.query.number !== 'undefined' && <span> </span>}
-          <Tooltip
-            title={
-              typeof props.query.profFirst !== 'undefined' &&
+        {!props.extraSections ?
+          <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit grow">
+            <Tooltip
+              title={
+                typeof props.query.prefix !== 'undefined' &&
+                typeof props.query.number !== 'undefined'
+              }
+              placement="top"
+            >
+              <span>{searchQueryLabel(convertToCourseOnly(props.query))}</span>
+            </Tooltip>
+            {typeof props.query.profFirst !== 'undefined' &&
               typeof props.query.profLast !== 'undefined' &&
-              ((latestMatchedSections.type === 'professor' || latestMatchedSections.type === 'combo') &&
-              latestMatchedSections.RMP &&
-              latestMatchedSections.RMP.teacherRatingTags.length > 0
-                ? 'Tags: ' +
-                  latestMatchedSections.RMP.teacherRatingTags
-                    .sort((a, b) => b.tagCount - a.tagCount)
-                    .slice(0, 3)
-                    .map((tag) => tag.tagName)
-                    .join(', ')
-                : 'No Tags Available')
-            }
-            placement="top"
-          >
-            <span>{searchQueryLabel(convertToProfOnly(props.query))}</span>
-          </Tooltip>
-          {((typeof props.query.profFirst === 'undefined' &&
-            typeof props.query.profLast === 'undefined') ||
-            (typeof props.query.prefix === 'undefined' &&
-              typeof props.query.number === 'undefined')) && (
-            <span> (Overall)</span>
-          )}
-        </Typography>
+              typeof props.query.prefix !== 'undefined' &&
+              typeof props.query.number !== 'undefined' && <span> </span>}
+            <Tooltip
+              title={
+                typeof props.query.profFirst !== 'undefined' &&
+                typeof props.query.profLast !== 'undefined' &&
+                ((latestMatchedSections.type === 'professor' || latestMatchedSections.type === 'combo') &&
+                latestMatchedSections.RMP &&
+                latestMatchedSections.RMP.teacherRatingTags.length > 0
+                  ? 'Tags: ' +
+                    latestMatchedSections.RMP.teacherRatingTags
+                      .sort((a, b) => b.tagCount - a.tagCount)
+                      .slice(0, 3)
+                      .map((tag) => tag.tagName)
+                      .join(', ')
+                  : 'No Tags Available')
+              }
+              placement="top"
+            >
+              <span>{searchQueryLabel(convertToProfOnly(props.query))}</span>
+            </Tooltip>
+            {((typeof props.query.profFirst === 'undefined' &&
+              typeof props.query.profLast === 'undefined') ||
+              (typeof props.query.prefix === 'undefined' &&
+                typeof props.query.number === 'undefined')) && (
+              <span> (Overall)</span>
+            )}
+          </Typography>
+          : <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit grow">
+            <Tooltip
+              title={props.extraLabel == "lab" ? 'Lab/Discussion/Practice Sections for ' + searchQueryLabel(convertToCourseOnly(props.query)) : (props.extraLabel == "exam" ? 'Exam Sections for ' + searchQueryLabel(convertToCourseOnly(props.query)) : 'Sections of ' + searchQueryLabel(convertToCourseOnly(props.query)) + ' without a Professor assigned yet')}
+              placement="top"
+            >
+              <span>{props.extraLabel == "lab" ? 'Lab Sections' : (props.extraLabel == "exam" ? 'Exam Sections' : 'Sections without Professors')}</span>
+            </Tooltip>
+          </Typography>
+        }
         <MeetingChip
           color={props.color}
           meetings={
@@ -643,28 +658,34 @@ export default function PlannerCard(props: PlannerCardProps) {
               </TableBody>
             </Table>
           </TableContainer>
-          {latestExtraSections && latestExtraSections.sections.filter((section) => section.professor_details?.length == 0).length > 0 ? <PlannerCard
-            key={searchQueryLabel(props.query) + " extra sections"}
-            query={props.query}
-            setPlannerSection={props.setPlannerSection}
-            removeFromPlanner={props.removeFromPlanner}
-            selectedSections={props.selectedSections}
-            openConflictMessage={props.openConflictMessage}
-            color={props.color}
-            latestSemester={props.latestSemester}
-            extraSections={latestExtraSections ? latestExtraSections : undefined}
-          /> : <></>}
-          {latestExtraSections && latestExtraSections.sections.filter((section) => section.professor_details && section.professor_details?.length > 0 && !sectionCanOverlap(section.section_number)).length > 0 ? <PlannerCard
-            key={searchQueryLabel(props.query) + " extra sections"}
-            query={props.query}
-            setPlannerSection={props.setPlannerSection}
-            removeFromPlanner={props.removeFromPlanner}
-            selectedSections={props.selectedSections}
-            openConflictMessage={props.openConflictMessage}
-            color={props.color}
-            latestSemester={props.latestSemester}
-            extraSections={latestExtraSections ? latestExtraSections : undefined}
-          /> : <></>}
+          {/* Unassigned Professor Sections -- only show for a non-overall card */}
+          {props.query.profFirst != null && props.query.profLast !== null && latestExtraSections && latestExtraSections.sections.filter((section) => section.professor_details?.length == 0).length > 0 
+            && <PlannerCard
+              key={searchQueryLabel(props.query) + " extra sections"}
+              query={props.query}
+              setPlannerSection={props.setPlannerSection}
+              removeFromPlanner={props.removeFromPlanner}
+              selectedSections={props.selectedSections}
+              openConflictMessage={props.openConflictMessage}
+              color={props.color}
+              latestSemester={props.latestSemester}
+              extraSections={latestExtraSections ? latestExtraSections : undefined}
+              extraLabel='unassigned'
+            />}
+          {/* Extra Sections (Lab, Exam, Discussion, Etc) */}
+          {latestExtraSections && latestExtraSections.sections.filter((section) => section.professor_details && section.professor_details?.length > 0 && !sectionCanOverlap(section.section_number)).length > 0
+            && <PlannerCard
+              key={searchQueryLabel(props.query) + " lab sections"}
+              query={props.query}
+              setPlannerSection={props.setPlannerSection}
+              removeFromPlanner={props.removeFromPlanner}
+              selectedSections={props.selectedSections}
+              openConflictMessage={props.openConflictMessage}
+              color={props.color}
+              latestSemester={props.latestSemester}
+              extraSections={latestExtraSections ? latestExtraSections : undefined}
+              extraLabel='lab'
+            />}
         </Collapse>
       }
 
