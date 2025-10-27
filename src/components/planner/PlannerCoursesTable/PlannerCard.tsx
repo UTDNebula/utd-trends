@@ -462,8 +462,8 @@ export default function PlannerCard(props: PlannerCardProps) {
       sections: result.sections.filter(
         (section) =>
           section.academic_session.name == props.latestSemester && // latest sem's sections only
-          !(section.professor_details && section.professor_details[0]) // either have no professor assigned, or
-          || sectionCanOverlap(section.section_number), // be an "Extra" section (labs, exams, etc)
+          (!(section.professor_details && section.professor_details[0]) // either have no professor assigned, or
+          || sectionCanOverlap(section.section_number)), // be an "Extra" section (labs, exams, etc)
       ),
     };
   }
