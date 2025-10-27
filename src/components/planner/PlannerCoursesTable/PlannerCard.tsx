@@ -245,7 +245,12 @@ function SectionTableRow(props: SectionTableRowProps) {
                 props.openConflictMessage();
                 return; // Prevent section selection
               }
-              props.setPlannerSection(props.course, props.data.section_number);
+              props.setPlannerSection({
+                prefix: props.data.course_details![0].subject_prefix,
+                number: props.data.course_details![0].course_number,
+                profFirst: props.data.professor_details![0].first_name,
+                profLast: props.data.professor_details![0].last_name,
+              } as SearchQuery, props.data.section_number); // using the section's course and prof details every time ensures overall matches de/selection behavior
             }}
           />
         ) : (
@@ -260,7 +265,14 @@ function SectionTableRow(props: SectionTableRowProps) {
                 props.openConflictMessage();
                 return; // Prevent section selection
               }
-              props.setPlannerSection(props.course, props.data.section_number);
+              // if (selectedSection.course_details && newSection.course_details && selectedSection.course_details[0].subject_prefix == newSection.course_details[0].subject_prefix && selectedSection.course_details[0].course_number == newSection.course_details[0].course_number)
+                
+              props.setPlannerSection({
+                prefix: props.data.course_details![0].subject_prefix,
+                number: props.data.course_details![0].course_number,
+                profFirst: props.data.professor_details![0].first_name,
+                profLast: props.data.professor_details![0].last_name,
+              } as SearchQuery, props.data.section_number); // using the section's course and prof details every time ensures overall matches de/selection behavior
             }}
           />
         )}
