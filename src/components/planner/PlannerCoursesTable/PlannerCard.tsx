@@ -673,7 +673,7 @@ export default function PlannerCard(props: PlannerCardProps) {
               extraLabel='unassigned'
             />}
           {/* Extra Sections (Lab, Exam, Discussion, Etc) */}
-          {latestExtraSections && latestExtraSections.sections.filter((section) => section.professor_details && section.professor_details?.length > 0 && !sectionCanOverlap(section.section_number)).length > 0
+          {latestExtraSections && latestExtraSections.sections.filter((section) => section.professor_details && section.professor_details?.length > 0 && sectionCanOverlap(section.section_number)).length > 0
             && <PlannerCard
               key={searchQueryLabel(props.query) + " lab sections"}
               query={props.query}
