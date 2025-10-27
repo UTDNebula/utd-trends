@@ -643,7 +643,18 @@ export default function PlannerCard(props: PlannerCardProps) {
               </TableBody>
             </Table>
           </TableContainer>
-          {latestExtraSections && latestExtraSections.sections.length > 0 ? <PlannerCard
+          {latestExtraSections && latestExtraSections.sections.filter((section) => section.professor_details?.length == 0).length > 0 ? <PlannerCard
+            key={searchQueryLabel(props.query) + " extra sections"}
+            query={props.query}
+            setPlannerSection={props.setPlannerSection}
+            removeFromPlanner={props.removeFromPlanner}
+            selectedSections={props.selectedSections}
+            openConflictMessage={props.openConflictMessage}
+            color={props.color}
+            latestSemester={props.latestSemester}
+            extraSections={latestExtraSections ? latestExtraSections : undefined}
+          /> : <></>}
+          {latestExtraSections && latestExtraSections.sections.filter((section) => section.professor_details && section.professor_details?.length > 0 && !sectionCanOverlap(section.section_number)).length > 0 ? <PlannerCard
             key={searchQueryLabel(props.query) + " extra sections"}
             query={props.query}
             setPlannerSection={props.setPlannerSection}
