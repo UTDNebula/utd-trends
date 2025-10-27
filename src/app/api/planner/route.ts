@@ -1,5 +1,4 @@
 import { fetchSearchResult } from '@/modules/fetchSearchResult';
-import { fetchLatestSemester } from '@/modules/fetchSections';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {

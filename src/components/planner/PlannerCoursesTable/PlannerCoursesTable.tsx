@@ -11,7 +11,6 @@ import { displaySemesterName } from '@/modules/semesters';
 import {
   convertToCourseOnly,
   removeSection,
-  searchQueryEqual,
   searchQueryLabel,
   searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';

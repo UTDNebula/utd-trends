@@ -117,8 +117,13 @@ export function SharedStateProvider({
   }
 
   function setPlannerSection(query: SearchQuery, section: string) {
-    if (!planner.find((course) => searchQueryEqual(removeSection(course), removeSection(query)))) // if section's course-prof combo doesn't exist
-      setPlanner((prev: SearchQueryMultiSection[]) => (prev.concat(query))) // add it to MyPlanner
+    if (
+      !planner.find((course) =>
+        searchQueryEqual(removeSection(course), removeSection(query)),
+      )
+    )
+      // if section's course-prof combo doesn't exist
+      setPlanner((prev: SearchQueryMultiSection[]) => prev.concat(query)); // add it to MyPlanner
     setPlanner((prev: SearchQueryMultiSection[]) =>
       prev.map((course) => {
         if (searchQueryEqual(removeSection(course), removeSection(query))) {

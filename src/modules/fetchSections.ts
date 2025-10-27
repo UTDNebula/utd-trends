@@ -43,8 +43,8 @@ export type SectionsData = {
   syllabus_uri: string;
   grade_distribution: number[];
   attributes: unknown;
-  course_details?: Course[]
-  professor_details?: Professor[]
+  course_details?: Course[];
+  professor_details?: Professor[];
 }[];
 
 export type Sections = {
@@ -132,9 +132,9 @@ export default async function fetchSections(
       convertToCourseOnly(query),
       convertToProfOnly(query),
     ]
-    //Remove empty objects (for non combos)
-    .filter((obj) => Object.keys(obj).length !== 0);
-    
+      //Remove empty objects (for non combos)
+      .filter((obj) => Object.keys(obj).length !== 0);
+
     //Call each
     const settledData = await Promise.allSettled(
       seperatedCombo.map((query) => fetchSingleSections(query)),

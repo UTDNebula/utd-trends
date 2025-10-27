@@ -130,8 +130,12 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               (makeBigger ? 'text-sm' : 'text-xs leading-none')
             }
           >
-            {selectedSection.course_details && selectedSection.course_details[0] ? selectedSection.course_details[0].subject_prefix + ' ' + selectedSection.course_details[0].course_number : ''}.
-            {selectedSection.section_number}
+            {selectedSection.course_details && selectedSection.course_details[0]
+              ? selectedSection.course_details[0].subject_prefix +
+                ' ' +
+                selectedSection.course_details[0].course_number
+              : ''}
+            .{selectedSection.section_number}
           </div>
           <div
             className={
@@ -139,7 +143,12 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               (makeBigger ? '' : 'leading-none')
             }
           >
-            {selectedSection.professor_details && selectedSection.professor_details[0] ? selectedSection.professor_details[0].first_name + ' ' + selectedSection.professor_details[0].last_name : ''}
+            {selectedSection.professor_details &&
+            selectedSection.professor_details[0]
+              ? selectedSection.professor_details[0].first_name +
+                ' ' +
+                selectedSection.professor_details[0].last_name
+              : ''}
           </div>
           <div
             className={

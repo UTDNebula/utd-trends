@@ -26,7 +26,7 @@ export function calculateGrades(grades: GradesData, semesters?: string[]) {
         (item, i) => item + session.grade_distribution[i],
       );
     }
-  })
+  });
 
   const total: number = grade_distribution.reduce(
     (accumulator, currentValue) => accumulator + currentValue,

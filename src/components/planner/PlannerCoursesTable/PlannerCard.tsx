@@ -94,7 +94,17 @@ function hasConflict(
   if (!newSection || !selectedSections) return false;
 
   for (const selectedSection of selectedSections) {
-    if (selectedSection.course_details && selectedSection.course_details[0] && newSection.course_details && newSection.course_details[0] && selectedSection.course_details[0].subject_prefix == newSection.course_details[0].subject_prefix && selectedSection.course_details[0].course_number == newSection.course_details[0].course_number) // if same course, allow switching at all costs
+    if (
+      selectedSection.course_details &&
+      selectedSection.course_details[0] &&
+      newSection.course_details &&
+      newSection.course_details[0] &&
+      selectedSection.course_details[0].subject_prefix ==
+        newSection.course_details[0].subject_prefix &&
+      selectedSection.course_details[0].course_number ==
+        newSection.course_details[0].course_number
+    )
+      // if same course, allow switching at all costs
       return false;
     for (const newMeeting of newSection.meetings) {
       if (!newMeeting || !newMeeting.meeting_days) continue;
@@ -220,14 +230,29 @@ function SectionTableRow(props: SectionTableRowProps) {
   const isSelected = props.selectedSections.some(
     (el) =>
       el.section_number == props.data.section_number && // check the section number
-      el.course_details?.some( // and also if the course is the same
+      el.course_details?.some(
+        // and also if the course is the same
         (c) =>
           c.subject_prefix == props.course.prefix &&
           c.course_number == props.course.number,
       ),
   );
-  const allSectionsOfProfWithSyllabus = props.syllabusSections.filter((s) => s.professor_details?.find((p) => props.data.professor_details && props.data.professor_details.find((prof) => prof.first_name == p.first_name && prof.last_name == p.last_name)));
-  const bestSyllabus = allSectionsOfProfWithSyllabus && allSectionsOfProfWithSyllabus[0] ? allSectionsOfProfWithSyllabus[0].syllabus_uri : (props.syllabusSections && props.syllabusSections[0] ? props.syllabusSections[0].syllabus_uri : ''); // try to get latest syllabus of professor, else the latest syllabus
+  const allSectionsOfProfWithSyllabus = props.syllabusSections.filter((s) =>
+    s.professor_details?.find(
+      (p) =>
+        props.data.professor_details &&
+        props.data.professor_details.find(
+          (prof) =>
+            prof.first_name == p.first_name && prof.last_name == p.last_name,
+        ),
+    ),
+  );
+  const bestSyllabus =
+    allSectionsOfProfWithSyllabus && allSectionsOfProfWithSyllabus[0]
+      ? allSectionsOfProfWithSyllabus[0].syllabus_uri
+      : props.syllabusSections && props.syllabusSections[0]
+        ? props.syllabusSections[0].syllabus_uri
+        : ''; // try to get latest syllabus of professor, else the latest syllabus
   let syllabusToShow = props.data.syllabus_uri ?? bestSyllabus; // either selected section's (for next sem) or the best one overall
   if (syllabusToShow == '') {
     syllabusToShow = bestSyllabus;
@@ -247,16 +272,21 @@ function SectionTableRow(props: SectionTableRowProps) {
                 props.openConflictMessage();
                 return; // Prevent section selection
               }
-              props.setPlannerSection({
-                ...(props.data.course_details && props.data.course_details[0] && {
-                  prefix: props.data.course_details[0].subject_prefix,
-                  number: props.data.course_details[0].course_number,
-                }),
-                ...(props.data.professor_details && props.data.professor_details[0] && {
-                  profFirst: props.data.professor_details[0].first_name,
-                  profLast: props.data.professor_details[0].last_name,
-                }),
-              } as SearchQuery, props.data.section_number); // using the section's course and prof details every time ensures overall matches de/selection behavior
+              props.setPlannerSection(
+                {
+                  ...(props.data.course_details &&
+                    props.data.course_details[0] && {
+                      prefix: props.data.course_details[0].subject_prefix,
+                      number: props.data.course_details[0].course_number,
+                    }),
+                  ...(props.data.professor_details &&
+                    props.data.professor_details[0] && {
+                      profFirst: props.data.professor_details[0].first_name,
+                      profLast: props.data.professor_details[0].last_name,
+                    }),
+                } as SearchQuery,
+                props.data.section_number,
+              ); // using the section's course and prof details every time ensures overall matches de/selection behavior
             }}
           />
         ) : (
@@ -271,13 +301,16 @@ function SectionTableRow(props: SectionTableRowProps) {
                 props.openConflictMessage();
                 return; // Prevent section selection
               }
-                
-              props.setPlannerSection({
-                prefix: props.data.course_details![0].subject_prefix,
-                number: props.data.course_details![0].course_number,
-                profFirst: props.data.professor_details![0].first_name,
-                profLast: props.data.professor_details![0].last_name,
-              } as SearchQuery, props.data.section_number); // using the section's course and prof details every time ensures overall matches de/selection behavior
+
+              props.setPlannerSection(
+                {
+                  prefix: props.data.course_details![0].subject_prefix,
+                  number: props.data.course_details![0].course_number,
+                  profFirst: props.data.professor_details![0].first_name,
+                  profLast: props.data.professor_details![0].last_name,
+                } as SearchQuery,
+                props.data.section_number,
+              ); // using the section's course and prof details every time ensures overall matches de/selection behavior
             }}
           />
         )}
@@ -383,7 +416,7 @@ type PlannerCardProps = {
   selectedSections: Sections['all'];
   openConflictMessage: () => void;
   color: { fill: string; outline: string; font: string };
-  latestSemester: string
+  latestSemester: string;
 };
 
 export default function PlannerCard(props: PlannerCardProps) {
@@ -399,15 +432,28 @@ export default function PlannerCard(props: PlannerCardProps) {
       setOpen(!open);
     }
   }
-  const allSectionsWithSyllabus = result.sections.filter((s) => !!s.syllabus_uri && !!s.academic_session?.start_date)
+  const allSectionsWithSyllabus = result.sections
+    .filter((s) => !!s.syllabus_uri && !!s.academic_session?.start_date)
     .sort(
       (a, b) =>
         new Date(b.academic_session.start_date).getTime() -
         new Date(a.academic_session.start_date).getTime(),
     ); // all sections of the course, sorted by most recent syllabus
-  const latestMatchedSections = {...result, sections: result.sections.filter((section) => (section.academic_session.name == props.latestSemester) && ((!props.query.profFirst && !props.query.profLast) || section.professor_details && section.professor_details[0] && section.professor_details[0]?.first_name == props.query.profFirst && section.professor_details[0]?.last_name == props.query.profLast))}
+  const latestMatchedSections = {
+    ...result,
+    sections: result.sections.filter(
+      (section) =>
+        section.academic_session.name == props.latestSemester &&
+        ((!props.query.profFirst && !props.query.profLast) ||
+          (section.professor_details &&
+            section.professor_details[0] &&
+            section.professor_details[0]?.first_name == props.query.profFirst &&
+            section.professor_details[0]?.last_name == props.query.profLast)),
+    ),
+  };
   const hasMultipleDateRanges =
-    typeof latestMatchedSections.sections !== 'undefined' && latestMatchedSections.sections.length >= 1
+    typeof latestMatchedSections.sections !== 'undefined' &&
+    latestMatchedSections.sections.length >= 1
       ? latestMatchedSections.sections.some(
           (section) =>
             section.meetings[0].start_date !==
@@ -565,7 +611,9 @@ export default function PlannerCard(props: PlannerCardProps) {
                     data={section}
                     syllabusSections={allSectionsWithSyllabus}
                     course={props.query}
-                    lastRow={index === latestMatchedSections.sections.length - 1}
+                    lastRow={
+                      index === latestMatchedSections.sections.length - 1
+                    }
                     setPlannerSection={props.setPlannerSection}
                     selectedSections={props.selectedSections}
                     openConflictMessage={props.openConflictMessage}
