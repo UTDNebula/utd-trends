@@ -443,12 +443,22 @@ export default function PlannerCard(props: PlannerCardProps) {
     ...result,
     sections: result.sections.filter(
       (section) =>
-        section.academic_session.name == props.latestSemester &&
-        ((!props.query.profFirst && !props.query.profLast) ||
+        section.academic_session.name == props.latestSemester && // latest sem's sections only
+        ((!props.query.profFirst && !props.query.profLast) || // if overall, should show every prof's section
           (section.professor_details &&
             section.professor_details[0] &&
             section.professor_details[0]?.first_name == props.query.profFirst &&
-            section.professor_details[0]?.last_name == props.query.profLast)),
+            section.professor_details[0]?.last_name == props.query.profLast)) // else, show only this professor's sections
+        && !sectionCanOverlap(section.section_number), // that are not "Extra"
+    ),
+  };
+  const latestExtraSections = {
+    ...result,
+    sections: result.sections.filter(
+      (section) =>
+        section.academic_session.name == props.latestSemester && // latest sem's sections only
+        !(section.professor_details && section.professor_details[0]) // either have no professor assigned, or
+        || sectionCanOverlap(section.section_number), // be an "Extra" section (labs, exams, etc)
     ),
   };
   const hasMultipleDateRanges =
