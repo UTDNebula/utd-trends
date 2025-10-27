@@ -98,6 +98,7 @@ export default function PlannerCoursesTable() {
                 color={
                   plannerColorMap[searchQueryLabel(convertToCourseOnly(query))]
                 }
+                latestSemester={latestSemester}
               />
             );
           })}

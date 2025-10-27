@@ -366,6 +366,7 @@ type PlannerCardProps = {
   selectedSections: Sections['all'];
   openConflictMessage: () => void;
   color: { fill: string; outline: string; font: string };
+  latestSemester: string
 };
 
 export default function PlannerCard(props: PlannerCardProps) {
@@ -387,7 +388,7 @@ export default function PlannerCard(props: PlannerCardProps) {
         new Date(b.academic_session.start_date).getTime() -
         new Date(a.academic_session.start_date).getTime(),
     ); // all sections of the course, sorted by most recent syllabus
-  const latestMatchedSections = {...result, sections: result.sections.filter((section) => (!props.query.profFirst && !props.query.profLast) || section.professor_details && section.professor_details[0]?.first_name == props.query.profFirst && section.professor_details[0]?.last_name == props.query.profLast)}
+  const latestMatchedSections = {...result, sections: result.sections.filter((section) => (section.academic_session.name == props.latestSemester) && ((!props.query.profFirst && !props.query.profLast) || section.professor_details && section.professor_details[0]?.first_name == props.query.profFirst && section.professor_details[0]?.last_name == props.query.profLast))}
   const hasMultipleDateRanges =
     typeof latestMatchedSections.sections !== 'undefined' && latestMatchedSections.sections.length >= 1
       ? latestMatchedSections.sections.some(
