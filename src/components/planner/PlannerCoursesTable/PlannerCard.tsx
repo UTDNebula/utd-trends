@@ -365,7 +365,7 @@ function SectionTableRow(props: SectionTableRowProps) {
       )}
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
         <div style={{ fontSize: '10px', color: 'gray' }}>
-          {syllabusToShow ? (
+          {syllabusToShow != '' ? (
             <Link
               href={syllabusToShow}
               target="_blank"
@@ -435,13 +435,20 @@ export default function PlannerCard(props: PlannerCardProps) {
       setOpen(!open);
     }
   }
-  const allSectionsWithSyllabus = result.sections
+  
+  let allSectionsWithSyllabus = result.sections
     .filter((s) => !!s.syllabus_uri && !!s.academic_session?.start_date)
     .sort(
       (a, b) =>
         new Date(b.academic_session.start_date).getTime() -
         new Date(a.academic_session.start_date).getTime(),
     ); // all sections of the course, sorted by most recent syllabus
+  if (props.extraSections && props.extraLabel == 'lab')
+    allSectionsWithSyllabus = allSectionsWithSyllabus.filter((s) => sectionCanOverlap(s.section_number, "extra")); // only keep extra sections for syllabus lookup
+  else if (props.extraSections && props.extraLabel == 'exam')
+    allSectionsWithSyllabus = allSectionsWithSyllabus.filter((s) => sectionCanOverlap(s.section_number, "exam")); // only keep exam sections for syllabus lookup
+  else if (props.extraSections && props.extraLabel == 'unassigned')
+    allSectionsWithSyllabus = allSectionsWithSyllabus.filter((s) => false); // No syllabi should be shown
   let latestMatchedSections : SearchResult = result; // fallback if filtering is null, at least it will have correct grade/rmp data
   let latestExtraSections : SearchResult | null = null;
   if (!props.extraSections) {
