@@ -307,8 +307,8 @@ function SectionTableRow(props: SectionTableRowProps) {
                 {
                   prefix: props.data.course_details![0].subject_prefix,
                   number: props.data.course_details![0].course_number,
-                  profFirst: props.data.professor_details![0].first_name,
-                  profLast: props.data.professor_details![0].last_name,
+                  profFirst: props.data.professor_details && props.data.professor_details[0] ? props.data.professor_details[0].first_name : undefined,
+                  profLast: props.data.professor_details && props.data.professor_details[0] ? props.data.professor_details[0].last_name : undefined,
                 } as SearchQuery,
                 props.data.section_number,
               ); // using the section's course and prof details every time ensures overall matches de/selection behavior
