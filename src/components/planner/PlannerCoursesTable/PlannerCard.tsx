@@ -652,7 +652,7 @@ export default function PlannerCard(props: PlannerCardProps) {
             openConflictMessage={props.openConflictMessage}
             color={props.color}
             latestSemester={props.latestSemester}
-            extraSections={props.extraSections && latestExtraSections ? latestExtraSections : undefined}
+            extraSections={latestExtraSections ? latestExtraSections : undefined}
           />
         </Collapse>
       }
