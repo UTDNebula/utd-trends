@@ -94,7 +94,7 @@ function hasConflict(
   if (!newSection || !selectedSections) return false;
 
   for (const selectedSection of selectedSections) {
-    if (selectedSection.course_details && newSection.course_details && selectedSection.course_details[0].subject_prefix == newSection.course_details[0].subject_prefix && selectedSection.course_details[0].course_number == newSection.course_details[0].course_number) // if same course, allow switching at all costs
+    if (selectedSection.course_details && selectedSection.course_details[0] && newSection.course_details && newSection.course_details[0] && selectedSection.course_details[0].subject_prefix == newSection.course_details[0].subject_prefix && selectedSection.course_details[0].course_number == newSection.course_details[0].course_number) // if same course, allow switching at all costs
       return false;
     for (const newMeeting of newSection.meetings) {
       if (!newMeeting || !newMeeting.meeting_days) continue;
@@ -248,10 +248,14 @@ function SectionTableRow(props: SectionTableRowProps) {
                 return; // Prevent section selection
               }
               props.setPlannerSection({
-                prefix: props.data.course_details && props.data.course_details[0] ? props.data.course_details[0].subject_prefix : null,
-                number: props.data.course_details && props.data.course_details[0] ? props.data.course_details[0].course_number : null,
-                profFirst: props.data.professor_details && props.data.professor_details[0] ? props.data.professor_details[0].first_name : null,
-                profLast: props.data.professor_details && props.data.professor_details[0] ? props.data.professor_details[0].last_name : null,
+                ...(props.data.course_details && props.data.course_details[0] && {
+                  prefix: props.data.course_details[0].subject_prefix,
+                  number: props.data.course_details[0].course_number,
+                }),
+                ...(props.data.professor_details && props.data.professor_details[0] && {
+                  profFirst: props.data.professor_details[0].first_name,
+                  profLast: props.data.professor_details[0].last_name,
+                }),
               } as SearchQuery, props.data.section_number); // using the section's course and prof details every time ensures overall matches de/selection behavior
             }}
           />
@@ -267,7 +271,6 @@ function SectionTableRow(props: SectionTableRowProps) {
                 props.openConflictMessage();
                 return; // Prevent section selection
               }
-              // if (selectedSection.course_details && newSection.course_details && selectedSection.course_details[0].subject_prefix == newSection.course_details[0].subject_prefix && selectedSection.course_details[0].course_number == newSection.course_details[0].course_number)
                 
               props.setPlannerSection({
                 prefix: props.data.course_details![0].subject_prefix,
@@ -402,7 +405,7 @@ export default function PlannerCard(props: PlannerCardProps) {
         new Date(b.academic_session.start_date).getTime() -
         new Date(a.academic_session.start_date).getTime(),
     ); // all sections of the course, sorted by most recent syllabus
-  const latestMatchedSections = {...result, sections: result.sections.filter((section) => (section.academic_session.name == props.latestSemester) && ((!props.query.profFirst && !props.query.profLast) || section.professor_details && section.professor_details[0]?.first_name == props.query.profFirst && section.professor_details[0]?.last_name == props.query.profLast))}
+  const latestMatchedSections = {...result, sections: result.sections.filter((section) => (section.academic_session.name == props.latestSemester) && ((!props.query.profFirst && !props.query.profLast) || section.professor_details && section.professor_details[0] && section.professor_details[0]?.first_name == props.query.profFirst && section.professor_details[0]?.last_name == props.query.profLast))}
   const hasMultipleDateRanges =
     typeof latestMatchedSections.sections !== 'undefined' && latestMatchedSections.sections.length >= 1
       ? latestMatchedSections.sections.some(
