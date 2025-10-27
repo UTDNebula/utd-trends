@@ -37,6 +37,7 @@ import {
   type SearchQuery,
   searchQueryLabel,
   type SearchQueryMultiSection,
+  type SearchResult,
   sectionCanOverlap,
 } from '@/types/SearchQuery';
 import { useSearchResult } from '@/modules/plannerFetch';
@@ -417,6 +418,7 @@ type PlannerCardProps = {
   openConflictMessage: () => void;
   color: { fill: string; outline: string; font: string };
   latestSemester: string;
+  extraSections?: SearchResult;
 };
 
 export default function PlannerCard(props: PlannerCardProps) {
@@ -439,28 +441,36 @@ export default function PlannerCard(props: PlannerCardProps) {
         new Date(b.academic_session.start_date).getTime() -
         new Date(a.academic_session.start_date).getTime(),
     ); // all sections of the course, sorted by most recent syllabus
-  const latestMatchedSections = {
-    ...result,
-    sections: result.sections.filter(
-      (section) =>
-        section.academic_session.name == props.latestSemester && // latest sem's sections only
-        ((!props.query.profFirst && !props.query.profLast) || // if overall, should show every prof's section
-          (section.professor_details &&
-            section.professor_details[0] &&
-            section.professor_details[0]?.first_name == props.query.profFirst &&
-            section.professor_details[0]?.last_name == props.query.profLast)) // else, show only this professor's sections
-        && !sectionCanOverlap(section.section_number), // that are not "Extra"
-    ),
-  };
-  const latestExtraSections = {
-    ...result,
-    sections: result.sections.filter(
-      (section) =>
-        section.academic_session.name == props.latestSemester && // latest sem's sections only
-        !(section.professor_details && section.professor_details[0]) // either have no professor assigned, or
-        || sectionCanOverlap(section.section_number), // be an "Extra" section (labs, exams, etc)
-    ),
-  };
+  let latestMatchedSections : SearchResult = result; // fallback if filtering is null, at least it will have correct grade/rmp data
+  let latestExtraSections : SearchResult;
+  if (!props.extraSections) {
+    latestMatchedSections = {
+      ...result,
+      sections: result.sections.filter(
+        (section) =>
+          section.academic_session.name == props.latestSemester && // latest sem's sections only
+          ((!props.query.profFirst && !props.query.profLast) || // if overall, should show every prof's section
+            (section.professor_details &&
+              section.professor_details[0] &&
+              section.professor_details[0]?.first_name == props.query.profFirst &&
+              section.professor_details[0]?.last_name == props.query.profLast)) // else, show only this professor's sections
+          && !sectionCanOverlap(section.section_number), // that are not "Extra"
+      ),
+    };
+    latestExtraSections = {
+      ...result,
+      sections: result.sections.filter(
+        (section) =>
+          section.academic_session.name == props.latestSemester && // latest sem's sections only
+          !(section.professor_details && section.professor_details[0]) // either have no professor assigned, or
+          || sectionCanOverlap(section.section_number), // be an "Extra" section (labs, exams, etc)
+      ),
+    };
+  }
+  else {
+    latestMatchedSections = props.extraSections;
+  }
+
   const hasMultipleDateRanges =
     typeof latestMatchedSections.sections !== 'undefined' &&
     latestMatchedSections.sections.length >= 1
@@ -567,11 +577,11 @@ export default function PlannerCard(props: PlannerCardProps) {
             title={
               typeof props.query.profFirst !== 'undefined' &&
               typeof props.query.profLast !== 'undefined' &&
-              ((result.type === 'professor' || result.type === 'combo') &&
-              result.RMP &&
-              result.RMP.teacherRatingTags.length > 0
+              ((latestMatchedSections.type === 'professor' || latestMatchedSections.type === 'combo') &&
+              latestMatchedSections.RMP &&
+              latestMatchedSections.RMP.teacherRatingTags.length > 0
                 ? 'Tags: ' +
-                  result.RMP.teacherRatingTags
+                  latestMatchedSections.RMP.teacherRatingTags
                     .sort((a, b) => b.tagCount - a.tagCount)
                     .slice(0, 3)
                     .map((tag) => tag.tagName)
@@ -633,6 +643,7 @@ export default function PlannerCard(props: PlannerCardProps) {
               </TableBody>
             </Table>
           </TableContainer>
+
         </Collapse>
       }
 
@@ -645,11 +656,11 @@ export default function PlannerCard(props: PlannerCardProps) {
           <div className="p-2 md:p-4 flex flex-col gap-2">
             <SingleGradesInfo
               course={removeSection(props.query)}
-              grades={result.grades}
-              filteredGrades={calculateGrades(result.grades)}
+              grades={latestMatchedSections.grades}
+              filteredGrades={calculateGrades(latestMatchedSections.grades)}
             />
-            {(result.type === 'professor' || result.type === 'combo') &&
-              result.RMP && <SingleProfInfo rmp={result.RMP} />}
+            {(latestMatchedSections.type === 'professor' || latestMatchedSections.type === 'combo') &&
+              latestMatchedSections.RMP && <SingleProfInfo rmp={latestMatchedSections.RMP} />}
           </div>
         </Collapse>
       }
