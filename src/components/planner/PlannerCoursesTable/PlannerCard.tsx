@@ -307,8 +307,16 @@ function SectionTableRow(props: SectionTableRowProps) {
                 {
                   prefix: props.data.course_details![0].subject_prefix,
                   number: props.data.course_details![0].course_number,
-                  profFirst: props.data.professor_details && props.data.professor_details[0] ? props.data.professor_details[0].first_name : undefined,
-                  profLast: props.data.professor_details && props.data.professor_details[0] ? props.data.professor_details[0].last_name : undefined,
+                  profFirst:
+                    props.data.professor_details &&
+                    props.data.professor_details[0]
+                      ? props.data.professor_details[0].first_name
+                      : undefined,
+                  profLast:
+                    props.data.professor_details &&
+                    props.data.professor_details[0]
+                      ? props.data.professor_details[0].last_name
+                      : undefined,
                 } as SearchQuery,
                 props.data.section_number,
               ); // using the section's course and prof details every time ensures overall matches de/selection behavior
@@ -435,7 +443,7 @@ export default function PlannerCard(props: PlannerCardProps) {
       setOpen(!open);
     }
   }
-  
+
   let allSectionsWithSyllabus = result.sections
     .filter((s) => !!s.syllabus_uri && !!s.academic_session?.start_date)
     .sort(
@@ -444,13 +452,17 @@ export default function PlannerCard(props: PlannerCardProps) {
         new Date(a.academic_session.start_date).getTime(),
     ); // all sections of the course, sorted by most recent syllabus
   if (props.extraSections && props.extraLabel == 'lab')
-    allSectionsWithSyllabus = allSectionsWithSyllabus.filter((s) => sectionCanOverlap(s.section_number, "extra")); // only keep extra sections for syllabus lookup
+    allSectionsWithSyllabus = allSectionsWithSyllabus.filter((s) =>
+      sectionCanOverlap(s.section_number, 'extra'),
+    ); // only keep extra sections for syllabus lookup
   else if (props.extraSections && props.extraLabel == 'exam')
-    allSectionsWithSyllabus = allSectionsWithSyllabus.filter((s) => sectionCanOverlap(s.section_number, "exam")); // only keep exam sections for syllabus lookup
+    allSectionsWithSyllabus = allSectionsWithSyllabus.filter((s) =>
+      sectionCanOverlap(s.section_number, 'exam'),
+    ); // only keep exam sections for syllabus lookup
   else if (props.extraSections && props.extraLabel == 'unassigned')
-    allSectionsWithSyllabus = allSectionsWithSyllabus.filter((s) => false); // No syllabi should be shown
-  let latestMatchedSections : SearchResult = result; // fallback if filtering is null, at least it will have correct grade/rmp data
-  let latestExtraSections : SearchResult | null = null;
+    allSectionsWithSyllabus = allSectionsWithSyllabus.filter(() => false); // No syllabi should be shown
+  let latestMatchedSections: SearchResult = result; // fallback if filtering is null, at least it will have correct grade/rmp data
+  let latestExtraSections: SearchResult | null = null;
   if (!props.extraSections) {
     latestMatchedSections = {
       ...result,
@@ -460,9 +472,11 @@ export default function PlannerCard(props: PlannerCardProps) {
           ((!props.query.profFirst && !props.query.profLast) || // if overall, should show every prof's section
             (section.professor_details &&
               section.professor_details[0] &&
-              section.professor_details[0]?.first_name == props.query.profFirst &&
-              section.professor_details[0]?.last_name == props.query.profLast)) // else, show only this professor's sections
-          && !sectionCanOverlap(section.section_number), // that are not "Extra"
+              section.professor_details[0]?.first_name ==
+                props.query.profFirst &&
+              section.professor_details[0]?.last_name ==
+                props.query.profLast)) && // else, show only this professor's sections
+          !sectionCanOverlap(section.section_number), // that are not "Extra"
       ),
     };
     latestExtraSections = {
@@ -470,12 +484,11 @@ export default function PlannerCard(props: PlannerCardProps) {
       sections: result.sections.filter(
         (section) =>
           section.academic_session.name == props.latestSemester && // latest sem's sections only
-          (!(section.professor_details && section.professor_details[0]) // either have no professor assigned, or
-          || sectionCanOverlap(section.section_number)), // be an "Extra" section (labs, exams, etc)
+          (!(section.professor_details && section.professor_details[0]) || // either have no professor assigned, or
+            sectionCanOverlap(section.section_number)), // be an "Extra" section (labs, exams, etc)
       ),
     };
-  }
-  else {
+  } else {
     latestMatchedSections = props.extraSections;
   }
 
@@ -524,7 +537,7 @@ export default function PlannerCard(props: PlannerCardProps) {
               <KeyboardArrowIcon fontSize="inherit" />
             </IconButton>
           </Tooltip>
-          {!props.extraSections && 
+          {!props.extraSections && (
             <Tooltip title={'Remove from Planner'} placement="top">
               <Checkbox
                 checked={true /*inPlanner?*/}
@@ -541,8 +554,8 @@ export default function PlannerCard(props: PlannerCardProps) {
                 }}
               />
             </Tooltip>
-          }
-          {!props.extraSections && 
+          )}
+          {!props.extraSections && (
             <Tooltip title="Switch Opening Sections/Grades" placement="top">
               <ToggleButtonGroup
                 value={whichOpen}
@@ -569,9 +582,9 @@ export default function PlannerCard(props: PlannerCardProps) {
                 </ToggleButton>
               </ToggleButtonGroup>
             </Tooltip>
-          }
+          )}
         </div>
-        {!props.extraSections ?
+        {!props.extraSections ? (
           <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit grow">
             <Tooltip
               title={
@@ -590,7 +603,8 @@ export default function PlannerCard(props: PlannerCardProps) {
               title={
                 typeof props.query.profFirst !== 'undefined' &&
                 typeof props.query.profLast !== 'undefined' &&
-                ((latestMatchedSections.type === 'professor' || latestMatchedSections.type === 'combo') &&
+                ((latestMatchedSections.type === 'professor' ||
+                  latestMatchedSections.type === 'combo') &&
                 latestMatchedSections.RMP &&
                 latestMatchedSections.RMP.teacherRatingTags.length > 0
                   ? 'Tags: ' +
@@ -612,15 +626,32 @@ export default function PlannerCard(props: PlannerCardProps) {
               <span> (Overall)</span>
             )}
           </Typography>
-          : <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit grow">
+        ) : (
+          <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit grow">
             <Tooltip
-              title={props.extraLabel == "lab" ? 'Lab/Discussion/Practice Sections for ' + searchQueryLabel(convertToCourseOnly(props.query)) : (props.extraLabel == "exam" ? 'Exam Sections for ' + searchQueryLabel(convertToCourseOnly(props.query)) : 'Sections of ' + searchQueryLabel(convertToCourseOnly(props.query)) + ' without a Professor assigned yet')}
+              title={
+                props.extraLabel == 'lab'
+                  ? 'Lab/Discussion/Practice Sections for ' +
+                    searchQueryLabel(convertToCourseOnly(props.query))
+                  : props.extraLabel == 'exam'
+                    ? 'Exam Sections for ' +
+                      searchQueryLabel(convertToCourseOnly(props.query))
+                    : 'Sections of ' +
+                      searchQueryLabel(convertToCourseOnly(props.query)) +
+                      ' without a Professor assigned yet'
+              }
               placement="top"
             >
-              <span>{props.extraLabel == "lab" ? 'Lab Sections' : (props.extraLabel == "exam" ? 'Exam Sections' : 'Sections without Professors')}</span>
+              <span>
+                {props.extraLabel == 'lab'
+                  ? 'Lab Sections'
+                  : props.extraLabel == 'exam'
+                    ? 'Exam Sections'
+                    : 'Sections without Professors'}
+              </span>
             </Tooltip>
           </Typography>
-        }
+        )}
         <MeetingChip
           color={props.color}
           meetings={
@@ -666,47 +697,80 @@ export default function PlannerCard(props: PlannerCardProps) {
             </Table>
           </TableContainer>
           {/* Unassigned Professor Sections -- only show for a non-overall card */}
-          {props.query.profFirst != null && props.query.profLast !== null && latestExtraSections && latestExtraSections.sections.filter((section) => section.professor_details?.length == 0 && !sectionCanOverlap(section.section_number)).length > 0 
-            && <PlannerCard
-              key={searchQueryLabel(props.query) + " extra sections"}
-              query={props.query}
-              setPlannerSection={props.setPlannerSection}
-              removeFromPlanner={props.removeFromPlanner}
-              selectedSections={props.selectedSections}
-              openConflictMessage={props.openConflictMessage}
-              color={props.color}
-              latestSemester={props.latestSemester}
-              extraSections={{...latestExtraSections, sections: latestExtraSections.sections.filter((section) => section.professor_details?.length == 0 && !sectionCanOverlap(section.section_number))}}
-              extraLabel='unassigned'
-            />}
+          {props.query.profFirst != null &&
+            props.query.profLast !== null &&
+            latestExtraSections &&
+            latestExtraSections.sections.filter(
+              (section) =>
+                section.professor_details?.length == 0 &&
+                !sectionCanOverlap(section.section_number),
+            ).length > 0 && (
+              <PlannerCard
+                key={searchQueryLabel(props.query) + ' extra sections'}
+                query={props.query}
+                setPlannerSection={props.setPlannerSection}
+                removeFromPlanner={props.removeFromPlanner}
+                selectedSections={props.selectedSections}
+                openConflictMessage={props.openConflictMessage}
+                color={props.color}
+                latestSemester={props.latestSemester}
+                extraSections={{
+                  ...latestExtraSections,
+                  sections: latestExtraSections.sections.filter(
+                    (section) =>
+                      section.professor_details?.length == 0 &&
+                      !sectionCanOverlap(section.section_number),
+                  ),
+                }}
+                extraLabel="unassigned"
+              />
+            )}
           {/* Extra Sections (Lab, Discussion, Etc) -- with prof assigned or without too */}
-          {latestExtraSections && latestExtraSections.sections.filter((section) => sectionCanOverlap(section.section_number, 'extra')).length > 0
-            && <PlannerCard
-              key={searchQueryLabel(props.query) + " lab sections"}
-              query={props.query}
-              setPlannerSection={props.setPlannerSection}
-              removeFromPlanner={props.removeFromPlanner}
-              selectedSections={props.selectedSections}
-              openConflictMessage={props.openConflictMessage}
-              color={props.color}
-              latestSemester={props.latestSemester}
-              extraSections={{...latestExtraSections, sections: latestExtraSections.sections.filter((section) => sectionCanOverlap(section.section_number, 'extra'))}}
-              extraLabel='lab'
-            />}
+          {latestExtraSections &&
+            latestExtraSections.sections.filter((section) =>
+              sectionCanOverlap(section.section_number, 'extra'),
+            ).length > 0 && (
+              <PlannerCard
+                key={searchQueryLabel(props.query) + ' lab sections'}
+                query={props.query}
+                setPlannerSection={props.setPlannerSection}
+                removeFromPlanner={props.removeFromPlanner}
+                selectedSections={props.selectedSections}
+                openConflictMessage={props.openConflictMessage}
+                color={props.color}
+                latestSemester={props.latestSemester}
+                extraSections={{
+                  ...latestExtraSections,
+                  sections: latestExtraSections.sections.filter((section) =>
+                    sectionCanOverlap(section.section_number, 'extra'),
+                  ),
+                }}
+                extraLabel="lab"
+              />
+            )}
           {/* Extra Sections (Exam) -- with prof assigned or without too */}
-          {latestExtraSections && latestExtraSections.sections.filter((section) => sectionCanOverlap(section.section_number, 'exam')).length > 0
-            && <PlannerCard
-              key={searchQueryLabel(props.query) + " exam sections"}
-              query={props.query}
-              setPlannerSection={props.setPlannerSection}
-              removeFromPlanner={props.removeFromPlanner}
-              selectedSections={props.selectedSections}
-              openConflictMessage={props.openConflictMessage}
-              color={props.color}
-              latestSemester={props.latestSemester}
-              extraSections={{...latestExtraSections, sections: latestExtraSections.sections.filter((section) => sectionCanOverlap(section.section_number, 'exam'))}}
-              extraLabel='exam'
-            />}
+          {latestExtraSections &&
+            latestExtraSections.sections.filter((section) =>
+              sectionCanOverlap(section.section_number, 'exam'),
+            ).length > 0 && (
+              <PlannerCard
+                key={searchQueryLabel(props.query) + ' exam sections'}
+                query={props.query}
+                setPlannerSection={props.setPlannerSection}
+                removeFromPlanner={props.removeFromPlanner}
+                selectedSections={props.selectedSections}
+                openConflictMessage={props.openConflictMessage}
+                color={props.color}
+                latestSemester={props.latestSemester}
+                extraSections={{
+                  ...latestExtraSections,
+                  sections: latestExtraSections.sections.filter((section) =>
+                    sectionCanOverlap(section.section_number, 'exam'),
+                  ),
+                }}
+                extraLabel="exam"
+              />
+            )}
         </Collapse>
       }
 
@@ -722,8 +786,11 @@ export default function PlannerCard(props: PlannerCardProps) {
               grades={latestMatchedSections.grades}
               filteredGrades={calculateGrades(latestMatchedSections.grades)}
             />
-            {(latestMatchedSections.type === 'professor' || latestMatchedSections.type === 'combo') &&
-              latestMatchedSections.RMP && <SingleProfInfo rmp={latestMatchedSections.RMP} />}
+            {(latestMatchedSections.type === 'professor' ||
+              latestMatchedSections.type === 'combo') &&
+              latestMatchedSections.RMP && (
+                <SingleProfInfo rmp={latestMatchedSections.RMP} />
+              )}
           </div>
         </Collapse>
       }

@@ -135,10 +135,8 @@ export function searchQueryMultiSectionSplit(
 }
 
 export function sectionCanOverlap(section: string, type?: string): boolean {
-  if (type == "exam")
-    return /^[7]/.test(section);
-  else if (type == "extra")
-      return /^[1236]/.test(section);
+  if (type == 'exam') return /^[7]/.test(section);
+  else if (type == 'extra') return /^[1236]/.test(section);
   return /^[12367]/.test(section);
 }
 
