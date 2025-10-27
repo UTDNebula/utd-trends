@@ -454,11 +454,13 @@ export default function PlannerCard(props: PlannerCardProps) {
   if (props.extraSections && props.extraLabel == 'lab')
     allSectionsWithSyllabus = allSectionsWithSyllabus.filter((s) =>
       sectionCanOverlap(s.section_number, 'extra'),
-    ); // only keep extra sections for syllabus lookup
+    );
+  // only keep extra sections for syllabus lookup
   else if (props.extraSections && props.extraLabel == 'exam')
     allSectionsWithSyllabus = allSectionsWithSyllabus.filter((s) =>
       sectionCanOverlap(s.section_number, 'exam'),
-    ); // only keep exam sections for syllabus lookup
+    );
+  // only keep exam sections for syllabus lookup
   else if (props.extraSections && props.extraLabel == 'unassigned')
     allSectionsWithSyllabus = allSectionsWithSyllabus.filter(() => false); // No syllabi should be shown
   let latestMatchedSections: SearchResult = result; // fallback if filtering is null, at least it will have correct grade/rmp data
