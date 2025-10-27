@@ -643,7 +643,7 @@ export default function PlannerCard(props: PlannerCardProps) {
               </TableBody>
             </Table>
           </TableContainer>
-          <PlannerCard
+          {latestExtraSections && latestExtraSections.sections.length > 0 ? <PlannerCard
             key={searchQueryLabel(props.query) + " extra sections"}
             query={props.query}
             setPlannerSection={props.setPlannerSection}
@@ -653,7 +653,7 @@ export default function PlannerCard(props: PlannerCardProps) {
             color={props.color}
             latestSemester={props.latestSemester}
             extraSections={latestExtraSections ? latestExtraSections : undefined}
-          />
+          /> : <></>}
         </Collapse>
       }
 
