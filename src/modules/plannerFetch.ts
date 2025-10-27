@@ -164,7 +164,7 @@ export function useSearchResult(query: SearchQuery) {
   }, [sectionHook, rmpHook, query]);
   if (isProfessorQuery(query)) {
     if (isCourseQuery(query)) {
-      return combinedHook; // combo
+      return combinedHook!; // combo -- know this is non-null as query is both a prof and course query
     }
     return rmpHook; // professor only
   }
