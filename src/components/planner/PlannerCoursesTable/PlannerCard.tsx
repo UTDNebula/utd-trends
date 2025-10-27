@@ -669,11 +669,11 @@ export default function PlannerCard(props: PlannerCardProps) {
               openConflictMessage={props.openConflictMessage}
               color={props.color}
               latestSemester={props.latestSemester}
-              extraSections={latestExtraSections ? latestExtraSections : undefined}
+              extraSections={{...latestExtraSections, sections: latestExtraSections.sections.filter((section) => section.professor_details?.length == 0 && !sectionCanOverlap(section.section_number))}}
               extraLabel='unassigned'
             />}
-          {/* Extra Sections (Lab, Exam, Discussion, Etc) */}
-          {latestExtraSections && latestExtraSections.sections.filter((section) => section.professor_details && section.professor_details?.length > 0 && sectionCanOverlap(section.section_number)).length > 0
+          {/* Extra Sections (Lab, Exam, Discussion, Etc) -- with prof assigned or without too */}
+          {latestExtraSections && latestExtraSections.sections.filter((section) => sectionCanOverlap(section.section_number)).length > 0
             && <PlannerCard
               key={searchQueryLabel(props.query) + " lab sections"}
               query={props.query}
@@ -683,7 +683,7 @@ export default function PlannerCard(props: PlannerCardProps) {
               openConflictMessage={props.openConflictMessage}
               color={props.color}
               latestSemester={props.latestSemester}
-              extraSections={latestExtraSections ? latestExtraSections : undefined}
+              extraSections={{...latestExtraSections, sections: latestExtraSections.sections.filter((section) => sectionCanOverlap(section.section_number))}}
               extraLabel='lab'
             />}
         </Collapse>
