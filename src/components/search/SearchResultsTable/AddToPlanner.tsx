@@ -1,6 +1,9 @@
 import { useSharedState } from '@/app/SharedStateProvider';
+import { fetchSearchResult } from '@/modules/fetchSearchResult';
 import {
   convertToCourseOnly,
+  convertToProfOnly,
+  removeSection,
   searchQueryEqual,
   searchQueryLabel,
   sectionCanOverlap,
@@ -64,15 +67,36 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
               if (addJustCourseToo) {
                 addToPlanner(convertToCourseOnly(searchResult.searchQuery));
               }
-              queryClient.setQueryData(
-                ['results', searchQueryLabel(searchResult.searchQuery)],
-                {
-                  ...searchResult,
-                  sections: searchResult.sections.filter(
-                    (s) => s.academic_session.name === latestSemester,
+              queryClient.prefetchQuery({
+                queryKey: [
+                  'results',
+                  searchQueryLabel(
+                    convertToCourseOnly(
+                      removeSection(searchResult.searchQuery),
+                    ),
                   ),
+                ],
+                queryFn: async () => {
+                  const data = await fetchSearchResult(
+                    convertToCourseOnly(searchResult.searchQuery),
+                  );
+                  return data;
                 },
-              );
+              });
+              queryClient.prefetchQuery({
+                queryKey: [
+                  'rmp',
+                  searchQueryLabel(
+                    convertToProfOnly(removeSection(searchResult.searchQuery)),
+                  ),
+                ],
+                queryFn: async () => {
+                  const data = await fetchSearchResult(
+                    convertToProfOnly(removeSection(searchResult.searchQuery)),
+                  );
+                  return data;
+                },
+              });
             }
           }}
           icon={<BookOutlinedIcon />}
