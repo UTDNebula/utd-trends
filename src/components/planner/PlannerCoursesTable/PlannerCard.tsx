@@ -442,7 +442,7 @@ export default function PlannerCard(props: PlannerCardProps) {
         new Date(a.academic_session.start_date).getTime(),
     ); // all sections of the course, sorted by most recent syllabus
   let latestMatchedSections : SearchResult = result; // fallback if filtering is null, at least it will have correct grade/rmp data
-  let latestExtraSections : SearchResult;
+  let latestExtraSections : SearchResult | null = null;
   if (!props.extraSections) {
     latestMatchedSections = {
       ...result,
@@ -643,7 +643,17 @@ export default function PlannerCard(props: PlannerCardProps) {
               </TableBody>
             </Table>
           </TableContainer>
-
+          <PlannerCard
+            key={searchQueryLabel(props.query) + " extra sections"}
+            query={props.query}
+            setPlannerSection={props.setPlannerSection}
+            removeFromPlanner={props.removeFromPlanner}
+            selectedSections={props.selectedSections}
+            openConflictMessage={props.openConflictMessage}
+            color={props.color}
+            latestSemester={props.latestSemester}
+            extraSections={props.extraSections && latestExtraSections ? latestExtraSections : undefined}
+          />
         </Collapse>
       }
 
