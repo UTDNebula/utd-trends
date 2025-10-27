@@ -659,7 +659,7 @@ export default function PlannerCard(props: PlannerCardProps) {
             </Table>
           </TableContainer>
           {/* Unassigned Professor Sections -- only show for a non-overall card */}
-          {props.query.profFirst != null && props.query.profLast !== null && latestExtraSections && latestExtraSections.sections.filter((section) => section.professor_details?.length == 0).length > 0 
+          {props.query.profFirst != null && props.query.profLast !== null && latestExtraSections && latestExtraSections.sections.filter((section) => section.professor_details?.length == 0 && !sectionCanOverlap(section.section_number)).length > 0 
             && <PlannerCard
               key={searchQueryLabel(props.query) + " extra sections"}
               query={props.query}
