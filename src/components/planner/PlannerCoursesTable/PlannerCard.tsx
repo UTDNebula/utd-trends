@@ -672,8 +672,8 @@ export default function PlannerCard(props: PlannerCardProps) {
               extraSections={{...latestExtraSections, sections: latestExtraSections.sections.filter((section) => section.professor_details?.length == 0 && !sectionCanOverlap(section.section_number))}}
               extraLabel='unassigned'
             />}
-          {/* Extra Sections (Lab, Exam, Discussion, Etc) -- with prof assigned or without too */}
-          {latestExtraSections && latestExtraSections.sections.filter((section) => sectionCanOverlap(section.section_number)).length > 0
+          {/* Extra Sections (Lab, Discussion, Etc) -- with prof assigned or without too */}
+          {latestExtraSections && latestExtraSections.sections.filter((section) => sectionCanOverlap(section.section_number, 'extra')).length > 0
             && <PlannerCard
               key={searchQueryLabel(props.query) + " lab sections"}
               query={props.query}
@@ -683,8 +683,22 @@ export default function PlannerCard(props: PlannerCardProps) {
               openConflictMessage={props.openConflictMessage}
               color={props.color}
               latestSemester={props.latestSemester}
-              extraSections={{...latestExtraSections, sections: latestExtraSections.sections.filter((section) => sectionCanOverlap(section.section_number))}}
+              extraSections={{...latestExtraSections, sections: latestExtraSections.sections.filter((section) => sectionCanOverlap(section.section_number, 'extra'))}}
               extraLabel='lab'
+            />}
+          {/* Extra Sections (Exam) -- with prof assigned or without too */}
+          {latestExtraSections && latestExtraSections.sections.filter((section) => sectionCanOverlap(section.section_number, 'exam')).length > 0
+            && <PlannerCard
+              key={searchQueryLabel(props.query) + " exam sections"}
+              query={props.query}
+              setPlannerSection={props.setPlannerSection}
+              removeFromPlanner={props.removeFromPlanner}
+              selectedSections={props.selectedSections}
+              openConflictMessage={props.openConflictMessage}
+              color={props.color}
+              latestSemester={props.latestSemester}
+              extraSections={{...latestExtraSections, sections: latestExtraSections.sections.filter((section) => sectionCanOverlap(section.section_number, 'exam'))}}
+              extraLabel='exam'
             />}
         </Collapse>
       }
