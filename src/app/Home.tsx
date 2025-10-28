@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  FormControl,
-  FormControlLabel,
-  Switch,
-  Tooltip,
-} from '@mui/material';
+import { FormControl, FormControlLabel, Switch, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useState, useTransition } from 'react';
