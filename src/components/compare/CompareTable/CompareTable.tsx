@@ -17,8 +17,9 @@ import React, { useState } from 'react';
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
 import type { RMP } from '@/modules/fetchRmp';
-import { searchQueryLabel, type SearchResult } from '@/types/SearchQuery';
 import { calculateGrades, type GradesData } from '@/modules/fetchGrades';
+import { searchQueryLabel, type SearchResult } from '@/types/SearchQuery';
+import AddToPlanner from '@/components/search/SearchResultsTable/AddToPlanner';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(
@@ -270,16 +271,20 @@ function GradeAndRmpRow({
     </TableRow>
   );
 }
-type CheckboxRowProps = {
+
+type PlannerRowProps = {
   name: string;
   courses: SearchResult[];
-  removeFromCompare: (arg0: SearchResult) => void;
   cell_className: string;
   colors: string[];
   orderBy: string;
   order: 'asc' | 'desc';
+};
+type CheckboxRowProps = PlannerRowProps & {
+  removeFromCompare: (arg0: SearchResult) => void;
   handleClick: (arg0: string) => void;
 };
+
 // This is for checkboxes to remove courses from the compare table
 function CheckboxRow({
   name,
@@ -334,6 +339,36 @@ function CheckboxRow({
           </Tooltip>
         </TableCell>
       ))}
+    </TableRow>
+  );
+}
+
+function PlannerRow({
+  name,
+  courses,
+  cell_className, // for specifying border mostly
+  colors, // border colors
+}: PlannerRowProps) {
+  return (
+    <TableRow sx={{ '& td': { border: 0 } }}>
+      <TableCell align="right" className="pl-0">
+        {name}
+      </TableCell>
+      {courses.map((course, index) => {
+        return (
+          <TableCell
+            align="center"
+            key={index}
+            className={cell_className}
+            style={{
+              borderColor: colors[index],
+              backgroundColor: colors[index] + '10', // add transparency
+            }}
+          >
+            <AddToPlanner searchResult={course} />
+          </TableCell>
+        );
+      })}
     </TableRow>
   );
 }
@@ -535,11 +570,19 @@ export default function CompareTable({
               name="Color"
               courses={sortedResults}
               removeFromCompare={removeFromCompare}
-              cell_className="pt-0 pb-1 border-x-2 border-b-2 rounded-b-lg"
+              cell_className="pt-0 pb-1 border-x-2"
               colors={mappedColors}
               orderBy={orderBy}
               order={order}
               handleClick={handleClick}
+            />
+            <PlannerRow
+              name="Add to Planner"
+              courses={sortedResults}
+              cell_className="pt-0 pb-1 border-x-2 border-b-2 rounded-b-lg"
+              colors={mappedColors}
+              orderBy={orderBy}
+              order={order}
             />
           </TableBody>
         </Table>
