@@ -151,22 +151,28 @@ export default function Filters({
           return false;
       }
       const courseGrades = result.grades;
-      return courseGrades && calculateGrades(courseGrades).gpa >= gpaNum;
+      return (
+        (courseGrades && calculateGrades(courseGrades, chosenSemesters).gpa >= gpaNum) ||
+        courseGrades == undefined
+      );
     }).length;
   });
 
   minRatings.forEach((ratingString) => {
     const ratingNum = parseFloat(ratingString);
     rmpCounts[ratingString] = searchResults.filter((result) => {
+      // don't count classes already filtered out by semester or grade filters
+      const inSearchResults = result.grades.some((s)=>chosenSemesters.includes(s._id) || s._id == latestSemester)
       if (
-        typeof minGPA === 'string' &&
-        calculateGrades(result.grades, chosenSemesters).gpa < parseFloat(minGPA)
+        !inSearchResults ||
+        (typeof minGPA === 'string' &&
+        calculateGrades(result.grades, chosenSemesters).gpa < parseFloat(minGPA))
       )
         return false;
       return (
         result.type !== 'course' &&
-        result.RMP &&
-        result.RMP.avgRating >= ratingNum
+        ((result.RMP && result.RMP.avgRating >= ratingNum) ||
+          !result.RMP?.avgRating)
       );
     }).length;
   });
