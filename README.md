@@ -43,7 +43,7 @@ our [Discord](https://discord.utdnebula.com/) section.
 
 This project requires a working [Node.js](https://nodejs.org/en/) and NPM
 installation. To start, clone the repository, and then run `npm run dev` to launch
-a local development server at [`localhost:3000`](https://localhost:3000) by default.
+a local development server at [`localhost:3000`](http://localhost:3000) by default.
 
 ```bash
 git clone https://github.com/UTDNebula/utd-trends.git
@@ -51,6 +51,17 @@ cd utd-Trends
 npm install
 npm run dev
 ```
+
+### Documentation
+
+Available at [utdnebula.github.io/utd-trends](https://utdnebula.github.io/utd-trends/)
+
+This project utilizes [React Styleguidist](https://github.com/styleguidist/react-styleguidist)
+to generate component documentation and provide a isolated development environment
+with hot-reloading support. View the doumentation for the develop branch at
+[utdnebula.github.io/utd-trends](https://utdnebula.github.io/utd-trends/) or run
+`npm run docs` to launch a local development server at
+[`localhost:6060`](http://localhost:6060).
 
 ### Contact
 

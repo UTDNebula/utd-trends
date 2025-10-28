@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "esnext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -22,9 +22,21 @@
       "@/*": ["*"]
     },
     "baseUrl": "src",
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["src", "next-env.d.ts", "**/*.ts", "**/*.tsx", "/**/**/*/.tsx"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "/**/**/*/.tsx",
+    "next-env.d.ts",
+    "src",
+    ".next/types/**/*.ts"
+  ],
   "exclude": ["node_modules"],
   "ts-node": {
     "transpileOnly": true,

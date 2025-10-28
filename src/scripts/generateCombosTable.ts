@@ -1,24 +1,31 @@
 /*
 Build the combos table
 */
-import * as fs from 'fs';
+import { writeFileSync } from 'fs';
 
-import aggregatedData from '@/data/autocomplete_data.json';
+import aggregatedData from '../data/aggregated_data.json';
 import {
   type SearchQuery,
   searchQueryEqual,
-} from '@/modules/SearchQuery/SearchQuery';
+  searchQuerySort,
+} from '../types/SearchQuery';
 
 export type TableType = { [key: string]: SearchQuery[] };
 
 const table: TableType = {};
 
+function addBlank(prefix: string, number: string) {
+  const courseString = prefix + ' ' + number; //string representation
+  if (!Object.prototype.hasOwnProperty.call(table, courseString)) {
+    table[courseString] = [];
+  }
+}
+
 function addCombo( //variables
   prefix: string,
   number: string,
-  sectionNumber: string,
-  profFirst: string,
-  profLast: string,
+  profFirst?: string,
+  profLast?: string,
 ) {
   const courseString = prefix + ' ' + number; //string representation
   const profString = profFirst + ' ' + profLast;
@@ -40,60 +47,11 @@ function addCombo( //variables
   ) {
     table[profString].push(courseObject);
   }
-
-  if (sectionNumber === 'HON') {
-    //honor course separate
-    const courseWSectionString = prefix + ' ' + number + '.' + sectionNumber;
-    const courseWSectionObject: SearchQuery = {
-      prefix,
-      number,
-      sectionNumber,
-    };
-    if (!Object.prototype.hasOwnProperty.call(table, courseWSectionString)) {
-      table[courseWSectionString] = [profObject]; //add from query like with regular course
-    } else if (
-      table[courseWSectionString].findIndex((x) =>
-        searchQueryEqual(profObject, x),
-      ) === -1
-    ) {
-      table[courseWSectionString].push(profObject);
-    }
-    if (!Object.prototype.hasOwnProperty.call(table, profString)) {
-      table[profString] = [courseWSectionObject];
-    } else if (
-      table[profString].findIndex((x) =>
-        searchQueryEqual(courseWSectionObject, x),
-      ) === -1
-    ) {
-      table[profString].push(courseWSectionObject);
-    }
-  }
 }
 
 function sortResults(key: string) {
   if (Object.prototype.hasOwnProperty.call(table, key)) {
-    table[key].sort((a, b) => {
-      if ('profLast' in a && 'profLast' in b) {
-        //handle undefined variables based on searchQueryLabel
-        const aFirstName = a.profFirst ?? '';
-        const bFirstName = b.profFirst ?? '';
-        const aLastName = a.profLast ?? '';
-        const bLastName = b.profLast ?? '';
-
-        return (
-          aLastName.localeCompare(bLastName) ||
-          aFirstName.localeCompare(bFirstName) //sort by last name then first name
-        );
-      } else if ('prefix' in a && 'prefix' in b) {
-        const aPrefix = a.prefix ?? ''; //make sure the is no empty input for prefix and number
-        const bPrefix = b.prefix ?? '';
-        const aNumber = a.number ?? '';
-        const bNumber = b.number ?? '';
-
-        return aPrefix.localeCompare(bPrefix) || aNumber.localeCompare(bNumber); //sort by prefix then number
-      }
-      return 0;
-    });
+    table[key].sort(searchQuerySort);
   }
 }
 
@@ -105,6 +63,7 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
     courseNumberItr++
   ) {
     const courseNumberData = prefixData.course_numbers[courseNumberItr];
+    addBlank(prefixData.subject_prefix, courseNumberData.course_number);
     for (
       let academicSessionItr = 0;
       academicSessionItr < courseNumberData.academic_sessions.length;
@@ -133,7 +92,6 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
             addCombo(
               prefixData.subject_prefix,
               courseNumberData.course_number,
-              sectionData.section_number,
               professorData.first_name,
               professorData.last_name,
             );
@@ -147,5 +105,5 @@ for (const key in table) {
   sortResults(key);
 }
 
-fs.writeFileSync('src/data/combo_table.json', JSON.stringify(table));
+writeFileSync('src/data/combo_table.json', JSON.stringify(table));
 console.log('Combo table generation done.');

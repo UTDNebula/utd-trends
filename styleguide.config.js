@@ -1,9 +1,13 @@
 const path = require('path');
 const webpack = require('webpack');
 const dotenv = require('dotenv').config({ path: __dirname + '/.env' });
+
 module.exports = {
   pagePerSection: true,
-  title: 'UTD Trends Style Guide',
+  title: 'UTD Trends Documentation',
+  styleguideComponents: {
+    Wrapper: path.join(__dirname, './src/components/DocsWrapper.tsx'),
+  },
   template: {
     links: [
       {
@@ -15,15 +19,15 @@ module.exports = {
   sections: [
     {
       name: 'Introduction',
-      content: 'styleguidistDocs/introduction.md',
+      content: 'docs/introduction.md',
     },
     {
       name: 'Style Guide',
-      content: 'styleguidistDocs/styling.md',
+      content: 'docs/styling.md',
     },
     {
       name: 'Common Components',
-      content: 'styleguidistDocs/common.md',
+      content: 'docs/common.md',
       components: ['./src/components/common/**/*.tsx'],
     },
     {
@@ -31,9 +35,24 @@ module.exports = {
       components: ['./src/components/navigation/**/*.tsx'],
     },
     {
+      name: 'Dashboard Components',
+      components: ['./src/components/dashboard/**/*.tsx'],
+    },
+    {
+      name: 'Overview Components',
+      components: ['./src/components/overview/**/*.tsx'],
+    },
+    {
+      name: 'Search Components',
+      components: ['./src/components/search/**/*.tsx'],
+    },
+    {
       name: 'Graph Components',
-      content: './src/components/graph/GraphProps.md',
       components: ['./src/components/graph/**/*.tsx'],
+    },
+    {
+      name: 'Compare Components',
+      components: ['./src/components/compare/**/*.tsx'],
     },
     {
       name: 'Icon Components',
@@ -42,11 +61,18 @@ module.exports = {
   ],
 
   propsParser: require('react-docgen-typescript').parse,
-  require: [
-    path.resolve(__dirname, 'styleguide/setup.js'),
-    path.join(__dirname, './src/styles/globals.css'),
-  ],
+  require: [path.join(__dirname, './src/styles/globals.css')],
   webpackConfig: {
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, 'src'),
+      },
+      fallback: {
+        zlib: false,
+        stream: false,
+        fs: false,
+      },
+    },
     plugins: [
       new webpack.DefinePlugin({
         'process.env': JSON.stringify(dotenv.parsed),
@@ -54,33 +80,11 @@ module.exports = {
     ],
     module: {
       rules: [
+        // File Loaders that are needed for your components
         {
           test: /\.tsx?$/,
           exclude: /node_modules/,
           loader: 'babel-loader',
-        },
-        // Other loaders that are needed for your components
-        {
-          test: /\.css$/,
-          use: [
-            'style-loader',
-            'css-loader',
-            {
-              loader: 'postcss-loader',
-              options: {
-                postcssOptions: {
-                  plugins: [
-                    [
-                      'postcss-preset-env',
-                      {
-                        // Options
-                      },
-                    ],
-                  ],
-                },
-              },
-            },
-          ],
         },
         {
           test: /\.md$/,
@@ -92,6 +96,23 @@ module.exports = {
               loader: 'markdown-loader',
             },
           ],
+        },
+        {
+          test: /\.css$/,
+          use: [
+            'style-loader',
+            'css-loader',
+            {
+              loader: 'postcss-loader',
+            },
+          ],
+        },
+        {
+          test: /\.(png)$/,
+          type: 'asset/resource',
+          generator: {
+            filename: 'assets/[name][ext]',
+          },
         },
       ],
     },
