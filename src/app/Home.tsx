@@ -1,15 +1,12 @@
 'use client';
 
-import BookIcon from '@mui/icons-material/Book';
 import {
-  Button,
   FormControl,
   FormControlLabel,
   Switch,
   Tooltip,
 } from '@mui/material';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState, useTransition } from 'react';
 
@@ -18,6 +15,7 @@ import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
 import SearchBar from '@/components/search/SearchBar/SearchBar';
 import { displaySemesterName } from '@/modules/semesters';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
+import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 
 interface Props {
   latestSemester: string;
@@ -77,17 +75,7 @@ export default function Home(props: Props) {
             4th 7pm.
           </span>
         </a>*/}
-        <Link href="/planner" className="ml-auto">
-          <Button
-            variant="contained"
-            disableElevation
-            size="large"
-            className="px-4 normal-case"
-          >
-            <BookIcon className="mr-2" />
-            My Planner
-          </Button>
-        </Link>
+        <PlannerButton className="ml-auto" />
       </div>
       <div className="max-w-xl grow flex flex-col justify-center">
         <h2 className="text-sm font-semibold mb-3 text-royal dark:text-cornflower-300 tracking-wider flex gap-1 items-center">

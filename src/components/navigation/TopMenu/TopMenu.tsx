@@ -1,9 +1,8 @@
 'use client';
 
-import BookIcon from '@mui/icons-material/Book';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ShareIcon from '@mui/icons-material/Share';
-import { Button, IconButton, Snackbar, Tooltip } from '@mui/material';
+import { IconButton, Snackbar, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { Suspense, useCallback, useEffect, useState } from 'react';
@@ -15,6 +14,7 @@ import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
 import SearchBar, {
   LoadingSearchBar,
 } from '@/components/search/SearchBar/SearchBar';
+import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 
 /**
  * Props type used by the TopMenu component
@@ -117,7 +117,8 @@ export default function TopMenu(props: Props) {
             />
           </Suspense>
         )}
-        <Link
+        <PlannerButton
+          isPlanner={props.isPlanner}
           href={
             props.isPlanner
               ? dashboardSearchTerms != null
@@ -133,18 +134,8 @@ export default function TopMenu(props: Props) {
                 )
               : null
           }
-          className="ml-auto rounded-xl"
-        >
-          <Button
-            variant="contained"
-            disableElevation
-            size="large"
-            className="px-4 normal-case"
-          >
-            <BookIcon className="mr-2" />
-            {props.isPlanner ? 'Search Results' : 'My Planner'}
-          </Button>
-        </Link>
+          className="ml-auto"
+        />
         <div className="flex gap-0 md:gap-4">
           <div className="ml-auto">
             <WhatsNew />

@@ -1,18 +1,16 @@
-import BookIcon from '@mui/icons-material/Book';
 import {
-  Button,
   FormControl,
   FormControlLabel,
   Switch,
   Tooltip,
 } from '@mui/material';
 import Image from 'next/image';
-import Link from 'next/link';
 import React from 'react';
 
 import Background from '@/../public/background.png';
 import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
 import { LoadingSearchBar } from '@/components/search/SearchBar/SearchBar';
+import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
@@ -26,17 +24,7 @@ export default function Loading() {
         fill
         className="object-cover -z-20"
       />
-      <Link href="/planner" className="absolute top-4 right-4 rounded-xl">
-        <Button
-          variant="contained"
-          disableElevation
-          size="large"
-          className="px-4 normal-case"
-        >
-          <BookIcon className="mr-2" />
-          My Planner
-        </Button>
-      </Link>
+      <PlannerButton className="absolute top-4 right-4" />
       <div className="max-w-xl grow flex flex-col justify-center">
         <h2 className="text-sm font-semibold mb-3 text-royal dark:text-cornflower-300 tracking-wider flex gap-1 items-center">
           <span className="leading-none">POWERED BY</span>
