@@ -79,11 +79,15 @@ const SearchBar = ({
     'ex. CS 1200, CS 2337',
     'ex. MATH 2418',
     'ex. John Cole, Jason Smith',
+    'ex. MKT 3320',
+    'ex. ANGM 3305 Robert Manriquez',
   ];
-  const [searchBarHintIndex, setSearchBarHintIndex] = useState<number>(1);
+  const [searchBarHintIndex, setSearchBarHintIndex] = useState<number>(
+    Math.floor(Math.random() * searchBarHints.length),
+  );
 
   function changeHint() {
-    setSearchBarHintIndex(Math.floor(Math.random() * 4));
+    setSearchBarHintIndex(Math.floor(Math.random() * searchBarHints.length));
   }
 
   useEffect(() => {
