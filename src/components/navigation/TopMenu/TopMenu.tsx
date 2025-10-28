@@ -1,8 +1,10 @@
 'use client';
 
+import DownloadIcon from '@mui/icons-material/Download';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ShareIcon from '@mui/icons-material/Share';
 import { IconButton, Snackbar, Tooltip } from '@mui/material';
+import html2canvas from 'html2canvas-pro';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { Suspense, useCallback, useEffect, useState } from 'react';
@@ -21,6 +23,7 @@ import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
  */
 type Props = {
   isPlanner: boolean;
+  downloadRef?: React.RefObject<HTMLDivElement | null>;
 };
 
 /**
@@ -182,22 +185,72 @@ export default function TopMenu(props: Props) {
               </div>
             </div>
           )}
-          <Tooltip title="Share Link to Search">
-            <IconButton
-              className="aspect-square"
-              size="medium"
-              onClick={() => {
-                let url = window.location.href;
-                if (
-                  new URLSearchParams(window.location.search).toString() === ''
-                ) {
-                  url = 'https://trends.utdnebula.com/';
-                }
-                shareLink(url);
-              }}
-            >
-              <ShareIcon className="text-3xl mr-0.5 -ml-0.5" />
-            </IconButton>
+          <Tooltip
+            title={`${props.isPlanner ? 'Download your Schedule' : 'Share link to Search'}`}
+          >
+            {props.isPlanner ? (
+              <IconButton
+                className="aspect-square"
+                size="medium"
+                onClick={() => {
+                  const refObj = props.downloadRef;
+                  if (!refObj) {
+                    return;
+                  }
+                  if (!refObj.current) {
+                    return;
+                  }
+
+                  html2canvas(refObj.current).then(
+                    (canvasImg: HTMLCanvasElement) => {
+                      const linkTag = document.createElement('a');
+
+                      canvasImg.toBlob((blob) => {
+                        if (!blob) {
+                          return;
+                        }
+                        if (refObj.current === null) {
+                          return;
+                        }
+
+                        const imgURL = URL.createObjectURL(blob);
+                        linkTag.href = imgURL;
+                        linkTag.download = 'schedule.png';
+
+                        // Adding temp a tag for the download functionality (alternative to adding an api route handler)
+
+                        document.body.appendChild(linkTag);
+                        linkTag.click();
+                        document.body.removeChild(linkTag);
+
+                        // Removing ref to the object url
+
+                        URL.revokeObjectURL(imgURL);
+                      });
+                    },
+                  );
+                }}
+              >
+                <DownloadIcon className="text-3xl mt-0.5" />
+              </IconButton>
+            ) : (
+              <IconButton
+                className="aspect-square"
+                size="medium"
+                onClick={() => {
+                  let url = window.location.href;
+                  if (
+                    new URLSearchParams(window.location.search).toString() ===
+                    ''
+                  ) {
+                    url = 'https://trends.utdnebula.com/';
+                  }
+                  shareLink(url);
+                }}
+              >
+                <ShareIcon className="text-3xl mr-0.5 -ml-0.5" />
+              </IconButton>
+            )}
           </Tooltip>
         </div>
       </div>
