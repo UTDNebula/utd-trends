@@ -62,7 +62,7 @@ export function LoadingSearchBar(props: LoadingSearchBarProps) {
         variant="contained"
         disableElevation
         size="large"
-        className="h-11 w-[5.5rem] shrink-0 normal-case text-cornflower-200 dark:text-cornflower-700"
+        className="self-stretch my-px px-4 shrink-0 normal-case text-cornflower-200 dark:text-cornflower-700"
       >
         Search
       </Button>
@@ -644,21 +644,21 @@ export default function SearchBar(props: Props) {
           variant="contained"
           disableElevation
           size="large"
-          className={
-            'h-11 w-[5.5rem] shrink-0 normal-case' +
-            (value.length == 0
-              ? ' text-cornflower-200 dark:text-cornflower-700'
-              : '')
-          } //darkens the text when no valid search terms are entered (pseudo-disables the search button)
+          className={`self-stretch my-px px-4 shrink-0 normal-case relative ${
+            value.length == 0
+              ? 'text-cornflower-200 dark:text-cornflower-700'
+              : ''
+          }`} //darkens the text when no valid search terms are entered (pseudo-disables the search button)
           onClick={() => onSelect(value)}
         >
-          {isPending || props.isPending ? (
+          <p className={isPending || props.isPending ? 'opacity-0' : ''}>
+            Search
+          </p>
+          {(isPending || props.isPending) && (
             <CircularProgress
               color="inherit"
-              className="h-6 w-6 text-cornflower-50 dark:text-haiti"
+              className="absolute h-6 w-6 text-cornflower-50 dark:text-haiti"
             />
-          ) : (
-            'Search'
           )}
         </Button>
       </Tooltip>

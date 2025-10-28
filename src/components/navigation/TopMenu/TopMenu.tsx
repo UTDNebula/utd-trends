@@ -1,10 +1,9 @@
 'use client';
 
-import BookIcon from '@mui/icons-material/Book';
 import DownloadIcon from '@mui/icons-material/Download';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ShareIcon from '@mui/icons-material/Share';
-import { Button, IconButton, Snackbar, Tooltip } from '@mui/material';
+import { IconButton, Snackbar, Tooltip } from '@mui/material';
 import html2canvas from 'html2canvas-pro';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -17,6 +16,7 @@ import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
 import SearchBar, {
   LoadingSearchBar,
 } from '@/components/search/SearchBar/SearchBar';
+import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 
 /**
  * Props type used by the TopMenu component
@@ -120,7 +120,8 @@ export default function TopMenu(props: Props) {
             />
           </Suspense>
         )}
-        <Link
+        <PlannerButton
+          isPlanner={props.isPlanner}
           href={
             props.isPlanner
               ? dashboardSearchTerms != null
@@ -136,13 +137,8 @@ export default function TopMenu(props: Props) {
                 )
               : null
           }
-          className="ml-auto rounded-xl"
-        >
-          <Button className="bg-cornflower-500 rounded-xl text-white dark:bg-cornflower-400 text p-2 px-4 normal-case">
-            <BookIcon className="mr-2" />
-            {props.isPlanner ? 'Search Results' : 'My Planner'}
-          </Button>
-        </Link>
+          className="ml-auto"
+        />
         <div className="flex gap-0 md:gap-4">
           <div className="ml-auto">
             <WhatsNew />
@@ -152,14 +148,14 @@ export default function TopMenu(props: Props) {
               <div
                 className={
                   tutorialHint
-                    ? 'absolute w-11 h-11 rounded-full bg-royal dark:bg-cornflower-400 animate-ping'
+                    ? 'absolute w-11 h-11 rounded-full bg-royal dark:bg-cornflower-300 animate-ping'
                     : 'hidden'
                 }
               />
               <div
                 className={
                   tutorialHint
-                    ? ' rounded-full bg-royal dark:bg-cornflower-400'
+                    ? ' rounded-full bg-royal dark:bg-cornflower-300'
                     : ''
                 }
               >
