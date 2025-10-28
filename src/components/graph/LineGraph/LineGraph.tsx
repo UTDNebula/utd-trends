@@ -4,60 +4,45 @@ import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
 import { compareColors } from '@/modules/colors';
 import type { Grades } from '@/modules/fetchGrades';
+import { displaySemesterName } from '@/modules/semesters';
+import { FiltersContext } from '@/app/dashboard/FilterContext';
 
 function sortSemesters(a: string, b: string) {
-  let aNum = parseInt(a);
-  if (a.includes('S')) {
-    aNum += 0.1;
-  } else if (a.includes('U')) {
-    aNum += 0.2;
-  } else {
-    aNum += 0.3;
-  }
-  let bNum = parseInt(b);
-  if (b.includes('S')) {
-    bNum += 0.1;
-  } else if (b.includes('U')) {
-    bNum += 0.2;
-  } else {
-    bNum += 0.3;
-  }
-  return aNum - bNum;
+  const rank = (code: string) => {
+    let n = parseInt(code);
+    if (code.includes('S')) n += 0.1;
+    else if (code.includes('U')) n += 0.2;
+    else n += 0.3;
+    return n;
+  };
+  return rank(a) - rank(b);
 }
 
 function getSemesterGPAs(
-  data: {
-    name: string;
-    data: Grades['grades'];
-  },
-  allSemesters: string[],
+  data: { name: string; data: Grades['grades'] },
+  semesterMapping: Map<string, number>,
 ) {
-  const semesters = data.data
-    //remove summer
-    .filter((semester) => !semester._id.includes('U'))
-    .toSorted((a, b) => sortSemesters(a._id, b._id))
-    //get gpa and place in allSemesters
-    .map((semester) => {
-      const total: number = semester.grade_distribution.reduce(
-        (accumulator, currentValue) => accumulator + currentValue,
-        0,
-      );
+  const allPoints: { x: number; y: number; semester: string }[] = [];
 
+  data.data
+    .toSorted((a, b) => sortSemesters(a._id, b._id))
+    .forEach((semester) => {
+      const total = semester.grade_distribution.reduce((a, c) => a + c, 0);
       const GPALookup = [
         4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
       ];
+
       let gpa = 0;
       if (total !== 0) {
         gpa =
           GPALookup.reduce(
-            (accumulator, currentValue, index) =>
-              accumulator + currentValue * semester.grade_distribution[index],
+            (acc, val, i) => acc + val * semester.grade_distribution[i],
             0,
           ) /
           (total -
@@ -65,31 +50,27 @@ function getSemesterGPAs(
               semester.grade_distribution.length - 1
             ]);
       }
-      return {
-        x: allSemesters.indexOf(semester._id) + 1,
-        y: gpa,
-      };
+
+      const xValue = semesterMapping.get(semester._id);
+      if (xValue !== undefined) {
+        allPoints.push({ x: xValue, y: gpa, semester: semester._id });
+      }
     });
-  return {
-    name: data.name,
-    data: semesters,
-  };
+
+  return allPoints;
 }
 
-// Dynamically import react-apexcharts with SSR disabled.
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 type Props = {
   title: string;
-  xAxisLabels?: string[];
-  series: {
-    name: string;
-    data: Grades['grades'];
-  }[];
+  series: { name: string; data: Grades['grades'] }[];
   includedColors?: boolean[];
 };
 
 export default function LineGraph(props: Props) {
+  const { semesters, chosenSemesters, setChosenSemesters } =
+    use(FiltersContext);
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
@@ -97,47 +78,99 @@ export default function LineGraph(props: Props) {
     (fullScreenOpen ? FullscreenCloseIcon : FullscreenOpenIcon) +
     '</div>';
 
-  const noDataText = 'Please select a class to add';
-  // get all semesters from all series
-  const combinedSemesters = Array.from(
-    new Set(
-      props.series.flatMap((single) =>
-        single.data.map((semester) => semester._id),
-      ),
-    ),
-  )
-    .filter((semester) => !semester.includes('U'))
-    .toSorted(sortSemesters);
-  // fill in semester inbetween
-  const minSemester = combinedSemesters[0];
-  const maxSemester = combinedSemesters[combinedSemesters.length - 1];
-  const allSemesters: string[] = [];
-  for (let i = parseInt(minSemester); i <= parseInt(maxSemester); i++) {
-    if (i !== parseInt(minSemester) || minSemester.includes('S')) {
-      allSemesters.push(i + 'S');
-    }
-    if (i !== parseInt(maxSemester) || maxSemester.includes('F')) {
-      allSemesters.push(i + 'F');
-    }
-  }
-  // format series with gpas and semester places
-  const series = props.series.map((single) =>
-    getSemesterGPAs(single, allSemesters),
+  const allYearsSet = new Set<number>();
+  props.series.forEach((s) =>
+    s.data.forEach((sem) => allYearsSet.add(parseInt(sem._id))),
   );
+  const allYears = Array.from(allYearsSet).sort((a, b) => a - b);
+
+  const semesterMapping = new Map<string, number>();
+  const categories: string[] = []; // only labels for Spring/Fall
+  let idx = 0;
+
+  allYears.forEach((year) => {
+    const spring = `${year}S`;
+    const summer = `${year}U`;
+    const fall = `${year}F`;
+
+    semesterMapping.set(spring, idx);
+    categories.push(spring);
+
+    semesterMapping.set(summer, idx + 0.5); // summer between spring & fall
+
+    semesterMapping.set(fall, idx + 1);
+    categories.push(fall);
+
+    idx += 2;
+  });
+
+  const series = props.series.map((single) => ({
+    name: single.name,
+    data: getSemesterGPAs(single, semesterMapping).map((p) => ({
+      x: p.x,
+      y: p.y,
+      semester: p.semester,
+    })),
+  }));
 
   const theme = useTheme();
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
+  const multiplePoints = series.reduce((acc, s) => acc + s.data.length, 0) > 1;
+  const isInteger = (v: number) => Math.abs(v - Math.round(v)) < 1e-8;
+
+  // Compute min/max of data points (integer indices)
+  const dataIndices = series.flatMap((s) => s.data.map((p) => Math.round(p.x)));
+  const hasData = dataIndices.length > 0;
+  const allIndicesWithData = series.flatMap((s) => s.data.map((p) => p.x));
+  const firstIdxWithData = Math.min(...allIndicesWithData);
+  const lastIdxWithData = Math.max(...allIndicesWithData);
+  let customMin = 0;
+  let customMax = 0;
+  let customCategories = [...categories];
+  let singleLabelMode = false;
+  let tickAmount = multiplePoints ? undefined : 0;
+
+  if (!multiplePoints && hasData) {
+    singleLabelMode = true;
+    const point = series[0].data[0];
+    const sem = point.semester;
+
+    point.x = 0.5;
+    customMin = 0;
+    customMax = 1;
+
+    if (sem.includes('U')) {
+      const year = sem.slice(0, -1);
+      customCategories = [`${year}S`, `${year}F`];
+      tickAmount = 2;
+    } else {
+      customCategories = [sem];
+      tickAmount = 0;
+    }
+  } else if (multiplePoints && hasData) {
+    customMin = Math.floor(firstIdxWithData);
+    customMax = Math.ceil(lastIdxWithData);
+
+    if (isInteger(lastIdxWithData) != isInteger(firstIdxWithData)) {
+      if (isInteger(firstIdxWithData)) {
+        customMin = firstIdxWithData - 1;
+      } else {
+        customMax = lastIdxWithData + 1;
+      }
+    }
+    tickAmount = customMax - customMin;
+  }
+
   const options: ApexOptions = {
     chart: {
-      zoom: {
-        enabled: false,
-      },
+      type: 'line',
+      zoom: { enabled: false },
       toolbar: {
         tools: {
           customIcons: [
             {
-              icon: icon,
+              icon,
               index: 0,
               title: 'Fullscreen',
               class: 'custom-icon',
@@ -148,74 +181,161 @@ export default function LineGraph(props: Props) {
       },
       background: 'transparent',
       animations: {
-        enabled:
-          !fullScreenOpen &&
-          // disable if only one data point cause it look weird
-          !series.every((single) => single.data.length === 1),
+        enabled: !fullScreenOpen && !singleLabelMode && multiplePoints,
       },
-    },
-    grid: {
-      borderColor: prefersDarkMode ? '#404040' : '#e0e0e0',
-    },
-    legend: {
-      show: series.length !== 1,
-    },
-    xaxis: {
-      categories: allSemesters,
-      tickAmount: allSemesters.length - 1, // Ensure all ticks are shown
-      labels: {
-        show: true,
-        rotate: -45, // Rotate labels if necessary to fit them
-        style: {
-          fontSize: '12px',
+      events: {
+        markerClick: (event, chartContext, { seriesIndex, dataPointIndex }) => {
+          const semester =
+            chartContext.w.config?.series[seriesIndex]?.data[dataPointIndex]
+              .semester;
+
+          let newSemesters = chosenSemesters;
+
+          if (semester === null) return;
+          if (chosenSemesters?.length === semesters.length) {
+            newSemesters = [semester];
+          } else if (chosenSemesters.includes(semester)) {
+            newSemesters = chosenSemesters.filter((s) => s !== semester);
+            if (newSemesters.length == 0) {
+              newSemesters = semesters;
+            }
+          } else {
+            newSemesters = [...chosenSemesters, semester];
+          }
+
+          setChosenSemesters(newSemesters);
         },
       },
+    },
+    grid: { borderColor: prefersDarkMode ? '#404040' : '#e0e0e0' },
+    legend: { show: series.length !== 1 },
+    xaxis: {
+      type: 'numeric',
+      min: customMin,
+      max: customMax,
+      tickAmount: tickAmount,
+      tickPlacement: 'on',
+      labels: {
+        rotate: -45,
+        style: { fontSize: '12px' },
+        formatter: (val) => {
+          if (singleLabelMode) {
+            const numVal = Number(val);
+            if (customCategories.length === 1) return customCategories[0];
+            if (numVal === 0) return customCategories[0];
+            if (numVal === 1) return customCategories[1];
+            return '';
+          }
+
+          const n = Number(val);
+          if (!isInteger(n)) return '';
+
+          const idx = Math.round(n);
+          if (idx < customMin || idx > customMax) return '';
+          if (idx < 0 || idx >= categories.length) {
+            if (idx < 0) {
+              const firstCategory = categories[0];
+              if (firstCategory) {
+                const year = parseInt(firstCategory);
+                const semType = firstCategory.slice(-1);
+                if (semType === 'S') {
+                  return `${year - 1}F`;
+                } else if (semType === 'F') {
+                  return `${year}S`;
+                }
+              }
+            } else if (idx >= categories.length) {
+              // After the end - get the year and generate next semester
+              const lastCategory = categories[categories.length - 1];
+              if (lastCategory) {
+                const year = parseInt(lastCategory);
+                const semType = lastCategory.slice(-1);
+                if (semType === 'S') {
+                  return `${year}F`;
+                } else if (semType === 'F') {
+                  return `${year + 1}S`;
+                }
+              }
+            }
+            return '';
+          }
+
+          return categories[idx] ?? '';
+        },
+      },
+      axisTicks: { show: true },
     },
     yaxis: {
       min: 1,
       max: 4,
-      labels: {
-        formatter: (value: number) => value.toFixed(2),
-      },
+      labels: { formatter: (v) => (typeof v === 'number' ? v.toFixed(2) : '') },
     },
     colors:
       series.length === 1
         ? [theme.vars.palette.primary.main]
-        : compareColors.filter(
-            (searchQuery, i) => props.includedColors?.[i] ?? 1,
-          ),
-    stroke: {
-      curve: 'straight',
-    },
+        : compareColors.filter((_, i) => props.includedColors?.[i] ?? 1),
+    stroke: { curve: 'straight', width: 5 },
     title: {
       text: props.title,
       align: 'left',
-      style: {
-        fontFamily: 'inherit',
+      style: { fontFamily: 'inherit' },
+    },
+    markers: { size: 5 },
+    tooltip: {
+      x: {
+        formatter: (val, opts) => {
+          const sIndex = opts?.seriesIndex;
+          const dpIndex = opts?.dataPointIndex;
+          if (sIndex != null && dpIndex != null)
+            return (
+              displaySemesterName(
+                series[sIndex].data[dpIndex]?.semester,
+                false,
+              ) ?? ''
+            );
+          return '';
+        },
       },
     },
     noData: {
-      text: noDataText,
+      text: 'Please select a class to add',
       align: 'center',
-      verticalAlign: 'middle',
-      offsetX: 0,
-      offsetY: 0,
-      style: {
-        fontSize: '14px',
-        fontFamily: 'inherit',
-      },
+      style: { fontSize: '14px', fontFamily: 'inherit' },
     },
-    theme: {
-      mode: prefersDarkMode ? 'dark' : 'light',
-    },
-    markers: {
-      size: 4,
-    },
+    theme: { mode: prefersDarkMode ? 'dark' : 'light' },
+  };
+
+  const highlightedMarkers: ApexDiscretePoint[] =
+    chosenSemesters.length === semesters.length
+      ? []
+      : ((chosenSemesters?.flatMap((sem) => {
+          return series.flatMap((s, seriesIndex) => {
+            const dataPointIndex = s.data.findIndex((d) => d.semester === sem);
+            if (dataPointIndex === -1) return [];
+            return [
+              {
+                seriesIndex,
+                dataPointIndex,
+                fillColor: prefersDarkMode
+                  ? theme.palette.secondary.main
+                  : getComputedStyle(document.documentElement)
+                      .getPropertyValue('--color-cornflower-400')
+                      .trim(),
+                strokeColor: '#fff',
+                size: 8,
+              },
+            ];
+          });
+        }) ?? []) as ApexDiscretePoint[]);
+
+  options.markers = {
+    ...options.markers,
+    discrete: highlightedMarkers,
   };
 
   const graph = (
     <div className="h-full">
-      <Chart options={options} series={series} type="line" height={'100%'} />
+      <Chart options={options} series={series} type="line" height="100%" />
     </div>
   );
 

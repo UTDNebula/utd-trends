@@ -1,4 +1,3 @@
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery } from '@/types/SearchQuery';
 
 export interface Professor {
@@ -21,10 +20,10 @@ export interface Professor {
 
 export default async function fetchProfessor(
   query: SearchQuery,
-): Promise<GenericFetchedData<Professor>> {
+): Promise<Professor> {
   const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
   if (typeof API_KEY !== 'string') {
-    return { message: 'error', data: 'API key is undefined' };
+    throw new Error('API key is undefined');
   }
 
   try {
@@ -53,15 +52,10 @@ export default async function fetchProfessor(
       throw new Error(data.data ?? data.message);
     }
 
-    return {
-      message: 'success',
-      data: data.data[0],
-    };
+    return data.data[0];
   } catch (error) {
-    return {
-      message: 'error',
-      data:
-        error instanceof Error ? error.message : 'An unknown error occurred',
-    };
+    throw new Error(
+      error instanceof Error ? error.message : 'An unknown error occurred',
+    );
   }
 }

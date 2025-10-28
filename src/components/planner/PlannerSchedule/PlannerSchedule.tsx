@@ -4,7 +4,6 @@ import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection';
 import {
   convertToCourseOnly,
-  removeSection,
   searchQueryLabel,
   searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
@@ -45,7 +44,7 @@ function HourRow(props: HourRowProps) {
       className={`grid row-span-1 row-start-[var(--row-start-row)] col-span-full grid-rows-subgrid grid-cols-subgrid`}
     >
       <p
-        className={`text-[0.8125rem] text-white col-span-1 col-start-1 bg-cornflower-300 border-t px-1 text-right`}
+        className={`text-[0.8125rem] text-white dark:text-haiti col-span-1 col-start-1 bg-royal dark:bg-cornflower-300 border-t px-1 text-right`}
       >
         {props.hour > 12 ? props.hour - 12 : props.hour}:00
         {props.hour >= 12 ? 'PM' : 'AM'}
@@ -60,7 +59,7 @@ function HourRow(props: HourRowProps) {
 }
 
 export default function PlannerSchedule() {
-  const { sections, planner, plannerColorMap, courseNames } = useSharedState();
+  const { planner, plannerColorMap } = useSharedState();
 
   const courses = planner.flatMap((searchQuery) =>
     searchQueryMultiSectionSplit(searchQuery),
@@ -68,15 +67,15 @@ export default function PlannerSchedule() {
 
   return (
     <div
-      className={`w-full h-[calc(100vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[max-content_repeat(14,minmax(0,1fr))]`}
+      className={`w-full h-[calc(100vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-auto rounded-2xl grid-rows-[max-content_repeat(14,minmax(0,1fr))]`}
     >
       {/*Weekday Headers*/}
-      <div className="grid col-span-full grid-flow-row bg-cornflower-500 grid-cols-subgrid grid-rows-subgrid">
+      <div className="grid col-span-full grid-flow-row bg-royal dark:bg-cornflower-300 grid-cols-subgrid grid-rows-subgrid">
         <div className="col-span-1 h-min"></div>
         {DAYS.slice(START_DAY, END_DAY + 1).map((x, i) => (
           <p
             key={i}
-            className="text-sm text-white col-span-1 border-l text-center h-min overflow-hidden"
+            className="text-sm text-white dark:text-haiti col-span-1 border-l text-center h-min overflow-hidden"
           >
             {x}
           </p>
@@ -88,26 +87,14 @@ export default function PlannerSchedule() {
       ))}
 
       {courses.map((course) => {
-        const courseSections =
-          sections[searchQueryLabel(removeSection(course))];
-        if (
-          typeof courseSections === 'undefined' ||
-          courseSections.message !== 'success'
-        ) {
-          return null;
-        }
+        if (!course.sectionNumber) return null;
         return (
           <PlannerSection
             key={searchQueryLabel(course)}
-            selectedSection={courseSections.data.latest.find(
-              (section) => section.section_number === course.sectionNumber,
-            )}
+            selectedSection={course.sectionNumber}
             course={course}
             color={
               plannerColorMap[searchQueryLabel(convertToCourseOnly(course))]
-            }
-            courseName={
-              courseNames[searchQueryLabel(convertToCourseOnly(course))]
             }
           />
         );
