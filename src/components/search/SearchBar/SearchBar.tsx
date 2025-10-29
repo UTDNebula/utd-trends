@@ -62,7 +62,7 @@ export function LoadingSearchBar(props: LoadingSearchBarProps) {
         variant="contained"
         disableElevation
         size="large"
-        className="h-11 w-[5.5rem] shrink-0 normal-case text-cornflower-200 dark:text-cornflower-700"
+        className="self-stretch my-px px-4 shrink-0 normal-case text-cornflower-200 dark:text-cornflower-700"
       >
         Search
       </Button>
@@ -157,10 +157,34 @@ export default function SearchBar(props: Props) {
     }
   }, [searchTerms]); // useEffect is called every time the query changes
 
-  // updateValue -> onSelect -> updateQueries - clicking enter on an autocomplete suggestion in TopMenu Searchbar
-  // updateValue -> onSelect -> props.onSelect (custom function) - clicking enter on an autocomplete suggestion in home page SearchBar
-  // params.inputProps.onKeyDown -> handleKeyDown -> onSelect -> updateQueries/props.onSelect - clicking enter in the SearchBar
-  // Button onClick -> onSelect -> updateQueries/props.onSelect - Pressing the "Search" Button
+  const searchBarHints = [
+    'ex. GOVT 2306, Sara Johnson',
+    'ex. CS 1200, CS 2337',
+    'ex. MATH 2418',
+    'ex. John Cole, Jason Smith',
+    'ex. MKT 3320',
+    'ex. ANGM 3305 Robert Manriquez',
+  ];
+  const [searchBarHintIndex, setSearchBarHintIndex] = useState<number>(
+    Math.floor(Math.random() * searchBarHints.length),
+  );
+
+  function changeHint() {
+    setSearchBarHintIndex(Math.floor(Math.random() * searchBarHints.length));
+  }
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      changeHint();
+    }, 7000);
+
+    return () => clearInterval(interval); // Cleanup when component unmounts
+  }, []); // run on mount
+
+  // updateValue -> onSelect_internal -> updateQueries - clicking enter on an autocomplete suggestion in topMenu Searchbar
+  // updateValue -> onSelect_internal -> onSelect (custom function) - clicking enter on an autocomplete suggestion in home page SearchBar
+  // params.inputProps.onKeyDown -> handleKeyDown -> onSelect_internal -> updateQueries/onSelect - clicking enter in the SearchBar
+  // Button onClick -> onSelect_internal -> updateQueries/onSelect - Pressing the "Search" Button
 
   //change all values
   function updateValue(newValue: SearchQuery[]) {
@@ -187,8 +211,8 @@ export default function SearchBar(props: Props) {
     }
   }
 
-  //update parent and queries
   function onSelect(newValue: SearchQuery[]) {
+    changeHint();
     if (searchTerms == newValue.map((el) => searchQueryLabel(el)).join(','))
       // do not initiate a new search when the searchTerms haven't changed
       return;
@@ -487,7 +511,7 @@ export default function SearchBar(props: Props) {
               {...params}
               variant="outlined"
               className={props.input_className}
-              placeholder="ex. GOVT 2306"
+              placeholder={searchBarHints[searchBarHintIndex]}
               autoFocus={props.autoFocus}
             />
           );
@@ -497,7 +521,8 @@ export default function SearchBar(props: Props) {
           const value = (event.target as HTMLInputElement).value;
           // if the last character in the new string is a space, check for autocomplete
           if (
-            value[value.length - 1] === ' ' &&
+            (value[value.length - 1] === ' ' ||
+              value[value.length - 1] === ',') &&
             // but if the user is deleting text, don't try to autocomplete
             (event.nativeEvent as InputEvent).inputType === 'insertText'
           ) {
@@ -644,21 +669,21 @@ export default function SearchBar(props: Props) {
           variant="contained"
           disableElevation
           size="large"
-          className={
-            'h-11 w-[5.5rem] shrink-0 normal-case' +
-            (value.length == 0
-              ? ' text-cornflower-200 dark:text-cornflower-700'
-              : '')
-          } //darkens the text when no valid search terms are entered (pseudo-disables the search button)
+          className={`self-stretch my-px px-4 shrink-0 normal-case relative ${
+            value.length == 0
+              ? 'text-cornflower-200 dark:text-cornflower-700'
+              : ''
+          }`} //darkens the text when no valid search terms are entered (pseudo-disables the search button)
           onClick={() => onSelect(value)}
         >
-          {isPending || props.isPending ? (
+          <p className={isPending || props.isPending ? 'opacity-0' : ''}>
+            Search
+          </p>
+          {(isPending || props.isPending) && (
             <CircularProgress
               color="inherit"
-              className="h-6 w-6 text-cornflower-50 dark:text-haiti"
+              className="absolute h-6 w-6 text-cornflower-50 dark:text-haiti"
             />
-          ) : (
-            'Search'
           )}
         </Button>
       </Tooltip>

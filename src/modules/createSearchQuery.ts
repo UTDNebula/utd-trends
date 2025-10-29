@@ -17,14 +17,17 @@ export function createSearchQuery(
   filterTerms: SearchQuery[], //filterTerms is blank if the searchTerms are ALL courses or ALL professors
 ) {
   return searchTerms
-    .flatMap((searchTerm) =>
-      [searchTerm].concat(
+    .flatMap((searchTerm) => {
+      if (!(searchQueryLabel(searchTerm) in comboTable)) {
+        return [];
+      }
+      return [searchTerm].concat(
         comboTable[searchQueryLabel(searchTerm)].map((combo) => ({
           ...searchTerm,
           ...combo,
         })),
-      ),
-    )
+      );
+    })
     .filter(
       (searchTerm) =>
         !filterTerms.length ||

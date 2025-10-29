@@ -131,28 +131,38 @@ function hasConflict(
 
 function SectionTableHead(props: { hasMultipleDateRanges: boolean }) {
   return (
-    <TableRow className="bg-cornflower-600">
+    <TableRow className="bg-royal dark:bg-cornflower-300">
       <TableCell className="py-2 px-4 border-b-0" align="left">
-        <Typography className="text-white text-xs">Select</Typography>
+        <Typography className="text-white dark:text-haiti text-xs">
+          Select
+        </Typography>
       </TableCell>
       <TableCell className="py-2 px-4 border-b-0">
-        <Typography className="text-white text-xs">Section #</Typography>
+        <Typography className="text-white dark:text-haiti text-xs">
+          Section #
+        </Typography>
       </TableCell>
       <TableCell className="py-2 px-4 border-b-0">
-        <Typography className="text-white text-xs">Class #</Typography>
+        <Typography className="text-white dark:text-haiti text-xs">
+          Class #
+        </Typography>
       </TableCell>
       <TableCell className="py-2 px-4 border-b-0">
-        <Typography className="text-white text-xs">
+        <Typography className="text-white dark:text-haiti text-xs">
           Schedule & Location
         </Typography>
       </TableCell>
       {props.hasMultipleDateRanges && (
         <TableCell className="py-2 px-4 border-b-0">
-          <Typography className="text-white text-xs">Date Range</Typography>
+          <Typography className="text-white dark:text-haiti text-xs">
+            Date Range
+          </Typography>
         </TableCell>
       )}
       <TableCell className="py-2 px-4 border-b-0">
-        <Typography className="text-white text-xs">Syllabus</Typography>
+        <Typography className="text-white dark:text-haiti text-xs">
+          Syllabus
+        </Typography>
       </TableCell>
     </TableRow>
   );
