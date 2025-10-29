@@ -59,7 +59,7 @@ export default function Carousel({ names, children }: CarouselProps) {
       // If currentCard is out of bounds, reset it to 0
       setCurrentCard(0);
     }
-  }, [currentCard]);
+  }, [currentCard, children]);
 
   /**
    * Turn
