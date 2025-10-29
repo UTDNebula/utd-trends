@@ -139,9 +139,22 @@ export default function Filters({
   const gradeCounts: Record<string, number> = {};
   const rmpCounts: Record<string, number> = {};
 
+  const semFilteredResults = searchResults.filter((result) => {
+    const availableThisSemester =
+      filterNextSem &&
+      result.sections.some(
+        (section) => section.academic_session.name === latestSemester,
+      );
+    return (
+      result.grades.length == 0 ||
+      result.grades.some((s) => chosenSemesters.includes(s._id)) ||
+      availableThisSemester
+    );
+  });
+
   minGPAs.forEach((gpaString) => {
     const gpaNum = parseFloat(gpaString);
-    gradeCounts[gpaString] = searchResults.filter((result) => {
+    gradeCounts[gpaString] = semFilteredResults.filter((result) => {
       if (result.type !== 'course') {
         if (
           typeof minRating === 'string' &&
@@ -151,23 +164,29 @@ export default function Filters({
           return false;
       }
       const courseGrades = result.grades;
-      return courseGrades && calculateGrades(courseGrades).gpa >= gpaNum;
+      return (
+        (courseGrades &&
+          calculateGrades(courseGrades, chosenSemesters).gpa >= gpaNum) ||
+        courseGrades == undefined
+      );
     }).length;
   });
 
   minRatings.forEach((ratingString) => {
     const ratingNum = parseFloat(ratingString);
-    rmpCounts[ratingString] = searchResults.filter((result) => {
-      if (
-        typeof minGPA === 'string' &&
-        calculateGrades(result.grades, chosenSemesters).gpa < parseFloat(minGPA)
-      )
+    rmpCounts[ratingString] = semFilteredResults.filter((result) => {
+      // gpa filter
+      const calculated = calculateGrades(result.grades, chosenSemesters);
+      if (typeof minGPA === 'string' && calculated.gpa < parseFloat(minGPA))
         return false;
-      return (
+      if (
+        typeof ratingNum === 'number' &&
         result.type !== 'course' &&
         result.RMP &&
-        result.RMP.avgRating >= ratingNum
-      );
+        result.RMP.avgRating < ratingNum
+      )
+        return false;
+      return true;
     }).length;
   });
 
