@@ -69,7 +69,7 @@ export default async function Right(props: Props) {
           fetchProfessor(props.professors[0]),
           fetchGrades(props.professors[0]),
           fetchRmp(props.professors[0]),
-        ])
+        ]).catch(() => null)
       : null;
 
   const coursePromise =
@@ -77,7 +77,7 @@ export default async function Right(props: Props) {
       ? Promise.all([
           fetchCourse(props.courses[0]),
           fetchGrades(props.courses[0]),
-        ])
+        ]).catch(() => null)
       : null;
 
   const [professorResults, courseResults] = await Promise.all([
