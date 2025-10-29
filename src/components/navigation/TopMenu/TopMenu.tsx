@@ -1,9 +1,10 @@
 'use client';
 
-import BookIcon from '@mui/icons-material/Book';
+import DownloadIcon from '@mui/icons-material/Download';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ShareIcon from '@mui/icons-material/Share';
-import { Button, IconButton, Snackbar, Tooltip } from '@mui/material';
+import { IconButton, Snackbar, Tooltip } from '@mui/material';
+import html2canvas from 'html2canvas-pro';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { Suspense, useCallback, useEffect, useState } from 'react';
@@ -11,19 +12,22 @@ import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import Background from '@/../public/background.png';
 import WhatsNew from '@/components/common/WhatsNew/WhatsNew';
 import Tutorial from '@/components/dashboard/Tutorial/Tutorial';
+import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
 import SearchBar, {
   LoadingSearchBar,
 } from '@/components/search/SearchBar/SearchBar';
+import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 
 /**
  * Props type used by the TopMenu component
  */
 type Props = {
   isPlanner: boolean;
+  downloadRef?: React.RefObject<HTMLDivElement | null>;
 };
 
 /**
- * This is a component to hold UTD Trends branding and basic navigation
+ * This component is located at the top of the page. From left to right, it holds the UTD Trends logo (component name NebulaLogo), a search box (component name SearchBar), a "Search" button, the "My Planner" button if you are on the Search Results page (or "Search Results" if you are on the Planner page), a button to see what is new in Trends, a help button, and a share button.
  * @returns
  */
 export default function TopMenu(props: Props) {
@@ -95,8 +99,9 @@ export default function TopMenu(props: Props) {
         />
         <Link
           href="/"
-          className="lext-lg md:text-xl font-display font-medium md:font-bold"
+          className="lext-lg md:text-xl font-display font-medium md:font-bold flex gap-2 items-center"
         >
+          <NebulaLogo className="h-6 w-auto fill-haiti dark:fill-white" />
           UTD TRENDS
         </Link>
         {!props.isPlanner && (
@@ -115,7 +120,8 @@ export default function TopMenu(props: Props) {
             />
           </Suspense>
         )}
-        <Link
+        <PlannerButton
+          isPlanner={props.isPlanner}
           href={
             props.isPlanner
               ? dashboardSearchTerms != null
@@ -131,13 +137,8 @@ export default function TopMenu(props: Props) {
                 )
               : null
           }
-          className="ml-auto rounded-xl"
-        >
-          <Button className="bg-cornflower-500 rounded-xl text-white dark:bg-cornflower-400 text p-2 px-4 normal-case">
-            <BookIcon className="mr-2" />
-            {props.isPlanner ? 'Search Results' : 'My Planner'}
-          </Button>
-        </Link>
+          className="ml-auto"
+        />
         <div className="flex gap-0 md:gap-4">
           <div className="ml-auto">
             <WhatsNew />
@@ -147,14 +148,14 @@ export default function TopMenu(props: Props) {
               <div
                 className={
                   tutorialHint
-                    ? 'absolute w-11 h-11 rounded-full bg-royal dark:bg-cornflower-400 animate-ping'
+                    ? 'absolute w-11 h-11 rounded-full bg-royal dark:bg-cornflower-300 animate-ping'
                     : 'hidden'
                 }
               />
               <div
                 className={
                   tutorialHint
-                    ? ' rounded-full bg-royal dark:bg-cornflower-400'
+                    ? ' rounded-full bg-royal dark:bg-cornflower-300'
                     : ''
                 }
               >
@@ -184,22 +185,72 @@ export default function TopMenu(props: Props) {
               </div>
             </div>
           )}
-          <Tooltip title="Share Link to Search">
-            <IconButton
-              className="aspect-square"
-              size="medium"
-              onClick={() => {
-                let url = window.location.href;
-                if (
-                  new URLSearchParams(window.location.search).toString() === ''
-                ) {
-                  url = 'https://trends.utdnebula.com/';
-                }
-                shareLink(url);
-              }}
-            >
-              <ShareIcon className="text-3xl mr-0.5 -ml-0.5" />
-            </IconButton>
+          <Tooltip
+            title={`${props.isPlanner ? 'Download your Schedule' : 'Share link to Search'}`}
+          >
+            {props.isPlanner ? (
+              <IconButton
+                className="aspect-square"
+                size="medium"
+                onClick={() => {
+                  const refObj = props.downloadRef;
+                  if (!refObj) {
+                    return;
+                  }
+                  if (!refObj.current) {
+                    return;
+                  }
+
+                  html2canvas(refObj.current).then(
+                    (canvasImg: HTMLCanvasElement) => {
+                      const linkTag = document.createElement('a');
+
+                      canvasImg.toBlob((blob) => {
+                        if (!blob) {
+                          return;
+                        }
+                        if (refObj.current === null) {
+                          return;
+                        }
+
+                        const imgURL = URL.createObjectURL(blob);
+                        linkTag.href = imgURL;
+                        linkTag.download = 'schedule.png';
+
+                        // Adding temp a tag for the download functionality (alternative to adding an api route handler)
+
+                        document.body.appendChild(linkTag);
+                        linkTag.click();
+                        document.body.removeChild(linkTag);
+
+                        // Removing ref to the object url
+
+                        URL.revokeObjectURL(imgURL);
+                      });
+                    },
+                  );
+                }}
+              >
+                <DownloadIcon className="text-3xl mt-0.5" />
+              </IconButton>
+            ) : (
+              <IconButton
+                className="aspect-square"
+                size="medium"
+                onClick={() => {
+                  let url = window.location.href;
+                  if (
+                    new URLSearchParams(window.location.search).toString() ===
+                    ''
+                  ) {
+                    url = 'https://trends.utdnebula.com/';
+                  }
+                  shareLink(url);
+                }}
+              >
+                <ShareIcon className="text-3xl mr-0.5 -ml-0.5" />
+              </IconButton>
+            )}
           </Tooltip>
         </div>
       </div>

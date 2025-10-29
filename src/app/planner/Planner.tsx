@@ -5,9 +5,7 @@ import React from 'react';
 import { useSharedState } from '@/app/SharedStateProvider';
 import Split from '@/components/common/Split/Split';
 import StickySide from '@/components/common/Split/StickySide';
-import PlannerCoursesTable, {
-  LoadingPlannerCoursesTable,
-} from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
+import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
 import PlannerEmpty from '@/components/planner/PlannerEmpty/PlannerEmpty';
 import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedule';
 
@@ -15,19 +13,11 @@ import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedul
  * Returns the My Planner page
  */
 export default function Planner() {
-  const { sections, planner } = useSharedState();
+  const { planner } = useSharedState();
 
   return (
     <Split
-      left={
-        planner.length === 0 ? (
-          <PlannerEmpty />
-        ) : Object.keys(sections).length === 0 ? (
-          <LoadingPlannerCoursesTable />
-        ) : (
-          <PlannerCoursesTable />
-        )
-      }
+      left={planner.length === 0 ? <PlannerEmpty /> : <PlannerCoursesTable />}
       right={
         <StickySide>
           <PlannerSchedule />
