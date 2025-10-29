@@ -140,9 +140,11 @@ export default function Filters({
   const rmpCounts: Record<string, number> = {};
 
   const semFilteredResults = searchResults.filter((result) => {
-    const availableThisSemester = filterNextSem && result.sections.some(
-      (section) => section.academic_session.name === latestSemester,
-    );
+    const availableThisSemester =
+      filterNextSem &&
+      result.sections.some(
+        (section) => section.academic_session.name === latestSemester,
+      );
     return (
       result.grades.length == 0 ||
       result.grades.some((s) => chosenSemesters.includes(s._id)) ||
