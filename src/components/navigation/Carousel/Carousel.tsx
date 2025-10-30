@@ -51,13 +51,15 @@ export default function Carousel({ names, children }: CarouselProps) {
   const { compare } = useSharedState();
   const lastCompareLength = useRef(compare.length);
 
-  /**
-   * On each re-render, ensure currentCard is within valid bounds
-   */
-  if (Array.isArray(children) && currentCard >= children.length) {
-    // If currentCard is out of bounds, reset it to 0
-    setCurrentCard(0);
-  }
+  useEffect(() => {
+    /**
+     * On each re-render, ensure currentCard is within valid bounds
+     */
+    if (Array.isArray(children) && currentCard >= children.length) {
+      // If currentCard is out of bounds, reset it to 0
+      setCurrentCard(0);
+    }
+  }, [currentCard, children]);
 
   /**
    * Turn
