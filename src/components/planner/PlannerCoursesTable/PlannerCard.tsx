@@ -365,19 +365,26 @@ function SectionTableRow(props: SectionTableRowProps) {
 function MeetingChip(props: {
   color: { fill: string; outline: string; font: string };
   meetings: Sections['all'][number]['meetings'] | undefined;
+  isExtra: boolean;
 }) {
   if (typeof props.meetings === 'undefined') {
     return null;
   }
   return (
     <div
-      className="ml-auto p-1 px-3 rounded-3xl shadow-xs"
+      className="ml-auto p-1 px-3 rounded-3xl shadow-xs relative"
       style={{
         backgroundColor: props.color.fill,
         color: props.color.font,
         outline: `2px solid ${props.color.outline}`,
       }}
     >
+      {!props.isExtra && (
+        <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center text-[0.625rem] font-bold"
+        style={{ backgroundColor: props.color.font, color: props.color.outline}}>
+          +1
+        </div>
+      )}
       <Typography className="text-xs font-semibold text-center">
         {meetingDays(props.meetings[0].meeting_days)}
       </Typography>
@@ -633,11 +640,10 @@ export default function PlannerCard(props: PlannerCardProps) {
           color={props.color}
           meetings={
             latestMatchedSections.sections.find(
-              (section) =>
-                !sectionCanOverlap(section.section_number) &&
-                props.query.sectionNumbers?.includes(section.section_number),
+              (section) => props.selectedSections.find((s) => s.section_number === section.section_number && s.course_details && s.course_details[0] && section.course_details && section.course_details[0] && s.course_details[0].subject_prefix === section.course_details[0].subject_prefix && s.course_details[0].course_number === section.course_details[0].course_number)
             )?.meetings
           }
+          isExtra={props.extraSections !== undefined}
         />
       </div>
 
