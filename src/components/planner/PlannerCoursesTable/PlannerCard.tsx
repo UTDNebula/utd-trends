@@ -95,18 +95,6 @@ function hasConflict(
   if (!newSection || !selectedSections) return false;
 
   for (const selectedSection of selectedSections) {
-    if (
-      selectedSection.course_details &&
-      selectedSection.course_details[0] &&
-      newSection.course_details &&
-      newSection.course_details[0] &&
-      selectedSection.course_details[0].subject_prefix ==
-        newSection.course_details[0].subject_prefix &&
-      selectedSection.course_details[0].course_number ==
-        newSection.course_details[0].course_number
-    )
-      // if same course, allow switching at all costs
-      return false;
     for (const newMeeting of newSection.meetings) {
       if (!newMeeting || !newMeeting.meeting_days) continue;
 
@@ -132,6 +120,17 @@ function hasConflict(
             (newStart <= existingStart && newEnd >= existingEnd) ||
             (newStart >= existingStart && newEnd <= existingEnd)
           ) {
+            if (
+              selectedSection.course_details &&
+              selectedSection.course_details[0] &&
+              newSection.course_details &&
+              newSection.course_details[0] &&
+              selectedSection.course_details[0].subject_prefix ==
+                newSection.course_details[0].subject_prefix &&
+              selectedSection.course_details[0].course_number ==
+                newSection.course_details[0].course_number
+            )
+              return false; // if times overlap, but same course, we can switch it out without conflict
             return true; // Conflict detected
           }
         }
@@ -261,36 +260,7 @@ function SectionTableRow(props: SectionTableRowProps) {
   return (
     <TableRow>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
-        {sectionCanOverlap(props.data.section_number) ? (
-          <Checkbox
-            checked={isSelected}
-            onClick={() => {
-              if (
-                !isSelected &&
-                hasConflict(props.data, props.selectedSections)
-              ) {
-                // Check for conflict
-                props.openConflictMessage();
-                return; // Prevent section selection
-              }
-              props.setPlannerSection(
-                {
-                  ...(props.data.course_details &&
-                    props.data.course_details[0] && {
-                      prefix: props.data.course_details[0].subject_prefix,
-                      number: props.data.course_details[0].course_number,
-                    }),
-                  ...(props.data.professor_details &&
-                    props.data.professor_details[0] && {
-                      profFirst: props.data.professor_details[0].first_name,
-                      profLast: props.data.professor_details[0].last_name,
-                    }),
-                } as SearchQuery,
-                props.data.section_number,
-              ); // using the section's course and prof details every time ensures overall matches de/selection behavior
-            }}
-          />
-        ) : (
+        {
           <Radio
             checked={isSelected}
             onClick={() => {
@@ -322,7 +292,7 @@ function SectionTableRow(props: SectionTableRowProps) {
               ); // using the section's course and prof details every time ensures overall matches de/selection behavior
             }}
           />
-        )}
+        }
       </TableCell>
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
         <Typography className="text-sm">{props.data.section_number}</Typography>
