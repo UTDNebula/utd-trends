@@ -478,7 +478,12 @@ export default function PlannerCard(props: PlannerCardProps) {
   return (
     <Box
       component={Paper}
-      className="border border-royal dark:border-cornflower-300 rounded-lg"
+      className={
+        'border border-royal dark:border-cornflower-300 rounded-lg' +
+        (props.extraSections
+          ? ' my-4 mx-5 bg-[rgb(250,250,250)] dark:bg-[rgb(10,10,10)]'
+          : '')
+      }
     >
       <div
         role="button"
