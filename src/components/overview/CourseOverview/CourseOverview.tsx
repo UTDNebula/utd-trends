@@ -261,7 +261,7 @@ export default function CourseOverview({ course, courseData, grades }: Props) {
     } = parseDescription(courseData.data);
 
     // takes the courses that are the same as this course
-    const splittingRegex = /[a-zA-Z]{2,4} [0-9][0-9V]?[0-9]{2}/g;
+    const splittingRegex = /[a-zA-Z]{2,4} [0-9][0-9V][0-9]{2}/g;
     const splitTextSameAs = sameAsText.split(splittingRegex);
     const linkTextSameAs = sameAsText.match(splittingRegex);
 
