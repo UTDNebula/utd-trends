@@ -179,12 +179,13 @@ function Row({
   showTutorial,
 }: RowProps) {
   const chosenSemesters = use(FiltersContext).chosenSemesters;
+  const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
   const [open, setOpen] = useState(false);
 
   const rainbowColors = useRainbowColors();
   const filteredGrades = useMemo(
-    () => calculateGrades(searchResult.grades, chosenSemesters),
-    [searchResult.grades, chosenSemesters],
+    () => calculateGrades(searchResult.grades, chosenSemesters, chosenSectionTypes),
+    [searchResult.grades, chosenSemesters, chosenSectionTypes],
   );
 
   const canOpen = searchResult.type === 'course' || searchResult.RMP;

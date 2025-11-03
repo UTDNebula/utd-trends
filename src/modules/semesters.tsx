@@ -42,3 +42,11 @@ export function getSemestersFromSearchResult(searchResult: SearchResult) {
     compareSemesters(b, a),
   );
 }
+export function getSectionTypesFromSearchResults(searchResults: SearchResult[]) {
+  return [
+    ...new Set(searchResults.flatMap((r) => r.grades.flatMap((g) => g.data.map((sectionData) => sectionData.type)))),
+  ].sort()
+}
+export function getSectionTypesFromSearchResult(searchResult: SearchResult) {
+  return [...new Set(searchResult.grades.map((g) => g.data.map((sectionData) => sectionData.type),))].sort()
+}

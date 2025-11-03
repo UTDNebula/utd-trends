@@ -35,12 +35,13 @@ export default function ClientLeft(props: Props) {
   const results = use(props.resultsPromise);
 
   const chosenSemesters = use(FiltersContext).chosenSemesters;
+  const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
   const filteredResults = useMemo(
     () =>
       results.filter((result) => {
         if (
           typeof minGPA === 'string' &&
-          calculateGrades(result.grades, chosenSemesters).gpa <
+          calculateGrades(result.grades, chosenSemesters, chosenSectionTypes).gpa <
             parseFloat(minGPA)
         )
           return false;

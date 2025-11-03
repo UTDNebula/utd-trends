@@ -378,12 +378,14 @@ type CompareTableProps = {
   removeFromCompare: (arg0: SearchResult) => void;
   colorMap: { [key: string]: string };
   chosenSemesters: string[];
+  chosenSectionTypes: string[];
 };
 
 export default function CompareTable({
   includedResults,
   removeFromCompare,
   chosenSemesters,
+  chosenSectionTypes,
   colorMap,
 }: CompareTableProps) {
   //Table sorting category
@@ -414,8 +416,8 @@ export default function CompareTable({
   //Sort
   const sortedResults = [...includedResults].sort((a, b) => {
     if (orderBy === 'GPA') {
-      const aGrades = calculateGrades(a.grades, chosenSemesters);
-      const bGrades = calculateGrades(b.grades, chosenSemesters);
+      const aGrades = calculateGrades(a.grades, chosenSemesters, chosenSectionTypes);
+      const bGrades = calculateGrades(b.grades, chosenSemesters, chosenSectionTypes);
       if (order === 'asc') {
         return aGrades.gpa - bGrades.gpa;
       }

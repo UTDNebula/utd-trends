@@ -1,5 +1,5 @@
 'use client';
-import { getSemestersFromSearchResults } from '@/modules/semesters';
+import { getSectionTypesFromSearchResults, getSemestersFromSearchResults } from '@/modules/semesters';
 import type { SearchResult } from '@/types/SearchQuery';
 import {
   createContext,
@@ -15,7 +15,17 @@ export const FiltersContext = createContext<{
   chosenSemesters: string[];
   setChosenSemesters: Dispatch<SetStateAction<string[]>>;
   semesters: string[];
-}>({ semesters: [], chosenSemesters: [], setChosenSemesters: (_) => _ });
+  sectionTypes: string[];
+  chosenSectionTypes: string[];
+  setChosenSectionTypes: Dispatch<SetStateAction<string[]>>;
+}>({
+  semesters: [],
+  chosenSemesters: [],
+  setChosenSemesters: (_) => _,
+  sectionTypes: [],
+  chosenSectionTypes: [],
+  setChosenSectionTypes: (_) => _,
+});
 
 export default function FiltersProvider({
   searchResults,
@@ -31,6 +41,14 @@ export default function FiltersProvider({
   const [chosenSemesters, setChosenSemesters] = useState<string[]>(
     getSemestersFromSearchResults(searchResults),
   );
+
+  const sectionTypes = useMemo(() => {
+    return getSectionTypesFromSearchResults(searchResults.concat(compare));
+  }, [searchResults, compare]);
+  const [chosenSectionTypes, setChosenSectionTypes] = useState<string[]>(
+    getSectionTypesFromSearchResults(searchResults),
+  );
+
   const [prevSearchResults, setPrevSearchResults] =
     useState<SearchResult[]>(searchResults);
   if (searchResults != prevSearchResults) {
@@ -38,11 +56,12 @@ export default function FiltersProvider({
     setChosenSemesters(
       getSemestersFromSearchResults(searchResults.concat(compare)),
     );
+    setChosenSectionTypes(getSectionTypesFromSearchResults(searchResults.concat(compare)));
   }
 
   return (
     <FiltersContext.Provider
-      value={{ chosenSemesters, setChosenSemesters, semesters }}
+      value={{ chosenSemesters, setChosenSemesters, semesters, chosenSectionTypes, setChosenSectionTypes, sectionTypes }}
     >
       {children}
     </FiltersContext.Provider>

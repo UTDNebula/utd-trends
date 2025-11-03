@@ -149,8 +149,8 @@ export default function Filters({
         (section) => section.academic_session.name === latestSemester,
       );
     return (
-      result.grades.length == 0 ||
-      result.grades.some((s) => chosenSemesters.includes(s._id)) ||
+      !filterNextSem && (result.grades.length == 0 ||
+      result.grades.some((s) => chosenSemesters.includes(s._id) && chosenSectionTypes.includes(s.data[0].type))) ||
       availableThisSemester
     );
   });
@@ -169,7 +169,7 @@ export default function Filters({
       const courseGrades = result.grades;
       return (
         (courseGrades &&
-          calculateGrades(courseGrades, chosenSemesters).gpa >= gpaNum) ||
+          calculateGrades(courseGrades, chosenSemesters, chosenSectionTypes).gpa >= gpaNum) ||
         courseGrades == undefined
       );
     }).length;
@@ -179,7 +179,7 @@ export default function Filters({
     const ratingNum = parseFloat(ratingString);
     rmpCounts[ratingString] = semFilteredResults.filter((result) => {
       // gpa filter
-      const calculated = calculateGrades(result.grades, chosenSemesters);
+      const calculated = calculateGrades(result.grades, chosenSemesters, chosenSectionTypes);
       if (typeof minGPA === 'string' && calculated.gpa < parseFloat(minGPA))
         return false;
       if (
