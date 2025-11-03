@@ -162,9 +162,9 @@ function parseDescription(course: Course): {
   const sameAsText =
     formattedDescription.lastIndexOf('(Same as ') != -1
       ? formattedDescription.substring(
-          formattedDescription.lastIndexOf('(Same as '),
-          formattedDescription.lastIndexOf(' ('),
-        )
+        formattedDescription.lastIndexOf('(Same as '),
+        formattedDescription.lastIndexOf(' ('),
+      )
       : '';
 
   let offeringFrequency = formattedDescription.charAt(
@@ -202,11 +202,11 @@ function parseDescription(course: Course): {
     formattedDescription = formattedDescription.substring(
       0,
       1 +
-        formattedDescription.indexOf(
-          formattedDescription.indexOf(requisiteNames[firstRequisite]) != -1
-            ? requisiteNames[firstRequisite]
-            : requisiteNames[firstRequisite + 3],
-        ),
+      formattedDescription.indexOf(
+        formattedDescription.indexOf(requisiteNames[firstRequisite]) != -1
+          ? requisiteNames[firstRequisite]
+          : requisiteNames[firstRequisite + 3],
+      ),
     );
     requisites[lastRequisite] = requisites[lastRequisite].substring(
       0,
@@ -265,8 +265,8 @@ export default function CourseOverview({ course, courseData, grades }: Props) {
     const splitTextSameAs = sameAsText.split(splittingRegex);
     const linkTextSameAs = sameAsText.match(splittingRegex);
 
-    const splitTextDescription = sameAsText.split(splittingRegex);
-    const linkTextDescription = sameAsText.match(splittingRegex);
+    const splitTextDescription = formattedDescription.split(splittingRegex);
+    const linkTextDescription = formattedDescription.match(splittingRegex);
 
     courseComponent = (
       <>
@@ -302,7 +302,7 @@ export default function CourseOverview({ course, courseData, grades }: Props) {
 
             return <span key={i}>{text}</span>;
           })}
-          {/* {' ' + creditHours + ' credit hours.'} */}
+          {' ' + creditHours + ' credit hours.'}
         </p>
         {requisites.map((requisite, index) => {
           if (requisite === '') {
