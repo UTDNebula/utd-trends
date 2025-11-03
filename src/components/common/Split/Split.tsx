@@ -46,7 +46,7 @@ export default function Split(props: Props) {
           {props.left}
         </Panel>
         <PanelResizeHandle
-          className="mt-4 p-1 mx-1 w-0.5 rounded-full opacity-25 data-[resize-handle-state=drag]:opacity-50 transition ease-in-out bg-transparent hover:bg-royal data-[resize-handle-state=drag]:bg-royal"
+          className="mt-4 p-1 mx-1 w-0.5 rounded-full opacity-50 data-[resize-handle-state=drag]:opacity-100 transition ease-in-out bg-transparent hover:bg-royal dark:hover:bg-cornflower-300 data-[resize-handle-state=drag]:bg-royal dark:data-[resize-handle-state=drag]:bg-cornflower-300"
           onDoubleClick={handleResizeDoubleClick}
         />
         <Panel

@@ -11,7 +11,9 @@ export default function DocsWrapper({ children }: React.PropsWithChildren) {
   return (
     <div className="bg-white dark:bg-black text-haiti dark:text-white">
       <ThemeProvider theme={theme}>
-        <SharedStateProvider>{children}</SharedStateProvider>
+        <SharedStateProvider latestSemester="Fall 2025">
+          {children}
+        </SharedStateProvider>
       </ThemeProvider>
     </div>
   );

@@ -14,12 +14,20 @@ import {
   searchQuerySort,
 } from '@/types/SearchQuery';
 
-import Right, { LoadingRight } from './Right';
 import ServerLeft from './ServerLeft';
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from '@tanstack/react-query';
+import { fetchSearchResults } from '@/modules/fetchSearchResult';
+import { createSearchQuery } from '@/modules/createSearchQuery';
+import FiltersProvider from './FilterContext';
+import Right, { LoadingRight } from './Right';
 
-interface Props {
+type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
+};
 
 export async function generateMetadata({
   searchParams,
@@ -65,7 +73,8 @@ export async function generateMetadata({
             decodedSearchTerms
               .toSorted(searchQuerySort)
               .map((term) => searchQueryLabel(term).split(' ').join('+'))
-              .join(',')
+              .join(',') +
+            '&availability=true'
           : ''),
     },
   };
@@ -80,7 +89,7 @@ export default async function Page({ searchParams }: Props) {
     // Take first if duplicated queries
     searchTerms = searchTerms[0];
   }
-  if (typeof searchTerms === 'undefined') {
+  if (typeof searchTerms === 'undefined' || searchTerms.length === 0) {
     return (
       <>
         <TopMenu isPlanner={false} />
@@ -92,6 +101,7 @@ export default async function Page({ searchParams }: Props) {
   }
   searchTerms = decodeURIComponent(searchTerms);
 
+  // this maps each searchTerm into SearchQuery object
   const decodedSearchTerms = searchTerms.split(',').map(decodeSearchQueryLabel);
   const courses = decodedSearchTerms.filter(
     (query) => typeof query.prefix !== 'undefined',
@@ -99,36 +109,55 @@ export default async function Page({ searchParams }: Props) {
   const professors = decodedSearchTerms.filter(
     (query) => typeof query.profLast !== 'undefined',
   );
-
+  let results: SearchQuery[] = [];
+  if (courses.length > 0) {
+    results = createSearchQuery(courses, professors);
+  } else if (professors.length > 0) {
+    results = createSearchQuery(professors, []);
+  }
+  const queryClient = new QueryClient();
+  const searchResults = fetchSearchResults(results);
   return (
     <>
-      <TopMenu isPlanner={false} />
-      <main className="p-4">
-        <Suspense fallback={<LoadingFilters />}>
-          <Filters />
-        </Suspense>
-        <Split
-          left={
-            <Suspense fallback={<LoadingSearchResultsTable />}>
-              <ServerLeft courses={courses} professors={professors} />
+      <FiltersProvider searchResults={await searchResults}>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <TopMenu isPlanner={false} />
+          <main className="p-4">
+            <Suspense fallback={<LoadingFilters />}>
+              <Filters searchResultsPromise={searchResults} />
             </Suspense>
-          }
-          right={
-            <StickySide>
-              <Suspense
-                fallback={
-                  <LoadingRight courses={courses} professors={professors} />
-                }
-              >
-                <Right courses={courses} professors={professors} />
-              </Suspense>
-            </StickySide>
-          }
-          minLeft={40}
-          minRight={30}
-          defaultLeft={50}
-        />
-      </main>
+            <Split
+              left={
+                <Suspense fallback={<LoadingSearchResultsTable />}>
+                  <ServerLeft
+                    searchResultsPromise={searchResults}
+                    courses={courses}
+                    professors={professors}
+                  />
+                </Suspense>
+              }
+              right={
+                <StickySide>
+                  <Suspense
+                    fallback={
+                      <LoadingRight courses={courses} professors={professors} />
+                    }
+                  >
+                    <Right
+                      courses={courses}
+                      professors={professors}
+                      searchResultsPromise={searchResults}
+                    />
+                  </Suspense>
+                </StickySide>
+              }
+              minLeft={40}
+              minRight={30}
+              defaultLeft={50}
+            />
+          </main>
+        </HydrationBoundary>
+      </FiltersProvider>
     </>
   );
 }
