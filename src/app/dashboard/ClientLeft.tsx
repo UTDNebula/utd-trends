@@ -8,6 +8,7 @@ import SearchResultsTable from '@/components/search/SearchResultsTable/SearchRes
 import { type SearchResult } from '@/types/SearchQuery';
 import { calculateGrades } from '@/modules/fetchGrades';
 import { FiltersContext } from './FilterContext';
+import { matchSectionTypesFromSectionNumber } from '@/modules/semesters';
 
 interface Props {
   numSearches: number;
@@ -24,6 +25,7 @@ export default function ClientLeft(props: Props) {
 
   //Filtered results
   let includedResults: SearchResult[] = [];
+  let secondaryIncludedResults: SearchResult[] = [];
   let unIncludedResults: SearchResult[] = [];
 
   //Filters
@@ -36,6 +38,7 @@ export default function ClientLeft(props: Props) {
 
   const chosenSemesters = use(FiltersContext).chosenSemesters;
   const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
+  const sectionTypes = use(FiltersContext).sectionTypes;
   const filteredResults = useMemo(
     () =>
       results.filter((result) => {
@@ -67,18 +70,38 @@ export default function ClientLeft(props: Props) {
   );
 
   //Filter results based on gpa, rmp, and rmp difficulty
-  includedResults = filteredResults.filter((result) => {
+  const availableResults = filteredResults.filter((result) => {
     const availableThisSemester = result.sections.some(
       (section) => section.academic_session.name === latestSemester,
     );
     if (availability && !availableThisSemester) return false;
+    const hasChosenSectionTypes = result.grades.some(
+        (section) => 
+          section.data.some((s) =>
+      chosenSectionTypes.includes(s.type))
+    );
     const hasChosenSemester = result.grades.some((s) =>
       chosenSemesters.includes(s._id),
     );
-    if (!availability && !hasChosenSemester && result.grades.length !== 0)
+    if (!availability && (!hasChosenSemester || !hasChosenSectionTypes) && result.grades.length !== 0)
       return false;
     return true;
   });
+  // for all "available" results, check if section types are available
+  const sectionTypeFiltering = chosenSectionTypes.length < sectionTypes.length;
+  availableResults.forEach((result)=> {
+    const sectionsWithTypeNextSem = result.sections.filter(
+        (section) => 
+          section.academic_session.name === latestSemester 
+          && matchSectionTypesFromSectionNumber(section.section_number, chosenSectionTypes)
+      );
+    if (availability && sectionTypeFiltering && sectionsWithTypeNextSem.length == 0) {
+      secondaryIncludedResults.push(result);
+    } else {
+      // if not filtered out by section filters
+      includedResults.push(result);
+    }
+  })
   unIncludedResults = filteredResults.filter((result) => {
     if (!availability) return false;
     const availableThisSemester =
@@ -89,7 +112,12 @@ export default function ClientLeft(props: Props) {
     const hasChosenSemester = result.grades.some((s) =>
       chosenSemesters.includes(s._id),
     );
-    if (!hasChosenSemester && result.grades.length !== 0) return false;
+    const hasChosenSectionTypes = result.grades.some(
+        (section) => 
+          section.data.some((s) =>
+      chosenSectionTypes.includes(s.type))
+    );
+    if ((!hasChosenSemester || !hasChosenSectionTypes) && result.grades.length !== 0) return false;
     return true;
   });
 
@@ -97,6 +125,7 @@ export default function ClientLeft(props: Props) {
     <SearchResultsTable
       numSearches={props.numSearches}
       includedResults={includedResults}
+      secondaryIncludedResults={secondaryIncludedResults}
       unIncludedResults={unIncludedResults}
     />
   );

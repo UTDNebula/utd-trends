@@ -150,7 +150,7 @@ export default function Filters({
       );
     return (
       !filterNextSem && (result.grades.length == 0 ||
-      result.grades.some((s) => chosenSemesters.includes(s._id) && chosenSectionTypes.includes(s.data[0].type))) ||
+      result.grades.some((s) => chosenSemesters.includes(s._id))) ||
       availableThisSemester
     );
   });
