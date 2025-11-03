@@ -162,9 +162,9 @@ function parseDescription(course: Course): {
   const sameAsText =
     formattedDescription.lastIndexOf('(Same as ') != -1
       ? formattedDescription.substring(
-          formattedDescription.lastIndexOf('(Same as '),
-          formattedDescription.lastIndexOf(' ('),
-        )
+        formattedDescription.lastIndexOf('(Same as '),
+        formattedDescription.lastIndexOf(' ('),
+      )
       : '';
 
   let offeringFrequency = formattedDescription.charAt(
@@ -202,11 +202,11 @@ function parseDescription(course: Course): {
     formattedDescription = formattedDescription.substring(
       0,
       1 +
-        formattedDescription.indexOf(
-          formattedDescription.indexOf(requisiteNames[firstRequisite]) != -1
-            ? requisiteNames[firstRequisite]
-            : requisiteNames[firstRequisite + 3],
-        ),
+      formattedDescription.indexOf(
+        formattedDescription.indexOf(requisiteNames[firstRequisite]) != -1
+          ? requisiteNames[firstRequisite]
+          : requisiteNames[firstRequisite + 3],
+      ),
     );
     requisites[lastRequisite] = requisites[lastRequisite].substring(
       0,
@@ -261,7 +261,7 @@ export default function CourseOverview({ course, courseData, grades }: Props) {
     } = parseDescription(courseData.data);
 
     // takes the courses that are the same as this course
-    const splittingRegex = /[a-zA-Z]{2,4} [0-9][0-9V]?[0-9]{0,2}/g;
+    const splittingRegex = /[a-zA-Z]{2,4} [0-9][0-9V]?[0-9]{2}/g;
     const splitTextSameAs = sameAsText.split(splittingRegex);
     const linkTextSameAs = sameAsText.match(splittingRegex);
 
