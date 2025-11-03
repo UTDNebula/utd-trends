@@ -5,8 +5,6 @@ import { useTheme } from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React, { use, useState } from 'react';
-
-import { useSharedState } from '@/app/SharedStateProvider';
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
 import { compareColors } from '@/modules/colors';
@@ -91,10 +89,9 @@ type Props = {
 };
 
 export default function LineGraph(props: Props) {
-  const { semesters, chosenSemesters, setChosenSemesters } =
+  const { semesters, chosenSemesters, setChosenSemesters, chosenSectionTypes } =
     use(FiltersContext);
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
-  const { chosenSectionTypes } = useSharedState();
 
   const icon =
     '<div class="apexcharts-menu-icon">' +
