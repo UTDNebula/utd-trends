@@ -72,7 +72,11 @@ export default function Compare() {
                     ? ' (Overall)' //Indicates that this entry is an aggregate for the entire course/professor
                     : ''),
                 data: convertNumbersToPercents(
-                  calculateGrades(course.grades, chosenSemesters, chosenSectionTypes),
+                  calculateGrades(
+                    course.grades,
+                    chosenSemesters,
+                    chosenSectionTypes,
+                  ),
                 ),
               };
             })}

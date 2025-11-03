@@ -31,7 +31,7 @@ export function LoadingFilters() {
   return (
     <Grid container spacing={2} className="mb-4 sm:m-0">
       {/* min letter grade dropdown*/}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
@@ -42,7 +42,7 @@ export function LoadingFilters() {
       </Grid>
 
       {/* min rating dropdown*/}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
@@ -53,7 +53,7 @@ export function LoadingFilters() {
       </Grid>
 
       {/* semester dropdown */}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
@@ -64,12 +64,19 @@ export function LoadingFilters() {
       </Grid>
 
       {/* Teaching Next Semester switch*/}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
         <FormControl size="small">
           <FormControlLabel
             control={<Switch checked={true} />}
             label="Teaching Next Semester"
           />
+        </FormControl>
+      </Grid>
+
+      {/* section type dropdown */}
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+        <FormControl size="small">
+          <InputLabel id="SectionTypes">Section Types</InputLabel>
         </FormControl>
       </Grid>
     </Grid>
@@ -149,8 +156,9 @@ export default function Filters({
         (section) => section.academic_session.name === latestSemester,
       );
     return (
-      !filterNextSem && (result.grades.length == 0 ||
-      result.grades.some((s) => chosenSemesters.includes(s._id))) ||
+      (!filterNextSem &&
+        (result.grades.length == 0 ||
+          result.grades.some((s) => chosenSemesters.includes(s._id)))) ||
       availableThisSemester
     );
   });
@@ -169,7 +177,8 @@ export default function Filters({
       const courseGrades = result.grades;
       return (
         (courseGrades &&
-          calculateGrades(courseGrades, chosenSemesters, chosenSectionTypes).gpa >= gpaNum) ||
+          calculateGrades(courseGrades, chosenSemesters, chosenSectionTypes)
+            .gpa >= gpaNum) ||
         courseGrades == undefined
       );
     }).length;
@@ -179,7 +188,11 @@ export default function Filters({
     const ratingNum = parseFloat(ratingString);
     rmpCounts[ratingString] = semFilteredResults.filter((result) => {
       // gpa filter
-      const calculated = calculateGrades(result.grades, chosenSemesters, chosenSectionTypes);
+      const calculated = calculateGrades(
+        result.grades,
+        chosenSemesters,
+        chosenSectionTypes,
+      );
       if (typeof minGPA === 'string' && calculated.gpa < parseFloat(minGPA))
         return false;
       if (
@@ -222,7 +235,7 @@ export default function Filters({
       className="mb-4 sm:m-0"
     >
       {/* min letter grade dropdown*/}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
         <Tooltip title={'Select Minimum Letter Grade Average'} placement="top">
           <FormControl
             size="small"
@@ -271,7 +284,7 @@ export default function Filters({
       </Grid>
 
       {/* min rating dropdown*/}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
         <Tooltip title={'Select Minimum Professor Rating'} placement="top">
           <FormControl
             size="small"
@@ -333,7 +346,7 @@ export default function Filters({
       </Grid>
 
       {/* semester dropdown */}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
         <Tooltip
           title={'Select Semesters to Include Grades from'}
           placement="top"
@@ -441,7 +454,7 @@ export default function Filters({
       </Grid>
 
       {/* section type dropdown */}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
         <Tooltip
           title={'Select Section Types to Include Grades from'}
           placement="top"
@@ -514,7 +527,7 @@ export default function Filters({
       </Grid>
 
       {/* Teaching Next Semester switch*/}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
         <Tooltip title="Select Availability" placement="top">
           <FormControl
             size="small"

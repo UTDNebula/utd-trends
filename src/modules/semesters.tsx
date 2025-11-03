@@ -12,12 +12,12 @@ const typeRegexes: Record<string, RegExp> = {
   '5xx': /5[0-9][0-9]/,
   '6xx': /6[0-9][0-9]/,
   '7xx': /7[0-9][0-9]/,
-  'HNx': /HN[0-9]/,
-  'HON': /HON/,
-  'xUx': /[0-9]U[0-9]/,
-  'OTHERS': /.*/,
+  HNx: /HN[0-9]/,
+  HON: /HON/,
+  xUx: /[0-9]U[0-9]/,
+  OTHERS: /.*/,
 };
-const others = "OTHERS";
+const others = 'OTHERS';
 
 /** A comparator function used when sorting semesters by name. Returns -1 if semester 'a' is more older than semester 'b'. */
 export function compareSemesters(a: string, b: string) {
@@ -82,13 +82,20 @@ export function getSectionTypesFromSearchResult(searchResult: SearchResult) {
   ].sort();
 }
 
-export function matchSectionTypesFromSectionNumber (
+export function matchSectionTypesFromSectionNumber(
   sectionNumber: string,
   chosenSectionTypes: string[],
-) : boolean {
+): boolean {
   const matchesChosenSectionType = chosenSectionTypes.some(
     (secType) =>
       secType in typeRegexes && typeRegexes[secType].test(sectionNumber),
   );
-  return (matchesChosenSectionType || (chosenSectionTypes.includes(others) && !matchSectionTypesFromSectionNumber(sectionNumber, Object.keys(typeRegexes))));
+  return (
+    matchesChosenSectionType ||
+    (chosenSectionTypes.includes(others) &&
+      !matchSectionTypesFromSectionNumber(
+        sectionNumber,
+        Object.keys(typeRegexes),
+      ))
+  );
 }

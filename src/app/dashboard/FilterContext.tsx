@@ -1,5 +1,8 @@
 'use client';
-import { getSectionTypesFromSearchResults, getSemestersFromSearchResults } from '@/modules/semesters';
+import {
+  getSectionTypesFromSearchResults,
+  getSemestersFromSearchResults,
+} from '@/modules/semesters';
 import type { SearchResult } from '@/types/SearchQuery';
 import {
   createContext,
@@ -56,12 +59,21 @@ export default function FiltersProvider({
     setChosenSemesters(
       getSemestersFromSearchResults(searchResults.concat(compare)),
     );
-    setChosenSectionTypes(getSectionTypesFromSearchResults(searchResults.concat(compare)));
+    setChosenSectionTypes(
+      getSectionTypesFromSearchResults(searchResults.concat(compare)),
+    );
   }
 
   return (
     <FiltersContext.Provider
-      value={{ chosenSemesters, setChosenSemesters, semesters, chosenSectionTypes, setChosenSectionTypes, sectionTypes }}
+      value={{
+        chosenSemesters,
+        setChosenSemesters,
+        semesters,
+        chosenSectionTypes,
+        setChosenSectionTypes,
+        sectionTypes,
+      }}
     >
       {children}
     </FiltersContext.Provider>

@@ -35,7 +35,7 @@ function getSemesterGPAs(
   data.data
     .toSorted((a, b) => sortSemesters(a._id, b._id))
     .forEach((semester) => {
-    //get gpa and place in allSemesters
+      //get gpa and place in allSemesters
       // Aggregate grade_distribution across selected section types for this semester
       const aggregate = (semester.data ?? []).reduce(
         (acc, section) => {
@@ -71,13 +71,15 @@ function getSemesterGPAs(
           0,
         ) / totalGrades;
 
-    const xValue = semesterMapping.get(semester._id);
+      const xValue = semesterMapping.get(semester._id);
       if (xValue !== undefined) {
         allPoints.push({ x: xValue, y: gpa, semester: semester._id });
       }
     });
 
-  return allPoints.filter((pt): pt is { x: number; y: number; semester: string; } => pt !== null);;
+  return allPoints.filter(
+    (pt): pt is { x: number; y: number; semester: string } => pt !== null,
+  );
 }
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -127,11 +129,13 @@ export default function LineGraph(props: Props) {
 
   const series = props.series.map((single) => ({
     name: single.name,
-    data: getSemesterGPAs(single, semesterMapping, chosenSectionTypes).map((p) => ({
-      x: p.x,
-      y: p.y,
-      semester: p.semester,
-    })),
+    data: getSemesterGPAs(single, semesterMapping, chosenSectionTypes).map(
+      (p) => ({
+        x: p.x,
+        y: p.y,
+        semester: p.semester,
+      }),
+    ),
   }));
 
   const theme = useTheme();

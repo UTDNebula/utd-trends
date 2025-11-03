@@ -416,8 +416,16 @@ export default function CompareTable({
   //Sort
   const sortedResults = [...includedResults].sort((a, b) => {
     if (orderBy === 'GPA') {
-      const aGrades = calculateGrades(a.grades, chosenSemesters, chosenSectionTypes);
-      const bGrades = calculateGrades(b.grades, chosenSemesters, chosenSectionTypes);
+      const aGrades = calculateGrades(
+        a.grades,
+        chosenSemesters,
+        chosenSectionTypes,
+      );
+      const bGrades = calculateGrades(
+        b.grades,
+        chosenSemesters,
+        chosenSectionTypes,
+      );
       if (order === 'asc') {
         return aGrades.gpa - bGrades.gpa;
       }

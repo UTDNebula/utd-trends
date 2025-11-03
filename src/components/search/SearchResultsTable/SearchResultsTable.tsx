@@ -184,7 +184,8 @@ function Row({
 
   const rainbowColors = useRainbowColors();
   const filteredGrades = useMemo(
-    () => calculateGrades(searchResult.grades, chosenSemesters, chosenSectionTypes),
+    () =>
+      calculateGrades(searchResult.grades, chosenSemesters, chosenSectionTypes),
     [searchResult.grades, chosenSemesters, chosenSectionTypes],
   );
 
@@ -561,7 +562,8 @@ export default function SearchResultsTable({
   }
 
   const sortedResults = includedResults.sort(sortResults);
-  const sortedSecondaryIncludedResults = secondaryIncludedResults.sort(sortResults);
+  const sortedSecondaryIncludedResults =
+    secondaryIncludedResults.sort(sortResults);
   const sortedUnIncludedResults = unIncludedResults.sort(sortResults);
 
   return (

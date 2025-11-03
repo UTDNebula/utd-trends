@@ -24,8 +24,8 @@ export default function ClientLeft(props: Props) {
   const searchParams = useSearchParams();
 
   //Filtered results
-  let includedResults: SearchResult[] = [];
-  let secondaryIncludedResults: SearchResult[] = [];
+  const includedResults: SearchResult[] = [];
+  const secondaryIncludedResults: SearchResult[] = [];
   let unIncludedResults: SearchResult[] = [];
 
   //Filters
@@ -44,8 +44,8 @@ export default function ClientLeft(props: Props) {
       results.filter((result) => {
         if (
           typeof minGPA === 'string' &&
-          calculateGrades(result.grades, chosenSemesters, chosenSectionTypes).gpa <
-            parseFloat(minGPA)
+          calculateGrades(result.grades, chosenSemesters, chosenSectionTypes)
+            .gpa < parseFloat(minGPA)
         )
           return false;
 
@@ -66,7 +66,7 @@ export default function ClientLeft(props: Props) {
         }
         return true;
       }),
-    [results, minGPA, minRating, maxDiff, chosenSemesters],
+    [results, minGPA, minRating, maxDiff, chosenSemesters, chosenSectionTypes],
   );
 
   //Filter results based on gpa, rmp, and rmp difficulty
@@ -75,33 +75,42 @@ export default function ClientLeft(props: Props) {
       (section) => section.academic_session.name === latestSemester,
     );
     if (availability && !availableThisSemester) return false;
-    const hasChosenSectionTypes = result.grades.some(
-        (section) => 
-          section.data.some((s) =>
-      chosenSectionTypes.includes(s.type))
+    const hasChosenSectionTypes = result.grades.some((section) =>
+      section.data.some((s) => chosenSectionTypes.includes(s.type)),
     );
     const hasChosenSemester = result.grades.some((s) =>
       chosenSemesters.includes(s._id),
     );
-    if (!availability && (!hasChosenSemester || !hasChosenSectionTypes) && result.grades.length !== 0)
+    if (
+      !availability &&
+      (!hasChosenSemester || !hasChosenSectionTypes) &&
+      result.grades.length !== 0
+    )
       return false;
     return true;
   });
   // for all "available" results, check if section types are available
   const sectionTypeFiltering = chosenSectionTypes.length < sectionTypes.length;
-  availableResults.forEach((result)=> {
+  availableResults.forEach((result) => {
     const sectionsWithTypeNextSem = result.sections.filter(
-        (section) => 
-          section.academic_session.name === latestSemester 
-          && matchSectionTypesFromSectionNumber(section.section_number, chosenSectionTypes)
-      );
-    if (availability && sectionTypeFiltering && sectionsWithTypeNextSem.length == 0) {
+      (section) =>
+        section.academic_session.name === latestSemester &&
+        matchSectionTypesFromSectionNumber(
+          section.section_number,
+          chosenSectionTypes,
+        ),
+    );
+    if (
+      availability &&
+      sectionTypeFiltering &&
+      sectionsWithTypeNextSem.length == 0
+    ) {
       secondaryIncludedResults.push(result);
     } else {
       // if not filtered out by section filters
       includedResults.push(result);
     }
-  })
+  });
   unIncludedResults = filteredResults.filter((result) => {
     if (!availability) return false;
     const availableThisSemester =
@@ -112,12 +121,14 @@ export default function ClientLeft(props: Props) {
     const hasChosenSemester = result.grades.some((s) =>
       chosenSemesters.includes(s._id),
     );
-    const hasChosenSectionTypes = result.grades.some(
-        (section) => 
-          section.data.some((s) =>
-      chosenSectionTypes.includes(s.type))
+    const hasChosenSectionTypes = result.grades.some((section) =>
+      section.data.some((s) => chosenSectionTypes.includes(s.type)),
     );
-    if ((!hasChosenSemester || !hasChosenSectionTypes) && result.grades.length !== 0) return false;
+    if (
+      (!hasChosenSemester || !hasChosenSectionTypes) &&
+      result.grades.length !== 0
+    )
+      return false;
     return true;
   });
 
