@@ -162,9 +162,9 @@ function parseDescription(course: Course): {
   const sameAsText =
     formattedDescription.lastIndexOf('(Same as ') != -1
       ? formattedDescription.substring(
-        formattedDescription.lastIndexOf('(Same as '),
-        formattedDescription.lastIndexOf(' ('),
-      )
+          formattedDescription.lastIndexOf('(Same as '),
+          formattedDescription.lastIndexOf(' ('),
+        )
       : '';
 
   let offeringFrequency = formattedDescription.charAt(
@@ -202,11 +202,11 @@ function parseDescription(course: Course): {
     formattedDescription = formattedDescription.substring(
       0,
       1 +
-      formattedDescription.indexOf(
-        formattedDescription.indexOf(requisiteNames[firstRequisite]) != -1
-          ? requisiteNames[firstRequisite]
-          : requisiteNames[firstRequisite + 3],
-      ),
+        formattedDescription.indexOf(
+          formattedDescription.indexOf(requisiteNames[firstRequisite]) != -1
+            ? requisiteNames[firstRequisite]
+            : requisiteNames[firstRequisite + 3],
+        ),
     );
     requisites[lastRequisite] = requisites[lastRequisite].substring(
       0,
@@ -299,7 +299,6 @@ export default function CourseOverview({ course, courseData, grades }: Props) {
           return (
             <p key={index}>
               <b>{split[0] + ': '}</b>
-              {/* The pre-reqs and co-reqs are stored here [used to be just '{split[1]}']*/}
               {splitTextReqs.flatMap((text, i) => {
                 if (linkTextReqs && i < linkTextReqs.length) {
                   return (
