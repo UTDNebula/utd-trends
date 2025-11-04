@@ -473,7 +473,7 @@ export default function Filters({
               labelId="SectionTypes"
               multiple
               value={chosenSectionTypes}
-              onChange={(event: SelectChangeEvent<string[]>) => {
+              onChange={(event) => {
                 const {
                   target: { value },
                 } = event;
