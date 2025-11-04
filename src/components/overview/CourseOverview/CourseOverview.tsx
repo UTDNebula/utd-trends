@@ -234,6 +234,17 @@ interface Props {
   grades: GradesData;
 }
 
+function link(linkText: string) {
+  return (
+    <a
+      href={`dashboard?searchTerms=${linkText.replace(/\s+/g, '+')}&availability=true`}
+      className="underline"
+    >
+      {linkText}
+    </a>
+  );
+}
+
 export default function CourseOverview({ course, courseData, grades }: Props) {
   let courseComponent = null;
   if (
@@ -248,23 +259,73 @@ export default function CourseOverview({ course, courseData, grades }: Props) {
       courseTitle,
       creditHours,
     } = parseDescription(courseData.data);
+
+    // takes the courses that are the same as this course
+    const splittingRegex = /[a-zA-Z]{2,4} [0-9][0-9V][0-9]{2}/g;
+    const splitTextSameAs = sameAsText.split(splittingRegex);
+    const linkTextSameAs = sameAsText.match(splittingRegex);
+
+    const splitTextDescription = formattedDescription.split(splittingRegex);
+    const linkTextDescription = formattedDescription.match(splittingRegex);
+
     courseComponent = (
       <>
         <p className="text-2xl font-bold text-center">{courseTitle}</p>
-        <p className="text-lg font-semibold text-center">
-          {searchQueryLabel(course) + ' ' + sameAsText}
-        </p>
+        {/* Displays the courses that are the same as this course  */}
+        <div className="text-lg font-semibold text-center">
+          {searchQueryLabel(course) + ' '}
+          {/* Maps each chunk of text and link*/}
+          {splitTextSameAs.flatMap((text, i) => {
+            if (linkTextSameAs && i < linkTextSameAs.length) {
+              return (
+                <span key={i}>
+                  {text}
+                  {link(linkTextSameAs[i])}
+                </span>
+              );
+            }
+
+            return <span key={i}>{text}</span>;
+          })}
+        </div>
         <p className="font-semibold">{courseData.data.school}</p>
-        <p>{formattedDescription + ' ' + creditHours + ' credit hours.'}</p>
+        <p>
+          {splitTextDescription.flatMap((text, i) => {
+            if (linkTextDescription && i < linkTextDescription.length) {
+              return (
+                <span key={i}>
+                  {text}
+                  {link(linkTextDescription[i])}
+                </span>
+              );
+            }
+
+            return <span key={i}>{text}</span>;
+          })}
+          {' ' + creditHours + ' credit hours.'}
+        </p>
         {requisites.map((requisite, index) => {
           if (requisite === '') {
             return null;
           }
           const split = requisite.split(': ');
+          const splitTextReqs = split[1].split(splittingRegex);
+          const linkTextReqs = split[1].match(splittingRegex);
           return (
             <p key={index}>
               <b>{split[0] + ': '}</b>
-              {split[1]}
+              {splitTextReqs.flatMap((text, i) => {
+                if (linkTextReqs && i < linkTextReqs.length) {
+                  return (
+                    <span key={i}>
+                      {text}
+                      {link(linkTextReqs[i])}
+                    </span>
+                  );
+                }
+
+                return <span key={i}>{text}</span>;
+              })}
             </p>
           );
         })}
