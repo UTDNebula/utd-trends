@@ -63,6 +63,17 @@ export function LoadingFilters() {
         </FormControl>
       </Grid>
 
+      {/* section type dropdown */}
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+        <FormControl
+          size="small"
+          className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
+        >
+          <InputLabel id="SectionTypes">Section Types</InputLabel>
+          <Select label="SectionTypes" labelId="SectionTypes" value=""></Select>
+        </FormControl>
+      </Grid>
+
       {/* Teaching Next Semester switch*/}
       <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
         <FormControl size="small">
@@ -70,13 +81,6 @@ export function LoadingFilters() {
             control={<Switch checked={true} />}
             label="Teaching Next Semester"
           />
-        </FormControl>
-      </Grid>
-
-      {/* section type dropdown */}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
-        <FormControl size="small">
-          <InputLabel id="SectionTypes">Section Types</InputLabel>
         </FormControl>
       </Grid>
     </Grid>
