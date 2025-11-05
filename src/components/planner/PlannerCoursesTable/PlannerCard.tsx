@@ -365,7 +365,7 @@ function SectionTableRow(props: SectionTableRowProps) {
 function MeetingChip(props: {
   color: { fill: string; outline: string; font: string };
   meetings: Sections['all'][number]['meetings'] | undefined;
-  isExtra: boolean;
+  extraSelected: boolean;
 }) {
   if (typeof props.meetings === 'undefined') {
     return null;
@@ -379,7 +379,7 @@ function MeetingChip(props: {
         outline: `2px solid ${props.color.outline}`,
       }}
     >
-      {!props.isExtra && (
+      {props.extraSelected && (
         <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center text-[0.625rem] font-bold"
         style={{ backgroundColor: props.color.font, color: props.color.outline}}>
           +1
@@ -643,7 +643,9 @@ export default function PlannerCard(props: PlannerCardProps) {
               (section) => props.selectedSections.find((s) => s.section_number === section.section_number && s.course_details && s.course_details[0] && section.course_details && section.course_details[0] && s.course_details[0].subject_prefix === section.course_details[0].subject_prefix && s.course_details[0].course_number === section.course_details[0].course_number)
             )?.meetings
           }
-          isExtra={props.extraSections !== undefined}
+          extraSelected={latestExtraSections != null && (latestExtraSections.sections.find(
+              (section) => props.selectedSections.find((s) => s.section_number === section.section_number && s.course_details && s.course_details[0] && section.course_details && section.course_details[0] && s.course_details[0].subject_prefix === section.course_details[0].subject_prefix && s.course_details[0].course_number === section.course_details[0].course_number)
+            ) != null)}
         />
       </div>
 
