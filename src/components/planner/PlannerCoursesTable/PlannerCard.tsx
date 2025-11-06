@@ -370,7 +370,15 @@ function MeetingChip(props: {
   if (typeof props.meetings === 'undefined') {
     return null;
   }
-  const extraIndicator = props.extraSelected.find((x) => sectionCanOverlap(x.section_number, "extra")) ? "+lab" : props.extraSelected.find((x) => sectionCanOverlap(x.section_number, "exam")) ? "+ex" : "";
+  const extraIndicator = props.extraSelected.find((x) =>
+    sectionCanOverlap(x.section_number, 'extra'),
+  )
+    ? '+lab'
+    : props.extraSelected.find((x) =>
+          sectionCanOverlap(x.section_number, 'exam'),
+        )
+      ? '+ex'
+      : '';
   return (
     <div
       className="ml-auto p-1 px-3 rounded-3xl shadow-xs relative"
@@ -381,8 +389,13 @@ function MeetingChip(props: {
       }}
     >
       {extraIndicator.length > 0 && (
-        <div className="absolute -top-2 -right-3 w-fit h-5 px-2 rounded-full flex items-center justify-center text-[0.625rem] font-bold"
-        style={{ backgroundColor: props.color.font, color: props.color.outline}}>
+        <div
+          className="absolute -top-2 -right-3 w-fit h-5 px-2 rounded-full flex items-center justify-center text-[0.625rem] font-bold"
+          style={{
+            backgroundColor: props.color.font,
+            color: props.color.outline,
+          }}
+        >
           {extraIndicator}
         </div>
       )}
@@ -640,13 +653,41 @@ export default function PlannerCard(props: PlannerCardProps) {
         <MeetingChip
           color={props.color}
           meetings={
-            latestMatchedSections.sections.find(
-              (section) => props.selectedSections.find((s) => s.section_number === section.section_number && s.course_details && s.course_details[0] && section.course_details && section.course_details[0] && s.course_details[0].subject_prefix === section.course_details[0].subject_prefix && s.course_details[0].course_number === section.course_details[0].course_number)
+            latestMatchedSections.sections.find((section) =>
+              props.selectedSections.find(
+                (s) =>
+                  s.section_number === section.section_number &&
+                  s.course_details &&
+                  s.course_details[0] &&
+                  section.course_details &&
+                  section.course_details[0] &&
+                  s.course_details[0].subject_prefix ===
+                    section.course_details[0].subject_prefix &&
+                  s.course_details[0].course_number ===
+                    section.course_details[0].course_number,
+              ),
             )?.meetings
           }
-          extraSelected={latestExtraSections != null ? [(latestExtraSections.sections.find(
-              (section) => props.selectedSections.find((s) => s.section_number === section.section_number && s.course_details && s.course_details[0] && section.course_details && section.course_details[0] && s.course_details[0].subject_prefix === section.course_details[0].subject_prefix && s.course_details[0].course_number === section.course_details[0].course_number)
-            ))].filter((s) => s != undefined) : []}
+          extraSelected={
+            latestExtraSections != null
+              ? [
+                  latestExtraSections.sections.find((section) =>
+                    props.selectedSections.find(
+                      (s) =>
+                        s.section_number === section.section_number &&
+                        s.course_details &&
+                        s.course_details[0] &&
+                        section.course_details &&
+                        section.course_details[0] &&
+                        s.course_details[0].subject_prefix ===
+                          section.course_details[0].subject_prefix &&
+                        s.course_details[0].course_number ===
+                          section.course_details[0].course_number,
+                    ),
+                  ),
+                ].filter((s) => s != undefined)
+              : []
+          }
         />
       </div>
 
