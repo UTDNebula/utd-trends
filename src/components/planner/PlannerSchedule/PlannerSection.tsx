@@ -137,19 +137,17 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               : ''}
             .{selectedSection.section_number}
           </div>
-          <div
-            className={
-              'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
-              (makeBigger ? '' : 'leading-none')
-            }
-          >
-            {selectedSection.professor_details &&
-            selectedSection.professor_details[0]
-              ? selectedSection.professor_details[0].first_name +
-                ' ' +
-                selectedSection.professor_details[0].last_name
-              : ''}
-          </div>
+          {selectedSection.professor_details &&
+            selectedSection.professor_details.map((prof) => (
+              <div
+                className={
+                  'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+                  (makeBigger ? '' : 'leading-none')
+                }
+              >
+                {prof.first_name + ' ' + prof.last_name}
+              </div>
+            ))}
           <div
             className={
               'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
