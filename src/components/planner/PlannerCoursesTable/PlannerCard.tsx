@@ -454,6 +454,7 @@ export default function PlannerCard(props: PlannerCardProps) {
   // only keep exam sections for syllabus lookup
   else if (props.extraSections && props.extraLabel == 'unassigned')
     allSectionsWithSyllabus = allSectionsWithSyllabus.filter(() => false); // No syllabi should be shown
+  
   let latestMatchedSections: SearchResult = result; // fallback if filtering is null, at least it will have correct grade/rmp data
   let latestExtraSections: SearchResult | null = null;
   if (!props.extraSections) {
@@ -464,11 +465,8 @@ export default function PlannerCard(props: PlannerCardProps) {
           section.academic_session.name == props.latestSemester && // latest sem's sections only
           ((!props.query.profFirst && !props.query.profLast) || // if overall, should show every prof's section
             (section.professor_details &&
-              section.professor_details[0] &&
-              section.professor_details[0]?.first_name ==
-                props.query.profFirst &&
-              section.professor_details[0]?.last_name ==
-                props.query.profLast)) && // else, show only this professor's sections
+              section.professor_details.find((prof) => prof.first_name == props.query.profFirst) &&
+              section.professor_details.find((prof) => prof.last_name == props.query.profLast))) && // else, show only this professor's sections (a section *can* have multiple profs)
           !sectionCanOverlap(section.section_number), // that are not "Extra"
       ),
     };
