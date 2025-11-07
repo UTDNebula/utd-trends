@@ -140,6 +140,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
           {selectedSection.professor_details &&
             selectedSection.professor_details.map((prof) => (
               <div
+                key={prof._id}
                 className={
                   'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
                   (makeBigger ? '' : 'leading-none')
