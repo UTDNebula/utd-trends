@@ -399,11 +399,11 @@ function MeetingChip(props: {
           {extraIndicator}
         </div>
       )}
-      <Typography className="text-xs font-semibold text-center">
-        {meetingDays(props.meetings[0].meeting_days)}
+      <Typography className="text-xs font-semibold text-center min-w-13">
+        {meetingDays(props.meetings[0].meeting_days) || 'Time'}
       </Typography>
       <Typography className="text-xs text-center">
-        {props.meetings[0].start_time}
+        {props.meetings[0].start_time || 'TBD'}
       </Typography>
     </div>
   );
