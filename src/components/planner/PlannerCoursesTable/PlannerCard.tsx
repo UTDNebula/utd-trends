@@ -307,8 +307,12 @@ function SectionTableRow(props: SectionTableRowProps) {
           .map(parseMeeting)
           .map(([schedule, location, link], i) => (
             <div key={i}>
-              {schedule !== ' -' && (
+              {schedule !== ' -' ? (
                 <Typography className="text-xs">{schedule}</Typography>
+              ) : (
+                <Typography className="text-xs italic">
+                  No Meeting Time
+                </Typography>
               )}
               {location !== ' ' && (
                 <Typography className="text-xs">
