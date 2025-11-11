@@ -1,3 +1,5 @@
+import type { SearchResult } from '@/types/SearchQuery';
+
 /** A comparator function used when sorting semesters by name. Returns -1 if semester 'a' is more older than semester 'b'. */
 export function compareSemesters(a: string, b: string) {
   const x = a.substring(0, 2).localeCompare(b.substring(0, 2));
@@ -28,4 +30,15 @@ export function displaySemesterName(id: string, yearFirst = true) {
       '20' +
       id.slice(0, 2)
     );
+}
+
+export function getSemestersFromSearchResults(searchResults: SearchResult[]) {
+  return [
+    ...new Set(searchResults.flatMap((r) => r.grades.map((g) => g._id))),
+  ].sort((a, b) => compareSemesters(b, a));
+}
+export function getSemestersFromSearchResult(searchResult: SearchResult) {
+  return [...new Set(searchResult.grades.map((g) => g._id))].sort((a, b) =>
+    compareSemesters(b, a),
+  );
 }

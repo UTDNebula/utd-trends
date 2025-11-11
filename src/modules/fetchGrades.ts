@@ -1,18 +1,16 @@
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery } from '@/types/SearchQuery';
 
-type GradesSummary = {
+export type GradesSummary = {
   mean_gpa: number;
   gpa: number;
   total: number;
   grade_distribution: number[];
 };
 
-type GradesData = {
+export type GradesData = {
   _id: string;
   grade_distribution: number[];
 }[];
-
 export type Grades = {
   filtered: GradesSummary;
   unfiltered: GradesSummary;
@@ -22,13 +20,13 @@ export type Grades = {
 //Find GPA, total, and grade_distribution based on including some set of semesters
 export function calculateGrades(grades: GradesData, semesters?: string[]) {
   let grade_distribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-  for (const session of grades) {
+  grades.forEach((session) => {
     if (typeof semesters === 'undefined' || semesters.includes(session._id)) {
       grade_distribution = grade_distribution.map(
         (item, i) => item + session.grade_distribution[i],
       );
     }
-  }
+  });
 
   const total: number = grade_distribution.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
@@ -60,6 +58,8 @@ export function calculateGrades(grades: GradesData, semesters?: string[]) {
     median_gpa = GPALookup[medianIndex];
   }
 
+  // console.log("bb", grade_distribution)
+
   return {
     mean_gpa: mean_gpa,
     gpa: median_gpa,
@@ -70,10 +70,10 @@ export function calculateGrades(grades: GradesData, semesters?: string[]) {
 
 export default async function fetchGrades(
   query: SearchQuery,
-): Promise<GenericFetchedData<Grades>> {
+): Promise<GradesData> {
   const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
   if (typeof API_KEY !== 'string') {
-    return { message: 'error', data: 'API key is undefined' };
+    throw new Error('API key is undefined');
   }
 
   try {
@@ -106,21 +106,10 @@ export default async function fetchGrades(
       throw new Error(data.data ?? data.message);
     }
 
-    const calculated = calculateGrades(data.data);
-
-    return {
-      message: 'success',
-      data: {
-        filtered: calculated,
-        unfiltered: calculated,
-        grades: data.data, //type GradesData
-      },
-    };
+    return data.data !== null ? data.data : [];
   } catch (error) {
-    return {
-      message: 'error',
-      data:
-        error instanceof Error ? error.message : 'An unknown error occurred',
-    };
+    throw new Error(
+      error instanceof Error ? error.message : 'An unknown error occurred',
+    );
   }
 }

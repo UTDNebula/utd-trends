@@ -13,6 +13,9 @@ import { SnackbarProvider } from '@/contexts/SnackbarContext';
 import theme from '@/modules/theme';
 
 import { SharedStateProvider } from './SharedStateProvider';
+import QueryProvider from './QueryProvider';
+import { fetchLatestSemester } from '@/modules/fetchSections';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -63,11 +66,12 @@ export const viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const latestSemester = await fetchLatestSemester();
   return (
     <html lang="en">
       {process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' && (
@@ -76,11 +80,14 @@ export default function RootLayout({
       <body
         className={`bg-white dark:bg-black ${inter.variable} font-main ${baiJamjuree.variable} text-haiti dark:text-white`}
       >
-        <AppRouterCacheProvider>
+        <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>
-            <SharedStateProvider>
-              <SnackbarProvider>{children}</SnackbarProvider>
-            </SharedStateProvider>
+            <QueryProvider>
+              <SharedStateProvider latestSemester={latestSemester}>
+                <SnackbarProvider>{children}</SnackbarProvider>
+                <ReactQueryDevtools initialIsOpen={false} />
+              </SharedStateProvider>
+            </QueryProvider>
             <GitHubButton />
             <SpeedInsights />
           </ThemeProvider>

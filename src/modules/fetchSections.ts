@@ -1,10 +1,11 @@
 import { compareSemesters } from '@/modules/semesters';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToCourseOnly,
   convertToProfOnly,
   type SearchQuery,
 } from '@/types/SearchQuery';
+import type { Course } from './fetchCourse';
+import type { Professor } from './fetchProfessor';
 
 export type SectionsData = {
   _id: string;
@@ -42,6 +43,8 @@ export type SectionsData = {
   syllabus_uri: string;
   grade_distribution: number[];
   attributes: unknown;
+  course_details?: Course[];
+  professor_details?: Professor[];
 }[];
 
 export type Sections = {
@@ -49,12 +52,10 @@ export type Sections = {
   latest: SectionsData;
 };
 
-async function fetchSingleSections(
-  query: SearchQuery,
-): Promise<GenericFetchedData<SectionsData>> {
+async function fetchSingleSections(query: SearchQuery): Promise<SectionsData> {
   const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
   if (typeof API_KEY !== 'string') {
-    return { message: 'error', data: 'API key is undefined' };
+    throw new Error('MISSING API KEY');
   }
 
   try {
@@ -73,7 +74,7 @@ async function fetchSingleSections(
       url.searchParams.append('last_name', profLast);
     }
     if (typeof url === 'undefined') {
-      throw new Error('Incorrect query present');
+      throw new Error('Incorrect query present /section');
     }
 
     const res = await fetch(url.href, {
@@ -84,6 +85,7 @@ async function fetchSingleSections(
       },
       next: { revalidate: 3600 },
     });
+    if (!res.ok) throw new Error('Section fetch failed');
 
     const data = await res.json();
 
@@ -91,31 +93,21 @@ async function fetchSingleSections(
       throw new Error(data.data ?? data.message);
     }
 
-    return {
-      message: 'success',
-      data: data.data,
-    };
+    return data.data;
   } catch (error) {
-    return {
-      message: 'error',
-      data:
-        error instanceof Error ? error.message : 'An unknown error occurred',
-    };
+    throw new Error(
+      error instanceof Error ? error.message : 'An unknown error occurred',
+    );
   }
 }
 
-export async function fetchLatestSemester(): Promise<
-  GenericFetchedData<string>
-> {
+export async function fetchLatestSemester(): Promise<string> {
   try {
     const sections = await fetchSingleSections({
       prefix: 'GOVT',
       number: '2306',
     });
-    if (sections.message !== 'success') {
-      return sections;
-    }
-    const latestSemester = sections.data
+    const latestSemester = sections
       //exclude summers
       .filter((sem) => !sem.academic_session.name.includes('U'))
       //find max
@@ -124,22 +116,17 @@ export async function fetchLatestSemester(): Promise<
           ? a
           : b,
       ).academic_session.name;
-    return {
-      message: 'success',
-      data: latestSemester,
-    };
+    return latestSemester;
   } catch (error) {
-    return {
-      message: 'error',
-      data:
-        error instanceof Error ? error.message : 'An unknown error occurred',
-    };
+    throw new Error(
+      error instanceof Error ? error.message : 'An unknown error occurred',
+    );
   }
 }
 
 export default async function fetchSections(
   query: SearchQuery,
-): Promise<GenericFetchedData<Sections>> {
+): Promise<SectionsData> {
   try {
     const seperatedCombo = [
       convertToCourseOnly(query),
@@ -149,48 +136,28 @@ export default async function fetchSections(
       .filter((obj) => Object.keys(obj).length !== 0);
 
     //Call each
-    const [latestSemester, data] = await Promise.all([
-      fetchLatestSemester(),
-      Promise.all(seperatedCombo.map((query) => fetchSingleSections(query))),
-    ]);
-
-    if (latestSemester.message !== 'success') {
-      return { message: 'error', data: latestSemester.message };
-    }
-    if (data[0].message !== 'success') {
-      return { message: 'error', data: data[0].message };
-    }
-    if (data.length === 2 && data[1].message !== 'success') {
-      return { message: 'error', data: data[1].message };
-    }
+    const settledData = await Promise.allSettled(
+      seperatedCombo.map((query) => fetchSingleSections(query)),
+    );
+    const data = settledData
+      .filter((p) => p.status === 'fulfilled')
+      .map((p) => {
+        return p.value;
+      });
 
     //Find intersection of all course sections and all professor sections
     let intersection: SectionsData = [];
     if (data.length === 1) {
-      intersection = data[0].data;
+      intersection = data[0];
     } else if (data.length === 2) {
-      intersection = data[0].data.filter(
-        (value) =>
-          data[1].message !== 'success' ||
-          data[1].data.some((val) => val._id === value._id),
+      intersection = data[0].filter((value) =>
+        data[1].some((val) => val._id === value._id),
       );
     }
-    //Filter to only latestSemester
-    const latest = intersection.filter(
-      (section) => section.academic_session.name === latestSemester.data,
-    );
-    return {
-      message: 'success',
-      data: {
-        all: intersection,
-        latest: latest,
-      },
-    };
+    return intersection;
   } catch (error) {
-    return {
-      message: 'error',
-      data:
-        error instanceof Error ? error.message : 'An unknown error occurred',
-    };
+    throw new Error(
+      error instanceof Error ? error.message : 'An unknown error occurred',
+    );
   }
 }
