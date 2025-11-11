@@ -35,6 +35,7 @@ export async function GET(request: Request) {
       profFirst: profFirst,
       profLast: profLast,
     });
+    console.log('ab', result);
     // const latest = await fetchLatestSemester();
     // const filteredResult = {
     //   ...result,

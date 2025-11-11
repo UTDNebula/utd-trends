@@ -70,6 +70,7 @@ export async function fetchSearchResults(searchQueries: SearchQuery[]) {
   const SettledsearchResults = await Promise.allSettled(
     searchQueries.map(fetchSearchResult),
   );
+  console.log('aa', SettledsearchResults);
   const searchResults = SettledsearchResults.filter(
     (p) => p.status === 'fulfilled',
   ).map((p) => {
