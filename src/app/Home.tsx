@@ -1,27 +1,21 @@
 'use client';
 
-import BookIcon from '@mui/icons-material/Book';
-import {
-  Button,
-  FormControl,
-  FormControlLabel,
-  Switch,
-  Tooltip,
-} from '@mui/material';
+import { FormControl, FormControlLabel, Switch, Tooltip } from '@mui/material';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState, useTransition } from 'react';
 
 import Background from '@/../public/background.png';
 import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
-import SearchBar from '@/components/search/SearchBar/SearchBar';
+import SearchBar, {
+  updateRecentSearches,
+} from '@/components/search/SearchBar/SearchBar';
 import { displaySemesterName } from '@/modules/semesters';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
+import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 
 interface Props {
-  latestSemester: GenericFetchedData<string>;
+  latestSemester: string;
 }
 
 /**
@@ -44,6 +38,12 @@ export default function Home(props: Props) {
       startTransition(() => {
         router.push(`/dashboard?${searchParams.toString()}`);
       });
+      // add to recent searches
+      const chosenRecentOptions = chosenOptions.map((option) => ({
+        ...option,
+        isRecent: true,
+      }));
+      updateRecentSearches(chosenRecentOptions);
     }
   }
 
@@ -56,9 +56,9 @@ export default function Home(props: Props) {
         className="object-cover -z-20"
       />
       <div className="absolute top-4 left-4 right-4 flex gap-2 place-content-between flex-wrap-reverse">
-        {/*Ad for Kickoff*/}
-        {/*<a
-          href="https://discord.utdnebula.com/"
+        {/*Ad for Spring 2026*/}
+        <a
+          href="https://trends.utdnebula.com/dashboard?searchTerms=GOVT+2306&availability=true"
           target="_blank"
           rel="noreferrer"
           className="bg-royal dark:bg-cornflower-300 text-cornflower-50 dark:text-haiti py-3 px-5 rounded transition hover:scale-[1.01] text-center flex gap-2 items-center mr-auto"
@@ -74,28 +74,22 @@ export default function Home(props: Props) {
             alt=""
           />
           <span>
-            Want to contribute? Come to the <b>Nebula Labs Kickoff</b> on Sept
-            4th 7pm.
+            <b>Spring 2026</b> courses are now on Trends!
           </span>
-        </a>*/}
-        <Link href="/planner" className="ml-auto rounded-xl">
-          <Button className="bg-cornflower-500 rounded-xl text-white dark:bg-cornflower-400 text p-2 px-4 normal-case">
-            <BookIcon className="mr-2" />
-            My Planner
-          </Button>
-        </Link>
+        </a>
+        <PlannerButton className="ml-auto" />
       </div>
       <div className="max-w-xl grow flex flex-col justify-center">
-        <h2 className="text-sm font-semibold mb-3 text-cornflower-600 dark:text-cornflower-400 tracking-wider flex gap-1 items-center">
+        <h2 className="text-sm font-semibold mb-3 text-royal dark:text-cornflower-300 tracking-wider flex gap-1 items-center">
           <span className="leading-none">POWERED BY</span>
-          {/*eslint-disable-next-line react/jsx-no-target-blank*/}
+          {}
           <a
             href="https://www.utdnebula.com/"
             target="_blank"
             rel="noopener"
             className="underline decoration-transparent hover:decoration-inherit transition flex gap-1 items-center"
           >
-            <NebulaLogo className="h-4 w-auto fill-cornflower-600 dark:fill-cornflower-400" />
+            <NebulaLogo className="h-4 w-auto fill-royal dark:fill-cornflower-300" />
             <span className="leading-none">NEBULA LABS</span>
           </a>
         </h2>
@@ -107,7 +101,6 @@ export default function Home(props: Props) {
           find the perfect class.
         </p>
         <SearchBar
-          // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus={true}
           onSelect={searchOptionChosen}
           input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
@@ -115,14 +108,7 @@ export default function Home(props: Props) {
         />
         {/* Teaching Next Semester switch*/}
         <Tooltip title="Select Availability" placement="bottom-start">
-          <FormControl
-            size="small"
-            className={`min-w-max flex-row items-center ${
-              filterNextSem == 'true'
-                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
-                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
-            }`}
-          >
+          <FormControl size="small" className="min-w-max flex-row items-center">
             <FormControlLabel
               control={
                 <Switch
@@ -133,12 +119,10 @@ export default function Home(props: Props) {
                 />
               }
               label={
-                'Teaching ' +
-                (typeof props.latestSemester !== 'undefined' &&
-                props.latestSemester.message === 'success'
-                  ? 'in ' +
-                    displaySemesterName(props.latestSemester.data, false)
-                  : 'Next Semester')
+                props.latestSemester == ''
+                  ? 'Teaching Next Semester'
+                  : 'Teaching in ' +
+                    displaySemesterName(props.latestSemester, false)
               }
             />
           </FormControl>
