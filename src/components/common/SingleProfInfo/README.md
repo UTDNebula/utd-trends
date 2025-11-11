@@ -9,47 +9,32 @@ This component is to import various pieces of information from a professor's Rat
 ### Single Prof Info Example
 
 ```jsx
-const sampleTag = ['Sample (1)'];
+const mockRMP = {
+  id: '',
+  legacyId: '',
+  firstName: 'Professor',
+  lastName: 'Lastname',
+  school: {
+    id: '',
+    name: '',
+  },
+  department: '',
+  avgRating: 4.5,
+  numRatings: 100,
+  avgDifficulty: 3.8,
+  wouldTakeAgainPercent: 68,
+  teacherRatingTags: [],
+  ratingsDistribution: {
+    r1: 10,
+    r2: 30,
+    r3: 20,
+    r4: 5,
+    r5: 5,
+    total: 70,
+  },
+};
 
-import { Chip, Grid, IconButton } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 
-<>
-  <Grid container spacing={2} className="p-4">
-    <Grid size={6}>
-      <p className="text-xl font-bold">5.0</p>
-      <p>Professor rating</p>
-    </Grid>
-    <Grid size={6}>
-      <p className="text-xl font-bold">5.0</p>
-      <p>Difficulty</p>
-    </Grid>
-    <Grid size={6}>
-      <p className="text-xl font-bold">1,000</p>
-      <p>Ratings given</p>
-    </Grid>
-    <Grid size={6}>
-      <p className="text-xl font-bold">99%</p>
-      <p>Would take again</p>
-    </Grid>
-
-    <Grid size={12}>
-      <div className="flex gap-1 flex-wrap">
-        <Chip label={sampleTag[0]} />
-        <IconButton size="small">
-          <ExpandMoreIcon />
-        </IconButton>
-      </div>
-    </Grid>
-
-    <Grid size={12}>
-      <a
-        className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-        href="https://github.com/UTDNebula/utd-trends"
-      >
-        Visit Rate My Professors
-      </a>
-    </Grid>
-  </Grid>
-</>;
+<SingleProfInfo rmp={mockRMP} />;
 ```
