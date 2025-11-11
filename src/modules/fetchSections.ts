@@ -92,9 +92,13 @@ async function fetchSingleSections(query: SearchQuery): Promise<SectionsData> {
     if (data.message !== 'success') {
       throw new Error(data.data ?? data.message);
     }
+    console.log(`result for ${JSON.stringify(query)}: ${JSON.stringify(data)}`);
 
     return data.data;
   } catch (error) {
+    console.error(
+      `error occured fetching sections for ${JSON.stringify(query)}`,
+    );
     throw new Error(
       error instanceof Error ? error.message : 'An unknown error occurred',
     );
@@ -128,6 +132,7 @@ export default async function fetchSections(
   query: SearchQuery,
 ): Promise<SectionsData> {
   try {
+    console.log('start sections fetch');
     const seperatedCombo = [
       convertToCourseOnly(query),
       convertToProfOnly(query),
@@ -135,6 +140,8 @@ export default async function fetchSections(
       //Remove empty objects (for non combos)
       .filter((obj) => Object.keys(obj).length !== 0);
 
+    console.log(`searchQuery: ${JSON.stringify(query)}`);
+    console.log(`individual queries: ${JSON.stringify(seperatedCombo)}`);
     //Call each
     const settledData = await Promise.allSettled(
       seperatedCombo.map((query) => fetchSingleSections(query)),
@@ -144,6 +151,7 @@ export default async function fetchSections(
       .map((p) => {
         return p.value;
       });
+    console.log(`resolved queries: ${JSON.stringify(data)}`);
 
     //Find intersection of all course sections and all professor sections
     let intersection: SectionsData = [];
@@ -154,8 +162,10 @@ export default async function fetchSections(
         data[1].some((val) => val._id === value._id),
       );
     }
+    console.log(`successfully finished sections fetch`);
     return intersection;
   } catch (error) {
+    console.error(`sections fetch failed`);
     throw new Error(
       error instanceof Error ? error.message : 'An unknown error occurred',
     );
