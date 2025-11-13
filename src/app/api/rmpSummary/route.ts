@@ -52,7 +52,7 @@ export async function GET(request: Request) {
   }
 
   // Check cache
-  const filename = prefix + number + profFirst + profLast + '.txt';
+  const filename = profFirst + profLast + '.txt';
   const url = API_URL + 'storage/' + API_STORAGE_BUCKET + '/' + filename;
   const headers = {
     'x-api-key': API_KEY,
