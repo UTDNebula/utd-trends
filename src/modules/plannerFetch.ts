@@ -188,3 +188,21 @@ export function useSearchresults(queries: SearchQuery[]) {
   });
   return queriesHook;
 }
+
+export function useComboSearchresults(queries: SearchQuery[]) {
+  const queriesHook = useQueries({
+    queries: queries.map((q) => {
+      return {
+        queryKey: [
+          'results',
+          searchQueryLabel(removeSection(q)),
+        ],
+        queryFn: async () => {
+          return await fetchSearchResult(q);
+        },
+        staleTime: 1000 * 60 * 60,
+      };
+    }),
+  });
+  return queriesHook;
+}

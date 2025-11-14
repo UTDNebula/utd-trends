@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection';
 import type { SectionsData } from '@/modules/fetchSections';
-import type { SearchQuery } from '@/types/SearchQuery';
+import type { SearchQuery, SearchQueryMultiSection } from '@/types/SearchQuery';
 import {
   convertToCourseOnly,
   removeSection,
@@ -11,7 +11,7 @@ import {
 } from '@/types/SearchQuery';
 
 interface PreviewSectionGroupProps {
-  sectionGroup: SectionsData;
+  sectionGroup: SearchQueryMultiSection;
   previewCourse: SearchQuery;
   courseNames: Record<string, string | undefined>;
   plannerColorMap: Record<
@@ -20,9 +20,7 @@ interface PreviewSectionGroupProps {
   >;
   setPlannerSection: (
     course: SearchQuery,
-    sectionNumber: string,
-    section: SectionsData[number],
-    showConflictMessage: () => void,
+    sectionNumber: string
   ) => void;
   showConflictMessage: () => void;
   index: number;
@@ -41,14 +39,14 @@ export default function PreviewSectionGroup({
 }: PreviewSectionGroupProps) {
   const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null);
 
-  const firstSection = sectionGroup[0];
-  if (!firstSection) {
+  const firstSectionNumber = sectionGroup?.sectionNumbers? sectionGroup?.sectionNumbers[0] : null;
+  if (!firstSectionNumber) {
     return null;
   }
 
   const previewCourseWithSection = {
     ...previewCourse,
-    sectionNumber: firstSection.section_number,
+    sectionNumber: firstSectionNumber,
   };
   const courseKey = searchQueryLabel(
     convertToCourseOnly(previewCourseWithSection),
@@ -58,13 +56,12 @@ export default function PreviewSectionGroup({
   return (
     <>
       <PlannerSection
-        key={`preview-${searchQueryLabel(removeSection(previewCourse))}-${firstSection._id}-${index}`}
+        key={`preview-${searchQueryLabel(removeSection(previewCourse))}-${index}`}
         nooffset={false}
         placeholder={true}
-        selectedSection={firstSection}
+        selectedSection={firstSectionNumber}
         course={previewCourseWithSection}
         color={color}
-        courseName={properCourseName}
         isPreview={true}
         scoot={scoot}
         onSectionClick={(course, sectionNumber, event) => {
@@ -91,10 +88,10 @@ export default function PreviewSectionGroup({
           },
         }}
       >
-        {sectionGroup.map((section) => {
+        {sectionGroup.sectionNumbers?.map((section) => {
           const previewCourseWithSection = {
             ...previewCourse,
-            sectionNumber: section.section_number,
+            sectionNumber: section,
           };
           const courseKey = searchQueryLabel(
             convertToCourseOnly(previewCourseWithSection),
@@ -104,19 +101,16 @@ export default function PreviewSectionGroup({
 
           return (
             <PlannerSection
-              key={`preview-${searchQueryLabel(removeSection(previewCourse))}-${section._id}-${index}`}
+              key={`preview-${searchQueryLabel(removeSection(previewCourse))}-${index}`}
               nooffset={true}
               selectedSection={section}
               course={previewCourseWithSection}
               color={color}
-              courseName={properCourseName}
               isPreview={true}
               onSectionClick={(course, sectionNumber) => {
                 setPlannerSection(
                   course,
-                  sectionNumber,
-                  section,
-                  showConflictMessage,
+                  sectionNumber
                 );
                 setPopoverAnchor(null); // Close popover after selection
               }}

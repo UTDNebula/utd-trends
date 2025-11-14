@@ -25,15 +25,13 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
-import type { Grades } from '@/modules/fetchGrades';
-import type { RMP } from '@/modules/fetchRmp';
-import type { Sections } from '@/modules/fetchSections';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import type { Sections, SectionsData } from '@/modules/fetchSections';
+import { parseTime as parseTimeDays } from '@/modules/timeUtils';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -42,8 +40,12 @@ import {
   searchQueryEqual,
   searchQueryLabel,
   type SearchQueryMultiSection,
+  searchQueryMultiSectionSplit,
+  type SearchResult,
   sectionCanOverlap,
 } from '@/types/SearchQuery';
+import { useSearchResult } from '@/modules/plannerFetch';
+import { calculateGrades } from '@/modules/fetchGrades';
 
 export function LoadingPlannerCard() {
   return (
@@ -76,6 +78,71 @@ export function LoadingPlannerCard() {
       </div>
     </Box>
   );
+}
+
+function parseTime(time: string): number {
+  const [hour, minute] = time.split(':').map((s) => parseInt(s));
+  const isPM = time.includes('pm');
+  let hourNum = hour;
+  if (isPM && hour !== 12) {
+    hourNum += 12;
+  } else if (!isPM && hour === 12) {
+    hourNum = 0; // Midnight case
+  }
+  return hourNum + minute / 60;
+}
+
+function hasConflict(
+  newSection: Sections['all'][number],
+  selectedSections: Sections['all'],
+): boolean {
+  if (!newSection || !selectedSections) return false;
+
+  for (const selectedSection of selectedSections) {
+    for (const newMeeting of newSection.meetings) {
+      if (!newMeeting || !newMeeting.meeting_days) continue;
+
+      for (const existingMeeting of selectedSection.meetings) {
+        if (!existingMeeting || !existingMeeting.meeting_days) continue;
+
+        // Check if days overlap
+        const overlappingDays = newMeeting.meeting_days.some((day) =>
+          existingMeeting.meeting_days.includes(day),
+        );
+
+        if (overlappingDays) {
+          // Convert times to comparable values
+          const newStart = parseTime(newMeeting.start_time);
+          const newEnd = parseTime(newMeeting.end_time);
+          const existingStart = parseTime(existingMeeting.start_time);
+          const existingEnd = parseTime(existingMeeting.end_time);
+
+          // Check if times overlap
+          if (
+            (newStart < existingEnd && newStart >= existingStart) ||
+            (newEnd > existingStart && newEnd <= existingEnd) ||
+            (newStart <= existingStart && newEnd >= existingEnd) ||
+            (newStart >= existingStart && newEnd <= existingEnd)
+          ) {
+            if (
+              selectedSection.course_details &&
+              selectedSection.course_details[0] &&
+              newSection.course_details &&
+              newSection.course_details[0] &&
+              selectedSection.course_details[0].subject_prefix ==
+                newSection.course_details[0].subject_prefix &&
+              selectedSection.course_details[0].course_number ==
+                newSection.course_details[0].course_number
+            )
+              return false; // if times overlap, but same course, we can switch it out without conflict
+            return true; // Conflict detected
+          }
+        }
+      }
+    }
+  }
+
+  return false;
 }
 
 function SectionTableHead(props: { hasMultipleDateRanges: boolean }) {
@@ -154,7 +221,7 @@ function parseMeeting(meeting: Sections['all'][number]['meetings'][number]) {
 
 type SectionTableRowProps = {
   data: Sections['all'][number];
-  bestSyllabus: string;
+  syllabusSections: SectionsData;
   course: SearchQueryMultiSection;
   lastRow: boolean;
   setPlannerSection: (
@@ -164,15 +231,40 @@ type SectionTableRowProps = {
     openConflictMessage?: () => void,
   ) => void;
   hasMultipleDateRanges: boolean;
+  selectedSections: Sections['all'];
   openConflictMessage: () => void;
 };
 
 function SectionTableRow(props: SectionTableRowProps) {
-  const isSelected =
-    props.course.sectionNumbers?.includes(props.data.section_number) ?? false;
-  let syllabusToShow = props.data.syllabus_uri ?? props.bestSyllabus;
+  const isSelected = props.selectedSections.some(
+    (el) =>
+      el.section_number == props.data.section_number && // check the section number
+      el.course_details?.some(
+        // and also if the course is the same
+        (c) =>
+          c.subject_prefix == props.course.prefix &&
+          c.course_number == props.course.number,
+      ),
+  );
+  const allSectionsOfProfWithSyllabus = props.syllabusSections.filter((s) =>
+    s.professor_details?.find(
+      (p) =>
+        props.data.professor_details &&
+        props.data.professor_details.find(
+          (prof) =>
+            prof.first_name == p.first_name && prof.last_name == p.last_name,
+        ),
+    ),
+  );
+  const bestSyllabus =
+    allSectionsOfProfWithSyllabus && allSectionsOfProfWithSyllabus[0]
+      ? allSectionsOfProfWithSyllabus[0].syllabus_uri
+      : props.syllabusSections && props.syllabusSections[0]
+        ? props.syllabusSections[0].syllabus_uri
+        : ''; // try to get latest syllabus of professor, else the latest syllabus
+  let syllabusToShow = props.data.syllabus_uri ?? bestSyllabus; // either selected section's (for next sem) or the best one overall
   if (syllabusToShow == '') {
-    syllabusToShow = props.bestSyllabus;
+    syllabusToShow = bestSyllabus;
   }
   return (
     <TableRow>
@@ -193,12 +285,32 @@ function SectionTableRow(props: SectionTableRowProps) {
           <Radio
             checked={isSelected}
             onClick={() => {
+              if (
+                !isSelected &&
+                hasConflict(props.data, props.selectedSections)
+              ) {
+                // Check for conflict
+                props.openConflictMessage();
+                return; // Prevent section selection
+              }
+
               props.setPlannerSection(
-                props.course,
+                {
+                  prefix: props.data.course_details![0].subject_prefix,
+                  number: props.data.course_details![0].course_number,
+                  profFirst:
+                    props.data.professor_details &&
+                    props.data.professor_details[0]
+                      ? props.data.professor_details[0].first_name
+                      : undefined,
+                  profLast:
+                    props.data.professor_details &&
+                    props.data.professor_details[0]
+                      ? props.data.professor_details[0].last_name
+                      : undefined,
+                } as SearchQuery,
                 props.data.section_number,
-                props.data,
-                props.openConflictMessage,
-              );
+              ); // using the section's course and prof details every time ensures overall matches de/selection behavior
             }}
           />
         )}
@@ -252,7 +364,7 @@ function SectionTableRow(props: SectionTableRowProps) {
       )}
       <TableCell className={props.lastRow ? 'border-b-0' : ''}>
         <div style={{ fontSize: '10px', color: 'gray' }}>
-          {syllabusToShow ? (
+          {syllabusToShow != '' ? (
             <Link
               href={syllabusToShow}
               target="_blank"
@@ -299,45 +411,27 @@ function MeetingChip(props: {
 
 type PlannerCardProps = {
   query: SearchQueryMultiSection;
-  sections?: Sections['all'];
-  bestSyllabus: string;
+  selectedSections: Sections['all'];
   setPlannerSection: (searchQuery: SearchQuery, section: string) => void;
-  grades: GenericFetchedData<Grades>;
-  rmp: GenericFetchedData<RMP>;
   removeFromPlanner: () => void;
   openConflictMessage: () => void;
   color: { fill: string; outline: string; font: string };
-  courseName: string | undefined;
+  latestSemester: string;
+  extraSections?: SearchResult;
+  extraLabel?: string;
 };
 
 export default function PlannerCard(props: PlannerCardProps) {
-  const { setPreviewCourses } = useSharedState();
+  const { planner, setPreviewCourses, latestSemester } = useSharedState();
   const [open, setOpen] = useState(false);
+  const { isSuccess, data: result } = useSearchResult(props.query);
+  const [whichOpen, setWhichOpen] = useState<'sections' | 'grades'>('sections');
 
-  //appease the typescript gods
-  const sections = props.sections;
-  const canOpenSections =
-    typeof sections !== 'undefined' && sections.length !== 0;
-  const canOpenGrades =
-    !(
-      typeof props.grades === 'undefined' || props.grades.message !== 'success'
-    ) || !(typeof props.rmp === 'undefined' || props.rmp.message === 'success');
-  const [whichOpen, setWhichOpen] = useState<'sections' | 'grades' | null>(
-    canOpenSections ? 'sections' : canOpenGrades ? 'grades' : null,
-  );
-  useEffect(() => {
-    setWhichOpen((prev) => {
-      if (prev === null) {
-        return canOpenSections ? 'sections' : canOpenGrades ? 'grades' : null;
-      }
-      return prev;
-    });
-  }, [canOpenSections, canOpenGrades]);
+  if (!isSuccess) {
+    return <LoadingPlannerCard />;
+  }
   function handleOpen() {
-    if (
-      (whichOpen === 'sections' && canOpenSections) ||
-      (whichOpen === 'grades' && canOpenGrades)
-    ) {
+    if (whichOpen === 'sections' || whichOpen === 'grades') {
       const newOpen = !open;
       setOpen(newOpen);
 
@@ -370,21 +464,76 @@ export default function PlannerCard(props: PlannerCardProps) {
     }
   }
 
+  let allSectionsWithSyllabus = result.sections
+    .filter((s) => !!s.syllabus_uri && !!s.academic_session?.start_date)
+    .sort(
+      (a, b) =>
+        new Date(b.academic_session.start_date).getTime() -
+        new Date(a.academic_session.start_date).getTime(),
+    ); // all sections of the course, sorted by most recent syllabus
+  if (props.extraSections && props.extraLabel == 'lab')
+    allSectionsWithSyllabus = allSectionsWithSyllabus.filter((s) =>
+      sectionCanOverlap(s.section_number, 'extra'),
+    );
+  // only keep extra sections for syllabus lookup
+  else if (props.extraSections && props.extraLabel == 'exam')
+    allSectionsWithSyllabus = allSectionsWithSyllabus.filter((s) =>
+      sectionCanOverlap(s.section_number, 'exam'),
+    );
+  // only keep exam sections for syllabus lookup
+  else if (props.extraSections && props.extraLabel == 'unassigned')
+    allSectionsWithSyllabus = allSectionsWithSyllabus.filter(() => false); // No syllabi should be shown
+  let latestMatchedSections: SearchResult = result; // fallback if filtering is null, at least it will have correct grade/rmp data
+  let latestExtraSections: SearchResult | null = null;
+  if (!props.extraSections) {
+    latestMatchedSections = {
+      ...result,
+      sections: result.sections.filter(
+        (section) =>
+          section.academic_session.name == props.latestSemester && // latest sem's sections only
+          ((!props.query.profFirst && !props.query.profLast) || // if overall, should show every prof's section
+            (section.professor_details &&
+              section.professor_details[0] &&
+              section.professor_details[0]?.first_name ==
+                props.query.profFirst &&
+              section.professor_details[0]?.last_name ==
+                props.query.profLast)) && // else, show only this professor's sections
+          !sectionCanOverlap(section.section_number), // that are not "Extra"
+      ),
+    };
+    latestExtraSections = {
+      ...result,
+      sections: result.sections.filter(
+        (section) =>
+          section.academic_session.name == props.latestSemester && // latest sem's sections only
+          (!(section.professor_details && section.professor_details[0]) || // either have no professor assigned, or
+            sectionCanOverlap(section.section_number)), // be an "Extra" section (labs, exams, etc)
+      ),
+    };
+  } else {
+    latestMatchedSections = props.extraSections;
+  }
+
   const hasMultipleDateRanges =
-    typeof props.sections !== 'undefined' && props.sections.length >= 1
-      ? props.sections.some(
+    typeof latestMatchedSections.sections !== 'undefined' &&
+    latestMatchedSections.sections.length >= 1
+      ? latestMatchedSections.sections.some(
           (section) =>
             section.meetings[0].start_date !==
-              props.sections![0].meetings[0].start_date ||
+              latestMatchedSections.sections![0].meetings[0].start_date ||
             section.meetings[0].end_date !==
-              props.sections![0].meetings[0].end_date,
+              latestMatchedSections.sections![0].meetings[0].end_date,
         )
       : false;
-
   return (
     <Box
       component={Paper}
-      className="border border-royal dark:border-cornflower-300 rounded-lg"
+      className={
+        'border border-royal dark:border-cornflower-300 rounded-lg' +
+        (props.extraSections
+          ? ' my-4 mx-5 bg-[rgb(250,250,250)] dark:bg-[rgb(10,10,10)]'
+          : '')
+      }
     >
       <div
         role="button"
@@ -395,10 +544,7 @@ export default function PlannerCard(props: PlannerCardProps) {
             handleOpen();
           }
         }}
-        className={
-          'p-4 flex items-center gap-4' +
-          (canOpenSections || canOpenGrades ? ' cursor-pointer' : '')
-        }
+        className={'p-4 flex items-center gap-4 cursor-pointer'}
       >
         {/* Left-side Content */}
         <div className="flex items-center">
@@ -413,108 +559,130 @@ export default function PlannerCard(props: PlannerCardProps) {
                 e.stopPropagation(); // prevents double opening/closing
                 handleOpen();
               }}
-              disabled={!canOpenSections && !canOpenGrades}
               className={'transition-transform' + (open ? ' rotate-90' : '')}
             >
               <KeyboardArrowIcon fontSize="inherit" />
             </IconButton>
           </Tooltip>
-          <Tooltip title={'Remove from Planner'} placement="top">
-            <Checkbox
-              checked={true /*inPlanner?*/}
-              onClick={(e) => {
-                e.stopPropagation();
-                props.removeFromPlanner();
-              }}
-              icon={<BookOutlinedIcon />}
-              checkedIcon={<BookIcon />}
-              sx={{
-                '&.Mui-checked': {
-                  color: props.color.fill,
-                },
-              }}
-            />
-          </Tooltip>
-          <Tooltip title="Switch Opening Sections/Grades" placement="top">
-            <ToggleButtonGroup
-              value={whichOpen}
-              exclusive
-              onChange={(_, newValue) => {
-                if (newValue === 'sections' && canOpenSections) {
-                  setWhichOpen('sections');
-                }
-                if (newValue === 'grades' && canOpenGrades) {
-                  setWhichOpen('grades');
-                }
-                setOpen(true);
-              }}
-              size="small"
-              aria-label="dropdown switch"
-              onClick={(e) => e.stopPropagation()}
-              className="ml-2"
-            >
-              <ToggleButton
-                value="sections"
-                aria-label="sections"
-                disabled={!canOpenSections}
-              >
-                <EventIcon />
-              </ToggleButton>
-              <ToggleButton
-                value="grades"
-                aria-label="grades and rmp"
-                disabled={!canOpenGrades}
-              >
-                <BarChartIcon />
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Tooltip>
-        </div>
-        <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit grow">
-          <Tooltip
-            title={
-              typeof props.query.prefix !== 'undefined' &&
-              typeof props.query.number !== 'undefined' &&
-              props.courseName
-            }
-            placement="top"
-          >
-            <span>{searchQueryLabel(convertToCourseOnly(props.query))}</span>
-          </Tooltip>
-          {typeof props.query.profFirst !== 'undefined' &&
-            typeof props.query.profLast !== 'undefined' &&
-            typeof props.query.prefix !== 'undefined' &&
-            typeof props.query.number !== 'undefined' && <span> </span>}
-          <Tooltip
-            title={
-              typeof props.query.profFirst !== 'undefined' &&
-              typeof props.query.profLast !== 'undefined' &&
-              (props.rmp !== undefined &&
-              props.rmp.message === 'success' &&
-              props.rmp.data.teacherRatingTags.length > 0
-                ? 'Tags: ' +
-                  props.rmp.data.teacherRatingTags
-                    .sort((a, b) => b.tagCount - a.tagCount)
-                    .slice(0, 3)
-                    .map((tag) => tag.tagName)
-                    .join(', ')
-                : 'No Tags Available')
-            }
-            placement="top"
-          >
-            <span>{searchQueryLabel(convertToProfOnly(props.query))}</span>
-          </Tooltip>
-          {((typeof props.query.profFirst === 'undefined' &&
-            typeof props.query.profLast === 'undefined') ||
-            (typeof props.query.prefix === 'undefined' &&
-              typeof props.query.number === 'undefined')) && (
-            <span> (Overall)</span>
+          {!props.extraSections && (
+            <Tooltip title={'Remove from Planner'} placement="top">
+              <Checkbox
+                checked={true /*inPlanner?*/}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.removeFromPlanner();
+                }}
+                icon={<BookOutlinedIcon />}
+                checkedIcon={<BookIcon />}
+                sx={{
+                  '&.Mui-checked': {
+                    color: props.color.fill,
+                  },
+                }}
+              />
+            </Tooltip>
           )}
-        </Typography>
+          {!props.extraSections && (
+            <Tooltip title="Switch Opening Sections/Grades" placement="top">
+              <ToggleButtonGroup
+                value={whichOpen}
+                exclusive
+                onChange={(_, newValue) => {
+                  if (newValue === 'sections') {
+                    setWhichOpen('sections');
+                  }
+                  if (newValue === 'grades') {
+                    setWhichOpen('grades');
+                  }
+                  setOpen(true);
+                }}
+                size="small"
+                aria-label="dropdown switch"
+                onClick={(e) => e.stopPropagation()}
+                className="ml-2"
+              >
+                <ToggleButton value="sections" aria-label="sections">
+                  <EventIcon />
+                </ToggleButton>
+                <ToggleButton value="grades" aria-label="grades and rmp">
+                  <BarChartIcon />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Tooltip>
+          )}
+        </div>
+        {!props.extraSections ? (
+          <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit grow">
+            <Tooltip
+              title={
+                typeof props.query.prefix !== 'undefined' &&
+                typeof props.query.number !== 'undefined'
+              }
+              placement="top"
+            >
+              <span>{searchQueryLabel(convertToCourseOnly(props.query))}</span>
+            </Tooltip>
+            {typeof props.query.profFirst !== 'undefined' &&
+              typeof props.query.profLast !== 'undefined' &&
+              typeof props.query.prefix !== 'undefined' &&
+              typeof props.query.number !== 'undefined' && <span> </span>}
+            <Tooltip
+              title={
+                typeof props.query.profFirst !== 'undefined' &&
+                typeof props.query.profLast !== 'undefined' &&
+                ((latestMatchedSections.type === 'professor' ||
+                  latestMatchedSections.type === 'combo') &&
+                latestMatchedSections.RMP &&
+                latestMatchedSections.RMP.teacherRatingTags.length > 0
+                  ? 'Tags: ' +
+                    latestMatchedSections.RMP.teacherRatingTags
+                      .sort((a, b) => b.tagCount - a.tagCount)
+                      .slice(0, 3)
+                      .map((tag) => tag.tagName)
+                      .join(', ')
+                  : 'No Tags Available')
+              }
+              placement="top"
+            >
+              <span>{searchQueryLabel(convertToProfOnly(props.query))}</span>
+            </Tooltip>
+            {((typeof props.query.profFirst === 'undefined' &&
+              typeof props.query.profLast === 'undefined') ||
+              (typeof props.query.prefix === 'undefined' &&
+                typeof props.query.number === 'undefined')) && (
+              <span> (Overall)</span>
+            )}
+          </Typography>
+        ) : (
+          <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit grow">
+            <Tooltip
+              title={
+                props.extraLabel == 'lab'
+                  ? 'Lab/Discussion/Practice Sections for ' +
+                    searchQueryLabel(convertToCourseOnly(props.query))
+                  : props.extraLabel == 'exam'
+                    ? 'Exam Sections for ' +
+                      searchQueryLabel(convertToCourseOnly(props.query))
+                    : 'Sections of ' +
+                      searchQueryLabel(convertToCourseOnly(props.query)) +
+                      ' without a Professor assigned yet'
+              }
+              placement="top"
+            >
+              <span>
+                {props.extraLabel == 'lab'
+                  ? 'Lab Sections'
+                  : props.extraLabel == 'exam'
+                    ? 'Exam Sections'
+                    : 'Sections without Professors'}
+              </span>
+            </Tooltip>
+          </Typography>
+        )}
         <MeetingChip
           color={props.color}
           meetings={
-            sections?.find(
+            latestMatchedSections.sections.find(
               (section) =>
                 !sectionCanOverlap(section.section_number) &&
                 props.query.sectionNumbers?.includes(section.section_number),
@@ -523,7 +691,7 @@ export default function PlannerCard(props: PlannerCardProps) {
         />
       </div>
 
-      {canOpenSections && (
+      {
         <Collapse
           in={open && whichOpen === 'sections'}
           timeout="auto"
@@ -537,13 +705,16 @@ export default function PlannerCard(props: PlannerCardProps) {
                 />
               </TableHead>
               <TableBody>
-                {sections.map((section, index) => (
+                {latestMatchedSections.sections.map((section, index) => (
                   <SectionTableRow
-                    key={section.section_number}
+                    key={section._id}
                     data={section}
-                    bestSyllabus={props.bestSyllabus}
+                    syllabusSections={allSectionsWithSyllabus}
                     course={props.query}
-                    lastRow={index === sections.length - 1}
+                    lastRow={
+                      index === latestMatchedSections.sections.length - 1
+                    }
+                    selectedSections={props.selectedSections}
                     setPlannerSection={props.setPlannerSection}
                     openConflictMessage={props.openConflictMessage}
                     hasMultipleDateRanges={hasMultipleDateRanges}
@@ -552,10 +723,85 @@ export default function PlannerCard(props: PlannerCardProps) {
               </TableBody>
             </Table>
           </TableContainer>
+          {/* Unassigned Professor Sections -- only show for a non-overall card */}
+          {props.query.profFirst != null &&
+            props.query.profLast !== null &&
+            latestExtraSections &&
+            latestExtraSections.sections.filter(
+              (section) =>
+                section.professor_details?.length == 0 &&
+                !sectionCanOverlap(section.section_number),
+            ).length > 0 && (
+              <PlannerCard
+                key={searchQueryLabel(props.query) + ' extra sections'}
+                query={props.query}
+                setPlannerSection={props.setPlannerSection}
+                removeFromPlanner={props.removeFromPlanner}
+                selectedSections={props.selectedSections}
+                openConflictMessage={props.openConflictMessage}
+                color={props.color}
+                latestSemester={props.latestSemester}
+                extraSections={{
+                  ...latestExtraSections,
+                  sections: latestExtraSections.sections.filter(
+                    (section) =>
+                      section.professor_details?.length == 0 &&
+                      !sectionCanOverlap(section.section_number),
+                  ),
+                }}
+                extraLabel="unassigned"
+              />
+            )}
+          {/* Extra Sections (Lab, Discussion, Etc) -- with prof assigned or without too */}
+          {latestExtraSections &&
+            latestExtraSections.sections.filter((section) =>
+              sectionCanOverlap(section.section_number, 'extra'),
+            ).length > 0 && (
+              <PlannerCard
+                key={searchQueryLabel(props.query) + ' lab sections'}
+                query={props.query}
+                setPlannerSection={props.setPlannerSection}
+                removeFromPlanner={props.removeFromPlanner}
+                selectedSections={props.selectedSections}
+                openConflictMessage={props.openConflictMessage}
+                color={props.color}
+                latestSemester={props.latestSemester}
+                extraSections={{
+                  ...latestExtraSections,
+                  sections: latestExtraSections.sections.filter((section) =>
+                    sectionCanOverlap(section.section_number, 'extra'),
+                  ),
+                }}
+                extraLabel="lab"
+              />
+            )}
+          {/* Extra Sections (Exam) -- with prof assigned or without too */}
+          {latestExtraSections &&
+            latestExtraSections.sections.filter((section) =>
+              sectionCanOverlap(section.section_number, 'exam'),
+            ).length > 0 && (
+              <PlannerCard
+                key={searchQueryLabel(props.query) + ' exam sections'}
+                query={props.query}
+                setPlannerSection={props.setPlannerSection}
+                removeFromPlanner={props.removeFromPlanner}
+                selectedSections={props.selectedSections}
+                openConflictMessage={props.openConflictMessage}
+                color={props.color}
+                latestSemester={props.latestSemester}
+                extraSections={{
+                  ...latestExtraSections,
+                  sections: latestExtraSections.sections.filter((section) =>
+                    sectionCanOverlap(section.section_number, 'exam'),
+                  ),
+                }}
+                extraLabel="exam"
+              />
+            )}
         </Collapse>
-      )}
+      }
 
-      {canOpenGrades && (
+      {
         <Collapse
           in={open && whichOpen === 'grades'}
           timeout="auto"
@@ -564,13 +810,17 @@ export default function PlannerCard(props: PlannerCardProps) {
           <div className="p-2 md:p-4 flex flex-col gap-2">
             <SingleGradesInfo
               course={removeSection(props.query)}
-              grades={props.grades}
-              gradesToUse="unfiltered"
+              grades={latestMatchedSections.grades}
+              filteredGrades={calculateGrades(latestMatchedSections.grades)}
             />
-            <SingleProfInfo rmp={props.rmp} />
+            {(latestMatchedSections.type === 'professor' ||
+              latestMatchedSections.type === 'combo') &&
+              latestMatchedSections.RMP && (
+                <SingleProfInfo rmp={latestMatchedSections.RMP} />
+              )}
           </div>
         </Collapse>
-      )}
+      }
     </Box>
   );
 }

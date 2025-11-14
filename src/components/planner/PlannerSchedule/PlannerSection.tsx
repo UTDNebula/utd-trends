@@ -6,15 +6,15 @@ import {
   DAYS,
   START_HOUR,
 } from '@/components/planner/PlannerSchedule/PlannerSchedule';
-import type { Sections } from '@/modules/fetchSections';
 import { type SearchQuery } from '@/types/SearchQuery';
+import { useSearchResult } from '@/modules/plannerFetch';
+import { useSharedState } from '@/app/SharedStateProvider';
 
 interface PlannerSectionComponentProps {
   scoot?: number;
-  selectedSection: Sections['all'][number] | undefined;
+  selectedSection: string;
   course: SearchQuery;
   color: { fill: string; outline: string; font: string; filter?: string };
-  courseName: string | undefined;
   isPreview?: boolean;
   nooffset?: boolean;
   placeholder?: boolean;
@@ -45,10 +45,18 @@ const previewColor = (color: {
 
 export default function PlannerSection(props: PlannerSectionComponentProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const selectedSection = props.selectedSection;
-  if (typeof selectedSection === 'undefined') {
+  const { latestSemester } = useSharedState();
+  const result = useSearchResult(props.course);
+  if (!result.isSuccess || result.data.type === 'professor') {
     return null;
   }
+  const selectedSection = result.data.sections.find(
+    (s) =>
+      s.section_number === props.selectedSection &&
+      s.academic_session.name === latestSemester,
+  );
+  if (selectedSection === undefined) return null;
+  const courseName = result.data.courseName;
 
   // If nooffset is true, return a simple non-positioned element
   if (props.nooffset) {
@@ -193,7 +201,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
     return (
       <Tooltip
         key={selectedSection._id + i}
-        title={props.courseName}
+        title={courseName}
         placement="top"
         slotProps={{
           popper: {
@@ -265,7 +273,12 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               (makeBigger ? 'text-sm' : 'text-xs leading-none')
             }
           >
-            {`${props.course.prefix} ${props.course.number}.${selectedSection.section_number}`}
+            {selectedSection.course_details && selectedSection.course_details[0]
+              ? selectedSection.course_details[0].subject_prefix +
+                ' ' +
+                selectedSection.course_details[0].course_number
+              : ''}
+            .{selectedSection.section_number}
           </div>
           <div
             className={
@@ -273,7 +286,12 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               (makeBigger ? '' : 'leading-none')
             }
           >
-            {props.course.profFirst} {props.course.profLast}
+            {selectedSection.professor_details &&
+            selectedSection.professor_details[0]
+              ? selectedSection.professor_details[0].first_name +
+                ' ' +
+                selectedSection.professor_details[0].last_name
+              : ''}
           </div>
           <div
             className={

@@ -1,23 +1,11 @@
 'use client';
 
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useRef,
-  useState,
-} from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 import { compareColors, plannerColors } from '@/modules/colors';
-import { calculateGrades, type Grades } from '@/modules/fetchGrades';
-import type { RMP } from '@/modules/fetchRmp';
-import type { Sections } from '@/modules/fetchSections';
-import { compareSemesters } from '@/modules/semesters';
 import usePersistantState from '@/modules/usePersistantState';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToCourseOnly,
-  convertToProfOnly,
   removeDuplicates,
   removeSection,
   type SearchQuery,
@@ -25,8 +13,11 @@ import {
   searchQueryLabel,
   type SearchQueryMultiSection,
   searchQueryMultiSectionSplit,
+  type SearchResult,
   sectionCanOverlap,
 } from '@/types/SearchQuery';
+import type { Sections } from '@/modules/fetchSections';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
 
 function parseTime(time: string): number {
   const [hour, minute] = time.split(':').map((s) => parseInt(s));
@@ -109,17 +100,9 @@ type Setter<T> = (value: SetterValue<T>) => void;
 
 const SharedStateContext = createContext<
   | {
-      grades: { [key: string]: GenericFetchedData<Grades> };
-      setGrades: Setter<{ [key: string]: GenericFetchedData<Grades> }>;
-      rmp: { [key: string]: GenericFetchedData<RMP> };
-      setRmp: Setter<{ [key: string]: GenericFetchedData<RMP> }>;
-      sections: { [key: string]: GenericFetchedData<Sections> };
-      setSections: Setter<{ [key: string]: GenericFetchedData<Sections> }>;
-      compare: SearchQuery[];
-      addToCompare: (query: SearchQuery) => void;
-      removeFromCompare: (query: SearchQuery) => void;
-      compareGrades: { [key: string]: GenericFetchedData<Grades> };
-      compareRmp: { [key: string]: GenericFetchedData<RMP> };
+      compare: SearchResult[];
+      addToCompare: (query: SearchResult) => void;
+      removeFromCompare: (query: SearchResult) => void;
       compareColorMap: { [key: string]: string };
       planner: SearchQueryMultiSection[];
       addToPlanner: (query: SearchQuery) => void;
@@ -133,13 +116,9 @@ const SharedStateContext = createContext<
       plannerColorMap: {
         [key: string]: { fill: string; outline: string; font: string };
       };
-      semesters: string[];
-      chosenSemesters: string[];
-      setChosenSemesters: Setter<string[]>;
       courseNames: { [key: string]: string | undefined };
       setCourseNames: Setter<{ [key: string]: string | undefined }>;
-      latestSemester: GenericFetchedData<string> | undefined;
-      setLatestSemester: Setter<GenericFetchedData<string> | undefined>;
+      latestSemester: string;
       previewCourses: SearchQueryMultiSection[];
       setPreviewCourses: Setter<SearchQueryMultiSection[]>;
       hasConflict: (
@@ -156,178 +135,50 @@ const SharedStateContext = createContext<
 
 export function SharedStateProvider({
   children,
+  latestSemester,
 }: {
   children: React.ReactNode;
+  latestSemester: string;
 }) {
-  const [grades, internalSetGrades] = useState<{
-    [key: string]: GenericFetchedData<Grades>;
-  }>({});
-  const [semesters, setSemesters] = useState<string[]>([]);
-  const [chosenSemesters, internalSetChosenSemesters] = useState<string[]>([]);
-
-  const [rmp, setRmp] = useState<{ [key: string]: GenericFetchedData<RMP> }>(
-    {},
-  );
-
-  const [sections, setSections] = useState<{
-    [key: string]: GenericFetchedData<Sections>;
-  }>({});
-
-  const [previewCourses, setPreviewCourses] = useState<
+    const [previewCourses, setPreviewCourses] = useState<
     SearchQueryMultiSection[]
   >([]);
-
-  const [compare, setCompare] = useState<SearchQuery[]>([]);
-  const [compareGrades, internalSetCompareGrades] = useState<{
-    [key: string]: GenericFetchedData<Grades>;
-  }>({});
-  const compareGradesRef = useRef(compareGrades);
-  //Update ref for setGrades
-  const setCompareGrades = useCallback(
-    (value: SetterValue<{ [key: string]: GenericFetchedData<Grades> }>) => {
-      internalSetCompareGrades((prev) => {
-        const newValue = typeof value === 'function' ? value(prev) : value;
-
-        compareGradesRef.current = newValue;
-
-        return newValue;
-      });
-    },
-    [internalSetCompareGrades],
-  );
-  const [compareRmp, setCompareRmp] = useState<{
-    [key: string]: GenericFetchedData<RMP>;
-  }>({});
-
-  //Set grades and update semesters
-  const setGrades = useCallback(
-    (value: SetterValue<{ [key: string]: GenericFetchedData<Grades> }>) => {
-      internalSetGrades((prev) => {
-        const newValue = typeof value === 'function' ? value(prev) : value;
-
-        const newSemesters = Object.values(newValue)
-          // remove errored
-          .filter((grade) => grade.message === 'success')
-          //remove grade data, just semesters
-          .flatMap((grade) =>
-            grade.data.grades.map((gradeSemester) => gradeSemester._id),
-          );
-        // add semesters from compare grades
-        const semestersFromCompare = Object.values(compareGradesRef.current)
-          // remove errored
-          .filter((grade) => grade.message === 'success')
-          //remove grade data, just semesters
-          .flatMap((grade) =>
-            grade.data.grades.map((gradeSemester) => gradeSemester._id),
-          );
-        const allSemesters = newSemesters
-          .concat(semestersFromCompare)
-          // remove duplicates
-          .filter((value, index, array) => array.indexOf(value) === index)
-          // display the semesters in order of recency (most recent first)
-          .sort((a, b) => compareSemesters(b, a));
-
-        setSemesters(allSemesters);
-        internalSetChosenSemesters(allSemesters);
-
-        return newValue;
-      });
-    },
-    [internalSetGrades, setSemesters, internalSetChosenSemesters],
-  );
-
-  //Set chosen semesters and update grades and compare grades
-  const setChosenSemesters = useCallback(
-    (value: SetterValue<string[]>) => {
-      internalSetChosenSemesters((prev) => {
-        const newValue = typeof value === 'function' ? value(prev) : value;
-
-        // recalc filtered grades
-        internalSetGrades((prev) => {
-          for (const grade of Object.values(prev)) {
-            if (grade.message === 'success') {
-              grade.data.filtered = calculateGrades(
-                grade.data.grades,
-                newValue,
-              );
-            }
-          }
-          return prev;
-        });
-        setCompareGrades((prev) => {
-          for (const grade of Object.values(prev)) {
-            if (grade.message === 'success') {
-              grade.data.filtered = calculateGrades(
-                grade.data.grades,
-                newValue,
-              );
-            }
-          }
-          return prev;
-        });
-
-        return newValue;
-      });
-    },
-    [internalSetGrades, internalSetChosenSemesters, setCompareGrades],
-  );
+  const [compare, setCompare] = useState<SearchResult[]>([]);
 
   //Add a course+prof combo to compare (happens from search results)
   //copy over data basically
-  function addToCompare(query: SearchQuery) {
+  function addToCompare(result: SearchResult) {
     //If not already there
-    if (compare.every((obj) => !searchQueryEqual(obj, query))) {
+    if (
+      compare.every(
+        (obj) => !searchQueryEqual(obj.searchQuery, result.searchQuery),
+      )
+    ) {
       //Add to list
-      setCompare((prev) => prev.concat([query]));
-      //Save grade data
-      setCompareGrades((prev) => {
-        return {
-          ...prev,
-          [searchQueryLabel(query)]: grades[searchQueryLabel(query)],
-        };
-      });
-      //Save prof data
-      if (typeof query.profLast !== 'undefined') {
-        setCompareRmp((prev) => {
-          return {
-            ...prev,
-            [searchQueryLabel(convertToProfOnly(query))]:
-              rmp[searchQueryLabel(convertToProfOnly(query))],
-          };
-        });
-      }
+      setCompare((prev) => [...prev, result]);
     }
   }
 
   //Remove a course+prof combo from compare
-  function removeFromCompare(query: SearchQuery) {
+  function removeFromCompare(result: SearchResult) {
     //If already there
-    if (compare.some((obj) => searchQueryEqual(obj, query))) {
+    if (
+      compare.some((obj) =>
+        searchQueryEqual(obj.searchQuery, result.searchQuery),
+      )
+    ) {
       //Remove from list
-      setCompare((prev) => prev.filter((el) => !searchQueryEqual(el, query)));
-      //Remove from saved grade data
-      setCompareGrades((prev) => {
-        delete prev[searchQueryLabel(query)];
-        return prev;
-      });
-      //If no other courses in compare have the same professor
-      if (
-        !compare
-          .filter((el) => !searchQueryEqual(el, query))
-          .some((el) => searchQueryEqual(el, convertToProfOnly(query)))
-      ) {
-        //Remove from saved rmp data
-        setCompareRmp((prev) => {
-          delete prev[searchQueryLabel(convertToProfOnly(query))];
-          return prev;
-        });
-      }
+      setCompare((prev) => [
+        ...prev.filter(
+          (el) => !searchQueryEqual(el.searchQuery, result.searchQuery),
+        ),
+      ]);
     }
   }
 
   const compareColorMap = Object.fromEntries(
     compare.map((key, index) => [
-      searchQueryLabel(key),
+      searchQueryLabel(key.searchQuery),
       compareColors[index % compareColors.length],
     ]),
   );
@@ -368,29 +219,22 @@ export function SharedStateProvider({
     newSection?: Sections['all'][number],
     openConflictMessage?: () => void,
   ) {
-    if (newSection && openConflictMessage) {
-      const courseInPlanner = planner.find((course) =>
+    if (
+      !planner.find((course) =>
         searchQueryEqual(removeSection(course), removeSection(query)),
-      );
-      const isSelected =
-        courseInPlanner?.sectionNumbers?.includes(section) ?? false;
-      // Check for conflicts
-      if (
-        !isSelected &&
-        hasConflict(newSection, getSelectedSections(planner, sections))
-      ) {
-        openConflictMessage();
-        return; // Prevent section selection
-      }
-    }
-
+      )
+    )
+      // if section's course-prof combo doesn't exist
+      setPlanner((prev: SearchQueryMultiSection[]) => prev.concat(query)); // add it to MyPlanner
     setPlanner((prev: SearchQueryMultiSection[]) =>
       prev.map((course) => {
         if (searchQueryEqual(removeSection(course), removeSection(query))) {
+          // combo match
           if (typeof course.sectionNumbers === 'undefined') {
             return { ...course, sectionNumbers: [section] };
           }
           if (course.sectionNumbers.includes(section)) {
+            // unselect section
             return {
               ...course,
               sectionNumbers: course.sectionNumbers.filter(
@@ -398,24 +242,42 @@ export function SharedStateProvider({
               ),
             };
           } else {
+            // select/add section
             let newSections = course.sectionNumbers;
             if (!sectionCanOverlap(section)) {
               newSections = newSections.filter((s) => sectionCanOverlap(s));
             }
             return {
               ...course,
-              sectionNumbers: newSections.concat([section]),
+              sectionNumbers: [section]
+                .concat(newSections)
+                .filter(
+                  (section, index, self) =>
+                    self.findIndex((s) => s.charAt(0) == section.charAt(0)) ===
+                    index,
+                ), // keep only one of each section type (X##)
             };
           }
         } else if (
+          // not combo match, but same course match -- to potentialy remove sections from a different combo
           searchQueryEqual(
             convertToCourseOnly(course),
             convertToCourseOnly(query),
           ) &&
           typeof course.sectionNumbers !== 'undefined'
         ) {
-          //to remove from a different combo
+          if (sectionCanOverlap(section))
+            // if new section can overlap, keep all existing sections (minus duplicate starting digit)
+            return {
+              ...course,
+              sectionNumbers: course.sectionNumbers.filter(
+                (sec, idx, self) =>
+                  self.findIndex((s) => s.charAt(0) == sec.charAt(0)) == idx,
+              ),
+            };
+
           return {
+            // else, new section cannot overlap, so remove all existing non-overlapping sections
             ...course,
             sectionNumbers: course.sectionNumbers.filter((s) =>
               sectionCanOverlap(s),
@@ -438,37 +300,21 @@ export function SharedStateProvider({
     [key: string]: string | undefined;
   }>({});
 
-  const [latestSemester, setLatestSemester] = useState<
-    GenericFetchedData<string> | undefined
-  >();
-
   return (
     <SharedStateContext.Provider
       value={{
-        grades,
-        setGrades,
-        rmp,
-        setRmp,
-        sections,
-        setSections,
         compare,
         addToCompare,
         removeFromCompare,
-        compareGrades,
-        compareRmp,
         compareColorMap,
         planner,
         addToPlanner,
         removeFromPlanner,
         setPlannerSection,
         plannerColorMap,
-        semesters,
-        chosenSemesters,
-        setChosenSemesters,
         courseNames,
         setCourseNames,
         latestSemester,
-        setLatestSemester,
         previewCourses,
         setPreviewCourses,
         hasConflict,
