@@ -93,6 +93,20 @@ async function fetchSingleSections(query: SearchQuery): Promise<SectionsData> {
       throw new Error(data.data ?? data.message);
     }
 
+    const test = data.data as SectionsData | null;
+
+    console.log(
+      `query:${JSON.stringify(query)} \n is result null: ${data === null}
+      \n most recent semester: ${
+        test?.sort(
+          (a, b) =>
+            new Date(b.academic_session.start_date).getTime() -
+            new Date(a.academic_session.start_date).getTime(),
+        )[0].academic_session.name
+      }
+`,
+    );
+
     return data.data;
   } catch (error) {
     console.error(
