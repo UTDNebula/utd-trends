@@ -88,59 +88,6 @@ function parseTime(time: string): number {
   return hourNum + minute / 60;
 }
 
-function hasConflict(
-  newSection: Sections['all'][number],
-  selectedSections: Sections['all'],
-): boolean {
-  if (!newSection || !selectedSections) return false;
-
-  for (const selectedSection of selectedSections) {
-    for (const newMeeting of newSection.meetings) {
-      if (!newMeeting || !newMeeting.meeting_days) continue;
-
-      for (const existingMeeting of selectedSection.meetings) {
-        if (!existingMeeting || !existingMeeting.meeting_days) continue;
-
-        // Check if days overlap
-        const overlappingDays = newMeeting.meeting_days.some((day) =>
-          existingMeeting.meeting_days.includes(day),
-        );
-
-        if (overlappingDays) {
-          // Convert times to comparable values
-          const newStart = parseTime(newMeeting.start_time);
-          const newEnd = parseTime(newMeeting.end_time);
-          const existingStart = parseTime(existingMeeting.start_time);
-          const existingEnd = parseTime(existingMeeting.end_time);
-
-          // Check if times overlap
-          if (
-            (newStart < existingEnd && newStart >= existingStart) ||
-            (newEnd > existingStart && newEnd <= existingEnd) ||
-            (newStart <= existingStart && newEnd >= existingEnd) ||
-            (newStart >= existingStart && newEnd <= existingEnd)
-          ) {
-            if (
-              selectedSection.course_details &&
-              selectedSection.course_details[0] &&
-              newSection.course_details &&
-              newSection.course_details[0] &&
-              selectedSection.course_details[0].subject_prefix ==
-                newSection.course_details[0].subject_prefix &&
-              selectedSection.course_details[0].course_number ==
-                newSection.course_details[0].course_number
-            )
-              return false; // if times overlap, but same course, we can switch it out without conflict
-            return true; // Conflict detected
-          }
-        }
-      }
-    }
-  }
-
-  return false;
-}
-
 function SectionTableHead(props: { hasMultipleDateRanges: boolean }) {
   return (
     <TableRow className="bg-cornflower-600">
@@ -264,31 +211,8 @@ function SectionTableRow(props: SectionTableRowProps) {
           <Radio
             checked={isSelected}
             onClick={() => {
-              if (
-                !isSelected &&
-                hasConflict(props.data, props.selectedSections)
-              ) {
-                // Check for conflict
-                props.openConflictMessage();
-                return; // Prevent section selection
-              }
-
               props.setPlannerSection(
-                {
-                  prefix: props.data.course_details![0].subject_prefix,
-                  number: props.data.course_details![0].course_number,
-                  profFirst:
-                    props.data.professor_details &&
-                    props.data.professor_details[0] // always use the first prof
-                      ? props.data.professor_details[0].first_name
-                      : undefined,
-                  profLast:
-                    props.data.professor_details &&
-                    props.data.professor_details[0]
-                      ? props.data.professor_details[0].last_name
-                      : undefined,
-                } as SearchQuery,
-                props.data.section_number,
+                props.data, props.selectedSections, isSelected, props.openConflictMessage
               ); // using the section's course and prof details every time ensures overall matches de/selection behavior
             }}
           />
