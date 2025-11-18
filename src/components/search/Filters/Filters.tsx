@@ -348,10 +348,14 @@ export default function Filters({
                     setChosenSemesters(recentSemesters);
                   }
                 } else {
-                  {/*If all semesters were selected, select only clicked semester*/}                    
-                  if(chosenSemesters.length === semesters.length) {
-                    const clickedItem = chosenSemesters.find(x => !value.includes(x));
-                    if(clickedItem) {
+                  {
+                    /*If all semesters were selected, select only clicked semester*/
+                  }
+                  if (chosenSemesters.length === semesters.length) {
+                    const clickedItem = chosenSemesters.find(
+                      (x) => !value.includes(x),
+                    );
+                    if (clickedItem) {
                       setChosenSemesters([clickedItem]);
                     }
                   } else {
