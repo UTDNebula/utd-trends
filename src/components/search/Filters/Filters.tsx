@@ -500,7 +500,16 @@ export default function Filters({
                     setChosenSectionTypes(sectionTypes);
                   }
                 } else {
-                  setChosenSectionTypes(value as string[]);
+                  if (chosenSectionTypes.length === sectionTypes.length) {
+                    const clickedItem = chosenSectionTypes.find(
+                      (x) => !value.includes(x),
+                    );
+                    if (clickedItem) {
+                      setChosenSectionTypes([clickedItem]);
+                    }
+                  } else {
+                    setChosenSectionTypes(value as string[]);
+                  }
                 }
               }}
               renderValue={(selected) => {
