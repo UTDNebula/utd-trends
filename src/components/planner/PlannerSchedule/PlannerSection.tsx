@@ -12,7 +12,7 @@ import { KeyboardArrowDown } from '@mui/icons-material';
 
 interface PlannerSectionComponentProps {
   scoot?: number;
-  selectedSection: string;
+  sectionNumber: string;
   course: SearchQuery;
   color: { fill: string; outline: string; font: string; filter?: string };
   isPreview?: boolean;
@@ -52,7 +52,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
   }
   const selectedSection = result.data.sections.find(
     (s) =>
-      s.section_number === props.selectedSection &&
+      s.section_number === props.sectionNumber &&
       s.academic_session.name === latestSemester,
   );
   if (selectedSection === undefined) return null;

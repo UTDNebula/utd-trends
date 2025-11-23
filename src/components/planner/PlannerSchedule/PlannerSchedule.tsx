@@ -97,7 +97,7 @@ export default function PlannerSchedule() {
           <PlannerSection
             key={searchQueryLabel(course)}
             scoot={0}
-            selectedSection={course.sectionNumber}
+            sectionNumber={course.sectionNumber}
             course={course}
             color={
               plannerColorMap[searchQueryLabel(convertToCourseOnly(course))]
@@ -266,7 +266,7 @@ export default function PlannerSchedule() {
             return (
               <PlannerSection
                 key={`preview-single-${searchQueryLabel(removeSection(previewCourse))}-${section?._id}-${index}`}
-                selectedSection={section}
+                sectionNumber={section}
                 course={previewCourseWithSection}
                 color={color}
                 courseName={properCourseName}
