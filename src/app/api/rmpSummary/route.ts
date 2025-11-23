@@ -38,7 +38,6 @@ export async function GET(request: Request) {
   const number = searchParams.get('number');
   const profFirst = searchParams.get('profFirst');
   const profLast = searchParams.get('profLast');
-  const useCache = searchParams.get('useCache');
   if (
     typeof prefix !== 'string' ||
     typeof number !== 'string' ||
@@ -57,31 +56,27 @@ export async function GET(request: Request) {
   const headers = {
     'x-api-key': API_KEY,
     'x-storage-key': API_STORAGE_KEY,
-    'Content-Type': 'application/json',
   };
-  if (typeof useCache === 'string' && useCache === 'true') {
-    const cache = await fetch(url, { headers });
-    if (cache.ok) {
-      const cacheData = await cache.json();
-      // Cache is valid for 30 days
-      if (
-        new Date(cacheData.data.updated) >
-        new Date(Date.now() - 1000 * 60 * 60 * 24 * 30)
-      ) {
-        const mediaData = await fetch(cacheData.data.media_link, { headers });
-        if (mediaData.ok) {
-          return NextResponse.json(
-            { message: 'success', data: await mediaData.json() },
-            { status: 200 },
-          );
-        }
+  const cache = await fetch(url, { headers, next: { revalidate: 3600 } });
+  if (cache.ok) {
+    const cacheData = await cache.json();
+    // Cache is valid for 30 days
+    if (
+      new Date(cacheData.data.updated) >
+      new Date(Date.now() - 1000 * 60 * 60 * 24 * 30)
+    ) {
+      const mediaData = await fetch(cacheData.data.media_link, { headers });
+      if (mediaData.ok) {
+        return NextResponse.json(
+          { message: 'success', data: await mediaData.json() },
+          { status: 200 },
+        );
       }
     }
   }
+
   // Fetch RMP
   const searchQuery: SearchQuery = {
-    prefix: prefix,
-    number: number,
     profFirst: profFirst,
     profLast: profLast,
   };
