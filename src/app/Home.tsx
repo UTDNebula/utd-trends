@@ -63,19 +63,15 @@ export default function Home(props: Props) {
           rel="noreferrer"
           className="bg-royal dark:bg-cornflower-300 text-cornflower-50 dark:text-haiti py-3 px-5 rounded transition hover:scale-[1.01] text-center flex gap-2 items-center mr-auto"
         >
-          <Image
+          <img
             className="h-8 -my-1 -ml-2 hidden dark:block"
             src="/icon-black.svg"
             alt=""
-            width={32}
-            height={32}
           />
-          <Image
+          <img
             className="h-8 -my-1 -ml-2 block dark:hidden"
             src="/icon-white.svg"
             alt=""
-            width={32}
-            height={32}
           />
           <span>
             <b>Spring 2026</b> courses are now on Trends!
