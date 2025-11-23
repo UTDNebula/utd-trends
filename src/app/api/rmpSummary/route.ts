@@ -34,16 +34,9 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const prefix = searchParams.get('prefix');
-  const number = searchParams.get('number');
   const profFirst = searchParams.get('profFirst');
   const profLast = searchParams.get('profLast');
-  if (
-    typeof prefix !== 'string' ||
-    typeof number !== 'string' ||
-    typeof profFirst !== 'string' ||
-    typeof profLast !== 'string'
-  ) {
+  if (typeof profFirst !== 'string' || typeof profLast !== 'string') {
     return NextResponse.json(
       { message: 'error', data: 'Incorrect query parameters' },
       { status: 400 },
@@ -88,17 +81,23 @@ export async function GET(request: Request) {
       { status: 500 },
     );
   }
+  if (rmp.ratings.edges.length < 5) {
+    return NextResponse.json(
+      { message: 'error', data: 'Not enough ratings for a summary' },
+      { status: 500 },
+    );
+  }
 
   // AI
-  const prompt = `
-    You are a helpful assistant that summarizes the reviews of a professor.
-    The reviews are in the following JSON format:
-    ${JSON.stringify(rmp?.ratings)}
-    Please summarize the reviews in a concise and informative manner,
-    synthesizing the most important and relevant information for a student 
-    to know about the professor. 
-    The summary should be in plain-text (no markdown), and should be no more than 100 words.
-  `;
+  const prompt = `Summarize the Rate My Professors reviews of professor ${profFirst} ${profLast}:
+
+${rmp.ratings.edges.map((rating) => rating.node.comment.replaceAll('\n', ' ').slice(0, 500)).join('\n')}
+
+Summary requirements:
+- Summarize the reviews in a concise and informative manner, synthesizing the most important and relevant information.
+- Be respectful but honest.
+- Respond in plain-text (no markdown), with no more than 100 words.
+`;
   const GEMINI_SERVICE_ACCOUNT = process.env.GEMINI_SERVICE_ACCOUNT;
   if (typeof GEMINI_SERVICE_ACCOUNT !== 'string') {
     return NextResponse.json(
@@ -118,11 +117,11 @@ export async function GET(request: Request) {
     },
   });
   const response = await geminiClient.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.5-flash-lite',
     contents: prompt,
   });
-  // Cache response
 
+  // Cache response
   const cacheResponse = await fetch(url, {
     method: 'POST',
     headers: headers,
@@ -135,6 +134,7 @@ export async function GET(request: Request) {
       { status: 500 },
     );
   }
+
   // Return
   return NextResponse.json(
     { message: 'success', data: response.text },
