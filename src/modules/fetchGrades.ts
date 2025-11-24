@@ -58,8 +58,6 @@ export function calculateGrades(grades: GradesData, semesters?: string[]) {
     median_gpa = GPALookup[medianIndex];
   }
 
-  // console.log("bb", grade_distribution)
-
   return {
     mean_gpa: mean_gpa,
     gpa: median_gpa,
