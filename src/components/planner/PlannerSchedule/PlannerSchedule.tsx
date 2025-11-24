@@ -155,6 +155,7 @@ export default function PlannerSchedule() {
 
           // Add all sections to the flat array
           filteredSections.forEach((section) => {
+            allSections.find((s) => s._id == section._id) === undefined &&
             allSections.push(section);
           });
         });
