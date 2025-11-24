@@ -5,12 +5,15 @@ import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection'
 import { useSnackbar } from '@/contexts/SnackbarContext';
 import {
   convertToCourseOnly,
+  removeSection,
   searchQueryLabel,
   searchQueryMultiSectionSplit,
+  type SearchQuery,
 } from '@/types/SearchQuery';
 import type { SectionsData } from '@/modules/fetchSections';
 import { parseTime } from '@/modules/timeUtils';
 import { useSearchResult, useSearchresults } from '@/modules/plannerFetch';
+import PreviewSectionGroup from './PreviewSectionGroup';
 
 // hours shown (24-hour time)
 export const START_HOUR = 8;
@@ -68,7 +71,7 @@ export default function PlannerSchedule() {
   const courses = planner.flatMap((searchQuery) =>
     searchQueryMultiSectionSplit(searchQuery),
   );
-  const { showConflictMessage } = useSnackBar();
+  const { showConflictMessage } = useSnackbar();
 
   return (
     <div
@@ -242,10 +245,7 @@ export default function PlannerSchedule() {
               <PreviewSectionGroup
                 key={`preview-group-${courseKey}-${index}`}
                 sectionGroup={sectionGroup}
-                previewCourse={previewCourse}
-                courseNames={courseNames}
                 plannerColorMap={plannerColorMap}
-                setPlannerSection={setPlannerSection}
                 showConflictMessage={showConflictMessage}
                 index={index}
                 scoot={scoot}
@@ -254,29 +254,30 @@ export default function PlannerSchedule() {
           } else { // single preview section
             const section = sectionGroup[0];
             const previewCourseWithSection = {
-              ...previewCourse,
-              sectionNumber: section?.section_number,
-            };
+              prefix: section.course_details ? section.course_details[0].subject_prefix : null,
+              number: section.course_details ? section.course_details[0].course_number : null,
+              profFirst: section.professor_details ? section.professor_details[0].first_name : null,
+              profLast: section.professor_details ? section.professor_details[0].last_name : null,
+              sectionNumber: section.section_number,
+            } as SearchQuery;
             const courseKey = searchQueryLabel(
               convertToCourseOnly(previewCourseWithSection),
             );
-            const properCourseName = courseNames[courseKey];
             const color = plannerColorMap[courseKey];
 
             return (
               <PlannerSection
-                key={`preview-single-${searchQueryLabel(removeSection(previewCourse))}-${section?._id}-${index}`}
-                sectionNumber={section}
+                key={`preview-single-${searchQueryLabel(removeSection(previewCourseWithSection))}-${section?._id}-${index}`}
+                sectionNumber={section.section_number}
                 course={previewCourseWithSection}
                 color={color}
-                courseName={properCourseName}
                 isPreview={true}
                 scoot={scoot}
                 onSectionClick={(course, sectionNumber) => {
                   setPlannerSection(
-                    course,
-                    sectionNumber,
                     section,
+                    selectedSections,
+                    selectedSections.some((s) => s.section_number === section.section_number && s.course_details?.[0].subject_prefix === section.course_details?.[0].subject_prefix && s.course_details?.[0].course_number === section.course_details?.[0].course_number),
                     showConflictMessage,
                   );
                 }}
