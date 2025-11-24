@@ -280,7 +280,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               : ''}
             .{selectedSection.section_number}
           </div>
-          {selectedSection.professor_details &&
+          {selectedSection.professor_details && selectedSection.professor_details[0] &&
             selectedSection.professor_details.map((prof) => (
               <div
                 key={prof._id}

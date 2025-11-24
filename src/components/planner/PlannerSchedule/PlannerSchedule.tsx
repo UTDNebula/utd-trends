@@ -144,7 +144,7 @@ export default function PlannerSchedule() {
           const filteredSections : SectionsData = latestSections.flatMap((s) => s)
             .filter( // not same section
               (section) =>
-                !selectedSections.find((s) => (s.section_number == section.section_number) && (s.course_details && section.course_details && s.course_details[0].subject_prefix == section.course_details[0].subject_prefix && s.course_details[0].course_number == section.course_details[0].course_number)),
+                !selectedSections.find((s) => (s.section_number == section.section_number) && (s.course_details && s.course_details[0] && section.course_details && section.course_details[0] && s.course_details[0].subject_prefix == section.course_details[0].subject_prefix && s.course_details[0].course_number == section.course_details[0].course_number)),
             )
             // TODO: re-enable conflict detection perchance
             // .filter((section) => {
@@ -238,7 +238,7 @@ export default function PlannerSchedule() {
 
         return sectionsWithScoot.flatMap(({ sectionGroup, scoot }, index) => {
           const firstItem = sectionGroup[0];
-          const courseKey = (firstItem.course_details ? firstItem.course_details[0].subject_prefix + ' ' + firstItem.course_details[0].course_number : '') + (firstItem.professor_details ? firstItem.professor_details.map((p) => ' ' + p.first_name + ' ' + p.last_name).reduce((prev, curr) => prev + curr) : '');
+          const courseKey = (firstItem.course_details && firstItem.course_details[0] ? firstItem.course_details[0].subject_prefix + ' ' + firstItem.course_details[0].course_number : '') + (firstItem.professor_details && firstItem.professor_details[0] ? ' ' + firstItem.professor_details.map((p) => p.first_name + ' ' + p.last_name).join(' ') : '');
 
           if (sectionGroup.length > 1) { // need a preview section group
             return (
@@ -254,10 +254,10 @@ export default function PlannerSchedule() {
           } else { // single preview section
             const section = sectionGroup[0];
             const previewCourseWithSection = {
-              prefix: section.course_details ? section.course_details[0].subject_prefix : null,
-              number: section.course_details ? section.course_details[0].course_number : null,
-              profFirst: section.professor_details ? section.professor_details[0].first_name : null,
-              profLast: section.professor_details ? section.professor_details[0].last_name : null,
+              prefix: section.course_details && section.course_details[0] ? section.course_details[0].subject_prefix : null,
+              number: section.course_details && section.course_details[0] ? section.course_details[0].course_number : null,
+              profFirst: section.professor_details && section.professor_details[0] ? section.professor_details[0].first_name : null,
+              profLast: section.professor_details && section.professor_details[0] ? section.professor_details[0].last_name : null,
               sectionNumber: section.section_number,
             } as SearchQuery;
             const courseKey = searchQueryLabel(

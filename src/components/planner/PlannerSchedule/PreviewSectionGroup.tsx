@@ -40,10 +40,10 @@ export default function PreviewSectionGroup({
   }
 
   const previewFirstCourseWithSection = {
-    prefix: firstSection.course_details ? firstSection.course_details[0].subject_prefix : null,
-    number: firstSection.course_details ? firstSection.course_details[0].course_number : null,
-    profFirst: firstSection.professor_details ? firstSection.professor_details[0].first_name : null,
-    profLast: firstSection.professor_details ? firstSection.professor_details[0].last_name : null,
+    prefix: firstSection.course_details && firstSection.course_details[0] ? firstSection.course_details[0].subject_prefix : null,
+    number: firstSection.course_details && firstSection.course_details[0] ? firstSection.course_details[0].course_number : null,
+    profFirst: firstSection.professor_details && firstSection.professor_details[0] ? firstSection.professor_details[0].first_name : null,
+    profLast: firstSection.professor_details && firstSection.professor_details[0] ? firstSection.professor_details[0].last_name : null,
     sectionNumber: firstSection.section_number,
   } as SearchQuery;
 
@@ -114,10 +114,10 @@ export default function PreviewSectionGroup({
       >
         {sectionGroup.map((section) => {
           const previewCourseWithSection = {
-            prefix: section.course_details ? section.course_details[0].subject_prefix : null,
-            number: section.course_details ? section.course_details[0].course_number : null,
-            profFirst: section.professor_details ? section.professor_details[0].first_name : null,
-            profLast: section.professor_details ? section.professor_details[0].last_name : null,
+            prefix: section.course_details && section.course_details[0] ? section.course_details[0].subject_prefix : null,
+            number: section.course_details && section.course_details[0] ? section.course_details[0].course_number : null,
+            profFirst: section.professor_details && section.professor_details[0] ? section.professor_details[0].first_name : null,
+            profLast: section.professor_details && section.professor_details[0] ? section.professor_details[0].last_name : null,
             sectionNumber: section.section_number,
           } as SearchQuery
 
