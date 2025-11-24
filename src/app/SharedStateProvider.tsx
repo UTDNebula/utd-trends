@@ -29,28 +29,6 @@ function parseTime(time: string): number {
   return hourNum + minute / 60;
 }
 
-function getSelectedSections(
-  planner: SearchQueryMultiSection[],
-  sections: { [key: string]: GenericFetchedData<Sections> },
-): Sections['all'] {
-  return planner
-    .flatMap((searchQuery) => searchQueryMultiSectionSplit(searchQuery))
-    .map((single) => {
-      const singleSectionData =
-        sections[searchQueryLabel(removeSection(single))];
-      if (
-        typeof singleSectionData === 'undefined' ||
-        singleSectionData.message !== 'success'
-      ) {
-        return undefined;
-      }
-      return singleSectionData.data?.latest.find(
-        (s) => s.section_number === single.sectionNumber,
-      );
-    })
-    .filter((s): s is NonNullable<typeof s> => typeof s !== 'undefined');
-}
-
 type SetterValue<T> = T | ((prev: T) => T);
 type Setter<T> = (value: SetterValue<T>) => void;
 
@@ -220,19 +198,19 @@ export function SharedStateProvider({
     }
 
     const query = {
-                  prefix: data.course_details![0].subject_prefix,
-                  number: data.course_details![0].course_number,
-                  profFirst:
-                    data.professor_details &&
-                    data.professor_details[0] // always use the first prof
-                      ? data.professor_details[0].first_name
-                      : undefined,
-                  profLast:
-                    data.professor_details &&
-                    data.professor_details[0]
-                      ? data.professor_details[0].last_name
-                      : undefined,
-                } as SearchQuery;
+      prefix: data.course_details![0].subject_prefix,
+      number: data.course_details![0].course_number,
+      profFirst:
+        data.professor_details &&
+        data.professor_details[0] // always use the first prof
+          ? data.professor_details[0].first_name
+          : undefined,
+      profLast:
+        data.professor_details &&
+        data.professor_details[0]
+          ? data.professor_details[0].last_name
+          : undefined,
+    } as SearchQuery;
     const section = data.section_number;
 
 
@@ -332,6 +310,8 @@ export function SharedStateProvider({
         courseNames,
         setCourseNames,
         latestSemester,
+        previewCourses,
+        setPreviewCourses
       }}
     >
       {children}

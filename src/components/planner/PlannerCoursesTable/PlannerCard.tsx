@@ -35,6 +35,7 @@ import {
   convertToProfOnly,
   removeSection,
   type SearchQuery,
+  searchQueryEqual,
   searchQueryLabel,
   type SearchQueryMultiSection,
   type SearchResult,
@@ -42,6 +43,7 @@ import {
 } from '@/types/SearchQuery';
 import { useSearchResult } from '@/modules/plannerFetch';
 import { calculateGrades } from '@/modules/fetchGrades';
+import { useSharedState } from '@/app/SharedStateProvider';
 
 export function LoadingPlannerCard() {
   return (
@@ -74,18 +76,6 @@ export function LoadingPlannerCard() {
       </div>
     </Box>
   );
-}
-
-function parseTime(time: string): number {
-  const [hour, minute] = time.split(':').map((s) => parseInt(s));
-  const isPM = time.includes('pm');
-  let hourNum = hour;
-  if (isPM && hour !== 12) {
-    hourNum += 12;
-  } else if (!isPM && hour === 12) {
-    hourNum = 0; // Midnight case
-  }
-  return hourNum + minute / 60;
 }
 
 function SectionTableHead(props: { hasMultipleDateRanges: boolean }) {
@@ -167,13 +157,13 @@ type SectionTableRowProps = {
   syllabusSections: SectionsData;
   course: SearchQueryMultiSection;
   lastRow: boolean;
-  setPlannerSection: (searchQuery: SearchQuery, section: string) => void;
   hasMultipleDateRanges: boolean;
   selectedSections: Sections['all'];
   openConflictMessage: () => void;
 };
 
 function SectionTableRow(props: SectionTableRowProps) {
+  const { setPlannerSection} = useSharedState();
   const isSelected = props.selectedSections.some(
     (el) =>
       el.section_number == props.data.section_number && // check the section number
@@ -211,7 +201,7 @@ function SectionTableRow(props: SectionTableRowProps) {
           <Radio
             checked={isSelected}
             onClick={() => {
-              props.setPlannerSection(
+              setPlannerSection(
                 props.data, props.selectedSections, isSelected, props.openConflictMessage
               ); // using the section's course and prof details every time ensures overall matches de/selection behavior
             }}
@@ -339,7 +329,6 @@ function MeetingChip(props: {
 
 type PlannerCardProps = {
   query: SearchQueryMultiSection;
-  setPlannerSection: (searchQuery: SearchQuery, section: string) => void;
   removeFromPlanner: () => void;
   selectedSections: Sections['all'];
   openConflictMessage: () => void;
@@ -353,13 +342,41 @@ export default function PlannerCard(props: PlannerCardProps) {
   const [open, setOpen] = useState(false);
   const { isSuccess, data: result } = useSearchResult(props.query);
   const [whichOpen, setWhichOpen] = useState<'sections' | 'grades'>('sections');
-
+  const { setPreviewCourses } = useSharedState();
   if (!isSuccess) {
     return <LoadingPlannerCard />;
   }
   function handleOpen() {
     if (whichOpen === 'sections' || whichOpen === 'grades') {
-      setOpen(!open);
+      const newOpen = !open;
+      setOpen(newOpen);
+
+      // Update previewCourses
+      if (newOpen) {
+        setPreviewCourses((prev) => {
+          if (
+            prev.some((course) =>
+              searchQueryEqual(
+                removeSection(course),
+                removeSection(props.query),
+              ),
+            )
+          ) {
+            return prev;
+          }
+          return [...prev, props.query];
+        });
+      } else {
+        setPreviewCourses((prev) =>
+          prev.filter(
+            (course) =>
+              !searchQueryEqual(
+                removeSection(course),
+                removeSection(props.query),
+              ),
+          ),
+        );
+      }
     }
   }
 
@@ -644,7 +661,6 @@ export default function PlannerCard(props: PlannerCardProps) {
                     lastRow={
                       index === latestMatchedSections.sections.length - 1
                     }
-                    setPlannerSection={props.setPlannerSection}
                     selectedSections={props.selectedSections}
                     openConflictMessage={props.openConflictMessage}
                     hasMultipleDateRanges={hasMultipleDateRanges}
@@ -665,7 +681,6 @@ export default function PlannerCard(props: PlannerCardProps) {
               <PlannerCard
                 key={searchQueryLabel(props.query) + ' extra sections'}
                 query={props.query}
-                setPlannerSection={props.setPlannerSection}
                 removeFromPlanner={props.removeFromPlanner}
                 selectedSections={props.selectedSections}
                 openConflictMessage={props.openConflictMessage}
@@ -690,7 +705,6 @@ export default function PlannerCard(props: PlannerCardProps) {
               <PlannerCard
                 key={searchQueryLabel(props.query) + ' lab sections'}
                 query={props.query}
-                setPlannerSection={props.setPlannerSection}
                 removeFromPlanner={props.removeFromPlanner}
                 selectedSections={props.selectedSections}
                 openConflictMessage={props.openConflictMessage}
@@ -713,7 +727,6 @@ export default function PlannerCard(props: PlannerCardProps) {
               <PlannerCard
                 key={searchQueryLabel(props.query) + ' exam sections'}
                 query={props.query}
-                setPlannerSection={props.setPlannerSection}
                 removeFromPlanner={props.removeFromPlanner}
                 selectedSections={props.selectedSections}
                 openConflictMessage={props.openConflictMessage}
