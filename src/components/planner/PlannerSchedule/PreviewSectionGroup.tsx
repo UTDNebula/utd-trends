@@ -2,7 +2,7 @@ import { Popover } from '@mui/material';
 import React, { useState } from 'react';
 
 import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection';
-import type { Sections, SectionsData } from '@/modules/fetchSections';
+import type { SectionsData } from '@/modules/fetchSections';
 import type { SearchQuery } from '@/types/SearchQuery';
 import {
   convertToCourseOnly,
@@ -134,7 +134,7 @@ export default function PreviewSectionGroup({
               course={previewCourseWithSection}
               color={color}
               isPreview={true}
-              onSectionClick={(course, sectionNumber) => {
+              onSectionClick={() => {
                 setPlannerSection(
                   section,
                   selectedSections,

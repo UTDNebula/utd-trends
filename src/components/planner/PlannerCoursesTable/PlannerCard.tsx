@@ -34,7 +34,6 @@ import {
   convertToCourseOnly,
   convertToProfOnly,
   removeSection,
-  type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
   type SearchQueryMultiSection,

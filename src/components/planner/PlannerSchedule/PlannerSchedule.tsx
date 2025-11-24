@@ -12,7 +12,7 @@ import {
 } from '@/types/SearchQuery';
 import type { SectionsData } from '@/modules/fetchSections';
 import { parseTime } from '@/modules/timeUtils';
-import { useSearchResult, useSearchresults } from '@/modules/plannerFetch';
+import { useSearchresults } from '@/modules/plannerFetch';
 import PreviewSectionGroup from './PreviewSectionGroup';
 
 // hours shown (24-hour time)
@@ -155,8 +155,8 @@ export default function PlannerSchedule() {
 
           // Add all sections to the flat array
           filteredSections.forEach((section) => {
-            allSections.find((s) => s._id == section._id) === undefined &&
-            allSections.push(section);
+            if (allSections.find((s) => s._id == section._id) === undefined)
+              allSections.push(section);
           });
         });
 
@@ -275,7 +275,7 @@ export default function PlannerSchedule() {
                 color={color}
                 isPreview={true}
                 scoot={scoot}
-                onSectionClick={(course, sectionNumber) => {
+                onSectionClick={() => {
                   setPlannerSection(
                     section,
                     selectedSections,

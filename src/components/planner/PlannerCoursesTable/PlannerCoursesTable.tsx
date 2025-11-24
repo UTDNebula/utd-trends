@@ -1,7 +1,7 @@
 'use client';
 
-import { Alert, Snackbar, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { Typography } from '@mui/material';
+import React, { useEffect } from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerCard, {
@@ -38,7 +38,6 @@ export default function PlannerCoursesTable() {
   const {
     planner,
     removeFromPlanner,
-    setPlannerSection,
     setPreviewCourses,
     plannerColorMap,
     latestSemester,
@@ -49,7 +48,7 @@ export default function PlannerCoursesTable() {
   // Clear preview courses on component mount, because the tabs will be closed
   useEffect(() => {
     setPreviewCourses([]);
-  }, []);
+  }, [setPreviewCourses]);
 
   const allResults = useSearchresults(planner);
   const latestSections = allResults.map((r) =>
