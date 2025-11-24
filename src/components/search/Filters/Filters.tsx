@@ -14,16 +14,12 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { usePathname, useSearchParams } from 'next/navigation';
-import React, { use, useMemo } from 'react';
+import React, { use } from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import {
-  compareSemesters,
-  displaySemesterName,
-  getSemestersFromSearchResults,
-} from '@/modules/semesters';
+import { compareSemesters, displaySemesterName } from '@/modules/semesters';
 import type { SearchResult } from '@/types/SearchQuery';
 import { FiltersContext } from '@/app/dashboard/FilterContext';
 import { calculateGrades } from '@/modules/fetchGrades';
@@ -69,10 +65,7 @@ export function LoadingFilters() {
 
       {/* Teaching Next Semester switch*/}
       <Grid size={{ xs: 6, sm: 3 }} className="px-2">
-        <FormControl
-          size="small"
-          className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
-        >
+        <FormControl size="small">
           <FormControlLabel
             control={<Switch checked={true} />}
             label="Teaching Next Semester"
@@ -91,11 +84,9 @@ export default function Filters({
 }: {
   searchResultsPromise: Promise<SearchResult[]>;
 }) {
-  const { latestSemester, compare } = useSharedState();
+  const { latestSemester } = useSharedState();
   const searchResults = use(searchResultsPromise);
-  const semesters = useMemo(() => {
-    return getSemestersFromSearchResults(searchResults.concat(compare));
-  }, [searchResults, compare]);
+  const semesters = use(FiltersContext).semesters;
   const chosenSemesters = use(FiltersContext).chosenSemesters;
   const setChosenSemesters = use(FiltersContext).setChosenSemesters;
 
@@ -115,29 +106,6 @@ export default function Filters({
   }
   const filterNextSem = searchParams.get('availability') === 'true';
 
-  const filteredResults = useMemo(
-    () =>
-      searchResults.filter((result) => {
-        if (
-          typeof minGPA === 'string' &&
-          calculateGrades(result.grades, chosenSemesters).gpa <
-            parseFloat(minGPA)
-        )
-          return false;
-
-        // check if this search result should have RMP data
-        if (result.type !== 'course') {
-          if (
-            typeof minRating === 'string' &&
-            result.RMP &&
-            result.RMP.avgRating < parseFloat(minRating)
-          )
-            return false;
-        }
-        return true;
-      }),
-    [searchResults, minGPA, minRating, chosenSemesters],
-  );
   function getRecentSemesters() {
     // get current month and year
     const today = new Date();
@@ -171,22 +139,54 @@ export default function Filters({
   const gradeCounts: Record<string, number> = {};
   const rmpCounts: Record<string, number> = {};
 
+  const semFilteredResults = searchResults.filter((result) => {
+    const availableThisSemester =
+      filterNextSem &&
+      result.sections.some(
+        (section) => section.academic_session.name === latestSemester,
+      );
+    return (
+      result.grades.length == 0 ||
+      result.grades.some((s) => chosenSemesters.includes(s._id)) ||
+      availableThisSemester
+    );
+  });
+
   minGPAs.forEach((gpaString) => {
     const gpaNum = parseFloat(gpaString);
-    gradeCounts[gpaString] = filteredResults.filter((value) => {
-      const courseGrades = value.grades;
-      return courseGrades && calculateGrades(courseGrades).gpa >= gpaNum;
+    gradeCounts[gpaString] = semFilteredResults.filter((result) => {
+      if (result.type !== 'course') {
+        if (
+          typeof minRating === 'string' &&
+          result.RMP &&
+          result.RMP.avgRating < parseFloat(minRating)
+        )
+          return false;
+      }
+      const courseGrades = result.grades;
+      return (
+        (courseGrades &&
+          calculateGrades(courseGrades, chosenSemesters).gpa >= gpaNum) ||
+        courseGrades == undefined
+      );
     }).length;
   });
 
   minRatings.forEach((ratingString) => {
     const ratingNum = parseFloat(ratingString);
-    rmpCounts[ratingString] = filteredResults.filter((result) => {
-      return (
+    rmpCounts[ratingString] = semFilteredResults.filter((result) => {
+      // gpa filter
+      const calculated = calculateGrades(result.grades, chosenSemesters);
+      if (typeof minGPA === 'string' && calculated.gpa < parseFloat(minGPA))
+        return false;
+      if (
+        typeof ratingNum === 'number' &&
         result.type !== 'course' &&
         result.RMP &&
-        result.RMP.avgRating >= ratingNum
-      );
+        result.RMP.avgRating < ratingNum
+      )
+        return false;
+      return true;
     }).length;
   });
 
@@ -348,7 +348,19 @@ export default function Filters({
                     setChosenSemesters(recentSemesters);
                   }
                 } else {
-                  setChosenSemesters(value as string[]);
+                  {
+                    /*If all semesters were selected, select only clicked semester*/
+                  }
+                  if (chosenSemesters.length === semesters.length) {
+                    const clickedItem = chosenSemesters.find(
+                      (x) => !value.includes(x),
+                    );
+                    if (clickedItem) {
+                      setChosenSemesters([clickedItem]);
+                    }
+                  } else {
+                    setChosenSemesters(value as string[]);
+                  }
                 }
               }}
               renderValue={(selected) => {

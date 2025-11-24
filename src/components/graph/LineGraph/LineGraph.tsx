@@ -4,13 +4,14 @@ import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
 import { compareColors } from '@/modules/colors';
 import type { Grades } from '@/modules/fetchGrades';
 import { displaySemesterName } from '@/modules/semesters';
+import { FiltersContext } from '@/app/dashboard/FilterContext';
 
 function sortSemesters(a: string, b: string) {
   const rank = (code: string) => {
@@ -68,6 +69,8 @@ type Props = {
 };
 
 export default function LineGraph(props: Props) {
+  const { semesters, chosenSemesters, setChosenSemesters } =
+    use(FiltersContext);
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
@@ -180,6 +183,29 @@ export default function LineGraph(props: Props) {
       animations: {
         enabled: !fullScreenOpen && !singleLabelMode && multiplePoints,
       },
+      events: {
+        markerClick: (event, chartContext, { seriesIndex, dataPointIndex }) => {
+          const semester =
+            chartContext.w.config?.series[seriesIndex]?.data[dataPointIndex]
+              .semester;
+
+          let newSemesters = chosenSemesters;
+
+          if (semester === null) return;
+          if (chosenSemesters?.length === semesters.length) {
+            newSemesters = [semester];
+          } else if (chosenSemesters.includes(semester)) {
+            newSemesters = chosenSemesters.filter((s) => s !== semester);
+            if (newSemesters.length == 0) {
+              newSemesters = semesters;
+            }
+          } else {
+            newSemesters = [...chosenSemesters, semester];
+          }
+
+          setChosenSemesters(newSemesters);
+        },
+      },
     },
     grid: { borderColor: prefersDarkMode ? '#404040' : '#e0e0e0' },
     legend: { show: series.length !== 1 },
@@ -277,6 +303,34 @@ export default function LineGraph(props: Props) {
       style: { fontSize: '14px', fontFamily: 'inherit' },
     },
     theme: { mode: prefersDarkMode ? 'dark' : 'light' },
+  };
+
+  const highlightedMarkers: ApexDiscretePoint[] =
+    chosenSemesters.length === semesters.length
+      ? []
+      : ((chosenSemesters?.flatMap((sem) => {
+          return series.flatMap((s, seriesIndex) => {
+            const dataPointIndex = s.data.findIndex((d) => d.semester === sem);
+            if (dataPointIndex === -1) return [];
+            return [
+              {
+                seriesIndex,
+                dataPointIndex,
+                fillColor: prefersDarkMode
+                  ? theme.palette.secondary.main
+                  : getComputedStyle(document.documentElement)
+                      .getPropertyValue('--color-cornflower-400')
+                      .trim(),
+                strokeColor: '#fff',
+                size: 8,
+              },
+            ];
+          });
+        }) ?? []) as ApexDiscretePoint[]);
+
+  options.markers = {
+    ...options.markers,
+    discrete: highlightedMarkers,
   };
 
   const graph = (

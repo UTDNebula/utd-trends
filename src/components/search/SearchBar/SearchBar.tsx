@@ -1,5 +1,7 @@
 'use client';
 
+import HistoryToggleOffIcon from '@mui/icons-material/HistoryToggleOff';
+import SearchIcon from '@mui/icons-material/Search';
 import {
   Autocomplete,
   Button,
@@ -25,6 +27,7 @@ import untyped_professor_to_alias from '@/data/professor_to_alias.json';
 import {
   decodeSearchQueryLabel,
   isCourseQuery,
+  removeDuplicates,
   type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
@@ -59,7 +62,7 @@ export function LoadingSearchBar(props: LoadingSearchBarProps) {
         variant="contained"
         disableElevation
         size="large"
-        className="h-11 w-[5.5rem] shrink-0 normal-case text-cornflower-200 dark:text-cornflower-700"
+        className="self-stretch my-px px-4 shrink-0 normal-case text-cornflower-200 dark:text-cornflower-700"
       >
         Search
       </Button>
@@ -67,9 +70,33 @@ export function LoadingSearchBar(props: LoadingSearchBarProps) {
   );
 }
 
+export function getRecentSearches() {
+  const searchesText = window.localStorage.getItem('UTDTrendsRecent');
+  let recSearches: SearchQueryWithTitle[] = [];
+  if (searchesText != null) {
+    recSearches = JSON.parse(searchesText);
+  }
+  return recSearches;
+}
+
+//When new queries are made, compare them to the existing recent query cache
+export function updateRecentSearches(newValue: SearchQueryWithTitle[]) {
+  const recSearches: SearchQueryWithTitle[] = getRecentSearches();
+  // Add new searches to the beginning of the array
+  const concatArray = [...newValue, ...recSearches];
+  const dedupArray = removeDuplicates(concatArray)
+    .slice(0, 3)
+    .map((el) => ({ ...el, isRecent: true }));
+  window.localStorage.setItem(
+    'UTDTrendsRecent',
+    JSON.stringify(dedupArray), // ensure no title/subtitle/isRecent fields are stored
+  );
+}
+
 type SearchQueryWithTitle = SearchQuery & {
   title?: string;
   subtitle?: string;
+  isRecent?: boolean;
 };
 
 /**
@@ -113,12 +140,13 @@ export default function SearchBar(props: Props) {
     quickInputValue.current = newValue;
     _setInputValue(newValue);
   }
+
   //chosen values
   const [value, setValue] = useState<SearchQuery[]>([]);
 
   //set value from query
   const searchParams = useSearchParams();
-  const searchTerms = searchParams.get('searchTerms');
+  const searchTerms = searchParams ? searchParams.get('searchTerms') : null;
   useEffect(() => {
     if (searchTerms != null) {
       const arrayParam = searchTerms;
@@ -129,10 +157,34 @@ export default function SearchBar(props: Props) {
     }
   }, [searchTerms]); // useEffect is called every time the query changes
 
-  // updateValue -> onSelect -> updateQueries - clicking enter on an autocomplete suggestion in TopMenu Searchbar
-  // updateValue -> onSelect -> props.onSelect (custom function) - clicking enter on an autocomplete suggestion in home page SearchBar
-  // params.inputProps.onKeyDown -> handleKeyDown -> onSelect -> updateQueries/props.onSelect - clicking enter in the SearchBar
-  // Button onClick -> onSelect -> updateQueries/props.onSelect - Pressing the "Search" Button
+  const searchBarHints = [
+    'ex. GOVT 2306, Sara Johnson',
+    'ex. CS 1200, CS 2337',
+    'ex. MATH 2418',
+    'ex. John Cole, Jason Smith',
+    'ex. MKT 3320',
+    'ex. ANGM 3305 Robert Manriquez',
+  ];
+  const [searchBarHintIndex, setSearchBarHintIndex] = useState<number>(
+    Math.floor(Math.random() * searchBarHints.length),
+  );
+
+  function changeHint() {
+    setSearchBarHintIndex(Math.floor(Math.random() * searchBarHints.length));
+  }
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      changeHint();
+    }, 7000);
+
+    return () => clearInterval(interval); // Cleanup when component unmounts
+  }, []); // run on mount
+
+  // updateValue -> onSelect_internal -> updateQueries - clicking enter on an autocomplete suggestion in topMenu Searchbar
+  // updateValue -> onSelect_internal -> onSelect (custom function) - clicking enter on an autocomplete suggestion in home page SearchBar
+  // params.inputProps.onKeyDown -> handleKeyDown -> onSelect_internal -> updateQueries/onSelect - clicking enter in the SearchBar
+  // Button onClick -> onSelect_internal -> updateQueries/onSelect - Pressing the "Search" Button
 
   //change all values
   function updateValue(newValue: SearchQuery[]) {
@@ -151,7 +203,7 @@ export default function SearchBar(props: Props) {
       return;
     }
 
-    if (inputValue === '') {
+    if (inputValue === '' && !highlightedOption) {
       event.preventDefault();
       event.stopPropagation();
       onSelect(value);
@@ -159,8 +211,8 @@ export default function SearchBar(props: Props) {
     }
   }
 
-  //update parent and queries
   function onSelect(newValue: SearchQuery[]) {
+    changeHint();
     if (searchTerms == newValue.map((el) => searchQueryLabel(el)).join(','))
       // do not initiate a new search when the searchTerms haven't changed
       return;
@@ -179,6 +231,17 @@ export default function SearchBar(props: Props) {
     if (newValue.length && props.manageQuery === 'onSelect') {
       updateQueries(newValue);
     }
+
+    if (newValue.length > 0) {
+      let onlyNewValues: SearchQuery[] = [];
+      if (searchTerms != null) {
+        onlyNewValues = newValue.filter(
+          // extracts only the search terms that weren't there before
+          (el) => !searchTerms.includes(searchQueryLabel(el)),
+        );
+      }
+      updateRecentSearches(onlyNewValues);
+    }
   }
 
   const router = useRouter();
@@ -186,7 +249,9 @@ export default function SearchBar(props: Props) {
 
   //update url with what's in value
   async function updateQueries(newValue: SearchQuery[]) {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(
+      searchParams ? searchParams.toString() : '',
+    );
     if (newValue.length > 0) {
       params.set(
         'searchTerms',
@@ -200,6 +265,57 @@ export default function SearchBar(props: Props) {
     });
   }
 
+  // set options to recent searches only (at the start)
+  function prePopulateRecents() {
+    let recents: SearchQueryWithTitle[] = getRecentSearches();
+    recents = recents.filter(
+      (item) => !value.some((el) => searchQueryEqual(el, item)),
+    ); // remove currently chosen values
+    recents.forEach((el) => {
+      el.isRecent = true;
+    });
+    setOptions(recents);
+  }
+
+  // returns the filtered options after removing chosen values and adding recent searches that match the input
+  function filterOptions(
+    options: SearchQueryWithTitle[],
+    newInputValue: string,
+  ): SearchQueryWithTitle[] {
+    if (options.length == 0)
+      // no autocomplete options, don't waste time prepending matchedRecents (force it to call loadNewCourseNameOptions() )
+      return [];
+    const recents: SearchQueryWithTitle[] = getRecentSearches();
+    const matchedRecents = recents.filter((item: SearchQueryWithTitle) => {
+      if (value.some((el) => searchQueryEqual(el, item))) {
+        return false;
+      } // remove currently chosen values
+      if (
+        !(
+          searchQueryLabel(item)
+            .toLowerCase()
+            .includes(newInputValue.toLowerCase()) ||
+          item.subtitle?.toLowerCase().includes(newInputValue.toLowerCase()) ||
+          item.title?.toLowerCase().includes(newInputValue.toLowerCase())
+        )
+      ) {
+        return false;
+      } // remove non-matching recent options
+      return true;
+    });
+
+    const filtered: SearchQueryWithTitle[] = options.filter(
+      (item: SearchQueryWithTitle) =>
+        !value.some((el) => searchQueryEqual(el, item)) && // item must not be currently chosen
+        !matchedRecents.some((rec) => searchQueryEqual(rec, item)), // remove from filtered if it's a recent option (will add back in the return)
+    );
+
+    filtered.forEach((el) => {
+      el.isRecent = recents.some((rec) => searchQueryEqual(el, rec)); // deals with removals from recents
+    });
+    return [...matchedRecents, ...filtered];
+  }
+
   //fetch new options, add tags if valid
   function loadNewOptions(newInputValue: string) {
     if (noResult !== null && newInputValue.startsWith(noResult)) {
@@ -208,7 +324,7 @@ export default function SearchBar(props: Props) {
     }
     setLoading(true);
     if (newInputValue.trim() === '') {
-      setOptions([]);
+      prePopulateRecents();
       setLoading(false);
       return;
     }
@@ -222,12 +338,10 @@ export default function SearchBar(props: Props) {
         if (data.message !== 'success') {
           throw new Error(data.data ?? data.message);
         }
-        //remove currently chosen values
-        const filtered: SearchQuery[] = data.data.filter(
-          (item: SearchQuery) =>
-            value.findIndex((el) => searchQueryEqual(el, item)) === -1,
+        const filtered: SearchQueryWithTitle[] = filterOptions(
+          data.data,
+          newInputValue,
         );
-        //add to chosen values if only one option and space
         if (
           // if the returned options minus already selected values is 1, then this
           // means a space following should autocomplete the previous stuff to a chip
@@ -291,9 +405,9 @@ export default function SearchBar(props: Props) {
           }),
         );
         //remove currently chosen values
-        const filtered = formatted.filter(
-          (item: SearchQueryWithTitle) =>
-            !value.some((el) => searchQueryEqual(el, item)),
+        const filtered: SearchQueryWithTitle[] = filterOptions(
+          formatted,
+          newInputValue,
         );
         if (quickInputValue.current === newInputValue) {
           //still valid options
@@ -313,7 +427,12 @@ export default function SearchBar(props: Props) {
 
   useEffect(() => {
     fetch('/api/autocomplete?input=someSearchTerm');
+    prePopulateRecents();
+    // disable warning fpr prePopulateRecents because we only want this to run at the start
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const [highlightedOption, setHighlightedOption] = useState<boolean>(false);
 
   return (
     <div
@@ -325,9 +444,18 @@ export default function SearchBar(props: Props) {
         freeSolo
         loading={loading}
         //highlight first option to add with enter
+        onFocus={() => {
+          if (inputValue.trim() === '') {
+            prePopulateRecents();
+            return;
+          }
+        }}
         autoHighlight={true}
         clearOnBlur={false}
         className="grow"
+        onHighlightChange={(option) => {
+          setHighlightedOption(option !== null); // whether an option is highlighted
+        }}
         getOptionLabel={(option) => {
           if (typeof option === 'string') {
             return option;
@@ -383,7 +511,7 @@ export default function SearchBar(props: Props) {
               {...params}
               variant="outlined"
               className={props.input_className}
-              placeholder="ex. GOVT 2306"
+              placeholder={searchBarHints[searchBarHintIndex]}
               autoFocus={props.autoFocus}
             />
           );
@@ -393,7 +521,8 @@ export default function SearchBar(props: Props) {
           const value = (event.target as HTMLInputElement).value;
           // if the last character in the new string is a space, check for autocomplete
           if (
-            value[value.length - 1] === ' ' &&
+            (value[value.length - 1] === ' ' ||
+              value[value.length - 1] === ',') &&
             // but if the user is deleting text, don't try to autocomplete
             (event.nativeEvent as InputEvent).inputType === 'insertText'
           ) {
@@ -472,6 +601,14 @@ export default function SearchBar(props: Props) {
           const { key, ...otherProps } = props;
           return (
             <li key={key} {...otherProps}>
+              {
+                //If option isSearchQuery and isRecent is declared & is true
+                typeof option !== 'string' && option.isRecent == true ? (
+                  <HistoryToggleOffIcon className="text-gray-400 self-start mr-2 mt-0.5" />
+                ) : (
+                  <SearchIcon className="text-gray-400 self-start mr-2 mt-0.5" />
+                )
+              }
               <div>
                 <div>
                   {parts.map((part, index) => (
@@ -532,21 +669,21 @@ export default function SearchBar(props: Props) {
           variant="contained"
           disableElevation
           size="large"
-          className={
-            'h-11 w-[5.5rem] shrink-0 normal-case' +
-            (value.length == 0
-              ? ' text-cornflower-200 dark:text-cornflower-700'
-              : '')
-          } //darkens the text when no valid search terms are entered (pseudo-disables the search button)
+          className={`self-stretch my-px px-4 shrink-0 normal-case relative ${
+            value.length == 0
+              ? 'text-cornflower-200 dark:text-cornflower-700'
+              : ''
+          }`} //darkens the text when no valid search terms are entered (pseudo-disables the search button)
           onClick={() => onSelect(value)}
         >
-          {isPending || props.isPending ? (
+          <p className={isPending || props.isPending ? 'opacity-0' : ''}>
+            Search
+          </p>
+          {(isPending || props.isPending) && (
             <CircularProgress
               color="inherit"
-              className="h-6 w-6 text-cornflower-50 dark:text-haiti"
+              className="absolute h-6 w-6 text-cornflower-50 dark:text-haiti"
             />
-          ) : (
-            'Search'
           )}
         </Button>
       </Tooltip>

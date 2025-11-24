@@ -1,7 +1,7 @@
 'use client';
 
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { Badge, IconButton, Popover, Tooltip } from '@mui/material';
+import { Badge, Divider, IconButton, Popover, Tooltip } from '@mui/material';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
@@ -237,26 +237,23 @@ export default function WhatsNewButton() {
                       }
                     }}
                     title="Click to view release details"
-                    className="flex flex-col gap-1 hover:bg-gray-100 dark:hover:bg-cornflower-700 p-2 rounded-md transition-colors"
+                    className="flex flex-col gap-1 hover:bg-gray-100 dark:hover:bg-gray-900 p-2 rounded-md transition-colors"
                   >
                     <div className="flex justify-between">
                       <span
-                        className={`text-xs rounded-full ${readFeatures.includes(feature.id) ? 'ring-1 ring-cornflower-500 text-cornflower-700 dark:ring-cornflower-400 dark:text-cornflower-200' : 'bg-cornflower-600 text-white dark:bg-cornflower-300 dark:text-cornflower-900'} p-0.5 px-2`}
+                        className={`text-xs rounded-full ${readFeatures.includes(feature.id) ? 'ring-1 ring-royal text-royal dark:ring-cornflower-300 dark:text-cornflower-300' : 'bg-royal text-white dark:bg-cornflower-300 dark:text-haiti'} p-0.5 px-2`}
                       >
                         {feature.version}
                       </span>
-                      <p className="text-xs text-cornflower-500 dark:text-cornflower-400 mr-2">
+                      <p className="text-xs text-royal dark:text-cornflower-300 mr-2">
                         {feature.date}
                       </p>
                     </div>
                     <p className="text-sm ml-0.5">{feature.content}</p>
                   </Link>,
-                  latestFeatures.length - 1 !== index ? (
-                    <hr
-                      key={feature.id + 'divider'}
-                      className="border-gray-300 dark:border-gray-600"
-                    />
-                  ) : null,
+                  latestFeatures.length - 1 !== index && (
+                    <Divider key={feature.id + 'divider'} />
+                  ),
                 ])}
               </div>
             ) : (

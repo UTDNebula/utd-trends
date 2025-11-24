@@ -77,7 +77,7 @@ export default async function RootLayout({
         <GoogleAnalytics gaId="G-CC86XR1562" />
       )}
       <body
-        className={`bg-white dark:bg-black ${inter.variable} font-main ${baiJamjuree.variable} text-haiti dark:text-white`}
+        className={`bg-[rgb(246,246,246)] dark:bg-black ${inter.variable} font-main ${baiJamjuree.variable} text-haiti dark:text-white`}
       >
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>
