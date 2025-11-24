@@ -18,6 +18,7 @@ interface PlannerSectionComponentProps {
   isPreview?: boolean;
   nooffset?: boolean;
   placeholder?: boolean;
+  coursesInGroup?: string[];
   onSectionClick?: (
     course: SearchQuery,
     sectionNumber: string,
@@ -267,46 +268,84 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
             }
           }}
         >
-          <div
-            className={
-              'font-semibold text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
-              (makeBigger ? 'text-sm' : 'text-xs leading-none')
-            }
-          >
-            {selectedSection.course_details && selectedSection.course_details[0]
-              ? selectedSection.course_details[0].subject_prefix +
-                ' ' +
-                selectedSection.course_details[0].course_number
-              : ''}
-            .{selectedSection.section_number}
-          </div>
-          {selectedSection.professor_details &&
-            selectedSection.professor_details[0] &&
-            selectedSection.professor_details.map((prof) => (
+          {!props.placeholder ? (
+            <>
               <div
-                key={prof._id}
+                className={
+                  'font-semibold text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+                  (makeBigger ? 'text-sm' : 'text-xs leading-none')
+                }
+              >
+                {selectedSection.course_details &&
+                selectedSection.course_details[0]
+                  ? selectedSection.course_details[0].subject_prefix +
+                    ' ' +
+                    selectedSection.course_details[0].course_number
+                  : ''}
+                .{selectedSection.section_number}
+              </div>
+              {selectedSection.professor_details &&
+                selectedSection.professor_details[0] &&
+                selectedSection.professor_details.map((prof) => (
+                  <div
+                    key={prof._id}
+                    className={
+                      'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+                      (makeBigger ? '' : 'leading-none')
+                    }
+                  >
+                    {prof.first_name + ' ' + prof.last_name}
+                  </div>
+                ))}
+              <div
                 className={
                   'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
                   (makeBigger ? '' : 'leading-none')
                 }
               >
-                {prof.first_name + ' ' + prof.last_name}
+                {props.placeholder ? (
+                  <KeyboardArrowDown className="mx-auto -my-1" />
+                ) : (
+                  selectedSection.meetings[0]?.location?.building +
+                  ' ' +
+                  selectedSection.meetings[0]?.location?.room
+                )}
               </div>
-            ))}
-          <div
-            className={
-              'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
-              (makeBigger ? '' : 'leading-none')
-            }
-          >
-            {props.placeholder ? (
-              <KeyboardArrowDown className="mx-auto -my-1" />
-            ) : (
-              selectedSection.meetings[0]?.location?.building +
-              ' ' +
-              selectedSection.meetings[0]?.location?.room
-            )}
-          </div>
+            </>
+          ) : (
+            <>
+              <div
+                className={
+                  'font-semibold text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+                  (makeBigger ? 'text-sm' : 'text-xs leading-none')
+                }
+              >
+                Multiple Sections
+              </div>
+              <div
+                className={
+                  'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+                  (makeBigger ? '' : 'leading-none')
+                }
+              >
+                {props.coursesInGroup?.join(', ')}
+              </div>
+              <div
+                className={
+                  'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+                  (makeBigger ? '' : 'leading-none')
+                }
+              >
+                {props.placeholder ? (
+                  <KeyboardArrowDown className="mx-auto -my-1" />
+                ) : (
+                  selectedSection.meetings[0]?.location?.building +
+                  ' ' +
+                  selectedSection.meetings[0]?.location?.room
+                )}
+              </div>
+            </>
+          )}
         </button>
       </Tooltip>
     );

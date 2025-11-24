@@ -96,6 +96,22 @@ export default function PreviewSectionGroup({
         course={previewFirstCourseWithSection}
         color={color}
         isPreview={true}
+        coursesInGroup={sectionGroup.reduce(
+          (acc, section) =>
+            acc.includes(
+              section.course_details![0].subject_prefix +
+                ' ' +
+                section.course_details![0].course_number,
+            )
+              ? acc
+              : [
+                  ...acc,
+                  section.course_details![0].subject_prefix +
+                    ' ' +
+                    section.course_details![0].course_number,
+                ],
+          [] as string[],
+        )}
         scoot={scoot}
         onSectionClick={(course, sectionNumber, event) => {
           const targetElement = event?.currentTarget as HTMLElement;
