@@ -34,6 +34,17 @@ export default function PreviewSectionGroup({
   const { setPlannerSection} = useSharedState();
   const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null);
 
+  // get the selected sections
+  const { planner, latestSemester } = useSharedState();
+  const allResults = useSearchresults(planner);
+  const latestSections = allResults.map((r) =>
+    r.isSuccess
+      ? r.data.sections.filter(
+          (s) => s.academic_session.name === latestSemester,
+        )
+      : [],
+  ); // all the sections for each course in the planner for the latest semester
+
   const firstSection = sectionGroup[0];
   if (!firstSection) {
     return null;
@@ -51,17 +62,6 @@ export default function PreviewSectionGroup({
     convertToCourseOnly(previewFirstCourseWithSection),
   );
   const color = plannerColorMap[courseKey];
-
-  // get the selected sections
-  const { planner, latestSemester } = useSharedState();
-  const allResults = useSearchresults(planner);
-  const latestSections = allResults.map((r) =>
-    r.isSuccess
-      ? r.data.sections.filter(
-          (s) => s.academic_session.name === latestSemester,
-        )
-      : [],
-  ); // all the sections for each course in the planner for the latest semester
 
   const selectedSections = planner
       .map((searchQuery) =>

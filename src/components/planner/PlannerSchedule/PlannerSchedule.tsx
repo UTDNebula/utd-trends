@@ -73,6 +73,15 @@ export default function PlannerSchedule() {
   );
   const { showConflictMessage } = useSnackbar();
 
+  const allResults = useSearchresults(planner);
+        const latestSections = allResults.map((r) =>
+          r.isSuccess
+            ? r.data.sections.filter(
+                (s) => s.academic_session.name === latestSemester,
+              )
+            : [],
+        ); // all the sections for each course in the planner for the latest semester
+
   return (
     <div
       className={`w-full h-[calc(100vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-scroll rounded-2xl grid-rows-[max-content_repeat(14,minmax(0,1fr))]`}
@@ -113,15 +122,6 @@ export default function PlannerSchedule() {
       {(() => {
         // Collect all sections from all courses into a flat array
         const allSections : SectionsData = [];
-
-        const allResults = useSearchresults(planner);
-        const latestSections = allResults.map((r) =>
-          r.isSuccess
-            ? r.data.sections.filter(
-                (s) => s.academic_session.name === latestSemester,
-              )
-            : [],
-        ); // all the sections for each course in the planner for the latest semester
 
         const selectedSections = planner
             .map((searchQuery) =>
