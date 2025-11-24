@@ -23,7 +23,6 @@ export function parseTime(time: string, days: string[]): number {
   if (time === '')
     return Number.MAX_VALUE // no time means infinity (at end)
   const [hour, minute] = time.split(':');
-  console.log(time);
   const isPM = time.includes('pm');
   let hour24 = parseInt(hour);
   if (isPM && hour24 !== 12) hour24 += 12;

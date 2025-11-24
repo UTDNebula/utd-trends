@@ -141,7 +141,8 @@ export default function PlannerSchedule() {
         previewCourses.forEach((previewCourse) => {
           
           // filter out sections that are already selected
-          const filteredSections : SectionsData = latestSections.flatMap((s) => s)
+          const filteredSections : SectionsData = latestSections.flatMap((s) => s).filter((sec, idx, self) => self.findIndex((s) => sec._id == s._id) == idx)
+            .filter((section) => (section.course_details && section.course_details[0] && section.course_details[0].subject_prefix === previewCourse.prefix && section.course_details[0].course_number === previewCourse.number) && (previewCourse.profFirst && section.professor_details && section.professor_details.find((p) => p.first_name == previewCourse.profFirst && p.last_name == previewCourse.profLast)))
             .filter( // not same section
               (section) =>
                 !selectedSections.find((s) => (s.section_number == section.section_number) && (s.course_details && s.course_details[0] && section.course_details && section.course_details[0] && s.course_details[0].subject_prefix == section.course_details[0].subject_prefix && s.course_details[0].course_number == section.course_details[0].course_number)),
