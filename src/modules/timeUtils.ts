@@ -20,8 +20,7 @@ export const DAYS = [
  * @returns Numeric value representing the time in minutes from start of week
  */
 export function parseTime(time: string, days: string[]): number {
-  if (time === '')
-    return Number.MAX_VALUE // no time means infinity (at end)
+  if (time === '') return Number.MAX_VALUE; // no time means infinity (at end)
   const [hour, minute] = time.split(':');
   const isPM = time.includes('pm');
   let hour24 = parseInt(hour);

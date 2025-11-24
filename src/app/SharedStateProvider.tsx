@@ -41,7 +41,12 @@ const SharedStateContext = createContext<
       planner: SearchQueryMultiSection[];
       addToPlanner: (query: SearchQuery) => void;
       removeFromPlanner: (query: SearchQuery) => void;
-      setPlannerSection: (data: Sections['all'][number], selectedSections: SectionsData, isSelected: boolean, openConflictMessage: () => void) => void;
+      setPlannerSection: (
+        data: Sections['all'][number],
+        selectedSections: SectionsData,
+        isSelected: boolean,
+        openConflictMessage: () => void,
+      ) => void;
       plannerColorMap: {
         [key: string]: { fill: string; outline: string; font: string };
       };
@@ -187,11 +192,13 @@ export function SharedStateProvider({
     return false;
   }
 
-  function setPlannerSection(data: Sections['all'][number], selectedSections: SectionsData, isSelected: boolean, openConflictMessage: () => void) {
-    if (
-      !isSelected &&
-      hasConflict(data, selectedSections)
-    ) {
+  function setPlannerSection(
+    data: Sections['all'][number],
+    selectedSections: SectionsData,
+    isSelected: boolean,
+    openConflictMessage: () => void,
+  ) {
+    if (!isSelected && hasConflict(data, selectedSections)) {
       // Check for conflict
       openConflictMessage();
       return; // Prevent section selection
@@ -201,18 +208,15 @@ export function SharedStateProvider({
       prefix: data.course_details![0].subject_prefix,
       number: data.course_details![0].course_number,
       profFirst:
-        data.professor_details &&
-        data.professor_details[0] // always use the first prof
+        data.professor_details && data.professor_details[0] // always use the first prof
           ? data.professor_details[0].first_name
           : undefined,
       profLast:
-        data.professor_details &&
-        data.professor_details[0]
+        data.professor_details && data.professor_details[0]
           ? data.professor_details[0].last_name
           : undefined,
     } as SearchQuery;
     const section = data.section_number;
-
 
     if (
       !planner.find((course) =>
@@ -311,7 +315,7 @@ export function SharedStateProvider({
         setCourseNames,
         latestSemester,
         previewCourses,
-        setPreviewCourses
+        setPreviewCourses,
       }}
     >
       {children}

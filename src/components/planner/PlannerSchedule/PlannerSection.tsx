@@ -280,7 +280,8 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               : ''}
             .{selectedSection.section_number}
           </div>
-          {selectedSection.professor_details && selectedSection.professor_details[0] &&
+          {selectedSection.professor_details &&
+            selectedSection.professor_details[0] &&
             selectedSection.professor_details.map((prof) => (
               <div
                 key={prof._id}
@@ -300,7 +301,11 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
           >
             {props.placeholder ? (
               <KeyboardArrowDown className="mx-auto -my-1" />
-            ) : (selectedSection.meetings[0]?.location?.building + ' ' + selectedSection.meetings[0]?.location?.room)}
+            ) : (
+              selectedSection.meetings[0]?.location?.building +
+              ' ' +
+              selectedSection.meetings[0]?.location?.room
+            )}
           </div>
         </button>
       </Tooltip>

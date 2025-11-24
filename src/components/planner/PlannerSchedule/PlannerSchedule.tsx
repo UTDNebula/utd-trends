@@ -66,7 +66,13 @@ function HourRow(props: HourRowProps) {
 }
 
 export default function PlannerSchedule() {
-  const { planner, plannerColorMap, previewCourses, setPlannerSection, latestSemester } = useSharedState();
+  const {
+    planner,
+    plannerColorMap,
+    previewCourses,
+    setPlannerSection,
+    latestSemester,
+  } = useSharedState();
 
   const courses = planner.flatMap((searchQuery) =>
     searchQueryMultiSectionSplit(searchQuery),
@@ -74,13 +80,13 @@ export default function PlannerSchedule() {
   const { showConflictMessage } = useSnackbar();
 
   const allResults = useSearchresults(planner);
-        const latestSections = allResults.map((r) =>
-          r.isSuccess
-            ? r.data.sections.filter(
-                (s) => s.academic_session.name === latestSemester,
-              )
-            : [],
-        ); // all the sections for each course in the planner for the latest semester
+  const latestSections = allResults.map((r) =>
+    r.isSuccess
+      ? r.data.sections.filter(
+          (s) => s.academic_session.name === latestSemester,
+        )
+      : [],
+  ); // all the sections for each course in the planner for the latest semester
 
   return (
     <div
@@ -121,37 +127,64 @@ export default function PlannerSchedule() {
       {/* Preview Sessions Overlay */}
       {(() => {
         // Collect all sections from all courses into a flat array
-        const allSections : SectionsData = [];
+        const allSections: SectionsData = [];
 
         const selectedSections = planner
-            .map((searchQuery) =>
-              searchQueryMultiSectionSplit(searchQuery),
-            )
-            .flatMap((queries, idx) => {
-              return queries.map((query) => {
-                return latestSections[idx].find(
-                  (section) =>
-                    section.section_number === query.sectionNumber,
-                );
-              });
-            })
-            .filter((section) => typeof section !== 'undefined')
-          
+          .map((searchQuery) => searchQueryMultiSectionSplit(searchQuery))
+          .flatMap((queries, idx) => {
+            return queries.map((query) => {
+              return latestSections[idx].find(
+                (section) => section.section_number === query.sectionNumber,
+              );
+            });
+          })
+          .filter((section) => typeof section !== 'undefined');
 
         previewCourses.forEach((previewCourse) => {
-          
           // filter out sections that are already selected
-          const filteredSections : SectionsData = latestSections.flatMap((s) => s).filter((sec, idx, self) => self.findIndex((s) => sec._id == s._id) == idx)
-            .filter((section) => (section.course_details && section.course_details[0] && section.course_details[0].subject_prefix === previewCourse.prefix && section.course_details[0].course_number === previewCourse.number) && (!previewCourse.profFirst || section.professor_details && section.professor_details.find((p) => p.first_name == previewCourse.profFirst && p.last_name == previewCourse.profLast)))
-            .filter( // not same section
-              (section) =>
-                !selectedSections.find((s) => (s.section_number == section.section_number) && (s.course_details && s.course_details[0] && section.course_details && section.course_details[0] && s.course_details[0].subject_prefix == section.course_details[0].subject_prefix && s.course_details[0].course_number == section.course_details[0].course_number)),
+          const filteredSections: SectionsData = latestSections
+            .flatMap((s) => s)
+            .filter(
+              (sec, idx, self) =>
+                self.findIndex((s) => sec._id == s._id) == idx,
             )
-            // TODO: re-enable conflict detection perchance
-            // .filter((section) => {
-            //   const selectedSections = getSelectedSections(planner, sections);
-            //   return !hasConflict(section, selectedSections);
-            // });
+            .filter(
+              (section) =>
+                section.course_details &&
+                section.course_details[0] &&
+                section.course_details[0].subject_prefix ===
+                  previewCourse.prefix &&
+                section.course_details[0].course_number ===
+                  previewCourse.number &&
+                (!previewCourse.profFirst ||
+                  (section.professor_details &&
+                    section.professor_details.find(
+                      (p) =>
+                        p.first_name == previewCourse.profFirst &&
+                        p.last_name == previewCourse.profLast,
+                    ))),
+            )
+            .filter(
+              // not same section
+              (section) =>
+                !selectedSections.find(
+                  (s) =>
+                    s.section_number == section.section_number &&
+                    s.course_details &&
+                    s.course_details[0] &&
+                    section.course_details &&
+                    section.course_details[0] &&
+                    s.course_details[0].subject_prefix ==
+                      section.course_details[0].subject_prefix &&
+                    s.course_details[0].course_number ==
+                      section.course_details[0].course_number,
+                ),
+            );
+          // TODO: re-enable conflict detection perchance
+          // .filter((section) => {
+          //   const selectedSections = getSelectedSections(planner, sections);
+          //   return !hasConflict(section, selectedSections);
+          // });
 
           // Add all sections to the flat array
           filteredSections.forEach((section) => {
@@ -178,10 +211,7 @@ export default function PlannerSchedule() {
               acc[key].push(section);
               return acc;
             },
-            {} as Record<
-              string,
-              SectionsData
-            >,
+            {} as Record<string, SectionsData>,
           ),
         );
 
@@ -240,9 +270,21 @@ export default function PlannerSchedule() {
 
         return sectionsWithScoot.flatMap(({ sectionGroup, scoot }, index) => {
           const firstItem = sectionGroup[0];
-          const courseKey = (firstItem.course_details && firstItem.course_details[0] ? firstItem.course_details[0].subject_prefix + ' ' + firstItem.course_details[0].course_number : '') + (firstItem.professor_details && firstItem.professor_details[0] ? ' ' + firstItem.professor_details.map((p) => p.first_name + ' ' + p.last_name).join(' ') : '');
+          const courseKey =
+            (firstItem.course_details && firstItem.course_details[0]
+              ? firstItem.course_details[0].subject_prefix +
+                ' ' +
+                firstItem.course_details[0].course_number
+              : '') +
+            (firstItem.professor_details && firstItem.professor_details[0]
+              ? ' ' +
+                firstItem.professor_details
+                  .map((p) => p.first_name + ' ' + p.last_name)
+                  .join(' ')
+              : '');
 
-          if (sectionGroup.length > 1) { // need a preview section group
+          if (sectionGroup.length > 1) {
+            // need a preview section group
             return (
               <PreviewSectionGroup
                 key={`preview-group-${courseKey}-${index}`}
@@ -253,13 +295,26 @@ export default function PlannerSchedule() {
                 scoot={scoot}
               />
             );
-          } else { // single preview section
+          } else {
+            // single preview section
             const section = sectionGroup[0];
             const previewCourseWithSection = {
-              prefix: section.course_details && section.course_details[0] ? section.course_details[0].subject_prefix : null,
-              number: section.course_details && section.course_details[0] ? section.course_details[0].course_number : null,
-              profFirst: section.professor_details && section.professor_details[0] ? section.professor_details[0].first_name : null,
-              profLast: section.professor_details && section.professor_details[0] ? section.professor_details[0].last_name : null,
+              prefix:
+                section.course_details && section.course_details[0]
+                  ? section.course_details[0].subject_prefix
+                  : null,
+              number:
+                section.course_details && section.course_details[0]
+                  ? section.course_details[0].course_number
+                  : null,
+              profFirst:
+                section.professor_details && section.professor_details[0]
+                  ? section.professor_details[0].first_name
+                  : null,
+              profLast:
+                section.professor_details && section.professor_details[0]
+                  ? section.professor_details[0].last_name
+                  : null,
               sectionNumber: section.section_number,
             } as SearchQuery;
             const courseKey = searchQueryLabel(
@@ -279,7 +334,14 @@ export default function PlannerSchedule() {
                   setPlannerSection(
                     section,
                     selectedSections,
-                    selectedSections.some((s) => s.section_number === section.section_number && s.course_details?.[0].subject_prefix === section.course_details?.[0].subject_prefix && s.course_details?.[0].course_number === section.course_details?.[0].course_number),
+                    selectedSections.some(
+                      (s) =>
+                        s.section_number === section.section_number &&
+                        s.course_details?.[0].subject_prefix ===
+                          section.course_details?.[0].subject_prefix &&
+                        s.course_details?.[0].course_number ===
+                          section.course_details?.[0].course_number,
+                    ),
                     showConflictMessage,
                   );
                 }}

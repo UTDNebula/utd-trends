@@ -162,7 +162,7 @@ type SectionTableRowProps = {
 };
 
 function SectionTableRow(props: SectionTableRowProps) {
-  const { setPlannerSection} = useSharedState();
+  const { setPlannerSection } = useSharedState();
   const isSelected = props.selectedSections.some(
     (el) =>
       el.section_number == props.data.section_number && // check the section number
@@ -201,7 +201,10 @@ function SectionTableRow(props: SectionTableRowProps) {
             checked={isSelected}
             onClick={() => {
               setPlannerSection(
-                props.data, props.selectedSections, isSelected, props.openConflictMessage
+                props.data,
+                props.selectedSections,
+                isSelected,
+                props.openConflictMessage,
               ); // using the section's course and prof details every time ensures overall matches de/selection behavior
             }}
           />

@@ -31,7 +31,7 @@ export default function PreviewSectionGroup({
   index,
   scoot = 0,
 }: PreviewSectionGroupProps) {
-  const { setPlannerSection} = useSharedState();
+  const { setPlannerSection } = useSharedState();
   const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null);
 
   // get the selected sections
@@ -51,10 +51,22 @@ export default function PreviewSectionGroup({
   }
 
   const previewFirstCourseWithSection = {
-    prefix: firstSection.course_details && firstSection.course_details[0] ? firstSection.course_details[0].subject_prefix : null,
-    number: firstSection.course_details && firstSection.course_details[0] ? firstSection.course_details[0].course_number : null,
-    profFirst: firstSection.professor_details && firstSection.professor_details[0] ? firstSection.professor_details[0].first_name : null,
-    profLast: firstSection.professor_details && firstSection.professor_details[0] ? firstSection.professor_details[0].last_name : null,
+    prefix:
+      firstSection.course_details && firstSection.course_details[0]
+        ? firstSection.course_details[0].subject_prefix
+        : null,
+    number:
+      firstSection.course_details && firstSection.course_details[0]
+        ? firstSection.course_details[0].course_number
+        : null,
+    profFirst:
+      firstSection.professor_details && firstSection.professor_details[0]
+        ? firstSection.professor_details[0].first_name
+        : null,
+    profLast:
+      firstSection.professor_details && firstSection.professor_details[0]
+        ? firstSection.professor_details[0].last_name
+        : null,
     sectionNumber: firstSection.section_number,
   } as SearchQuery;
 
@@ -64,18 +76,15 @@ export default function PreviewSectionGroup({
   const color = plannerColorMap[courseKey];
 
   const selectedSections = planner
-      .map((searchQuery) =>
-        searchQueryMultiSectionSplit(searchQuery),
-      )
-      .flatMap((queries, idx) => {
-        return queries.map((query) => {
-          return latestSections[idx].find(
-            (section) =>
-              section.section_number === query.sectionNumber,
-          );
-        });
-      })
-      .filter((section) => typeof section !== 'undefined')
+    .map((searchQuery) => searchQueryMultiSectionSplit(searchQuery))
+    .flatMap((queries, idx) => {
+      return queries.map((query) => {
+        return latestSections[idx].find(
+          (section) => section.section_number === query.sectionNumber,
+        );
+      });
+    })
+    .filter((section) => typeof section !== 'undefined');
 
   return (
     <>
@@ -114,12 +123,24 @@ export default function PreviewSectionGroup({
       >
         {sectionGroup.map((section) => {
           const previewCourseWithSection = {
-            prefix: section.course_details && section.course_details[0] ? section.course_details[0].subject_prefix : null,
-            number: section.course_details && section.course_details[0] ? section.course_details[0].course_number : null,
-            profFirst: section.professor_details && section.professor_details[0] ? section.professor_details[0].first_name : null,
-            profLast: section.professor_details && section.professor_details[0] ? section.professor_details[0].last_name : null,
+            prefix:
+              section.course_details && section.course_details[0]
+                ? section.course_details[0].subject_prefix
+                : null,
+            number:
+              section.course_details && section.course_details[0]
+                ? section.course_details[0].course_number
+                : null,
+            profFirst:
+              section.professor_details && section.professor_details[0]
+                ? section.professor_details[0].first_name
+                : null,
+            profLast:
+              section.professor_details && section.professor_details[0]
+                ? section.professor_details[0].last_name
+                : null,
             sectionNumber: section.section_number,
-          } as SearchQuery
+          } as SearchQuery;
 
           const courseKey = searchQueryLabel(
             convertToCourseOnly(previewCourseWithSection),
@@ -138,7 +159,14 @@ export default function PreviewSectionGroup({
                 setPlannerSection(
                   section,
                   selectedSections,
-                  selectedSections.some((s) => s.section_number === section.section_number && s.course_details?.[0].subject_prefix === section.course_details?.[0].subject_prefix && s.course_details?.[0].course_number === section.course_details?.[0].course_number),
+                  selectedSections.some(
+                    (s) =>
+                      s.section_number === section.section_number &&
+                      s.course_details?.[0].subject_prefix ===
+                        section.course_details?.[0].subject_prefix &&
+                      s.course_details?.[0].course_number ===
+                        section.course_details?.[0].course_number,
+                  ),
                   showConflictMessage,
                 );
                 setPopoverAnchor(null); // Close popover after selection
