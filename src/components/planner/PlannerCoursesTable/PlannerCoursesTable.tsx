@@ -46,6 +46,10 @@ export default function PlannerCoursesTable() {
 
   const { showConflictMessage } = useSnackbar();
 
+  // Clear preview courses on component mount, because the tabs will be closed
+  useEffect(() => {
+    setPreviewCourses([]);
+  }, []);
 
   const allResults = useSearchresults(planner);
   const latestSections = allResults.map((r) =>
