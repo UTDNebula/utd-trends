@@ -101,9 +101,6 @@ export default function SearchBar(props: Props) {
   const [loading, setLoading] = useState(false);
   const [openErrorTooltip, setErrorTooltip] = useState(false);
 
-  //shortcut to loading course name results if a known substring has no normal results
-  const [noResult, setNoResults] = useState<null | string>(null);
-
   //text in search
   const [inputValue, _setInputValue] = useState('');
   //quick input updates for fetch (state is slow)
@@ -191,85 +188,77 @@ export default function SearchBar(props: Props) {
     });
   }
 
-//fetch new options, add tags if valid (merged endpoints, keep relevance order)
-async function loadNewOptions(newInputValue: string) {
-  setLoading(true);
-  const trimmed = newInputValue.trim();
+  //fetch new options, add tags if valid (merged endpoints, keep relevance order)
+  async function loadNewOptions(newInputValue: string) {
+    setLoading(true);
+    const trimmed = newInputValue.trim();
 
-  if (trimmed === '') {
-    setOptions([]);
-    setNoResults(null);
-    setLoading(false);
-    return;
-  }
-
-  try {
-    const [autoRes, courseNameRes] = await Promise.all([
-      fetch(
-        '/api/autocomplete?input=' +
-          encodeURIComponent(trimmed) +
-          '&searchBy=both&limit=20',
-      ),
-      fetch(
-        '/api/courseNameAutocomplete?input=' +
-          encodeURIComponent(trimmed),
-      ),
-    ]);
-
-    const autoJson = await autoRes.json();
-    const courseNameJson = await courseNameRes.json();
-
-    const fromAuto: SearchQuery[] =
-      autoJson.message === 'success' ? autoJson.data : [];
-
-    const fromCourseNames: SearchQueryWithTitle[] =
-      courseNameJson.message === 'success'
-        ? (courseNameJson.data as { title: string; result: SearchQuery }[]
-          ).map((item) => ({
-            ...item.result,
-            title: item.title,
-          }))
-        : [];
-
-    // graph results as SearchQueryWithTitle
-    const autoAsWithTitle = fromAuto as SearchQueryWithTitle[];
-
-    // IMPORTANT:
-    //  - courseNameAutocomplete is already relevance-sorted (Option B)
-    //  - autocomplete graph is good for codes/profs
-    // Put course-name results FIRST, keep their order
-    const merged: SearchQueryWithTitle[] = [
-      ...fromCourseNames,
-      ...autoAsWithTitle,
-    ];
-
-    // remove already-chosen chips
-    let filtered = merged.filter(
-      (item) =>
-        value.findIndex((el) => searchQueryEqual(el, item)) === -1,
-    );
-
-    // detect "code-like" query (e.g. "CS 1337") – for those we still like prefix+number sorting
-    const isCodeLike = /^[A-Za-z]{2,4}\s*\d{3,4}$/i.test(trimmed);
-
-    if (!filtered.length) {
-      setNoResults(trimmed);
-    } else {
-      setNoResults(null);
+    if (trimmed === '') {
+      setOptions([]);
+      setLoading(false);
+      return;
     }
 
-    // only update options if the input hasn't changed while we were fetching
-    if (quickInputValue.current === newInputValue) {
-      setOptions(
-        isCodeLike ? filtered.sort(sortByPrefixAndNumber) : filtered,
+    try {
+      const [autoRes, courseNameRes] = await Promise.all([
+        fetch(
+          '/api/autocomplete?input=' +
+            encodeURIComponent(trimmed) +
+            '&searchBy=both&limit=20',
+        ),
+        fetch(
+          '/api/courseNameAutocomplete?input=' + encodeURIComponent(trimmed),
+        ),
+      ]);
+
+      const autoJson = await autoRes.json();
+      const courseNameJson = await courseNameRes.json();
+
+      const fromAuto: SearchQuery[] =
+        autoJson.message === 'success' ? autoJson.data : [];
+
+      const fromCourseNames: SearchQueryWithTitle[] =
+        courseNameJson.message === 'success'
+          ? (
+              courseNameJson.data as { title: string; result: SearchQuery }[]
+            ).map((item) => ({
+              ...item.result,
+              title: item.title,
+            }))
+          : [];
+
+      // graph results as SearchQueryWithTitle
+      const autoAsWithTitle = fromAuto as SearchQueryWithTitle[];
+
+      // IMPORTANT:
+      //  - courseNameAutocomplete is already relevance-sorted (Option B)
+      //  - autocomplete graph is good for codes/profs
+      // Put course-name results FIRST, keep their order
+      const merged: SearchQueryWithTitle[] = [
+        ...fromCourseNames,
+        ...autoAsWithTitle,
+      ];
+
+      // remove already-chosen chips
+      const filtered = merged.filter(
+        (item) => value.findIndex((el) => searchQueryEqual(el, item)) === -1,
       );
+
+      // detect "code-like" query (e.g. "CS 1337") – for those we still like prefix+number sorting
+      const isCodeLike = /^[A-Za-z]{2,4}\s*\d{3,4}$/i.test(trimmed);
+
+      // only update options if the input hasn't changed while we were fetching
+      if (quickInputValue.current === newInputValue) {
+        setOptions(
+          isCodeLike ? filtered.sort(sortByPrefixAndNumber) : filtered,
+        );
+      }
+    } catch {
+      // ignore errors for now
+    } finally {
+      setLoading(false);
     }
-  } catch {
-    // ignore errors for now
-  } finally {
-    setLoading(false);
   }
-}
 
   //add value
   function addValue(newValue: SearchQuery) {

@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 
 import untypedCourseNameTable from '@/data/course_name_table.json';
+import { PREFIX_SYNONYMS } from '@/modules/prefixSynonyms';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery } from '@/types/SearchQuery';
-import{PREFIX_SYNONYMS} from '@/modules/prefixSynonyms';
 
 const courseNameTable = untypedCourseNameTable as {
   [key: string]: SearchQuery[];
@@ -115,27 +115,37 @@ type ResultWDistance = Result & {
 };
 
 const STOP_WORDS = new Set([
-  "the", "and", "of", "to", "in", "for", "with", "an", "a", "on", "ii", "iii", "iv",
+  'the',
+  'and',
+  'of',
+  'to',
+  'in',
+  'for',
+  'with',
+  'an',
+  'a',
+  'on',
+  'ii',
+  'iii',
+  'iv',
 ]);
 
 function normalize(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9+&\- ]+/g, " ")
-    .replace(/\s+/g, " ")
+    .replace(/[^a-z0-9+&\- ]+/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
 function tokenize(text: string): string[] {
   const norm = normalize(text);
   if (!norm) return [];
-  return norm
-    .split(" ")
-    .filter((t) => t && !STOP_WORDS.has(t));
+  return norm.split(' ').filter((t) => t && !STOP_WORDS.has(t));
 }
 
 function cheapStem(token: string): string {
-  return token.replace(/ing$|ed$|s$/g, "").trim();
+  return token.replace(/ing$|ed$|s$/g, '').trim();
 }
 
 /**
@@ -168,8 +178,8 @@ function buildCourseWords(title: string, result: SearchQuery): string[] {
   const lowerTitle = title.toLowerCase();
 
   if (lowerTitle.includes('data structure')) {
-    ['data structures', 'data structure', 'ds', 'dsa', 'algorithms'].forEach((w) =>
-      tokenize(w).forEach((t) => words.add(t)),
+    ['data structures', 'data structure', 'ds', 'dsa', 'algorithms'].forEach(
+      (w) => tokenize(w).forEach((t) => words.add(t)),
     );
   }
   if (lowerTitle.includes('algorithm')) {
@@ -192,7 +202,11 @@ function buildCourseWords(title: string, result: SearchQuery): string[] {
       tokenize(w).forEach((t) => words.add(t)),
     );
   }
-  if (lowerTitle.includes('statistics') || lowerTitle.includes('statistical') || prefix === 'STAT') {
+  if (
+    lowerTitle.includes('statistics') ||
+    lowerTitle.includes('statistical') ||
+    prefix === 'STAT'
+  ) {
     ['statistics', 'stats', 'probability', 'data analysis'].forEach((w) =>
       tokenize(w).forEach((t) => words.add(t)),
     );
@@ -309,12 +323,13 @@ export async function GET(request: Request) {
           .reduce((a, b) => a + b, 0);
 
         // Boost score if query words match prefix synonyms
-        const synonymBoost = inputArr
-          .filter((word) => {
+        const synonymBoost =
+          inputArr.filter((word) => {
             // Check if this query word matches a synonym token
-            return synonymTokens.has(word) || synonymTokens.has(cheapStem(word));
-          })
-          .length * -15; // Strong boost for each matching synonym word
+            return (
+              synonymTokens.has(word) || synonymTokens.has(cheapStem(word))
+            );
+          }).length * -15; // Strong boost for each matching synonym word
 
         // Extra boost for phrase matching: if the full input matches a synonym phrase
         const normalizedInput = normalize(input);
@@ -323,23 +338,28 @@ export async function GET(request: Request) {
           // Check if the input closely matches this synonym phrase
           if (phrase === normalizedInput) return true;
           // Also check if input is contained in phrase or vice versa for partial matches
-          if (phrase.includes(normalizedInput) || normalizedInput.includes(phrase)) {
+          if (
+            phrase.includes(normalizedInput) ||
+            normalizedInput.includes(phrase)
+          ) {
             return normalizedInput.length >= 8; // Only for reasonably long queries
           }
           return false;
         });
-        
+
         if (matchingSynonym) {
           // Base boost for matching a synonym phrase
           phraseBoost = -50;
-          
+
           // more boost if the course title actually contains words from the query
           // trying to prioritize relevant courses over generic courses in the same department
           const normalizedTitle = normalize(title);
-          const titleContainsQuery = inputArr.some(word => 
-            normalizedTitle.includes(word) || normalizedTitle.includes(cheapStem(word))
+          const titleContainsQuery = inputArr.some(
+            (word) =>
+              normalizedTitle.includes(word) ||
+              normalizedTitle.includes(cheapStem(word)),
           );
-          
+
           if (titleContainsQuery) {
             phraseBoost -= 100; // Much stronger boost for title relevance
           }
@@ -421,4 +441,3 @@ export async function GET(request: Request) {
     { status: 200 },
   );
 }
-
