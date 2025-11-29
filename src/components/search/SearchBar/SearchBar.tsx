@@ -191,111 +191,85 @@ export default function SearchBar(props: Props) {
     });
   }
 
-  //fetch new options, add tags if valid
-  function loadNewOptions(newInputValue: string) {
-    if (noResult !== null && newInputValue.startsWith(noResult)) {
-      loadNewCourseNameOptions(newInputValue);
-      return;
-    }
-    setLoading(true);
-    if (newInputValue.trim() === '') {
-      setOptions([]);
-      setLoading(false);
-      return;
-    }
-    fetch(
-      '/api/autocomplete?input=' +
-        encodeURIComponent(newInputValue) +
-        '&searchBy=both',
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.message !== 'success') {
-          throw new Error(data.data ?? data.message);
-        }
-        //remove currently chosen values
-        const filtered: SearchQuery[] = data.data.filter(
-          (item: SearchQuery) =>
-            value.findIndex((el) => searchQueryEqual(el, item)) === -1,
-        );
-        //add to chosen values if only one option and space
-        if (
-          // if the returned options minus already selected values is 1, then this
-          // means a space following should autocomplete the previous stuff to a chip
-          filtered.length === 1 &&
-          // if the next character the user typed was a space, then the chip should be autocompleted
-          // this looks at quickInputValue because it is always the most recent state of the field's string input,
-          // so requests that return later will still see that a space was typed after the text to be autocompleted,
-          // so it should autocomplete then when this is realized
-          quickInputValue.current.charAt(newInputValue.length) === ' '
-        ) {
-          // only add chip on space when it matches the full prof name
-          if (
-            (typeof filtered[0].profFirst === 'undefined' &&
-              typeof filtered[0].profLast === 'undefined') ||
-            searchQueryEqual(
-              {
-                profFirst: filtered[0].profFirst?.toLowerCase(),
-                profLast: filtered[0].profLast?.toLowerCase(),
-              },
-              decodeSearchQueryLabel(
-                quickInputValue.current.toLowerCase().trim(),
-              ),
-            )
-          ) {
-            addValue(filtered[0]);
-            const rest = quickInputValue.current
-              .slice(newInputValue.length)
-              .trimStart();
-            setInputValue(rest);
-            loadNewOptions(rest.trimEnd());
-          }
-        } else if (quickInputValue.current === newInputValue) {
-          //still valid options
-          if (!filtered.length) {
-            setNoResults(newInputValue);
-            loadNewCourseNameOptions(newInputValue);
-          }
-          setOptions(filtered.sort(sortByPrefixAndNumber));
-        }
-      })
-      .catch(() => {})
-      .finally(() => {
-        setLoading(false);
-      });
+//fetch new options, add tags if valid (merged endpoints, keep relevance order)
+async function loadNewOptions(newInputValue: string) {
+  setLoading(true);
+  const trimmed = newInputValue.trim();
+
+  if (trimmed === '') {
+    setOptions([]);
+    setNoResults(null);
+    setLoading(false);
+    return;
   }
 
-  //fetch new course name options
-  function loadNewCourseNameOptions(newInputValue: string) {
-    fetch(
-      '/api/courseNameAutocomplete?input=' + encodeURIComponent(newInputValue),
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.message !== 'success') {
-          throw new Error(data.data ?? data.message);
-        }
-        const formatted = data.data.map(
-          (item: { title: string; result: SearchQuery }) => ({
+  try {
+    const [autoRes, courseNameRes] = await Promise.all([
+      fetch(
+        '/api/autocomplete?input=' +
+          encodeURIComponent(trimmed) +
+          '&searchBy=both&limit=20',
+      ),
+      fetch(
+        '/api/courseNameAutocomplete?input=' +
+          encodeURIComponent(trimmed),
+      ),
+    ]);
+
+    const autoJson = await autoRes.json();
+    const courseNameJson = await courseNameRes.json();
+
+    const fromAuto: SearchQuery[] =
+      autoJson.message === 'success' ? autoJson.data : [];
+
+    const fromCourseNames: SearchQueryWithTitle[] =
+      courseNameJson.message === 'success'
+        ? (courseNameJson.data as { title: string; result: SearchQuery }[]
+          ).map((item) => ({
             ...item.result,
             title: item.title,
-          }),
-        );
-        //remove currently chosen values
-        const filtered = formatted.filter(
-          (item: SearchQueryWithTitle) =>
-            !value.some((el) => searchQueryEqual(el, item)),
-        );
-        if (quickInputValue.current === newInputValue) {
-          //still valid options
-          setOptions(filtered.sort(sortByPrefixAndNumber));
-        }
-      })
-      .catch(() => {})
-      .finally(() => {
-        setLoading(false);
-      });
+          }))
+        : [];
+
+    // graph results as SearchQueryWithTitle
+    const autoAsWithTitle = fromAuto as SearchQueryWithTitle[];
+
+    // IMPORTANT:
+    //  - courseNameAutocomplete is already relevance-sorted (Option B)
+    //  - autocomplete graph is good for codes/profs
+    // Put course-name results FIRST, keep their order
+    const merged: SearchQueryWithTitle[] = [
+      ...fromCourseNames,
+      ...autoAsWithTitle,
+    ];
+
+    // remove already-chosen chips
+    let filtered = merged.filter(
+      (item) =>
+        value.findIndex((el) => searchQueryEqual(el, item)) === -1,
+    );
+
+    // detect "code-like" query (e.g. "CS 1337") – for those we still like prefix+number sorting
+    const isCodeLike = /^[A-Za-z]{2,4}\s*\d{3,4}$/i.test(trimmed);
+
+    if (!filtered.length) {
+      setNoResults(trimmed);
+    } else {
+      setNoResults(null);
+    }
+
+    // only update options if the input hasn't changed while we were fetching
+    if (quickInputValue.current === newInputValue) {
+      setOptions(
+        isCodeLike ? filtered.sort(sortByPrefixAndNumber) : filtered,
+      );
+    }
+  } catch {
+    // ignore errors for now
+  } finally {
+    setLoading(false);
   }
+}
 
   //add value
   function addValue(newValue: SearchQuery) {
