@@ -67,11 +67,18 @@ export function LoadingSingleProfInfo() {
   );
 }
 
-type Props = {
-  rmp: RMP;
+type SyllabusData = {
+  weighting: { label: string; value: string }[];
+  grading: { grade: string; range: string }[];
+  summary: string;
 };
 
-export default function SingleProfInfo({ rmp }: Props) {
+type Props = {
+  rmp: RMP;
+  syllabus: SyllabusData;
+};
+
+export default function SingleProfInfo({ rmp, syllabus }: Props) {
   const [showMore, setShowMore] = useState(false);
   const [showSyllabus, setShowSyllabus] = useState(false);
 
@@ -202,26 +209,12 @@ export default function SingleProfInfo({ rmp }: Props) {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td className="px-2 py-1">Attendance</td>
-                      <td className="px-2 py-1">5%</td>
-                    </tr>
-                    <tr>
-                      <td className="px-2 py-1">Class Quiz</td>
-                      <td className="px-2 py-1">20%</td>
-                    </tr>
-                    <tr>
-                      <td className="px-2 py-1">Projects</td>
-                      <td className="px-2 py-1">20%</td>
-                    </tr>
-                    <tr>
-                      <td className="px-2 py-1">Midterm</td>
-                      <td className="px-2 py-1">25%</td>
-                    </tr>
-                    <tr>
-                      <td className="px-2 py-1">Final</td>
-                      <td className="px-2 py-1">30%</td>
-                    </tr>
+                    {syllabus.weighting.map((row, idx) => (
+                      <tr key={idx}>
+                        <td className="px-2 py-1">{row.label}</td>
+                        <td className="px-2 py-1">{row.value}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
 
@@ -234,26 +227,12 @@ export default function SingleProfInfo({ rmp }: Props) {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td className="px-2 py-1">A</td>
-                      <td className="px-2 py-1 whitespace-nowrap">90-100</td>
-                    </tr>
-                    <tr>
-                      <td className="px-2 py-1">B</td>
-                      <td className="px-2 py-1 whitespace-nowrap">80-89.9</td>
-                    </tr>
-                    <tr>
-                      <td className="px-2 py-1">C</td>
-                      <td className="px-2 py-1 whitespace-nowrap">70-79.9</td>
-                    </tr>
-                    <tr>
-                      <td className="px-2 py-1">D</td>
-                      <td className="px-2 py-1 whitespace-nowrap">60-69.9</td>
-                    </tr>
-                    <tr>
-                      <td className="px-2 py-1">F</td>
-                      <td className="px-2 py-1 whitespace-nowrap">0-59.9</td>
-                    </tr>
+                    {syllabus.grading.map((row, idx) => (
+                      <tr key={idx}>
+                        <td className="px-2 py-1">{row.grade}</td>
+                        <td className="px-2 py-1">{row.range}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -263,12 +242,7 @@ export default function SingleProfInfo({ rmp }: Props) {
                 id="ai-summary"
                 className="text-sm flex items-center  flex-1 min-h-[100px]"
               >
-                <p>
-                  Regular lecture attendance is mandatory. Attendance will be
-                  taken randomly at some lectures. Students who fail to follow
-                  the class material regularly are inviting scholastic
-                  difficulty.
-                </p>
+                <p>{syllabus.summary}</p>
               </div>
             </div>
           </div>

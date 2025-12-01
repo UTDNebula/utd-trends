@@ -832,7 +832,27 @@ export default function PlannerCard(props: PlannerCardProps) {
             {(latestMatchedSections.type === 'professor' ||
               latestMatchedSections.type === 'combo') &&
               latestMatchedSections.RMP && (
-                <SingleProfInfo rmp={latestMatchedSections.RMP} />
+                <SingleProfInfo
+                  rmp={latestMatchedSections.RMP}
+                  syllabus={{
+                    weighting: [
+                      { label: 'Attendance', value: '5%' },
+                      { label: 'Class Quiz', value: '20%' },
+                      { label: 'Projects', value: '20%' },
+                      { label: 'Midterm', value: '25%' },
+                      { label: 'Final', value: '30%' },
+                    ],
+                    grading: [
+                      { grade: 'A', range: '90-100' },
+                      { grade: 'B', range: '80-89.9' },
+                      { grade: 'C', range: '70-79.9' },
+                      { grade: 'D', range: '60-69.9' },
+                      { grade: 'F', range: '0-59.9' },
+                    ],
+                    summary:
+                      'Regular lecture attendance is mandatory. Attendance will be taken randomly at some lectures. Students who fail to follow the class material regularly are inviting scholastic difficulty.',
+                  }}
+                />
               )}
           </div>
         </Collapse>
