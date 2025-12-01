@@ -4,7 +4,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Chip, Collapse, Grid, IconButton, Skeleton } from '@mui/material';
 import Link from 'next/link';
 import React, { useState } from 'react';
-
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import type { RMP } from '@/modules/fetchRmp';
 
 export function LoadingSingleProfInfo() {
@@ -73,6 +73,7 @@ type Props = {
 
 export default function SingleProfInfo({ rmp }: Props) {
   const [showMore, setShowMore] = useState(false);
+  const [showSyllabus, setShowSyllabus] = useState(false);
 
   if (rmp.numRatings == 0) {
     return (
@@ -165,13 +166,113 @@ export default function SingleProfInfo({ rmp }: Props) {
       )}
 
       <Grid size={12}>
-        <Link
-          href={'https://www.ratemyprofessors.com/professor/' + rmp.legacyId}
-          target="_blank"
-          className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-        >
-          Visit Rate My Professors
-        </Link>
+        <div className="flex gap-7">
+          <Link
+            href={'https://www.ratemyprofessors.com/professor/' + rmp.legacyId}
+            target="_blank"
+            className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+          >
+            Visit Rate My Professors
+          </Link>
+
+          <button onClick={() => setShowSyllabus(!showSyllabus)}>
+            View Syllabus Summary{' '}
+            <ChevronRightIcon
+              className={`transition-transform ${showSyllabus ? 'rotate-90' : ''}`}
+            />
+          </button>
+        </div>
+        <Collapse in={showSyllabus}>
+          <div className="mt-4 rounded p-3">
+            <h3 className="font-bold text-xl mb-2">Syllabus Grading Summary</h3>
+            <hr className="mb-4" />
+
+            {/* Outer flex row: tables + AI summary */}
+            <div className="flex gap-8 items-center mt-2">
+              {/* Tables wrapper */}
+              <div className="tables-container flex gap-8">
+                {/* Weighting Table */}
+                <table className="text-sm">
+                  <thead>
+                    <tr>
+                      <th className="px-2 py-1 font-semibold text-lg">
+                        Weighting
+                      </th>
+                      <th className="px-2 py-1 font-semibold text-lg">%</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="px-2 py-1">Attendance</td>
+                      <td className="px-2 py-1">5%</td>
+                    </tr>
+                    <tr>
+                      <td className="px-2 py-1">Class Quiz</td>
+                      <td className="px-2 py-1">20%</td>
+                    </tr>
+                    <tr>
+                      <td className="px-2 py-1">Projects</td>
+                      <td className="px-2 py-1">20%</td>
+                    </tr>
+                    <tr>
+                      <td className="px-2 py-1">Midterm</td>
+                      <td className="px-2 py-1">25%</td>
+                    </tr>
+                    <tr>
+                      <td className="px-2 py-1">Final</td>
+                      <td className="px-2 py-1">30%</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                {/* Grade Scale Table */}
+                <table className="text-sm">
+                  <thead>
+                    <tr>
+                      <th className="px-2 py-1 font-semibold text-lg">Grade</th>
+                      <th className="px-2 py-1 font-semibold text-lg">Scale</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="px-2 py-1">A</td>
+                      <td className="px-2 py-1 whitespace-nowrap">90-100</td>
+                    </tr>
+                    <tr>
+                      <td className="px-2 py-1">B</td>
+                      <td className="px-2 py-1 whitespace-nowrap">80-89.9</td>
+                    </tr>
+                    <tr>
+                      <td className="px-2 py-1">C</td>
+                      <td className="px-2 py-1 whitespace-nowrap">70-79.9</td>
+                    </tr>
+                    <tr>
+                      <td className="px-2 py-1">D</td>
+                      <td className="px-2 py-1 whitespace-nowrap">60-69.9</td>
+                    </tr>
+                    <tr>
+                      <td className="px-2 py-1">F</td>
+                      <td className="px-2 py-1 whitespace-nowrap">0-59.9</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* AI Summary / Placeholder */}
+              <div
+                id="ai-summary"
+                className="text-sm flex items-center  flex-1 min-h-[100px]"
+              >
+                <p>
+                  Regular lecture attendance is mandatory. Attendance will be
+                  taken randomly at some lectures. Students who fail to follow
+                  the class material regularly are inviting scholastic
+                  difficulty.
+                </p>
+              </div>
+            </div>
+          </div>
+        </Collapse>
       </Grid>
     </Grid>
   );
