@@ -290,6 +290,7 @@ export default function SearchBar(props: Props) {
       if (value.some((el) => searchQueryEqual(el, item))) {
         return false;
       } // remove currently chosen values
+      console.log(searchQueryLabel(item));
       if (
         (searchQueryLabel(item) != undefined) &&
         !(
