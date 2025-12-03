@@ -117,13 +117,22 @@ export function SharedStateProvider({
   }
 
   function setPlannerSection(query: SearchQuery, section: string) {
+    if (
+      !planner.find((course) =>
+        searchQueryEqual(removeSection(course), removeSection(query)),
+      )
+    )
+      // if section's course-prof combo doesn't exist
+      setPlanner((prev: SearchQueryMultiSection[]) => prev.concat(query)); // add it to MyPlanner
     setPlanner((prev: SearchQueryMultiSection[]) =>
       prev.map((course) => {
         if (searchQueryEqual(removeSection(course), removeSection(query))) {
+          // combo match
           if (typeof course.sectionNumbers === 'undefined') {
             return { ...course, sectionNumbers: [section] };
           }
           if (course.sectionNumbers.includes(section)) {
+            // unselect section
             return {
               ...course,
               sectionNumbers: course.sectionNumbers.filter(
@@ -131,24 +140,42 @@ export function SharedStateProvider({
               ),
             };
           } else {
+            // select/add section
             let newSections = course.sectionNumbers;
             if (!sectionCanOverlap(section)) {
               newSections = newSections.filter((s) => sectionCanOverlap(s));
             }
             return {
               ...course,
-              sectionNumbers: newSections.concat([section]),
+              sectionNumbers: [section]
+                .concat(newSections)
+                .filter(
+                  (section, index, self) =>
+                    self.findIndex((s) => s.charAt(0) == section.charAt(0)) ===
+                    index,
+                ), // keep only one of each section type (X##)
             };
           }
         } else if (
+          // not combo match, but same course match -- to potentialy remove sections from a different combo
           searchQueryEqual(
             convertToCourseOnly(course),
             convertToCourseOnly(query),
           ) &&
           typeof course.sectionNumbers !== 'undefined'
         ) {
-          //to remove from a different combo
+          if (sectionCanOverlap(section))
+            // if new section can overlap, keep all existing sections (minus duplicate starting digit)
+            return {
+              ...course,
+              sectionNumbers: course.sectionNumbers.filter(
+                (sec, idx, self) =>
+                  self.findIndex((s) => s.charAt(0) == sec.charAt(0)) == idx,
+              ),
+            };
+
           return {
+            // else, new section cannot overlap, so remove all existing non-overlapping sections
             ...course,
             sectionNumbers: course.sectionNumbers.filter((s) =>
               sectionCanOverlap(s),
