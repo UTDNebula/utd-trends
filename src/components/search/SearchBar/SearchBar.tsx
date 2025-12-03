@@ -292,8 +292,7 @@ export default function SearchBar(props: Props) {
       } // remove currently chosen values
       console.log(searchQueryLabel(item));
       if (
-        (searchQueryLabel(item) != undefined) &&
-        !(
+        (
           searchQueryLabel(item)
             .toLowerCase()
             .includes(newInputValue.toLowerCase()) ||
