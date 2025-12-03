@@ -671,8 +671,8 @@ export default function SearchBar(props: Props) {
           disableElevation
           size="large"
           className={`self-stretch my-px px-4 shrink-0 normal-case relative ${value.length == 0
-              ? 'text-cornflower-200 dark:text-cornflower-700'
-              : ''
+            ? 'text-cornflower-200 dark:text-cornflower-700'
+            : ''
             }`} //darkens the text when no valid search terms are entered (pseudo-disables the search button)
           onClick={() => onSelect(value)}
         >
