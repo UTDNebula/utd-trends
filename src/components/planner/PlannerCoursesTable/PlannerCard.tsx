@@ -832,7 +832,11 @@ export default function PlannerCard(props: PlannerCardProps) {
             {(latestMatchedSections.type === 'professor' ||
               latestMatchedSections.type === 'combo') &&
               latestMatchedSections.RMP && (
-                <SingleProfInfo rmp={latestMatchedSections.RMP} />
+                <SingleProfInfo
+                  open={open && whichOpen === 'grades'}
+                  searchQuery={props.query}
+                  rmp={latestMatchedSections.RMP}
+                />
               )}
           </div>
         </Collapse>

@@ -5,7 +5,11 @@ import { Chip, Collapse, Grid, IconButton, Skeleton } from '@mui/material';
 import Link from 'next/link';
 import React, { useState } from 'react';
 
+import type { SearchQuery } from '@/types/SearchQuery';
 import type { RMP } from '@/modules/fetchRmp';
+import RmpSummary, {
+  LoadingRmpSummary,
+} from '@/components/common/RmpSummary/RmpSummary';
 
 export function LoadingSingleProfInfo() {
   const loadingTags = [
@@ -59,6 +63,10 @@ export function LoadingSingleProfInfo() {
       </Grid>
 
       <Grid size={12}>
+        <LoadingRmpSummary />
+      </Grid>
+
+      <Grid size={12}>
         <Skeleton variant="rounded">
           <p>Visit Rate My Professors</p>
         </Skeleton>
@@ -68,10 +76,12 @@ export function LoadingSingleProfInfo() {
 }
 
 type Props = {
+  open: boolean;
+  searchQuery: SearchQuery;
   rmp: RMP;
 };
 
-export default function SingleProfInfo({ rmp }: Props) {
+export default function SingleProfInfo({ open, searchQuery, rmp }: Props) {
   const [showMore, setShowMore] = useState(false);
 
   if (rmp.numRatings == 0) {
@@ -163,6 +173,10 @@ export default function SingleProfInfo({ rmp }: Props) {
           </div>
         </Grid>
       )}
+
+      <Grid size={12}>
+        <RmpSummary open={open} searchQuery={searchQuery} />
+      </Grid>
 
       <Grid size={12}>
         <Link
