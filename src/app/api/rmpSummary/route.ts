@@ -61,7 +61,7 @@ export async function GET(request: Request) {
       const mediaData = await fetch(cacheData.data.media_link, { headers });
       if (mediaData.ok) {
         return NextResponse.json(
-          { message: 'success', data: await mediaData.json() },
+          { message: 'success', data: await mediaData.text() },
           { status: 200 },
         );
       }
@@ -125,7 +125,7 @@ Summary requirements:
   const cacheResponse = await fetch(url, {
     method: 'POST',
     headers: headers,
-    body: JSON.stringify({ data: response.text }),
+    body: response.text,
   });
 
   if (!cacheResponse.ok) {
