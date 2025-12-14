@@ -35,7 +35,7 @@ export default function ClientLeft(props: Props) {
   const availability = searchParams.get('availability') === 'true';
 
   const results = use(props.resultsPromise);
-
+  const semesters = use(FiltersContext).semesters;
   const chosenSemesters = use(FiltersContext).chosenSemesters;
   const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
   const sectionTypes = use(FiltersContext).sectionTypes;
@@ -126,7 +126,11 @@ export default function ClientLeft(props: Props) {
     );
     if (
       (!hasChosenSemester || !hasChosenSectionTypes) &&
-      result.grades.length !== 0
+      !(
+        result.grades.length == 0 &&
+        chosenSemesters.length == semesters.length &&
+        chosenSectionTypes.length == sectionTypes.length
+      )
     )
       return false;
     return true;
