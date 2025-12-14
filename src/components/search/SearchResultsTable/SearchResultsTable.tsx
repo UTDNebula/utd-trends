@@ -429,7 +429,7 @@ export default function SearchResultsTable({
     }
   }
 
-  if (includedResults.length === 0 && unIncludedResults.length === 0) {
+  if (includedResults.length === 0 && secondaryIncludedResults.length === 0 && unIncludedResults.length === 0) {
     return (
       <div className="p-4">
         <Typography
