@@ -94,9 +94,10 @@ export async function GET(request: Request) {
 ${rmp.ratings.edges.map((rating) => rating.node.comment.replaceAll('\n', ' ').slice(0, 500)).join('\n')}
 
 Summary requirements:
-- Summarize the reviews in a concise and informative manner, synthesizing the most important and relevant information.
-- Be respectful but honest.
-- Respond in plain-text (no markdown), with no more than 100 words.
+- Summarize the reviews in a concise and informative manner.
+- Focus on the structure of the class, exams, projects, homeworks, and assignments.
+- Be respectful but honest, like a student writing to a peer.
+- Respond in plain-text (no markdown), in 30 words.
 `;
   const GEMINI_SERVICE_ACCOUNT = process.env.GEMINI_SERVICE_ACCOUNT;
   if (typeof GEMINI_SERVICE_ACCOUNT !== 'string') {
