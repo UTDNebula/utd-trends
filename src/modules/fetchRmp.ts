@@ -35,17 +35,18 @@ function buildProfessorSearchQuery(names: string[], reviews: boolean) {
                 teacherRatingTags { tagName tagCount }
                 ratingsDistribution { total r1 r2 r3 r4 r5 }
                 ${
-                  reviews &&
-                  `ratings (first: 100) {
+                  reviews
+                    ? `ratings (first: 100) {
                     edges {
                       node {
                         comment
                       }
                     }
                   }
+                `
+                    : ''
                 }
-              `
-                }
+              }
             }
           }
         }
