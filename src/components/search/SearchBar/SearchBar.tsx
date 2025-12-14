@@ -165,18 +165,21 @@ export default function SearchBar(props: Props) {
     'ex. MKT 3320',
     'ex. ANGM 3305 Robert Manriquez',
   ];
-  // Initialize with 0 to avoid hydration mismatch (Math.random() differs on server/client)
-  const [searchBarHintIndex, setSearchBarHintIndex] = useState<number>(0);
+  const [searchBarHintIndex, setSearchBarHintIndex] = useState<number>(
+    Math.floor(Math.random() * searchBarHints.length),
+  );
+
+  function changeHint() {
+    setSearchBarHintIndex(Math.floor(Math.random() * searchBarHints.length));
+  }
 
   useEffect(() => {
-    setSearchBarHintIndex(Math.floor(Math.random() * searchBarHints.length));
-
     const interval = setInterval(() => {
-      setSearchBarHintIndex(Math.floor(Math.random() * searchBarHints.length));
+      changeHint();
     }, 7000);
 
     return () => clearInterval(interval); // Cleanup when component unmounts
-  }, [searchBarHints.length]); // Only recreate if hints array changes
+  }, []); // run on mount
 
   // updateValue -> onSelect_internal -> updateQueries - clicking enter on an autocomplete suggestion in topMenu Searchbar
   // updateValue -> onSelect_internal -> onSelect (custom function) - clicking enter on an autocomplete suggestion in home page SearchBar
@@ -209,7 +212,7 @@ export default function SearchBar(props: Props) {
   }
 
   function onSelect(newValue: SearchQuery[]) {
-    setSearchBarHintIndex(Math.floor(Math.random() * searchBarHints.length));
+    changeHint();
     if (searchTerms == newValue.map((el) => searchQueryLabel(el)).join(','))
       // do not initiate a new search when the searchTerms haven't changed
       return;
