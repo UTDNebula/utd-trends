@@ -27,7 +27,7 @@ export function calculateGrades(
   sectionTypes?: string[],
 ) {
   let grade_distribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-  for (const session of grades) {
+  grades.forEach((session) => {
     if (typeof semesters === 'undefined' || semesters.includes(session._id)) {
       for (const sectionData of session.data) {
         if (
@@ -40,7 +40,7 @@ export function calculateGrades(
         }
       }
     }
-  }
+  });
 
   const total: number = grade_distribution.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
