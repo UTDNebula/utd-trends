@@ -1,9 +1,9 @@
 'use client';
 
 import { Skeleton, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-import type { SearchQuery } from '@/types/SearchQuery';
+import { type SearchQuery, searchQueryEqual } from '@/types/SearchQuery';
 
 export function LoadingRmpSummary() {
   return (
@@ -28,12 +28,18 @@ type Props = {
 };
 
 export default function RmpSummary({ open, searchQuery }: Props) {
+  const searchQueryRef = useRef(searchQuery);
   const [state, setState] = useState<'closed' | 'loading' | 'error' | 'done'>(
     'closed',
   );
   const [summary, setSummary] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!searchQueryEqual(searchQueryRef.current, searchQuery)) {
+      searchQueryRef.current = searchQuery;
+      setState('closed');
+      setSummary(null);
+    }
     if (open && state === 'closed') {
       setState('loading');
       const params = new URLSearchParams();
@@ -54,7 +60,7 @@ export default function RmpSummary({ open, searchQuery }: Props) {
           setSummary(data.data);
         });
     }
-  }, [open, state, searchQuery.profFirst, searchQuery.profLast]);
+  }, [open, state, searchQuery]);
 
   if (state === 'error') {
     return <p>Problem loading AI review summary.</p>;
