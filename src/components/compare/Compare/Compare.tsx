@@ -70,9 +70,15 @@ export default function Compare() {
                   (course.type !== 'combo'
                     ? ' (Overall)' //Indicates that this entry is an aggregate for the entire course/professor
                     : ''),
-                data: convertNumbersToPercents(
-                  calculateGrades(course.grades, chosenSemesters),
-                ),
+                data: Number.isNaN(
+                  convertNumbersToPercents(
+                    calculateGrades(course.grades, chosenSemesters),
+                  )[0],
+                )
+                  ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                  : convertNumbersToPercents(
+                      calculateGrades(course.grades, chosenSemesters),
+                    ),
               };
             })}
           />
