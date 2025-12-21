@@ -50,7 +50,7 @@ export async function GET(request: Request) {
     'x-api-key': API_KEY,
     'x-storage-key': API_STORAGE_KEY,
   };
-  const cache = await fetch(url, { headers, next: { revalidate: 3600 } });
+  const cache = await fetch(url, { headers});
   if (cache.ok) {
     const cacheData = await cache.json();
     // Cache is valid for 30 days
