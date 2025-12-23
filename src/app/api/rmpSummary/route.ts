@@ -50,7 +50,7 @@ export async function GET(request: Request) {
     'x-api-key': API_KEY,
     'x-storage-key': API_STORAGE_KEY,
   };
-  const cache = await fetch(url, { headers});
+  const cache = await fetch(url, { headers });
   if (cache.ok) {
     const cacheData = await cache.json();
     // Cache is valid for 30 days
@@ -58,7 +58,7 @@ export async function GET(request: Request) {
       new Date(cacheData.data.updated) >
       new Date(Date.now() - 1000 * 60 * 60 * 24 * 30)
     ) {
-      const mediaData = await fetch(cacheData.data.media_link, { headers });
+      const mediaData = await fetch(cacheData.data.media_link);
       if (mediaData.ok) {
         return NextResponse.json(
           { message: 'success', data: await mediaData.text() },

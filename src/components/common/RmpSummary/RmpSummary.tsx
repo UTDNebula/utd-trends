@@ -1,6 +1,6 @@
 'use client';
 
-import { Skeleton, Typography } from '@mui/material';
+import { Skeleton, Tooltip, Typography } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { type SearchQuery, searchQueryEqual } from '@/types/SearchQuery';
@@ -73,12 +73,17 @@ export default function RmpSummary({ open, searchQuery }: Props) {
   return (
     <>
       <p>{summary}</p>
-      <Typography
-        variant="overline"
-        className="text-gray-700 dark:text-gray-300"
+      <Tooltip
+        title="This summary is AI generated. Please double check any important information"
+        placement="right"
       >
-        AI REVIEW SUMMARY
-      </Typography>
+        <Typography
+          variant="overline"
+          className="text-gray-700 dark:text-gray-300"
+        >
+          AI REVIEW SUMMARY
+        </Typography>
+      </Tooltip>
     </>
   );
 }
