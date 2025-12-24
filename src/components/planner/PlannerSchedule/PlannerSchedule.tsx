@@ -2,11 +2,18 @@ import React from 'react';
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection';
+import { useSnackbar } from '@/contexts/SnackbarContext';
 import {
   convertToCourseOnly,
+  removeSection,
   searchQueryLabel,
   searchQueryMultiSectionSplit,
+  type SearchQuery,
 } from '@/types/SearchQuery';
+import type { SectionsData } from '@/modules/fetchSections';
+import { parseTime } from '@/modules/timeUtils';
+import { useSearchresults } from '@/modules/plannerFetch';
+import PreviewSectionGroup from './PreviewSectionGroup';
 
 // hours shown (24-hour time)
 export const START_HOUR = 8;
@@ -59,11 +66,24 @@ function HourRow(props: HourRowProps) {
 }
 
 export default function PlannerSchedule() {
-  const { planner, plannerColorMap } = useSharedState();
+  const {
+    planner,
+    plannerColorMap,
+    previewCourses,
+    setPlannerSection,
+    latestSemester,
+  } = useSharedState();
 
-  const courses = planner.flatMap((searchQuery) =>
-    searchQueryMultiSectionSplit(searchQuery),
-  );
+  const { showConflictMessage } = useSnackbar();
+
+  const allResults = useSearchresults(planner);
+  const latestSections = allResults.map((r) =>
+    r.isSuccess
+      ? r.data.sections.filter(
+          (s) => s.academic_session.name === latestSemester,
+        )
+      : [],
+  ); // all the sections for each course in the planner for the latest semester
 
   return (
     <div
@@ -86,19 +106,247 @@ export default function PlannerSchedule() {
         <HourRow key={i} hour={i + START_HOUR} />
       ))}
 
-      {courses.map((course) => {
-        if (!course.sectionNumber) return null;
-        return (
-          <PlannerSection
-            key={searchQueryLabel(course)}
-            selectedSection={course.sectionNumber}
-            course={course}
-            color={
-              plannerColorMap[searchQueryLabel(convertToCourseOnly(course))]
+      {/* Preview Sessions Overlay */}
+      {(() => {
+        // Collect all sections from all courses into a flat array
+        const allSections: SectionsData = [];
+
+        const selectedSections = planner
+          .map((searchQuery) => searchQueryMultiSectionSplit(searchQuery))
+          .flatMap((queries, idx) => {
+            return queries.map((query) => {
+              return latestSections[idx].find(
+                (section) =>
+                  section.section_number.toLowerCase() ===
+                  query.sectionNumber?.toLowerCase(),
+              );
+            });
+          })
+          .filter((section) => typeof section !== 'undefined');
+
+        previewCourses.forEach((previewCourse) => {
+          // filter out sections that are already selected
+          const filteredSections: SectionsData = latestSections
+            .flatMap((s) => s)
+            .filter(
+              (sec, idx, self) =>
+                self.findIndex((s) => sec._id == s._id) == idx,
+            )
+            .filter(
+              (section) =>
+                section.course_details &&
+                section.course_details[0] &&
+                section.course_details[0].subject_prefix ===
+                  previewCourse.prefix &&
+                section.course_details[0].course_number ===
+                  previewCourse.number &&
+                (!previewCourse.profFirst ||
+                  (section.professor_details &&
+                    section.professor_details.find(
+                      (p) =>
+                        p.first_name == previewCourse.profFirst &&
+                        p.last_name == previewCourse.profLast,
+                    ))),
+            );
+
+          // Add all sections to the flat array
+          filteredSections.forEach((section) => {
+            if (allSections.find((s) => s._id == section._id) === undefined)
+              allSections.push(section);
+          });
+        });
+
+        // Now group the flat array by meeting times
+        const groupedSectionsTemp = allSections.reduce(
+          (acc, section) => {
+            const key = section.meetings
+              .map(
+                (meeting) =>
+                  meeting.meeting_days.sort().join(',') +
+                  meeting.start_time +
+                  meeting.end_time,
+              )
+              .join('-');
+            if (!acc[key]) {
+              acc[key] = { sections: [], selected: undefined };
             }
-          />
+            acc[key].sections.push(section);
+            return acc;
+          },
+          {} as Record<
+            string,
+            { sections: SectionsData; selected?: SectionsData[number] }
+          >,
         );
-      })}
+
+        selectedSections.forEach((section) => {
+          const key = section.meetings
+            .map(
+              (meeting) =>
+                meeting.meeting_days.sort().join(',') +
+                meeting.start_time +
+                meeting.end_time,
+            )
+            .join('-');
+          if (key in groupedSectionsTemp) {
+            groupedSectionsTemp[key].selected = section;
+            groupedSectionsTemp[key].sections = groupedSectionsTemp[
+              key
+            ].sections.filter((s) => section._id != s._id);
+          } else {
+            groupedSectionsTemp[key] = { sections: [], selected: section };
+          }
+        });
+
+        const groupedSections = Object.values(groupedSectionsTemp);
+
+        // Add scoot logic: scoot later sections right.
+        const sectionsWithScoot = groupedSections
+          .sort((a, b) => {
+            const aObj = a.selected ?? a.sections[0];
+            const bObj = b.selected ?? b.sections[0];
+            const timeA = aObj.meetings[0]?.start_time || '';
+            const timeB = bObj.meetings[0]?.start_time || '';
+            const daysA = aObj.meetings[0]?.meeting_days || [];
+            const daysB = bObj.meetings[0]?.meeting_days || [];
+
+            // Convert to comparable format (24-hour) with weekday consideration
+            return parseTime(timeA, daysA) - parseTime(timeB, daysB);
+          })
+          .map((sectionGroup, index, self) => {
+            // Calculate scoot value based on overlapping times
+            let scootCounter = 0;
+
+            const previewSec =
+              sectionGroup.selected ?? sectionGroup.sections[0];
+
+            const currentSection = previewSec;
+            const currentStartTime = currentSection?.meetings[0]?.start_time;
+            const currentDays = currentSection?.meetings[0]?.meeting_days || [];
+
+            // iterate through sections by start time.
+            // basically scoot ="number of sections overlapping with the current section"
+            // when we come across a start, scootCounter++
+            // when we come across an end, scootCounter--
+            for (let i = 0; i < index; i++) {
+              const prevSection = self[i].selected ?? self[i].sections[0];
+              const prevEndTime = prevSection?.meetings[0]?.end_time;
+              const prevDays = prevSection?.meetings[0]?.meeting_days || [];
+
+              if (prevEndTime && currentStartTime) {
+                const prevEndMinutes = parseTime(prevEndTime, prevDays);
+                const currentStartMinutes = parseTime(
+                  currentStartTime,
+                  currentDays,
+                );
+
+                // Check if sections meet on the same day and if there's overlap
+                const hasCommonDay = prevDays.some((day) =>
+                  currentDays.includes(day),
+                );
+
+                // If previous section hasn't ended yet and they meet on the same day, increment scoot
+                if (hasCommonDay && prevEndMinutes > currentStartMinutes) {
+                  scootCounter++;
+                }
+              }
+            }
+
+            return {
+              sectionGroup,
+              scoot: scootCounter,
+            };
+          });
+
+        return sectionsWithScoot.flatMap(({ sectionGroup, scoot }, index) => {
+          const firstItem = sectionGroup.selected || sectionGroup.sections[0];
+
+          const courseKey =
+            (firstItem.course_details && firstItem.course_details[0]
+              ? firstItem.course_details[0].subject_prefix +
+                ' ' +
+                firstItem.course_details[0].course_number
+              : '') +
+            (firstItem.professor_details && firstItem.professor_details[0]
+              ? ' ' +
+                firstItem.professor_details
+                  .map((p) => p.first_name + ' ' + p.last_name)
+                  .join(' ')
+              : '');
+
+          if (
+            sectionGroup.sections.length + (sectionGroup.selected ? 1 : 0) >
+            1
+          ) {
+            // need a preview section group
+            return (
+              <PreviewSectionGroup
+                key={`preview-group-${courseKey}-${index}`}
+                sectionGroup={sectionGroup.sections}
+                plannerColorMap={plannerColorMap}
+                showConflictMessage={showConflictMessage}
+                index={index}
+                scoot={scoot}
+                selected={sectionGroup.selected}
+              />
+            );
+          } else {
+            // single preview section
+            const section = sectionGroup.selected ?? sectionGroup.sections[0];
+            const previewCourseWithSection = {
+              prefix:
+                section.course_details && section.course_details[0]
+                  ? section.course_details[0].subject_prefix
+                  : null,
+              number:
+                section.course_details && section.course_details[0]
+                  ? section.course_details[0].course_number
+                  : null,
+              profFirst:
+                section.professor_details && section.professor_details[0]
+                  ? section.professor_details[0].first_name
+                  : null,
+              profLast:
+                section.professor_details && section.professor_details[0]
+                  ? section.professor_details[0].last_name
+                  : null,
+              sectionNumber: section.section_number,
+            } as SearchQuery;
+            const courseKey = searchQueryLabel(
+              convertToCourseOnly(previewCourseWithSection),
+            );
+            const color = plannerColorMap[courseKey];
+
+            return (
+              <PlannerSection
+                key={`preview-single-${searchQueryLabel(removeSection(previewCourseWithSection))}-${section?._id}-${index}`}
+                sectionNumber={section.section_number}
+                course={previewCourseWithSection}
+                color={color}
+                isPreview={!sectionGroup.selected}
+                canExpand={false}
+                scoot={scoot}
+                onSectionClick={() => {
+                  setPlannerSection(
+                    section,
+                    selectedSections,
+                    selectedSections.some(
+                      (s) =>
+                        s.section_number.toLowerCase() ===
+                          section.section_number.toLowerCase() &&
+                        s.course_details?.[0].subject_prefix ===
+                          section.course_details?.[0].subject_prefix &&
+                        s.course_details?.[0].course_number ===
+                          section.course_details?.[0].course_number,
+                    ),
+                    showConflictMessage,
+                  );
+                }}
+              />
+            );
+          }
+        });
+      })()}
     </div>
   );
 }

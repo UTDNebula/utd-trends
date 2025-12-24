@@ -9,6 +9,7 @@ import { Bai_Jamjuree, Inter } from 'next/font/google';
 import React from 'react';
 
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
+import { SnackbarProvider } from '@/contexts/SnackbarContext';
 import theme from '@/modules/theme';
 
 import { SharedStateProvider } from './SharedStateProvider';
@@ -83,7 +84,7 @@ export default async function RootLayout({
           <ThemeProvider theme={theme}>
             <QueryProvider>
               <SharedStateProvider latestSemester={latestSemester}>
-                {children}
+                <SnackbarProvider>{children}</SnackbarProvider>
                 <ReactQueryDevtools initialIsOpen={false} />
               </SharedStateProvider>
             </QueryProvider>

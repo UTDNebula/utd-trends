@@ -1,5 +1,5 @@
 import { Tooltip } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   DAYS,
@@ -8,14 +8,44 @@ import {
 import { type SearchQuery } from '@/types/SearchQuery';
 import { useSearchResult } from '@/modules/plannerFetch';
 import { useSharedState } from '@/app/SharedStateProvider';
+import { KeyboardArrowDown } from '@mui/icons-material';
 
 interface PlannerSectionComponentProps {
-  selectedSection: string;
+  scoot?: number;
+  sectionNumber: string;
   course: SearchQuery;
-  color: { fill: string; outline: string; font: string };
+  color: { fill: string; outline: string; font: string; filter?: string };
+  isPreview?: boolean;
+  nooffset?: boolean;
+  canExpand?: boolean;
+  coursesInGroup?: string[];
+  onSectionClick?: (
+    course: SearchQuery,
+    sectionNumber: string,
+    event?: React.MouseEvent,
+  ) => void;
+  onSectionHover?: (
+    course: SearchQuery,
+    sectionNumber: string,
+    isHovered: boolean,
+  ) => void;
 }
 
+const previewColor = (color: {
+  fill: string;
+  outline: string;
+  font: string;
+}) => {
+  return {
+    fill: color.fill,
+    outline: color.outline,
+    font: color.font,
+    filter: 'saturate(0.2) opacity(0.7)',
+  };
+};
+
 export default function PlannerSection(props: PlannerSectionComponentProps) {
+  const [isHovered, setIsHovered] = useState(false);
   const { latestSemester } = useSharedState();
   const result = useSearchResult(props.course);
   if (!result.isSuccess || result.data.type === 'professor') {
@@ -23,11 +53,93 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
   }
   const selectedSection = result.data.sections.find(
     (s) =>
-      s.section_number === props.selectedSection &&
+      s.section_number === props.sectionNumber &&
       s.academic_session.name === latestSemester,
   );
   if (selectedSection === undefined) return null;
   const courseName = result.data.courseName;
+
+  // If nooffset is true, return a simple non-positioned element
+  if (props.nooffset) {
+    const currentColor = props.isPreview
+      ? isHovered
+        ? props.color
+        : previewColor(props.color)
+      : props.color;
+
+    return (
+      <div
+        className="p-2 rounded-xl border-2 m-1 cursor-pointer"
+        style={{
+          backgroundColor: currentColor.fill,
+          borderColor: isHovered ? 'red' : currentColor.outline,
+          color: currentColor.font,
+          filter: currentColor.filter,
+        }}
+        role="button"
+        tabIndex={0}
+        onMouseEnter={() => {
+          if (props.isPreview) {
+            setIsHovered(true);
+            props.onSectionHover?.(
+              props.course,
+              selectedSection.section_number,
+              true,
+            );
+          }
+        }}
+        onMouseLeave={() => {
+          if (props.isPreview) {
+            setIsHovered(false);
+            props.onSectionHover?.(
+              props.course,
+              selectedSection.section_number,
+              false,
+            );
+          }
+        }}
+        onClick={(event) => {
+          if (props.isPreview && props.onSectionClick && selectedSection) {
+            props.onSectionClick(
+              props.course,
+              selectedSection.section_number,
+              event,
+            );
+          }
+          setIsHovered(false);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            if (props.isPreview && props.onSectionClick && selectedSection) {
+              props.onSectionClick(
+                props.course,
+                selectedSection.section_number,
+              );
+            }
+          }
+        }}
+      >
+        <div className="font-semibold text-center text-sm">
+          {props.course.prefix} {props.course.number}.
+          {selectedSection.section_number}
+        </div>
+        <div className="text-xs text-center">
+          {props.course.profFirst} {props.course.profLast}
+        </div>
+        <div className="text-xs text-center">
+          {selectedSection.meetings[0]?.location?.building}{' '}
+          {selectedSection.meetings[0]?.location?.room}
+        </div>
+      </div>
+    );
+  }
+
+  const currentColor = props.isPreview
+    ? isHovered
+      ? props.color
+      : previewColor(props.color)
+    : props.color;
 
   const meetings: string[][] = [];
   for (let j = 0; j < selectedSection.meetings.length; j++) {
@@ -106,59 +218,136 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
           },
         }}
       >
-        <div
+        <button
+          type="button"
           style={
             {
               '--start-col': x[0],
               '--start-row': x[1],
               '--offset': x[3] + '%',
               '--height': x[2] + '%',
-              backgroundColor: props.color.fill,
-              borderColor: props.color.outline,
-              color: props.color.font,
+              '--left-offset': props.scoot ? `${props.scoot * 15}%` : '0%',
+              backgroundColor: currentColor.fill,
+              borderColor: isHovered ? 'red' : currentColor.outline,
+              color: currentColor.font,
+              filter: currentColor.filter,
+              zIndex: (props.scoot || 0) + (props.isPreview ? 0 : 10),
             } as React.CSSProperties
           }
           className={`col-start-[var(--start-col)] col-span-1 
             row-start-[var(--start-row)] row-span-1 relative 
             top-[var(--offset)] h-[var(--height)] overflow-hidden 
             rounded-xl border-2
-            ml-1 leading-relaxed`}
-        >
-          <div
-            className={
-              'font-semibold text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
-              (makeBigger ? 'text-sm' : 'text-xs leading-none')
+            ml-[var(--left-offset)] leading-relaxed ${props.isPreview ? 'cursor-pointer' : ''}`}
+          onMouseEnter={() => {
+            if (props.isPreview) {
+              setIsHovered(true);
+              props.onSectionHover?.(
+                props.course,
+                selectedSection.section_number,
+                true,
+              );
             }
-          >
-            {selectedSection.course_details && selectedSection.course_details[0]
-              ? selectedSection.course_details[0].subject_prefix +
-                ' ' +
-                selectedSection.course_details[0].course_number
-              : ''}
-            .{selectedSection.section_number}
-          </div>
-          {selectedSection.professor_details &&
-            selectedSection.professor_details.map((prof) => (
+          }}
+          onMouseLeave={() => {
+            setIsHovered(false);
+            if (props.isPreview) {
+              props.onSectionHover?.(
+                props.course,
+                selectedSection.section_number,
+                false,
+              );
+            }
+          }}
+          onClick={(event) => {
+            if (props.onSectionClick && selectedSection) {
+              props.onSectionClick(
+                props.course,
+                selectedSection.section_number,
+                event,
+              );
+            }
+          }}
+        >
+          {!props.canExpand || !props.isPreview ? (
+            <>
               <div
-                key={prof._id}
+                className={
+                  'font-semibold text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+                  (makeBigger ? 'text-sm' : 'text-xs leading-none')
+                }
+              >
+                {selectedSection.course_details &&
+                selectedSection.course_details[0]
+                  ? selectedSection.course_details[0].subject_prefix +
+                    ' ' +
+                    selectedSection.course_details[0].course_number
+                  : ''}
+                .{selectedSection.section_number}
+              </div>
+              {selectedSection.professor_details &&
+                selectedSection.professor_details[0] &&
+                selectedSection.professor_details.map((prof) => (
+                  <div
+                    key={prof._id}
+                    className={
+                      'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+                      (makeBigger ? '' : 'leading-none')
+                    }
+                  >
+                    {prof.first_name + ' ' + prof.last_name}
+                  </div>
+                ))}
+              <div
                 className={
                   'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
                   (makeBigger ? '' : 'leading-none')
                 }
               >
-                {prof.first_name + ' ' + prof.last_name}
+                {props.canExpand ? (
+                  <KeyboardArrowDown className="mx-auto -my-1" />
+                ) : (
+                  selectedSection.meetings[0]?.location?.building +
+                  ' ' +
+                  selectedSection.meetings[0]?.location?.room
+                )}
               </div>
-            ))}
-          <div
-            className={
-              'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
-              (makeBigger ? '' : 'leading-none')
-            }
-          >
-            {selectedSection.meetings[0]?.location?.building}{' '}
-            {selectedSection.meetings[0]?.location?.room}
-          </div>
-        </div>
+            </>
+          ) : (
+            <>
+              <div
+                className={
+                  'font-semibold text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+                  (makeBigger ? 'text-sm' : 'text-xs leading-none')
+                }
+              >
+                Multiple Sections
+              </div>
+              <div
+                className={
+                  'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+                  (makeBigger ? '' : 'leading-none')
+                }
+              >
+                {props.coursesInGroup?.join(', ')}
+              </div>
+              <div
+                className={
+                  'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+                  (makeBigger ? '' : 'leading-none')
+                }
+              >
+                {props.canExpand ? (
+                  <KeyboardArrowDown className="mx-auto -my-1" />
+                ) : (
+                  selectedSection.meetings[0]?.location?.building +
+                  ' ' +
+                  selectedSection.meetings[0]?.location?.room
+                )}
+              </div>
+            </>
+          )}
+        </button>
       </Tooltip>
     );
   });

@@ -97,15 +97,13 @@ export function convertToCourseOnly(
 export function isProfessorQuery(
   searchQuery: SearchQuery,
 ): searchQuery is SearchQuery & { profFirst: string; profLast: string } {
-  return (
-    searchQuery.profFirst !== undefined && searchQuery.profLast !== undefined
-  );
+  return searchQuery.profFirst != null && searchQuery.profLast != null;
 }
 
 export function isCourseQuery(
   searchQuery: SearchQuery,
 ): searchQuery is SearchQuery & { prefix: string; number: string } {
-  return searchQuery.prefix !== undefined && searchQuery.number !== undefined;
+  return searchQuery.prefix != null && searchQuery.number != null;
 }
 
 export function removeSection(
