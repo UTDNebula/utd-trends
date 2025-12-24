@@ -74,9 +74,6 @@ export default function PlannerSchedule() {
     latestSemester,
   } = useSharedState();
 
-  const courses = planner.flatMap((searchQuery) =>
-    searchQueryMultiSectionSplit(searchQuery),
-  );
   const { showConflictMessage } = useSnackbar();
 
   const allResults = useSearchresults(planner);
