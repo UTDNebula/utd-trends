@@ -22,6 +22,7 @@ interface PreviewSectionGroupProps {
   showConflictMessage: () => void;
   index: number;
   scoot?: number;
+  selected?: SectionsData[number];
 }
 
 export default function PreviewSectionGroup({
@@ -30,6 +31,7 @@ export default function PreviewSectionGroup({
   showConflictMessage,
   index,
   scoot = 0,
+  selected,
 }: PreviewSectionGroupProps) {
   const { setPlannerSection } = useSharedState();
   const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null);
@@ -45,7 +47,7 @@ export default function PreviewSectionGroup({
       : [],
   ); // all the sections for each course in the planner for the latest semester
 
-  const firstSection = sectionGroup[0];
+  const firstSection = selected || sectionGroup[0];
   if (!firstSection) {
     return null;
   }
@@ -91,11 +93,11 @@ export default function PreviewSectionGroup({
       <PlannerSection
         key={`preview-${searchQueryLabel(removeSection(previewFirstCourseWithSection))}-${firstSection._id}-${index}`}
         nooffset={false}
-        placeholder={true}
+        canExpand={true}
         sectionNumber={firstSection.section_number}
         course={previewFirstCourseWithSection}
         color={color}
-        isPreview={true}
+        isPreview={!selected}
         coursesInGroup={sectionGroup.reduce(
           (acc, section) =>
             acc.includes(

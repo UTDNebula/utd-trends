@@ -17,7 +17,7 @@ interface PlannerSectionComponentProps {
   color: { fill: string; outline: string; font: string; filter?: string };
   isPreview?: boolean;
   nooffset?: boolean;
-  placeholder?: boolean;
+  canExpand?: boolean;
   coursesInGroup?: string[];
   onSectionClick?: (
     course: SearchQuery,
@@ -106,6 +106,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               event,
             );
           }
+          setIsHovered(false)
         }}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
@@ -230,7 +231,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               borderColor: isHovered ? 'red' : currentColor.outline,
               color: currentColor.font,
               filter: currentColor.filter,
-              zIndex: props.scoot || 0,
+              zIndex:  (props.scoot || 0) + (props.isPreview ? 0 : 10),
             } as React.CSSProperties
           }
           className={`col-start-[var(--start-col)] col-span-1 
@@ -249,8 +250,8 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
             }
           }}
           onMouseLeave={() => {
+            setIsHovered(false);
             if (props.isPreview) {
-              setIsHovered(false);
               props.onSectionHover?.(
                 props.course,
                 selectedSection.section_number,
@@ -259,7 +260,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
             }
           }}
           onClick={(event) => {
-            if (props.isPreview && props.onSectionClick && selectedSection) {
+            if (props.onSectionClick && selectedSection) {
               props.onSectionClick(
                 props.course,
                 selectedSection.section_number,
@@ -268,7 +269,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
             }
           }}
         >
-          {!props.placeholder ? (
+          {!props.canExpand || !props.isPreview ? (
             <>
               <div
                 className={
@@ -303,7 +304,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
                   (makeBigger ? '' : 'leading-none')
                 }
               >
-                {props.placeholder ? (
+                {props.canExpand ? (
                   <KeyboardArrowDown className="mx-auto -my-1" />
                 ) : (
                   selectedSection.meetings[0]?.location?.building +
@@ -336,7 +337,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
                   (makeBigger ? '' : 'leading-none')
                 }
               >
-                {props.placeholder ? (
+                {props.canExpand ? (
                   <KeyboardArrowDown className="mx-auto -my-1" />
                 ) : (
                   selectedSection.meetings[0]?.location?.building +

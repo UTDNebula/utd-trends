@@ -109,21 +109,6 @@ export default function PlannerSchedule() {
         <HourRow key={i} hour={i + START_HOUR} />
       ))}
 
-      {courses.map((course) => {
-        if (!course.sectionNumber) return null;
-        return (
-          <PlannerSection
-            key={searchQueryLabel(course)}
-            scoot={0}
-            sectionNumber={course.sectionNumber}
-            course={course}
-            color={
-              plannerColorMap[searchQueryLabel(convertToCourseOnly(course))]
-            }
-          />
-        );
-      })}
-
       {/* Preview Sessions Overlay */}
       {(() => {
         // Collect all sections from all courses into a flat array
@@ -134,7 +119,7 @@ export default function PlannerSchedule() {
           .flatMap((queries, idx) => {
             return queries.map((query) => {
               return latestSections[idx].find(
-                (section) => section.section_number === query.sectionNumber,
+                (section) => section.section_number.toLowerCase() === query.sectionNumber?.toLowerCase(),
               );
             });
           })
@@ -163,28 +148,7 @@ export default function PlannerSchedule() {
                         p.first_name == previewCourse.profFirst &&
                         p.last_name == previewCourse.profLast,
                     ))),
-            )
-            .filter(
-              // not same section
-              (section) =>
-                !selectedSections.find(
-                  (s) =>
-                    s.section_number == section.section_number &&
-                    s.course_details &&
-                    s.course_details[0] &&
-                    section.course_details &&
-                    section.course_details[0] &&
-                    s.course_details[0].subject_prefix ==
-                      section.course_details[0].subject_prefix &&
-                    s.course_details[0].course_number ==
-                      section.course_details[0].course_number,
-                ),
             );
-          // TODO: re-enable conflict detection perchance
-          // .filter((section) => {
-          //   const selectedSections = getSelectedSections(planner, sections);
-          //   return !hasConflict(section, selectedSections);
-          // });
 
           // Add all sections to the flat array
           filteredSections.forEach((section) => {
@@ -194,34 +158,58 @@ export default function PlannerSchedule() {
         });
 
         // Now group the flat array by meeting times
-        const groupedSections = Object.values(
-          allSections.reduce(
-            (acc, section) => {
-              const key = section.meetings
-                .map(
-                  (meeting) =>
-                    meeting.meeting_days.sort().join(',') +
-                    meeting.start_time +
-                    meeting.end_time,
-                )
-                .join('-');
-              if (!acc[key]) {
-                acc[key] = [];
-              }
-              acc[key].push(section);
-              return acc;
-            },
-            {} as Record<string, SectionsData>,
-          ),
+        let groupedSectionsTemp = allSections.reduce(
+          (acc, section) => {
+            const key = section.meetings
+              .map(
+                (meeting) =>
+                  meeting.meeting_days.sort().join(',') +
+                  meeting.start_time +
+                  meeting.end_time,
+              )
+              .join('-');
+            if (!acc[key]) {
+              acc[key] = { sections: [], selected: undefined };
+            }
+            acc[key].sections.push(section);
+            return acc;
+          },
+          {} as Record<
+            string,
+            { sections: SectionsData; selected?: SectionsData[number] }
+          >,
         );
+
+        selectedSections.forEach((section) => {
+          const key = section.meetings
+            .map(
+              (meeting) =>
+                meeting.meeting_days.sort().join(',') +
+                meeting.start_time +
+                meeting.end_time,
+            )
+            .join('-');
+          if (key in groupedSectionsTemp) {
+            groupedSectionsTemp[key].selected = section;
+            groupedSectionsTemp[key].sections = groupedSectionsTemp[
+              key
+            ].sections.filter((s) => section._id != s._id);
+          } else {
+            groupedSectionsTemp[key] = { sections: [], selected: section };
+          }
+        });
+
+        const groupedSections = Object.values(groupedSectionsTemp);
 
         // Add scoot logic: scoot later sections right.
         const sectionsWithScoot = groupedSections
           .sort((a, b) => {
-            const timeA = a[0].meetings[0]?.start_time || '';
-            const timeB = b[0].meetings[0]?.start_time || '';
-            const daysA = a[0].meetings[0]?.meeting_days || [];
-            const daysB = b[0].meetings[0]?.meeting_days || [];
+            const aObj = a.selected ?? a.sections[0];
+            const bObj = b.selected ?? b.sections[0];
+            const timeA = aObj.meetings[0]?.start_time || '';
+            const timeB = bObj.meetings[0]?.start_time || '';
+            const daysA = aObj.meetings[0]?.meeting_days || [];
+            const daysB = bObj.meetings[0]?.meeting_days || [];
 
             // Convert to comparable format (24-hour) with weekday consideration
             return parseTime(timeA, daysA) - parseTime(timeB, daysB);
@@ -230,7 +218,10 @@ export default function PlannerSchedule() {
             // Calculate scoot value based on overlapping times
             let scootCounter = 0;
 
-            const currentSection = sectionGroup[0];
+            const previewSec =
+              sectionGroup.selected ?? sectionGroup.sections[0];
+
+            const currentSection = previewSec;
             const currentStartTime = currentSection?.meetings[0]?.start_time;
             const currentDays = currentSection?.meetings[0]?.meeting_days || [];
 
@@ -239,7 +230,7 @@ export default function PlannerSchedule() {
             // when we come across a start, scootCounter++
             // when we come across an end, scootCounter--
             for (let i = 0; i < index; i++) {
-              const prevSection = self[i][0];
+              const prevSection = self[i].selected ?? self[i].sections[0];
               const prevEndTime = prevSection?.meetings[0]?.end_time;
               const prevDays = prevSection?.meetings[0]?.meeting_days || [];
 
@@ -269,7 +260,8 @@ export default function PlannerSchedule() {
           });
 
         return sectionsWithScoot.flatMap(({ sectionGroup, scoot }, index) => {
-          const firstItem = sectionGroup[0];
+          const firstItem = sectionGroup.selected || sectionGroup.sections[0];
+
           const courseKey =
             (firstItem.course_details && firstItem.course_details[0]
               ? firstItem.course_details[0].subject_prefix +
@@ -283,21 +275,25 @@ export default function PlannerSchedule() {
                   .join(' ')
               : '');
 
-          if (sectionGroup.length > 1) {
+          if (
+            sectionGroup.sections.length + (sectionGroup.selected ? 1 : 0) >
+            1
+          ) {
             // need a preview section group
             return (
               <PreviewSectionGroup
                 key={`preview-group-${courseKey}-${index}`}
-                sectionGroup={sectionGroup}
+                sectionGroup={sectionGroup.sections}
                 plannerColorMap={plannerColorMap}
                 showConflictMessage={showConflictMessage}
                 index={index}
                 scoot={scoot}
+                selected={sectionGroup.selected}
               />
             );
           } else {
             // single preview section
-            const section = sectionGroup[0];
+            const section = sectionGroup.selected ?? sectionGroup.sections[0];
             const previewCourseWithSection = {
               prefix:
                 section.course_details && section.course_details[0]
@@ -328,7 +324,8 @@ export default function PlannerSchedule() {
                 sectionNumber={section.section_number}
                 course={previewCourseWithSection}
                 color={color}
-                isPreview={true}
+                isPreview={!sectionGroup.selected}
+                canExpand={false}
                 scoot={scoot}
                 onSectionClick={() => {
                   setPlannerSection(
@@ -336,7 +333,7 @@ export default function PlannerSchedule() {
                     selectedSections,
                     selectedSections.some(
                       (s) =>
-                        s.section_number === section.section_number &&
+                        s.section_number.toLowerCase() === section.section_number.toLowerCase() &&
                         s.course_details?.[0].subject_prefix ===
                           section.course_details?.[0].subject_prefix &&
                         s.course_details?.[0].course_number ===
