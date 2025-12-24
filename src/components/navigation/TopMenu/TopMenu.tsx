@@ -1,5 +1,13 @@
 'use client';
 
+import Background from '@/../public/background.png';
+import WhatsNew from '@/components/common/WhatsNew/WhatsNew';
+import Tutorial from '@/components/dashboard/Tutorial/Tutorial';
+import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
+import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
+import SearchBar, {
+  LoadingSearchBar,
+} from '@/components/search/SearchBar/SearchBar';
 import DownloadIcon from '@mui/icons-material/Download';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ShareIcon from '@mui/icons-material/Share';
@@ -8,15 +16,6 @@ import html2canvas from 'html2canvas-pro';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { Suspense, useCallback, useEffect, useState } from 'react';
-
-import Background from '@/../public/background.png';
-import WhatsNew from '@/components/common/WhatsNew/WhatsNew';
-import Tutorial from '@/components/dashboard/Tutorial/Tutorial';
-import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
-import SearchBar, {
-  LoadingSearchBar,
-} from '@/components/search/SearchBar/SearchBar';
-import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 
 /**
  * Props type used by the TopMenu component

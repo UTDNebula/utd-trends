@@ -1,5 +1,15 @@
 'use client';
 
+import { useSharedState } from '@/app/SharedStateProvider';
+import untyped_professor_to_alias from '@/data/professor_to_alias.json';
+import {
+  decodeSearchQueryLabel,
+  isCourseQuery,
+  removeDuplicates,
+  searchQueryEqual,
+  searchQueryLabel,
+  type SearchQuery,
+} from '@/types/SearchQuery';
 import HistoryToggleOffIcon from '@mui/icons-material/HistoryToggleOff';
 import SearchIcon from '@mui/icons-material/Search';
 import {
@@ -15,23 +25,12 @@ import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, {
-  type Key,
   useEffect,
   useRef,
   useState,
   useTransition,
+  type Key,
 } from 'react';
-
-import { useSharedState } from '@/app/SharedStateProvider';
-import untyped_professor_to_alias from '@/data/professor_to_alias.json';
-import {
-  decodeSearchQueryLabel,
-  isCourseQuery,
-  removeDuplicates,
-  type SearchQuery,
-  searchQueryEqual,
-  searchQueryLabel,
-} from '@/types/SearchQuery';
 
 const professor_to_alias = untyped_professor_to_alias as {
   [key: string]: string;

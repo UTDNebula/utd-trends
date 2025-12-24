@@ -1,20 +1,19 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
-
 import { compareColors, plannerColors } from '@/modules/colors';
 import usePersistantState from '@/modules/usePersistantState';
 import {
   convertToCourseOnly,
   removeDuplicates,
   removeSection,
-  type SearchQuery,
   searchQueryEqual,
   searchQueryLabel,
+  sectionCanOverlap,
+  type SearchQuery,
   type SearchQueryMultiSection,
   type SearchResult,
-  sectionCanOverlap,
 } from '@/types/SearchQuery';
+import React, { createContext, useContext, useState } from 'react';
 
 type SetterValue<T> = T | ((prev: T) => T);
 type Setter<T> = (value: SetterValue<T>) => void;

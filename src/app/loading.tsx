@@ -1,11 +1,10 @@
+import Background from '@/../public/background.png';
+import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
+import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
+import { LoadingSearchBar } from '@/components/search/SearchBar/SearchBar';
 import { FormControl, FormControlLabel, Switch, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import React from 'react';
-
-import Background from '@/../public/background.png';
-import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
-import { LoadingSearchBar } from '@/components/search/SearchBar/SearchBar';
-import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
