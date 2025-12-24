@@ -106,7 +106,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               event,
             );
           }
-          setIsHovered(false)
+          setIsHovered(false);
         }}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
@@ -231,7 +231,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               borderColor: isHovered ? 'red' : currentColor.outline,
               color: currentColor.font,
               filter: currentColor.filter,
-              zIndex:  (props.scoot || 0) + (props.isPreview ? 0 : 10),
+              zIndex: (props.scoot || 0) + (props.isPreview ? 0 : 10),
             } as React.CSSProperties
           }
           className={`col-start-[var(--start-col)] col-span-1 

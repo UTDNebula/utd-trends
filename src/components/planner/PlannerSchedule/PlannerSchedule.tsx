@@ -119,7 +119,9 @@ export default function PlannerSchedule() {
           .flatMap((queries, idx) => {
             return queries.map((query) => {
               return latestSections[idx].find(
-                (section) => section.section_number.toLowerCase() === query.sectionNumber?.toLowerCase(),
+                (section) =>
+                  section.section_number.toLowerCase() ===
+                  query.sectionNumber?.toLowerCase(),
               );
             });
           })
@@ -158,7 +160,7 @@ export default function PlannerSchedule() {
         });
 
         // Now group the flat array by meeting times
-        let groupedSectionsTemp = allSections.reduce(
+        const groupedSectionsTemp = allSections.reduce(
           (acc, section) => {
             const key = section.meetings
               .map(
@@ -333,7 +335,8 @@ export default function PlannerSchedule() {
                     selectedSections,
                     selectedSections.some(
                       (s) =>
-                        s.section_number.toLowerCase() === section.section_number.toLowerCase() &&
+                        s.section_number.toLowerCase() ===
+                          section.section_number.toLowerCase() &&
                         s.course_details?.[0].subject_prefix ===
                           section.course_details?.[0].subject_prefix &&
                         s.course_details?.[0].course_number ===

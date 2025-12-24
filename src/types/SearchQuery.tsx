@@ -97,9 +97,7 @@ export function convertToCourseOnly(
 export function isProfessorQuery(
   searchQuery: SearchQuery,
 ): searchQuery is SearchQuery & { profFirst: string; profLast: string } {
-  return (
-    searchQuery.profFirst != null && searchQuery.profLast != null
-  );
+  return searchQuery.profFirst != null && searchQuery.profLast != null;
 }
 
 export function isCourseQuery(
