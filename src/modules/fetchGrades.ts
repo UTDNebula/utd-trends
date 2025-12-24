@@ -20,13 +20,13 @@ export type Grades = {
 //Find GPA, total, and grade_distribution based on including some set of semesters
 export function calculateGrades(grades: GradesData, semesters?: string[]) {
   let grade_distribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-  for (const session of grades) {
+  grades.forEach((session) => {
     if (typeof semesters === 'undefined' || semesters.includes(session._id)) {
       grade_distribution = grade_distribution.map(
         (item, i) => item + session.grade_distribution[i],
       );
     }
-  }
+  });
 
   const total: number = grade_distribution.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
