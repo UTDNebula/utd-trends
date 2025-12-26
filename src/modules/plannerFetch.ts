@@ -105,29 +105,32 @@ export function useSearchResult(query: SearchQuery) {
           .map((section) => ({
             // convert to GradesData form
             _id: section.academic_session.name,
-            grade_distribution: section.grade_distribution,
+            data: [{
+              type: "all",
+              grade_distribution: section.grade_distribution,
+            }]
           }))
           .reduce((acc, curr) => {
             // group by semester _id
             const existing = acc.find((item) => item._id === curr._id);
 
             if (existing) {
-              existing.grade_distribution = existing.grade_distribution.map(
+              existing.data.map((e)=>{e.grade_distribution.map(
                 (val, idx) => {
-                  const currVal = curr.grade_distribution[idx];
+                  const currVal = curr.data[0].grade_distribution[idx];
                   // check for valid numbers otheriwise it NaN'd
                   return typeof val === 'number' && typeof currVal === 'number'
                     ? val + currVal
                     : val;
                 },
-              );
+              );});
             } else {
               acc.push({ ...curr });
             }
 
             return acc;
           }, [] as GradesData)
-          .filter((d) => d.grade_distribution.length != 0), // knock out the semesters with no disributions (like perhaps the upcoming one)
+          .filter((d) => d.data.every((s)=>s.grade_distribution.length != 0)), // knock out the semesters with no disributions (like perhaps the upcoming one)
       },
     };
   }
