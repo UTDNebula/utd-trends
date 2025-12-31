@@ -1,9 +1,8 @@
 'use client';
 
-import React from 'react';
-
 import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
 import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedule';
+import React from 'react';
 
 export default function PlannerDownloadUI({
   downloadRef,

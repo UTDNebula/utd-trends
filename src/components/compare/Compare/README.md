@@ -5,8 +5,13 @@ This component allows different courses to be compared with 3 different componen
 ```jsx
 // code is basically a combination of sample code from common/SingleGradesInfo and compare/CompareTable
 
+import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
+import BarGraph from '@/components/graph/BarGraph/BarGraph';
+import LineGraph from '@/components/graph/LineGraph/LineGraph';
+import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
 import CloseIcon from '@mui/icons-material/Close';
 import {
+  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -14,13 +19,8 @@ import {
   TableHead,
   TableRow,
   Tooltip,
-  Skeleton,
 } from '@mui/material';
 import React from 'react';
-import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
-import BarGraph from '@/components/graph/BarGraph/BarGraph';
-import LineGraph from '@/components/graph/LineGraph/LineGraph';
-import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
 
 // code from CompareTable
 const SampleProps = {

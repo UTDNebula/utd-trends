@@ -7,11 +7,11 @@
 ### TopMenu Example
 
 ```tsx
-import React from 'react';
 import BookIcon from '@mui/icons-material/Book';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ShareIcon from '@mui/icons-material/Share';
 import { Button, IconButton, Snackbar, Tooltip } from '@mui/material';
+import React from 'react';
 
 function TopMenu({ isPlanner = false }) {
   return (
