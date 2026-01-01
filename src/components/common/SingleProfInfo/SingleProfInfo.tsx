@@ -1,16 +1,14 @@
 'use client';
 
-import type { RMP } from '@/modules/fetchRmp';
+import RmpSummary, {
+  LoadingRmpSummary,
+} from '@/components/common/RmpSummary/RmpSummary';
+import type { RMP, RMP } from '@/modules/fetchRmp';
+import type { SearchQuery } from '@/types/SearchQuery';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Chip, Collapse, Grid, IconButton, Skeleton } from '@mui/material';
 import Link from 'next/link';
 import React, { useState } from 'react';
-
-import type { SearchQuery } from '@/types/SearchQuery';
-import type { RMP } from '@/modules/fetchRmp';
-import RmpSummary, {
-  LoadingRmpSummary,
-} from '@/components/common/RmpSummary/RmpSummary';
 
 export function LoadingSingleProfInfo() {
   const loadingTags = [

@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
 import fetchRmp from '@/modules/fetchRmp';
 import type { SearchQuery } from '@/types/SearchQuery';
+import { GoogleGenAI } from '@google/genai';
+import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
   const API_URL = process.env.NEBULA_API_URL;

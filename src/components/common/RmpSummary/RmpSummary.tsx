@@ -1,9 +1,8 @@
 'use client';
 
+import { searchQueryEqual, type SearchQuery } from '@/types/SearchQuery';
 import { Skeleton, Tooltip, Typography } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
-
-import { type SearchQuery, searchQueryEqual } from '@/types/SearchQuery';
 
 export function LoadingRmpSummary() {
   return (
