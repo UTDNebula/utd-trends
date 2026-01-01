@@ -1,11 +1,10 @@
 'use client';
 
+import usePersistantState from '@/modules/usePersistantState';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Badge, Divider, IconButton, Popover, Tooltip } from '@mui/material';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-
-import usePersistantState from '@/modules/usePersistantState';
 
 interface ReleaseData {
   id: number;

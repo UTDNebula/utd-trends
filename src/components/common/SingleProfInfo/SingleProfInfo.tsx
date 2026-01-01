@@ -1,5 +1,6 @@
 'use client';
 
+import type { RMP } from '@/modules/fetchRmp';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Chip, Collapse, Grid, IconButton, Skeleton } from '@mui/material';
 import Link from 'next/link';
