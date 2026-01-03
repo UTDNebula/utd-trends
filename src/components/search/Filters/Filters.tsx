@@ -160,11 +160,11 @@ export default function Filters({
         (section) => section.academic_session.name === latestSemester,
       );
     return (
-      (!filterNextSem &&
-        (result.grades.length == 0 ||
-          result.grades.some((s) => chosenSemesters.includes(s._id)))) ||
-      availableThisSemester
-    );
+      (result.grades.length == 0 &&
+      chosenSemesters.length == semesters.length &&
+      chosenSectionTypes.length == sectionTypes.length) ||
+      result.grades.some((s) => chosenSemesters.includes(s._id)) ||
+      availableThisSemester);
   });
 
   minGPAs.forEach((gpaString) => {
@@ -183,7 +183,9 @@ export default function Filters({
         (courseGrades &&
           calculateGrades(courseGrades, chosenSemesters, chosenSectionTypes)
             .gpa >= gpaNum) ||
-        courseGrades == undefined
+        (courseGrades == undefined &&
+          chosenSemesters.length == semesters.length &&
+          chosenSectionTypes.length == sectionTypes.length)
       );
     }).length;
   });
