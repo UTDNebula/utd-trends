@@ -161,10 +161,11 @@ export default function Filters({
       );
     return (
       (result.grades.length == 0 &&
-      chosenSemesters.length == semesters.length &&
-      chosenSectionTypes.length == sectionTypes.length) ||
+        chosenSemesters.length == semesters.length &&
+        chosenSectionTypes.length == sectionTypes.length) ||
       result.grades.some((s) => chosenSemesters.includes(s._id)) ||
-      availableThisSemester);
+      availableThisSemester
+    );
   });
 
   minGPAs.forEach((gpaString) => {
