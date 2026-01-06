@@ -6,11 +6,11 @@ import {
 import type { SearchResult } from '@/types/SearchQuery';
 import {
   createContext,
+  useMemo,
+  useState,
   type Dispatch,
   type ReactNode,
   type SetStateAction,
-  useMemo,
-  useState,
 } from 'react';
 import { useSharedState } from '../SharedStateProvider';
 

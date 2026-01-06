@@ -1,12 +1,10 @@
 'use client';
 
-import { Alert, Snackbar, Typography } from '@mui/material';
-import React, { useState } from 'react';
-
 import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerCard, {
   LoadingPlannerCard,
 } from '@/components/planner/PlannerCoursesTable/PlannerCard';
+import { useSearchresults } from '@/modules/plannerFetch';
 import { displaySemesterName } from '@/modules/semesters';
 import {
   convertToCourseOnly,
@@ -14,7 +12,8 @@ import {
   searchQueryLabel,
   searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
-import { useSearchresults } from '@/modules/plannerFetch';
+import { Alert, Snackbar, Typography } from '@mui/material';
+import React, { useState } from 'react';
 
 export function LoadingPlannerCoursesTable() {
   const { planner } = useSharedState();

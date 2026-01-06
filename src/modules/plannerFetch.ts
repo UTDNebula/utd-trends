@@ -1,4 +1,5 @@
 'use client';
+
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import {
   convertToCourseOnly,
