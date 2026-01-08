@@ -34,9 +34,8 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const profFirst = searchParams.get('profFirst');
-  const profLast = searchParams.get('profLast');
-  if (typeof profFirst !== 'string' || typeof profLast !== 'string') {
+  const syllabus_uri = searchParams.get('syllabus_uri');
+  if (typeof syllabus_uri !== 'string') {
     return NextResponse.json(
       { message: 'error', data: 'Incorrect query parameters' },
       { status: 400 },
@@ -44,7 +43,7 @@ export async function GET(request: Request) {
   }
 
   // Check cache
-  const filename = profFirst + profLast + '.txt';
+  const filename = syllabus_uri + '.txt';
   const url = API_URL + 'storage/' + API_STORAGE_BUCKET + '/' + filename;
   const headers = {
     'x-api-key': API_KEY,
