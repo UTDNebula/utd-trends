@@ -1,20 +1,17 @@
 import '@/styles/globals.css';
-
-import { ThemeProvider } from '@mui/material/styles';
+import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
+import { fetchLatestSemester } from '@/modules/fetchSections';
+import theme from '@/modules/theme';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+import { ThemeProvider } from '@mui/material/styles';
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import type { Metadata } from 'next';
 import { Bai_Jamjuree, Inter } from 'next/font/google';
 import React from 'react';
-
-import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
-import theme from '@/modules/theme';
-
-import { SharedStateProvider } from './SharedStateProvider';
 import QueryProvider from './QueryProvider';
-import { fetchLatestSemester } from '@/modules/fetchSections';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { SharedStateProvider } from './SharedStateProvider';
 
 const inter = Inter({
   subsets: ['latin'],

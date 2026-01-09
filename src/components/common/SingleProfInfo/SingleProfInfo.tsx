@@ -1,11 +1,11 @@
 'use client';
 
+import type { RMP } from '@/modules/fetchRmp';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Chip, Collapse, Grid, IconButton, Skeleton } from '@mui/material';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import type { RMP } from '@/modules/fetchRmp';
 
 export function LoadingSingleProfInfo() {
   const loadingTags = [
