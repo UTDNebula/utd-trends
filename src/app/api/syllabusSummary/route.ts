@@ -73,30 +73,30 @@ export async function GET(request: Request) {
     );
   }
 
-  // Check cache
-  const filename = syllabus_uri + '.txt';
-  const url = API_URL + 'storage/' + API_STORAGE_BUCKET + '/' + filename;
-  const headers = {
-    'x-api-key': API_KEY,
-    'x-storage-key': API_STORAGE_KEY,
-  };
-  const cache = await fetch(url, { headers });
-  if (cache.ok) {
-    const cacheData = await cache.json();
-    // Cache is valid for 30 days
-    if (
-      new Date(cacheData.data.updated) >
-      new Date(Date.now() - 1000 * 60 * 60 * 24 * 30)
-    ) {
-      const mediaData = await fetch(cacheData.data.media_link); //TODO: what is media_link?
-      if (mediaData.ok) {
-        return NextResponse.json(
-          { message: 'success', data: await mediaData.text() },
-          { status: 200 },
-        );
-      }
-    }
-  }
+//   // Check cache
+//   const filename = syllabus_uri + '.txt';
+//   const url = API_URL + 'storage/' + API_STORAGE_BUCKET + '/' + filename;
+//   const headers = {
+//     'x-api-key': API_KEY,
+//     'x-storage-key': API_STORAGE_KEY,
+//   };
+//   const cache = await fetch(url, { headers });
+//   if (cache.ok) {
+//     const cacheData = await cache.json();
+//     // Cache is valid for 30 days
+//     if (
+//       new Date(cacheData.data.updated) >
+//       new Date(Date.now() - 1000 * 60 * 60 * 24 * 30)
+//     ) {
+//       const mediaData = await fetch(cacheData.data.media_link); //TODO: what is media_link?
+//       if (mediaData.ok) {
+//         return NextResponse.json(
+//           { message: 'success', data: await mediaData.text() },
+//           { status: 200 },
+//         );
+//       }
+//     }
+//   }
 
     // Fetch Syllabus from URI
     const syllabus = await fetch(syllabus_uri);
@@ -129,7 +129,7 @@ export async function GET(request: Request) {
     },
   });
   const response = await geminiClient.models.generateContent({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash-lite',
       config: {
         responseMimeType: 'application/json',
         responseSchema: syllabusResponseSchema,
@@ -145,30 +145,30 @@ export async function GET(request: Request) {
               },
             },
             {
-              text: 'Extract the grading weights and grade scale exactly as shown in the tables. Provide a concise summary of the course.',
+              text: 'Extract the grading weights and grade scale exactly as shown in the tables. Provide a concise summary of the course for students.',
             },
           ],
         },
       ],
     });
 
-  // Cache response
-  const cacheResponse = await fetch(url, {
-    method: 'POST',
-    headers: headers,
-    body: response.text,
-  });
+//   // Cache response
+//   const cacheResponse = await fetch(url, {
+//     method: 'POST',
+//     headers: headers,
+//     body: response.text,
+//   });
 
-  if (!cacheResponse.ok) {
-    return NextResponse.json(
-      { message: 'error', data: 'Failed to cache response' },
-      { status: 500 },
-    );
-  }
-
+//   if (!cacheResponse.ok) {
+//     return NextResponse.json(
+//       { message: 'error', data: 'Failed to cache response' },
+//       { status: 500 },
+//     );
+//   }
+    const responseData = JSON.parse(response.text ?? '');
   // Return
   return NextResponse.json(
-    { message: 'success', data: response.text },
+    { message: 'success', data: responseData },
     { status: 200 },
   );
 }
