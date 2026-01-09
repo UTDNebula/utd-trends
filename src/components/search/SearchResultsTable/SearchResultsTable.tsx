@@ -377,7 +377,6 @@ function Row({
               />
               {searchResult.type !== 'course' && searchResult.RMP && (
                 <SingleProfInfo
-                  rmp={searchResult.RMP}
                   syllabus={{
                     weighting: [
                       { label: 'Attendance', value: '5%' },
@@ -396,6 +395,9 @@ function Row({
                     summary:
                       'Regular lecture attendance is mandatory. Attendance will be taken randomly at some lectures. Students who fail to follow the class material regularly are inviting scholastic difficulty.',
                   }}
+                  open={open}
+                  searchQuery={course}
+                  rmp={searchResult.RMP}
                 />
               )}
             </div>

@@ -851,6 +851,8 @@ export default function PlannerCard(props: PlannerCardProps) {
                     summary:
                       'Regular lecture attendance is mandatory. Attendance will be taken randomly at some lectures. Students who fail to follow the class material regularly are inviting scholastic difficulty.',
                   }}
+                  open={open && whichOpen === 'grades'}
+                  searchQuery={props.query}
                 />
               )}
           </div>

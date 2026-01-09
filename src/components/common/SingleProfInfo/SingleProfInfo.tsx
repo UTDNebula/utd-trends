@@ -1,6 +1,10 @@
 'use client';
 
+import RmpSummary, {
+  LoadingRmpSummary,
+} from '@/components/common/RmpSummary/RmpSummary';
 import type { RMP } from '@/modules/fetchRmp';
+import type { SearchQuery } from '@/types/SearchQuery';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Chip, Collapse, Grid, IconButton, Skeleton } from '@mui/material';
 import Link from 'next/link';
@@ -59,6 +63,10 @@ export function LoadingSingleProfInfo() {
       </Grid>
 
       <Grid size={12}>
+        <LoadingRmpSummary />
+      </Grid>
+
+      <Grid size={12}>
         <Skeleton variant="rounded">
           <p>Visit Rate My Professors</p>
         </Skeleton>
@@ -74,11 +82,13 @@ type SyllabusData = {
 };
 
 type Props = {
+  open: boolean;
+  searchQuery: SearchQuery;
   rmp: RMP;
   syllabus: SyllabusData;
 };
 
-export default function SingleProfInfo({ rmp, syllabus }: Props) {
+export default function SingleProfInfo({ open, searchQuery, rmp, syllabus }: Props) {
   const [showMore, setShowMore] = useState(false);
   const [showSyllabus, setShowSyllabus] = useState(false);
 
@@ -171,6 +181,10 @@ export default function SingleProfInfo({ rmp, syllabus }: Props) {
           </div>
         </Grid>
       )}
+
+      <Grid size={12}>
+        <RmpSummary open={open} searchQuery={searchQuery} />
+      </Grid>
 
       <Grid size={12}>
         <div className="flex gap-7">

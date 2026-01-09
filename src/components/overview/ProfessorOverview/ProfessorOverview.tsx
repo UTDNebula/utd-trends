@@ -146,6 +146,8 @@ export default function ProfessorOverview({
             summary:
               'Regular lecture attendance is mandatory. Attendance will be taken randomly at some lectures. Students who fail to follow the class material regularly are inviting scholastic difficulty.',
           }}
+          open
+          searchQuery={professor}
         />
       )}
     </div>
