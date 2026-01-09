@@ -3,6 +3,37 @@ import type { SearchQuery } from '@/types/SearchQuery';
 import { GoogleGenAI } from '@google/genai';
 import { NextResponse } from 'next/server';
 
+const syllabusResponseSchema = {
+  type: 'OBJECT',
+  properties: {
+    summary: {
+      type: 'STRING',
+      description: 'A direct, no-fluff summary of the course content and professor style.',
+    },
+    grade_weights: {
+      type: 'ARRAY',
+      items: {
+        type: 'OBJECT',
+        properties: {
+          category: { type: 'STRING', description: 'e.g., Attendance, Midterm' },
+          percentage: { type: 'STRING', description: 'e.g., 5%, 20%' },
+        },
+      },
+    },
+    grade_scale: {
+      type: 'ARRAY',
+      items: {
+        type: 'OBJECT',
+        properties: {
+          grade: { type: 'STRING', description: 'e.g., A, B' },
+          scale: { type: 'STRING', description: 'e.g., 90-100, 80-89.9' },
+        },
+      },
+    },
+  },
+  required: ['summary', 'grade_weights', 'grade_scale'],
+};
+
 export async function GET(request: Request) {
   const API_URL = process.env.NEBULA_API_URL;
   if (typeof API_URL !== 'string') {
@@ -57,7 +88,7 @@ export async function GET(request: Request) {
       new Date(cacheData.data.updated) >
       new Date(Date.now() - 1000 * 60 * 60 * 24 * 30)
     ) {
-      const mediaData = await fetch(cacheData.data.media_link);
+      const mediaData = await fetch(cacheData.data.media_link); //TODO: what is media_link?
       if (mediaData.ok) {
         return NextResponse.json(
           { message: 'success', data: await mediaData.text() },
@@ -67,37 +98,18 @@ export async function GET(request: Request) {
     }
   }
 
-  // Fetch RMP
-  const searchQuery: SearchQuery = {
-    profFirst: profFirst,
-    profLast: profLast,
-  };
-  const rmp = await fetchRmp(searchQuery, true);
+    // Fetch Syllabus from URI
+    const syllabus = await fetch(syllabus_uri);
 
-  if (!rmp?.ratings) {
-    return NextResponse.json(
-      { message: 'error', data: 'No ratings found' },
-      { status: 500 },
-    );
-  }
-  if (rmp.ratings.edges.length < 5) {
-    return NextResponse.json(
-      { message: 'error', data: 'Not enough ratings for a summary' },
-      { status: 500 },
-    );
-  }
+    if (!syllabus.ok) {
+        return NextResponse.json({ error: 'Failed to fetch Syllabus from URI' }, { status: 500 });
+    }
+
+    const arrayBuffer = await syllabus.arrayBuffer();
+    const pdfBase64 = Buffer.from(arrayBuffer).toString('base64');
 
   // AI
-  const prompt = `Summarize the Rate My Professors reviews of professor ${profFirst} ${profLast}:
-
-${rmp.ratings.edges.map((rating) => rating.node.comment.replaceAll('\n', ' ').slice(0, 500)).join('\n')}
-
-Summary requirements:
-- Summarize the reviews in a concise and informative manner.
-- Focus on the structure of the class, exams, projects, homeworks, and assignments.
-- Be respectful but honest, like a student writing to a peer.
-- Respond in plain-text (no markdown), in 30 words.
-`;
+  const prompt = ``;
   const GEMINI_SERVICE_ACCOUNT = process.env.GEMINI_SERVICE_ACCOUNT;
   if (typeof GEMINI_SERVICE_ACCOUNT !== 'string') {
     return NextResponse.json(
@@ -117,9 +129,28 @@ Summary requirements:
     },
   });
   const response = await geminiClient.models.generateContent({
-    model: 'gemini-2.5-flash-lite',
-    contents: prompt,
-  });
+      model: 'gemini-1.5-flash',
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: syllabusResponseSchema,
+      },
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              inlineData: {
+                mimeType: 'application/pdf',
+                data: pdfBase64,
+              },
+            },
+            {
+              text: 'Extract the grading weights and grade scale exactly as shown in the tables. Provide a concise summary of the course.',
+            },
+          ],
+        },
+      ],
+    });
 
   // Cache response
   const cacheResponse = await fetch(url, {
