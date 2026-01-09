@@ -1,5 +1,3 @@
-import fetchRmp from '@/modules/fetchRmp';
-import type { SearchQuery } from '@/types/SearchQuery';
 import { GoogleGenAI } from '@google/genai';
 import { NextResponse } from 'next/server';
 
@@ -8,14 +6,18 @@ const syllabusResponseSchema = {
   properties: {
     summary: {
       type: 'STRING',
-      description: 'A direct, no-fluff summary of the course content and professor style.',
+      description:
+        'A direct, no-fluff summary of the course structure & professor style.',
     },
     grade_weights: {
       type: 'ARRAY',
       items: {
         type: 'OBJECT',
         properties: {
-          category: { type: 'STRING', description: 'e.g., Attendance, Midterm' },
+          category: {
+            type: 'STRING',
+            description: 'e.g., Attendance, Midterm',
+          },
           percentage: { type: 'STRING', description: 'e.g., 5%, 20%' },
         },
       },
@@ -73,43 +75,45 @@ export async function GET(request: Request) {
     );
   }
 
-//   // Check cache
-//   const filename = syllabus_uri + '.txt';
-//   const url = API_URL + 'storage/' + API_STORAGE_BUCKET + '/' + filename;
-//   const headers = {
-//     'x-api-key': API_KEY,
-//     'x-storage-key': API_STORAGE_KEY,
-//   };
-//   const cache = await fetch(url, { headers });
-//   if (cache.ok) {
-//     const cacheData = await cache.json();
-//     // Cache is valid for 30 days
-//     if (
-//       new Date(cacheData.data.updated) >
-//       new Date(Date.now() - 1000 * 60 * 60 * 24 * 30)
-//     ) {
-//       const mediaData = await fetch(cacheData.data.media_link); //TODO: what is media_link?
-//       if (mediaData.ok) {
-//         return NextResponse.json(
-//           { message: 'success', data: await mediaData.text() },
-//           { status: 200 },
-//         );
-//       }
-//     }
-//   }
+  //   // Check cache
+  //   const filename = syllabus_uri + '.txt';
+  //   const url = API_URL + 'storage/' + API_STORAGE_BUCKET + '/' + filename;
+  //   const headers = {
+  //     'x-api-key': API_KEY,
+  //     'x-storage-key': API_STORAGE_KEY,
+  //   };
+  //   const cache = await fetch(url, { headers });
+  //   if (cache.ok) {
+  //     const cacheData = await cache.json();
+  //     // Cache is valid for 30 days
+  //     if (
+  //       new Date(cacheData.data.updated) >
+  //       new Date(Date.now() - 1000 * 60 * 60 * 24 * 30)
+  //     ) {
+  //       const mediaData = await fetch(cacheData.data.media_link); //TODO: what is media_link?
+  //       if (mediaData.ok) {
+  //         return NextResponse.json(
+  //           { message: 'success', data: await mediaData.text() },
+  //           { status: 200 },
+  //         );
+  //       }
+  //     }
+  //   }
 
-    // Fetch Syllabus from URI
-    const syllabus = await fetch(syllabus_uri);
+  // Fetch Syllabus from URI
+  const syllabus = await fetch(syllabus_uri);
 
-    if (!syllabus.ok) {
-        return NextResponse.json({ error: 'Failed to fetch Syllabus from URI' }, { status: 500 });
-    }
+  if (!syllabus.ok) {
+    return NextResponse.json(
+      { error: 'Failed to fetch Syllabus from URI' },
+      { status: 500 },
+    );
+  }
 
-    const arrayBuffer = await syllabus.arrayBuffer();
-    const pdfBase64 = Buffer.from(arrayBuffer).toString('base64');
+  const arrayBuffer = await syllabus.arrayBuffer();
+  const pdfBase64 = Buffer.from(arrayBuffer).toString('base64');
 
   // AI
-  const prompt = ``;
   const GEMINI_SERVICE_ACCOUNT = process.env.GEMINI_SERVICE_ACCOUNT;
   if (typeof GEMINI_SERVICE_ACCOUNT !== 'string') {
     return NextResponse.json(
@@ -129,43 +133,43 @@ export async function GET(request: Request) {
     },
   });
   const response = await geminiClient.models.generateContent({
-      model: 'gemini-2.5-flash-lite',
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: syllabusResponseSchema,
+    model: 'gemini-2.5-flash-lite',
+    config: {
+      responseMimeType: 'application/json',
+      responseSchema: syllabusResponseSchema,
+    },
+    contents: [
+      {
+        role: 'user',
+        parts: [
+          {
+            inlineData: {
+              mimeType: 'application/pdf',
+              data: pdfBase64,
+            },
+          },
+          {
+            text: 'Extract the grading weights and grade scale exactly as shown in the tables. Provide a concise summary of the course structure & professor style for students.',
+          },
+        ],
       },
-      contents: [
-        {
-          role: 'user',
-          parts: [
-            {
-              inlineData: {
-                mimeType: 'application/pdf',
-                data: pdfBase64,
-              },
-            },
-            {
-              text: 'Extract the grading weights and grade scale exactly as shown in the tables. Provide a concise summary of the course for students.',
-            },
-          ],
-        },
-      ],
-    });
+    ],
+  });
 
-//   // Cache response
-//   const cacheResponse = await fetch(url, {
-//     method: 'POST',
-//     headers: headers,
-//     body: response.text,
-//   });
+  //   // Cache response
+  //   const cacheResponse = await fetch(url, {
+  //     method: 'POST',
+  //     headers: headers,
+  //     body: response.text,
+  //   });
 
-//   if (!cacheResponse.ok) {
-//     return NextResponse.json(
-//       { message: 'error', data: 'Failed to cache response' },
-//       { status: 500 },
-//     );
-//   }
-    const responseData = JSON.parse(response.text ?? '');
+  //   if (!cacheResponse.ok) {
+  //     return NextResponse.json(
+  //       { message: 'error', data: 'Failed to cache response' },
+  //       { status: 500 },
+  //     );
+  //   }
+  const responseData = JSON.parse(response.text ?? '');
   // Return
   return NextResponse.json(
     { message: 'success', data: responseData },
