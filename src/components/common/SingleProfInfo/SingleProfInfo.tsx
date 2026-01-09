@@ -5,11 +5,11 @@ import RmpSummary, {
 } from '@/components/common/RmpSummary/RmpSummary';
 import type { RMP } from '@/modules/fetchRmp';
 import type { SearchQuery } from '@/types/SearchQuery';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Chip, Collapse, Grid, IconButton, Skeleton } from '@mui/material';
 import Link from 'next/link';
 import React, { useState } from 'react';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 export function LoadingSingleProfInfo() {
   const loadingTags = [
@@ -88,7 +88,12 @@ type Props = {
   syllabus: SyllabusData;
 };
 
-export default function SingleProfInfo({ open, searchQuery, rmp, syllabus }: Props) {
+export default function SingleProfInfo({
+  open,
+  searchQuery,
+  rmp,
+  syllabus,
+}: Props) {
   const [showMore, setShowMore] = useState(false);
   const [showSyllabus, setShowSyllabus] = useState(false);
 
