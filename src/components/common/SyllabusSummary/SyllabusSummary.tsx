@@ -112,22 +112,29 @@ export default function SyllabusSummary({
               </table>
 
               {/* Grade Scale Table */}
-              <table className="text-sm">
-                <thead>
-                  <tr>
-                    <th className="px-2 py-1 font-semibold text-lg">Grade</th>
-                    <th className="px-2 py-1 font-semibold text-lg">Scale</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {syllabus.letter_grade_scale.map((row, idx) => (
-                    <tr key={idx}>
-                      <td className="px-2 py-1">{row.grade}</td>
-                      <td className="px-2 py-1">{row.range}</td>
+              {syllabus.letter_grade_scale != null &&
+              syllabus.letter_grade_scale.length > 0 ? (
+                <table className="text-sm">
+                  <thead>
+                    <tr>
+                      <th className="px-2 py-1 font-semibold text-lg">Grade</th>
+                      <th className="px-2 py-1 font-semibold text-lg">Scale</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {syllabus.letter_grade_scale.map((row, idx) => (
+                      <tr key={idx}>
+                        <td className="px-2 py-1">{row.grade}</td>
+                        <td className="px-2 py-1">{row.range}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="flex justify-center items-center">
+                  <p className="">Grade scale not available</p>
+                </div>
+              )}
             </div>
 
             {/* AI Summary / Placeholder */}

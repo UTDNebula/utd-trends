@@ -149,7 +149,25 @@ export async function GET(request: Request) {
             },
           },
           {
-            text: 'Extract the grading weights and grade scale exactly as shown in the tables. Provide a concise summary of the course structure & professor style for students.',
+     //       text: 'Extract the grading weights and grade scale exactly as shown in the tables. Provide a concise summary of the course structure & professor style for students.',
+              text: `Extract the grading weights and grade scale exactly as shown in the tables.
+
+                      Then write a concise, student-focused summary that helps a student decide 
+                      whether this professor is a good fit for them.
+
+                      Focus on:
+                      - workload intensity (exam-heavy vs assignment-heavy)
+                      - number and type of exams(comprehensive or not, mcqs or subjective etc)
+                      - group vs individual work
+                      - strictness on deadlines and academic policies
+                      - teaching style (theoretical vs practical, lecture-heavy vs interactive)
+                      - overall stress level for an average student
+
+                      Avoid course topic descriptions unless they affect workload or difficulty.
+                      Be direct and practical.
+                      
+                      `
+
           },
         ],
       },
