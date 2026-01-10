@@ -13,6 +13,7 @@ This component shows a comparison between different courses. It is part of the C
 ### CompareTable Example
 
 ```jsx
+import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   Table,
@@ -24,7 +25,6 @@ import {
   Tooltip,
 } from '@mui/material';
 import React, { useState } from 'react';
-import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 
 const SampleProps = {
   name: [

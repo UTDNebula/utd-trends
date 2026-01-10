@@ -12,6 +12,7 @@ It uses the `framer-motion` library to provide sliding carousel animations when 
 
 ```tsx
 import { useSharedState } from '@/app/SharedStateProvider';
+
 const ShardStateSetter = () => {
   const { addToCompare } = useSharedState();
   React.useEffect(() => {

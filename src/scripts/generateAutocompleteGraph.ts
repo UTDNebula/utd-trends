@@ -4,7 +4,6 @@ Documentation: https://nebula-labs.atlassian.net/wiki/spaces/TRENDS/pages/679936
 */
 import { writeFileSync } from 'fs';
 import { DirectedGraph } from 'graphology';
-
 import aggregatedData from '../data/aggregated_data.json';
 import professor_to_alias from '../data/professor_to_alias.json';
 import { decodeSearchQueryLabel, type SearchQuery } from '../types/SearchQuery';

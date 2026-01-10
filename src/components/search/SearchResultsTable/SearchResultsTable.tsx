@@ -1,5 +1,23 @@
 'use client';
 
+import { FiltersContext } from '@/app/dashboard/FilterContext';
+import { useSharedState } from '@/app/SharedStateProvider';
+import Rating from '@/components/common/Rating/Rating';
+import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
+import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
+import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
+import { gpaToColor, useRainbowColors } from '@/modules/colors';
+import { calculateGrades } from '@/modules/fetchGrades';
+import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import { displaySemesterName } from '@/modules/semesters';
+import {
+  convertToCourseOnly,
+  convertToProfOnly,
+  searchQueryEqual,
+  searchQueryLabel,
+  type SearchQuery,
+  type SearchResult,
+} from '@/types/SearchQuery';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
@@ -18,31 +36,23 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import dynamic from 'next/dynamic';
 import React, { use, useMemo, useState } from 'react';
 
-import { useSharedState } from '@/app/SharedStateProvider';
-import Rating from '@/components/common/Rating/Rating';
-import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
-import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
-import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
-import { gpaToColor, useRainbowColors } from '@/modules/colors';
-import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import { displaySemesterName } from '@/modules/semesters';
-import {
-  convertToCourseOnly,
-  convertToProfOnly,
-  type SearchQuery,
-  searchQueryEqual,
-  searchQueryLabel,
-  type SearchResult,
-} from '@/types/SearchQuery';
-import { calculateGrades } from '@/modules/fetchGrades';
-import { FiltersContext } from '@/app/dashboard/FilterContext';
-import dynamic from 'next/dynamic';
 const AddToPlanner = dynamic(() => import('./AddToPlanner'), {
   ssr: false,
   loading: () => <Checkbox disabled icon={<BookOutlinedIcon />} />,
 });
+
+// sets the color for the table head cells
+function getCellSx() {
+  return {
+    backgroundColor: 'rgb(252,252,252)',
+    '@media (prefers-color-scheme: dark)': {
+      backgroundColor: 'var(--mui-palette-background-default)',
+    },
+  };
+}
 
 function LoadingRow() {
   const nameCell = (
@@ -106,13 +116,15 @@ export function LoadingSearchResultsTable() {
         <Table stickyHeader aria-label="collapsible table">
           <TableHead>
             <TableRow>
-              <TableCell className="hidden sm:table-cell">Actions</TableCell>
-              <TableCell>
+              <TableCell className="hidden sm:table-cell" sx={getCellSx()}>
+                Actions
+              </TableCell>
+              <TableCell sx={getCellSx()}>
                 <TableSortLabel active direction="asc">
                   Name
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="center">
+              <TableCell align="center" sx={getCellSx()}>
                 <Tooltip
                   title="Median Letter Grade Across Course Sections"
                   placement="top"
@@ -122,7 +134,7 @@ export function LoadingSearchResultsTable() {
                   </div>
                 </Tooltip>
               </TableCell>
-              <TableCell align="center">
+              <TableCell align="center" sx={getCellSx()}>
                 <Tooltip
                   title="Average Professor Rating from Rate My Professors"
                   placement="top"
@@ -558,8 +570,10 @@ export default function SearchResultsTable({
         <Table stickyHeader aria-label="collapsible table">
           <TableHead>
             <TableRow>
-              <TableCell className="hidden sm:table-cell">Actions</TableCell>
-              <TableCell>
+              <TableCell className="hidden sm:table-cell" sx={getCellSx()}>
+                Actions
+              </TableCell>
+              <TableCell sx={getCellSx()}>
                 <TableSortLabel
                   active={orderBy === 'name'}
                   direction={orderBy === 'name' ? order : 'asc'}
@@ -570,7 +584,7 @@ export default function SearchResultsTable({
                   Name
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="center">
+              <TableCell align="center" sx={getCellSx()}>
                 <Tooltip
                   title="Average Letter Grade Across Course Sections"
                   placement="top"
@@ -588,7 +602,7 @@ export default function SearchResultsTable({
                   </div>
                 </Tooltip>
               </TableCell>
-              <TableCell align="center">
+              <TableCell align="center" sx={getCellSx()}>
                 <Tooltip
                   title="Average Professor Rating from Rate My Professors"
                   placement="top"
@@ -629,7 +643,7 @@ export default function SearchResultsTable({
 
             {/* Divider row */}
             {sortedUnIncludedResults.length > 0 && (
-              <TableRow className="bg-gray-200 dark:bg-gray-700">
+              <TableRow>
                 <TableCell colSpan={5} className="p-0">
                   <div className="flex items-center py-2 my-2">
                     <Divider className="grow" />

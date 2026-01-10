@@ -1,11 +1,10 @@
 'use client';
 
+import { useSharedState } from '@/app/SharedStateProvider';
+import { TabNavMenu } from '@/components/navigation/TabNavMenu/TabNavMenu';
 import { Collapse, useMediaQuery } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
-
-import { useSharedState } from '@/app/SharedStateProvider';
-import { TabNavMenu } from '@/components/navigation/TabNavMenu/TabNavMenu';
 
 interface CarouselProps {
   names: React.ReactNode;
@@ -51,13 +50,15 @@ export default function Carousel({ names, children }: CarouselProps) {
   const { compare } = useSharedState();
   const lastCompareLength = useRef(compare.length);
 
-  /**
-   * On each re-render, ensure currentCard is within valid bounds
-   */
-  if (Array.isArray(children) && currentCard >= children.length) {
-    // If currentCard is out of bounds, reset it to 0
-    setCurrentCard(0);
-  }
+  useEffect(() => {
+    /**
+     * On each re-render, ensure currentCard is within valid bounds
+     */
+    if (Array.isArray(children) && currentCard >= children.length) {
+      // If currentCard is out of bounds, reset it to 0
+      setCurrentCard(0);
+    }
+  }, [currentCard, children]);
 
   /**
    * Turn

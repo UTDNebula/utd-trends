@@ -1,8 +1,6 @@
-import React, { Suspense } from 'react';
-
 import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
 import { type SearchQuery, type SearchResult } from '@/types/SearchQuery';
-
+import React, { Suspense } from 'react';
 import ClientLeft from './ClientLeft';
 
 interface Props {

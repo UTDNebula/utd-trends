@@ -1,10 +1,9 @@
 import { writeFileSync } from 'fs';
-
 import aggregatedData from '../data/aggregated_data.json';
 import {
   convertToCourseOnly,
-  type SearchQuery,
   searchQueryLabel,
+  type SearchQuery,
 } from '../types/SearchQuery';
 
 export type TableType = { [key: string]: SearchQuery[] };

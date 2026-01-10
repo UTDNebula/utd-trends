@@ -1,20 +1,19 @@
 'use client';
 
-import { Skeleton } from '@mui/material';
-import Image from 'next/image';
-import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
-
 import SingleGradesInfo, {
   LoadingSingleGradesInfo,
 } from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo, {
   LoadingSingleProfInfo,
 } from '@/components/common/SingleProfInfo/SingleProfInfo';
+import { calculateGrades, type GradesData } from '@/modules/fetchGrades';
 import type { Professor } from '@/modules/fetchProfessor';
 import type { RMP } from '@/modules/fetchRmp';
-import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
-import { calculateGrades, type GradesData } from '@/modules/fetchGrades';
+import { searchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
+import { Skeleton } from '@mui/material';
+import Image from 'next/image';
+import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
 
 export function LoadingProfessorOverview() {
   return (

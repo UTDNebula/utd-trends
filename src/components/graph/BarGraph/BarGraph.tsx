@@ -1,13 +1,12 @@
 'use client';
 
+import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
+import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
+import { compareColors, useRainbowColors } from '@/modules/colors';
 import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
 import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
-
-import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
-import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
-import { compareColors, useRainbowColors } from '@/modules/colors';
 
 // Dynamically import react-apexcharts with SSR disabled.
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });

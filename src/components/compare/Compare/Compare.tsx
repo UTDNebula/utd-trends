@@ -1,15 +1,14 @@
 'use client';
 
-import React, { use } from 'react';
-
+import { FiltersContext } from '@/app/dashboard/FilterContext';
 import { useSharedState } from '@/app/SharedStateProvider';
 import CompareTable from '@/components/compare/CompareTable/CompareTable';
 import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
-import { searchQueryLabel } from '@/types/SearchQuery';
 import { calculateGrades, type GradesSummary } from '@/modules/fetchGrades';
-import { FiltersContext } from '@/app/dashboard/FilterContext';
+import { searchQueryLabel } from '@/types/SearchQuery';
+import React, { use } from 'react';
 
 function convertNumbersToPercents(distribution: GradesSummary): number[] {
   const total = distribution.total;

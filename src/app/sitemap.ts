@@ -1,7 +1,6 @@
-import type { MetadataRoute } from 'next';
-
 import untypedComboTable from '@/data/combo_table.json';
-import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
+import { searchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
+import type { MetadataRoute } from 'next';
 
 const comboTable = untypedComboTable as { [key: string]: SearchQuery[] };
 

@@ -47,11 +47,13 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
   return (
     <Tooltip
       title={
-        hasLatestSemester
-          ? inPlanner
-            ? 'Remove from Planner'
-            : 'Add to Planner'
-          : 'Not being taught'
+        searchResult.type === 'professor'
+          ? 'Cannot add professor to planner'
+          : hasLatestSemester
+            ? inPlanner
+              ? 'Remove from Planner'
+              : 'Add to Planner'
+            : 'Not being taught'
       }
       placement="top"
     >
@@ -101,7 +103,7 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
           }}
           icon={<BookOutlinedIcon />}
           checkedIcon={<BookIcon />}
-          disabled={!hasLatestSemester}
+          disabled={!hasLatestSemester || searchResult.type === 'professor'}
         />
       </span>
     </Tooltip>

@@ -5,10 +5,10 @@ import {
   DAYS,
   START_HOUR,
 } from '@/components/planner/PlannerSchedule/PlannerSchedule';
-import { type SearchQuery } from '@/types/SearchQuery';
 import { useSearchResult } from '@/modules/plannerFetch';
-import { useSharedState } from '@/app/SharedStateProvider';
+import { type SearchQuery } from '@/types/SearchQuery';
 import { KeyboardArrowDown } from '@mui/icons-material';
+import { useSharedState } from '@/app/SharedStateProvider';
 
 interface PlannerSectionComponentProps {
   scoot?: number;

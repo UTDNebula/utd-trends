@@ -1,6 +1,4 @@
-import { Card } from '@mui/material';
-import React from 'react';
-
+import Compare from '@/components/compare/Compare/Compare';
 import Carousel from '@/components/navigation/Carousel/Carousel';
 import CourseOverview, {
   LoadingCourseOverview,
@@ -13,7 +11,8 @@ import fetchGrades from '@/modules/fetchGrades';
 import fetchProfessor from '@/modules/fetchProfessor';
 import fetchRmp from '@/modules/fetchRmp';
 import { type SearchQuery, type SearchResult } from '@/types/SearchQuery';
-import Compare from '@/components/compare/Compare/Compare';
+import { Card } from '@mui/material';
+import React from 'react';
 
 interface LoadingRightProps {
   courses?: SearchQuery[];
@@ -69,7 +68,7 @@ export default async function Right(props: Props) {
           fetchProfessor(props.professors[0]),
           fetchGrades(props.professors[0]),
           fetchRmp(props.professors[0]),
-        ])
+        ]).catch(() => null)
       : null;
 
   const coursePromise =
@@ -77,7 +76,7 @@ export default async function Right(props: Props) {
       ? Promise.all([
           fetchCourse(props.courses[0]),
           fetchGrades(props.courses[0]),
-        ])
+        ]).catch(() => null)
       : null;
 
   const [professorResults, courseResults] = await Promise.all([

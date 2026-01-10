@@ -7,6 +7,7 @@ import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerCard, {
   LoadingPlannerCard,
 } from '@/components/planner/PlannerCoursesTable/PlannerCard';
+import { useSearchresults } from '@/modules/plannerFetch';
 import { displaySemesterName } from '@/modules/semesters';
 import {
   convertToCourseOnly,
@@ -14,7 +15,6 @@ import {
   searchQueryLabel,
   searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
-import { useSearchresults } from '@/modules/plannerFetch';
 import { useSnackbar } from '@/contexts/SnackbarContext';
 
 export function LoadingPlannerCoursesTable() {

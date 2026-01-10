@@ -1,5 +1,20 @@
 'use client';
 
+import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
+import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
+import { calculateGrades } from '@/modules/fetchGrades';
+import type { Sections, SectionsData } from '@/modules/fetchSections';
+import { useSearchResult } from '@/modules/plannerFetch';
+import {
+  convertToCourseOnly,
+  convertToProfOnly,
+  removeSection,
+  searchQueryLabel,
+  sectionCanOverlap,
+  type SearchQuery,
+  type SearchQueryMultiSection,
+  type SearchResult,
+} from '@/types/SearchQuery';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
@@ -26,22 +41,9 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import React, { useState } from 'react';
-
-import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
-import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
-import type { Sections, SectionsData } from '@/modules/fetchSections';
 import {
-  convertToCourseOnly,
-  convertToProfOnly,
-  removeSection,
   searchQueryEqual,
-  searchQueryLabel,
-  type SearchQueryMultiSection,
-  type SearchResult,
-  sectionCanOverlap,
 } from '@/types/SearchQuery';
-import { useSearchResult } from '@/modules/plannerFetch';
-import { calculateGrades } from '@/modules/fetchGrades';
 import { useSharedState } from '@/app/SharedStateProvider';
 
 export function LoadingPlannerCard() {
@@ -79,28 +81,38 @@ export function LoadingPlannerCard() {
 
 function SectionTableHead(props: { hasMultipleDateRanges: boolean }) {
   return (
-    <TableRow className="bg-cornflower-600">
+    <TableRow className="bg-royal dark:bg-cornflower-300">
       <TableCell className="py-2 px-4 border-b-0" align="left">
-        <Typography className="text-white text-xs">Select</Typography>
+        <Typography className="text-white dark:text-haiti text-xs">
+          Select
+        </Typography>
       </TableCell>
       <TableCell className="py-2 px-4 border-b-0">
-        <Typography className="text-white text-xs">Section #</Typography>
+        <Typography className="text-white dark:text-haiti text-xs">
+          Section #
+        </Typography>
       </TableCell>
       <TableCell className="py-2 px-4 border-b-0">
-        <Typography className="text-white text-xs">Class #</Typography>
+        <Typography className="text-white dark:text-haiti text-xs">
+          Class #
+        </Typography>
       </TableCell>
       <TableCell className="py-2 px-4 border-b-0">
-        <Typography className="text-white text-xs">
+        <Typography className="text-white dark:text-haiti text-xs">
           Schedule & Location
         </Typography>
       </TableCell>
       {props.hasMultipleDateRanges && (
         <TableCell className="py-2 px-4 border-b-0">
-          <Typography className="text-white text-xs">Date Range</Typography>
+          <Typography className="text-white dark:text-haiti text-xs">
+            Date Range
+          </Typography>
         </TableCell>
       )}
       <TableCell className="py-2 px-4 border-b-0">
-        <Typography className="text-white text-xs">Syllabus</Typography>
+        <Typography className="text-white dark:text-haiti text-xs">
+          Syllabus
+        </Typography>
       </TableCell>
     </TableRow>
   );

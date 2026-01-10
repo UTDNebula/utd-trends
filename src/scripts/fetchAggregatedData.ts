@@ -1,9 +1,9 @@
 /*
 Fetch the aggregated data from the API
 */
-import { config } from 'dotenv';
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';
+import { config } from 'dotenv';
 
 const envPath = resolve(__dirname, '../../.env.local');
 config({ path: envPath });

@@ -1,11 +1,9 @@
-import React from 'react';
-
 import Split from '@/components/common/Split/Split';
 import StickySide from '@/components/common/Split/StickySide';
 import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import { LoadingFilters } from '@/components/search/Filters/Filters';
 import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
-
+import React from 'react';
 import { LoadingRight } from './Right';
 
 /**
