@@ -3,6 +3,7 @@
 import RmpSummary, {
   LoadingRmpSummary,
 } from '@/components/common/RmpSummary/RmpSummary';
+import SyllabusSummary from '@/components/common/SyllabusSummary/SyllabusSummary';
 import type { RMP } from '@/modules/fetchRmp';
 import type { SearchQuery } from '@/types/SearchQuery';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -75,24 +76,18 @@ export function LoadingSingleProfInfo() {
   );
 }
 
-type SyllabusData = {
-  weighting: { label: string; value: string }[];
-  grading: { grade: string; range: string }[];
-  summary: string;
-};
-
 type Props = {
   open: boolean;
   searchQuery: SearchQuery;
   rmp: RMP;
-  syllabus: SyllabusData;
+  syllabus_uri?: string | null;
 };
 
 export default function SingleProfInfo({
   open,
   searchQuery,
   rmp,
-  syllabus,
+  syllabus_uri,
 }: Props) {
   const [showMore, setShowMore] = useState(false);
   const [showSyllabus, setShowSyllabus] = useState(false);
@@ -208,64 +203,14 @@ export default function SingleProfInfo({
             />
           </button>
         </div>
-        <Collapse in={showSyllabus}>
-          <div className="mt-4 rounded p-3">
-            <h3 className="font-bold text-xl mb-2">Syllabus Grading Summary</h3>
-            <hr className="mb-4" />
-
-            {/* Outer flex row: tables + AI summary */}
-            <div className="flex gap-8 items-center mt-2">
-              {/* Tables wrapper */}
-              <div className="tables-container flex gap-8">
-                {/* Weighting Table */}
-                <table className="text-sm">
-                  <thead>
-                    <tr>
-                      <th className="px-2 py-1 font-semibold text-lg">
-                        Weighting
-                      </th>
-                      <th className="px-2 py-1 font-semibold text-lg">%</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {syllabus.weighting.map((row, idx) => (
-                      <tr key={idx}>
-                        <td className="px-2 py-1">{row.label}</td>
-                        <td className="px-2 py-1">{row.value}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                {/* Grade Scale Table */}
-                <table className="text-sm">
-                  <thead>
-                    <tr>
-                      <th className="px-2 py-1 font-semibold text-lg">Grade</th>
-                      <th className="px-2 py-1 font-semibold text-lg">Scale</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {syllabus.grading.map((row, idx) => (
-                      <tr key={idx}>
-                        <td className="px-2 py-1">{row.grade}</td>
-                        <td className="px-2 py-1">{row.range}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* AI Summary / Placeholder */}
-              <div
-                id="ai-summary"
-                className="text-sm flex items-center  flex-1 min-h-[100px]"
-              >
-                <p>{syllabus.summary}</p>
-              </div>
-            </div>
-          </div>
-        </Collapse>
+        {syllabus_uri && (
+          <SyllabusSummary
+            open={open}
+            searchQuery={searchQuery}
+            showSyllabus={showSyllabus}
+            syllabus_uri={syllabus_uri}
+          />
+        )}
       </Grid>
     </Grid>
   );

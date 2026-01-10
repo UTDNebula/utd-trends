@@ -377,27 +377,21 @@ function Row({
               />
               {searchResult.type !== 'course' && searchResult.RMP && (
                 <SingleProfInfo
-                  syllabus={{
-                    weighting: [
-                      { label: 'Attendance', value: '5%' },
-                      { label: 'Class Quiz', value: '20%' },
-                      { label: 'Projects', value: '20%' },
-                      { label: 'Midterm', value: '25%' },
-                      { label: 'Final', value: '30%' },
-                    ],
-                    grading: [
-                      { grade: 'A', range: '90-100' },
-                      { grade: 'B', range: '80-89.9' },
-                      { grade: 'C', range: '70-79.9' },
-                      { grade: 'D', range: '60-69.9' },
-                      { grade: 'F', range: '0-59.9' },
-                    ],
-                    summary:
-                      'Regular lecture attendance is mandatory. Attendance will be taken randomly at some lectures. Students who fail to follow the class material regularly are inviting scholastic difficulty.',
-                  }}
                   open={open}
                   searchQuery={course}
                   rmp={searchResult.RMP}
+                  syllabus_uri={
+                    searchResult.sections
+                      .filter(
+                        (s) =>
+                          !!s.syllabus_uri && !!s.academic_session?.start_date,
+                      )
+                      .sort(
+                        (a, b) =>
+                          new Date(b.academic_session.start_date).getTime() -
+                          new Date(a.academic_session.start_date).getTime(),
+                      )[0]?.syllabus_uri || null
+                  }
                 />
               )}
             </div>

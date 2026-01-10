@@ -22,18 +22,18 @@ const syllabusResponseSchema = {
         },
       },
     },
-    grade_scale: {
+    letter_grade_scale: {
       type: 'ARRAY',
       items: {
         type: 'OBJECT',
         properties: {
           grade: { type: 'STRING', description: 'e.g., A, B' },
-          scale: { type: 'STRING', description: 'e.g., 90-100, 80-89.9' },
+          range: { type: 'STRING', description: 'e.g., 90-100, 80-89.9' },
         },
       },
     },
   },
-  required: ['summary', 'grade_weights', 'grade_scale'],
+  required: ['summary', 'grade_weights', 'letter_grade_scale'],
 };
 
 export async function GET(request: Request) {
