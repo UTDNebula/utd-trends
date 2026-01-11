@@ -76,90 +76,90 @@ export default function SyllabusSummary({
     return <p>Problem loading AI review summary.</p>;
   }
 
-  if (!syllabus) {
-    return <LoadingSyllabusSummary />;
-  }
-
   return (
     <>
       <Collapse in={showSyllabus}>
-        <div className="mt-4 rounded p-3">
-          <h3 className="font-bold text-xl mb-2">Syllabus Grading Summary</h3>
-          <hr className="mb-4" />
+        {!syllabus ? (
+          <LoadingSyllabusSummary />
+        ) : (
+          <div className="mt-4 rounded p-3">
+            <h3 className="font-bold text-xl mb-2">Syllabus Grading Summary</h3>
+            <hr className="mb-4" />
 
-          {/* Outer flex row: tables + AI summary */}
-          <div className="flex gap-8 items-center mt-2">
-            {/* Tables wrapper */}
-            <div className="tables-container flex gap-8">
-              {/* Weighting Table */}
-              {syllabus.grade_weights != null &&
-                syllabus.grade_weights.length > 0 && (
-                  <table className="text-sm">
-                    <thead>
-                      <tr>
-                        <th className="px-2 py-1 font-semibold text-lg">
-                          Weighting
-                        </th>
-                        <th className="px-2 py-1 font-semibold text-lg">%</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {syllabus.grade_weights.map((row, idx) => (
-                        <tr key={idx}>
-                          <td className="px-2 py-1">{row.category}</td>
-                          <td className="px-2 py-1">{row.percentage}</td>
+            {/* Outer flex row: tables + AI summary */}
+            <div className="flex gap-8 items-center mt-2">
+              {/* Tables wrapper */}
+              <div className="tables-container flex gap-8">
+                {/* Weighting Table */}
+                {syllabus.grade_weights != null &&
+                  syllabus.grade_weights.length > 0 && (
+                    <table className="text-sm">
+                      <thead>
+                        <tr>
+                          <th className="px-2 py-1 font-semibold text-lg">
+                            Weighting
+                          </th>
+                          <th className="px-2 py-1 font-semibold text-lg">%</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
+                      </thead>
+                      <tbody>
+                        {syllabus.grade_weights.map((row, idx) => (
+                          <tr key={idx}>
+                            <td className="px-2 py-1">{row.category}</td>
+                            <td className="px-2 py-1">{row.percentage}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
 
-              {/* Grade Scale Table */}
-              {syllabus.letter_grade_scale != null &&
-                syllabus.letter_grade_scale.length > 0 && (
-                  <table className="text-sm">
-                    <thead>
-                      <tr>
-                        <th className="px-2 py-1 font-semibold text-lg">
-                          Grade
-                        </th>
-                        <th className="px-2 py-1 font-semibold text-lg">
-                          Scale
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {syllabus.letter_grade_scale.map((row, idx) => (
-                        <tr key={idx}>
-                          <td className="px-2 py-1">{row.grade}</td>
-                          <td className="px-2 py-1">{row.range}</td>
+                {/* Grade Scale Table */}
+                {syllabus.letter_grade_scale != null &&
+                  syllabus.letter_grade_scale.length > 0 && (
+                    <table className="text-sm">
+                      <thead>
+                        <tr>
+                          <th className="px-2 py-1 font-semibold text-lg">
+                            Grade
+                          </th>
+                          <th className="px-2 py-1 font-semibold text-lg">
+                            Scale
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-            </div>
+                      </thead>
+                      <tbody>
+                        {syllabus.letter_grade_scale.map((row, idx) => (
+                          <tr key={idx}>
+                            <td className="px-2 py-1">{row.grade}</td>
+                            <td className="px-2 py-1">{row.range}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+              </div>
 
-            {/* AI Summary / Placeholder */}
-            <div
-              id="ai-summary"
-              className="text-sm flex flex-col items-center flex-1 min-h-[100px]"
-            >
-              {syllabus.summary != null ? (
-                <p>{syllabus.summary}</p>
-              ) : (
-                <p>Could not summarize the syllabus</p>
-              )}
-              <Link
-                href={syllabus_uri}
-                target="_blank"
-                rel="noopener noreferrer"
+              {/* AI Summary / Placeholder */}
+              <div
+                id="ai-summary"
+                className="text-sm flex flex-col items-center flex-1 min-h-[100px]"
               >
-                View Syllabus
-              </Link>
+                {syllabus.summary != null ? (
+                  <p>{syllabus.summary}</p>
+                ) : (
+                  <p>Could not summarize the syllabus</p>
+                )}
+                <Link
+                  href={syllabus_uri}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Syllabus
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </Collapse>
     </>
   );
