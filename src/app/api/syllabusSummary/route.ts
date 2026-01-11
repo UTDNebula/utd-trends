@@ -161,12 +161,13 @@ export async function GET(request: Request) {
                       - group vs individual work
                       - strictness on deadlines and academic policies
                       - teaching style (theoretical vs practical, lecture-heavy vs interactive)
-                      - overall stress level for an average student
+                      
 
                       Avoid course topic descriptions unless they affect workload or difficulty.
                       Be direct and practical.
-                      
-                      `,
+                      No need to write about academic honesty policies
+                      Keep the word limit to around 30-40 words
+                    `,
           },
         ],
       },
