@@ -92,49 +92,52 @@ export default function SyllabusSummary({
             {/* Tables wrapper */}
             <div className="tables-container flex gap-8">
               {/* Weighting Table */}
-              <table className="text-sm">
-                <thead>
-                  <tr>
-                    <th className="px-2 py-1 font-semibold text-lg">
-                      Weighting
-                    </th>
-                    <th className="px-2 py-1 font-semibold text-lg">%</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {syllabus.grade_weights.map((row, idx) => (
-                    <tr key={idx}>
-                      <td className="px-2 py-1">{row.category}</td>
-                      <td className="px-2 py-1">{row.percentage}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              {syllabus.grade_weights != null &&
+                syllabus.grade_weights.length > 0 && (
+                  <table className="text-sm">
+                    <thead>
+                      <tr>
+                        <th className="px-2 py-1 font-semibold text-lg">
+                          Weighting
+                        </th>
+                        <th className="px-2 py-1 font-semibold text-lg">%</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {syllabus.grade_weights.map((row, idx) => (
+                        <tr key={idx}>
+                          <td className="px-2 py-1">{row.category}</td>
+                          <td className="px-2 py-1">{row.percentage}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
 
               {/* Grade Scale Table */}
               {syllabus.letter_grade_scale != null &&
-              syllabus.letter_grade_scale.length > 0 ? (
-                <table className="text-sm">
-                  <thead>
-                    <tr>
-                      <th className="px-2 py-1 font-semibold text-lg">Grade</th>
-                      <th className="px-2 py-1 font-semibold text-lg">Scale</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {syllabus.letter_grade_scale.map((row, idx) => (
-                      <tr key={idx}>
-                        <td className="px-2 py-1">{row.grade}</td>
-                        <td className="px-2 py-1">{row.range}</td>
+                syllabus.letter_grade_scale.length > 0 && (
+                  <table className="text-sm">
+                    <thead>
+                      <tr>
+                        <th className="px-2 py-1 font-semibold text-lg">
+                          Grade
+                        </th>
+                        <th className="px-2 py-1 font-semibold text-lg">
+                          Scale
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <div className="flex justify-center items-center">
-                  <p className="">Grade scale not available</p>
-                </div>
-              )}
+                    </thead>
+                    <tbody>
+                      {syllabus.letter_grade_scale.map((row, idx) => (
+                        <tr key={idx}>
+                          <td className="px-2 py-1">{row.grade}</td>
+                          <td className="px-2 py-1">{row.range}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
             </div>
 
             {/* AI Summary / Placeholder */}
@@ -142,7 +145,11 @@ export default function SyllabusSummary({
               id="ai-summary"
               className="text-sm flex flex-col items-center flex-1 min-h-[100px]"
             >
-              <p>{syllabus.summary}</p>
+              {syllabus.summary != null ? (
+                <p>{syllabus.summary}</p>
+              ) : (
+                <p>Could not summarize the syllabus</p>
+              )}
               <Link
                 href={syllabus_uri}
                 target="_blank"

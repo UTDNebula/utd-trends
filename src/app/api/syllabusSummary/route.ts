@@ -149,8 +149,8 @@ export async function GET(request: Request) {
             },
           },
           {
-     //       text: 'Extract the grading weights and grade scale exactly as shown in the tables. Provide a concise summary of the course structure & professor style for students.',
-              text: `Extract the grading weights and grade scale exactly as shown in the tables.
+            //       text: 'Extract the grading weights and grade scale exactly as shown in the tables. Provide a concise summary of the course structure & professor style for students.',
+            text: `Extract the grading weights and grade scale exactly as shown in the tables.
 
                       Then write a concise, student-focused summary that helps a student decide 
                       whether this professor is a good fit for them.
@@ -166,8 +166,7 @@ export async function GET(request: Request) {
                       Avoid course topic descriptions unless they affect workload or difficulty.
                       Be direct and practical.
                       
-                      `
-
+                      `,
           },
         ],
       },
