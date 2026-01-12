@@ -292,7 +292,7 @@ export default function SearchBar(props: Props) {
       } // remove currently chosen values
 
       if (
-        searchQueryLabel(item)
+        !searchQueryLabel(item)
           .toLowerCase()
           .includes(newInputValue.toLowerCase()) ||
         item.subtitle?.toLowerCase().includes(newInputValue.toLowerCase()) ||
@@ -329,8 +329,8 @@ export default function SearchBar(props: Props) {
     }
     fetch(
       '/api/autocomplete?input=' +
-        encodeURIComponent(newInputValue) +
-        '&searchBy=both',
+      encodeURIComponent(newInputValue) +
+      '&searchBy=both',
     )
       .then((response) => response.json())
       .then((data) => {
@@ -381,7 +381,7 @@ export default function SearchBar(props: Props) {
           setOptions(filtered);
         }
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => {
         setLoading(false);
       });
@@ -413,7 +413,7 @@ export default function SearchBar(props: Props) {
           setOptions(filtered);
         }
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => {
         setLoading(false);
       });
@@ -668,11 +668,10 @@ export default function SearchBar(props: Props) {
           variant="contained"
           disableElevation
           size="large"
-          className={`self-stretch my-px px-4 shrink-0 normal-case relative ${
-            value.length == 0
-              ? 'text-cornflower-200 dark:text-cornflower-700'
-              : ''
-          }`} //darkens the text when no valid search terms are entered (pseudo-disables the search button)
+          className={`self-stretch my-px px-4 shrink-0 normal-case relative ${value.length == 0
+            ? 'text-cornflower-200 dark:text-cornflower-700'
+            : ''
+            }`} //darkens the text when no valid search terms are entered (pseudo-disables the search button)
           onClick={() => onSelect(value)}
         >
           <p className={isPending || props.isPending ? 'opacity-0' : ''}>
