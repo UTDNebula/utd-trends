@@ -1,5 +1,11 @@
 'use client';
 
+import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
+import AddToPlanner from '@/components/search/SearchResultsTable/AddToPlanner';
+import { gpaToColor, useRainbowColors } from '@/modules/colors';
+import { calculateGrades, type GradesData } from '@/modules/fetchGrades';
+import type { RMP } from '@/modules/fetchRmp';
+import { searchQueryLabel, type SearchResult } from '@/types/SearchQuery';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   Checkbox,
@@ -13,13 +19,6 @@ import {
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
-
-import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
-import { gpaToColor, useRainbowColors } from '@/modules/colors';
-import type { RMP } from '@/modules/fetchRmp';
-import { calculateGrades, type GradesData } from '@/modules/fetchGrades';
-import { searchQueryLabel, type SearchResult } from '@/types/SearchQuery';
-import AddToPlanner from '@/components/search/SearchResultsTable/AddToPlanner';
 
 //Find the color corresponding to a number in a range
 function colorMidpoint(
