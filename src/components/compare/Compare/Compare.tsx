@@ -77,8 +77,8 @@ export default function Compare() {
                 )
                   ? grade_dist
                   : convertNumbersToPercents(
-                    calculateGrades(course.grades, chosenSemesters),
-                  ),
+                      calculateGrades(course.grades, chosenSemesters),
+                    ),
               };
             })}
           />
