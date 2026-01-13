@@ -23,7 +23,6 @@ export default function Compare() {
   if (compare.length === 0) {
     return <p>Click a checkbox to add something to compare.</p>;
   }
-  const grade_dist = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
   return (
     <div className="flex flex-col gap-4">
@@ -64,6 +63,14 @@ export default function Compare() {
               return response;
             }}
             series={compare.map((course) => {
+              const grade_dist = [];
+              const num_categories = convertNumbersToPercents(
+                calculateGrades(course.grades, chosenSemesters),
+              ).length;
+              for (let idx = 0; idx < num_categories; idx++) {
+                grade_dist.push(0);
+              }
+
               return {
                 name:
                   searchQueryLabel(course.searchQuery) +
