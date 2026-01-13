@@ -23,6 +23,7 @@ export default function Compare() {
   if (compare.length === 0) {
     return <p>Click a checkbox to add something to compare.</p>;
   }
+  const grade_dist = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
   return (
     <div className="flex flex-col gap-4">
@@ -74,10 +75,10 @@ export default function Compare() {
                     calculateGrades(course.grades, chosenSemesters),
                   )[0],
                 )
-                  ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                  ? grade_dist
                   : convertNumbersToPercents(
-                      calculateGrades(course.grades, chosenSemesters),
-                    ),
+                    calculateGrades(course.grades, chosenSemesters),
+                  ),
               };
             })}
           />
