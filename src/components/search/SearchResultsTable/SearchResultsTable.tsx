@@ -376,7 +376,11 @@ function Row({
                 filteredGrades={filteredGrades}
               />
               {searchResult.type !== 'course' && searchResult.RMP && (
-                <SingleProfInfo rmp={searchResult.RMP} />
+                <SingleProfInfo
+                  open={open}
+                  searchQuery={course}
+                  rmp={searchResult.RMP}
+                />
               )}
             </div>
           </Collapse>

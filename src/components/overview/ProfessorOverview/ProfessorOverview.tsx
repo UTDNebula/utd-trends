@@ -125,7 +125,7 @@ export default function ProfessorOverview({
         grades={grades}
         filteredGrades={calculateGrades(grades)}
       />
-      {rmp && <SingleProfInfo rmp={rmp} />}
+      {rmp && <SingleProfInfo open searchQuery={professor} rmp={rmp} />}
     </div>
   );
 }
