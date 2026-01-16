@@ -149,10 +149,13 @@ export async function GET(request: Request) {
             },
           },
           {
-            //       text: 'Extract the grading weights and grade scale exactly as shown in the tables. Provide a concise summary of the course structure & professor style for students.',
-            text: `Extract the grading weights and grade scale exactly as shown in the tables.
+            text:
+            // Original - 'Extract the grading weights and grade scale exactly as shown in the tables. Provide a concise summary of the course structure & professor style for students.',
 
-                      Then write a concise, student-focused summary that helps a student decide 
+               /* `  POLISHED VERSION THE ORIGINAL
+            Extract the grading weights and grade scale exactly as shown in the tables.
+
+                      Then write a concise, student-focused summary only in bullet points, and not a paragraph that helps a student decide 
                       whether this professor is a good fit for them.
 
                       Focus on:
@@ -167,7 +170,73 @@ export async function GET(request: Request) {
                       Be direct and practical.
                       No need to write about academic honesty policies
                       Keep the word limit to around 30-40 words
-                    `,
+                    `, */
+                    
+            /*  `  RATE MY PROFF STYLE
+                      Extract the grading weights and grade scale exactly as shown in the tables.
+
+                      Then write a short, student-style summary that sounds like a realistic
+                      RateMyProfessor review.
+
+                      Focus on:
+                      - how heavy the workload feels
+                      - how frequent the exams are, and how stressful they can be based on their weightage 
+                      - whether group work is common or avoidable
+                      - how strict deadlines feel in practice
+                      
+
+                      Use casual, plain language.
+                      Avoid formal or academic wording.
+                      Do not use bullets or headings.
+                      No need to talk about Grading scale, until its not standard
+                      Write 2-3 natural sentences (30-40 words).
+                  `, */
+            
+            
+            
+            /*`   (SNAPSHOT VERSION - NEEDS TO BE PROPERLY FORMATTED!)
+            Extract the grading weights and grade scale exactly as shown in the tables. 
+                      Write a concise   student-focused summary " Snapshot" using 4-5 labeled lines that helps a student decide 
+                      whether this professor is a good fit for them.
+
+                      Focus on:
+                      - workload intensity (exam-heavy vs assignment-heavy)
+                      - number and type of exams(comprehensive or not, mcqs or subjective etc)
+                      - group vs individual work
+                      - strictness on deadlines and academic policies
+                      - teaching style (theoretical vs practical, lecture-heavy vs interactive)
+                      
+
+                      Avoid course topic descriptions unless they affect workload or difficulty.
+                      Be direct and practical.
+                      No need to write about academic honesty policies or make up exam policies
+                      Each line must follow the format:
+                      Label: short description
+                      Do NOT use paragraphs or bullet points. 
+
+            
+            `*/
+
+            
+            /* `  (BULLET POINTS - NEED TO BE FORMATTED PROPERLY)
+            Extract the grading weights and grade scale exactly as shown in the tables.
+
+                      Then write a concise, student-focused summary only in bullet points, and not a paragraph that helps a student decide 
+                      whether this professor is a good fit for them.
+
+                      Focus on:
+                      - workload intensity (exam-heavy vs assignment-heavy)
+                      - number and type of exams(comprehensive or not, mcqs or subjective etc)
+                      - group vs individual work
+                      - strictness on deadlines and academic policies
+                      - teaching style (theoretical vs practical, lecture-heavy vs interactive)
+                      
+
+                      Avoid course topic descriptions unless they affect workload or difficulty.
+                      Be direct and practical.
+                      No need to write about academic honesty policies
+                      Keep the word limit to around 30-40 words
+                    `, */
           },
         ],
       },
