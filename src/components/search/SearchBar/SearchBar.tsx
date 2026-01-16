@@ -288,11 +288,13 @@ export default function SearchBar(props: Props) {
       } // remove currently chosen values
 
       if (
-        !searchQueryLabel(item)
-          .toLowerCase()
-          .includes(newInputValue.toLowerCase()) ||
-        item.subtitle?.toLowerCase().includes(newInputValue.toLowerCase()) ||
-        item.title?.toLowerCase().includes(newInputValue.toLowerCase())
+        !(
+          searchQueryLabel(item)
+            .toLowerCase()
+            .includes(newInputValue.toLowerCase()) ||
+          item.subtitle?.toLowerCase().includes(newInputValue.toLowerCase()) ||
+          item.title?.toLowerCase().includes(newInputValue.toLowerCase())
+        )
       ) {
         return false;
       } // remove non-matching recent options
