@@ -1,13 +1,12 @@
 'use client';
 
-import React from 'react';
-
 import { useSharedState } from '@/app/SharedStateProvider';
 import Split from '@/components/common/Split/Split';
 import StickySide from '@/components/common/Split/StickySide';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
 import PlannerEmpty from '@/components/planner/PlannerEmpty/PlannerEmpty';
 import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedule';
+import React from 'react';
 
 /**
  * Returns the My Planner page

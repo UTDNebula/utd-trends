@@ -1,15 +1,14 @@
 'use client';
 
-import { Skeleton } from '@mui/material';
-import React from 'react';
-
 import SingleGradesInfo, {
   LoadingSingleGradesInfo,
 } from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import type { Course } from '@/modules/fetchCourse';
-import type { GenericFetchedData } from '@/types/GenericFetchedData';
-import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 import { calculateGrades, type GradesData } from '@/modules/fetchGrades';
+import type { GenericFetchedData } from '@/types/GenericFetchedData';
+import { searchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
+import { Skeleton } from '@mui/material';
+import React from 'react';
 
 export function LoadingCourseOverview() {
   const courseComponent = (

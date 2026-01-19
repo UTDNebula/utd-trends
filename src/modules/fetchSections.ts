@@ -4,6 +4,8 @@ import {
   convertToProfOnly,
   type SearchQuery,
 } from '@/types/SearchQuery';
+import type { Course } from './fetchCourse';
+import type { Professor } from './fetchProfessor';
 
 export type SectionsData = {
   _id: string;
@@ -41,6 +43,8 @@ export type SectionsData = {
   syllabus_uri: string;
   grade_distribution: number[];
   attributes: unknown;
+  course_details?: Course[];
+  professor_details?: Professor[];
 }[];
 
 export type Sections = {

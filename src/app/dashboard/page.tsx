@@ -1,29 +1,27 @@
-import type { Metadata } from 'next';
-import React, { Suspense } from 'react';
-
 import Split from '@/components/common/Split/Split';
 import StickySide from '@/components/common/Split/StickySide';
 import DashboardEmpty from '@/components/dashboard/DashboardEmpty/DashboardEmpty';
 import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import Filters, { LoadingFilters } from '@/components/search/Filters/Filters';
 import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
+import { createSearchQuery } from '@/modules/createSearchQuery';
+import { fetchSearchResults } from '@/modules/fetchSearchResult';
 import {
   decodeSearchQueryLabel,
-  type SearchQuery,
   searchQueryLabel,
   searchQuerySort,
+  type SearchQuery,
 } from '@/types/SearchQuery';
-
-import ServerLeft from './ServerLeft';
 import {
   dehydrate,
   HydrationBoundary,
   QueryClient,
 } from '@tanstack/react-query';
-import { fetchSearchResults } from '@/modules/fetchSearchResult';
-import { createSearchQuery } from '@/modules/createSearchQuery';
+import type { Metadata } from 'next';
+import React, { Suspense } from 'react';
 import FiltersProvider from './FilterContext';
 import Right, { LoadingRight } from './Right';
+import ServerLeft from './ServerLeft';
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;

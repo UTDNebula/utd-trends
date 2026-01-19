@@ -2,10 +2,10 @@
 
 import React, { useRef } from 'react';
 import {
-  type ImperativePanelHandle,
   Panel,
   PanelGroup,
   PanelResizeHandle,
+  type ImperativePanelHandle,
 } from 'react-resizable-panels';
 
 interface Props {
