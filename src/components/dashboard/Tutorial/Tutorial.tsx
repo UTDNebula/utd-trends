@@ -228,7 +228,6 @@ export default function Tutorial() {
       }
     }
     if (ask) {
-       
       setTutorialHint(true);
     }
   }, []);
