@@ -1,27 +1,22 @@
 'use client';
 
 import React, { useRef } from 'react';
-import {
-  Panel,
-  PanelGroup,
-  PanelResizeHandle,
-  type ImperativePanelHandle,
-} from 'react-resizable-panels';
+import { Group, Panel, Separator, usePanelRef } from 'react-resizable-panels';
 
 interface Props {
   left: React.ReactNode;
   right: React.ReactNode;
-  minLeft: number;
-  minRight: number;
-  defaultLeft: number;
+  minLeft: string;
+  minRight: string;
+  defaultLeft: string;
 }
 
 /**
  * Split component to make a draggable left and right side
  */
 export default function Split(props: Props) {
-  const panelLRef = useRef<ImperativePanelHandle>(null);
-  const panelRRef = useRef<ImperativePanelHandle>(null);
+  const panelLRef = usePanelRef();
+  const panelRRef = usePanelRef();
   // Resets RHS & LHS when double clicking handle
   const handleResizeDoubleClick = () => {
     panelLRef.current?.resize(props.defaultLeft);
@@ -33,32 +28,32 @@ export default function Split(props: Props) {
         <div data-tutorial-id="RHS">{props.right}</div>
         <div data-tutorial-id="LHS">{props.left}</div>
       </div>
-      <PanelGroup
-        direction="horizontal"
+      <Group
+        orientation="horizontal"
         className="hidden sm:flex overflow-visible"
       >
         <Panel
-          ref={panelLRef}
+          panelRef={panelLRef}
           minSize={props.minLeft}
           defaultSize={props.defaultLeft}
           data-tutorial-id="LHS"
         >
           {props.left}
         </Panel>
-        <PanelResizeHandle
+        <Separator
           className="mt-4 p-1 mx-1 w-0.5 rounded-full opacity-50 data-[resize-handle-state=drag]:opacity-100 transition ease-in-out bg-transparent hover:bg-royal dark:hover:bg-cornflower-300 data-[resize-handle-state=drag]:bg-royal dark:data-[resize-handle-state=drag]:bg-cornflower-300"
           onDoubleClick={handleResizeDoubleClick}
         />
         <Panel
           className="overflow-visible min-w-0"
-          ref={panelRRef}
+          panelRef={panelRRef}
           minSize={props.minRight}
-          defaultSize={100 - props.defaultLeft}
+          defaultSize={100 - parseInt(props.defaultLeft) + '%'}
           data-tutorial-id="RHS"
         >
           {props.right}
         </Panel>
-      </PanelGroup>
+      </Group>
     </>
   );
 }

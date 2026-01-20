@@ -22,9 +22,9 @@ export default function Page() {
               <LoadingRight />
             </StickySide>
           }
-          minLeft={40}
-          minRight={30}
-          defaultLeft={50}
+          minLeft="40%"
+          minRight="30%"
+          defaultLeft="50%"
         />
       </main>
     </>

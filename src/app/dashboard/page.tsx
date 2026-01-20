@@ -149,9 +149,9 @@ export default async function Page({ searchParams }: Props) {
                   </Suspense>
                 </StickySide>
               }
-              minLeft={40}
-              minRight={30}
-              defaultLeft={50}
+              minLeft="40%"
+              minRight="30%"
+              defaultLeft="50%"
             />
           </main>
         </HydrationBoundary>
