@@ -1,8 +1,8 @@
 'use client';
 
-import { searchQueryEqual, type SearchQuery } from '@/types/SearchQuery';
+import { type SearchQuery } from '@/types/SearchQuery';
 import { Skeleton, Tooltip, Typography } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export function LoadingRmpSummary() {
   return (
@@ -27,41 +27,51 @@ type Props = {
 };
 
 export default function RmpSummary({ open, searchQuery }: Props) {
-  const searchQueryRef = useRef(searchQuery);
-  const [state, setState] = useState<'closed' | 'loading' | 'error' | 'done'>(
-    'closed',
-  );
   const [summary, setSummary] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
+  const status = !open
+    ? 'closed'
+    : error
+      ? 'error'
+      : summary === null
+        ? 'loading'
+        : 'done';
+
+  // Fetch when opened
   useEffect(() => {
-    if (!searchQueryEqual(searchQueryRef.current, searchQuery)) {
-      searchQueryRef.current = searchQuery;
-      setState('closed');
-      setSummary(null);
-    }
-    if (open && state === 'closed') {
-      setState('loading');
-      const params = new URLSearchParams();
-      if (searchQuery.profFirst)
-        params.append('profFirst', searchQuery.profFirst);
-      if (searchQuery.profLast) params.append('profLast', searchQuery.profLast);
-      fetch(`/api/rmpSummary?${params.toString()}`, {
-        method: 'GET',
-        next: { revalidate: 3600 },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.message !== 'success') {
-            setState('error');
-            return;
-          }
-          setState('done');
-          setSummary(data.data);
-        });
-    }
-  }, [open, state, searchQuery]);
+    if (!open) return;
 
-  if (state === 'error') {
+    let cancelled = false;
+
+    const params = new URLSearchParams();
+    if (searchQuery.profFirst)
+      params.append('profFirst', searchQuery.profFirst);
+    if (searchQuery.profLast) params.append('profLast', searchQuery.profLast);
+    fetch(`/api/rmpSummary?${params.toString()}`, {
+      method: 'GET',
+      next: { revalidate: 3600 },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled) return;
+
+        if (data.message !== 'success') {
+          setError(true);
+          return;
+        }
+        setSummary(data.data);
+      })
+      .catch(() => {
+        if (!cancelled) setError(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, searchQuery]);
+
+  if (status === 'error') {
     return <p>Problem loading AI review summary.</p>;
   }
 

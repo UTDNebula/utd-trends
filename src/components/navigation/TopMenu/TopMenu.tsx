@@ -9,13 +9,12 @@ import SearchBar, {
   LoadingSearchBar,
 } from '@/components/search/SearchBar/SearchBar';
 import DownloadIcon from '@mui/icons-material/Download';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ShareIcon from '@mui/icons-material/Share';
 import { IconButton, Snackbar, Tooltip } from '@mui/material';
 import html2canvas from 'html2canvas-pro';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { Suspense, useCallback, useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 
 /**
  * Props type used by the TopMenu component
@@ -58,29 +57,11 @@ export default function TopMenu(props: Props) {
     alert(url);
   }
 
-  const [openTutorial, setOpenTutorial] = useState(false);
-  const closeTutorial = useCallback(() => setOpenTutorial(false), []);
-  const [tutorialHint, setTutorialHint] = useState(false);
-  //Open if not already closed (based on localStorage)
-  useEffect(() => {
-    const previous = localStorage.getItem('tutorialHint');
-    let ask = previous === null;
-    if (previous !== null) {
-      const parsed = JSON.parse(previous);
-      if (parsed !== null && parsed.value !== 'opened') {
-        ask = true;
-      }
-    }
-    if (ask) {
-      setTutorialHint(true);
-    }
-  }, []);
-  const cacheIndex = 0; //Increment this to open the popup for all users on next deployment
-
   const [dashboardSearchTerms, setDashboardSearchTerms] = useState<
     null | string
   >(null);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDashboardSearchTerms(
       window.sessionStorage.getItem('dashboardSearchTerms'),
     );
@@ -142,48 +123,7 @@ export default function TopMenu(props: Props) {
           <div className="ml-auto">
             <WhatsNew />
           </div>
-          {!props.isPlanner && (
-            <div className="relative">
-              <div
-                className={
-                  tutorialHint
-                    ? 'absolute w-11 h-11 rounded-full bg-royal dark:bg-cornflower-300 animate-ping'
-                    : 'hidden'
-                }
-              />
-              <div
-                className={
-                  tutorialHint
-                    ? ' rounded-full bg-royal dark:bg-cornflower-300'
-                    : ''
-                }
-              >
-                <Tooltip title="Open Tutorial">
-                  <IconButton
-                    className="aspect-square"
-                    size="medium"
-                    onClick={() => {
-                      setTutorialHint(false);
-                      localStorage.setItem(
-                        'tutorialHint',
-                        JSON.stringify({
-                          value: 'opened',
-                          cacheIndex: cacheIndex,
-                        }),
-                      );
-                      setOpenTutorial(true);
-                    }}
-                  >
-                    <HelpOutlineIcon
-                      className={
-                        'text-3xl' + (tutorialHint ? ' text-white' : '')
-                      }
-                    />
-                  </IconButton>
-                </Tooltip>
-              </div>
-            </div>
-          )}
+          {!props.isPlanner && <Tutorial />}
           <Tooltip
             title={`${props.isPlanner ? 'Download your Schedule' : 'Share link to Search'}`}
           >
@@ -259,7 +199,6 @@ export default function TopMenu(props: Props) {
         onClose={() => setOpenCopied(false)}
         message="Copied!"
       />
-      <Tutorial open={openTutorial} close={closeTutorial} />
     </>
   );
 }

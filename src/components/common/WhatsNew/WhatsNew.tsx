@@ -124,7 +124,7 @@ export default function WhatsNewButton() {
     [],
   );
   const [latestFeatures, setLatestFeatures] = useState<Feature[]>([]);
-  const [state, setState] = useState('done');
+  const [error, setError] = useState<Error | null>(null);
 
   // Check if the latest feature is unread
   const unread = Boolean(
@@ -132,15 +132,23 @@ export default function WhatsNewButton() {
   );
   const open = Boolean(anchorEl);
 
+  const status = error ? 'error' : latestFeatures === null ? 'loading' : 'done';
+
   // Fetch releases
   useEffect(() => {
-    setState('loading');
+    let cancelled = false;
+
     fetchReleases()
-      .then((response) => {
-        setLatestFeatures(response);
-        setState('done');
+      .then((features) => {
+        if (!cancelled) setLatestFeatures(features);
       })
-      .catch(() => setState('error'));
+      .catch((err) => {
+        if (!cancelled) setError(err);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Handle opening the popover
@@ -215,12 +223,12 @@ export default function WhatsNewButton() {
         <h3 className="font-bold mb-3 text-base text-center">
           What&apos;s New?
         </h3>
-        {(state === 'loading' && (
+        {(status === 'loading' && (
           <div className="flex justify-center py-4">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-royal"></div>
           </div>
         )) ||
-          (state === 'done' &&
+          (status === 'done' &&
             (latestFeatures.length > 0 ? (
               <div className="flex flex-col gap-2">
                 {latestFeatures.flatMap((feature, index) => [

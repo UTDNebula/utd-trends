@@ -15,7 +15,7 @@ const eslintConfig = defineConfig([
     'build/**',
     'next-env.d.ts',
     'styleguide/build/**',
-    'styleguide.config.js'
+    'styleguide.config.js',
   ]),
 ]);
 
