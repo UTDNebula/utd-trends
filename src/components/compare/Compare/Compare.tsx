@@ -64,10 +64,10 @@ export default function Compare() {
             }}
             series={compare.map((course) => {
               const grade_dist = [];
-              const num_categories = convertNumbersToPercents(
+              const categories = convertNumbersToPercents(
                 calculateGrades(course.grades, chosenSemesters),
-              ).length;
-              for (let idx = 0; idx < num_categories; idx++) {
+              );
+              for (let idx = 0; idx < categories.length; idx++) {
                 grade_dist.push(0);
               }
 
@@ -78,14 +78,10 @@ export default function Compare() {
                     ? ' (Overall)' //Indicates that this entry is an aggregate for the entire course/professor
                     : ''),
                 data: Number.isNaN(
-                  convertNumbersToPercents(
-                    calculateGrades(course.grades, chosenSemesters),
-                  )[0],
+                  categories[0],
                 )
                   ? grade_dist
-                  : convertNumbersToPercents(
-                      calculateGrades(course.grades, chosenSemesters),
-                    ),
+                  : categories,
               };
             })}
           />
