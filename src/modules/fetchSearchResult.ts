@@ -10,6 +10,7 @@ import {
 import fetchGrades from './fetchGrades';
 import fetchRmp from './fetchRmp';
 import fetchSections from './fetchSections';
+
 const coursePrefixNumberTable = untypedCoursePrefixNumberTable as {
   [key: string]: string;
 };

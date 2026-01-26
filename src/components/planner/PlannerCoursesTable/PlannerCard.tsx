@@ -1,5 +1,20 @@
 'use client';
 
+import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
+import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
+import { calculateGrades } from '@/modules/fetchGrades';
+import type { Sections, SectionsData } from '@/modules/fetchSections';
+import { useSearchResult } from '@/modules/plannerFetch';
+import {
+  convertToCourseOnly,
+  convertToProfOnly,
+  removeSection,
+  searchQueryLabel,
+  sectionCanOverlap,
+  type SearchQuery,
+  type SearchQueryMultiSection,
+  type SearchResult,
+} from '@/types/SearchQuery';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
@@ -26,22 +41,6 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import React, { useState } from 'react';
-
-import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
-import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
-import type { Sections, SectionsData } from '@/modules/fetchSections';
-import {
-  convertToCourseOnly,
-  convertToProfOnly,
-  removeSection,
-  type SearchQuery,
-  searchQueryLabel,
-  type SearchQueryMultiSection,
-  type SearchResult,
-  sectionCanOverlap,
-} from '@/types/SearchQuery';
-import { useSearchResult } from '@/modules/plannerFetch';
-import { calculateGrades } from '@/modules/fetchGrades';
 
 export function LoadingPlannerCard() {
   return (
@@ -832,7 +831,11 @@ export default function PlannerCard(props: PlannerCardProps) {
             {(latestMatchedSections.type === 'professor' ||
               latestMatchedSections.type === 'combo') &&
               latestMatchedSections.RMP && (
-                <SingleProfInfo rmp={latestMatchedSections.RMP} />
+                <SingleProfInfo
+                  open={open && whichOpen === 'grades'}
+                  searchQuery={props.query}
+                  rmp={latestMatchedSections.RMP}
+                />
               )}
           </div>
         </Collapse>

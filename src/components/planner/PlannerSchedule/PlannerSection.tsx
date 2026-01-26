@@ -1,13 +1,12 @@
-import { Tooltip } from '@mui/material';
-import React from 'react';
-
+import { useSharedState } from '@/app/SharedStateProvider';
 import {
   DAYS,
   START_HOUR,
 } from '@/components/planner/PlannerSchedule/PlannerSchedule';
-import { type SearchQuery } from '@/types/SearchQuery';
 import { useSearchResult } from '@/modules/plannerFetch';
-import { useSharedState } from '@/app/SharedStateProvider';
+import { type SearchQuery } from '@/types/SearchQuery';
+import { Tooltip } from '@mui/material';
+import React from 'react';
 
 interface PlannerSectionComponentProps {
   selectedSection: string;

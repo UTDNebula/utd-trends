@@ -1,5 +1,23 @@
 'use client';
 
+import { FiltersContext } from '@/app/dashboard/FilterContext';
+import { useSharedState } from '@/app/SharedStateProvider';
+import Rating from '@/components/common/Rating/Rating';
+import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
+import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
+import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
+import { gpaToColor, useRainbowColors } from '@/modules/colors';
+import { calculateGrades } from '@/modules/fetchGrades';
+import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import { displaySemesterName } from '@/modules/semesters';
+import {
+  convertToCourseOnly,
+  convertToProfOnly,
+  searchQueryEqual,
+  searchQueryLabel,
+  type SearchQuery,
+  type SearchResult,
+} from '@/types/SearchQuery';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
@@ -18,27 +36,9 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import dynamic from 'next/dynamic';
 import React, { use, useMemo, useState } from 'react';
 
-import { useSharedState } from '@/app/SharedStateProvider';
-import Rating from '@/components/common/Rating/Rating';
-import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
-import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
-import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
-import { gpaToColor, useRainbowColors } from '@/modules/colors';
-import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import { displaySemesterName } from '@/modules/semesters';
-import {
-  convertToCourseOnly,
-  convertToProfOnly,
-  type SearchQuery,
-  searchQueryEqual,
-  searchQueryLabel,
-  type SearchResult,
-} from '@/types/SearchQuery';
-import { calculateGrades } from '@/modules/fetchGrades';
-import { FiltersContext } from '@/app/dashboard/FilterContext';
-import dynamic from 'next/dynamic';
 const AddToPlanner = dynamic(() => import('./AddToPlanner'), {
   ssr: false,
   loading: () => <Checkbox disabled icon={<BookOutlinedIcon />} />,
@@ -376,7 +376,11 @@ function Row({
                 filteredGrades={filteredGrades}
               />
               {searchResult.type !== 'course' && searchResult.RMP && (
-                <SingleProfInfo rmp={searchResult.RMP} />
+                <SingleProfInfo
+                  open={open}
+                  searchQuery={course}
+                  rmp={searchResult.RMP}
+                />
               )}
             </div>
           </Collapse>

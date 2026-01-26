@@ -1,9 +1,8 @@
-import { NextResponse } from 'next/server';
-
 import autocompleteGraph from '@/data/autocomplete_graph.json';
 import { getGraph, searchAutocomplete } from '@/modules/autocomplete';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery } from '@/types/SearchQuery';
+import { NextResponse } from 'next/server';
 
 const graph = getGraph(autocompleteGraph as object);
 
