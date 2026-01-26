@@ -77,11 +77,7 @@ export default function Compare() {
                   (course.type !== 'combo'
                     ? ' (Overall)' //Indicates that this entry is an aggregate for the entire course/professor
                     : ''),
-                data: Number.isNaN(
-                  categories[0],
-                )
-                  ? grade_dist
-                  : categories,
+                data: Number.isNaN(categories[0]) ? grade_dist : categories,
               };
             })}
           />
