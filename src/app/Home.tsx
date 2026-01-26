@@ -56,7 +56,7 @@ export default function Home(props: Props) {
       />
       <div className="absolute top-4 left-4 right-4 flex gap-2 place-content-between flex-wrap-reverse">
         {/*Ad for Spring 2026*/}
-        <a
+        {/*<a
           href="https://trends.utdnebula.com/dashboard?searchTerms=GOVT+2306&availability=true"
           target="_blank"
           rel="noreferrer"
@@ -79,7 +79,7 @@ export default function Home(props: Props) {
           <span>
             <b>Spring 2026</b> courses are now on Trends!
           </span>
-        </a>
+        </a>*/}
         <PlannerButton className="ml-auto" />
       </div>
       <div className="max-w-xl grow flex flex-col justify-center">
