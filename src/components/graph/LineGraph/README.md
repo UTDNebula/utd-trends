@@ -17,9 +17,9 @@ The `LineGraph` component displays semester-wise GPA trends for one or more cour
 ### Example Usage
 
 ```tsx
+import { FiltersContext } from '@/app/dashboard/FilterContext';
 import React from 'react';
 import LineGraph from './LineGraph';
-import { FiltersContext } from '@/app/dashboard/FilterContext';
 
 const data = [
   {
