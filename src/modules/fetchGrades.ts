@@ -83,15 +83,17 @@ export function calculateGrades(
 export default async function fetchGrades(
   query: SearchQuery,
 ): Promise<GradesData> {
-  const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
+  const API_URL = process.env.NEBULA_API_URL;
+  if (typeof API_URL !== 'string') {
+    throw new Error('API URL is undefined');
+  }
+  const API_KEY = process.env.NEBULA_API_KEY;
   if (typeof API_KEY !== 'string') {
     throw new Error('API key is undefined');
   }
 
   try {
-    const url = new URL(
-      'https://api.utdnebula.com/grades/semester/sectionType',
-    );
+    const url = new URL(API_URL + 'grades/semester/sectionType');
     if (typeof query.prefix === 'string') {
       url.searchParams.append('prefix', query.prefix);
     }

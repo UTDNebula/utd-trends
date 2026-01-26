@@ -2,7 +2,14 @@
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
-  const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
+  const API_URL = process.env.NEBULA_API_URL;
+  if (typeof API_URL !== 'string') {
+    return NextResponse.json(
+      { message: 'error', data: 'API URL is undefined' },
+      { status: 500 },
+    );
+  }
+  const API_KEY = process.env.NEBULA_API_KEY;
   if (typeof API_KEY !== 'string') {
     return NextResponse.json(
       { message: 'error', data: 'API key is undefined' },
@@ -33,7 +40,7 @@ export async function GET(request: Request) {
     Accept: 'application/json',
   };
 
-  const url = new URL('https://api.utdnebula.com/grades/semester/sectionType');
+  const url = new URL(API_URL + 'grades/semester/sectionType');
   if (typeof prefix === 'string') {
     url.searchParams.append('prefix', prefix);
   }
