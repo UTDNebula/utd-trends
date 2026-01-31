@@ -63,7 +63,7 @@ export default function Home(props: Props) {
           rel="noreferrer"
           className="bg-royal dark:bg-cornflower-300 text-cornflower-50 dark:text-haiti rounded transition hover:scale-[1.01] text-center flex gap-2 items-center mr-auto"
         >
-          <UTDTrendsLogoStandalone className="h-12 w-auto my-1 ml-2 fill-white dark:fill-haiti shrink-0" />
+          <UTDTrendsLogoStandalone className="h-12 w-auto ml-2 fill-white dark:fill-haiti shrink-0" />
           <span className="my-3 mr-5">
             <b>Spring 2026</b> courses are now on Trends!
           </span>
