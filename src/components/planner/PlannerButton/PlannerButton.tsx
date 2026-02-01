@@ -31,16 +31,12 @@ export default function PlannerButton({
       variant="contained"
       disableElevation
       size="large"
-      className={`px-4 normal-case rounded-3xl ${className ?? ''}`}
+      className={`normal-case rounded-full ${className ?? ''}`}
       component={Link}
       href={href}
       onClick={onClick}
+      startIcon={isPlanner ? <SearchIcon /> : <BookIcon />}
     >
-      {isPlanner ? (
-        <SearchIcon className="mr-2" />
-      ) : (
-        <BookIcon className="mr-2" />
-      )}
       {isPlanner ? 'Search Results' : 'My Planner'}
     </Button>
   );
