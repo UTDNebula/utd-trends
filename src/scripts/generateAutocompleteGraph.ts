@@ -184,7 +184,7 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
         const sectionData = academicSessionData.sections[sectionItr];
         const uniqueProfessorSet = new Set<string>();
 
-        courseStudents += sectionData.total_students;
+        courseStudents += sectionData.total_students ?? 0;
         for (
           let professorItr = 0;
           professorItr < sectionData.professors.length;
@@ -192,15 +192,16 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
         ) {
           const professorData = sectionData.professors[professorItr];
           // Makes sure that we don't double count professors in the same section
-          const uniqueSetKey = `${professorData.first_name}|${professorData.last_name}`;
-          if (uniqueProfessorSet.has(uniqueSetKey)) { continue; }
-          uniqueProfessorSet.add(uniqueSetKey);
+
           if (
             'first_name' in professorData && //handle empty professor: {}
             'last_name' in professorData &&
             professorData.first_name !== '' && //handle blank name
             professorData.last_name !== ''
           ) {
+            const uniqueSetKey = `${professorData.first_name}|${professorData.last_name}`;
+            if (uniqueProfessorSet.has(uniqueSetKey)) { continue; }
+            uniqueProfessorSet.add(uniqueSetKey);
             addProfessor(professorData.first_name, professorData.last_name, undefined, sectionData.total_students ?? 0);
           }
         }
