@@ -1,18 +1,18 @@
 'use client';
 
-import { FormControl, FormControlLabel, Switch, Tooltip } from '@mui/material';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import React, { useState, useTransition } from 'react';
-
 import Background from '@/../public/background.png';
 import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
+import { UTDTrendsLogoStandalone } from '@/components/icons/UTDTrendsLogo/UTDTrendsLogo';
+import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 import SearchBar, {
   updateRecentSearches,
 } from '@/components/search/SearchBar/SearchBar';
 import { displaySemesterName } from '@/modules/semesters';
-import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
-import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
+import { searchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
+import { FormControl, FormControlLabel, Switch, Tooltip } from '@mui/material';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import React, { useState, useTransition } from 'react';
 
 interface Props {
   latestSemester: string;
@@ -61,19 +61,10 @@ export default function Home(props: Props) {
           href="https://trends.utdnebula.com/dashboard?searchTerms=GOVT+2306&availability=true"
           target="_blank"
           rel="noreferrer"
-          className="bg-royal dark:bg-cornflower-300 text-cornflower-50 dark:text-haiti py-3 px-5 rounded transition hover:scale-[1.01] text-center flex gap-2 items-center mr-auto"
+          className="bg-royal dark:bg-cornflower-300 text-cornflower-50 dark:text-haiti rounded transition hover:scale-[1.01] text-center flex gap-2 items-center mr-auto"
         >
-          <img
-            className="h-8 -my-1 -ml-2 hidden dark:block"
-            src="/icon-black.svg"
-            alt=""
-          />
-          <img
-            className="h-8 -my-1 -ml-2 block dark:hidden"
-            src="/icon-white.svg"
-            alt=""
-          />
-          <span>
+          <UTDTrendsLogoStandalone className="h-12 w-auto ml-2 fill-white dark:fill-haiti shrink-0" />
+          <span className="my-3 mr-5">
             <b>Spring 2026</b> courses are now on Trends!
           </span>
         </a>

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection';
 import {
@@ -7,6 +5,7 @@ import {
   searchQueryLabel,
   searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
+import React from 'react';
 
 // hours shown (24-hour time)
 export const START_HOUR = 8;

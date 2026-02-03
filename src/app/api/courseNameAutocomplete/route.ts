@@ -1,8 +1,7 @@
-import { NextResponse } from 'next/server';
-
 import untypedCourseNameTable from '@/data/course_name_table.json';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery } from '@/types/SearchQuery';
+import { NextResponse } from 'next/server';
 
 const courseNameTable = untypedCourseNameTable as {
   [key: string]: SearchQuery[];

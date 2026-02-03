@@ -1,12 +1,11 @@
-import { Skeleton } from '@mui/material';
-import React from 'react';
-
 import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
-import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import { type SearchQuery, searchQueryLabel } from '@/types/SearchQuery';
 import type { GradesData, GradesSummary } from '@/modules/fetchGrades';
+import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import { searchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
+import { Skeleton } from '@mui/material';
+import React from 'react';
 
 export function LoadingSingleGradesInfo() {
   return (
