@@ -2,7 +2,6 @@
 
 import Background from '@/../public/background.png';
 import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
-import { UTDTrendsLogoStandalone } from '@/components/icons/UTDTrendsLogo/UTDTrendsLogo';
 import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 import SearchBar, {
   updateRecentSearches,
