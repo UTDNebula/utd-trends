@@ -417,7 +417,7 @@ export default function CompareTable({
   colorMap,
 }: CompareTableProps) {
   //Table sorting category
-  const [orderBy, setOrderBy] = useState<string>('Color');
+  const [orderBy, setOrderBy] = useState<string>('GPA');
   //Table sorting direction
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   //Cycle through sorting
@@ -619,29 +619,13 @@ export default function CompareTable({
         </Table>
       </TableContainer>
       {/* Mobile version (rotated) */}
-      <div className="min-w-96 max-w-full overflow-x-auto sm:hidden">
-        <TableContainer className="w-fit mb-4">
+      <div className="w-full min-w-0 overflow-x-auto sm:hidden">
+        <TableContainer className="w-full mb-4" sx={{ overflow: 'visible' }}>
           <Table
             size="small"
-            className="border-separate border-spacing-x-0 border-spacing-y-2 [table-layout:fixed]"
+            className="border-separate border-spacing-x-0 border-spacing-y-2 w-full"
+            sx={{ tableLayout: 'fixed' }}
           >
-            <colgroup>
-              {/* Compare column */}
-              <col style={{ width: `${200 / 9}%` }} />
-              {/* GPA column */}
-              <col style={{ width: `${100 / 9}%` }} />
-              {/* Rating column */}
-              <col style={{ width: `${100 / 9}%` }} />
-              {/* Would Take Again column */}
-              <col style={{ width: `${100 / 9}%` }} />
-              {/* Difficulty column */}
-              <col style={{ width: `${100 / 9}%` }} />
-              {/* # of Grades / Ratings column */}
-              <col style={{ width: `${100 / 9}%` }} />
-              {/* Color column */}
-              <col style={{ width: `${100 / 9}%` }} />
-              {/* Add to Planner column */}
-            </colgroup>
             <TableHead>
               <TableRow>
                 {(() => {
@@ -650,7 +634,7 @@ export default function CompareTable({
                   const gradesRatingsLabel = (
                     <span className="inline-flex flex-col items-center">
                       <span># of Grades</span>
-                      <span className="my-0.5 w-full min-w-[1.5rem] border-t border-current opacity-70" />
+                      <span className="my-0.5 w-full border-t border-current opacity-70" />
                       <span>Ratings</span>
                     </span>
                   );
@@ -659,26 +643,25 @@ export default function CompareTable({
                     Rating: false,
                     'Would Take Again': false,
                     Difficulty: true, // defaultAscSort
-                    Color: false,
                   };
                   const labels: (string | React.ReactNode)[] = [
+                    '',
                     'Compare',
                     'GPA',
                     'Rating',
                     'Would Take Again',
                     'Difficulty',
                     gradesRatingsLabel,
-                    'Color',
                     'Add to Planner',
                   ];
                   const sortKeys = [
+                    null,
                     null,
                     'GPA',
                     'Rating',
                     'Would Take Again',
                     'Difficulty',
                     null,
-                    'Color',
                     null,
                   ] as (string | null)[];
                   const sortTooltips: { [key: string]: string } = {
@@ -686,7 +669,6 @@ export default function CompareTable({
                     Rating: 'Sort by Rating',
                     'Would Take Again': 'Sort by Would Take Again %',
                     Difficulty: 'Sort by Difficulty',
-                    Color: 'Sort by Color',
                   };
                   return labels.map((label, i) => {
                     const className =
@@ -714,6 +696,8 @@ export default function CompareTable({
                             onClick={() => handleClick(sortKey)}
                             sx={{
                               '& .MuiTableSortLabel-icon': {
+                                marginLeft: '0',
+                                marginRight: '0',
                                 fontSize: '0.5rem',
                               },
                             }}
@@ -730,7 +714,11 @@ export default function CompareTable({
                           typeof label === 'string' ? label : 'grades-ratings'
                         }
                         className={className}
-                        sx={{ borderBottom: 'none' }}
+                        sx={{
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          wordBreak: 'break-word',
+                        }}
                       >
                         {content}
                       </TableCell>
@@ -771,10 +759,33 @@ export default function CompareTable({
                     sx={{ '& td': { border: 0 } }}
                   >
                     <TableCell
+                      align="center"
+                      className={`${firstCellClassName} rounded-l-lg`}
+                      style={cellStyle}
+                      sx={{ maxWidth: '1.5rem' }}
+                    >
+                      <Tooltip title="Remove from Compare">
+                        <Checkbox
+                          size="small"
+                          checked={true}
+                          onClick={() => removeFromCompare(result)}
+                          sx={{
+                            '&.Mui-checked': {
+                              color: mappedColors[rowIndex],
+                            },
+                          }}
+                        />
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell
                       component="th"
                       scope="row"
-                      className={`text-center font-medium ${firstCellClassName} rounded-l-lg`}
-                      sx={{ borderBottom: 'none' }}
+                      className={`text-center font-medium text-[10px] break-words whitespace-normal ${middleCellClassName}`}
+                      sx={{
+                        borderBottom: 'none',
+                        wordBreak: 'break-word',
+                        overflowWrap: 'break-word',
+                      }}
                       style={cellStyle}
                     >
                       {searchQueryLabel(result.searchQuery)}
@@ -903,23 +914,6 @@ export default function CompareTable({
                             </Typography>
                           )}
                         </span>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell
-                      align="center"
-                      className={middleCellClassName}
-                      style={cellStyle}
-                    >
-                      <Tooltip title="Remove from Compare">
-                        <Checkbox
-                          checked={true}
-                          onClick={() => removeFromCompare(result)}
-                          sx={{
-                            '&.Mui-checked': {
-                              color: mappedColors[rowIndex],
-                            },
-                          }}
-                        />
                       </Tooltip>
                     </TableCell>
                     <TableCell
