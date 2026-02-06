@@ -21,13 +21,17 @@ export interface Professor {
 export default async function fetchProfessor(
   query: SearchQuery,
 ): Promise<Professor> {
-  const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
+  const API_URL = process.env.NEBULA_API_URL;
+  if (typeof API_URL !== 'string') {
+    throw new Error('API URL is undefined');
+  }
+  const API_KEY = process.env.NEBULA_API_KEY;
   if (typeof API_KEY !== 'string') {
     throw new Error('API key is undefined');
   }
 
   try {
-    const url = new URL('https://api.utdnebula.com/professor');
+    const url = new URL(API_URL + 'professor');
     if (
       typeof query.profFirst === 'string' &&
       typeof query.profLast === 'string'

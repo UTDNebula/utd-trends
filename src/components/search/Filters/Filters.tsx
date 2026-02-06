@@ -1,5 +1,12 @@
 'use client';
 
+import { FiltersContext } from '@/app/dashboard/FilterContext';
+import { useSharedState } from '@/app/SharedStateProvider';
+import Rating from '@/components/common/Rating/Rating';
+import { calculateGrades } from '@/modules/fetchGrades';
+import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import { compareSemesters, displaySemesterName } from '@/modules/semesters';
+import type { SearchResult } from '@/types/SearchQuery';
 import {
   Checkbox,
   FormControl,
@@ -15,14 +22,6 @@ import {
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { usePathname, useSearchParams } from 'next/navigation';
 import React, { use } from 'react';
-
-import { useSharedState } from '@/app/SharedStateProvider';
-import Rating from '@/components/common/Rating/Rating';
-import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import { compareSemesters, displaySemesterName } from '@/modules/semesters';
-import type { SearchResult } from '@/types/SearchQuery';
-import { FiltersContext } from '@/app/dashboard/FilterContext';
-import { calculateGrades } from '@/modules/fetchGrades';
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
@@ -348,7 +347,19 @@ export default function Filters({
                     setChosenSemesters(recentSemesters);
                   }
                 } else {
-                  setChosenSemesters(value as string[]);
+                  {
+                    /*If all semesters were selected, select only clicked semester*/
+                  }
+                  if (chosenSemesters.length === semesters.length) {
+                    const clickedItem = chosenSemesters.find(
+                      (x) => !value.includes(x),
+                    );
+                    if (clickedItem) {
+                      setChosenSemesters([clickedItem]);
+                    }
+                  } else {
+                    setChosenSemesters(value as string[]);
+                  }
                 }
               }}
               renderValue={(selected) => {

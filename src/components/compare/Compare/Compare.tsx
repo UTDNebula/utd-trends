@@ -1,15 +1,14 @@
 'use client';
 
-import React, { use } from 'react';
-
+import { FiltersContext } from '@/app/dashboard/FilterContext';
 import { useSharedState } from '@/app/SharedStateProvider';
 import CompareTable from '@/components/compare/CompareTable/CompareTable';
 import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
-import { searchQueryLabel } from '@/types/SearchQuery';
 import { calculateGrades, type GradesSummary } from '@/modules/fetchGrades';
-import { FiltersContext } from '@/app/dashboard/FilterContext';
+import { searchQueryLabel } from '@/types/SearchQuery';
+import React, { use } from 'react';
 
 function convertNumbersToPercents(distribution: GradesSummary): number[] {
   const total = distribution.total;
@@ -64,15 +63,21 @@ export default function Compare() {
               return response;
             }}
             series={compare.map((course) => {
+              const grade_dist = [];
+              const categories = convertNumbersToPercents(
+                calculateGrades(course.grades, chosenSemesters),
+              );
+              for (let idx = 0; idx < categories.length; idx++) {
+                grade_dist.push(0);
+              }
+
               return {
                 name:
                   searchQueryLabel(course.searchQuery) +
                   (course.type !== 'combo'
                     ? ' (Overall)' //Indicates that this entry is an aggregate for the entire course/professor
                     : ''),
-                data: convertNumbersToPercents(
-                  calculateGrades(course.grades, chosenSemesters),
-                ),
+                data: Number.isNaN(categories[0]) ? grade_dist : categories,
               };
             })}
           />

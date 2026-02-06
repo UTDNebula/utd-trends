@@ -1,5 +1,15 @@
 'use client';
 
+import { useSharedState } from '@/app/SharedStateProvider';
+import untyped_professor_to_alias from '@/data/professor_to_alias.json';
+import {
+  decodeSearchQueryLabel,
+  isCourseQuery,
+  removeDuplicates,
+  searchQueryEqual,
+  searchQueryLabel,
+  type SearchQuery,
+} from '@/types/SearchQuery';
 import HistoryToggleOffIcon from '@mui/icons-material/HistoryToggleOff';
 import SearchIcon from '@mui/icons-material/Search';
 import {
@@ -15,23 +25,12 @@ import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, {
-  type Key,
   useEffect,
   useRef,
   useState,
   useTransition,
+  type Key,
 } from 'react';
-
-import { useSharedState } from '@/app/SharedStateProvider';
-import untyped_professor_to_alias from '@/data/professor_to_alias.json';
-import {
-  decodeSearchQueryLabel,
-  isCourseQuery,
-  removeDuplicates,
-  type SearchQuery,
-  searchQueryEqual,
-  searchQueryLabel,
-} from '@/types/SearchQuery';
 
 const professor_to_alias = untyped_professor_to_alias as {
   [key: string]: string;
@@ -165,21 +164,18 @@ export default function SearchBar(props: Props) {
     'ex. MKT 3320',
     'ex. ANGM 3305 Robert Manriquez',
   ];
-  const [searchBarHintIndex, setSearchBarHintIndex] = useState<number>(
-    Math.floor(Math.random() * searchBarHints.length),
-  );
-
-  function changeHint() {
-    setSearchBarHintIndex(Math.floor(Math.random() * searchBarHints.length));
-  }
+  // Initialize with 0 to avoid hydration mismatch (Math.random() differs on server/client)
+  const [searchBarHintIndex, setSearchBarHintIndex] = useState<number>(0);
 
   useEffect(() => {
+    setSearchBarHintIndex(Math.floor(Math.random() * searchBarHints.length));
+
     const interval = setInterval(() => {
-      changeHint();
+      setSearchBarHintIndex(Math.floor(Math.random() * searchBarHints.length));
     }, 7000);
 
     return () => clearInterval(interval); // Cleanup when component unmounts
-  }, []); // run on mount
+  }, [searchBarHints.length]); // Only recreate if hints array changes
 
   // updateValue -> onSelect_internal -> updateQueries - clicking enter on an autocomplete suggestion in topMenu Searchbar
   // updateValue -> onSelect_internal -> onSelect (custom function) - clicking enter on an autocomplete suggestion in home page SearchBar
@@ -212,7 +208,7 @@ export default function SearchBar(props: Props) {
   }
 
   function onSelect(newValue: SearchQuery[]) {
-    changeHint();
+    setSearchBarHintIndex(Math.floor(Math.random() * searchBarHints.length));
     if (searchTerms == newValue.map((el) => searchQueryLabel(el)).join(','))
       // do not initiate a new search when the searchTerms haven't changed
       return;
@@ -290,6 +286,7 @@ export default function SearchBar(props: Props) {
       if (value.some((el) => searchQueryEqual(el, item))) {
         return false;
       } // remove currently chosen values
+
       if (
         !(
           searchQueryLabel(item)

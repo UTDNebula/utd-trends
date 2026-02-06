@@ -1,5 +1,13 @@
 'use client';
 
+import Background from '@/../public/background.png';
+import WhatsNew from '@/components/common/WhatsNew/WhatsNew';
+import Tutorial from '@/components/dashboard/Tutorial/Tutorial';
+import { UTDTrendsLogoStandalone } from '@/components/icons/UTDTrendsLogo/UTDTrendsLogo';
+import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
+import SearchBar, {
+  LoadingSearchBar,
+} from '@/components/search/SearchBar/SearchBar';
 import DownloadIcon from '@mui/icons-material/Download';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ShareIcon from '@mui/icons-material/Share';
@@ -8,15 +16,6 @@ import html2canvas from 'html2canvas-pro';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { Suspense, useCallback, useEffect, useState } from 'react';
-
-import Background from '@/../public/background.png';
-import WhatsNew from '@/components/common/WhatsNew/WhatsNew';
-import Tutorial from '@/components/dashboard/Tutorial/Tutorial';
-import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
-import SearchBar, {
-  LoadingSearchBar,
-} from '@/components/search/SearchBar/SearchBar';
-import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 
 /**
  * Props type used by the TopMenu component
@@ -99,10 +98,19 @@ export default function TopMenu(props: Props) {
         />
         <Link
           href="/"
-          className="lext-lg md:text-xl font-display font-medium md:font-bold flex gap-2 items-center"
+          className="font-display flex gap-2 items-center select-none text-haiti dark:text-white py-2"
         >
-          <NebulaLogo className="h-6 w-auto fill-haiti dark:fill-white" />
-          UTD TRENDS
+          <div className="flex flex-row items-center max-sm:hidden">
+            <UTDTrendsLogoStandalone className="h-10 w-auto fill-haiti dark:fill-white" />
+          </div>
+          <div className="flex flex-col">
+            <span className="whitespace-nowrap text-lg md:text-xl font-bold leading-5">
+              UTD TRENDS
+            </span>
+            <span className="whitespace-nowrap text-xs md:text-sm font-medium">
+              by Nebula Labs
+            </span>
+          </div>
         </Link>
         {!props.isPlanner && (
           <Suspense

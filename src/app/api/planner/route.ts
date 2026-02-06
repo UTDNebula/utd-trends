@@ -1,9 +1,8 @@
 import { fetchSearchResult } from '@/modules/fetchSearchResult';
-import { fetchLatestSemester } from '@/modules/fetchSections';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
-  const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
+  const API_KEY = process.env.NEBULA_API_KEY;
   if (typeof API_KEY !== 'string') {
     return NextResponse.json(
       { message: 'error', data: 'API key is undefined' },
@@ -36,18 +35,11 @@ export async function GET(request: Request) {
       profFirst: profFirst,
       profLast: profLast,
     });
-    const latest = await fetchLatestSemester();
-    const filteredResult = {
-      ...result,
-      sections: result.sections.filter(
-        (s) => s.academic_session.name === latest,
-      ),
-    };
 
     return NextResponse.json(
       {
         message: 'success',
-        data: filteredResult,
+        data: result,
       },
       { status: 200 },
     );

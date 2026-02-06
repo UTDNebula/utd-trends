@@ -1,13 +1,12 @@
-import { Tooltip } from '@mui/material';
-import React from 'react';
-
+import { useSharedState } from '@/app/SharedStateProvider';
 import {
   DAYS,
   START_HOUR,
 } from '@/components/planner/PlannerSchedule/PlannerSchedule';
-import { type SearchQuery } from '@/types/SearchQuery';
 import { useSearchResult } from '@/modules/plannerFetch';
-import { useSharedState } from '@/app/SharedStateProvider';
+import { type SearchQuery } from '@/types/SearchQuery';
+import { Tooltip } from '@mui/material';
+import React from 'react';
 
 interface PlannerSectionComponentProps {
   selectedSection: string;
@@ -130,17 +129,25 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               (makeBigger ? 'text-sm' : 'text-xs leading-none')
             }
           >
-            {props.course.prefix} {props.course.number}.
-            {selectedSection.section_number}
+            {selectedSection.course_details && selectedSection.course_details[0]
+              ? selectedSection.course_details[0].subject_prefix +
+                ' ' +
+                selectedSection.course_details[0].course_number
+              : ''}
+            .{selectedSection.section_number}
           </div>
-          <div
-            className={
-              'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
-              (makeBigger ? '' : 'leading-none')
-            }
-          >
-            {props.course.profFirst} {props.course.profLast}
-          </div>
+          {selectedSection.professor_details &&
+            selectedSection.professor_details.map((prof) => (
+              <div
+                key={prof._id}
+                className={
+                  'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
+                  (makeBigger ? '' : 'leading-none')
+                }
+              >
+                {prof.first_name + ' ' + prof.last_name}
+              </div>
+            ))}
           <div
             className={
               'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +

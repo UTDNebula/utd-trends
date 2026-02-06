@@ -20,13 +20,13 @@ export type Grades = {
 //Find GPA, total, and grade_distribution based on including some set of semesters
 export function calculateGrades(grades: GradesData, semesters?: string[]) {
   let grade_distribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-  for (const session of grades) {
+  grades.forEach((session) => {
     if (typeof semesters === 'undefined' || semesters.includes(session._id)) {
       grade_distribution = grade_distribution.map(
         (item, i) => item + session.grade_distribution[i],
       );
     }
-  }
+  });
 
   const total: number = grade_distribution.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
@@ -69,13 +69,17 @@ export function calculateGrades(grades: GradesData, semesters?: string[]) {
 export default async function fetchGrades(
   query: SearchQuery,
 ): Promise<GradesData> {
-  const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
+  const API_URL = process.env.NEBULA_API_URL;
+  if (typeof API_URL !== 'string') {
+    throw new Error('API URL is undefined');
+  }
+  const API_KEY = process.env.NEBULA_API_KEY;
   if (typeof API_KEY !== 'string') {
     throw new Error('API key is undefined');
   }
 
   try {
-    const url = new URL('https://api.utdnebula.com/grades/semester');
+    const url = new URL(API_URL + 'grades/semester');
     if (typeof query.prefix === 'string') {
       url.searchParams.append('prefix', query.prefix);
     }
