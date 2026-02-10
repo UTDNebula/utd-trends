@@ -2,7 +2,6 @@ import Split from '@/components/common/Split/Split';
 import StickySide from '@/components/common/Split/StickySide';
 import DashboardEmpty from '@/components/dashboard/DashboardEmpty/DashboardEmpty';
 import Header from '@/components/navigation/Header/Header';
-import TopMenu from '@/components/navigation/TopMenu/TopMenu';
 import Filters, { LoadingFilters } from '@/components/search/Filters/Filters';
 import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
 import { createSearchQuery } from '@/modules/createSearchQuery';
@@ -91,7 +90,7 @@ export default async function Page({ searchParams }: Props) {
   if (typeof searchTerms === 'undefined' || searchTerms.length === 0) {
     return (
       <>
-        <TopMenu isPlanner={false} />
+        <Header isPlanner={false} />
         <main className="p-4">
           <DashboardEmpty />
         </main>

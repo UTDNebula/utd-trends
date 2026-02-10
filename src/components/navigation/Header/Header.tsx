@@ -1,5 +1,3 @@
-'use server';
-
 import UTDTrendsLogoStandalone from '@/components/icons/UTDTrendsLogo/UTDTrendsLogo';
 import SearchBar, {
   LoadingSearchBar,
@@ -13,7 +11,7 @@ export type HeaderProps = BaseHeaderProps & {
   downloadRef?: React.RefObject<HTMLDivElement | null>;
 };
 
-const Header = async (props: HeaderProps) => {
+const Header = (props: HeaderProps) => {
   const searchBar = !props.isPlanner ? (
     <Suspense
       fallback={
@@ -46,7 +44,7 @@ const Header = async (props: HeaderProps) => {
           display: { md: 'adjacent', lg: 'inline' },
         },
       }}
-      className="lg:px-16"
+      className="lg:px-16 min-h-18"
       {...props}
     >
       {props.children}
