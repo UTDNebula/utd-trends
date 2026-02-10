@@ -47,7 +47,7 @@ export type HeaderItemVisibility = {
   account?: boolean;
 };
 
-type SearchDisplayValues = 'inline' | 'collapsible' | 'adjacent';
+type SearchDisplayValues = 'inline' | 'collapsible' | 'adjacent' | 'hidden';
 
 export type HeaderItemConfig = {
   search?: {
@@ -56,6 +56,7 @@ export type HeaderItemConfig = {
      * - `"inline"` Show full search bar inside the header
      * - `"collapsible"` Collapse search bar behind a compact search button
      * - `"adjacent"` Show full search bar beneath the header
+     * - `"hidden"` Hides the search bar
      *
      * If an object is provided, sets search bar visibility options that depend on screen size
      * @example <caption>"inline" on large screens, "collapsible" on small screens</caption>
@@ -294,15 +295,13 @@ export const BaseHeader = ({
             </div>
 
             {/* Center */}
-            <div className="order-last max-sm:basis-full basis-128 sm:order-none">
-              {inlineSearchBarVisibility && searchBar && (
-                <div
-                  className={`${dynamicVisibilityClasses('inline')} ${shadow ? 'drop-shadow-[0_0_4px_rgb(0_0_0_/_0.4)]' : ''}`}
-                >
-                  {searchBar}
-                </div>
-              )}
-            </div>
+            {inlineSearchBarVisibility && searchBar && (
+              <div
+                className={`order-last max-sm:basis-full basis-128 sm:order-none ${dynamicVisibilityClasses('inline')} ${shadow ? 'drop-shadow-[0_0_4px_rgb(0_0_0_/_0.4)]' : ''}`}
+              >
+                {searchBar}
+              </div>
+            )}
 
             {/* Right */}
             <div
