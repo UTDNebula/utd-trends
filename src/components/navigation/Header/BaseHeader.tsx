@@ -33,16 +33,7 @@ export type HeaderItemVisibility = {
    * @default true
    */
   logo?: true | false | 'both' | 'icon' | 'text';
-  /**
-   * Visibility options for the header search bar. Valid options:
-   * - `true` Automatically switches between "full" or "compact" based on screen size
-   * - `false` Disabled
-   * - `"full"` Always show full search bar
-   * - `"compact"` Always show collapsed search button
-   * @default true
-   */
-  // search?: true | false | 'full' | 'compact';
-  search?: true | false;
+  search?: boolean;
   children?: boolean;
   account?: boolean;
 };
@@ -142,7 +133,7 @@ export type BaseHeaderProps = {
  * Context for child components of BaseHeader
  */
 export const BaseHeaderContext = createContext({
-  openCompactSearchBar: false,
+  openCollapsibleSearchBar: false,
 });
 
 export function useBaseHeaderContext() {
@@ -219,12 +210,13 @@ export const BaseHeader = ({
     searchBarComponentVisibility('collapsible');
   const adjacentSearchBarVisibility = searchBarComponentVisibility('adjacent');
 
-  const [openCompactSearchBar, setOpenCompactSearchBar] = useState(false);
+  const [openCollapsibleSearchBar, setOpenCollapsibleSearchBar] =
+    useState(false);
 
   return (
-    <BaseHeaderContext.Provider value={{ openCompactSearchBar }}>
+    <BaseHeaderContext.Provider value={{ openCollapsibleSearchBar }}>
       <div
-        className={`${disableSticky ? '' : 'sticky'} min-h-17 top-0 z-50 flex w-full justify-between items-center gap-y-2 gap-x-2 md:gap-x-4 lg:gap-x-8 py-2 px-4 ${menu || openCompactSearchBar ? 'max-sm:pl-2' : ''} flex-wrap sm:flex-nowrap ${transparent ? '' : 'bg-lighten dark:bg-darken'} ${className}`}
+        className={`${disableSticky ? '' : 'sticky'} min-h-17 top-0 z-50 flex w-full justify-between items-center gap-y-2 gap-x-2 md:gap-x-4 lg:gap-x-8 py-2 px-4 ${menu || openCollapsibleSearchBar ? 'max-sm:pl-2' : ''} flex-wrap sm:flex-nowrap ${transparent ? '' : 'bg-lighten dark:bg-darken'} ${className}`}
       >
         {!transparent && (
           <>
@@ -238,7 +230,7 @@ export const BaseHeader = ({
             <div className="absolute inset-0 bg-lighten dark:bg-darken -z-10"></div>
           </>
         )}
-        {!openCompactSearchBar ? (
+        {!openCollapsibleSearchBar ? (
           // Main header
           <>
             {/* Left */}
@@ -311,7 +303,7 @@ export const BaseHeader = ({
                 <IconButton
                   size="large"
                   className={`${dynamicVisibilityClasses('collapsible')}`}
-                  onClick={() => setOpenCompactSearchBar((prev) => !prev)}
+                  onClick={() => setOpenCollapsibleSearchBar((prev) => !prev)}
                 >
                   <SearchIcon />
                 </IconButton>
@@ -326,7 +318,7 @@ export const BaseHeader = ({
             <div className="w-full max-w-128 flex gap-x-2 items-center">
               <IconButton
                 size="large"
-                onClick={() => setOpenCompactSearchBar(false)}
+                onClick={() => setOpenCollapsibleSearchBar(false)}
               >
                 <ArrowBackIcon />
               </IconButton>
