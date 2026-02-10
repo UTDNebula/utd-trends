@@ -3,138 +3,30 @@
 import usePersistantState from '@/modules/usePersistantState';
 import CloseIcon from '@mui/icons-material/Close';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import {
-  Badge,
-  Divider,
-  IconButton,
-  Modal,
-  Paper,
-  Popover,
-  Tooltip,
-  type ModalProps,
-} from '@mui/material';
+import Badge from '@mui/material/Badge';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import Modal, { type ModalProps } from '@mui/material/Modal';
+import Paper from '@mui/material/Paper';
+import Popover from '@mui/material/Popover';
+import Tooltip from '@mui/material/Tooltip';
 import Link from 'next/link';
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from 'react';
-
-interface ReleaseData {
-  id: number;
-  name: string;
-  published_at: string;
-  body: string;
-  html_url: string;
-}
-
-interface Feature {
-  id: string;
-  version: string;
-  date: string;
-  content: string;
-  releaseUrl: string;
-  releaseId: string;
-}
-
-type FetchState = 'done' | 'loading' | 'error';
-
-// Extract features from GitHub release content
-const extractFeaturesFromRelease = (releaseBody: string): string[] => {
-  const lines = releaseBody.split('\n');
-  const features: string[] = [];
-
-  let inOverviewSection = true;
-
-  for (const line of lines) {
-    const trimmedLine = line.trim();
-
-    if (trimmedLine.startsWith('## ')) {
-      inOverviewSection = false;
-      continue;
-    }
-
-    if (
-      inOverviewSection &&
-      (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* '))
-    ) {
-      const featureContent = trimmedLine.replace(/^[-*]\s+/, '').trim();
-      if (featureContent) {
-        features.push(featureContent);
-      }
-    }
-  }
-
-  if (features.length === 0) {
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (trimmed && !trimmed.startsWith('#')) {
-        features.push(trimmed);
-        break;
-      }
-    }
-  }
-
-  return features;
-};
-
-// Function to fetch only the 2 most recent releases
-const fetchReleases = async () => {
-  return fetch(
-    'https://api.github.com/repos/UTDNebula/utd-trends/releases?per_page=2',
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`GitHub API responded with status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((response) => {
-      if (!Array.isArray(response) || response.length === 0) {
-        throw new Error('GitHub API responded with not known format');
-      }
-
-      const allFeatures: Feature[] = [];
-
-      response.forEach((release: ReleaseData) => {
-        if (release && release.body) {
-          const extractedFeatures = extractFeaturesFromRelease(release.body);
-          const featureVersion = release.name;
-          const featureDate = new Date(release.published_at).toLocaleDateString(
-            'en-US',
-            {
-              month: 'short',
-              day: 'numeric',
-            },
-          );
-
-          if (extractedFeatures.length > 0) {
-            // Get only the first feature from the latest release
-            const featureContent = extractedFeatures[0];
-            const id = `${release.id}-0`;
-
-            const newFeature = {
-              id,
-              version: featureVersion,
-              date: featureDate,
-              content: featureContent,
-              releaseUrl: release.html_url,
-              releaseId: release.id.toString(),
-            };
-            allFeatures.push(newFeature);
-          }
-        }
-      });
-
-      return allFeatures;
-    });
-};
+import React, { useContext, useEffect, useState, type ReactNode } from 'react';
+import {
+  fetchReleases,
+  WhatsNewContext,
+  type Feature,
+  type FetchState,
+} from './WhatsNewUtils';
 
 type WhatsNewContentsProps = { onClose?: () => void };
 
-const WhatsNewContents = ({ onClose }: WhatsNewContentsProps) => {
+/**
+ * Info about the latest features from GitHub releases
+ * - Should be a direct child of a {@linkcode Paper} component or similar
+ * - Must be inside a {@linkcode WhatsNewProvider}
+ */
+export const WhatsNewContents = ({ onClose }: WhatsNewContentsProps) => {
   const { readFeatures, latestFeatures, markFeatureAsRead, state } =
     useContext(WhatsNewContext);
 
@@ -204,9 +96,10 @@ const WhatsNewContents = ({ onClose }: WhatsNewContentsProps) => {
 };
 
 /**
- * WhatsNewButton component that shows the latest feature from GitHub releases
+ * Button that opens a popover that contains {@linkcode WhatsNewContents}
+ * - Must be inside a {@linkcode WhatsNewProvider}
  */
-export default function WhatsNewButton() {
+export function WhatsNewButton() {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);
 
@@ -267,20 +160,6 @@ export default function WhatsNewButton() {
   );
 }
 
-export function WhatsNewBadge({ children }: { children: ReactNode }) {
-  const { unread } = useContext(WhatsNewContext);
-
-  if (unread) {
-    return (
-      <Badge color="primary" badgeContent=" ">
-        {children}
-      </Badge>
-    );
-  } else {
-    return <>{children}</>;
-  }
-}
-
 type WhatsNewModalProps = Omit<ModalProps, 'children'> & {
   open: boolean;
   onClose?: () => void;
@@ -288,6 +167,11 @@ type WhatsNewModalProps = Omit<ModalProps, 'children'> & {
   setUnread?: (value: boolean) => void;
 };
 
+/**
+ * Modal containing {@linkcode WhatsNewContents}
+ * - Must be controlled using props
+ * - Must be inside a {@linkcode WhatsNewProvider}
+ */
 export function WhatsNewModal({
   open,
   onClose,
@@ -321,28 +205,31 @@ export function WhatsNewModal({
   );
 }
 
-type WhatsNewContextType = {
-  readFeatures: string[];
-  latestFeatures: Feature[];
-  unread: boolean;
-  markFeatureAsRead: (featureId: string) => void;
-  markAllFeaturesAsRead: () => void;
-  state: FetchState | undefined;
-};
+/**
+ * Conditionally adds a badge to its children depending on whether there are unread features
+ * - Must be inside a {@linkcode WhatsNewProvider}
+ */
+export function WhatsNewBadge({ children }: { children: ReactNode }) {
+  const { unread } = useContext(WhatsNewContext);
 
-export const WhatsNewContext = createContext<WhatsNewContextType>({
-  readFeatures: [],
-  latestFeatures: [],
-  unread: false,
-  markFeatureAsRead: () => {},
-  markAllFeaturesAsRead: () => {},
-  state: undefined,
-});
+  if (unread) {
+    return (
+      <Badge color="primary" badgeContent=" ">
+        {children}
+      </Badge>
+    );
+  } else {
+    return <>{children}</>;
+  }
+}
 
 type WhatsNewProviderProps = {
   children: ReactNode;
 };
 
+/**
+ * Fetches info about the latest features from GitHub releases, then provides this data to its children
+ */
 export function WhatsNewProvider({ children }: WhatsNewProviderProps) {
   const [readFeatures, setReadFeatures] = usePersistantState<string[]>(
     'readFeatures',

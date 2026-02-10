@@ -1,7 +1,8 @@
 'use client';
 
-import WhatsNew, {
+import {
   WhatsNewBadge,
+  WhatsNewButton,
   WhatsNewModal,
   WhatsNewProvider,
 } from '@/components/common/WhatsNew/WhatsNew';
@@ -170,8 +171,9 @@ export default function HeaderChildren(props: HeaderProps) {
   return (
     <>
       <WhatsNewProvider>
+        {/* Shown on small screens */}
         <div className="flex gap-x-2 sm:hidden">
-          {/* When PlannerButton is moved to a bottom nav bar, remove the small size props from all the children in this div */}
+          {/* TODO: When PlannerButton is moved to a bottom nav bar, remove the small size props from all the children in this div */}
           <PlannerButton {...plannerButtonProps} size="small" />
           <div className="relative w-fit h-fit">
             <div
@@ -206,72 +208,74 @@ export default function HeaderChildren(props: HeaderProps) {
             </div>
           </div>
         </div>
-        <div className="flex gap-x-2 max-sm:hidden">
+
+        {/* Shown on large screens */}
+        <div className="flex gap-x-4 max-sm:hidden">
+          {/* Planner button */}
           <PlannerButton {...plannerButtonProps} />
-          <div className="flex gap-x-4">
-            {/* Whats new button */}
-            <div className="ml-auto">
-              <WhatsNew />
-            </div>
 
-            {/* Tutorial button */}
-            {!props.isPlanner && (
-              <div className="relative">
-                <div
-                  className={
-                    tutorialHint
-                      ? 'absolute w-11 h-11 rounded-full bg-royal dark:bg-cornflower-300 animate-ping'
-                      : 'hidden'
-                  }
-                />
-                <div
-                  className={
-                    tutorialHint
-                      ? 'rounded-full bg-royal dark:bg-cornflower-300'
-                      : ''
-                  }
-                >
-                  <Tooltip title="Open Tutorial">
-                    <IconButton
-                      className="aspect-square"
-                      size="medium"
-                      onClick={handleClickTutorial}
-                    >
-                      <HelpOutlineIcon
-                        className={
-                          'text-3xl' +
-                          (tutorialHint ? ' text-white dark:text-haiti' : '')
-                        }
-                      />
-                    </IconButton>
-                  </Tooltip>
-                </div>
-              </div>
-            )}
-
-            {/* Share/download button */}
-            <Tooltip
-              title={`${props.isPlanner ? 'Download your Schedule' : 'Share link to Search'}`}
-            >
-              {props.isPlanner ? (
-                <IconButton
-                  className="aspect-square"
-                  size="medium"
-                  onClick={handleClickDownload}
-                >
-                  <DownloadIcon className="text-3xl mt-0.5" />
-                </IconButton>
-              ) : (
-                <IconButton
-                  className="aspect-square"
-                  size="medium"
-                  onClick={handleClickShare}
-                >
-                  <ShareIcon className="text-3xl mr-0.5 -ml-0.5" />
-                </IconButton>
-              )}
-            </Tooltip>
+          {/* Whats new button */}
+          <div className="ml-auto">
+            <WhatsNewButton />
           </div>
+
+          {/* Tutorial button */}
+          {!props.isPlanner && (
+            <div className="relative">
+              <div
+                className={
+                  tutorialHint
+                    ? 'absolute w-11 h-11 rounded-full bg-royal dark:bg-cornflower-300 animate-ping'
+                    : 'hidden'
+                }
+              />
+              <div
+                className={
+                  tutorialHint
+                    ? 'rounded-full bg-royal dark:bg-cornflower-300'
+                    : ''
+                }
+              >
+                <Tooltip title="Open Tutorial">
+                  <IconButton
+                    className="aspect-square"
+                    size="medium"
+                    onClick={handleClickTutorial}
+                  >
+                    <HelpOutlineIcon
+                      className={
+                        'text-3xl' +
+                        (tutorialHint ? ' text-white dark:text-haiti' : '')
+                      }
+                    />
+                  </IconButton>
+                </Tooltip>
+              </div>
+            </div>
+          )}
+
+          {/* Share/download button */}
+          <Tooltip
+            title={`${props.isPlanner ? 'Download your Schedule' : 'Share link to Search'}`}
+          >
+            {props.isPlanner ? (
+              <IconButton
+                className="aspect-square"
+                size="medium"
+                onClick={handleClickDownload}
+              >
+                <DownloadIcon className="text-3xl mt-0.5" />
+              </IconButton>
+            ) : (
+              <IconButton
+                className="aspect-square"
+                size="medium"
+                onClick={handleClickShare}
+              >
+                <ShareIcon className="text-3xl mr-0.5 -ml-0.5" />
+              </IconButton>
+            )}
+          </Tooltip>
         </div>
         <Menu
           id="header-menu"
@@ -281,7 +285,6 @@ export default function HeaderChildren(props: HeaderProps) {
           slotProps={{
             list: {
               'aria-labelledby': 'header-menu-button',
-              // className: 'bg-red-500',
             },
           }}
           className="w-80 max-w-full"
@@ -294,10 +297,10 @@ export default function HeaderChildren(props: HeaderProps) {
           >
             <ListItemIcon>
               <WhatsNewBadge>
-                <InfoOutlinedIcon className="text-3xl" />
+                <InfoOutlinedIcon />
               </WhatsNewBadge>
             </ListItemIcon>
-            <ListItemText>What&apos;s new in Trends?</ListItemText>
+            <ListItemText>What&apos;s new?</ListItemText>
           </MenuItem>
 
           <div className="relative">
@@ -320,7 +323,7 @@ export default function HeaderChildren(props: HeaderProps) {
               <ListItemIcon>
                 <HelpOutlineIcon />
               </ListItemIcon>
-              <ListItemText>Open Tutorial</ListItemText>
+              <ListItemText>Tutorial</ListItemText>
             </MenuItem>
           </div>
 
@@ -334,7 +337,7 @@ export default function HeaderChildren(props: HeaderProps) {
               <ListItemIcon>
                 <DownloadIcon />
               </ListItemIcon>
-              <ListItemText>Download your Schedule</ListItemText>
+              <ListItemText>Download schedule</ListItemText>
             </MenuItem>
           ) : (
             <MenuItem
@@ -346,7 +349,7 @@ export default function HeaderChildren(props: HeaderProps) {
               <ListItemIcon>
                 <ShareIcon />
               </ListItemIcon>
-              <ListItemText>Share link to Search</ListItemText>
+              <ListItemText>Copy link</ListItemText>
             </MenuItem>
           )}
         </Menu>

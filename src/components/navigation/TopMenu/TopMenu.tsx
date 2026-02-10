@@ -1,7 +1,7 @@
 'use client';
 
 import Background from '@/../public/background.png';
-import WhatsNew from '@/components/common/WhatsNew/WhatsNew';
+import { WhatsNewButton } from '@/components/common/WhatsNew/WhatsNew';
 import Tutorial from '@/components/dashboard/Tutorial/Tutorial';
 import { UTDTrendsLogoStandalone } from '@/components/icons/UTDTrendsLogo/UTDTrendsLogo';
 import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
@@ -149,7 +149,7 @@ export default function TopMenu(props: Props) {
         />
         <div className="flex gap-0 md:gap-4">
           <div className="ml-auto">
-            <WhatsNew />
+            <WhatsNewButton />
           </div>
           {!props.isPlanner && (
             <div className="relative">
