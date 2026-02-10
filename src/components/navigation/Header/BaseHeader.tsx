@@ -60,9 +60,9 @@ export type HeaderItemConfig = {
      *
      * If an object is provided, sets search bar visibility options that depend on screen size
      * @example <caption>"inline" on large screens, "collapsible" on small screens</caption>
-     * {md: "collapsiblie", lg: "inline"}
+     * {md: "collapsible", lg: "inline"}
      *
-     * @default {md: "collapsiblie", lg: "inline"}
+     * @default {md: "collapsible", lg: "inline"}
      */
     display?:
       | SearchDisplayValues
@@ -338,9 +338,9 @@ export const BaseHeader = ({
         )}
       </div>
       {adjacentSearchBarVisibility && searchBar ? (
-        <div className="px-4 py-2">
+        <div className={`px-4 py-2 ${dynamicVisibilityClasses('adjacent')}`}>
           <div
-            className={`max-w-128 ${dynamicVisibilityClasses('adjacent')} ${shadow ? 'drop-shadow-[0_0_4px_rgb(0_0_0_/_0.4)]' : ''}`}
+            className={`max-w-128 ${shadow ? 'drop-shadow-[0_0_4px_rgb(0_0_0_/_0.4)]' : ''}`}
           >
             {searchBar}
           </div>
