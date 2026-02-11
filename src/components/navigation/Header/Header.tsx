@@ -11,7 +11,10 @@ export type HeaderProps = BaseHeaderProps & {
   downloadRef?: React.RefObject<HTMLDivElement | null>;
 };
 
-const Header = (props: HeaderProps) => {
+/**
+ * General UTD Trends header, which should be displayed at the top of every page
+ */
+export default function Header(props: HeaderProps) {
   const searchBar = !props.isPlanner ? (
     <Suspense
       fallback={
@@ -52,6 +55,6 @@ const Header = (props: HeaderProps) => {
       <HeaderChildren {...props} />
     </BaseHeader>
   );
-};
+}
 
-export default Header;
+// export default Header;
