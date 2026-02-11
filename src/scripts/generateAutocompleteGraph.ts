@@ -15,7 +15,7 @@ type SearchQueryWithTotalStudents = SearchQuery & {
 type SessionNameAndStudents = {
   name: string;
   students: number;
-}
+};
 
 export type NodeAttributes = {
   c: string;
@@ -121,11 +121,18 @@ function addCourse(prefix: string, number: string, students: number) {
   });
 }
 
-function updateCourse(best: SessionNameAndStudents, current: SessionNameAndStudents): SessionNameAndStudents {
+function updateCourse(
+  best: SessionNameAndStudents,
+  current: SessionNameAndStudents,
+): SessionNameAndStudents {
   // If the student count is 0, then return the previous session
-  if (current.students == 0) { return best; }
+  if (current.students == 0) {
+    return best;
+  }
   // Name doesn't exist or isn't in the right format
-  if (!current.name || current.name.length != 3) { return best; } 
+  if (!current.name || current.name.length != 3) {
+    return best;
+  }
 
   // if the current term has more students than the previous term then it will be returned
   // Otherwise, the students for the current term likely haven't loaded, the previous term will be returned
@@ -135,7 +142,6 @@ function updateCourse(best: SessionNameAndStudents, current: SessionNameAndStude
 
   // otherwise return the original
   return best;
-
 }
 //Add nodes in format: (<professorLast>|<professorFirst> <professorLast>)
 function addProfessor(
@@ -240,7 +246,7 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
       }
       bestSession = updateCourse(bestSession, {
         name: academicSessionData.academic_session.name ?? '',
-        students: sessionStudents
+        students: sessionStudents,
       }); // Returns courseStudents if current session is more recent
     }
     courseStudents = bestSession.students;
