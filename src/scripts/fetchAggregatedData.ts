@@ -8,8 +8,11 @@ import { config } from 'dotenv';
 const envPath = resolve(__dirname, '../../.env.local');
 config({ path: envPath });
 
-const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
-if (typeof API_KEY !== 'string') {
+const API_URL = process.env.NEBULA_API_URL;
+const API_KEY = process.env.NEBULA_API_KEY;
+if (typeof API_URL !== 'string') {
+  console.error('API URL is undefined');
+} else if (typeof API_KEY !== 'string') {
   console.error('API key is undefined');
 } else {
   const headers = {
@@ -17,7 +20,7 @@ if (typeof API_KEY !== 'string') {
     Accept: 'application/json',
   };
 
-  fetch('https://api.utdnebula.com/autocomplete/dag', {
+  fetch(API_URL + 'autocomplete/dag', {
     method: 'GET',
     headers: headers,
   })
