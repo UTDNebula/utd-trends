@@ -8,10 +8,14 @@ import {
   Button,
   Checkbox,
   IconButton,
+  ListItemText,
+  MenuItem,
   Popover,
   Tooltip,
 } from '@mui/material';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import React, { useEffect, useState } from 'react';
+import useTutorialHint from './useTutorialHint';
 
 type TutorialPopupProps = {
   element: Element;
@@ -178,21 +182,20 @@ const stepsTemplate: StepTemplate[] = [
   },
 ];
 
-export default function Tutorial() {
+interface Props {
+  handleCloseMenu: () => void;
+}
+
+export default function Tutorial({ handleCloseMenu }: Props) {
+  const [tutorialHint, setTutorialHint] = useTutorialHint();
+
   const [place, setPlace] = useState(-1);
   const [steps, setSteps] = useState<Step[]>([]);
   const open = place !== -1;
   const closeTutorial = () => setPlace(-1);
   const openTutorial = () => {
     setPlace(0);
-    setTutorialHint(false);
-    localStorage.setItem(
-      'tutorialHint',
-      JSON.stringify({
-        value: 'opened',
-        cacheIndex: cacheIndex,
-      }),
-    );
+    setTutorialHint();
 
     // For each element, set anchor based on `data-tutorial-id`
     const elements =
@@ -216,26 +219,34 @@ export default function Tutorial() {
     );
   };
 
-  const [tutorialHint, setTutorialHint] = useState(false);
-  //Open if not already closed (based on localStorage)
-  useEffect(() => {
-    const previous = localStorage.getItem('tutorialHint');
-    let ask = previous === null;
-    if (previous !== null) {
-      const parsed = JSON.parse(previous);
-      if (parsed !== null && parsed.value !== 'opened') {
-        ask = true;
-      }
-    }
-    if (ask) {
-      setTutorialHint(true);
-    }
-  }, []);
-  const cacheIndex = 0; //Increment this to open the popup for all users on next deployment
-
   return (
     <>
-      <div className="relative">
+      {/* Shown on small screens */}
+      <div className="relative sm:hidden">
+        <div
+          className={
+            tutorialHint
+              ? 'absolute w-full h-1/2 translate-y-1/2 bg-royal dark:bg-cornflower-300 animate-ping'
+              : 'hidden'
+          }
+        />
+        <MenuItem
+          onClick={() => {
+            openTutorial();
+            handleCloseMenu();
+          }}
+          className={
+            tutorialHint ? 'bg-royal/20 dark:bg-cornflower-300/20' : ''
+          }
+        >
+          <ListItemIcon>
+            <HelpOutlineIcon />
+          </ListItemIcon>
+          <ListItemText>Tutorial</ListItemText>
+        </MenuItem>
+      </div>
+      {/* Shown on large screens */}
+      <div className="relative max-sm:hidden">
         <div
           className={
             tutorialHint

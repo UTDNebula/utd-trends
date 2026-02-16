@@ -43,7 +43,7 @@ interface LoadingSearchBarProps {
 
 export function LoadingSearchBar(props: LoadingSearchBarProps) {
   return (
-    <div className={'flex items-center gap-2 ' + (props.className ?? '')}>
+    <div className={'flex items-center ' + (props.className ?? '')}>
       <Autocomplete
         className="grow"
         options={[]}
@@ -51,7 +51,7 @@ export function LoadingSearchBar(props: LoadingSearchBarProps) {
           return (
             <TextField
               {...params}
-              className={props.input_className}
+              className={`[&>.MuiInputBase-root]:rounded-r-none ${props.input_className}`}
               placeholder="ex. GOVT 2306"
             />
           );
@@ -61,9 +61,9 @@ export function LoadingSearchBar(props: LoadingSearchBarProps) {
         variant="contained"
         disableElevation
         size="large"
-        className="self-stretch my-px px-4 shrink-0 normal-case text-cornflower-200 dark:text-cornflower-700"
+        className="rounded-l-none self-stretch px-4 shrink-0 normal-case relative text-cornflower-200 dark:text-cornflower-700"
       >
-        Search
+        <SearchIcon color="inherit" />
       </Button>
     </div>
   );
@@ -286,6 +286,7 @@ export default function SearchBar(props: Props) {
       if (value.some((el) => searchQueryEqual(el, item))) {
         return false;
       } // remove currently chosen values
+
       if (
         !(
           searchQueryLabel(item)
@@ -432,7 +433,7 @@ export default function SearchBar(props: Props) {
 
   return (
     <div
-      className={'flex items-center gap-2 ' + (props.className ?? '')}
+      className={`flex items-center ${props.className}`}
       data-tutorial-id="search"
     >
       <Autocomplete
@@ -506,7 +507,7 @@ export default function SearchBar(props: Props) {
             <TextField
               {...params}
               variant="outlined"
-              className={props.input_className}
+              className={`[&>.MuiInputBase-root]:rounded-r-none ${props.input_className}`}
               placeholder={searchBarHints[searchBarHintIndex]}
               autoFocus={props.autoFocus}
             />
@@ -665,16 +666,17 @@ export default function SearchBar(props: Props) {
           variant="contained"
           disableElevation
           size="large"
-          className={`self-stretch my-px px-4 shrink-0 normal-case relative ${
+          className={`rounded-l-none self-stretch px-4 shrink-0 normal-case relative ${
             value.length == 0
               ? 'text-cornflower-200 dark:text-cornflower-700'
               : ''
           }`} //darkens the text when no valid search terms are entered (pseudo-disables the search button)
           onClick={() => onSelect(value)}
         >
-          <p className={isPending || props.isPending ? 'opacity-0' : ''}>
-            Search
-          </p>
+          <SearchIcon
+            color="inherit"
+            className={isPending || props.isPending ? 'opacity-0' : ''}
+          />
           {(isPending || props.isPending) && (
             <CircularProgress
               color="inherit"

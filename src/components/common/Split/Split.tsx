@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React from 'react';
 import { Group, Panel, Separator, usePanelRef } from 'react-resizable-panels';
 
 interface Props {
