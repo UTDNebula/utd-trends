@@ -1,5 +1,6 @@
 'use client';
 
+import usePersistantState from '@/modules/usePersistantState';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
@@ -14,8 +15,15 @@ import {
   Tooltip,
 } from '@mui/material';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import React, { useEffect, useState } from 'react';
-import useTutorialHint from './useTutorialHint';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from 'react';
+
+const cacheIndex = 0; //Increment this to open the popup for all users on next deployment
 
 type TutorialPopupProps = {
   element: Element;
@@ -182,42 +190,12 @@ const stepsTemplate: StepTemplate[] = [
   },
 ];
 
-interface Props {
+interface TutorialButtonProps {
   handleCloseMenu: () => void;
 }
 
-export default function Tutorial({ handleCloseMenu }: Props) {
-  const [tutorialHint, setTutorialHint] = useTutorialHint();
-
-  const [place, setPlace] = useState(-1);
-  const [steps, setSteps] = useState<Step[]>([]);
-  const open = place !== -1;
-  const closeTutorial = () => setPlace(-1);
-  const openTutorial = () => {
-    setPlace(0);
-    setTutorialHint();
-
-    // For each element, set anchor based on `data-tutorial-id`
-    const elements =
-      document.querySelectorAll<HTMLElement>('[data-tutorial-id]');
-    if (!elements.length) {
-      closeTutorial();
-      return;
-    }
-    const newSteps = [...stepsTemplate];
-    elements.forEach((element) => {
-      if (element.offsetParent !== null) {
-        const id = element.getAttribute('data-tutorial-id') as string;
-        const foundStep = newSteps.findIndex((step) => step.id === id);
-        if (foundStep !== -1) {
-          newSteps[foundStep].element = element;
-        }
-      }
-    });
-    setSteps(
-      newSteps.filter((step) => typeof step.element !== 'undefined') as Step[],
-    );
-  };
+export function TutorialButton({ handleCloseMenu }: TutorialButtonProps) {
+  const { tutorialHint, openTutorial } = useContext(TutorialContext);
 
   return (
     <>
@@ -232,6 +210,7 @@ export default function Tutorial({ handleCloseMenu }: Props) {
         />
         <MenuItem
           onClick={() => {
+            console.log('clicked');
             openTutorial();
             handleCloseMenu();
           }}
@@ -272,6 +251,16 @@ export default function Tutorial({ handleCloseMenu }: Props) {
           </Tooltip>
         </div>
       </div>
+    </>
+  );
+}
+
+export default function Tutorial() {
+  const { closeTutorial, place, setPlace, open, steps } =
+    useContext(TutorialContext);
+
+  return (
+    <>
       <Backdrop sx={(theme) => ({ zIndex: theme.zIndex.modal })} open={open} />
       {steps.map(({ content, ...otherProps }, index) => (
         <TutorialPopup
@@ -292,5 +281,108 @@ export default function Tutorial({ handleCloseMenu }: Props) {
         </TutorialPopup>
       ))}
     </>
+  );
+}
+
+type TutorialContextType = {
+  tutorialHint: boolean;
+  closeTutorial: () => void;
+  openTutorial: () => void;
+  place: number;
+  setPlace: (place: number) => void;
+  open: boolean;
+  steps: Step[];
+};
+
+/**
+ * Context for WhatsNew. Provides list of features, read status, and functions to modify read status
+ */
+export const TutorialContext = createContext<TutorialContextType>({
+  tutorialHint: false,
+  closeTutorial: () => {},
+  openTutorial: () => {},
+  place: -1,
+  setPlace: () => {},
+  open: false,
+  steps: [],
+});
+
+type TutorialProviderProps = {
+  children: ReactNode;
+};
+
+/**
+ * Fetches info about the latest features from GitHub releases, then provides this data to its children
+ */
+export function TutorialProvider({ children }: TutorialProviderProps) {
+  const [tutorialState, setTutorialState] = usePersistantState<{
+    value: string;
+    cacheIndex: number;
+  } | null>(
+    'tutorialHint',
+    {
+      value: 'opened',
+      cacheIndex: cacheIndex,
+    },
+    true,
+    null,
+  );
+
+  let tutorialHint = false;
+  if (tutorialState === null || tutorialState.value !== 'opened') {
+    tutorialHint = true;
+  }
+
+  const setTutorialHint = () => {
+    setTutorialState({
+      value: 'opened',
+      cacheIndex: cacheIndex,
+    });
+  };
+
+  const [place, setPlace] = useState(-1);
+  const open = place !== -1;
+  const [steps, setSteps] = useState<Step[]>([]);
+  const closeTutorial = () => setPlace(-1);
+  const openTutorial = () => {
+    setPlace(0);
+    setTutorialHint();
+
+    // For each element, set anchor based on `data-tutorial-id`
+    const elements =
+      document.querySelectorAll<HTMLElement>('[data-tutorial-id]');
+    if (!elements.length) {
+      closeTutorial();
+      return;
+    }
+    const newSteps = [...stepsTemplate];
+    elements.forEach((element) => {
+      if (element.offsetParent !== null) {
+        const id = element.getAttribute('data-tutorial-id') as string;
+        const foundStep = newSteps.findIndex((step) => step.id === id);
+        if (foundStep !== -1) {
+          newSteps[foundStep].element = element;
+        }
+      }
+    });
+    setSteps(
+      newSteps.filter((step) => typeof step.element !== 'undefined') as Step[],
+    );
+  };
+
+  return (
+    <TutorialContext.Provider
+      value={{
+        tutorialHint,
+        closeTutorial,
+        openTutorial,
+        place,
+        setPlace,
+        open,
+        steps,
+      }}
+    >
+      {children}
+    </TutorialContext.Provider>
   );
 }
