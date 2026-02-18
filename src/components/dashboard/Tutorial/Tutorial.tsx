@@ -210,7 +210,6 @@ export function TutorialButton({ handleCloseMenu }: TutorialButtonProps) {
         />
         <MenuItem
           onClick={() => {
-            console.log('clicked');
             openTutorial();
             handleCloseMenu();
           }}
