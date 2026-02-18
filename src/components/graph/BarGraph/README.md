@@ -1,129 +1,42 @@
-### Bar Graph Example
+## BarGraph Component
+
+The `BarGraph` component renders vertical bar graphs using ApexCharts. It supports multiple series, custom colors, fullscreen mode, tooltips, and dark/light theme detection.
+
+---
+
+### Props
+
+| Prop               | Type                                                                                                | Description                                                                          | Required |
+| ------------------ | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | -------- |
+| `series`           | `{ name: string; data: number[] }[]`                                                                | Array of data series to display. Each series contains a `name` and array of numbers. | Yes      |
+| `title`            | `string`                                                                                            | The title displayed above the chart.                                                 | Yes      |
+| `xaxisLabels`      | `string[]`                                                                                          | Labels for the x-axis categories.                                                    | No       |
+| `labels`           | `string[]`                                                                                          | Optional labels for each bar.                                                        | No       |
+| `yaxisFormatter`   | `(val: number) => string`                                                                           | Optional formatter for y-axis labels.                                                | No       |
+| `tooltipFormatter` | `(val: number, extra: { series: number[]; seriesIndex: number; dataPointIndex: number }) => string` | Optional formatter for tooltip values.                                               | No       |
+| `includedColors`   | `boolean[]`                                                                                         | Optional array to filter which colors from the palette should be applied.            | No       |
+
+### Example Usage
 
 ```tsx
-const axisLabel = ['A', 'B', 'C', 'D', 'F'];
-const startData = [
-  { name: 'Smith', data: [1, 2, 3, 4, 1] },
-  { name: 'Jason', data: [2, 5, 1, 6, 9] },
-  { name: 'Suzy', data: [2, 5, 2, 1, 1] },
-];
-const [currentData, setCurrentData] = React.useState(startData);
-const decrementDataSetCount = () => {
-  // const newData = currentData.filter((value, index) => { index < currentData.length-1})
-  const newData = currentData.slice(1, currentData.length);
-  setCurrentData(newData);
-};
-const incrementDataSetCount = () => {
-  const newData = [
-    ...currentData,
-    {
-      name: Math.random().toString().substr(2, 8),
-      data: [
-        Math.floor(Math.random() * 10),
-        Math.floor(Math.random() * 10),
-        Math.floor(Math.random() * 10),
-        Math.floor(Math.random() * 10),
-        Math.floor(Math.random() * 10),
-      ],
-    },
+function ExampleBarGraph() {
+  const data = [
+    { name: 'Math 101', data: [85, 90, 75, 60] },
+    { name: 'History 201', data: [70, 88, 92, 80] },
   ];
-  setCurrentData(newData);
-};
-const [currentAxisLabel, setCurrentAxisLabel] = React.useState(axisLabel);
-const addAxisLabels = () => {
-  const newAxisLabel = [...currentAxisLabel, 'X', 'Y', 'Z'];
-  setCurrentAxisLabel(newAxisLabel);
-};
-const resetGraph = () => {
-  setCurrentAxisLabel(axisLabel);
-  setCurrentData(startData);
-};
-const name = 'Bar Graph Example';
-<div style={{ width: '100%', height: '300px' }}>
-  <BarGraph
-    xaxisLabels={currentAxisLabel}
-    series={currentData}
-    title={name}
-  ></BarGraph>
-  <div style={{ margin: '1.5rem', marginTop: '2.5rem' }}>
-    Current props being passed to the <code>BarGraph</code> component:
-    <div
-      style={{
-        border: '1px solid black',
-        borderRadius: '6px',
-        padding: '1rem',
-      }}
-    >
-      <code>
-        <div style={{ margin: '0.5rem', padding: '0.25rem' }}>&lt;BarGraph</div>
-        <div
-          style={{ magin: '0.5rem', padding: '0.25rem', marginLeft: '2rem' }}
-        >
-          <strong>xaxisLabels</strong> = [
-          {currentAxisLabel.map((label) => label + ', ')}]
-        </div>
-        <div
-          style={{ magin: '0.5rem', padding: '0.25rem', marginLeft: '2rem' }}
-        >
-          <strong>series</strong> = [
-          {currentData.map((data) => JSON.stringify(data) + ',  ')}]
-        </div>
-        <div
-          style={{ magin: '0.5rem', padding: '0.25rem', marginLeft: '2rem' }}
-        >
-          <strong>title</strong> = "{name}"
-        </div>
-        <div style={{ magin: '0.5rem', padding: '0.25rem' }}>
-          &gt;&lt;/BarGraph&gt;
-        </div>
-      </code>
-    </div>
-  </div>
-  <div style={{ display: 'flex', flexDirection: 'horizontal', margin: '1rem' }}>
-    <button
-      style={{
-        border: '1px solid black',
-        borderRadius: '6px',
-        margin: '0.65rem',
-        padding: '0.5rem',
-      }}
-      onClick={(e) => incrementDataSetCount()}
-    >
-      Add Another Series
-    </button>
-    <button
-      style={{
-        border: '1px solid black',
-        borderRadius: '6px',
-        margin: '0.65rem',
-        padding: '0.5rem',
-      }}
-      onClick={(e) => decrementDataSetCount()}
-    >
-      Remove A Series
-    </button>
-    <button
-      style={{
-        border: '1px solid black',
-        borderRadius: '6px',
-        margin: '0.65rem',
-        padding: '0.5rem',
-      }}
-      onClick={(e) => addAxisLabels()}
-    >
-      Add Three xaxisLabels
-    </button>
-    <button
-      style={{
-        border: '1px solid black',
-        borderRadius: '6px',
-        margin: '0.65rem',
-        padding: '0.5rem',
-      }}
-      onClick={(e) => resetGraph()}
-    >
-      Reset Graph
-    </button>
-  </div>
-</div>;
+
+  const xLabels = ['Q1', 'Q2', 'Q3', 'Q4'];
+
+  return (
+    <BarGraph
+      title="Course Grades"
+      series={data}
+      xaxisLabels={xLabels}
+      yaxisFormatter={(val) => `${val}%`}
+      tooltipFormatter={(val) => `Score: ${val}%`}
+    />
+  );
+}
+
+<ExampleBarGraph />;
 ```

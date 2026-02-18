@@ -1,18 +1,13 @@
 import { useSharedState } from '@/app/SharedStateProvider';
-import { fetchSearchResult } from '@/modules/fetchSearchResult';
 import {
   convertToCourseOnly,
-  convertToProfOnly,
-  removeSection,
   searchQueryEqual,
-  searchQueryLabel,
   sectionCanOverlap,
   type SearchResult,
 } from '@/types/SearchQuery';
 import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import { Checkbox, Tooltip } from '@mui/material';
-import { useQueryClient } from '@tanstack/react-query';
 
 type addToPlannerProps = {
   searchResult: SearchResult;
@@ -26,7 +21,7 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
   const hasLatestSemester = sections.some(
     (s) => s.academic_session.name === latestSemester,
   );
-  const queryClient = useQueryClient();
+
   const inPlanner = planner.some((obj) =>
     searchQueryEqual(obj, searchResult.searchQuery),
   );
@@ -69,36 +64,6 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
               if (addJustCourseToo) {
                 addToPlanner(convertToCourseOnly(searchResult.searchQuery));
               }
-              queryClient.prefetchQuery({
-                queryKey: [
-                  'results',
-                  searchQueryLabel(
-                    convertToCourseOnly(
-                      removeSection(searchResult.searchQuery),
-                    ),
-                  ),
-                ],
-                queryFn: async () => {
-                  const data = await fetchSearchResult(
-                    convertToCourseOnly(searchResult.searchQuery),
-                  );
-                  return data;
-                },
-              });
-              queryClient.prefetchQuery({
-                queryKey: [
-                  'rmp',
-                  searchQueryLabel(
-                    convertToProfOnly(removeSection(searchResult.searchQuery)),
-                  ),
-                ],
-                queryFn: async () => {
-                  const data = await fetchSearchResult(
-                    convertToProfOnly(removeSection(searchResult.searchQuery)),
-                  );
-                  return data;
-                },
-              });
             }
           }}
           icon={<BookOutlinedIcon />}

@@ -64,19 +64,25 @@ export default function Compare() {
               return response;
             }}
             series={compare.map((course) => {
+              const grade_dist = [];
+              const categories = convertNumbersToPercents(
+                calculateGrades(
+                  course.grades,
+                  chosenSemesters,
+                  chosenSectionTypes,
+                ),
+              );
+              for (let idx = 0; idx < categories.length; idx++) {
+                grade_dist.push(0);
+              }
+
               return {
                 name:
                   searchQueryLabel(course.searchQuery) +
                   (course.type !== 'combo'
                     ? ' (Overall)' //Indicates that this entry is an aggregate for the entire course/professor
                     : ''),
-                data: convertNumbersToPercents(
-                  calculateGrades(
-                    course.grades,
-                    chosenSemesters,
-                    chosenSectionTypes,
-                  ),
-                ),
+                data: Number.isNaN(categories[0]) ? grade_dist : categories,
               };
             })}
           />
