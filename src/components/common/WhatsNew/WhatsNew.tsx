@@ -12,12 +12,7 @@ import Popover from '@mui/material/Popover';
 import Tooltip from '@mui/material/Tooltip';
 import Link from 'next/link';
 import React, { useContext, useEffect, useState, type ReactNode } from 'react';
-import {
-  fetchReleases,
-  WhatsNewContext,
-  type Feature,
-  type FetchState,
-} from './WhatsNewUtils';
+import { fetchReleases, WhatsNewContext, type Feature } from './WhatsNewUtils';
 
 type WhatsNewContentsProps = { onClose?: () => void };
 
@@ -27,7 +22,7 @@ type WhatsNewContentsProps = { onClose?: () => void };
  * - Must be inside a {@linkcode WhatsNewProvider}
  */
 export const WhatsNewContents = ({ onClose }: WhatsNewContentsProps) => {
-  const { readFeatures, latestFeatures, markFeatureAsRead, state } =
+  const { readFeatures, latestFeatures, markFeatureAsRead, status } =
     useContext(WhatsNewContext);
 
   return (
@@ -46,12 +41,12 @@ export const WhatsNewContents = ({ onClose }: WhatsNewContentsProps) => {
           </div>
         )}
       </div>
-      {(state === 'loading' && (
+      {(status === 'loading' && (
         <div className="flex justify-center py-4">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-royal"></div>
         </div>
       )) ||
-        (state === 'done' &&
+        (status === 'done' &&
           (latestFeatures.length > 0 ? (
             <div className="flex flex-col gap-2">
               {latestFeatures.flatMap((feature, index) => [
@@ -236,7 +231,8 @@ export function WhatsNewProvider({ children }: WhatsNewProviderProps) {
     [],
   );
   const [latestFeatures, setLatestFeatures] = useState<Feature[]>([]);
-  const [state, setState] = useState<FetchState>('done');
+  const [error, setError] = useState<Error | null>(null);
+  const status = error ? 'error' : latestFeatures === null ? 'loading' : 'done';
 
   // Check if the latest feature is unread
   const unread = Boolean(
@@ -245,13 +241,19 @@ export function WhatsNewProvider({ children }: WhatsNewProviderProps) {
 
   // Fetch releases
   useEffect(() => {
-    setState('loading');
+    let cancelled = false;
+
     fetchReleases()
-      .then((response) => {
-        setLatestFeatures(response);
-        setState('done');
+      .then((features) => {
+        if (!cancelled) setLatestFeatures(features);
       })
-      .catch(() => setState('error'));
+      .catch((err) => {
+        if (!cancelled) setError(err);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Mark a feature as read
@@ -278,7 +280,7 @@ export function WhatsNewProvider({ children }: WhatsNewProviderProps) {
         unread,
         markFeatureAsRead,
         markAllFeaturesAsRead,
-        state,
+        status,
       }}
     >
       {children}

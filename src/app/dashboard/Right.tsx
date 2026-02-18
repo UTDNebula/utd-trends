@@ -43,7 +43,9 @@ export function LoadingRight(props: LoadingRightProps) {
 
   return (
     <Card>
-      <Carousel names={names}>{tabs}</Carousel>
+      <Carousel key={names.join()} names={names}>
+        {tabs}
+      </Carousel>
     </Card>
   );
 }
@@ -116,7 +118,9 @@ export default async function Right(props: Props) {
 
   return (
     <Card>
-      <Carousel names={names}>{tabs}</Carousel>
+      <Carousel key={names.join()} names={names}>
+        {tabs}
+      </Carousel>
     </Card>
   );
 }
