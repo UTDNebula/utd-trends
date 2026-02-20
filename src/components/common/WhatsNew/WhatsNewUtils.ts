@@ -120,7 +120,7 @@ type WhatsNewContextType = {
   unread: boolean;
   markFeatureAsRead: (featureId: string) => void;
   markAllFeaturesAsRead: () => void;
-  state: FetchState | undefined;
+  status: FetchState | undefined;
 };
 
 /**
@@ -132,5 +132,5 @@ export const WhatsNewContext = createContext<WhatsNewContextType>({
   unread: false,
   markFeatureAsRead: () => {},
   markAllFeaturesAsRead: () => {},
-  state: undefined,
+  status: undefined,
 });
