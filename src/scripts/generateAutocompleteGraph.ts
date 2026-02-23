@@ -12,11 +12,6 @@ type SearchQueryWithTotalStudents = SearchQuery & {
   totalStudents?: number;
 };
 
-type SessionNameAndStudents = {
-  name: string;
-  students: number;
-};
-
 export type NodeAttributes = {
   c: string;
   d?: SearchQueryWithTotalStudents;
