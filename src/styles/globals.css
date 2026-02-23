@@ -50,6 +50,63 @@
   background-color: var(--mui-palette-background-paper);
 }
 
+@utility scroll-shadow {
+  position: relative;
+}
+
+.scroll-shadow::before,
+.scroll-shadow::after {
+  content: '';
+  position: sticky;
+  left: 0;
+  right: 0;
+  height: 20px;
+  pointer-events: none;
+  z-index: 10;
+  display: block;
+  transition: opacity 0.2s ease;
+}
+
+.scroll-shadow::before {
+  top: 0;
+  background: radial-gradient(
+    farthest-side at 50% 0,
+    rgba(0, 0, 0, 0.5),
+    transparent
+  );
+  opacity: var(--scroll-shadow-top-opacity, 0);
+  margin-bottom: -20px;
+}
+
+.scroll-shadow::after {
+  bottom: 0;
+  background: radial-gradient(
+    farthest-side at 50% 100%,
+    rgba(0, 0, 0, 0.5),
+    transparent
+  );
+  opacity: var(--scroll-shadow-bottom-opacity, 0);
+  margin-top: -20px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .scroll-shadow::before {
+    background: radial-gradient(
+      farthest-side at 50% 0,
+      rgba(255, 255, 255, 0.6),
+      transparent
+    );
+  }
+
+  .scroll-shadow::after {
+    background: radial-gradient(
+      farthest-side at 50% 100%,
+      rgba(255, 255, 255, 0.6),
+      transparent
+    );
+  }
+}
+
 @layer utilities {
   html,
   body,
