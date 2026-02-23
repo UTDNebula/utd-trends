@@ -121,28 +121,6 @@ function addCourse(prefix: string, number: string, students: number) {
   });
 }
 
-function updateCourse(
-  best: SessionNameAndStudents,
-  current: SessionNameAndStudents,
-): SessionNameAndStudents {
-  // If the student count is 0, then return the previous session
-  if (current.students == 0) {
-    return best;
-  }
-  // Name doesn't exist or isn't in the right format
-  if (!current.name || current.name.length != 3) {
-    return best;
-  }
-
-  // if the current term has more students than the previous term then it will be returned
-  // Otherwise, the students for the current term likely haven't loaded, the previous term will be returned
-  if (current.students > best.students) {
-    return current;
-  }
-
-  // otherwise return the original
-  return best;
-}
 //Add nodes in format: (<professorLast>|<professorFirst> <professorLast>)
 function addProfessor(
   profFirst: string,
@@ -195,10 +173,6 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
     const courseNumberData = prefixData.course_numbers[courseNumberItr];
     // add course was moved downwards, since we needed section data to sum all students
     let courseStudents = 0;
-    let bestSession = {
-      name: '',
-      students: 0,
-    };
     for (
       let academicSessionItr = 0;
       academicSessionItr < courseNumberData.academic_sessions.length;
@@ -206,7 +180,6 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
     ) {
       const academicSessionData =
         courseNumberData.academic_sessions[academicSessionItr];
-      let sessionStudents = 0;
       for (
         let sectionItr = 0;
         sectionItr < academicSessionData.sections.length;
@@ -215,7 +188,7 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
         const sectionData = academicSessionData.sections[sectionItr];
         const uniqueProfessorSet = new Set<string>();
 
-        sessionStudents += sectionData.total_students ?? 0;
+        courseStudents += sectionData.total_students ?? 0;
         for (
           let professorItr = 0;
           professorItr < sectionData.professors.length;
@@ -244,12 +217,7 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
           }
         }
       }
-      bestSession = updateCourse(bestSession, {
-        name: academicSessionData.academic_session.name ?? '',
-        students: sessionStudents,
-      }); // Returns courseStudents if current session is more recent
     }
-    courseStudents = bestSession.students;
     addCourse(
       prefixData.subject_prefix,
       courseNumberData.course_number,

@@ -277,8 +277,24 @@ export function searchAutocomplete(
     };
   });
 
-  return results.filter(
+  const filteredResults = results.filter(
     (option, index, self) =>
       index === self.findIndex((t) => searchQueryEqual(t, option)),
   );
+
+  return filteredResults.sort((a, b) => {
+    const aIsCourse = 'prefix' in a;
+    const bIsCourse = 'prefix' in b;
+
+    // making sure that courses always come before professors
+    if (aIsCourse !== bIsCourse) {
+      if (aIsCourse) {
+        return -1;
+      }
+      return 1;
+    }
+
+    // sorts results in descending order, while putting any results with 0 students at the end
+    return (b.totalStudents ?? -1) - (a.totalStudents ?? -1);
+  });
 }

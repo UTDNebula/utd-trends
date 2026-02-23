@@ -555,18 +555,17 @@ export default function SearchBar(props: Props) {
           let subtext;
           if (typeof option === 'string') {
             text = option;
+          } else if (typeof option.title !== 'undefined') {
+            text = option.title;
+            subtext = searchQueryLabel(option);
+          } else if (typeof option.subtitle !== 'undefined') {
+            text = searchQueryLabel(option);
+            subtext = option.subtitle;
           } else {
-            if (typeof option.title !== 'undefined') {
-              text = option.title;
-              subtext = searchQueryLabel(option);
-            } else if (typeof option.subtitle !== 'undefined') {
-              text = searchQueryLabel(option);
-              subtext = option.subtitle;
-            } else {
-              text = searchQueryLabel(option);
-              subtext = professor_to_alias[searchQueryLabel(option)] ?? '';
-            }
+            text = searchQueryLabel(option);
+            subtext = professor_to_alias[searchQueryLabel(option)] ?? '';
           }
+
           //add spaces between prefix and course number
           const matches = match(
             text,
