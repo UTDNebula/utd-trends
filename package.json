@@ -14,7 +14,8 @@
     "lint": "eslint --fix .",
     "lint:check": "eslint .",
     "docs": "styleguidist server",
-    "docs:build": "styleguidist build"
+    "docs:build": "styleguidist build",
+    "test": "jest"
   },
   "engines": {
     "node": "22.x"
@@ -49,7 +50,11 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "@tanstack/eslint-plugin-query": "^5.91.3",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
     "@types/autosuggest-highlight": "^3.2.0",
+    "@types/jest": "^30.0.0",
     "@types/node": "^25.0.9",
     "@types/react": "^19.2.8",
     "@types/react-dom": "^19.2.3",
@@ -62,10 +67,12 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "node-fetch": "^3.3.1",
     "prettier": "^3.8.0",
     "tailwindcss": "^4.1.18",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
 }
