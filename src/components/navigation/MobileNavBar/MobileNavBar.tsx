@@ -13,7 +13,7 @@ export default function MobileNavBar() {
   const [value, setValue] = React.useState(pathname);
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[1000] block shadow-md md:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-[1000] block shadow-md md:hidden pb-[env(safe-area-inset-bottom)]">
       <BottomNavigation
         showLabels
         value={value}
