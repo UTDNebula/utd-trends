@@ -18,23 +18,26 @@ export default function MobileNavBar() {
         showLabels
         value={value}
         onChange={(event, newValue) => {
-          if (newValue === "/")
-          {
+          if (newValue === '/') {
             if (window.sessionStorage.getItem('dashboardSearchTerms') != null) {
-                setValue('/dashboard?' + window.sessionStorage.getItem('dashboardSearchTerms'))
-                router.push('/dashboard?' + window.sessionStorage.getItem('dashboardSearchTerms'));
+              setValue(
+                '/dashboard?' +
+                  window.sessionStorage.getItem('dashboardSearchTerms'),
+              );
+              router.push(
+                '/dashboard?' +
+                  window.sessionStorage.getItem('dashboardSearchTerms'),
+              );
+            } else {
+              setValue('/');
+              router.push('/');
             }
-            else {
-                setValue('/');
-                router.push('/');
-            }
-          }
-          else {
+          } else {
             setValue(newValue);
             sessionStorage.setItem(
-                'dashboardSearchTerms',
-                new URLSearchParams(window.location.search).toString(),
-            )
+              'dashboardSearchTerms',
+              new URLSearchParams(window.location.search).toString(),
+            );
             router.push(newValue);
           }
         }}
