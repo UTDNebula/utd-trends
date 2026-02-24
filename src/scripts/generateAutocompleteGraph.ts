@@ -135,15 +135,6 @@ function addProfessor(
     profFirst: profFirst,
     profLast: profLast,
   };
-  /* 
-    Alternative to data (shallow copy of original prof instead of ref):
-    const data = {
-      ...(originalProf ?? {
-        profFirst: profFirst,
-        profLast: profLast
-      })
-    }
-  */
 
   // saves the node with the data
   const profNode = addWithParents(nodes, profLast, data);
