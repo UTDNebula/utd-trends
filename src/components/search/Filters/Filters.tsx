@@ -74,7 +74,7 @@ export function LoadingFilters() {
       </Grid>
 
       {/* Teaching Next Semester switch*/}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 12, sm: 12 / 5 }} className="px-2">
         <FormControl size="small">
           <FormControlLabel
             control={<Switch checked={true} />}
@@ -162,9 +162,9 @@ export default function Filters({
       section.data.some((s) => chosenSectionTypes.includes(s.type)),
     );
     return (
-      (result.grades.length == 0 &&
-        chosenSemesters.length == semesters.length &&
-        chosenSectionTypes.length == sectionTypes.length) ||
+      (result.grades.length === 0 &&
+        chosenSemesters.length === semesters.length &&
+        chosenSectionTypes.length === sectionTypes.length) ||
       (result.grades.some((s) => chosenSemesters.includes(s._id)) &&
         hasChosenSectionTypes) ||
       availableThisSemester
@@ -187,9 +187,9 @@ export default function Filters({
         (courseGrades &&
           calculateGrades(courseGrades, chosenSemesters, chosenSectionTypes)
             .gpa >= gpaNum) ||
-        (courseGrades == undefined &&
-          chosenSemesters.length == semesters.length &&
-          chosenSectionTypes.length == sectionTypes.length)
+        (courseGrades === undefined &&
+          chosenSemesters.length === semesters.length &&
+          chosenSectionTypes.length === sectionTypes.length)
       );
     }).length;
   });
@@ -558,7 +558,7 @@ export default function Filters({
       </Grid>
 
       {/* Teaching Next Semester switch*/}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 12, sm: 12 / 5 }} className="px-2">
         <Tooltip title="Select Availability" placement="top">
           <FormControl
             size="small"

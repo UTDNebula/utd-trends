@@ -68,30 +68,34 @@ export default function ClientLeft(props: Props) {
     [results, minGPA, minRating, maxDiff, chosenSemesters, chosenSectionTypes],
   );
 
-  //Filter results based on gpa, rmp, and rmp difficulty
+  //Filter results based on gpa, rmp, rmp difficulty, availability, and grade section type
   const availableResults = filteredResults.filter((result) => {
     const availableThisSemester = result.sections.some(
       (section) => section.academic_session.name === latestSemester,
     );
     if (availability && !availableThisSemester) return false;
+
+    // for grades - at least one section has been taught with section types
     const hasChosenSectionTypes = result.grades.some((section) =>
       section.data.some((s) => chosenSectionTypes.includes(s.type)),
     );
     const hasChosenSemester = result.grades.some((s) =>
       chosenSemesters.includes(s._id),
     );
+    // only show courses without grades if no semester/section filters are enabled
     const noSemesterOrSectionFilter =
-      chosenSemesters.length == semesters.length &&
-      chosenSectionTypes.length == sectionTypes.length;
+      chosenSemesters.length === semesters.length &&
+      chosenSectionTypes.length === sectionTypes.length;
     if (
       !availability &&
       (!hasChosenSemester || !hasChosenSectionTypes) &&
-      !(result.grades.length == 0 && noSemesterOrSectionFilter)
+      !(result.grades.length === 0 && noSemesterOrSectionFilter)
     )
       return false;
     return true;
   });
-  // for all "available" results, check if section types are available
+  // for all "available" results, check if section types are available next semester
+  // if not, keep in separate section
   const sectionTypeFiltering = chosenSectionTypes.length < sectionTypes.length;
   availableResults.forEach((result) => {
     const sectionsWithTypeNextSem = result.sections.filter(
@@ -105,7 +109,7 @@ export default function ClientLeft(props: Props) {
     if (
       availability &&
       sectionTypeFiltering &&
-      sectionsWithTypeNextSem.length == 0
+      sectionsWithTypeNextSem.length === 0
     ) {
       secondaryIncludedResults.push(result);
     } else {
@@ -113,6 +117,7 @@ export default function ClientLeft(props: Props) {
       includedResults.push(result);
     }
   });
+  // filter results that are not available next semester
   unIncludedResults = filteredResults.filter((result) => {
     if (!availability) return false;
     const availableThisSemester =
@@ -120,18 +125,21 @@ export default function ClientLeft(props: Props) {
         (section) => section.academic_session.name === latestSemester,
       ).length > 0;
     if (availability && availableThisSemester) return false;
+
     const hasChosenSemester = result.grades.some((s) =>
       chosenSemesters.includes(s._id),
     );
+    // for grades - at least one section has been taught with section types
     const hasChosenSectionTypes = result.grades.some((section) =>
       section.data.some((s) => chosenSectionTypes.includes(s.type)),
     );
+    // only show courses without grades if no semester/section filters are enabled
     const noSemesterOrSectionFilter =
-      chosenSemesters.length == semesters.length &&
-      chosenSectionTypes.length == sectionTypes.length;
+      chosenSemesters.length === semesters.length &&
+      chosenSectionTypes.length === sectionTypes.length;
     if (
       (!hasChosenSemester || !hasChosenSectionTypes) &&
-      !(result.grades.length == 0 && noSemesterOrSectionFilter)
+      !(result.grades.length === 0 && noSemesterOrSectionFilter)
     )
       return false;
     return true;

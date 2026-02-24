@@ -670,7 +670,7 @@ export default function SearchResultsTable({
               </TableRow>
             )}
 
-            {/* Unincluded Results (Unavailable courses) */}
+            {/* Secondary Included Results (Available but do not match filters) */}
             {sortedSecondaryIncludedResults.map((result) => {
               return (
                 <Row
