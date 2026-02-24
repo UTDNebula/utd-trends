@@ -96,6 +96,7 @@ type SearchQueryWithTitle = SearchQuery & {
   title?: string;
   subtitle?: string;
   isRecent?: boolean;
+  totalStudents?: number;
 };
 
 /**
@@ -564,6 +565,7 @@ export default function SearchBar(props: Props) {
             text = searchQueryLabel(option);
             subtext = professor_to_alias[searchQueryLabel(option)] ?? '';
           }
+
           //add spaces between prefix and course number
           const matches = match(
             text,
