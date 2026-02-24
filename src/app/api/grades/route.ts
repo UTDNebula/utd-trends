@@ -40,7 +40,7 @@ export async function GET(request: Request) {
     Accept: 'application/json',
   };
 
-  const url = new URL(API_URL + 'grades/semester/sectionType');
+  const url = new URL(API_URL + 'grades/semester');
   if (typeof prefix === 'string') {
     url.searchParams.append('prefix', prefix);
   }
