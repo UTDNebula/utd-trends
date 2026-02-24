@@ -158,11 +158,15 @@ export default function Filters({
       result.sections.some(
         (section) => section.academic_session.name === latestSemester,
       );
+    const hasChosenSectionTypes = result.grades.some((section) =>
+      section.data.some((s) => chosenSectionTypes.includes(s.type)),
+    );
     return (
       (result.grades.length == 0 &&
         chosenSemesters.length == semesters.length &&
         chosenSectionTypes.length == sectionTypes.length) ||
-      result.grades.some((s) => chosenSemesters.includes(s._id)) ||
+      (result.grades.some((s) => chosenSemesters.includes(s._id)) &&
+        hasChosenSectionTypes) ||
       availableThisSemester
     );
   });

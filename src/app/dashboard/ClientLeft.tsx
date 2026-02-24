@@ -80,10 +80,13 @@ export default function ClientLeft(props: Props) {
     const hasChosenSemester = result.grades.some((s) =>
       chosenSemesters.includes(s._id),
     );
+    const noSemesterOrSectionFilter =
+      chosenSemesters.length == semesters.length &&
+      chosenSectionTypes.length == sectionTypes.length;
     if (
       !availability &&
       (!hasChosenSemester || !hasChosenSectionTypes) &&
-      result.grades.length !== 0
+      !(result.grades.length == 0 && noSemesterOrSectionFilter)
     )
       return false;
     return true;
@@ -123,13 +126,12 @@ export default function ClientLeft(props: Props) {
     const hasChosenSectionTypes = result.grades.some((section) =>
       section.data.some((s) => chosenSectionTypes.includes(s.type)),
     );
+    const noSemesterOrSectionFilter =
+      chosenSemesters.length == semesters.length &&
+      chosenSectionTypes.length == sectionTypes.length;
     if (
       (!hasChosenSemester || !hasChosenSectionTypes) &&
-      !(
-        result.grades.length == 0 &&
-        chosenSemesters.length == semesters.length &&
-        chosenSectionTypes.length == sectionTypes.length
-      )
+      !(result.grades.length == 0 && noSemesterOrSectionFilter)
     )
       return false;
     return true;
