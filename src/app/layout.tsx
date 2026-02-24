@@ -1,5 +1,6 @@
 import '@/styles/globals.css';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
+import MobileNavBar from '@/components/navigation/MobileNavBar/MobileNavBar';
 import { fetchLatestSemester } from '@/modules/fetchSections';
 import theme from '@/modules/theme';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
@@ -80,6 +81,7 @@ export default async function RootLayout({
             <QueryProvider>
               <SharedStateProvider latestSemester={latestSemester}>
                 {children}
+                <MobileNavBar />
                 <ReactQueryDevtools initialIsOpen={false} />
               </SharedStateProvider>
             </QueryProvider>
