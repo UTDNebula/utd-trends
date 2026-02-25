@@ -104,8 +104,10 @@ export default function Filters({
   const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
   const setChosenSectionTypes = use(FiltersContext).setChosenSectionTypes;
   const sectionTypes = use(FiltersContext).sectionTypes;
-  const chosenSectionTypesOverride = use(FiltersContext).chosenSectionTypesOverride;
-  const setChosenSectionTypesOverride = use(FiltersContext).setChosenSectionTypesOverride;
+  const chosenSectionTypesOverride =
+    use(FiltersContext).chosenSectionTypesOverride;
+  const setChosenSectionTypesOverride =
+    use(FiltersContext).setChosenSectionTypesOverride;
   const sectionTypesOverride = use(FiltersContext).sectionTypesOverride;
 
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
@@ -565,7 +567,9 @@ export default function Filters({
       {/* section type override toggle */}
       <Grid size={{ xs: 6, sm: 12 / 6 }} className="px-2">
         <Tooltip
-          title={'Override filters to show only one section type (in-person, online, or hybrid)'}
+          title={
+            'Override filters to show only one section type (in-person, online, or hybrid)'
+          }
           placement="top"
         >
           <FormControl
@@ -586,7 +590,9 @@ export default function Filters({
               aria-label="Platform"
             >
               {sectionTypesOverride.map((t) => (
-                <ToggleButton key={t} value={t}>{t}</ToggleButton>
+                <ToggleButton key={t} value={t}>
+                  {t}
+                </ToggleButton>
               ))}
             </ToggleButtonGroup>
           </FormControl>

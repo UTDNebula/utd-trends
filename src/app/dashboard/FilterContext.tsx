@@ -33,7 +33,7 @@ export const FiltersContext = createContext<{
   chosenSectionTypes: [],
   setChosenSectionTypes: (_) => _,
   sectionTypesOverride: [],
-  chosenSectionTypesOverride: "",
+  chosenSectionTypesOverride: '',
   setChosenSectionTypesOverride: (_) => _,
 });
 
@@ -59,11 +59,11 @@ export default function FiltersProvider({
     getSectionTypesFromSearchResults(searchResults),
   );
 
-  const sectionTypesOverride = ["all", "in-person", "online", "hybrid"];
+  const sectionTypesOverride = ['all', 'in-person', 'online', 'hybrid'];
   const [chosenSectionTypesOverride, setChosenSectionTypesOverride] =
-    useState<string>(
-      () => {return sectionTypesOverride[0]}
-    );
+    useState<string>(() => {
+      return sectionTypesOverride[0];
+    });
 
   const [prevSearchResults, setPrevSearchResults] =
     useState<SearchResult[]>(searchResults);
