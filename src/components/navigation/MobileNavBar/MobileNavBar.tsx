@@ -5,33 +5,33 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SearchIcon from '@mui/icons-material/Search';
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
-import React from 'react';
 
 export default function MobileNavBar() {
   const router = useRouter();
   const pathname = usePathname();
-  const [value, setValue] = React.useState(pathname);
+  const activeTab =
+    pathname === '/dashboard' || pathname === '/' ? '/' : pathname;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[1000] block shadow-md md:hidden pb-[env(safe-area-inset-bottom)]">
+    <div className="fixed inset-x-0 bottom-0 z-[1000] block bg-white shadow-md dark:bg-haiti md:hidden pb-[env(safe-area-inset-bottom)]">
       <BottomNavigation
         showLabels
-        value={value}
+        value={activeTab}
         onChange={(event, newValue) => {
           if (newValue === '/') {
             const dashboardSearchTerms = window.sessionStorage.getItem(
               'dashboardSearchTerms',
             );
-            setValue('/');
             router.push(
               dashboardSearchTerms ? '/dashboard?' + dashboardSearchTerms : '/',
             );
           } else {
-            setValue(newValue);
-            sessionStorage.setItem(
-              'dashboardSearchTerms',
-              new URLSearchParams(window.location.search).toString(),
-            );
+            if (pathname === '/dashboard') {
+              sessionStorage.setItem(
+                'dashboardSearchTerms',
+                new URLSearchParams(window.location.search).toString(),
+              );
+            }
             router.push(newValue);
           }
         }}
