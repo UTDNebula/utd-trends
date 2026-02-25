@@ -24,6 +24,8 @@ const SharedStateContext = createContext<
       addToCompare: (query: SearchResult) => void;
       removeFromCompare: (query: SearchResult) => void;
       compareColorMap: { [key: string]: string };
+      isCompareOpen: boolean;
+      setIsCompareOpen: (open: boolean) => void;
       planner: SearchQueryMultiSection[];
       addToPlanner: (query: SearchQuery) => void;
       removeFromPlanner: (query: SearchQuery) => void;
@@ -84,6 +86,8 @@ export function SharedStateProvider({
       compareColors[index % compareColors.length],
     ]),
   );
+
+  const [isCompareOpen, setIsCompareOpen] = useState(false);
 
   //Store course+prof combos in planner
   const [planner, setPlanner] = usePersistantState<SearchQueryMultiSection[]>(
@@ -204,6 +208,8 @@ export function SharedStateProvider({
         addToCompare,
         removeFromCompare,
         compareColorMap,
+        isCompareOpen,
+        setIsCompareOpen,
         planner,
         addToPlanner,
         removeFromPlanner,

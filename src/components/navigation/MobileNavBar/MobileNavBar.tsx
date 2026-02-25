@@ -1,5 +1,6 @@
 'use client';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SearchIcon from '@mui/icons-material/Search';
@@ -7,6 +8,7 @@ import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
 
 export default function MobileNavBar() {
+  const { setIsCompareOpen } = useSharedState();
   const router = useRouter();
   const pathname = usePathname();
   const activeTab =
@@ -19,13 +21,18 @@ export default function MobileNavBar() {
         value={activeTab}
         onChange={(event, newValue) => {
           if (newValue === '/') {
+            setIsCompareOpen(false);
             const dashboardSearchTerms = window.sessionStorage.getItem(
               'dashboardSearchTerms',
             );
             router.push(
               dashboardSearchTerms ? '/dashboard?' + dashboardSearchTerms : '/',
             );
+          } else if (newValue == '/compare') {
+            setIsCompareOpen(true);
           } else {
+            // going to /planner
+            setIsCompareOpen(false);
             if (pathname === '/dashboard') {
               sessionStorage.setItem(
                 'dashboardSearchTerms',
