@@ -19,19 +19,13 @@ export default function MobileNavBar() {
         value={value}
         onChange={(event, newValue) => {
           if (newValue === '/') {
-            if (window.sessionStorage.getItem('dashboardSearchTerms') != null) {
-              setValue(
-                '/dashboard?' +
-                  window.sessionStorage.getItem('dashboardSearchTerms'),
-              );
-              router.push(
-                '/dashboard?' +
-                  window.sessionStorage.getItem('dashboardSearchTerms'),
-              );
-            } else {
-              setValue('/');
-              router.push('/');
-            }
+            const dashboardSearchTerms = window.sessionStorage.getItem(
+              'dashboardSearchTerms',
+            );
+            setValue('/');
+            router.push(
+              dashboardSearchTerms ? '/dashboard?' + dashboardSearchTerms : '/',
+            );
           } else {
             setValue(newValue);
             sessionStorage.setItem(
