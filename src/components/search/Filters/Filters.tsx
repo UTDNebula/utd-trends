@@ -586,7 +586,7 @@ export default function Filters({
               aria-label="Platform"
             >
               {sectionTypesOverride.map((t) => (
-                <ToggleButton value={t}>{t}</ToggleButton>
+                <ToggleButton key={t} value={t}>{t}</ToggleButton>
               ))}
             </ToggleButtonGroup>
           </FormControl>
