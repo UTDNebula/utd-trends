@@ -20,6 +20,8 @@ import {
   Tooltip,
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { usePathname, useSearchParams } from 'next/navigation';
 import React, { use } from 'react';
 
@@ -30,7 +32,7 @@ export function LoadingFilters() {
   return (
     <Grid container spacing={2} className="mb-4 sm:m-0">
       {/* min letter grade dropdown*/}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 6 }} className="px-2">
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
@@ -41,7 +43,7 @@ export function LoadingFilters() {
       </Grid>
 
       {/* min rating dropdown*/}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 6 }} className="px-2">
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
@@ -52,7 +54,7 @@ export function LoadingFilters() {
       </Grid>
 
       {/* semester dropdown */}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 6 }} className="px-2">
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
@@ -63,7 +65,7 @@ export function LoadingFilters() {
       </Grid>
 
       {/* section type dropdown */}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 6 }} className="px-2">
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
@@ -74,7 +76,7 @@ export function LoadingFilters() {
       </Grid>
 
       {/* Teaching Next Semester switch*/}
-      <Grid size={{ xs: 12, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 12, sm: 12 / 6 }} className="px-2">
         <FormControl size="small">
           <FormControlLabel
             control={<Switch checked={true} />}
@@ -102,6 +104,9 @@ export default function Filters({
   const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
   const setChosenSectionTypes = use(FiltersContext).setChosenSectionTypes;
   const sectionTypes = use(FiltersContext).sectionTypes;
+  const chosenSectionTypesOverride = use(FiltersContext).chosenSectionTypesOverride;
+  const setChosenSectionTypesOverride = use(FiltersContext).setChosenSectionTypesOverride;
+  const sectionTypesOverride = use(FiltersContext).sectionTypesOverride;
 
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
@@ -245,7 +250,7 @@ export default function Filters({
       className="mb-4 sm:m-0"
     >
       {/* min letter grade dropdown*/}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 6 }} className="px-2">
         <Tooltip title={'Select Minimum Letter Grade Average'} placement="top">
           <FormControl
             size="small"
@@ -294,7 +299,7 @@ export default function Filters({
       </Grid>
 
       {/* min rating dropdown*/}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 6 }} className="px-2">
         <Tooltip title={'Select Minimum Professor Rating'} placement="top">
           <FormControl
             size="small"
@@ -356,7 +361,7 @@ export default function Filters({
       </Grid>
 
       {/* semester dropdown */}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 6 }} className="px-2">
         <Tooltip
           title={'Select Semesters to Include Grades from'}
           placement="top"
@@ -476,7 +481,7 @@ export default function Filters({
       </Grid>
 
       {/* section type dropdown */}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 6 }} className="px-2">
         <Tooltip
           title={'Select Section Types to Include Grades from'}
           placement="top"
@@ -557,8 +562,39 @@ export default function Filters({
         </Tooltip>
       </Grid>
 
+      {/* section type override toggle */}
+      <Grid size={{ xs: 6, sm: 12 / 6 }} className="px-2">
+        <Tooltip
+          title={'Override filters to show only one section type (in-person, online, or hybrid)'}
+          placement="top"
+        >
+          <FormControl
+            size="small"
+            className={`w-full ${
+              chosenSectionTypes.length !== sectionTypes.length
+                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
+                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
+            }`}
+          >
+            <ToggleButtonGroup
+              color="primary"
+              value={chosenSectionTypesOverride}
+              exclusive
+              onChange={(_event, value: string) => {
+                setChosenSectionTypesOverride(value);
+              }}
+              aria-label="Platform"
+            >
+              {sectionTypesOverride.map((t) => (
+                <ToggleButton value={t}>{t}</ToggleButton>
+              ))}
+            </ToggleButtonGroup>
+          </FormControl>
+        </Tooltip>
+      </Grid>
+
       {/* Teaching Next Semester switch*/}
-      <Grid size={{ xs: 12, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 12, sm: 12 / 6 }} className="px-2">
         <Tooltip title="Select Availability" placement="top">
           <FormControl
             size="small"
