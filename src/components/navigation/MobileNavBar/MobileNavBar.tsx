@@ -5,7 +5,7 @@ import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SearchIcon from '@mui/icons-material/Search';
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 export default function MobileNavBar() {
   const { isCompareOpen, setIsCompareOpen } = useSharedState();
@@ -25,14 +25,14 @@ export default function MobileNavBar() {
         value={activeTab}
         onChange={(event, newValue) => {
           // store search terms in session storage when navigating away from the dashboard
-          const params = new URLSearchParams(window.location.search);
+          const params = useSearchParams();
           if (
             pathname === '/dashboard' &&
             !(params.size === 1 && params.get('availability') === 'true') // if the search terms lead to an empty dashboard, don't store
           ) {
             sessionStorage.setItem(
               'dashboardSearchTerms',
-              new URLSearchParams(window.location.search).toString(),
+              params.toString(),
             );
           }
           // navigation
