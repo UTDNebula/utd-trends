@@ -26,29 +26,48 @@ function sortSemesters(a: string, b: string) {
 function getSemesterGPAs(
   data: { name: string; data: Grades['grades'] },
   semesterMapping: Map<string, number>,
+  chosenSectionTypes: string[] | undefined,
 ) {
   const allPoints: { x: number; y: number; semester: string }[] = [];
 
   data.data
     .toSorted((a, b) => sortSemesters(a._id, b._id))
     .forEach((semester) => {
-      const total = semester.grade_distribution.reduce((a, c) => a + c, 0);
+      //get gpa and place in allSemesters
+      // Aggregate grade_distribution across selected section types for this semester
+      const aggregate = (semester.data ?? []).reduce(
+        (acc, section) => {
+          if (
+            !chosenSectionTypes ||
+            chosenSectionTypes.length === 0 ||
+            chosenSectionTypes.includes(section.type)
+          ) {
+            return acc.map(
+              (v, i) => v + (section.grade_distribution?.[i] ?? 0),
+            );
+          }
+          return acc;
+        },
+        Array(14).fill(0) as number[],
+      );
+
+      const total = aggregate.reduce((a, c) => a + c, 0);
+
+      const totalGrades = total - aggregate[aggregate.length - 1];
+      // No valid grades to compute GPA
+      if (totalGrades <= 0) {
+        return null;
+      }
+
       const GPALookup = [
         4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
       ];
-
-      let gpa = 0;
-      if (total !== 0) {
-        gpa =
-          GPALookup.reduce(
-            (acc, val, i) => acc + val * semester.grade_distribution[i],
-            0,
-          ) /
-          (total -
-            semester.grade_distribution[
-              semester.grade_distribution.length - 1
-            ]);
-      }
+      const gpa =
+        GPALookup.reduce(
+          (accumulator, currentValue, index) =>
+            accumulator + currentValue * aggregate[index],
+          0,
+        ) / totalGrades;
 
       const xValue = semesterMapping.get(semester._id);
       if (xValue !== undefined) {
@@ -56,7 +75,9 @@ function getSemesterGPAs(
       }
     });
 
-  return allPoints;
+  return allPoints.filter(
+    (pt): pt is { x: number; y: number; semester: string } => pt !== null,
+  );
 }
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -68,7 +89,7 @@ type Props = {
 };
 
 export default function LineGraph(props: Props) {
-  const { semesters, chosenSemesters, setChosenSemesters } =
+  const { semesters, chosenSemesters, setChosenSemesters, chosenSectionTypes } =
     use(FiltersContext);
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
@@ -105,11 +126,13 @@ export default function LineGraph(props: Props) {
 
   const series = props.series.map((single) => ({
     name: single.name,
-    data: getSemesterGPAs(single, semesterMapping).map((p) => ({
-      x: p.x,
-      y: p.y,
-      semester: p.semester,
-    })),
+    data: getSemesterGPAs(single, semesterMapping, chosenSectionTypes).map(
+      (p) => ({
+        x: p.x,
+        y: p.y,
+        semester: p.semester,
+      }),
+    ),
   }));
 
   const theme = useTheme();

@@ -30,7 +30,7 @@ export function LoadingFilters() {
   return (
     <Grid container spacing={2} className="mb-4 sm:m-0">
       {/* min letter grade dropdown*/}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
@@ -41,7 +41,7 @@ export function LoadingFilters() {
       </Grid>
 
       {/* min rating dropdown*/}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
@@ -52,7 +52,7 @@ export function LoadingFilters() {
       </Grid>
 
       {/* semester dropdown */}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
@@ -62,8 +62,19 @@ export function LoadingFilters() {
         </FormControl>
       </Grid>
 
+      {/* section type dropdown */}
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+        <FormControl
+          size="small"
+          className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
+        >
+          <InputLabel id="SectionTypes">Section Types</InputLabel>
+          <Select label="SectionTypes" labelId="SectionTypes" value=""></Select>
+        </FormControl>
+      </Grid>
+
       {/* Teaching Next Semester switch*/}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 12, sm: 12 / 5 }} className="px-2">
         <FormControl size="small">
           <FormControlLabel
             control={<Switch checked={true} />}
@@ -88,6 +99,9 @@ export default function Filters({
   const semesters = use(FiltersContext).semesters;
   const chosenSemesters = use(FiltersContext).chosenSemesters;
   const setChosenSemesters = use(FiltersContext).setChosenSemesters;
+  const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
+  const setChosenSectionTypes = use(FiltersContext).setChosenSectionTypes;
+  const sectionTypes = use(FiltersContext).sectionTypes;
 
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
@@ -144,9 +158,15 @@ export default function Filters({
       result.sections.some(
         (section) => section.academic_session.name === latestSemester,
       );
+    const hasChosenSectionTypes = result.grades.some((section) =>
+      section.data.some((s) => chosenSectionTypes.includes(s.type)),
+    );
     return (
-      result.grades.length == 0 ||
-      result.grades.some((s) => chosenSemesters.includes(s._id)) ||
+      (result.grades.length === 0 &&
+        chosenSemesters.length === semesters.length &&
+        chosenSectionTypes.length === sectionTypes.length) ||
+      (result.grades.some((s) => chosenSemesters.includes(s._id)) &&
+        hasChosenSectionTypes) ||
       availableThisSemester
     );
   });
@@ -165,8 +185,11 @@ export default function Filters({
       const courseGrades = result.grades;
       return (
         (courseGrades &&
-          calculateGrades(courseGrades, chosenSemesters).gpa >= gpaNum) ||
-        courseGrades == undefined
+          calculateGrades(courseGrades, chosenSemesters, chosenSectionTypes)
+            .gpa >= gpaNum) ||
+        (courseGrades === undefined &&
+          chosenSemesters.length === semesters.length &&
+          chosenSectionTypes.length === sectionTypes.length)
       );
     }).length;
   });
@@ -175,7 +198,11 @@ export default function Filters({
     const ratingNum = parseFloat(ratingString);
     rmpCounts[ratingString] = semFilteredResults.filter((result) => {
       // gpa filter
-      const calculated = calculateGrades(result.grades, chosenSemesters);
+      const calculated = calculateGrades(
+        result.grades,
+        chosenSemesters,
+        chosenSectionTypes,
+      );
       if (typeof minGPA === 'string' && calculated.gpa < parseFloat(minGPA))
         return false;
       if (
@@ -189,6 +216,27 @@ export default function Filters({
     }).length;
   });
 
+  function displaySectionTypeName(id: string): string {
+    const SectionTypesMap: Record<string, string> = {
+      '0xx': 'Normal day lecture',
+      '0Wx': 'Online class',
+      '0Hx': 'Hybrid day class (online + face-to-face)',
+      '0Lx': 'LLC-only section',
+      '5Hx': 'Hybrid night class (online + face-to-face)',
+      '1xx': 'Lab section (sciences)',
+      '2xx': 'Discussion section (humanities)',
+      '3xx': 'Problem section (maths)',
+      '5xx': 'Night lecture (past 5 PM)',
+      '6xx': 'Lab night section (past 7 PM)',
+      '7xx': 'Exam section',
+      HNx: 'Honors-only',
+      HON: 'Honors-only',
+      xUx: 'Summer Class',
+    };
+
+    return SectionTypesMap[id] || id; // Default to ID if no mapping exists
+  }
+
   return (
     <Grid
       container
@@ -197,7 +245,7 @@ export default function Filters({
       className="mb-4 sm:m-0"
     >
       {/* min letter grade dropdown*/}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
         <Tooltip title={'Select Minimum Letter Grade Average'} placement="top">
           <FormControl
             size="small"
@@ -246,7 +294,7 @@ export default function Filters({
       </Grid>
 
       {/* min rating dropdown*/}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
         <Tooltip title={'Select Minimum Professor Rating'} placement="top">
           <FormControl
             size="small"
@@ -308,7 +356,7 @@ export default function Filters({
       </Grid>
 
       {/* semester dropdown */}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
         <Tooltip
           title={'Select Semesters to Include Grades from'}
           placement="top"
@@ -427,8 +475,90 @@ export default function Filters({
         </Tooltip>
       </Grid>
 
+      {/* section type dropdown */}
+      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+        <Tooltip
+          title={'Select Section Types to Include Grades from'}
+          placement="top"
+        >
+          <FormControl
+            size="small"
+            className={`w-full ${
+              chosenSectionTypes.length !== sectionTypes.length
+                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
+                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
+            }`}
+          >
+            <InputLabel id="SectionTypes">Section Types</InputLabel>
+            <Select
+              label="Section Types"
+              labelId="SectionTypes"
+              multiple
+              value={chosenSectionTypes}
+              onChange={(event) => {
+                const {
+                  target: { value },
+                } = event;
+                if (value.includes('select-all')) {
+                  if (chosenSectionTypes.length === sectionTypes.length) {
+                    setChosenSectionTypes([]);
+                  } else {
+                    setChosenSectionTypes(sectionTypes);
+                  }
+                } else {
+                  if (chosenSectionTypes.length === sectionTypes.length) {
+                    const clickedItem = chosenSectionTypes.find(
+                      (x) => !value.includes(x),
+                    );
+                    if (clickedItem) {
+                      setChosenSectionTypes([clickedItem]);
+                    }
+                  } else {
+                    setChosenSectionTypes(value as string[]);
+                  }
+                }
+              }}
+              renderValue={(selected) => {
+                if (chosenSectionTypes.length === sectionTypes.length) {
+                  return 'All selected';
+                }
+                return selected.sort().join(', ');
+              }}
+              MenuProps={{ autoFocus: false }}
+            >
+              {/* select all section types */}
+              <MenuItem className="h-10 items-center" value="select-all">
+                <Checkbox
+                  checked={
+                    sectionTypes.length > 0 &&
+                    chosenSectionTypes.length === sectionTypes.length
+                  }
+                  indeterminate={
+                    chosenSectionTypes.length !== sectionTypes.length &&
+                    chosenSectionTypes.length !== 0
+                  }
+                  disabled={sectionTypes.length == 0}
+                />
+                <ListItemText
+                  className={sectionTypes.length > 0 ? '' : 'text-gray-400'}
+                  primary="Select All"
+                />
+              </MenuItem>
+
+              {/* individual options */}
+              {sectionTypes.map((t) => (
+                <MenuItem className="h-10 items-center" key={t} value={t}>
+                  <Checkbox checked={chosenSectionTypes.includes(t)} />
+                  <ListItemText primary={displaySectionTypeName(t)} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Tooltip>
+      </Grid>
+
       {/* Teaching Next Semester switch*/}
-      <Grid size={{ xs: 6, sm: 3 }} className="px-2">
+      <Grid size={{ xs: 12, sm: 12 / 5 }} className="px-2">
         <Tooltip title="Select Availability" placement="top">
           <FormControl
             size="small"
