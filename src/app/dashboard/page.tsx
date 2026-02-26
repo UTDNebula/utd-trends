@@ -90,10 +90,12 @@ export default async function Page({ searchParams }: Props) {
   if (typeof searchTerms === 'undefined' || searchTerms.length === 0) {
     return (
       <>
-        <Header isPlanner={false} />
-        <main className="p-4">
-          <DashboardEmpty />
-        </main>
+        <FiltersProvider searchResults={[]}>
+          <Header isPlanner={false} />
+          <main className="p-4">
+            <DashboardEmpty />
+          </main>
+        </FiltersProvider>
       </>
     );
   }

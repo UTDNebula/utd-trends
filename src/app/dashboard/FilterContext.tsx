@@ -51,8 +51,6 @@ export default function FiltersProvider({
       {isCompareOpen ? (
         <>
           <Header isPlanner={true} />
-
-          {/* Main Compare Content */}
           <main className="p-4 overflow-y-auto">
             <Card className="w-full p-4">
               <Compare />

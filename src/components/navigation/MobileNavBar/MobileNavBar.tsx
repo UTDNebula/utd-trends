@@ -11,6 +11,7 @@ export default function MobileNavBar() {
   const { isCompareOpen, setIsCompareOpen } = useSharedState();
   const router = useRouter();
   const pathname = usePathname();
+  const params = useSearchParams();
   const activeTab =
     pathname === '/dashboard' || pathname === '/'
       ? isCompareOpen
@@ -25,7 +26,6 @@ export default function MobileNavBar() {
         value={activeTab}
         onChange={(event, newValue) => {
           // store search terms in session storage when navigating away from the dashboard
-          const params = useSearchParams();
           if (
             pathname === '/dashboard' &&
             !(params.size === 1 && params.get('availability') === 'true') // if the search terms lead to an empty dashboard, don't store
