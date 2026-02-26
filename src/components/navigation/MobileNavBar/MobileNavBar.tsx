@@ -30,10 +30,7 @@ export default function MobileNavBar() {
             pathname === '/dashboard' &&
             !(params.size === 1 && params.get('availability') === 'true') // if the search terms lead to an empty dashboard, don't store
           ) {
-            sessionStorage.setItem(
-              'dashboardSearchTerms',
-              params.toString(),
-            );
+            sessionStorage.setItem('dashboardSearchTerms', params.toString());
           }
           // navigation
           if (newValue === 'search') {
