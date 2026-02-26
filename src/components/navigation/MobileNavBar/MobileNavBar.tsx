@@ -8,11 +8,15 @@ import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
 
 export default function MobileNavBar() {
-  const { setIsCompareOpen } = useSharedState();
+  const { isCompareOpen, setIsCompareOpen } = useSharedState();
   const router = useRouter();
   const pathname = usePathname();
   const activeTab =
-    pathname === '/dashboard' || pathname === '/' ? '/' : pathname;
+    pathname === '/dashboard' || pathname === '/'
+      ? isCompareOpen
+        ? 'compare'
+        : 'search'
+      : 'planner';
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[1000] block bg-white shadow-md dark:bg-haiti md:hidden pb-[env(safe-area-inset-bottom)]">
@@ -20,42 +24,56 @@ export default function MobileNavBar() {
         showLabels
         value={activeTab}
         onChange={(event, newValue) => {
-          if (newValue === '/') {
+          // store search terms in session storage when navigating away from the dashboard
+          const params = new URLSearchParams(window.location.search);
+          if (
+            pathname === '/dashboard' &&
+            !(params.size === 1 && params.get('availability') === 'true') // if the search terms lead to an empty dashboard, don't store
+          ) {
+            sessionStorage.setItem(
+              'dashboardSearchTerms',
+              new URLSearchParams(window.location.search).toString(),
+            );
+          }
+          // navigation
+          if (newValue === 'search') {
             setIsCompareOpen(false);
             const dashboardSearchTerms = window.sessionStorage.getItem(
               'dashboardSearchTerms',
             );
             router.push(
-              dashboardSearchTerms ? '/dashboard?' + dashboardSearchTerms : '/',
+              dashboardSearchTerms ? '/dashboard?' + dashboardSearchTerms : '/', // if no stored search terms, we can just go to landing page
             );
-          } else if (newValue == '/compare') {
+          } else if (newValue === 'compare') {
             setIsCompareOpen(true);
+            const dashboardSearchTerms = window.sessionStorage.getItem(
+              'dashboardSearchTerms',
+            );
+            router.push(
+              dashboardSearchTerms
+                ? '/dashboard?' + dashboardSearchTerms
+                : '/dashboard?availability=true', // if no stored search terms, we still need dashboard to show compare
+            );
           } else {
             // going to /planner
             setIsCompareOpen(false);
-            if (pathname === '/dashboard') {
-              sessionStorage.setItem(
-                'dashboardSearchTerms',
-                new URLSearchParams(window.location.search).toString(),
-              );
-            }
-            router.push(newValue);
+            router.push('/planner');
           }
         }}
       >
         <BottomNavigationAction
           label="Search"
-          value="/"
+          value="search"
           icon={<SearchIcon />}
         />
         <BottomNavigationAction
           label="Compare"
-          value="/compare"
+          value="compare"
           icon={<CompareArrowsIcon />}
         />
         <BottomNavigationAction
           label="MyPlanner"
-          value="/planner"
+          value="planner"
           icon={<MenuBookIcon />}
         />
       </BottomNavigation>
