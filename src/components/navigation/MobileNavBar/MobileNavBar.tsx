@@ -13,11 +13,11 @@ export default function MobileNavBar() {
   const pathname = usePathname();
   const params = useSearchParams();
   const activeTab =
-    pathname === '/dashboard' || pathname === '/'
+    pathname === '/dashboard'
       ? isCompareOpen
         ? 'compare'
         : 'search'
-      : 'planner';
+      : pathname === '/planner' ? 'planner' : 'search';
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[1000] block bg-white shadow-md dark:bg-haiti md:hidden pb-[env(safe-area-inset-bottom)]">
@@ -46,14 +46,16 @@ export default function MobileNavBar() {
             const dashboardSearchTerms = window.sessionStorage.getItem(
               'dashboardSearchTerms',
             );
-            router.push(
-              dashboardSearchTerms
-                ? '/dashboard?' + dashboardSearchTerms
-                : '/dashboard?availability=true', // if no stored search terms, we still need dashboard to show compare
-            );
+            setTimeout(() => {
+              router.push(
+                dashboardSearchTerms
+                  ? '/dashboard?' + dashboardSearchTerms
+                  : '/dashboard?availability=true', // if no stored search terms, we still need dashboard to show compare
+              );
+            }, 0);
           } else {
             // going to /planner
-            setIsCompareOpen(false);
+            // setIsCompareOpen(false);
             router.push('/planner');
           }
         }}
