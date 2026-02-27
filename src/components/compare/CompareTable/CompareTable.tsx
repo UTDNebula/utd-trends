@@ -61,6 +61,40 @@ function colorMidpoint(
     .toString(16)
     .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
+
+type ValueTagProps = {
+  /** Display value; -1 = loading placeholder, undefined = show nothing, number = show tag */
+  value: number | -1 | undefined;
+  formatValue: (n: number) => string;
+  tooltipTitle: string;
+  backgroundColor: string;
+};
+
+/** Shared tag-style value display for desktop and mobile compare table cells */
+function ValueTag({
+  value,
+  formatValue,
+  tooltipTitle,
+  backgroundColor,
+}: ValueTagProps) {
+  if (value === undefined) return null;
+  if (value === -1) {
+    return (
+      <Typography className="text-xs sm:text-base opacity-0">0.00</Typography>
+    );
+  }
+  return (
+    <Tooltip title={tooltipTitle} placement="top">
+      <Typography
+        className="text-xs sm:text-base inline-block sm:inline min-w-[8vw] sm:min-w-0 rounded-full px-1 py-1 sm:px-5 sm:py-2 text-black"
+        style={{ backgroundColor }}
+      >
+        {formatValue(value)}
+      </Typography>
+    </Tooltip>
+  );
+}
+
 type GradeOrRmpRowProps<T> = {
   name: string;
   values: (T | undefined)[];
@@ -100,7 +134,7 @@ function GradeOrRmpRow<T>({
   };
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
-      <TableCell align="right" className="pl-0">
+      <TableCell align="right">
         <TableSortLabel
           active={orderBy === name}
           direction={orderBy === name ? order : defaultAscSort ? 'asc' : 'desc'}
@@ -135,51 +169,50 @@ function GradeOrRmpRow<T>({
           )}
         </TableSortLabel>
       </TableCell>
-      {values.map((value, index) => (
-        <TableCell
-          align="center"
-          key={index}
-          className={cell_className}
-          style={{
-            borderColor: colors[index],
-            backgroundColor: colors[index] + '10', // add transparency
-          }}
-        >
-          {value === undefined ||
-            (getValue(value) !== -1 ? (
-              (name !== 'GPA' ? (value as RMP).numRatings > 0 : true) && ( // do not display RMP data (non-GPA data) if there are no reviews
-                <Tooltip
-                  title={`${name}: ${formatValue(getValue(value))}`}
-                  placement="top"
-                >
-                  <Typography
-                    className="text-base inline rounded-full px-5 py-2 text-black"
-                    style={{
-                      backgroundColor:
-                        name === 'GPA'
-                          ? gpaToColor(rainbowColors, getValue(value))
-                          : colorMidpoint(
-                              goodValue,
-                              badValue,
-                              getValue(value),
-                              rainbowColors[12],
-                              rainbowColors[0],
-                            ),
-                    }}
-                  >
-                    {/*value.data is all the data past the state of loading, done, or error.
-                getValue returns the specific value from the data structure, like gpa.
-                formatValue makes it look pretty like 3.7216373 displaying as 3.72.*/}
-                    {formatValue(getValue(value))}
-                  </Typography>
-                </Tooltip>
+      {values.map((value, index) => {
+        const rawVal = value === undefined ? undefined : getValue(value);
+        const displayVal: number | -1 | undefined =
+          value === undefined
+            ? undefined
+            : rawVal === -1
+              ? -1
+              : (name !== 'GPA' ? (value as RMP).numRatings > 0 : true)
+                ? rawVal!
+                : undefined;
+        const showTag = displayVal !== undefined && displayVal !== -1;
+        const tooltipTitle = showTag
+          ? `${name}: ${formatValue(displayVal as number)}`
+          : '';
+        const backgroundColor = showTag
+          ? name === 'GPA'
+            ? gpaToColor(rainbowColors, displayVal as number)
+            : colorMidpoint(
+                goodValue,
+                badValue,
+                displayVal as number,
+                rainbowColors[12],
+                rainbowColors[0],
               )
-            ) : (
-              <Typography className="text-base opacity-0">0.00</Typography>
-            )) ||
-            null}
-        </TableCell>
-      ))}
+          : '';
+        return (
+          <TableCell
+            align="center"
+            key={index}
+            className={cell_className}
+            style={{
+              borderColor: colors[index],
+              backgroundColor: colors[index] + '10', // add transparency
+            }}
+          >
+            <ValueTag
+              value={displayVal}
+              formatValue={formatValue}
+              tooltipTitle={tooltipTitle}
+              backgroundColor={backgroundColor}
+            />
+          </TableCell>
+        );
+      })}
     </TableRow>
   );
 }
@@ -205,7 +238,7 @@ function GradeAndRmpRow({
 }: GradeAndRmpRowProps) {
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
-      <TableCell align="right" className="pl-0">
+      <TableCell align="right">
         <Tooltip
           title="Total # of Grades & Ratings"
           placement="left"
@@ -297,7 +330,7 @@ function CheckboxRow({
 }: CheckboxRowProps) {
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
-      <TableCell align="right" className="pl-0">
+      <TableCell align="right">
         <TableSortLabel
           active={orderBy === name}
           direction={orderBy === name ? order : 'desc'}
@@ -350,9 +383,7 @@ function PlannerRow({
 }: PlannerRowProps) {
   return (
     <TableRow sx={{ '& td': { border: 0 } }}>
-      <TableCell align="right" className="pl-0">
-        {name}
-      </TableCell>
+      <TableCell align="right">{name}</TableCell>
       {courses.map((course, index) => {
         return (
           <TableCell
@@ -388,7 +419,7 @@ export default function CompareTable({
   colorMap,
 }: CompareTableProps) {
   //Table sorting category
-  const [orderBy, setOrderBy] = useState<string>('Color');
+  const [orderBy, setOrderBy] = useState<string>('GPA');
   //Table sorting direction
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   //Cycle through sorting
@@ -469,7 +500,8 @@ export default function CompareTable({
 
   return (
     <div className="overflow-x-auto">
-      <TableContainer className="w-fit mb-4">
+      {/* Desktop version */}
+      <TableContainer className="hidden sm:table w-fit mb-4">
         <Table size="small" className="border-spacing-x-2 border-separate">
           <TableHead>
             <TableRow>
@@ -596,6 +628,318 @@ export default function CompareTable({
           </TableBody>
         </Table>
       </TableContainer>
+      {/* Mobile version (rotated) */}
+      <div className="w-full min-w-0 overflow-x-auto sm:hidden">
+        <TableContainer className="w-full mb-4" sx={{ overflow: 'visible' }}>
+          <Table
+            size="small"
+            className="border-separate border-spacing-x-0 border-spacing-y-2 w-full"
+            sx={{ tableLayout: 'fixed' }}
+          >
+            <TableHead>
+              <TableRow>
+                {(() => {
+                  const mobileHeaderBase =
+                    'text-center py-2 border-t-2 border-b-2 px-0 text-[8px] leading-tight';
+                  const gradesRatingsLabel = (
+                    <span className="inline-flex flex-col items-center">
+                      <span># of Grades</span>
+                      <span className="my-0.5 w-full border-t border-current opacity-70" />
+                      <span>Ratings</span>
+                    </span>
+                  );
+                  const sortableColumns: { [key: string]: boolean } = {
+                    GPA: false,
+                    Rating: false,
+                    'Would Take Again': false,
+                    Difficulty: true, // defaultAscSort
+                  };
+                  const labels: (string | React.ReactNode)[] = [
+                    '',
+                    'Compare',
+                    'GPA',
+                    'Rating',
+                    'Would Take Again',
+                    'Difficulty',
+                    gradesRatingsLabel,
+                    'Add to Planner',
+                  ];
+                  const sortKeys = [
+                    null,
+                    null,
+                    'GPA',
+                    'Rating',
+                    'Would Take Again',
+                    'Difficulty',
+                    null,
+                    null,
+                  ] as (string | null)[];
+                  const sortTooltips: { [key: string]: string } = {
+                    GPA: 'Sort by GPA',
+                    Rating: 'Sort by Rating',
+                    'Would Take Again': 'Sort by Would Take Again %',
+                    Difficulty: 'Sort by Difficulty',
+                  };
+                  return labels.map((label, i) => {
+                    const className =
+                      i === 0
+                        ? `font-bold border-l-2 rounded-l-lg ${mobileHeaderBase}`
+                        : i === labels.length - 1
+                          ? `border-r-2 rounded-r-lg ${mobileHeaderBase}`
+                          : mobileHeaderBase;
+                    const sortKey = sortKeys[i];
+                    const content =
+                      sortKey != null ? (
+                        <Tooltip
+                          title={sortTooltips[sortKey] ?? ''}
+                          placement="top"
+                        >
+                          <TableSortLabel
+                            active={orderBy === sortKey}
+                            direction={
+                              orderBy === sortKey
+                                ? order
+                                : sortableColumns[sortKey]
+                                  ? 'asc'
+                                  : 'desc'
+                            }
+                            onClick={() => handleClick(sortKey)}
+                            sx={{
+                              '& .MuiTableSortLabel-icon': {
+                                marginLeft: '0',
+                                marginRight: '0',
+                                fontSize: '0.5rem',
+                              },
+                            }}
+                          >
+                            {label}
+                          </TableSortLabel>
+                        </Tooltip>
+                      ) : (
+                        label
+                      );
+                    return (
+                      <TableCell
+                        key={
+                          typeof label === 'string' ? label : 'grades-ratings'
+                        }
+                        className={className}
+                        sx={{
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          wordBreak: 'break-word',
+                        }}
+                      >
+                        {content}
+                      </TableCell>
+                    );
+                  });
+                })()}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {sortedResults.map((result, rowIndex) => {
+                const grades = result.grades;
+                const rmp = result.type !== 'course' ? result.RMP : undefined;
+                const gradeSummary = calculateGrades(grades, chosenSemesters);
+                const cellStyle = {
+                  borderColor: mappedColors[rowIndex],
+                  backgroundColor: mappedColors[rowIndex] + '10',
+                };
+                const firstCellClassName =
+                  'py-2 border-t-2 border-b-2 border-l-2 px-0';
+                const middleCellClassName = 'py-2 border-t-2 border-b-2 px-0';
+                const lastCellClassName =
+                  'py-2 border-t-2 border-b-2 border-r-2 px-0';
+
+                const ratingVal =
+                  rmp && rmp.numRatings > 0 ? rmp.avgRating : undefined;
+                const wouldTakeVal =
+                  rmp && rmp.numRatings > 0
+                    ? rmp.wouldTakeAgainPercent
+                    : undefined;
+                const difficultyVal =
+                  rmp && rmp.numRatings > 0 ? rmp.avgDifficulty : undefined;
+                const gradeTotal = gradeSummary.total;
+                const rmpTotal = rmp ? rmp.numRatings : undefined;
+
+                return (
+                  <TableRow
+                    key={searchQueryLabel(result.searchQuery)}
+                    sx={{ '& td': { border: 0 } }}
+                  >
+                    <TableCell
+                      align="center"
+                      className={`${firstCellClassName} rounded-l-lg`}
+                      style={cellStyle}
+                      sx={{ maxWidth: '1.5rem' }}
+                    >
+                      <Tooltip title="Remove from Compare">
+                        <Checkbox
+                          size="small"
+                          checked={true}
+                          onClick={() => removeFromCompare(result)}
+                          sx={{
+                            '&.Mui-checked': {
+                              color: mappedColors[rowIndex],
+                            },
+                          }}
+                        />
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      className={`text-center font-medium text-[10px] break-words whitespace-normal ${middleCellClassName}`}
+                      sx={{
+                        borderBottom: 'none',
+                        wordBreak: 'break-word',
+                        overflowWrap: 'break-word',
+                      }}
+                      style={cellStyle}
+                    >
+                      {searchQueryLabel(result.searchQuery)}
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      className={middleCellClassName}
+                      style={cellStyle}
+                    >
+                      <ValueTag
+                        value={gradeSummary.gpa}
+                        formatValue={(x) => x.toFixed(2)}
+                        tooltipTitle={
+                          gradeSummary.gpa !== -1
+                            ? `GPA: ${gradeSummary.gpa.toFixed(2)}`
+                            : ''
+                        }
+                        backgroundColor={
+                          gradeSummary.gpa !== -1
+                            ? gpaToColor(rainbowColors, gradeSummary.gpa)
+                            : ''
+                        }
+                      />
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      className={middleCellClassName}
+                      style={cellStyle}
+                    >
+                      <ValueTag
+                        value={ratingVal}
+                        formatValue={(x) => x.toFixed(1)}
+                        tooltipTitle={
+                          ratingVal != null
+                            ? `Rating: ${ratingVal.toFixed(1)}`
+                            : ''
+                        }
+                        backgroundColor={
+                          ratingVal != null
+                            ? colorMidpoint(
+                                5,
+                                0,
+                                ratingVal,
+                                rainbowColors[12],
+                                rainbowColors[0],
+                              )
+                            : ''
+                        }
+                      />
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      className={middleCellClassName}
+                      style={cellStyle}
+                    >
+                      <ValueTag
+                        value={wouldTakeVal}
+                        formatValue={(x) => x.toFixed(0) + '%'}
+                        tooltipTitle={
+                          wouldTakeVal != null
+                            ? `Would Take Again: ${wouldTakeVal.toFixed(0)}%`
+                            : ''
+                        }
+                        backgroundColor={
+                          wouldTakeVal != null
+                            ? colorMidpoint(
+                                100,
+                                0,
+                                wouldTakeVal,
+                                rainbowColors[12],
+                                rainbowColors[0],
+                              )
+                            : ''
+                        }
+                      />
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      className={middleCellClassName}
+                      style={cellStyle}
+                    >
+                      <ValueTag
+                        value={difficultyVal}
+                        formatValue={(x) => x.toFixed(1)}
+                        tooltipTitle={
+                          difficultyVal != null
+                            ? `Difficulty: ${difficultyVal.toFixed(1)}`
+                            : ''
+                        }
+                        backgroundColor={
+                          difficultyVal != null
+                            ? colorMidpoint(
+                                0,
+                                5,
+                                difficultyVal,
+                                rainbowColors[12],
+                                rainbowColors[0],
+                              )
+                            : ''
+                        }
+                      />
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      className={middleCellClassName}
+                      style={cellStyle}
+                    >
+                      <Tooltip
+                        title={`Grades: ${gradeTotal ?? 'N/A'} / Ratings: ${rmpTotal ?? 'N/A'}`}
+                        placement="top"
+                      >
+                        <span className="inline-flex flex-col items-center">
+                          {grades === undefined ? (
+                            <CloseIcon />
+                          ) : (
+                            <Typography className="text-base">
+                              {gradeTotal}
+                            </Typography>
+                          )}
+                          <span className="my-0.5 w-full min-w-[1.5rem] border-t border-current opacity-70" />
+                          {rmp === undefined || rmpTotal === 0 ? (
+                            <CloseIcon />
+                          ) : (
+                            <Typography className="text-base">
+                              {rmpTotal}
+                            </Typography>
+                          )}
+                        </span>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      className={`${lastCellClassName} rounded-r-lg`}
+                      style={cellStyle}
+                    >
+                      <AddToPlanner searchResult={result} />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
     </div>
   );
 }
