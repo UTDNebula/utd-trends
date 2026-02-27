@@ -185,7 +185,8 @@ function Row({
   const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
   const [open, setOpen] = useState(false);
   const sectionTypesOverride = use(FiltersContext).sectionTypesOverride;
-  const [chosenSectionTypesOverride, setChosenSectionTypesOverride] = useState<string>("all");
+  const [chosenSectionTypesOverride, setChosenSectionTypesOverride] =
+    useState<string>('all');
 
   const rainbowColors = useRainbowColors();
   const filteredGrades = useMemo(
