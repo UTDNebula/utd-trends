@@ -6,6 +6,7 @@ import Rating from '@/components/common/Rating/Rating';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
+import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
 import { calculateGrades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
@@ -33,6 +34,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -181,6 +184,8 @@ function Row({
   const chosenSemesters = use(FiltersContext).chosenSemesters;
   const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
   const [open, setOpen] = useState(false);
+  const sectionTypesOverride = use(FiltersContext).sectionTypesOverride;
+  const [chosenSectionTypesOverride, setChosenSectionTypesOverride] = useState<string>("all");
 
   const rainbowColors = useRainbowColors();
   const filteredGrades = useMemo(
@@ -372,6 +377,29 @@ function Row({
         <TableCell className="p-0" colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <div className="p-2 md:p-4 flex flex-col gap-2">
+              {/* section type override toggle */}
+              <Tooltip
+                title={
+                  'Override filters to show only one section type (in-person, online, or hybrid)'
+                }
+                placement="top"
+              >
+                <ToggleButtonGroup
+                  color="primary"
+                  value={chosenSectionTypesOverride}
+                  exclusive
+                  onChange={(_event, value: string) => {
+                    setChosenSectionTypesOverride(value);
+                  }}
+                  aria-label="Platform"
+                >
+                  {sectionTypesOverride.map((t) => (
+                    <ToggleButton key={t} value={t}>
+                      {t}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+              </Tooltip>
               <SingleGradesInfo
                 course={course}
                 grades={searchResult.grades}
