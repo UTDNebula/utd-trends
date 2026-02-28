@@ -1,6 +1,5 @@
 'use client';
 
-import { useSharedState } from '@/app/SharedStateProvider';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SearchIcon from '@mui/icons-material/Search';
@@ -8,13 +7,15 @@ import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 export default function MobileNavBar() {
-  const { isCompareOpen, setIsCompareOpen } = useSharedState();
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
+  const usefulParams = new URLSearchParams(useSearchParams().toString());
+  usefulParams.delete('compare');
+
   const activeTab =
     pathname === '/dashboard'
-      ? isCompareOpen
+      ? params.get('compare') === 'true'
         ? 'compare'
         : 'search'
       : pathname === '/planner'
@@ -29,14 +30,19 @@ export default function MobileNavBar() {
         onChange={(event, newValue) => {
           // store search terms in session storage when navigating away from the dashboard
           if (
-            pathname === '/dashboard' &&
-            !(params.size === 1 && params.get('availability') === 'true') // if the search terms lead to an empty dashboard, don't store
+            pathname === '/dashboard' && //TODO:
+            !(
+              usefulParams.size === 1 &&
+              usefulParams.get('availability') === 'true'
+            ) // if the search terms lead to an empty dashboard, don't store
           ) {
-            sessionStorage.setItem('dashboardSearchTerms', params.toString());
+            sessionStorage.setItem(
+              'dashboardSearchTerms',
+              usefulParams.toString(),
+            );
           }
           // navigation
           if (newValue === 'search') {
-            setIsCompareOpen(false);
             const dashboardSearchTerms = window.sessionStorage.getItem(
               'dashboardSearchTerms',
             );
@@ -44,20 +50,16 @@ export default function MobileNavBar() {
               dashboardSearchTerms ? '/dashboard?' + dashboardSearchTerms : '/', // if no stored search terms, we can just go to landing page
             );
           } else if (newValue === 'compare') {
-            setIsCompareOpen(true);
             const dashboardSearchTerms = window.sessionStorage.getItem(
               'dashboardSearchTerms',
             );
-            setTimeout(() => {
-              router.push(
-                dashboardSearchTerms
-                  ? '/dashboard?' + dashboardSearchTerms
-                  : '/dashboard?availability=true', // if no stored search terms, we still need dashboard to show compare
-              );
-            }, 0);
+            router.push(
+              dashboardSearchTerms
+                ? '/dashboard?' + dashboardSearchTerms + '&compare=true'
+                : '/dashboard?availability=true&compare=true', // if no stored search terms, we still need dashboard to show compare
+            );
           } else {
             // going to /planner
-            // setIsCompareOpen(false);
             router.push('/planner');
           }
         }}

@@ -5,6 +5,7 @@ import Header from '@/components/navigation/Header/Header';
 import { getSemestersFromSearchResults } from '@/modules/semesters';
 import type { SearchResult } from '@/types/SearchQuery';
 import { Card } from '@mui/material';
+import { useSearchParams } from 'next/navigation';
 import {
   createContext,
   useMemo,
@@ -28,7 +29,8 @@ export default function FiltersProvider({
   searchResults: SearchResult[];
   children: ReactNode;
 }) {
-  const { compare, isCompareOpen } = useSharedState();
+  const { compare } = useSharedState();
+  const params = useSearchParams();
   const semesters = useMemo(() => {
     return getSemestersFromSearchResults(searchResults.concat(compare));
   }, [searchResults, compare]);
@@ -48,7 +50,7 @@ export default function FiltersProvider({
     <FiltersContext.Provider
       value={{ chosenSemesters, setChosenSemesters, semesters }}
     >
-      {isCompareOpen ? (
+      {params.get('compare') === 'true' ? (
         <>
           <Header isPlanner={true} />
           <main className="p-4 overflow-y-auto">
