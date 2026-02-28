@@ -17,7 +17,9 @@ export default function MobileNavBar() {
       ? isCompareOpen
         ? 'compare'
         : 'search'
-      : pathname === '/planner' ? 'planner' : 'search';
+      : pathname === '/planner'
+        ? 'planner'
+        : 'search';
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[1000] block bg-white shadow-md dark:bg-haiti md:hidden pb-[env(safe-area-inset-bottom)]">
