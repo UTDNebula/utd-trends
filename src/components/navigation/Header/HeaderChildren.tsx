@@ -194,7 +194,6 @@ function HeaderChildrenInner(props: HeaderProps) {
       {/* Shown on small screens */}
       <div className="flex gap-x-2 sm:hidden">
         {/* TODO: When PlannerButton is moved to a bottom nav bar, remove the small size props from all the children in this div */}
-        <PlannerButton {...plannerButtonProps} size="small" />
         {tutorialHint && !props.isPlanner ? (
           moreVertIcon
         ) : (

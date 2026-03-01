@@ -1,7 +1,6 @@
 'use client';
 
-import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
-import { Badge, IconButton, Tab, Tabs } from '@mui/material';
+import { Badge, Tab, Tabs } from '@mui/material';
 import React from 'react';
 
 /**
@@ -14,8 +13,7 @@ type TabNavMenuProps = {
   turner: (displacement: number) => void;
   options: string[];
   compareLength: number;
-  open: boolean;
-  setOpen: (arg0: boolean) => void;
+  isMobile: boolean;
 };
 
 /**
@@ -27,17 +25,6 @@ type TabNavMenuProps = {
 export const TabNavMenu = (props: TabNavMenuProps) => {
   return (
     <div className="w-full flex items-center">
-      <IconButton
-        aria-label="open overview"
-        onClick={() => props.setOpen(!props.open)}
-        size="medium"
-        className={
-          'sm:hidden ml-2 transition-transform' +
-          (props.open ? ' rotate-90' : '')
-        }
-      >
-        <KeyboardArrowIcon fontSize="inherit" />
-      </IconButton>
       <div className="flex-1 min-w-0 flex justify-center">
         <Tabs
           value={props.value}
@@ -51,7 +38,9 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
               className="text-lg text-gray-600 dark:text-gray-200 normal-case"
               value={index}
               label={
-                index === props.options.length - 1 && props.compareLength ? (
+                index === props.options.length - 1 &&
+                props.compareLength &&
+                !props.isMobile ? (
                   <div className="flex items-center gap-4">
                     {option}
                     <Badge badgeContent={props.compareLength} color="primary" />
@@ -60,7 +49,6 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
                   option
                 )
               }
-              onClick={() => props.setOpen(true)}
             />
           ))}
         </Tabs>
