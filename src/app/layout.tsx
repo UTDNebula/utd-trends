@@ -69,7 +69,7 @@ export default async function RootLayout({
 }) {
   const latestSemester = await fetchLatestSemester();
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full overscroll-none">
       {process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' && (
         <GoogleAnalytics gaId="G-CC86XR1562" />
       )}
