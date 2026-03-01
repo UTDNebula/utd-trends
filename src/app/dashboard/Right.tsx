@@ -126,7 +126,6 @@ export default async function Right(props: Props) {
           grades={grades}
           rmp={rmp}
         />
-        ,
       </Card>,
     );
   }
