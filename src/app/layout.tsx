@@ -80,7 +80,9 @@ export default async function RootLayout({
           <ThemeProvider theme={theme}>
             <QueryProvider>
               <SharedStateProvider latestSemester={latestSemester}>
-                {children}
+                <div className="pb-[calc(56px+env(safe-area-inset-bottom))] md:pb-0">
+                  {children}
+                </div>
                 <MobileNavBar />
                 <ReactQueryDevtools initialIsOpen={false} />
               </SharedStateProvider>
