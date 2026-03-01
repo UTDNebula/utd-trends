@@ -12,7 +12,7 @@ import fetchGrades from '@/modules/fetchGrades';
 import fetchProfessor from '@/modules/fetchProfessor';
 import fetchRmp from '@/modules/fetchRmp';
 import { type SearchQuery, type SearchResult } from '@/types/SearchQuery';
-import { Card, Typography } from '@mui/material';
+import { Card } from '@mui/material';
 import React, { Suspense } from 'react';
 import ServerLeft from './ServerLeft';
 
@@ -86,7 +86,7 @@ export default async function Right(props: Props) {
           professors={props.professors}
           searchResultsPromise={props.searchResultsPromise}
         />
-      </Suspense>
+      </Suspense>,
     );
   }
 
@@ -116,15 +116,18 @@ export default async function Right(props: Props) {
     const [profData, grades, rmp] = professorResults;
     names.push('Professor');
     tabs.push(
-      <Card className={`${props.isMobile ? 'p-6' : 'bg-transparent bg-none shadow-none'}`}>
-      <ProfessorOverview
-        key="professor"
-        professor={props.professors[0]}
-        profData={profData}
-        grades={grades}
-        rmp={rmp}
-      />,
-      </Card>
+      <Card
+        className={`${props.isMobile ? 'p-6' : 'bg-transparent bg-none shadow-none'}`}
+      >
+        <ProfessorOverview
+          key="professor"
+          professor={props.professors[0]}
+          profData={profData}
+          grades={grades}
+          rmp={rmp}
+        />
+        ,
+      </Card>,
     );
   }
 
@@ -132,7 +135,9 @@ export default async function Right(props: Props) {
     const [courseData, grades] = courseResults;
     names.push('Class');
     tabs.push(
-      <Card className={`${props.isMobile ? 'p-6' : 'bg-transparent bg-none shadow-none'}`}>
+      <Card
+        className={`${props.isMobile ? 'p-6' : 'bg-transparent bg-none shadow-none'}`}
+      >
         <CourseOverview
           key="course"
           course={props.courses[0]}
@@ -149,7 +154,9 @@ export default async function Right(props: Props) {
   }
 
   return (
-    <Card className={`${props.isMobile ? 'bg-transparent bg-none shadow-none overflow-visible' : ''}`}>
+    <Card
+      className={`${props.isMobile ? 'bg-transparent bg-none shadow-none overflow-visible' : ''}`}
+    >
       <Carousel key={names.join()} names={names} isMobile={props.isMobile}>
         {tabs}
       </Carousel>

@@ -1,7 +1,6 @@
 'use client';
 
-import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
-import { Badge, IconButton, Tab, Tabs } from '@mui/material';
+import { Badge, Tab, Tabs } from '@mui/material';
 import React from 'react';
 
 /**
@@ -39,7 +38,9 @@ export const TabNavMenu = (props: TabNavMenuProps) => {
               className="text-lg text-gray-600 dark:text-gray-200 normal-case"
               value={index}
               label={
-                index === props.options.length - 1 && props.compareLength && !props.isMobile ? (
+                index === props.options.length - 1 &&
+                props.compareLength &&
+                !props.isMobile ? (
                   <div className="flex items-center gap-4">
                     {option}
                     <Badge badgeContent={props.compareLength} color="primary" />

@@ -2,7 +2,6 @@
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import { TabNavMenu } from '@/components/navigation/TabNavMenu/TabNavMenu';
-import { Collapse, useMediaQuery } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
 
@@ -42,7 +41,11 @@ const variants = {
  * @param props the props passed from the parent component
  * @returns
  */
-export default function Carousel({ names, children, isMobile = false }: CarouselProps) {
+export default function Carousel({
+  names,
+  children,
+  isMobile = false,
+}: CarouselProps) {
   // The card currently being displayed
   const [currentCard, setCurrentCard] = useState(0);
   // The Direction that the card is moving in
@@ -65,7 +68,6 @@ export default function Carousel({ names, children, isMobile = false }: Carousel
       return newCard;
     });
   };
-
 
   return (
     <>

@@ -143,7 +143,10 @@ export default async function Page({ searchParams }: Props) {
                   <StickySide>
                     <Suspense
                       fallback={
-                        <LoadingRight courses={courses} professors={professors} />
+                        <LoadingRight
+                          courses={courses}
+                          professors={professors}
+                        />
                       }
                     >
                       <Right
@@ -164,7 +167,11 @@ export default async function Page({ searchParams }: Props) {
             <div className="block md:hidden mt-4">
               <Suspense
                 fallback={
-                  <LoadingRight courses={courses} professors={professors} isMobile={true} />
+                  <LoadingRight
+                    courses={courses}
+                    professors={professors}
+                    isMobile={true}
+                  />
                 }
               >
                 <Right

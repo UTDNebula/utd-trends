@@ -79,7 +79,7 @@ export default function MobileNavBar() {
               badgeContent={activeTab === 'compare' ? 0 : compare.length}
               color="primary"
               sx={{
-                '& .MuiBadge-badge': { right: -12, top: 4 } 
+                '& .MuiBadge-badge': { right: -12, top: 4 },
               }}
             >
               <CompareArrowsIcon />
@@ -91,15 +91,15 @@ export default function MobileNavBar() {
           value="planner"
           icon={
             <Badge
-                badgeContent={activeTab === 'planner' ? 0 : planner.length}
-                color="primary"
-                sx={{
-                  '& .MuiBadge-badge': { right: -15, top: 4 } 
-                }}
-              >
-                <MenuBookIcon />
-              </Badge>
-            }
+              badgeContent={activeTab === 'planner' ? 0 : planner.length}
+              color="primary"
+              sx={{
+                '& .MuiBadge-badge': { right: -15, top: 4 },
+              }}
+            >
+              <MenuBookIcon />
+            </Badge>
+          }
         />
       </BottomNavigation>
     </div>
