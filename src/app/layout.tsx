@@ -9,7 +9,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import type { Metadata } from 'next';
 import { Bai_Jamjuree, Inter } from 'next/font/google';
-import React from 'react';
+import React, { Suspense } from 'react';
 import QueryProvider from './QueryProvider';
 import { SharedStateProvider } from './SharedStateProvider';
 
@@ -83,7 +83,9 @@ export default async function RootLayout({
                 <div className="pb-[calc(56px+env(safe-area-inset-bottom))] md:pb-0">
                   {children}
                 </div>
-                <MobileNavBar />
+                <Suspense fallback={null}>
+                  <MobileNavBar />
+                </Suspense>
                 <ReactQueryDevtools initialIsOpen={false} />
               </SharedStateProvider>
             </QueryProvider>
