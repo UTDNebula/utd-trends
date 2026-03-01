@@ -9,6 +9,7 @@ import React, { useState } from 'react';
 interface CarouselProps {
   names: React.ReactNode;
   children: React.ReactNode;
+  isMobile?: boolean;
 }
 
 /**
@@ -41,7 +42,7 @@ const variants = {
  * @param props the props passed from the parent component
  * @returns
  */
-export default function Carousel({ names, children }: CarouselProps) {
+export default function Carousel({ names, children, isMobile = false }: CarouselProps) {
   // The card currently being displayed
   const [currentCard, setCurrentCard] = useState(0);
   // The Direction that the card is moving in
@@ -65,8 +66,6 @@ export default function Carousel({ names, children }: CarouselProps) {
     });
   };
 
-  const isSmallScreen = useMediaQuery('(max-width: 640px)');
-  const [open, setOpen] = useState(() => !isSmallScreen);
 
   return (
     <>
@@ -75,38 +74,35 @@ export default function Carousel({ names, children }: CarouselProps) {
         options={Array.isArray(names) ? names : [names]}
         turner={turn}
         compareLength={compare.length}
-        open={open}
-        setOpen={setOpen}
+        isMobile={isMobile}
       />
-      <Collapse in={open}>
-        <AnimatePresence>
-          <div className="p-4 lg:p-6">
-            <motion.div
-              key={currentCard}
-              custom={direction}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{
-                x: { type: 'spring', stiffness: 300, damping: 30 },
-                opacity: { duration: 0.2 },
-              }}
-            >
-              {Array.isArray(children)
-                ? children.map((child, index) => (
-                    <div
-                      key={index}
-                      className={index === currentCard ? 'block' : 'hidden'}
-                    >
-                      {child}
-                    </div>
-                  ))
-                : children}
-            </motion.div>
-          </div>
-        </AnimatePresence>
-      </Collapse>
+      <AnimatePresence>
+        <div className="pt-2 md:p-4 lg:p-6">
+          <motion.div
+            key={currentCard}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              x: { type: 'spring', stiffness: 300, damping: 30 },
+              opacity: { duration: 0.2 },
+            }}
+          >
+            {Array.isArray(children)
+              ? children.map((child, index) => (
+                  <div
+                    key={index}
+                    className={index === currentCard ? 'block' : 'hidden'}
+                  >
+                    {child}
+                  </div>
+                ))
+              : children}
+          </motion.div>
+        </div>
+      </AnimatePresence>
     </>
   );
 }
