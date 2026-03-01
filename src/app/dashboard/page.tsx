@@ -138,7 +138,7 @@ export default async function Page({ searchParams }: Props) {
                   Compare
                 </Typography>
                 <Card className="w-full p-4">
-                  <Compare />
+                  <Compare isMobile={true} />
                 </Card>
               </>
             ) : (
