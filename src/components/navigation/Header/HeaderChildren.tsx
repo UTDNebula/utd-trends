@@ -172,7 +172,6 @@ function HeaderChildrenInner(props: HeaderProps) {
       >
         <IconButton
           id="header-menu-button"
-          size="small"
           aria-controls={openMenu ? 'header-menu' : undefined}
           aria-haspopup="true"
           aria-expanded={openMenu ? 'true' : undefined}
@@ -181,7 +180,6 @@ function HeaderChildrenInner(props: HeaderProps) {
           }}
         >
           <MoreVertIcon
-            fontSize="small"
             className={`${tutorialHint && !openMenu && !props.isPlanner ? ' text-white dark:text-haiti' : ''}`}
           />
         </IconButton>
