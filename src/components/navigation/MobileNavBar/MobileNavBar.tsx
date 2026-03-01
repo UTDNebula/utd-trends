@@ -1,9 +1,10 @@
 'use client';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SearchIcon from '@mui/icons-material/Search';
-import { BottomNavigation, BottomNavigationAction } from '@mui/material';
+import { Badge, BottomNavigation, BottomNavigationAction } from '@mui/material';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 export default function MobileNavBar() {
@@ -12,6 +13,7 @@ export default function MobileNavBar() {
   const params = useSearchParams();
   const usefulParams = new URLSearchParams(useSearchParams().toString());
   usefulParams.delete('compare');
+  const { compare, planner } = useSharedState();
 
   const activeTab =
     pathname === '/dashboard'
@@ -72,12 +74,32 @@ export default function MobileNavBar() {
         <BottomNavigationAction
           label="Compare"
           value="compare"
-          icon={<CompareArrowsIcon />}
+          icon={
+            <Badge
+              badgeContent={activeTab === 'compare' ? 0 : compare.length}
+              color="primary"
+              sx={{
+                '& .MuiBadge-badge': { right: -12, top: 4 } 
+              }}
+            >
+              <CompareArrowsIcon />
+            </Badge>
+          }
         />
         <BottomNavigationAction
           label="MyPlanner"
           value="planner"
-          icon={<MenuBookIcon />}
+          icon={
+            <Badge
+                badgeContent={activeTab === 'planner' ? 0 : planner.length}
+                color="primary"
+                sx={{
+                  '& .MuiBadge-badge': { right: -15, top: 4 } 
+                }}
+              >
+                <MenuBookIcon />
+              </Badge>
+            }
         />
       </BottomNavigation>
     </div>
