@@ -134,9 +134,9 @@ export default async function Page({ searchParams }: Props) {
 
             {isCompare ? (
               <>
-              <Typography className="leading-tight text-3xl font-bold p-4">
-                Compare
-              </Typography>
+                <Typography className="leading-tight text-3xl font-bold p-4">
+                  Compare
+                </Typography>
                 <Card className="w-full p-4">
                   <Compare />
                 </Card>
