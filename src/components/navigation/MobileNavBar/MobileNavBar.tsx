@@ -6,6 +6,7 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SearchIcon from '@mui/icons-material/Search';
 import { Badge, BottomNavigation, BottomNavigationAction } from '@mui/material';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function MobileNavBar() {
   const router = useRouter();
@@ -14,6 +15,12 @@ export default function MobileNavBar() {
   const usefulParams = new URLSearchParams(useSearchParams().toString());
   usefulParams.delete('compare');
   const { compare, planner } = useSharedState();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
+  }, []);
 
   const activeTab =
     pathname === '/dashboard'
@@ -76,7 +83,9 @@ export default function MobileNavBar() {
           value="compare"
           icon={
             <Badge
-              badgeContent={activeTab === 'compare' ? 0 : compare.length}
+              badgeContent={
+                !isMounted || activeTab === 'compare' ? 0 : compare.length
+              }
               color="primary"
               sx={{
                 '& .MuiBadge-badge': { right: -12, top: 4 },
@@ -91,7 +100,9 @@ export default function MobileNavBar() {
           value="planner"
           icon={
             <Badge
-              badgeContent={activeTab === 'planner' ? 0 : planner.length}
+              badgeContent={
+                !isMounted || activeTab === 'planner' ? 0 : planner.length
+              }
               color="primary"
               sx={{
                 '& .MuiBadge-badge': { right: -15, top: 4 },
