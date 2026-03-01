@@ -6,22 +6,31 @@ import CourseOverview, {
 import ProfessorOverview, {
   LoadingProfessorOverview,
 } from '@/components/overview/ProfessorOverview/ProfessorOverview';
+import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
 import fetchCourse from '@/modules/fetchCourse';
 import fetchGrades from '@/modules/fetchGrades';
 import fetchProfessor from '@/modules/fetchProfessor';
 import fetchRmp from '@/modules/fetchRmp';
 import { type SearchQuery, type SearchResult } from '@/types/SearchQuery';
-import { Card } from '@mui/material';
-import React from 'react';
+import { Card, Typography } from '@mui/material';
+import React, { Suspense } from 'react';
+import ServerLeft from './ServerLeft';
 
 interface LoadingRightProps {
   courses?: SearchQuery[];
   professors?: SearchQuery[];
+  isMobile?: boolean;
 }
 
 export function LoadingRight(props: LoadingRightProps) {
   const names = [];
   const tabs = [];
+
+  if (props.isMobile) {
+    names.push('Search Results');
+    tabs.push(<LoadingSearchResultsTable key="search-results" />);
+  }
+
   if (
     typeof props.courses !== 'undefined' &&
     typeof props.professors !== 'undefined' &&
@@ -38,12 +47,15 @@ export function LoadingRight(props: LoadingRightProps) {
     names.push('Class');
     tabs.push(<LoadingCourseOverview key="course" />);
   }
-  // names.push('Compare');
-  // tabs.push(<Compare key="compare" />);
+
+  if (!props.isMobile) {
+    names.push('Compare');
+    tabs.push(<Compare key="compare" />);
+  }
 
   return (
     <Card>
-      <Carousel key={names.join()} names={names}>
+      <Carousel key={names.join()} names={names} isMobile={props.isMobile}>
         {tabs}
       </Carousel>
     </Card>
@@ -54,15 +66,29 @@ interface Props {
   courses: SearchQuery[];
   professors: SearchQuery[];
   searchResultsPromise: Promise<SearchResult[]>;
+  isMobile?: boolean;
 }
 
 /**
- * Returns the left side
+ * Returns the right side (or full mobile view)
  */
 export default async function Right(props: Props) {
   //Add RHS tabs, only add overview tab if one course/prof
   const names = [];
   const tabs = [];
+
+  if (props.isMobile) {
+    names.push('Search');
+    tabs.push(
+      <Suspense key="search-results" fallback={<LoadingSearchResultsTable />}>
+        <ServerLeft
+          courses={props.courses}
+          professors={props.professors}
+          searchResultsPromise={props.searchResultsPromise}
+        />
+      </Suspense>
+    );
+  }
 
   const professorPromise =
     props.professors.length === 1
@@ -90,6 +116,7 @@ export default async function Right(props: Props) {
     const [profData, grades, rmp] = professorResults;
     names.push('Professor');
     tabs.push(
+      <Card className={`${props.isMobile ? 'p-6' : 'bg-transparent bg-none shadow-none'}`}>
       <ProfessorOverview
         key="professor"
         professor={props.professors[0]}
@@ -97,6 +124,7 @@ export default async function Right(props: Props) {
         grades={grades}
         rmp={rmp}
       />,
+      </Card>
     );
   }
 
@@ -104,21 +132,25 @@ export default async function Right(props: Props) {
     const [courseData, grades] = courseResults;
     names.push('Class');
     tabs.push(
-      <CourseOverview
-        key="course"
-        course={props.courses[0]}
-        courseData={courseData}
-        grades={grades}
-      />,
+      <Card className={`${props.isMobile ? 'p-6' : 'bg-transparent bg-none shadow-none'}`}>
+        <CourseOverview
+          key="course"
+          course={props.courses[0]}
+          courseData={courseData}
+          grades={grades}
+        />
+      </Card>,
     );
   }
 
-  names.push('Compare');
-  tabs.push(<Compare key="compare" />);
+  if (!props.isMobile) {
+    names.push('Compare');
+    tabs.push(<Compare key="compare" />);
+  }
 
   return (
-    <Card>
-      <Carousel key={names.join()} names={names}>
+    <Card className={`${props.isMobile ? 'bg-transparent bg-none shadow-none overflow-visible' : ''}`}>
+      <Carousel key={names.join()} names={names} isMobile={props.isMobile}>
         {tabs}
       </Carousel>
     </Card>

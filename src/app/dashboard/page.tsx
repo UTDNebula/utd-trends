@@ -126,35 +126,55 @@ export default async function Page({ searchParams }: Props) {
             <Suspense fallback={<LoadingFilters />}>
               <Filters searchResultsPromise={searchResults} />
             </Suspense>
-            <Split
-              left={
-                <Suspense fallback={<LoadingSearchResultsTable />}>
-                  <ServerLeft
-                    searchResultsPromise={searchResults}
-                    courses={courses}
-                    professors={professors}
-                  />
-                </Suspense>
-              }
-              right={
-                <StickySide>
-                  <Suspense
-                    fallback={
-                      <LoadingRight courses={courses} professors={professors} />
-                    }
-                  >
-                    <Right
+
+            {/* Desktop Layout */}
+            <div className="hidden md:block">
+              <Split
+                left={
+                  <Suspense fallback={<LoadingSearchResultsTable />}>
+                    <ServerLeft
+                      searchResultsPromise={searchResults}
                       courses={courses}
                       professors={professors}
-                      searchResultsPromise={searchResults}
                     />
                   </Suspense>
-                </StickySide>
-              }
-              minLeft="40%"
-              minRight="30%"
-              defaultLeft="50%"
-            />
+                }
+                right={
+                  <StickySide>
+                    <Suspense
+                      fallback={
+                        <LoadingRight courses={courses} professors={professors} />
+                      }
+                    >
+                      <Right
+                        courses={courses}
+                        professors={professors}
+                        searchResultsPromise={searchResults}
+                      />
+                    </Suspense>
+                  </StickySide>
+                }
+                minLeft="40%"
+                minRight="30%"
+                defaultLeft="50%"
+              />
+            </div>
+
+            {/* Mobile Layout */}
+            <div className="block md:hidden mt-4">
+              <Suspense
+                fallback={
+                  <LoadingRight courses={courses} professors={professors} isMobile={true} />
+                }
+              >
+                <Right
+                  courses={courses}
+                  professors={professors}
+                  searchResultsPromise={searchResults}
+                  isMobile={true}
+                />
+              </Suspense>
+            </div>
           </main>
         </HydrationBoundary>
       </FiltersProvider>
