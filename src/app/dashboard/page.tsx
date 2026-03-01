@@ -98,7 +98,18 @@ export default async function Page({ searchParams }: Props) {
         <FiltersProvider searchResults={[]}>
           <Header isPlanner={false} />
           <main className="p-4">
-            <DashboardEmpty />
+            {isCompare ? (
+              <>
+                <Typography className="leading-tight text-3xl font-bold p-4">
+                  Compare
+                </Typography>
+                <Card className="w-full p-4">
+                  <Compare isMobile={true} />
+                </Card>
+              </>
+            ) : (
+              <DashboardEmpty />
+            )}
           </main>
         </FiltersProvider>
       </>
