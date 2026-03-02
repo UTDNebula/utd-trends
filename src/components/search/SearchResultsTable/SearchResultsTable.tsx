@@ -179,12 +179,14 @@ function Row({
   showTutorial,
 }: RowProps) {
   const chosenSemesters = use(FiltersContext).chosenSemesters;
+  const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
   const [open, setOpen] = useState(false);
 
   const rainbowColors = useRainbowColors();
   const filteredGrades = useMemo(
-    () => calculateGrades(searchResult.grades, chosenSemesters),
-    [searchResult.grades, chosenSemesters],
+    () =>
+      calculateGrades(searchResult.grades, chosenSemesters, chosenSectionTypes),
+    [searchResult.grades, chosenSemesters, chosenSectionTypes],
   );
 
   const canOpen = searchResult.type === 'course' || searchResult.RMP;
@@ -393,12 +395,14 @@ function Row({
 type SearchResultsTableProps = {
   numSearches: number;
   includedResults: SearchResult[];
+  secondaryIncludedResults: SearchResult[];
   unIncludedResults: SearchResult[];
 };
 
 export default function SearchResultsTable({
   numSearches,
   includedResults,
+  secondaryIncludedResults,
   unIncludedResults,
 }: SearchResultsTableProps) {
   const {
@@ -429,7 +433,11 @@ export default function SearchResultsTable({
     }
   }
 
-  if (includedResults.length === 0 && unIncludedResults.length === 0) {
+  if (
+    includedResults.length === 0 &&
+    secondaryIncludedResults.length === 0 &&
+    unIncludedResults.length === 0
+  ) {
     return (
       <div className="p-4">
         <Typography
@@ -562,6 +570,8 @@ export default function SearchResultsTable({
   }
 
   const sortedResults = includedResults.sort(sortResults);
+  const sortedSecondaryIncludedResults =
+    secondaryIncludedResults.sort(sortResults);
   const sortedUnIncludedResults = unIncludedResults.sort(sortResults);
 
   return (
@@ -641,6 +651,39 @@ export default function SearchResultsTable({
                   removeFromCompare={removeFromCompare}
                   color={compareColorMap[searchQueryLabel(result.searchQuery)]}
                   showTutorial={index === numSearches}
+                />
+              );
+            })}
+
+            {/* First Divider row */}
+            {sortedSecondaryIncludedResults.length > 0 && (
+              <TableRow>
+                <TableCell colSpan={5} className="p-0">
+                  <div className="flex items-center py-2 my-2">
+                    <Divider className="grow" />
+                    <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
+                      {'Teaching Next Semester, Filters Do Not Match'}
+                    </Typography>
+                    <Divider className="grow" />
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+
+            {/* Secondary Included Results (Available but do not match filters) */}
+            {sortedSecondaryIncludedResults.map((result) => {
+              return (
+                <Row
+                  searchResult={result}
+                  key={searchQueryLabel(result.searchQuery)}
+                  course={result.searchQuery}
+                  inCompare={compare.some((obj) =>
+                    searchQueryEqual(obj.searchQuery, result.searchQuery),
+                  )}
+                  addToCompare={addToCompare}
+                  removeFromCompare={removeFromCompare}
+                  color={compareColorMap[searchQueryLabel(result.searchQuery)]}
+                  showTutorial={false}
                 />
               );
             })}
