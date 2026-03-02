@@ -10,9 +10,12 @@ import {
   type SearchResult,
 } from '@/types/SearchQuery';
 import BookIcon from '@mui/icons-material/Book';
+import { Badge, Divider, IconButton, Popover } from '@mui/material';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import { Checkbox, Tooltip } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
+import fetchSections from '@/modules/fetchSections';
+import { useEffect } from 'react';
 
 type addToPlannerProps = {
   searchResult: SearchResult;
@@ -44,68 +47,86 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
       searchResult.searchQuery,
       convertToCourseOnly(searchResult.searchQuery),
     ) && canAddCourseOnlyToPlanner;
-  return (
-    <Tooltip
-      title={
-        searchResult.type === 'professor'
-          ? 'Cannot add professor to planner'
-          : hasLatestSemester
-            ? inPlanner
-              ? 'Remove from Planner'
-              : 'Add to Planner'
-            : 'Not being taught'
+
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        console.log(searchResult.searchQuery)
+        const data = await fetchSections(searchResult.searchQuery);
+        console.log(data)
+      } catch (err) {
+        console.error('fetchSections failed', err);
       }
-      placement="top"
-    >
-      <span>
-        <Checkbox
-          checked={inPlanner}
-          onClick={(e) => {
-            e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
-            if (inPlanner) {
-              removeFromPlanner(searchResult.searchQuery);
-            } else {
-              addToPlanner(searchResult.searchQuery);
-              if (addJustCourseToo) {
-                addToPlanner(convertToCourseOnly(searchResult.searchQuery));
-              }
-              queryClient.prefetchQuery({
-                queryKey: [
-                  'results',
-                  searchQueryLabel(
-                    convertToCourseOnly(
-                      removeSection(searchResult.searchQuery),
+    };
+    load();
+  }, [searchResult.searchQuery]);
+
+
+  return (
+    <Badge color="secondary" badgeContent=" ">
+      <Tooltip
+        title={
+          searchResult.type === 'professor'
+            ? 'Cannot add professor to planner'
+            : hasLatestSemester
+              ? inPlanner
+                ? 'Remove from Planner'
+                : 'Add to Planner'
+              : 'Not being taught'
+        }
+        placement="top"
+      >
+        <span>
+          <Checkbox
+            checked={inPlanner}
+            onClick={(e) => {
+              e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
+              if (inPlanner) {
+                removeFromPlanner(searchResult.searchQuery);
+              } else {
+                addToPlanner(searchResult.searchQuery);
+                if (addJustCourseToo) {
+                  addToPlanner(convertToCourseOnly(searchResult.searchQuery));
+                }
+                queryClient.prefetchQuery({
+                  queryKey: [
+                    'results',
+                    searchQueryLabel(
+                      convertToCourseOnly(
+                        removeSection(searchResult.searchQuery),
+                      ),
                     ),
-                  ),
-                ],
-                queryFn: async () => {
-                  const data = await fetchSearchResult(
-                    convertToCourseOnly(searchResult.searchQuery),
-                  );
-                  return data;
-                },
-              });
-              queryClient.prefetchQuery({
-                queryKey: [
-                  'rmp',
-                  searchQueryLabel(
-                    convertToProfOnly(removeSection(searchResult.searchQuery)),
-                  ),
-                ],
-                queryFn: async () => {
-                  const data = await fetchSearchResult(
-                    convertToProfOnly(removeSection(searchResult.searchQuery)),
-                  );
-                  return data;
-                },
-              });
-            }
-          }}
-          icon={<BookOutlinedIcon />}
-          checkedIcon={<BookIcon />}
-          disabled={!hasLatestSemester || searchResult.type === 'professor'}
-        />
-      </span>
-    </Tooltip>
+                  ],
+                  queryFn: async () => {
+                    const data = await fetchSearchResult(
+                      convertToCourseOnly(searchResult.searchQuery),
+                    );
+                    return data;
+                  },
+                });
+                queryClient.prefetchQuery({
+                  queryKey: [
+                    'rmp',
+                    searchQueryLabel(
+                      convertToProfOnly(removeSection(searchResult.searchQuery)),
+                    ),
+                  ],
+                  queryFn: async () => {
+                    const data = await fetchSearchResult(
+                      convertToProfOnly(removeSection(searchResult.searchQuery)),
+                    );
+                    return data;
+                  },
+                });
+              }
+            }}
+            icon={<BookOutlinedIcon />}
+            checkedIcon={<BookIcon />}
+            disabled={!hasLatestSemester || searchResult.type === 'professor'}
+          />
+        </span>
+      </Tooltip>
+    </Badge>
   );
 }
