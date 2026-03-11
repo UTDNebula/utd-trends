@@ -36,7 +36,7 @@ export default function BarGraph(props: Props) {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
-    '<div class="apexcharts-menu-icon" title="Bar Graph" aria-label="Bar Graph">' +
+    '<div class="apexcharts-menu-icon">' +
     (fullScreenOpen ? FullscreenCloseIcon : FullscreenOpenIcon) +
     '</div>';
 

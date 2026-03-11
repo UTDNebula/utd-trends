@@ -94,7 +94,7 @@ export default function LineGraph(props: Props) {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
-    '<div class="apexcharts-menu-icon" title="Line Graph" aria-label="Line Graph">' +
+    '<div class="apexcharts-menu-icon">' +
     (fullScreenOpen ? FullscreenCloseIcon : FullscreenOpenIcon) +
     '</div>';
 
