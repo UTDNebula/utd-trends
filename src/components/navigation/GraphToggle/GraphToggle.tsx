@@ -50,16 +50,16 @@ export default function GraphToggle(props: Props) {
         orientation="vertical"
         aria-label="chart type"
       >
-      <Tooltip title="Bar Chart" placement="top">
-        <ToggleButton value="bar" aria-label="bar chart">
-          <BarChartIcon />
-        </ToggleButton>
-      </Tooltip>
-      <Tooltip title="Line Chart" placement="bottom">  
-        <ToggleButton value="line" aria-label="line chart">
-          <TimelineIcon />
-        </ToggleButton>
-      </Tooltip>
+        <Tooltip title="Bar Chart" placement="top">
+          <ToggleButton value="bar" aria-label="bar chart">
+            <BarChartIcon />
+          </ToggleButton>
+        </Tooltip>
+        <Tooltip title="Line Chart" placement="bottom">
+          <ToggleButton value="line" aria-label="line chart">
+            <TimelineIcon />
+          </ToggleButton>
+        </Tooltip>
       </ToggleButtonGroup>
     </div>
   );
