@@ -22,6 +22,7 @@ export const FiltersContext = createContext<{
   sectionTypes: string[];
   chosenSectionTypes: string[];
   setChosenSectionTypes: Dispatch<SetStateAction<string[]>>;
+  sectionTypesOverride: string[];
 }>({
   semesters: [],
   chosenSemesters: [],
@@ -29,6 +30,7 @@ export const FiltersContext = createContext<{
   sectionTypes: [],
   chosenSectionTypes: [],
   setChosenSectionTypes: (_) => _,
+  sectionTypesOverride: [],
 });
 
 export default function FiltersProvider({
@@ -53,6 +55,8 @@ export default function FiltersProvider({
     getSectionTypesFromSearchResults(searchResults),
   );
 
+  const sectionTypesOverride = ['all', 'in-person', 'online', 'hybrid'];
+
   const [prevSearchResults, setPrevSearchResults] =
     useState<SearchResult[]>(searchResults);
   if (searchResults != prevSearchResults) {
@@ -74,6 +78,7 @@ export default function FiltersProvider({
         chosenSectionTypes,
         setChosenSectionTypes,
         sectionTypes,
+        sectionTypesOverride,
       }}
     >
       {children}
