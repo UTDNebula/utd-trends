@@ -485,7 +485,13 @@ export default function CompareTable({
 
   // Update mappedColors to use the passed colorMap
   const mappedColors = sortedResults.map(
-    (result) => colorMap[searchQueryLabel(result.searchQuery)],
+    (result) =>
+      colorMap[
+        searchQueryLabel(result.searchQuery) +
+          (result.type !== 'combo' && result.type !== 'professor'
+            ? ' (Overall)'
+            : '')
+      ],
   );
 
   return (
@@ -512,7 +518,10 @@ export default function CompareTable({
                     backgroundColor: mappedColors[index] + '10', // add transparency
                   }}
                 >
-                  {searchQueryLabel(result.searchQuery)}
+                  {searchQueryLabel(result.searchQuery) +
+                    (result.type !== 'combo' && result.type !== 'professor'
+                      ? ' (Overall)'
+                      : '')}
                 </TableCell>
               ))}
             </TableRow>
@@ -623,39 +632,28 @@ export default function CompareTable({
         <TableContainer className="w-full mb-4" sx={{ overflow: 'visible' }}>
           <Table
             size="small"
-            className="border-separate border-spacing-x-0 border-spacing-y-2 w-full"
+            className="border-separate border-spacing-x-0 border-spacing-y-0 w-full"
             sx={{ tableLayout: 'fixed' }}
           >
             <TableHead>
               <TableRow>
-                {(() => {
-                  const mobileHeaderBase =
-                    'text-center py-2 border-t-2 border-b-2 px-0 text-[8px] leading-tight';
-                  const gradesRatingsLabel = (
-                    <span className="inline-flex flex-col items-center">
-                      <span># of Grades</span>
-                      <span className="my-0.5 w-full border-t border-current opacity-70" />
-                      <span>Ratings</span>
-                    </span>
-                  );
-                  const sortableColumns: { [key: string]: boolean } = {
-                    GPA: false,
-                    Rating: false,
-                    'Would Take Again': false,
-                    Difficulty: true, // defaultAscSort
-                  };
-                  const labels: (string | React.ReactNode)[] = [
-                    '',
-                    'Compare',
-                    'GPA',
-                    'Rating',
-                    'Would Take Again',
-                    'Difficulty',
-                    gradesRatingsLabel,
-                    'Add to Planner',
-                  ];
-                  const sortKeys = [
-                    null,
+                {[
+                  '',
+                  'GPA',
+                  'Rating',
+                  'Would Take Again',
+                  'Difficulty',
+                  <span
+                    key="grades-ratings"
+                    className="inline-flex flex-col items-center"
+                  >
+                    <span># of Grades</span>
+                    <span className="my-0.5 w-full border-t border-current opacity-70" />
+                    <span>Ratings</span>
+                  </span>,
+                  'Add to Planner',
+                ].map((label, i) => {
+                  const sortKey = [
                     null,
                     'GPA',
                     'Rating',
@@ -663,105 +661,99 @@ export default function CompareTable({
                     'Difficulty',
                     null,
                     null,
-                  ] as (string | null)[];
-                  const sortTooltips: { [key: string]: string } = {
-                    GPA: 'Sort by GPA',
-                    Rating: 'Sort by Rating',
-                    'Would Take Again': 'Sort by Would Take Again %',
-                    Difficulty: 'Sort by Difficulty',
-                  };
-                  return labels.map((label, i) => {
-                    const className =
-                      i === 0
-                        ? `font-bold border-l-2 rounded-l-lg ${mobileHeaderBase}`
-                        : i === labels.length - 1
-                          ? `border-r-2 rounded-r-lg ${mobileHeaderBase}`
-                          : mobileHeaderBase;
-                    const sortKey = sortKeys[i];
-                    const content =
-                      sortKey != null ? (
-                        <Tooltip
-                          title={sortTooltips[sortKey] ?? ''}
-                          placement="top"
-                        >
-                          <TableSortLabel
-                            active={orderBy === sortKey}
-                            direction={
-                              orderBy === sortKey
-                                ? order
-                                : sortableColumns[sortKey]
-                                  ? 'asc'
-                                  : 'desc'
-                            }
-                            onClick={() => handleClick(sortKey)}
-                            sx={{
-                              '& .MuiTableSortLabel-icon': {
-                                marginLeft: '0',
-                                marginRight: '0',
-                                fontSize: '0.5rem',
-                              },
-                            }}
-                          >
-                            {label}
-                          </TableSortLabel>
-                        </Tooltip>
-                      ) : (
-                        label
-                      );
-                    return (
-                      <TableCell
-                        key={
-                          typeof label === 'string' ? label : 'grades-ratings'
+                  ][i] as string | null;
+                  const content =
+                    sortKey != null ? (
+                      <Tooltip
+                        title={
+                          {
+                            GPA: 'Sort by GPA',
+                            Rating: 'Sort by Rating',
+                            'Would Take Again': 'Sort by Would Take Again %',
+                            Difficulty: 'Sort by Difficulty',
+                          }[sortKey] ?? ''
                         }
-                        className={className}
-                        sx={{
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          wordBreak: 'break-word',
-                        }}
+                        placement="top"
                       >
-                        {content}
-                      </TableCell>
+                        <TableSortLabel
+                          active={orderBy === sortKey}
+                          direction={
+                            orderBy === sortKey
+                              ? order
+                              : { Difficulty: true }[sortKey]
+                                ? 'asc'
+                                : 'desc'
+                          }
+                          onClick={() => handleClick(sortKey)}
+                          sx={{
+                            '& .MuiTableSortLabel-icon': {
+                              marginLeft: '0',
+                              marginRight: '0',
+                              fontSize: '0.5rem',
+                            },
+                          }}
+                        >
+                          {label}
+                        </TableSortLabel>
+                      </Tooltip>
+                    ) : (
+                      label
                     );
-                  });
-                })()}
+                  return (
+                    <TableCell
+                      key={typeof label === 'string' ? label : 'grades-ratings'}
+                      className={
+                        'text-center py-2 border-t-2 border-b-2 border-white px-0 text-xs leading-tight' +
+                        (i === 0 ? ' font-bold border-l-2 rounded-l-lg' : '') +
+                        (i === 6 ? ' border-r-2 rounded-r-lg' : '')
+                      }
+                      sx={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        wordBreak: 'break-word',
+                      }}
+                    >
+                      {content}
+                    </TableCell>
+                  );
+                })}
               </TableRow>
             </TableHead>
             <TableBody>
-              {sortedResults.map((result, rowIndex) => {
+              {sortedResults.flatMap((result, rowIndex) => {
                 const grades = result.grades;
                 const rmp = result.type !== 'course' ? result.RMP : undefined;
                 const gradeSummary = calculateGrades(grades, chosenSemesters);
-                const cellStyle = {
-                  borderColor: mappedColors[rowIndex],
-                  backgroundColor: mappedColors[rowIndex] + '10',
-                };
-                const firstCellClassName =
-                  'py-2 border-t-2 border-b-2 border-l-2 px-0';
-                const middleCellClassName = 'py-2 border-t-2 border-b-2 px-0';
-                const lastCellClassName =
-                  'py-2 border-t-2 border-b-2 border-r-2 px-0';
+                const key = searchQueryLabel(result.searchQuery);
 
-                const ratingVal =
-                  rmp && rmp.numRatings > 0 ? rmp.avgRating : undefined;
-                const wouldTakeVal =
-                  rmp && rmp.numRatings > 0
-                    ? rmp.wouldTakeAgainPercent
-                    : undefined;
-                const difficultyVal =
-                  rmp && rmp.numRatings > 0 ? rmp.avgDifficulty : undefined;
-                const gradeTotal = gradeSummary.total;
-                const rmpTotal = rmp ? rmp.numRatings : undefined;
-
-                return (
-                  <TableRow
-                    key={searchQueryLabel(result.searchQuery)}
-                    sx={{ '& td': { border: 0 } }}
-                  >
+                return [
+                  <TableRow key={`${key}-spacer`}>
+                    <TableCell colSpan={7} sx={{ border: 'none' }} />
+                  </TableRow>,
+                  <TableRow key={`${key}-title`}>
+                    <TableCell
+                      colSpan={7}
+                      className="pt-4 pb-0 my-0 border-t-2 border-l-2 border-r-2 rounded-t-lg px-4"
+                      style={{
+                        borderColor: mappedColors[rowIndex],
+                        backgroundColor: mappedColors[rowIndex] + '10',
+                      }}
+                      sx={{ borderBottom: 'none' }}
+                    >
+                      {searchQueryLabel(result.searchQuery) +
+                        (result.type !== 'combo' && result.type !== 'professor'
+                          ? ' (Overall)'
+                          : '')}
+                    </TableCell>
+                  </TableRow>,
+                  <TableRow key={`${key}-data`} className="[&_td]:border-t-0">
                     <TableCell
                       align="center"
-                      className={`${firstCellClassName} rounded-l-lg`}
-                      style={cellStyle}
+                      className="py-0 border-t-2 border-b-2 border-l-2 px-0 rounded-tl-none rounded-tr-none rounded-br-none rounded-bl-lg"
+                      style={{
+                        borderColor: mappedColors[rowIndex],
+                        backgroundColor: mappedColors[rowIndex] + '10',
+                      }}
                       sx={{ maxWidth: '1.5rem' }}
                     >
                       <Tooltip title="Remove from Compare">
@@ -778,22 +770,12 @@ export default function CompareTable({
                       </Tooltip>
                     </TableCell>
                     <TableCell
-                      component="th"
-                      scope="row"
-                      className={`text-center font-medium text-[10px] break-words whitespace-normal ${middleCellClassName}`}
-                      sx={{
-                        borderBottom: 'none',
-                        wordBreak: 'break-word',
-                        overflowWrap: 'break-word',
-                      }}
-                      style={cellStyle}
-                    >
-                      {searchQueryLabel(result.searchQuery)}
-                    </TableCell>
-                    <TableCell
                       align="center"
-                      className={middleCellClassName}
-                      style={cellStyle}
+                      className="py-2 border-t-2 border-b-2 px-0"
+                      style={{
+                        borderColor: mappedColors[rowIndex],
+                        backgroundColor: mappedColors[rowIndex] + '10',
+                      }}
                     >
                       <ValueTag
                         value={gradeSummary.gpa}
@@ -812,23 +794,28 @@ export default function CompareTable({
                     </TableCell>
                     <TableCell
                       align="center"
-                      className={middleCellClassName}
-                      style={cellStyle}
+                      className="py-2 border-t-2 border-b-2 px-0"
+                      style={{
+                        borderColor: mappedColors[rowIndex],
+                        backgroundColor: mappedColors[rowIndex] + '10',
+                      }}
                     >
                       <ValueTag
-                        value={ratingVal}
+                        value={
+                          rmp && rmp.numRatings > 0 ? rmp.avgRating : undefined
+                        }
                         formatValue={(x) => x.toFixed(1)}
                         tooltipTitle={
-                          ratingVal != null
-                            ? `Rating: ${ratingVal.toFixed(1)}`
+                          rmp && rmp.numRatings > 0
+                            ? `Rating: ${rmp.avgRating.toFixed(1)}`
                             : ''
                         }
                         backgroundColor={
-                          ratingVal != null
+                          rmp && rmp.numRatings > 0
                             ? colorMidpoint(
                                 5,
                                 0,
-                                ratingVal,
+                                rmp.avgRating,
                                 rainbowColors[12],
                                 rainbowColors[0],
                               )
@@ -838,23 +825,30 @@ export default function CompareTable({
                     </TableCell>
                     <TableCell
                       align="center"
-                      className={middleCellClassName}
-                      style={cellStyle}
+                      className="py-2 border-t-2 border-b-2 px-0"
+                      style={{
+                        borderColor: mappedColors[rowIndex],
+                        backgroundColor: mappedColors[rowIndex] + '10',
+                      }}
                     >
                       <ValueTag
-                        value={wouldTakeVal}
+                        value={
+                          rmp && rmp.numRatings > 0
+                            ? rmp.wouldTakeAgainPercent
+                            : undefined
+                        }
                         formatValue={(x) => x.toFixed(0) + '%'}
                         tooltipTitle={
-                          wouldTakeVal != null
-                            ? `Would Take Again: ${wouldTakeVal.toFixed(0)}%`
+                          rmp && rmp.numRatings > 0
+                            ? `Would Take Again: ${rmp.wouldTakeAgainPercent.toFixed(0)}%`
                             : ''
                         }
                         backgroundColor={
-                          wouldTakeVal != null
+                          rmp && rmp.numRatings > 0
                             ? colorMidpoint(
                                 100,
                                 0,
-                                wouldTakeVal,
+                                rmp.wouldTakeAgainPercent,
                                 rainbowColors[12],
                                 rainbowColors[0],
                               )
@@ -864,23 +858,30 @@ export default function CompareTable({
                     </TableCell>
                     <TableCell
                       align="center"
-                      className={middleCellClassName}
-                      style={cellStyle}
+                      className="py-2 border-t-2 border-b-2 px-0"
+                      style={{
+                        borderColor: mappedColors[rowIndex],
+                        backgroundColor: mappedColors[rowIndex] + '10',
+                      }}
                     >
                       <ValueTag
-                        value={difficultyVal}
+                        value={
+                          rmp && rmp.numRatings > 0
+                            ? rmp.avgDifficulty
+                            : undefined
+                        }
                         formatValue={(x) => x.toFixed(1)}
                         tooltipTitle={
-                          difficultyVal != null
-                            ? `Difficulty: ${difficultyVal.toFixed(1)}`
+                          rmp && rmp.numRatings > 0
+                            ? `Difficulty: ${rmp.avgDifficulty.toFixed(1)}`
                             : ''
                         }
                         backgroundColor={
-                          difficultyVal != null
+                          rmp && rmp.numRatings > 0
                             ? colorMidpoint(
                                 0,
                                 5,
-                                difficultyVal,
+                                rmp.avgDifficulty,
                                 rainbowColors[12],
                                 rainbowColors[0],
                               )
@@ -890,27 +891,30 @@ export default function CompareTable({
                     </TableCell>
                     <TableCell
                       align="center"
-                      className={middleCellClassName}
-                      style={cellStyle}
+                      className="py-2 border-t-2 border-b-2 px-0"
+                      style={{
+                        borderColor: mappedColors[rowIndex],
+                        backgroundColor: mappedColors[rowIndex] + '10',
+                      }}
                     >
                       <Tooltip
-                        title={`Grades: ${gradeTotal ?? 'N/A'} / Ratings: ${rmpTotal ?? 'N/A'}`}
+                        title={`Grades: ${gradeSummary.total ?? 'N/A'} / Ratings: ${rmp?.numRatings ?? 'N/A'}`}
                         placement="top"
                       >
                         <span className="inline-flex flex-col items-center">
                           {grades === undefined ? (
                             <CloseIcon />
                           ) : (
-                            <Typography className="text-base">
-                              {gradeTotal}
+                            <Typography className="text-xs sm:text-base">
+                              {gradeSummary.total}
                             </Typography>
                           )}
                           <span className="my-0.5 w-full min-w-[1.5rem] border-t border-current opacity-70" />
-                          {rmp === undefined || rmpTotal === 0 ? (
+                          {!rmp || rmp.numRatings === 0 ? (
                             <CloseIcon />
                           ) : (
-                            <Typography className="text-base">
-                              {rmpTotal}
+                            <Typography className="text-xs sm:text-base">
+                              {rmp?.numRatings}
                             </Typography>
                           )}
                         </span>
@@ -918,13 +922,16 @@ export default function CompareTable({
                     </TableCell>
                     <TableCell
                       align="center"
-                      className={`${lastCellClassName} rounded-r-lg`}
-                      style={cellStyle}
+                      className="py-2 border-t-2 border-b-2 border-r-2 px-0 rounded-tl-none rounded-tr-none rounded-bl-none rounded-br-lg"
+                      style={{
+                        borderColor: mappedColors[rowIndex],
+                        backgroundColor: mappedColors[rowIndex] + '10',
+                      }}
                     >
                       <AddToPlanner searchResult={result} />
                     </TableCell>
-                  </TableRow>
-                );
+                  </TableRow>,
+                ];
               })}
             </TableBody>
           </Table>
