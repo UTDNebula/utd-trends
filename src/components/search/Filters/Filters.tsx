@@ -125,7 +125,7 @@ export default function Filters({
     const mm = today.getMonth() + 1; // January is 1
     let yyyy = today.getFullYear();
 
-    let season = 'F';
+    let season: string;
     if (mm <= 5)
       // jan - may
       season = 'S';
@@ -175,11 +175,7 @@ export default function Filters({
     const gpaNum = parseFloat(gpaString);
     gradeCounts[gpaString] = semFilteredResults.filter((result) => {
       if (result.type !== 'course') {
-        if (
-          typeof minRating === 'string' &&
-          result.RMP &&
-          result.RMP.avgRating < parseFloat(minRating)
-        )
+        if (result.RMP && result.RMP.avgRating < parseFloat(minRating))
           return false;
       }
       const courseGrades = result.grades;
@@ -203,10 +199,8 @@ export default function Filters({
         chosenSemesters,
         chosenSectionTypes,
       );
-      if (typeof minGPA === 'string' && calculated.gpa < parseFloat(minGPA))
-        return false;
+      if (calculated.gpa < parseFloat(minGPA)) return false;
       if (
-        typeof ratingNum === 'number' &&
         result.type !== 'course' &&
         result.RMP &&
         result.RMP.avgRating < ratingNum
