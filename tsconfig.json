@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,7 +23,9 @@
       "rsg-components/*": [
         "./node_modules/react-styleguidist/lib/client/rsg-components/*"
       ],
-      "@/*": ["*"]
+      "@/*": [
+        "*"
+      ]
     },
     "baseUrl": "src",
     "verbatimModuleSyntax": true,
@@ -38,7 +44,9 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"],
+  "exclude": [
+    "node_modules"
+  ],
   "ts-node": {
     "transpileOnly": true,
     "moduleTypes": {
