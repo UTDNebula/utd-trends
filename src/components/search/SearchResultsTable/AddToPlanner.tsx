@@ -15,11 +15,11 @@ type addToPlannerProps = {
 
 export default function AddToPlanner({ searchResult }: addToPlannerProps) {
   const sections = searchResult.sections;
-  const { latestSemester, planner, addToPlanner, removeFromPlanner } =
+  const { teachingSemester, planner, addToPlanner, removeFromPlanner } =
     useSharedState();
   // Check if the course section has the latest semester data
   const hasLatestSemester = sections.some(
-    (s) => s.academic_session.name === latestSemester,
+    (s) => s.academic_session.name === teachingSemester,
   );
 
   const inPlanner = planner.some((obj) =>
@@ -27,7 +27,7 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
   );
 
   const courseOnlySections = searchResult.sections.filter(
-    (s) => s.academic_session.name === latestSemester,
+    (s) => s.academic_session.name === teachingSemester,
   );
   const canAddCourseOnlyToPlanner =
     typeof courseOnlySections !== 'undefined' &&

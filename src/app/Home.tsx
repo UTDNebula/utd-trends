@@ -6,6 +6,7 @@ import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 import SearchBar, {
   updateRecentSearches,
 } from '@/components/search/SearchBar/SearchBar';
+import { useSharedState } from '@/app/SharedStateProvider';
 import { displaySemesterName } from '@/modules/semesters';
 import { searchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
 import { FormControl, FormControlLabel, Switch, Tooltip } from '@mui/material';
@@ -13,14 +14,11 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useState, useTransition } from 'react';
 
-interface Props {
-  latestSemester: string;
-}
-
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
-export default function Home(props: Props) {
+export default function Home() {
+  const { teachingSemester } = useSharedState();
   const router = useRouter();
 
   //for spinner after router.push
@@ -108,12 +106,12 @@ export default function Home(props: Props) {
                   }}
                 />
               }
-              label={
-                props.latestSemester == ''
-                  ? 'Teaching Next Semester'
-                  : 'Teaching in ' +
-                    displaySemesterName(props.latestSemester, false)
-              }
+                label={
+                  teachingSemester === ''
+                    ? 'Teaching Next Semester'
+                    : 'Teaching in ' +
+                      displaySemesterName(teachingSemester, false)
+                }
             />
           </FormControl>
         </Tooltip>

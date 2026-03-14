@@ -38,7 +38,7 @@ export default function PlannerCoursesTable() {
     removeFromPlanner,
     setPlannerSection,
     plannerColorMap,
-    latestSemester,
+    teachingSemester,
   } = useSharedState();
 
   const [openConflictMessage, setOpenConflictMessage] = useState(false);
@@ -52,7 +52,7 @@ export default function PlannerCoursesTable() {
   const latestSections = allResults.map((r) =>
     r.isSuccess
       ? r.data.sections.filter(
-          (s) => s.academic_session.name === latestSemester,
+          (s) => s.academic_session.name === teachingSemester,
         )
       : [],
   );
@@ -60,8 +60,9 @@ export default function PlannerCoursesTable() {
     <>
       <Typography variant="h2" className="leading-tight text-3xl font-bold p-4">
         {'My Planner' +
-          (typeof latestSemester !== 'undefined' &&
-            ' — ' + displaySemesterName(latestSemester, false))}
+          (typeof teachingSemester !== 'undefined' &&
+            teachingSemester !== '' &&
+            ' — ' + displaySemesterName(teachingSemester, false))}
       </Typography>
       <div className="flex flex-col gap-4 mb-4 sm:mb-0">
         {planner
@@ -96,7 +97,7 @@ export default function PlannerCoursesTable() {
                 color={
                   plannerColorMap[searchQueryLabel(convertToCourseOnly(query))]
                 }
-                latestSemester={latestSemester}
+                teachingSemester={teachingSemester}
               />
             );
           })}

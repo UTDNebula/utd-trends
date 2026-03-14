@@ -410,7 +410,7 @@ export default function SearchResultsTable({
     addToCompare,
     removeFromCompare,
     compareColorMap,
-    latestSemester,
+    teachingSemester,
   } = useSharedState();
 
   //Table sorting category
@@ -696,8 +696,8 @@ export default function SearchResultsTable({
                     <Divider className="grow" />
                     <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
                       {'Not teaching ' +
-                        (latestSemester !== ''
-                          ? 'in ' + displaySemesterName(latestSemester, false)
+                        (teachingSemester !== ''
+                          ? 'in ' + displaySemesterName(teachingSemester, false)
                           : 'Next Semester')}
                     </Typography>
                     <Divider className="grow" />

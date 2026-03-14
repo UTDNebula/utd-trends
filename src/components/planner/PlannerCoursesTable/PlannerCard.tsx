@@ -429,7 +429,7 @@ type PlannerCardProps = {
   selectedSections: Sections['all'];
   openConflictMessage: () => void;
   color: { fill: string; outline: string; font: string };
-  latestSemester: string;
+  teachingSemester: string;
   extraSections?: SearchResult;
   extraLabel?: string;
 };
@@ -475,7 +475,7 @@ export default function PlannerCard(props: PlannerCardProps) {
       ...result,
       sections: result.sections.filter(
         (section) =>
-          section.academic_session.name == props.latestSemester && // latest sem's sections only
+          section.academic_session.name == props.teachingSemester && // latest sem's sections only
           ((!props.query.profFirst && !props.query.profLast) || // if overall, should show every prof's section
             (section.professor_details &&
               section.professor_details.find(
@@ -491,7 +491,7 @@ export default function PlannerCard(props: PlannerCardProps) {
       ...result,
       sections: result.sections.filter(
         (section) =>
-          section.academic_session.name == props.latestSemester && // latest sem's sections only
+          section.academic_session.name == props.teachingSemester && // latest sem's sections only
           (!(section.professor_details && section.professor_details[0]) || // either have no professor assigned, or
             sectionCanOverlap(section.section_number)), // be an "Extra" section (labs, exams, etc)
       ),
@@ -755,7 +755,7 @@ export default function PlannerCard(props: PlannerCardProps) {
                 selectedSections={props.selectedSections}
                 openConflictMessage={props.openConflictMessage}
                 color={props.color}
-                latestSemester={props.latestSemester}
+                teachingSemester={props.teachingSemester}
                 extraSections={{
                   ...latestExtraSections,
                   sections: latestExtraSections.sections.filter(
@@ -780,7 +780,7 @@ export default function PlannerCard(props: PlannerCardProps) {
                 selectedSections={props.selectedSections}
                 openConflictMessage={props.openConflictMessage}
                 color={props.color}
-                latestSemester={props.latestSemester}
+                teachingSemester={props.teachingSemester}
                 extraSections={{
                   ...latestExtraSections,
                   sections: latestExtraSections.sections.filter((section) =>
@@ -803,7 +803,7 @@ export default function PlannerCard(props: PlannerCardProps) {
                 selectedSections={props.selectedSections}
                 openConflictMessage={props.openConflictMessage}
                 color={props.color}
-                latestSemester={props.latestSemester}
+                teachingSemester={props.teachingSemester}
                 extraSections={{
                   ...latestExtraSections,
                   sections: latestExtraSections.sections.filter((section) =>

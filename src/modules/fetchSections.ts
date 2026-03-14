@@ -105,21 +105,37 @@ async function fetchSingleSections(query: SearchQuery): Promise<SectionsData> {
   }
 }
 
+/** Returns unique semester IDs from sections, sorted ascending (oldest first). Includes Summer. */
+export async function fetchAvailableSemesters(): Promise<string[]> {
+  try {
+    const sections = await fetchSingleSections({
+      prefix: 'GOVT',
+      number: '2306',
+    });
+    const names = [
+      ...new Set(sections.map((s) => s.academic_session.name)),
+    ].sort(compareSemesters);
+    return names;
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : 'An unknown error occurred',
+    );
+  }
+}
+
+/** Returns the latest semester ID (most recent in API). Includes Summer. */
 export async function fetchLatestSemester(): Promise<string> {
   try {
     const sections = await fetchSingleSections({
       prefix: 'GOVT',
       number: '2306',
     });
-    const latestSemester = sections
-      //exclude summers
-      .filter((sem) => !sem.academic_session.name.includes('U'))
-      //find max
-      .reduce((a, b) =>
-        compareSemesters(b.academic_session.name, a.academic_session.name) < 0
-          ? a
-          : b,
-      ).academic_session.name;
+    if (sections.length === 0) return '';
+    const latestSemester = sections.reduce((a, b) =>
+      compareSemesters(b.academic_session.name, a.academic_session.name) < 0
+        ? a
+        : b,
+    ).academic_session.name;
     return latestSemester;
   } catch (error) {
     throw new Error(

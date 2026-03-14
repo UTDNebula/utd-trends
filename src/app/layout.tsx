@@ -1,6 +1,9 @@
 import '@/styles/globals.css';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
-import { fetchLatestSemester } from '@/modules/fetchSections';
+import {
+  fetchAvailableSemesters,
+  fetchLatestSemester,
+} from '@/modules/fetchSections';
 import theme from '@/modules/theme';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ThemeProvider } from '@mui/material/styles';
@@ -66,7 +69,13 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const latestSemester = await fetchLatestSemester();
+  const [availableSemesters, defaultTeachingSemester] = await Promise.all([
+    fetchAvailableSemesters().catch(() => []),
+    fetchLatestSemester().catch(() => ''),
+  ]).then(([available, defaultSem]) => [
+    available,
+    defaultSem || (available.length > 0 ? available[available.length - 1] : ''),
+  ]);
   return (
     <html lang="en">
       {process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' && (
@@ -78,7 +87,10 @@ export default async function RootLayout({
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>
             <QueryProvider>
-              <SharedStateProvider latestSemester={latestSemester}>
+              <SharedStateProvider
+                availableSemesters={availableSemesters}
+                defaultTeachingSemester={defaultTeachingSemester}
+              >
                 {children}
                 <ReactQueryDevtools initialIsOpen={false} />
               </SharedStateProvider>

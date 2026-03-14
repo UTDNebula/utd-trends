@@ -94,7 +94,8 @@ export default function Filters({
 }: {
   searchResultsPromise: Promise<SearchResult[]>;
 }) {
-  const { latestSemester } = useSharedState();
+  const { teachingSemester, setTeachingSemester, availableSemesters } =
+    useSharedState();
   const searchResults = use(searchResultsPromise);
   const semesters = use(FiltersContext).semesters;
   const chosenSemesters = use(FiltersContext).chosenSemesters;
@@ -156,7 +157,7 @@ export default function Filters({
     const availableThisSemester =
       filterNextSem &&
       result.sections.some(
-        (section) => section.academic_session.name === latestSemester,
+        (section) => section.academic_session.name === teachingSemester,
       );
     const hasChosenSectionTypes = result.grades.some((section) =>
       section.data.some((s) => chosenSectionTypes.includes(s.type)),
@@ -551,42 +552,72 @@ export default function Filters({
         </Tooltip>
       </Grid>
 
-      {/* Teaching Next Semester switch*/}
+      {/* Teaching Next Semester switch + semester dropdown */}
       <Grid size={{ xs: 12, sm: 12 / 5 }} className="px-2">
         <Tooltip title="Select Availability" placement="top">
           <FormControl
             size="small"
-            className={`${
+            className={`w-full ${
               filterNextSem
                 ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
                 : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
             }`}
           >
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={filterNextSem}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    const params = new URLSearchParams(searchParams.toString());
-                    if (event.target.checked) {
-                      params.set('availability', 'true');
-                    } else {
-                      params.delete('availability');
-                    }
-                    window.history.replaceState(
-                      null,
-                      '',
-                      `${pathname}?${params.toString()}`,
-                    );
-                  }}
-                />
-              }
-              label={
-                latestSemester == ''
-                  ? 'Teaching Next Semester'
-                  : 'Teaching in ' + displaySemesterName(latestSemester, false)
-              }
-            />
+            <div className="flex flex-wrap items-center gap-2">
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={filterNextSem}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      const params = new URLSearchParams(
+                        searchParams.toString(),
+                      );
+                      if (event.target.checked) {
+                        params.set('availability', 'true');
+                      } else {
+                        params.delete('availability');
+                      }
+                      window.history.replaceState(
+                        null,
+                        '',
+                        `${pathname}?${params.toString()}`,
+                      );
+                    }}
+                  />
+                }
+                label={
+                  teachingSemester === ''
+                    ? 'Teaching Next Semester'
+                    : 'Teaching in'
+                }
+              />
+              {availableSemesters.length > 0 && (
+                <Select
+                  size="small"
+                  value={
+                    teachingSemester ||
+                    availableSemesters[availableSemesters.length - 1]
+                  }
+                  onChange={(e: SelectChangeEvent<string>) =>
+                    setTeachingSemester(e.target.value)
+                  }
+                  displayEmpty
+                  disabled={!filterNextSem}
+                  renderValue={(v) =>
+                    v
+                      ? displaySemesterName(v, false)
+                      : 'Teaching Next Semester'
+                  }
+                  className="min-w-[120px]"
+                >
+                  {availableSemesters.map((sem) => (
+                    <MenuItem key={sem} value={sem}>
+                      {displaySemesterName(sem, false)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+            </div>
           </FormControl>
         </Tooltip>
       </Grid>

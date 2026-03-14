@@ -18,7 +18,7 @@ interface Props {
  * Returns the left side
  */
 export default function ClientLeft(props: Props) {
-  const { latestSemester } = useSharedState();
+  const { teachingSemester } = useSharedState();
 
   const searchParams = useSearchParams();
 
@@ -71,7 +71,7 @@ export default function ClientLeft(props: Props) {
   //Filter results based on gpa, rmp, rmp difficulty, availability, and grade section type
   const availableResults = filteredResults.filter((result) => {
     const availableThisSemester = result.sections.some(
-      (section) => section.academic_session.name === latestSemester,
+      (section) => section.academic_session.name === teachingSemester,
     );
     if (availability && !availableThisSemester) return false;
 
@@ -100,7 +100,7 @@ export default function ClientLeft(props: Props) {
   availableResults.forEach((result) => {
     const sectionsWithTypeNextSem = result.sections.filter(
       (section) =>
-        section.academic_session.name === latestSemester &&
+        section.academic_session.name === teachingSemester &&
         matchSectionTypesFromSectionNumber(
           section.section_number,
           chosenSectionTypes,
@@ -122,7 +122,7 @@ export default function ClientLeft(props: Props) {
     if (!availability) return false;
     const availableThisSemester =
       result.sections.filter(
-        (section) => section.academic_session.name === latestSemester,
+        (section) => section.academic_session.name === teachingSemester,
       ).length > 0;
     if (availability && availableThisSemester) return false;
 

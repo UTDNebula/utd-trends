@@ -33,18 +33,25 @@ const SharedStateContext = createContext<
       };
       courseNames: { [key: string]: string | undefined };
       setCourseNames: Setter<{ [key: string]: string | undefined }>;
-      latestSemester: string;
+      availableSemesters: string[];
+      teachingSemester: string;
+      setTeachingSemester: (semester: string) => void;
     }
   | undefined
 >(undefined);
 
 export function SharedStateProvider({
   children,
-  latestSemester,
+  availableSemesters,
+  defaultTeachingSemester,
 }: {
   children: React.ReactNode;
-  latestSemester: string;
+  availableSemesters: string[];
+  defaultTeachingSemester: string;
 }) {
+  const [teachingSemester, setTeachingSemester] = useState<string>(
+    defaultTeachingSemester,
+  );
   const [compare, setCompare] = useState<SearchResult[]>([]);
 
   //Add a course+prof combo to compare (happens from search results)
@@ -211,7 +218,9 @@ export function SharedStateProvider({
         plannerColorMap,
         courseNames,
         setCourseNames,
-        latestSemester,
+        availableSemesters,
+        teachingSemester,
+        setTeachingSemester,
       }}
     >
       {children}

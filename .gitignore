@@ -49,3 +49,6 @@ yarn-error.log*
 
 # jetbrains
 .idea
+
+# cursor
+/.cursor
