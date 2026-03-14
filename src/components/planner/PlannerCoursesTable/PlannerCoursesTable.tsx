@@ -12,7 +12,17 @@ import {
   searchQueryLabel,
   searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
-import { Alert, Snackbar, Typography } from '@mui/material';
+import {
+  Alert,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Snackbar,
+  Typography,
+} from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material/Select';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 
 export function LoadingPlannerCoursesTable() {
@@ -39,7 +49,11 @@ export default function PlannerCoursesTable() {
     setPlannerSection,
     plannerColorMap,
     teachingSemester,
+    setTeachingSemester,
+    availableSemesters,
   } = useSharedState();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [openConflictMessage, setOpenConflictMessage] = useState(false);
   const conflictMessageClose = (_: unknown, reason?: string) => {
@@ -56,15 +70,53 @@ export default function PlannerCoursesTable() {
         )
       : [],
   );
+  const effectiveSemester =
+    teachingSemester || availableSemesters[availableSemesters.length - 1] || '';
+
   return (
     <>
-      <Typography variant="h2" className="leading-tight text-3xl font-bold p-4">
-        {'My Planner' +
-          (typeof teachingSemester !== 'undefined' &&
-            teachingSemester !== '' &&
-            ' — ' + displaySemesterName(teachingSemester, false))}
-      </Typography>
-      <div className="flex flex-col gap-4 mb-4 sm:mb-0">
+      <div className="flex flex-wrap items-center gap-3 p-4 pb-0">
+        <Typography
+          variant="h2"
+          className="leading-tight text-3xl font-bold shrink-0"
+        >
+          {'My Planner' +
+            (effectiveSemester
+              ? ' — ' + displaySemesterName(effectiveSemester, false)
+              : '')}
+        </Typography>
+        {availableSemesters.length > 0 && (
+          <FormControl size="small" className="min-w-[140px]">
+            <InputLabel id="planner-teaching-semester">Semester</InputLabel>
+            <Select
+              labelId="planner-teaching-semester"
+              label="Semester"
+              size="small"
+              value={effectiveSemester}
+              onChange={(e: SelectChangeEvent<string>) => {
+                const newSemester = e.target.value;
+                setTeachingSemester(newSemester);
+                const params = new URLSearchParams(searchParams.toString());
+                params.set('availability', newSemester);
+                router.replace(`/planner?${params.toString()}`, {
+                  scroll: false,
+                });
+              }}
+              renderValue={(v) =>
+                v ? displaySemesterName(v, false) : 'Select semester'
+              }
+              className="bg-white dark:bg-haiti"
+            >
+              {availableSemesters.map((sem) => (
+                <MenuItem key={sem} value={sem}>
+                  {displaySemesterName(sem, false)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+      </div>
+      <div className="flex flex-col gap-4 mb-4 sm:mb-0 pt-4">
         {planner
           .toSorted((query1, query2) => {
             return searchQueryLabel(removeSection(query1)).localeCompare(
