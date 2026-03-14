@@ -31,7 +31,8 @@ export default function ClientLeft(props: Props) {
   const minGPA = searchParams.get('minGPA');
   const minRating = searchParams.get('minRating');
   const maxDiff = searchParams.get('maxDiff');
-  const availability = searchParams.get('availability') === 'true';
+  const availabilitySemester = searchParams.get('availability');
+  const availability = !!availabilitySemester;
 
   const results = use(props.resultsPromise);
   const semesters = use(FiltersContext).semesters;
@@ -71,7 +72,9 @@ export default function ClientLeft(props: Props) {
   //Filter results based on gpa, rmp, rmp difficulty, availability, and grade section type
   const availableResults = filteredResults.filter((result) => {
     const availableThisSemester = result.sections.some(
-      (section) => section.academic_session.name === teachingSemester,
+      (section) =>
+        section.academic_session.name ===
+        (availabilitySemester ?? teachingSemester),
     );
     if (availability && !availableThisSemester) return false;
 
@@ -100,7 +103,8 @@ export default function ClientLeft(props: Props) {
   availableResults.forEach((result) => {
     const sectionsWithTypeNextSem = result.sections.filter(
       (section) =>
-        section.academic_session.name === teachingSemester &&
+        section.academic_session.name ===
+          (availabilitySemester ?? teachingSemester) &&
         matchSectionTypesFromSectionNumber(
           section.section_number,
           chosenSectionTypes,
@@ -122,7 +126,9 @@ export default function ClientLeft(props: Props) {
     if (!availability) return false;
     const availableThisSemester =
       result.sections.filter(
-        (section) => section.academic_session.name === teachingSemester,
+        (section) =>
+          section.academic_session.name ===
+          (availabilitySemester ?? teachingSemester),
       ).length > 0;
     if (availability && availableThisSemester) return false;
 

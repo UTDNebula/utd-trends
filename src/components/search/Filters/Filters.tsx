@@ -21,7 +21,7 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { usePathname, useSearchParams } from 'next/navigation';
-import React, { use } from 'react';
+import React, { use, useEffect } from 'react';
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
@@ -118,7 +118,18 @@ export default function Filters({
   if (Array.isArray(minRating)) {
     minRating = minRating[0]; // if minRating is an array, make it a string
   }
-  const filterNextSem = searchParams.get('availability') === 'true';
+  const availabilitySemester = searchParams.get('availability');
+  const filterNextSem = !!availabilitySemester;
+
+  // Sync teaching semester from URL so dropdown matches shared links
+  useEffect(() => {
+    if (
+      availabilitySemester &&
+      availableSemesters.includes(availabilitySemester)
+    ) {
+      setTeachingSemester(availabilitySemester);
+    }
+  }, [availabilitySemester, availableSemesters, setTeachingSemester]);
 
   function getRecentSemesters() {
     // get current month and year
@@ -154,10 +165,12 @@ export default function Filters({
   const rmpCounts: Record<string, number> = {};
 
   const semFilteredResults = searchResults.filter((result) => {
+    const semesterToFilter = availabilitySemester || teachingSemester;
     const availableThisSemester =
       filterNextSem &&
+      semesterToFilter &&
       result.sections.some(
-        (section) => section.academic_session.name === teachingSemester,
+        (section) => section.academic_session.name === semesterToFilter,
       );
     const hasChosenSectionTypes = result.grades.some((section) =>
       section.data.some((s) => chosenSectionTypes.includes(s.type)),
@@ -573,7 +586,12 @@ export default function Filters({
                         searchParams.toString(),
                       );
                       if (event.target.checked) {
-                        params.set('availability', 'true');
+                        params.set(
+                          'availability',
+                          teachingSemester ||
+                            availableSemesters[availableSemesters.length - 1] ||
+                            '',
+                        );
                       } else {
                         params.delete('availability');
                       }
@@ -598,9 +616,21 @@ export default function Filters({
                     teachingSemester ||
                     availableSemesters[availableSemesters.length - 1]
                   }
-                  onChange={(e: SelectChangeEvent<string>) =>
-                    setTeachingSemester(e.target.value)
-                  }
+                  onChange={(e: SelectChangeEvent<string>) => {
+                    const newSemester = e.target.value;
+                    setTeachingSemester(newSemester);
+                    if (filterNextSem) {
+                      const params = new URLSearchParams(
+                        searchParams.toString(),
+                      );
+                      params.set('availability', newSemester);
+                      window.history.replaceState(
+                        null,
+                        '',
+                        `${pathname}?${params.toString()}`,
+                      );
+                    }
+                  }}
                   displayEmpty
                   disabled={!filterNextSem}
                   renderValue={(v) =>

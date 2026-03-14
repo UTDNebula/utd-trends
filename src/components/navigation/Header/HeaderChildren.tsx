@@ -1,5 +1,6 @@
 'use client';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import {
   WhatsNewBadge,
   WhatsNewButton,
@@ -125,6 +126,7 @@ function HeaderChildrenInner(props: HeaderProps) {
   const [openWhatsNewModal, setOpenWhatsNewModal] = useState(false);
   const closeWhatsNewModal = useCallback(() => setOpenWhatsNewModal(false), []);
 
+  const { teachingSemester } = useSharedState();
   const [dashboardSearchTerms, setDashboardSearchTerms] = useState<
     null | string
   >(null);
@@ -141,7 +143,9 @@ function HeaderChildrenInner(props: HeaderProps) {
     href: props.isPlanner
       ? dashboardSearchTerms != null
         ? '/dashboard?' + dashboardSearchTerms
-        : '/dashboard?availability=true'
+        : teachingSemester
+          ? '/dashboard?availability=' + teachingSemester
+          : '/dashboard'
       : '/planner',
     onClick: () =>
       !props.isPlanner

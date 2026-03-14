@@ -9,31 +9,39 @@ import SearchBar, {
 } from '@/components/search/SearchBar/SearchBar';
 import { displaySemesterName } from '@/modules/semesters';
 import { searchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
-import { FormControl, FormControlLabel, Switch, Tooltip } from '@mui/material';
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Tooltip,
+} from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material/Select';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useState, useTransition } from 'react';
+import React, { useTransition } from 'react';
 
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
 export default function Home() {
-  const { teachingSemester } = useSharedState();
+  const { teachingSemester, setTeachingSemester, availableSemesters } =
+    useSharedState();
   const router = useRouter();
 
   //for spinner after router.push
   const [isPending, startTransition] = useTransition();
 
-  const [filterNextSem, setFilterNextSem] = useState('true');
-
   async function searchOptionChosen(chosenOptions: SearchQuery[]) {
     if (chosenOptions.length) {
-      const searchParams = new URLSearchParams({
+      const params = new URLSearchParams({
         searchTerms: chosenOptions.map(searchQueryLabel).join(','),
-        availability: filterNextSem,
       });
+      if (teachingSemester) {
+        params.set('availability', teachingSemester);
+      }
       startTransition(() => {
-        router.push(`/dashboard?${searchParams.toString()}`);
+        router.push(`/dashboard?${params.toString()}`);
       });
       // add to recent searches
       const chosenRecentOptions = chosenOptions.map((option) => ({
@@ -94,27 +102,40 @@ export default function Home() {
           input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
           isPending={isPending}
         />
-        {/* Teaching Next Semester switch*/}
-        <Tooltip title="Select Availability" placement="bottom-start">
-          <FormControl size="small" className="min-w-max flex-row items-center">
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={filterNextSem == 'true'}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    setFilterNextSem(event.target.checked ? 'true' : 'false');
-                  }}
-                />
-              }
-              label={
-                teachingSemester === ''
-                  ? 'Teaching Next Semester'
-                  : 'Teaching in ' +
-                    displaySemesterName(teachingSemester, false)
-              }
-            />
-          </FormControl>
-        </Tooltip>
+        {/* Teaching in semester selector */}
+        {availableSemesters.length > 0 && (
+          <Tooltip
+            title="Filter results to courses teaching in this semester"
+            placement="bottom-start"
+          >
+            <FormControl size="small" className="min-w-[160px]">
+              <InputLabel id="home-teaching-semester">Teaching in</InputLabel>
+              <Select
+                labelId="home-teaching-semester"
+                label="Teaching in"
+                size="small"
+                value={
+                  teachingSemester ||
+                  availableSemesters[availableSemesters.length - 1]
+                }
+                onChange={(e: SelectChangeEvent<string>) =>
+                  setTeachingSemester(e.target.value)
+                }
+                displayEmpty
+                renderValue={(v) =>
+                  v ? displaySemesterName(v, false) : 'Teaching Next Semester'
+                }
+                className="bg-white dark:bg-haiti"
+              >
+                {availableSemesters.map((sem) => (
+                  <MenuItem key={sem} value={sem}>
+                    {displaySemesterName(sem, false)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Tooltip>
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 'use client';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import SingleGradesInfo, {
   LoadingSingleGradesInfo,
 } from '@/components/common/SingleGradesInfo/SingleGradesInfo';
@@ -233,18 +234,22 @@ interface Props {
   grades: GradesData;
 }
 
-function link(linkText: string) {
+function link(linkText: string, availabilitySemester?: string) {
+  const params = new URLSearchParams({
+    searchTerms: linkText.replace(/\s+/g, '+'),
+  });
+  if (availabilitySemester) {
+    params.set('availability', availabilitySemester);
+  }
   return (
-    <a
-      href={`dashboard?searchTerms=${linkText.replace(/\s+/g, '+')}&availability=true`}
-      className="underline"
-    >
+    <a href={`dashboard?${params.toString()}`} className="underline">
       {linkText}
     </a>
   );
 }
 
 export default function CourseOverview({ course, courseData, grades }: Props) {
+  const { teachingSemester } = useSharedState();
   let courseComponent = null;
   if (
     courseData.message === 'success' &&
@@ -279,7 +284,7 @@ export default function CourseOverview({ course, courseData, grades }: Props) {
               return (
                 <span key={i}>
                   {text}
-                  {link(linkTextSameAs[i])}
+                  {link(linkTextSameAs[i], teachingSemester)}
                 </span>
               );
             }
@@ -294,7 +299,7 @@ export default function CourseOverview({ course, courseData, grades }: Props) {
               return (
                 <span key={i}>
                   {text}
-                  {link(linkTextDescription[i])}
+                  {link(linkTextDescription[i], teachingSemester)}
                 </span>
               );
             }
@@ -318,7 +323,7 @@ export default function CourseOverview({ course, courseData, grades }: Props) {
                   return (
                     <span key={i}>
                       {text}
-                      {link(linkTextReqs[i])}
+                      {link(linkTextReqs[i], teachingSemester)}
                     </span>
                   );
                 }
