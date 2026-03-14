@@ -1,12 +1,12 @@
 'use client';
 
 import Background from '@/../public/background.png';
+import { useSharedState } from '@/app/SharedStateProvider';
 import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
 import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 import SearchBar, {
   updateRecentSearches,
 } from '@/components/search/SearchBar/SearchBar';
-import { useSharedState } from '@/app/SharedStateProvider';
 import { displaySemesterName } from '@/modules/semesters';
 import { searchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
 import { FormControl, FormControlLabel, Switch, Tooltip } from '@mui/material';
@@ -106,12 +106,12 @@ export default function Home() {
                   }}
                 />
               }
-                label={
-                  teachingSemester === ''
-                    ? 'Teaching Next Semester'
-                    : 'Teaching in ' +
-                      displaySemesterName(teachingSemester, false)
-                }
+              label={
+                teachingSemester === ''
+                  ? 'Teaching Next Semester'
+                  : 'Teaching in ' +
+                    displaySemesterName(teachingSemester, false)
+              }
             />
           </FormControl>
         </Tooltip>

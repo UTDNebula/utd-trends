@@ -604,9 +604,7 @@ export default function Filters({
                   displayEmpty
                   disabled={!filterNextSem}
                   renderValue={(v) =>
-                    v
-                      ? displaySemesterName(v, false)
-                      : 'Teaching Next Semester'
+                    v ? displaySemesterName(v, false) : 'Teaching Next Semester'
                   }
                   className="min-w-[120px]"
                 >
