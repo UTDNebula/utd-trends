@@ -69,7 +69,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [availableSemesters, defaultTeachingSemester] = await Promise.all([
+  const [availableSemesters, defaultTeachingSemester]: [string[], string] = await Promise.all([
     fetchAvailableSemesters().catch(() => []),
     fetchLatestSemester().catch(() => ''),
   ]).then(([available, defaultSem]) => [
