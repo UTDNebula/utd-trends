@@ -62,7 +62,13 @@ export default function PlannerCoursesTable() {
     }
     setOpenConflictMessage(false);
   };
-  const allResults = useSearchresults(planner);
+  const effectiveSemester =
+    teachingSemester || availableSemesters[availableSemesters.length - 1] || '';
+  const plannerForSemester = planner.filter(
+    (entry) => entry.semester === effectiveSemester,
+  );
+  const queriesForSemester = plannerForSemester.map((e) => e.query);
+  const allResults = useSearchresults(queriesForSemester);
   const latestSections = allResults.map((r) =>
     r.isSuccess
       ? r.data.sections.filter(
@@ -70,8 +76,6 @@ export default function PlannerCoursesTable() {
         )
       : [],
   );
-  const effectiveSemester =
-    teachingSemester || availableSemesters[availableSemesters.length - 1] || '';
 
   return (
     <>
@@ -86,14 +90,14 @@ export default function PlannerCoursesTable() {
               : '')}
         </Typography>
         {availableSemesters.length > 0 && (
-          <FormControl size="small" className="min-w-[140px]">
+          <FormControl size="small" className="min-w-35">
             <InputLabel id="planner-teaching-semester">Semester</InputLabel>
             <Select
               labelId="planner-teaching-semester"
               label="Semester"
               size="small"
               value={effectiveSemester}
-              onChange={(e: SelectChangeEvent<string>) => {
+              onChange={(e: SelectChangeEvent) => {
                 const newSemester = e.target.value;
                 setTeachingSemester(newSemester);
                 const params = new URLSearchParams(searchParams.toString());
@@ -117,33 +121,31 @@ export default function PlannerCoursesTable() {
         )}
       </div>
       <div className="flex flex-col gap-4 mb-4 sm:mb-0 pt-4">
-        {planner
-          .toSorted((query1, query2) => {
-            return searchQueryLabel(removeSection(query1)).localeCompare(
-              searchQueryLabel(removeSection(query2)),
-            );
-          })
-          .map((query) => {
+        {plannerForSemester
+          .toSorted((a, b) =>
+            searchQueryLabel(removeSection(a.query)).localeCompare(
+              searchQueryLabel(removeSection(b.query)),
+            ),
+          )
+          .map((entry) => {
+            const query = entry.query;
             return (
               <PlannerCard
-                key={searchQueryLabel(query)}
+                key={searchQueryLabel(query) + entry.semester}
                 query={query}
                 setPlannerSection={setPlannerSection}
                 removeFromPlanner={() => {
-                  removeFromPlanner(query);
+                  removeFromPlanner(query, entry.semester);
                 }}
-                selectedSections={planner
-                  .map((searchQuery) =>
-                    searchQueryMultiSectionSplit(searchQuery),
+                selectedSections={plannerForSemester
+                  .map((e) => searchQueryMultiSectionSplit(e.query))
+                  .flatMap((queries, idx) =>
+                    queries.map((q) =>
+                      latestSections[idx]?.find(
+                        (section) => section.section_number === q.sectionNumber,
+                      ),
+                    ),
                   )
-                  .flatMap((queries, idx) => {
-                    return queries.map((query) => {
-                      return latestSections[idx].find(
-                        (section) =>
-                          section.section_number === query.sectionNumber,
-                      );
-                    });
-                  })
                   .filter((section) => typeof section !== 'undefined')}
                 openConflictMessage={() => setOpenConflictMessage(true)}
                 color={

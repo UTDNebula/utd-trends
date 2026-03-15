@@ -22,8 +22,10 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
     (s) => s.academic_session.name === teachingSemester,
   );
 
-  const inPlanner = planner.some((obj) =>
-    searchQueryEqual(obj, searchResult.searchQuery),
+  const inPlanner = planner.some(
+    (entry) =>
+      searchQueryEqual(entry.query, searchResult.searchQuery) &&
+      entry.semester === teachingSemester,
   );
 
   const courseOnlySections = searchResult.sections.filter(
@@ -58,11 +60,14 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
           onClick={(e) => {
             e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
             if (inPlanner) {
-              removeFromPlanner(searchResult.searchQuery);
+              removeFromPlanner(searchResult.searchQuery, teachingSemester);
             } else {
-              addToPlanner(searchResult.searchQuery);
+              addToPlanner(searchResult.searchQuery, teachingSemester);
               if (addJustCourseToo) {
-                addToPlanner(convertToCourseOnly(searchResult.searchQuery));
+                addToPlanner(
+                  convertToCourseOnly(searchResult.searchQuery),
+                  teachingSemester,
+                );
               }
             }
           }}

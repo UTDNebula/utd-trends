@@ -9,11 +9,29 @@ import {
   searchQueryEqual,
   searchQueryLabel,
   sectionCanOverlap,
+  type PlannerEntry,
   type SearchQuery,
   type SearchQueryMultiSection,
   type SearchResult,
 } from '@/types/SearchQuery';
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+
+function isPlannerEntry(
+  x: SearchQueryMultiSection | PlannerEntry,
+): x is PlannerEntry {
+  return 'semester' in x;
+}
+
+function migratePlanner(
+  raw: (SearchQueryMultiSection | PlannerEntry)[],
+  defaultSemester: string,
+): PlannerEntry[] {
+  return raw.map((item) =>
+    isPlannerEntry(item)
+      ? item
+      : { query: item as SearchQueryMultiSection, semester: defaultSemester },
+  );
+}
 
 type SetterValue<T> = T | ((prev: T) => T);
 type Setter<T> = (value: SetterValue<T>) => void;
@@ -24,9 +42,9 @@ const SharedStateContext = createContext<
       addToCompare: (query: SearchResult) => void;
       removeFromCompare: (query: SearchResult) => void;
       compareColorMap: { [key: string]: string };
-      planner: SearchQueryMultiSection[];
-      addToPlanner: (query: SearchQuery) => void;
-      removeFromPlanner: (query: SearchQuery) => void;
+      planner: PlannerEntry[];
+      addToPlanner: (query: SearchQuery, semester: string) => void;
+      removeFromPlanner: (query: SearchQuery, semester: string) => void;
       setPlannerSection: (query: SearchQuery, section: string) => void;
       plannerColorMap: {
         [key: string]: { fill: string; outline: string; font: string };
@@ -92,78 +110,116 @@ export function SharedStateProvider({
     ]),
   );
 
-  //Store course+prof combos in planner
-  const [planner, setPlanner] = usePersistantState<SearchQueryMultiSection[]>(
-    'planner',
-    [],
-  );
+  //Store planner entries (query + semester added for)
+  const [plannerRaw, setPlanner] = usePersistantState<
+    (SearchQueryMultiSection | PlannerEntry)[]
+  >('planner', []);
 
-  //Add a course+prof combo to planner (happens from search results)
-  function addToPlanner(query: SearchQuery) {
-    setPlanner((prev: SearchQueryMultiSection[]) => {
-      //If not already there
-      if (prev.findIndex((obj) => searchQueryEqual(obj, query)) === -1) {
-        //Add to list
-        return prev.concat([query]);
-      }
-      return prev;
+  // Migrate old format (SearchQueryMultiSection[]) to PlannerEntry[]
+  const planner: PlannerEntry[] = plannerRaw.every(isPlannerEntry)
+    ? (plannerRaw as PlannerEntry[])
+    : migratePlanner(plannerRaw, defaultTeachingSemester);
+
+  useEffect(() => {
+    if (plannerRaw.length > 0 && !plannerRaw.every(isPlannerEntry)) {
+      setPlanner(migratePlanner(plannerRaw, defaultTeachingSemester));
+    }
+  }, [plannerRaw, defaultTeachingSemester, setPlanner]);
+
+  //Add a course+prof combo to planner (happens from search results); semester = selected semester when adding
+  function addToPlanner(query: SearchQuery, semester: string) {
+    setPlanner((prev: (SearchQueryMultiSection | PlannerEntry)[]) => {
+      const entries = prev.every(isPlannerEntry)
+        ? (prev as PlannerEntry[])
+        : migratePlanner(prev, defaultTeachingSemester);
+      if (
+        entries.some(
+          (e) => searchQueryEqual(e.query, query) && e.semester === semester,
+        )
+      )
+        return entries;
+      return entries.concat([
+        { query: query as SearchQueryMultiSection, semester },
+      ]);
     });
   }
 
-  //Remove a course+prof combo from compare
-  function removeFromPlanner(query: SearchQuery) {
-    setPlanner((prev: SearchQueryMultiSection[]) => {
-      //If already there
-      if (planner.some((obj) => searchQueryEqual(obj, query))) {
-        //Remove to list
-        return prev.filter((el) => !searchQueryEqual(el, query));
-      }
-      return prev;
+  function removeFromPlanner(query: SearchQuery, semester: string) {
+    setPlanner((prev: (SearchQueryMultiSection | PlannerEntry)[]) => {
+      const entries = prev.every(isPlannerEntry)
+        ? (prev as PlannerEntry[])
+        : migratePlanner(prev, defaultTeachingSemester);
+      return entries.filter(
+        (e) => !(searchQueryEqual(e.query, query) && e.semester === semester),
+      );
     });
   }
 
   function setPlannerSection(query: SearchQuery, section: string) {
-    if (
-      !planner.find((course) =>
-        searchQueryEqual(removeSection(course), removeSection(query)),
-      )
-    )
-      // if section's course-prof combo doesn't exist
-      setPlanner((prev: SearchQueryMultiSection[]) => prev.concat(query)); // add it to MyPlanner
-    setPlanner((prev: SearchQueryMultiSection[]) =>
-      prev.map((course) => {
+    const currentEntries = planner.every(isPlannerEntry)
+      ? planner
+      : migratePlanner(plannerRaw, defaultTeachingSemester);
+    const matchIdx = currentEntries.findIndex(
+      (e) =>
+        e.semester === teachingSemester &&
+        searchQueryEqual(removeSection(e.query), removeSection(query)),
+    );
+    if (matchIdx === -1) {
+      setPlanner((prev: (SearchQueryMultiSection | PlannerEntry)[]) => {
+        const entries = prev.every(isPlannerEntry)
+          ? (prev as PlannerEntry[])
+          : migratePlanner(prev, defaultTeachingSemester);
+        return entries.concat([
+          {
+            query: query as SearchQueryMultiSection,
+            semester: teachingSemester,
+          },
+        ]);
+      });
+    }
+    setPlanner((prev: (SearchQueryMultiSection | PlannerEntry)[]) => {
+      const entries = prev.every(isPlannerEntry)
+        ? (prev as PlannerEntry[])
+        : migratePlanner(prev, defaultTeachingSemester);
+      return entries.map((entry, idx) => {
+        if (idx !== matchIdx) return entry;
+        const course = entry.query;
         if (searchQueryEqual(removeSection(course), removeSection(query))) {
-          // combo match
           if (typeof course.sectionNumbers === 'undefined') {
-            return { ...course, sectionNumbers: [section] };
+            return {
+              ...entry,
+              query: { ...course, sectionNumbers: [section] },
+            };
           }
           if (course.sectionNumbers.includes(section)) {
-            // unselect section
             return {
-              ...course,
-              sectionNumbers: course.sectionNumbers.filter(
-                (s) => s !== section,
-              ),
+              ...entry,
+              query: {
+                ...course,
+                sectionNumbers: course.sectionNumbers.filter(
+                  (s) => s !== section,
+                ),
+              },
             };
-          } else {
-            // select/add section
-            let newSections = course.sectionNumbers;
-            if (!sectionCanOverlap(section)) {
-              newSections = newSections.filter((s) => sectionCanOverlap(s));
-            }
-            return {
+          }
+          let newSections = course.sectionNumbers;
+          if (!sectionCanOverlap(section)) {
+            newSections = newSections.filter((s) => sectionCanOverlap(s));
+          }
+          return {
+            ...entry,
+            query: {
               ...course,
               sectionNumbers: [section]
                 .concat(newSections)
                 .filter(
-                  (section, index, self) =>
-                    self.findIndex((s) => s.charAt(0) == section.charAt(0)) ===
-                    index,
-                ), // keep only one of each section type (X##)
-            };
-          }
-        } else if (
-          // not combo match, but same course match -- to potentialy remove sections from a different combo
+                  (s, i, self) =>
+                    self.findIndex((x) => x.charAt(0) === s.charAt(0)) === i,
+                ),
+            },
+          };
+        }
+        if (
           searchQueryEqual(
             convertToCourseOnly(course),
             convertToCourseOnly(query),
@@ -171,33 +227,38 @@ export function SharedStateProvider({
           typeof course.sectionNumbers !== 'undefined'
         ) {
           if (sectionCanOverlap(section))
-            // if new section can overlap, keep all existing sections (minus duplicate starting digit)
             return {
-              ...course,
-              sectionNumbers: course.sectionNumbers.filter(
-                (sec, idx, self) =>
-                  self.findIndex((s) => s.charAt(0) == sec.charAt(0)) == idx,
-              ),
+              ...entry,
+              query: {
+                ...course,
+                sectionNumbers: course.sectionNumbers.filter(
+                  (sec, i, self) =>
+                    self.findIndex((s) => s.charAt(0) === sec.charAt(0)) === i,
+                ),
+              },
             };
-
           return {
-            // else, new section cannot overlap, so remove all existing non-overlapping sections
-            ...course,
-            sectionNumbers: course.sectionNumbers.filter((s) =>
-              sectionCanOverlap(s),
-            ),
+            ...entry,
+            query: {
+              ...course,
+              sectionNumbers: course.sectionNumbers.filter((s) =>
+                sectionCanOverlap(s),
+              ),
+            },
           };
         }
-        return course;
-      }),
-    );
+        return entry;
+      });
+    });
   }
 
   const plannerColorMap = Object.fromEntries(
-    removeDuplicates(planner.map(convertToCourseOnly)).map((key, index) => [
-      searchQueryLabel(key),
-      plannerColors[index % plannerColors.length],
-    ]),
+    removeDuplicates(planner.map((e) => convertToCourseOnly(e.query))).map(
+      (key, index) => [
+        searchQueryLabel(key),
+        plannerColors[index % plannerColors.length],
+      ],
+    ),
   );
 
   const [courseNames, setCourseNames] = useState<{
