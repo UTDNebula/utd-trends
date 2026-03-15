@@ -69,13 +69,15 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [availableSemesters, defaultTeachingSemester] = await Promise.all([
-    fetchAvailableSemesters().catch(() => []),
-    fetchLatestSemester().catch(() => ''),
-  ]).then(([available, defaultSem]) => [
-    available,
-    defaultSem || (available.length > 0 ? available[available.length - 1] : ''),
-  ]);
+  const [availableSemesters, defaultTeachingSemester]: [string[], string] =
+    await Promise.all([
+      fetchAvailableSemesters().catch(() => []),
+      fetchLatestSemester().catch(() => ''),
+    ]).then(([available, defaultSem]) => [
+      available,
+      defaultSem ||
+        (available.length > 0 ? available[available.length - 1] : ''),
+    ]);
   return (
     <html lang="en">
       {process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' && (
