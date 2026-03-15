@@ -84,8 +84,6 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
     return !hasConflict(section, selectedSections); // Keep sections with no conflicts
   });
 
-  console.log(sectionsThatFitPlannerSchedule.length);
-
   return sectionsThatFitPlannerSchedule.length > 0 ? (
     <Badge color="secondary" badgeContent=" ">
       <Tooltip
