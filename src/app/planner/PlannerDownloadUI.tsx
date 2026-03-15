@@ -11,13 +11,10 @@ export default function PlannerDownloadUI({
 }: {
   downloadRef: React.RefObject<HTMLDivElement | null>;
 }) {
-  const { latestSemester } = useSharedState();
+  const { teachingSemester } = useSharedState();
 
   return (
-    <div
-      className="bg-black p-4 absolute left-[-9999px] top-0"
-      ref={downloadRef}
-    >
+    <div className="bg-black p-4 absolute -left-full top-0" ref={downloadRef}>
       <div className="flex flex-row mb-4 justify-start gap-2 pl-2 items-center">
         <div className="font-display flex gap-2 items-center select-none text-white">
           <div className="flex flex-row items-center max-sm:hidden">
@@ -33,7 +30,7 @@ export default function PlannerDownloadUI({
           </div>
         </div>
         <h1 className="ml-auto mr-2 text-white">
-          {displaySemesterName(latestSemester, false)}
+          {displaySemesterName(teachingSemester, false)}
         </h1>
       </div>
       <PlannerSchedule />
