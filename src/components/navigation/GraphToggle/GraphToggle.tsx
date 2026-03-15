@@ -2,7 +2,12 @@
 
 import BarChartIcon from '@mui/icons-material/BarChart';
 import TimelineIcon from '@mui/icons-material/Timeline';
-import { Skeleton, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
+import {
+  Skeleton,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
+} from '@mui/material';
 import React, { useState } from 'react';
 
 type Props = {
