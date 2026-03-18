@@ -99,3 +99,19 @@ export function matchSectionTypesFromSectionNumber(
       ))
   );
 }
+
+const order = { S: 1, U: 2, F: 3 };
+
+export function compareSemesters2(a: string, b: string) {
+  const yearA = parseInt(a.slice(0, 2));
+  const yearB = parseInt(b.slice(0, 2));
+
+  if (yearA !== yearB) {
+    return yearA - yearB;
+  }
+
+  const seasonA = order[a[2] as keyof typeof order];
+  const seasonB = order[b[2] as keyof typeof order];
+
+  return seasonA - seasonB;
+}
