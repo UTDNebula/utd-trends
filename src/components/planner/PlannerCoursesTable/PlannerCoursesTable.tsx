@@ -4,6 +4,7 @@ import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerCard, {
   LoadingPlannerCard,
 } from '@/components/planner/PlannerCoursesTable/PlannerCard';
+import { useSnackbar } from '@/contexts/SnackbarContext';
 import { useSearchresults } from '@/modules/plannerFetch';
 import { displaySemesterName } from '@/modules/semesters';
 import {
@@ -12,8 +13,8 @@ import {
   searchQueryLabel,
   searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
-import { Alert, Snackbar, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import { Typography } from '@mui/material';
+import React, { useEffect } from 'react';
 
 export function LoadingPlannerCoursesTable() {
   const { planner } = useSharedState();
@@ -36,18 +37,18 @@ export default function PlannerCoursesTable() {
   const {
     planner,
     removeFromPlanner,
-    setPlannerSection,
+    setPreviewCourses,
     plannerColorMap,
     latestSemester,
   } = useSharedState();
 
-  const [openConflictMessage, setOpenConflictMessage] = useState(false);
-  const conflictMessageClose = (_: unknown, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpenConflictMessage(false);
-  };
+  const { showConflictMessage } = useSnackbar();
+
+  // Clear preview courses on component mount, because the tabs will be closed
+  useEffect(() => {
+    setPreviewCourses([]);
+  }, [setPreviewCourses]);
+
   const allResults = useSearchresults(planner);
   const latestSections = allResults.map((r) =>
     r.isSuccess
@@ -75,7 +76,6 @@ export default function PlannerCoursesTable() {
               <PlannerCard
                 key={searchQueryLabel(query)}
                 query={query}
-                setPlannerSection={setPlannerSection}
                 removeFromPlanner={() => {
                   removeFromPlanner(query);
                 }}
@@ -92,7 +92,7 @@ export default function PlannerCoursesTable() {
                     });
                   })
                   .filter((section) => typeof section !== 'undefined')}
-                openConflictMessage={() => setOpenConflictMessage(true)}
+                openConflictMessage={showConflictMessage}
                 color={
                   plannerColorMap[searchQueryLabel(convertToCourseOnly(query))]
                 }
@@ -101,20 +101,6 @@ export default function PlannerCoursesTable() {
             );
           })}
       </div>
-      <Snackbar
-        open={openConflictMessage}
-        autoHideDuration={6000}
-        onClose={conflictMessageClose}
-      >
-        <Alert
-          onClose={conflictMessageClose}
-          severity="error"
-          variant="filled"
-          className="w-full"
-        >
-          This section conflicts with your schedule!
-        </Alert>
-      </Snackbar>
     </>
   );
 }

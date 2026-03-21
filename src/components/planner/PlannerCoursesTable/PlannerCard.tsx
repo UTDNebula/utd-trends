@@ -1,5 +1,6 @@
 'use client';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import { calculateGrades } from '@/modules/fetchGrades';
@@ -9,9 +10,9 @@ import {
   convertToCourseOnly,
   convertToProfOnly,
   removeSection,
+  searchQueryEqual,
   searchQueryLabel,
   sectionCanOverlap,
-  type SearchQuery,
   type SearchQueryMultiSection,
   type SearchResult,
 } from '@/types/SearchQuery';
@@ -73,71 +74,6 @@ export function LoadingPlannerCard() {
       </div>
     </Box>
   );
-}
-
-function parseTime(time: string): number {
-  const [hour, minute] = time.split(':').map((s) => parseInt(s));
-  const isPM = time.includes('pm');
-  let hourNum = hour;
-  if (isPM && hour !== 12) {
-    hourNum += 12;
-  } else if (!isPM && hour === 12) {
-    hourNum = 0; // Midnight case
-  }
-  return hourNum + minute / 60;
-}
-
-function hasConflict(
-  newSection: Sections['all'][number],
-  selectedSections: Sections['all'],
-): boolean {
-  if (!newSection || !selectedSections) return false;
-
-  for (const selectedSection of selectedSections) {
-    for (const newMeeting of newSection.meetings) {
-      if (!newMeeting || !newMeeting.meeting_days) continue;
-
-      for (const existingMeeting of selectedSection.meetings) {
-        if (!existingMeeting || !existingMeeting.meeting_days) continue;
-
-        // Check if days overlap
-        const overlappingDays = newMeeting.meeting_days.some((day) =>
-          existingMeeting.meeting_days.includes(day),
-        );
-
-        if (overlappingDays) {
-          // Convert times to comparable values
-          const newStart = parseTime(newMeeting.start_time);
-          const newEnd = parseTime(newMeeting.end_time);
-          const existingStart = parseTime(existingMeeting.start_time);
-          const existingEnd = parseTime(existingMeeting.end_time);
-
-          // Check if times overlap
-          if (
-            (newStart < existingEnd && newStart >= existingStart) ||
-            (newEnd > existingStart && newEnd <= existingEnd) ||
-            (newStart <= existingStart && newEnd >= existingEnd) ||
-            (newStart >= existingStart && newEnd <= existingEnd)
-          ) {
-            if (
-              selectedSection.course_details &&
-              selectedSection.course_details[0] &&
-              newSection.course_details &&
-              newSection.course_details[0] &&
-              selectedSection.course_details[0].subject_prefix ==
-                newSection.course_details[0].subject_prefix &&
-              selectedSection.course_details[0].course_number ==
-                newSection.course_details[0].course_number
-            )
-              return false; // if times overlap, but same course, we can switch it out without conflict
-            return true; // Conflict detected
-          }
-        }
-      }
-    }
-  }
-
-  return false;
 }
 
 function SectionTableHead(props: { hasMultipleDateRanges: boolean }) {
@@ -229,13 +165,13 @@ type SectionTableRowProps = {
   syllabusSections: SectionsData;
   course: SearchQueryMultiSection;
   lastRow: boolean;
-  setPlannerSection: (searchQuery: SearchQuery, section: string) => void;
   hasMultipleDateRanges: boolean;
   selectedSections: Sections['all'];
   openConflictMessage: () => void;
 };
 
 function SectionTableRow(props: SectionTableRowProps) {
+  const { setPlannerSection } = useSharedState();
   const isSelected = props.selectedSections.some(
     (el) =>
       el.section_number == props.data.section_number && // check the section number
@@ -273,31 +209,11 @@ function SectionTableRow(props: SectionTableRowProps) {
           <Radio
             checked={isSelected}
             onClick={() => {
-              if (
-                !isSelected &&
-                hasConflict(props.data, props.selectedSections)
-              ) {
-                // Check for conflict
-                props.openConflictMessage();
-                return; // Prevent section selection
-              }
-
-              props.setPlannerSection(
-                {
-                  prefix: props.data.course_details![0].subject_prefix,
-                  number: props.data.course_details![0].course_number,
-                  profFirst:
-                    props.data.professor_details &&
-                    props.data.professor_details[0] // always use the first prof
-                      ? props.data.professor_details[0].first_name
-                      : undefined,
-                  profLast:
-                    props.data.professor_details &&
-                    props.data.professor_details[0]
-                      ? props.data.professor_details[0].last_name
-                      : undefined,
-                } as SearchQuery,
-                props.data.section_number,
+              setPlannerSection(
+                props.data,
+                props.selectedSections,
+                isSelected,
+                props.openConflictMessage,
               ); // using the section's course and prof details every time ensures overall matches de/selection behavior
             }}
           />
@@ -424,7 +340,6 @@ function MeetingChip(props: {
 
 type PlannerCardProps = {
   query: SearchQueryMultiSection;
-  setPlannerSection: (searchQuery: SearchQuery, section: string) => void;
   removeFromPlanner: () => void;
   selectedSections: Sections['all'];
   openConflictMessage: () => void;
@@ -438,13 +353,41 @@ export default function PlannerCard(props: PlannerCardProps) {
   const [open, setOpen] = useState(false);
   const { isSuccess, data: result } = useSearchResult(props.query);
   const [whichOpen, setWhichOpen] = useState<'sections' | 'grades'>('sections');
-
+  const { setPreviewCourses } = useSharedState();
   if (!isSuccess) {
     return <LoadingPlannerCard />;
   }
   function handleOpen() {
     if (whichOpen === 'sections' || whichOpen === 'grades') {
-      setOpen(!open);
+      const newOpen = !open;
+      setOpen(newOpen);
+
+      // Update previewCourses
+      if (newOpen) {
+        setPreviewCourses((prev) => {
+          if (
+            prev.some((course) =>
+              searchQueryEqual(
+                removeSection(course),
+                removeSection(props.query),
+              ),
+            )
+          ) {
+            return prev;
+          }
+          return [...prev, props.query];
+        });
+      } else {
+        setPreviewCourses((prev) =>
+          prev.filter(
+            (course) =>
+              !searchQueryEqual(
+                removeSection(course),
+                removeSection(props.query),
+              ),
+          ),
+        );
+      }
     }
   }
 
@@ -729,7 +672,6 @@ export default function PlannerCard(props: PlannerCardProps) {
                     lastRow={
                       index === latestMatchedSections.sections.length - 1
                     }
-                    setPlannerSection={props.setPlannerSection}
                     selectedSections={props.selectedSections}
                     openConflictMessage={props.openConflictMessage}
                     hasMultipleDateRanges={hasMultipleDateRanges}
@@ -750,7 +692,6 @@ export default function PlannerCard(props: PlannerCardProps) {
               <PlannerCard
                 key={searchQueryLabel(props.query) + ' extra sections'}
                 query={props.query}
-                setPlannerSection={props.setPlannerSection}
                 removeFromPlanner={props.removeFromPlanner}
                 selectedSections={props.selectedSections}
                 openConflictMessage={props.openConflictMessage}
@@ -775,7 +716,6 @@ export default function PlannerCard(props: PlannerCardProps) {
               <PlannerCard
                 key={searchQueryLabel(props.query) + ' lab sections'}
                 query={props.query}
-                setPlannerSection={props.setPlannerSection}
                 removeFromPlanner={props.removeFromPlanner}
                 selectedSections={props.selectedSections}
                 openConflictMessage={props.openConflictMessage}
@@ -798,7 +738,6 @@ export default function PlannerCard(props: PlannerCardProps) {
               <PlannerCard
                 key={searchQueryLabel(props.query) + ' exam sections'}
                 query={props.query}
-                setPlannerSection={props.setPlannerSection}
                 removeFromPlanner={props.removeFromPlanner}
                 selectedSections={props.selectedSections}
                 openConflictMessage={props.openConflictMessage}
