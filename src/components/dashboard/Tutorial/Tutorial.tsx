@@ -1,15 +1,35 @@
 'use client';
 
+import usePersistantState from '@/modules/usePersistantState';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import CloseIcon from '@mui/icons-material/Close';
-import { Backdrop, Button, Checkbox, IconButton, Popover } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import {
+  Backdrop,
+  Button,
+  Checkbox,
+  IconButton,
+  ListItemText,
+  MenuItem,
+  Popover,
+  Tooltip,
+} from '@mui/material';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from 'react';
+
+const cacheIndex = 0; //Increment this to open the popup for all users on next deployment
 
 type TutorialPopupProps = {
   element: Element;
   open: boolean;
   incrementStep: () => void;
-  close: () => void;
+  closeTutorial: () => void;
   title: string;
   buttonText: string;
   anchorOrigin: {
@@ -27,7 +47,7 @@ const TutorialPopup = ({
   element,
   open,
   incrementStep,
-  close,
+  closeTutorial,
   title,
   buttonText,
   anchorOrigin,
@@ -64,7 +84,7 @@ const TutorialPopup = ({
       className="pointer-events-auto"
       disableScrollLock={true}
       marginThreshold={0}
-      onClose={close}
+      onClose={closeTutorial}
     >
       <div
         className="p-2 flex flex-col items-start min-w-32 max-w-96"
@@ -73,7 +93,7 @@ const TutorialPopup = ({
       >
         <div className="flex w-full items-center gap-2 pl-2">
           <p className="text-lg font-bold">{title}</p>
-          <IconButton onClick={close} className="ml-auto">
+          <IconButton onClick={closeTutorial} className="ml-auto">
             <CloseIcon />
           </IconButton>
         </div>
@@ -170,21 +190,168 @@ const stepsTemplate: StepTemplate[] = [
   },
 ];
 
-type TutorialProps = {
+interface TutorialButtonProps {
+  handleCloseMenu: () => void;
+}
+
+export function TutorialButton({ handleCloseMenu }: TutorialButtonProps) {
+  const { tutorialHint, openTutorial } = useContext(TutorialContext);
+
+  return (
+    <>
+      {/* Shown on small screens */}
+      <div className="relative sm:hidden">
+        <div
+          className={
+            tutorialHint
+              ? 'absolute w-full h-1/2 translate-y-1/2 bg-royal dark:bg-cornflower-300 animate-ping'
+              : 'hidden'
+          }
+        />
+        <MenuItem
+          onClick={() => {
+            openTutorial();
+            handleCloseMenu();
+          }}
+          className={
+            tutorialHint ? 'bg-royal/20 dark:bg-cornflower-300/20' : ''
+          }
+        >
+          <ListItemIcon>
+            <HelpOutlineIcon />
+          </ListItemIcon>
+          <ListItemText>Tutorial</ListItemText>
+        </MenuItem>
+      </div>
+      {/* Shown on large screens */}
+      <div className="relative max-sm:hidden">
+        <div
+          className={
+            tutorialHint
+              ? 'absolute w-11 h-11 rounded-full bg-royal dark:bg-cornflower-300 animate-ping'
+              : 'hidden'
+          }
+        />
+        <div
+          className={
+            tutorialHint ? ' rounded-full bg-royal dark:bg-cornflower-300' : ''
+          }
+        >
+          <Tooltip title="Open Tutorial">
+            <IconButton
+              className="aspect-square"
+              size="medium"
+              onClick={openTutorial}
+            >
+              <HelpOutlineIcon
+                className={'text-3xl' + (tutorialHint ? ' text-white' : '')}
+              />
+            </IconButton>
+          </Tooltip>
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default function Tutorial() {
+  const { closeTutorial, place, setPlace, open, steps } =
+    useContext(TutorialContext);
+
+  return (
+    <>
+      <Backdrop sx={(theme) => ({ zIndex: theme.zIndex.modal })} open={open} />
+      {steps.map(({ content, ...otherProps }, index) => (
+        <TutorialPopup
+          key={index}
+          open={open && place === index}
+          incrementStep={() => {
+            if (place === steps.length - 1) {
+              closeTutorial();
+              return;
+            }
+            setPlace(place + 1);
+          }}
+          closeTutorial={closeTutorial}
+          buttonText={index === steps.length - 1 ? 'Done' : 'Next'}
+          {...otherProps}
+        >
+          {content}
+        </TutorialPopup>
+      ))}
+    </>
+  );
+}
+
+type TutorialContextType = {
+  tutorialHint: boolean;
+  closeTutorial: () => void;
+  openTutorial: () => void;
+  place: number;
+  setPlace: (place: number) => void;
   open: boolean;
-  close: () => void;
+  steps: Step[];
 };
 
-export default function Tutorial({ open, close }: TutorialProps) {
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [place, setPlace] = useState(0);
+/**
+ * Context for WhatsNew. Provides list of features, read status, and functions to modify read status
+ */
+export const TutorialContext = createContext<TutorialContextType>({
+  tutorialHint: false,
+  closeTutorial: () => {},
+  openTutorial: () => {},
+  place: -1,
+  setPlace: () => {},
+  open: false,
+  steps: [],
+});
 
-  useEffect(() => {
+type TutorialProviderProps = {
+  children: ReactNode;
+};
+
+/**
+ * Fetches info about the latest features from GitHub releases, then provides this data to its children
+ */
+export function TutorialProvider({ children }: TutorialProviderProps) {
+  const [tutorialState, setTutorialState] = usePersistantState<{
+    value: string;
+    cacheIndex: number;
+  } | null>(
+    'tutorialHint',
+    {
+      value: 'opened',
+      cacheIndex: cacheIndex,
+    },
+    true,
+    null,
+  );
+
+  let tutorialHint = false;
+  if (tutorialState === null || tutorialState.value !== 'opened') {
+    tutorialHint = true;
+  }
+
+  const setTutorialHint = () => {
+    setTutorialState({
+      value: 'opened',
+      cacheIndex: cacheIndex,
+    });
+  };
+
+  const [place, setPlace] = useState(-1);
+  const open = place !== -1;
+  const [steps, setSteps] = useState<Step[]>([]);
+  const closeTutorial = () => setPlace(-1);
+  const openTutorial = () => {
+    setPlace(0);
+    setTutorialHint();
+
     // For each element, set anchor based on `data-tutorial-id`
     const elements =
       document.querySelectorAll<HTMLElement>('[data-tutorial-id]');
     if (!elements.length) {
-      close();
+      closeTutorial();
       return;
     }
     const newSteps = [...stepsTemplate];
@@ -200,30 +367,21 @@ export default function Tutorial({ open, close }: TutorialProps) {
     setSteps(
       newSteps.filter((step) => typeof step.element !== 'undefined') as Step[],
     );
-    setPlace(0);
-  }, [open, close]);
+  };
 
   return (
-    <>
-      <Backdrop sx={(theme) => ({ zIndex: theme.zIndex.modal })} open={open} />
-      {steps.map(({ content, ...otherProps }, index) => (
-        <TutorialPopup
-          key={index}
-          open={open && place === index}
-          incrementStep={() => {
-            if (place === steps.length - 1) {
-              close();
-              return;
-            }
-            setPlace(place + 1);
-          }}
-          close={close}
-          buttonText={index === steps.length - 1 ? 'Done' : 'Next'}
-          {...otherProps}
-        >
-          {content}
-        </TutorialPopup>
-      ))}
-    </>
+    <TutorialContext.Provider
+      value={{
+        tutorialHint,
+        closeTutorial,
+        openTutorial,
+        place,
+        setPlace,
+        open,
+        steps,
+      }}
+    >
+      {children}
+    </TutorialContext.Provider>
   );
 }

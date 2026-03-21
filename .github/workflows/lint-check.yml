@@ -1,10 +1,10 @@
-name: Lint and Formatting Check
+name: Lint, Test, and Formatting Check
 
 on: push
 
 jobs:
   main:
-    name: Run ESLint + Prettier
+    name: Run ESLint, Jest, and Prettier
     runs-on: ubuntu-latest
 
     steps:
@@ -21,6 +21,9 @@ jobs:
 
       - name: Run ESLint
         run: npm run lint:check
+
+      - name: Run Jest
+        run: npm run test
 
       - name: Run Prettier
         run: npm run format:check

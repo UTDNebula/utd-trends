@@ -42,13 +42,17 @@ export type Course = {
 export default async function fetchCourse(
   query: SearchQuery,
 ): Promise<GenericFetchedData<Course>> {
-  const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
+  const API_URL = process.env.NEBULA_API_URL;
+  if (typeof API_URL !== 'string') {
+    return { message: 'error', data: 'API URL is undefined' };
+  }
+  const API_KEY = process.env.NEBULA_API_KEY;
   if (typeof API_KEY !== 'string') {
     return { message: 'error', data: 'API key is undefined' };
   }
 
   try {
-    const url = new URL('https://api.utdnebula.com/course');
+    const url = new URL(API_URL + 'course');
     if (typeof query.prefix === 'string' && typeof query.number === 'string') {
       url.searchParams.append('subject_prefix', query.prefix);
       url.searchParams.append('course_number', query.number);

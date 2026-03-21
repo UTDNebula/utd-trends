@@ -53,9 +53,13 @@ export type Sections = {
 };
 
 async function fetchSingleSections(query: SearchQuery): Promise<SectionsData> {
-  const API_KEY = process.env.REACT_APP_NEBULA_API_KEY;
+  const API_URL = process.env.NEBULA_API_URL;
+  if (typeof API_URL !== 'string') {
+    throw new Error('API URL is undefined');
+  }
+  const API_KEY = process.env.NEBULA_API_KEY;
   if (typeof API_KEY !== 'string') {
-    throw new Error('MISSING API KEY');
+    throw new Error('API key is undefined');
   }
 
   try {
@@ -65,11 +69,11 @@ async function fetchSingleSections(query: SearchQuery): Promise<SectionsData> {
     const profFirst = query.profFirst;
     const profLast = query.profLast;
     if (typeof prefix === 'string' && typeof number === 'string') {
-      url = new URL('https://api.utdnebula.com/course/sections/trends');
+      url = new URL(API_URL + 'course/sections/trends');
       url.searchParams.append('subject_prefix', prefix);
       url.searchParams.append('course_number', number);
     } else if (typeof profFirst === 'string' && typeof profLast === 'string') {
-      url = new URL('https://api.utdnebula.com/professor/sections/trends');
+      url = new URL(API_URL + 'professor/sections/trends');
       url.searchParams.append('first_name', profFirst);
       url.searchParams.append('last_name', profLast);
     }

@@ -2,7 +2,12 @@
 
 import BarChartIcon from '@mui/icons-material/BarChart';
 import TimelineIcon from '@mui/icons-material/Timeline';
-import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import {
+  Skeleton,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
+} from '@mui/material';
 import React, { useState } from 'react';
 
 type Props = {
@@ -50,12 +55,16 @@ export default function GraphToggle(props: Props) {
         orientation="vertical"
         aria-label="chart type"
       >
-        <ToggleButton value="bar" aria-label="line chart">
-          <BarChartIcon />
-        </ToggleButton>
-        <ToggleButton value="line" aria-label="bar chart">
-          <TimelineIcon />
-        </ToggleButton>
+        <Tooltip title="Bar Chart" placement="top">
+          <ToggleButton value="bar" aria-label="bar chart">
+            <BarChartIcon />
+          </ToggleButton>
+        </Tooltip>
+        <Tooltip title="Line Chart" placement="bottom">
+          <ToggleButton value="line" aria-label="line chart">
+            <TimelineIcon />
+          </ToggleButton>
+        </Tooltip>
       </ToggleButtonGroup>
     </div>
   );
