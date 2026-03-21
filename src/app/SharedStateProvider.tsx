@@ -1,6 +1,7 @@
 'use client';
 
 import { compareColors, plannerColors } from '@/modules/colors';
+import type { Sections, SectionsData } from '@/modules/fetchSections';
 import usePersistantState from '@/modules/usePersistantState';
 import {
   convertToCourseOnly,
@@ -14,7 +15,6 @@ import {
   type SearchResult,
 } from '@/types/SearchQuery';
 import React, { createContext, useContext, useState } from 'react';
-import type { Sections, SectionsData } from '@/modules/fetchSections';
 
 function parseTime(time: string): number {
   const [hour, minute] = time.split(':').map((s) => parseInt(s));

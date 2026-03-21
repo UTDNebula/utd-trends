@@ -1,6 +1,4 @@
-import { Tooltip } from '@mui/material';
-import React, { useState } from 'react';
-
+import { useSharedState } from '@/app/SharedStateProvider';
 import {
   DAYS,
   START_HOUR,
@@ -8,7 +6,8 @@ import {
 import { useSearchResult } from '@/modules/plannerFetch';
 import { type SearchQuery } from '@/types/SearchQuery';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { useSharedState } from '@/app/SharedStateProvider';
+import { Tooltip } from '@mui/material';
+import React, { useState } from 'react';
 
 interface PlannerSectionComponentProps {
   scoot?: number;

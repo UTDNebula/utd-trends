@@ -1,8 +1,7 @@
-import { Popover } from '@mui/material';
-import React, { useState } from 'react';
-
+import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection';
 import type { SectionsData } from '@/modules/fetchSections';
+import { useSearchresults } from '@/modules/plannerFetch';
 import type { SearchQuery } from '@/types/SearchQuery';
 import {
   convertToCourseOnly,
@@ -10,8 +9,8 @@ import {
   searchQueryLabel,
   searchQueryMultiSectionSplit,
 } from '@/types/SearchQuery';
-import { useSearchresults } from '@/modules/plannerFetch';
-import { useSharedState } from '@/app/SharedStateProvider';
+import { Popover } from '@mui/material';
+import React, { useState } from 'react';
 
 interface PreviewSectionGroupProps {
   sectionGroup: SectionsData;

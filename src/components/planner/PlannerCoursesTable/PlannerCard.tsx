@@ -1,5 +1,6 @@
 'use client';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import { calculateGrades } from '@/modules/fetchGrades';
@@ -9,9 +10,9 @@ import {
   convertToCourseOnly,
   convertToProfOnly,
   removeSection,
+  searchQueryEqual,
   searchQueryLabel,
   sectionCanOverlap,
-  type SearchQuery,
   type SearchQueryMultiSection,
   type SearchResult,
 } from '@/types/SearchQuery';
@@ -41,10 +42,6 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import React, { useState } from 'react';
-import {
-  searchQueryEqual,
-} from '@/types/SearchQuery';
-import { useSharedState } from '@/app/SharedStateProvider';
 
 export function LoadingPlannerCard() {
   return (

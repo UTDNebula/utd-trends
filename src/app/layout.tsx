@@ -1,5 +1,6 @@
 import '@/styles/globals.css';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
+import { SnackbarProvider } from '@/contexts/SnackbarContext';
 import { fetchLatestSemester } from '@/modules/fetchSections';
 import theme from '@/modules/theme';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
@@ -9,8 +10,6 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import type { Metadata } from 'next';
 import { Bai_Jamjuree, Inter } from 'next/font/google';
 import React from 'react';
-import { SnackbarProvider } from '@/contexts/SnackbarContext';
-
 import QueryProvider from './QueryProvider';
 import { SharedStateProvider } from './SharedStateProvider';
 

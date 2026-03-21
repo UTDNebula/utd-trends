@@ -1,6 +1,9 @@
 import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection';
 import { useSnackbar } from '@/contexts/SnackbarContext';
+import type { SectionsData } from '@/modules/fetchSections';
+import { useSearchresults } from '@/modules/plannerFetch';
+import { parseTime } from '@/modules/timeUtils';
 import {
   convertToCourseOnly,
   removeSection,
@@ -9,9 +12,6 @@ import {
   type SearchQuery,
 } from '@/types/SearchQuery';
 import React from 'react';
-import type { SectionsData } from '@/modules/fetchSections';
-import { parseTime } from '@/modules/timeUtils';
-import { useSearchresults } from '@/modules/plannerFetch';
 import PreviewSectionGroup from './PreviewSectionGroup';
 
 // hours shown (24-hour time)
