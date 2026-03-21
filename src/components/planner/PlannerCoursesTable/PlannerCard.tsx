@@ -832,9 +832,21 @@ export default function PlannerCard(props: PlannerCardProps) {
               latestMatchedSections.type === 'combo') &&
               latestMatchedSections.RMP && (
                 <SingleProfInfo
+                  rmp={latestMatchedSections.RMP}
                   open={open && whichOpen === 'grades'}
                   searchQuery={props.query}
-                  rmp={latestMatchedSections.RMP}
+                  syllabus_uri={
+                    latestMatchedSections.sections
+                      .filter(
+                        (s) =>
+                          !!s.syllabus_uri && !!s.academic_session?.start_date,
+                      )
+                      .sort(
+                        (a, b) =>
+                          new Date(b.academic_session.start_date).getTime() -
+                          new Date(a.academic_session.start_date).getTime(),
+                      )[0]?.syllabus_uri || null
+                  }
                 />
               )}
           </div>

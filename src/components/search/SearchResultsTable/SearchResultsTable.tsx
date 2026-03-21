@@ -382,6 +382,18 @@ function Row({
                   open={open}
                   searchQuery={course}
                   rmp={searchResult.RMP}
+                  syllabus_uri={
+                    searchResult.sections
+                      .filter(
+                        (s) =>
+                          !!s.syllabus_uri && !!s.academic_session?.start_date,
+                      )
+                      .sort(
+                        (a, b) =>
+                          new Date(b.academic_session.start_date).getTime() -
+                          new Date(a.academic_session.start_date).getTime(),
+                      )[0]?.syllabus_uri || null
+                  }
                 />
               )}
             </div>
