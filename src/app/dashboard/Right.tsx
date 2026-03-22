@@ -117,10 +117,10 @@ export default async function Right(props: Props) {
     names.push('Professor');
     tabs.push(
       <Card
+        key="professor"
         className={`${props.isMobile ? 'p-6' : 'bg-transparent bg-none shadow-none'}`}
       >
         <ProfessorOverview
-          key="professor"
           professor={props.professors[0]}
           profData={profData}
           grades={grades}
@@ -135,10 +135,10 @@ export default async function Right(props: Props) {
     names.push('Class');
     tabs.push(
       <Card
+        key="course"
         className={`${props.isMobile ? 'p-6' : 'bg-transparent bg-none shadow-none'}`}
       >
         <CourseOverview
-          key="course"
           course={props.courses[0]}
           courseData={courseData}
           grades={grades}

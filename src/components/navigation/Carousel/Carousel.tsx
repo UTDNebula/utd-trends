@@ -79,7 +79,7 @@ export default function Carousel({
         isMobile={isMobile}
       />
       <AnimatePresence>
-        <div className="pt-2 md:p-4 lg:p-6">
+        <div className="pt-2 md:p-4 lg:p-6 min-h-[75vh] grid overflow-hidden relative">
           <motion.div
             key={currentCard}
             custom={direction}
@@ -91,6 +91,7 @@ export default function Carousel({
               x: { type: 'spring', stiffness: 300, damping: 30 },
               opacity: { duration: 0.2 },
             }}
+            className="col-start-1 row-start-1 w-full"
           >
             {Array.isArray(children)
               ? children.map((child, index) => (
