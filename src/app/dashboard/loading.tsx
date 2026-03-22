@@ -15,25 +15,17 @@ export default function Page() {
       <Header isPlanner={false} />
       <main className="p-4">
         <LoadingFilters />
-        {/* Desktop Layout */}
-        <div className="hidden md:block">
-          <Split
-            left={<LoadingSearchResultsTable />}
-            right={
-              <StickySide>
-                <LoadingRight />
-              </StickySide>
-            }
-            minLeft="40%"
-            minRight="30%"
-            defaultLeft="50%"
-          />
-        </div>
-
-        {/* Mobile Layout */}
-        <div className="block md:hidden mt-4">
-          <LoadingRight isMobile={true} />
-        </div>
+        <Split
+          left={<LoadingSearchResultsTable />}
+          right={
+            <StickySide>
+              <LoadingRight />
+            </StickySide>
+          }
+          minLeft="40%"
+          minRight="30%"
+          defaultLeft="50%"
+        />
       </main>
     </>
   );

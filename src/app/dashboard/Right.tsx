@@ -27,7 +27,7 @@ export function LoadingRight(props: LoadingRightProps) {
   const tabs = [];
 
   if (props.isMobile) {
-    names.push('Search');
+    names.push('Search Results');
     tabs.push(<LoadingSearchResultsTable key="search-results" />);
   }
 
@@ -54,9 +54,7 @@ export function LoadingRight(props: LoadingRightProps) {
   }
 
   return (
-    <Card
-      className={`${props.isMobile ? 'bg-transparent bg-none shadow-none overflow-visible' : ''}`}
-    >
+    <Card>
       <Carousel key={names.join()} names={names} isMobile={props.isMobile}>
         {tabs}
       </Carousel>

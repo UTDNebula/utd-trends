@@ -78,7 +78,7 @@ export default function Carousel({
         compareLength={compare.length}
         isMobile={isMobile}
       />
-      <AnimatePresence initial={!isMobile}>
+      <AnimatePresence>
         <div className="pt-2 md:p-4 lg:p-6 min-h-[75vh] grid overflow-hidden relative">
           <motion.div
             key={currentCard}
