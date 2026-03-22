@@ -72,6 +72,7 @@ export default function MobileNavBar() {
             router.push('/planner');
           }
         }}
+        className="[&>.Mui-selected_.MuiBottomNavigationAction-label]:transform-none [&>.Mui-selected_.MuiBottomNavigationAction-label]:text-xs"
       >
         <BottomNavigationAction
           label="Search"
