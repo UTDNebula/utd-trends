@@ -2,7 +2,8 @@
 
 import Compare from '@/components/compare/Compare/Compare';
 import SearchIcon from '@mui/icons-material/Search';
-import { Button, Card, Link, Typography } from '@mui/material';
+import { Button, Card, Typography } from '@mui/material';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
 export default function ComparePage() {
