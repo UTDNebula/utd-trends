@@ -1,6 +1,6 @@
 import Split from '@/components/common/Split/Split';
 import StickySide from '@/components/common/Split/StickySide';
-import Compare from '@/components/compare/Compare/Compare';
+import ComparePage from '@/components/compare/ComparePage/ComparePage';
 import DashboardEmpty from '@/components/dashboard/DashboardEmpty/DashboardEmpty';
 import Header from '@/components/navigation/Header/Header';
 import Filters, { LoadingFilters } from '@/components/search/Filters/Filters';
@@ -13,7 +13,6 @@ import {
   searchQuerySort,
   type SearchQuery,
 } from '@/types/SearchQuery';
-import { Card, Typography } from '@mui/material';
 import {
   dehydrate,
   HydrationBoundary,
@@ -98,18 +97,7 @@ export default async function Page({ searchParams }: Props) {
         <FiltersProvider searchResults={[]}>
           <Header isPlanner={false} />
           <main className="p-4">
-            {isCompare ? (
-              <>
-                <Typography className="leading-tight text-3xl font-bold p-4">
-                  Compare
-                </Typography>
-                <Card className="w-full p-4">
-                  <Compare isMobile={true} />
-                </Card>
-              </>
-            ) : (
-              <DashboardEmpty />
-            )}
+            {isCompare ? <ComparePage /> : <DashboardEmpty />}
           </main>
         </FiltersProvider>
       </>
@@ -144,14 +132,7 @@ export default async function Page({ searchParams }: Props) {
             </Suspense>
 
             {isCompare ? (
-              <>
-                <Typography className="leading-tight text-3xl font-bold p-4">
-                  Compare
-                </Typography>
-                <Card className="w-full p-4">
-                  <Compare isMobile={true} />
-                </Card>
-              </>
+              <ComparePage />
             ) : (
               <>
                 {/* Desktop Layout */}
