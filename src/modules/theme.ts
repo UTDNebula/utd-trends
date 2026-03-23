@@ -65,6 +65,8 @@ const theme = createTheme({
       },
       styleOverrides: {
         root: {
+          color: 'var(--mui-palette-text-disabled)',
+          transition: 'color 0.3s ease',
           gap: '4px',
           paddingTop: '4px',
           '& > :first-child:not(.MuiBottomNavigationAction-label)': {
