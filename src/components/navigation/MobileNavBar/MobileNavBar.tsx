@@ -1,8 +1,8 @@
 'use client';
 
 import { useSharedState } from '@/app/SharedStateProvider';
+import BookIcon from '@mui/icons-material/Book';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SearchIcon from '@mui/icons-material/Search';
 import { Badge, BottomNavigation, BottomNavigationAction } from '@mui/material';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -77,7 +77,11 @@ export default function MobileNavBar() {
         <BottomNavigationAction
           label="Search"
           value="search"
-          icon={<SearchIcon />}
+          icon={
+            <span>
+              <SearchIcon className="relative" />
+            </span>
+          }
         />
         <BottomNavigationAction
           label="Compare"
@@ -109,7 +113,7 @@ export default function MobileNavBar() {
                 '& .MuiBadge-badge': { right: -15, top: 4 },
               }}
             >
-              <MenuBookIcon />
+              <BookIcon />
             </Badge>
           }
         />
