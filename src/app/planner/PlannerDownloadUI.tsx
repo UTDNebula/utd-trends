@@ -1,7 +1,9 @@
 'use client';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import { UTDTrendsLogoStandalone } from '@/components/icons/UTDTrendsLogo/UTDTrendsLogo';
 import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedule';
+import { displaySemesterName } from '@/modules/semesters';
 import React from 'react';
 
 export default function PlannerDownloadUI({
@@ -9,6 +11,8 @@ export default function PlannerDownloadUI({
 }: {
   downloadRef: React.RefObject<HTMLDivElement | null>;
 }) {
+  const { latestSemester } = useSharedState();
+
   return (
     <div
       className="bg-black p-4 absolute left-[-9999px] top-0"
@@ -28,7 +32,9 @@ export default function PlannerDownloadUI({
             </span>
           </div>
         </div>
-        <h1 className="ml-auto mr-2 text-white">FALL 2025</h1>
+        <h1 className="ml-auto mr-2 text-white">
+          {displaySemesterName(latestSemester, false)}
+        </h1>
       </div>
       <PlannerSchedule />
     </div>

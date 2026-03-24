@@ -141,7 +141,7 @@ function HeaderChildrenInner(props: HeaderProps) {
     href: props.isPlanner
       ? dashboardSearchTerms != null
         ? '/dashboard?' + dashboardSearchTerms
-        : '/dashboard?availability=true'
+        : '/'
       : '/planner',
     onClick: () =>
       !props.isPlanner
