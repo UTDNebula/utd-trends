@@ -86,7 +86,7 @@ function addToPrefixes(label: string) {
   aggregateTable[prefix][firstDigit][secondDigit].push(label);
 }
 
-Object.entries(reverseTable).forEach(([label, name]) => addToPrefixes(label));
+Object.entries(reverseTable).forEach(([label]) => addToPrefixes(label));
 
 writeFileSync(
   'src/data/course_aggregates_table.json',

@@ -35,7 +35,7 @@ export function createSearchQuery(
           const number = searchTerm.number.replaceAll('X', '');
           const firstDigitTable = aggregate_table[searchTerm.prefix][number[0]];
 
-          const courses: String[] =
+          const courses: string[] =
             number.length > 1
               ? number[1] in firstDigitTable
                 ? firstDigitTable[number[1]]
