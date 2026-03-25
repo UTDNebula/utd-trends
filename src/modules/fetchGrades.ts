@@ -31,8 +31,9 @@ export function calculateGrades(
     if (typeof semesters === 'undefined' || semesters.includes(session._id)) {
       for (const sectionData of session.data) {
         if (
-          typeof sectionTypes === 'undefined' ||
-          sectionTypes.includes(sectionData.type)
+          (typeof sectionTypes === 'undefined' ||
+          sectionTypes.includes(sectionData.type)) &&
+          sectionData.type !== 'Pass/Fail'
         ) {
           grade_distribution = grade_distribution.map(
             (item, i) => item + sectionData.grade_distribution[i],
