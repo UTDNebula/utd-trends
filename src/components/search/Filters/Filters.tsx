@@ -1,3 +1,6 @@
+// TODO: This component has many states, which means tons of re-renders.
+// To improve performance, move some components to their own files
+
 'use client';
 
 import { FiltersContext } from '@/app/dashboard/FilterContext';
@@ -5,23 +8,26 @@ import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
 import { calculateGrades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import { setParams } from '@/modules/searchParams';
 import { compareSemesters, displaySemesterName } from '@/modules/semesters';
 import type { SearchResult } from '@/types/SearchQuery';
 import {
   Checkbox,
+  Divider,
   FormControl,
   FormControlLabel,
   Grid,
   InputLabel,
   ListItemText,
   MenuItem,
+  MenuList,
   Select,
   Switch,
   Tooltip,
 } from '@mui/material';
-import type { SelectChangeEvent } from '@mui/material/Select';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import React, { use } from 'react';
+import FilterChip from './FilterChip';
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
@@ -107,7 +113,6 @@ export default function Filters({
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
 
   const searchParams = useSearchParams();
-  const pathname = usePathname();
 
   let minGPA = searchParams.get('minGPA') ?? '';
   if (Array.isArray(minGPA)) {
@@ -240,105 +245,101 @@ export default function Filters({
   return (
     <Grid
       container
-      spacing={2}
+      spacing={{ xs: 1, md: 2 }}
       data-tutorial-id="filters"
       className="mb-4 sm:m-0"
     >
-      {/* min letter grade dropdown*/}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
-        <Tooltip title={'Select Minimum Letter Grade Average'} placement="top">
-          <FormControl
-            size="small"
-            className={`w-full ${
-              minGPA
-                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
-                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
-            }`}
-          >
-            <InputLabel id="minGPA">Min Letter Grade</InputLabel>
-            <Select
-              label="Min Letter Grade"
-              labelId="minGPA"
-              value={minGPA}
-              onChange={(event: SelectChangeEvent) => {
-                const params = new URLSearchParams(searchParams.toString());
-                const newValue = event.target.value;
-                if (newValue !== '') {
-                  params.set('minGPA', newValue);
-                } else {
-                  params.delete('minGPA');
-                }
-                window.history.replaceState(
-                  null,
-                  '',
-                  `${pathname}?${params.toString()}`,
-                );
-              }}
-              renderValue={(value) => gpaToLetterGrade(Number(value))}
-            >
-              <MenuItem className="h-10" value="">
-                <em>None</em>
+      <Tooltip title="Minimum letter grade average" placement="top">
+        <FilterChip
+          label="Min Letter Grade"
+          renderValue={minGPA ? gpaToLetterGrade(Number(minGPA)) : undefined}
+          dirty={Boolean(minGPA)}
+          popoverComponent={(ctx) => (
+            <MenuList autoFocusItem={ctx.open}>
+              <MenuItem
+                className="h-10"
+                value=""
+                selected={minGPA === ''}
+                aria-selected={minGPA === ''}
+                onClick={() => {
+                  setParams((params) => {
+                    params.delete('minGPA');
+                  });
+                  ctx.closePopover();
+                }}
+              >
+                <em className="italic">None</em>
               </MenuItem>
-              {/* dropdown options*/}
               {minGPAs.map((value) => (
-                <MenuItem className="h-10" key={value} value={value}>
+                <MenuItem
+                  className="h-10"
+                  key={value}
+                  value={value}
+                  selected={minGPA === value}
+                  aria-selected={minGPA === value}
+                  onClick={() => {
+                    setParams((params) => {
+                      params.set('minGPA', value);
+                    });
+                    ctx.closePopover();
+                  }}
+                >
                   <span className="w-5">{gpaToLetterGrade(Number(value))}</span>
                   <span className="text-sm text-gray-400 ml-2">
                     ({gradeCounts[value] ?? 0})
                   </span>
                 </MenuItem>
               ))}
-            </Select>
-          </FormControl>
-        </Tooltip>
-      </Grid>
+            </MenuList>
+          )}
+        />
+      </Tooltip>
 
-      {/* min rating dropdown*/}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
-        <Tooltip title={'Select Minimum Professor Rating'} placement="top">
-          <FormControl
-            size="small"
-            className={`w-full ${
-              minRating
-                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
-                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
-            }`}
-          >
-            <InputLabel id="minRating">Min Rating</InputLabel>
-            <Select
-              label="Min Rating"
-              labelId="minRating"
-              value={minRating}
-              onChange={(event: SelectChangeEvent) => {
-                const params = new URLSearchParams(searchParams.toString());
-                const newValue = event.target.value;
-                if (newValue !== '') {
-                  params.set('minRating', newValue);
-                } else {
-                  params.delete('minRating');
-                }
-                window.history.replaceState(
-                  null,
-                  '',
-                  `${pathname}?${params.toString()}`,
-                );
-              }}
-              renderValue={(value) => (
-                <Rating
-                  key={value}
-                  defaultValue={Number(value)}
-                  precision={0.5}
-                  sx={{ fontSize: 18 }}
-                  readOnly
-                />
-              )}
-            >
-              <MenuItem className="h-10" value="">
-                <em>None</em>
+      <Tooltip title="Minimum professor rating" placement="top">
+        <FilterChip
+          label="Min Rating"
+          renderValue={
+            minRating ? (
+              <Rating
+                key={minRating}
+                defaultValue={Number(minRating)}
+                precision={0.5}
+                sx={{ fontSize: 18 }}
+                readOnly
+              />
+            ) : undefined
+          }
+          dirty={Boolean(minRating)}
+          popoverComponent={(ctx) => (
+            <MenuList autoFocusItem={ctx.open}>
+              <MenuItem
+                className="h-10"
+                value=""
+                selected={minRating === ''}
+                aria-selected={minRating === ''}
+                onClick={() => {
+                  setParams((params) => {
+                    params.delete('minRating');
+                  });
+                  ctx.closePopover();
+                }}
+              >
+                <em className="italic">None</em>
               </MenuItem>
-              {/* dropdown options*/}
               {minRatings.map((value) => (
-                <MenuItem className="h-10" key={value} value={value}>
+                <MenuItem
+                  className="h-10"
+                  key={value}
+                  value={value}
+                  selected={minRating === value}
+                  aria-selected={minRating === value}
+                  onClick={() => {
+                    setParams((params) => {
+                      params.set('minRating', value);
+                    });
+                    ctx.closePopover();
+                  }}
+                >
                   <Rating
                     defaultValue={Number(value)}
                     precision={0.5}
@@ -350,76 +351,35 @@ export default function Filters({
                   </span>
                 </MenuItem>
               ))}
-            </Select>
-          </FormControl>
-        </Tooltip>
-      </Grid>
+            </MenuList>
+          )}
+        />
+      </Tooltip>
 
-      {/* semester dropdown */}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
-        <Tooltip
-          title={'Select Semesters to Include Grades from'}
-          placement="top"
-        >
-          <FormControl
-            size="small"
-            className={`w-full ${
-              chosenSemesters.length !== semesters.length
-                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
-                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
-            }`}
-          >
-            <InputLabel id="Semesters">Semesters</InputLabel>
-            <Select
-              label="Semesters"
-              labelId="Semesters"
-              multiple
-              value={chosenSemesters}
-              onChange={(event) => {
-                const {
-                  target: { value },
-                } = event;
-                if (value.includes('select-all')) {
+      <Tooltip title="Semesters to include grades from" placement="top">
+        <FilterChip
+          label="Semesters"
+          renderValue={
+            chosenSemesters.length > 0
+              ? chosenSemesters.length === semesters.length
+                ? 'All'
+                : chosenSemesters.sort(compareSemesters).join(', ')
+              : 'None'
+          }
+          dirty={chosenSemesters.length !== semesters.length}
+          popoverComponent={
+            <MenuList className="*:pr-6">
+              <MenuItem
+                className="h-10 items-center"
+                value="select-all"
+                onClick={() => {
                   if (chosenSemesters.length === semesters.length) {
                     setChosenSemesters([]);
                   } else {
                     setChosenSemesters(semesters);
                   }
-                } else if (value.includes('recent')) {
-                  if (
-                    chosenSemesters.length === recentSemesters.length &&
-                    chosenSemesters.every((el) => recentSemesters.includes(el))
-                  ) {
-                    setChosenSemesters(semesters);
-                  } else {
-                    setChosenSemesters(recentSemesters);
-                  }
-                } else {
-                  {
-                    /*If all semesters were selected, select only clicked semester*/
-                  }
-                  if (chosenSemesters.length === semesters.length) {
-                    const clickedItem = chosenSemesters.find(
-                      (x) => !value.includes(x),
-                    );
-                    if (clickedItem) {
-                      setChosenSemesters([clickedItem]);
-                    }
-                  } else {
-                    setChosenSemesters(value as string[]);
-                  }
-                }
-              }}
-              renderValue={(selected) => {
-                if (chosenSemesters.length === semesters.length) {
-                  return 'All selected';
-                }
-                return selected.sort(compareSemesters).join(', ');
-              }}
-              MenuProps={{ autoFocus: false }}
-            >
-              {/* select all sessions */}
-              <MenuItem className="h-10 items-center" value="select-all">
+                }}
+              >
                 <Checkbox
                   checked={
                     semesters.length > 0 &&
@@ -444,7 +404,20 @@ export default function Filters({
               </MenuItem>
 
               {/* recent sessions -- last <recentSemesters.length> long-semesters from current semester*/}
-              <MenuItem className="h-10 items-center" value="recent">
+              <MenuItem
+                className="h-10 items-center"
+                value="recent"
+                onClick={() => {
+                  if (
+                    chosenSemesters.length === recentSemesters.length &&
+                    chosenSemesters.every((el) => recentSemesters.includes(el))
+                  ) {
+                    setChosenSemesters(semesters);
+                  } else {
+                    setChosenSemesters(recentSemesters);
+                  }
+                }}
+              >
                 <Checkbox
                   checked={
                     recentSemesters.length > 0 &&
@@ -459,75 +432,66 @@ export default function Filters({
                 />
               </MenuItem>
 
+              <Divider component="li" />
+
               {/* individual options */}
               {semesters.map((session) => (
                 <MenuItem
                   className="h-10 items-center"
                   key={session}
                   value={session}
+                  onClick={() => {
+                    /* If all are selected, select only the clicked item */
+                    if (chosenSemesters.length === semesters.length) {
+                      setChosenSemesters([session]);
+                    } else {
+                      setChosenSemesters((prev) => {
+                        const newArray = [...prev];
+                        const index = newArray.indexOf(session);
+                        if (index > -1) {
+                          newArray.splice(index, 1);
+                        } else {
+                          newArray.push(session);
+                        }
+                        return newArray;
+                      });
+                    }
+                  }}
                 >
                   <Checkbox checked={chosenSemesters.includes(session)} />
                   <ListItemText primary={displaySemesterName(session)} />
                 </MenuItem>
               ))}
-            </Select>
-          </FormControl>
-        </Tooltip>
-      </Grid>
+            </MenuList>
+          }
+        />
+      </Tooltip>
 
-      {/* section type dropdown */}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
-        <Tooltip
-          title={'Select Section Types to Include Grades from'}
-          placement="top"
-        >
-          <FormControl
-            size="small"
-            className={`w-full ${
-              chosenSectionTypes.length !== sectionTypes.length
-                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
-                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
-            }`}
-          >
-            <InputLabel id="SectionTypes">Section Types</InputLabel>
-            <Select
-              label="Section Types"
-              labelId="SectionTypes"
-              multiple
-              value={chosenSectionTypes}
-              onChange={(event) => {
-                const {
-                  target: { value },
-                } = event;
-                if (value.includes('select-all')) {
+      <Tooltip title="Section types to include grades from" placement="top">
+        <FilterChip
+          label="Section Types"
+          renderValue={
+            chosenSectionTypes.length > 0
+              ? chosenSectionTypes.length === sectionTypes.length
+                ? 'All'
+                : chosenSectionTypes.sort().join(', ')
+              : 'None'
+          }
+          dirty={chosenSectionTypes.length !== sectionTypes.length}
+          popoverComponent={
+            <MenuList className="*:pr-6">
+              {/* select all section types */}
+              <MenuItem
+                className="h-10 items-center"
+                value="select-all"
+                onClick={() => {
                   if (chosenSectionTypes.length === sectionTypes.length) {
                     setChosenSectionTypes([]);
                   } else {
                     setChosenSectionTypes(sectionTypes);
                   }
-                } else {
-                  if (chosenSectionTypes.length === sectionTypes.length) {
-                    const clickedItem = chosenSectionTypes.find(
-                      (x) => !value.includes(x),
-                    );
-                    if (clickedItem) {
-                      setChosenSectionTypes([clickedItem]);
-                    }
-                  } else {
-                    setChosenSectionTypes(value as string[]);
-                  }
-                }
-              }}
-              renderValue={(selected) => {
-                if (chosenSectionTypes.length === sectionTypes.length) {
-                  return 'All selected';
-                }
-                return selected.sort().join(', ');
-              }}
-              MenuProps={{ autoFocus: false }}
-            >
-              {/* select all section types */}
-              <MenuItem className="h-10 items-center" value="select-all">
+                }}
+              >
                 <Checkbox
                   checked={
                     sectionTypes.length > 0 &&
@@ -545,57 +509,88 @@ export default function Filters({
                 />
               </MenuItem>
 
+              <Divider component="li" />
+
               {/* individual options */}
-              {sectionTypes.map((t) => (
-                <MenuItem className="h-10 items-center" key={t} value={t}>
-                  <Checkbox checked={chosenSectionTypes.includes(t)} />
-                  <ListItemText primary={displaySectionTypeName(t)} />
+              {sectionTypes.map((section) => (
+                <MenuItem
+                  className="h-10 items-center"
+                  key={section}
+                  value={section}
+                  onClick={() => {
+                    /* If all are selected, select only the clicked item */
+                    if (chosenSectionTypes.length === sectionTypes.length) {
+                      setChosenSectionTypes([section]);
+                    } else {
+                      setChosenSectionTypes((prev) => {
+                        const newArray = [...prev];
+                        const index = newArray.indexOf(section);
+                        if (index > -1) {
+                          newArray.splice(index, 1);
+                        } else {
+                          newArray.push(section);
+                        }
+                        return newArray;
+                      });
+                    }
+                  }}
+                >
+                  <Checkbox checked={chosenSectionTypes.includes(section)} />
+                  <ListItemText primary={displaySectionTypeName(section)} />
                 </MenuItem>
               ))}
-            </Select>
-          </FormControl>
-        </Tooltip>
-      </Grid>
+            </MenuList>
+          }
+        />
+      </Tooltip>
 
-      {/* Teaching Next Semester switch*/}
-      <Grid size={{ xs: 12, sm: 12 / 5 }} className="px-2">
-        <Tooltip title="Select Availability" placement="top">
-          <FormControl
-            size="small"
-            className={`${
-              filterNextSem
-                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
-                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
-            }`}
-          >
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={filterNextSem}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    const params = new URLSearchParams(searchParams.toString());
-                    if (event.target.checked) {
-                      params.set('availability', 'true');
-                    } else {
-                      params.delete('availability');
-                    }
-                    window.history.replaceState(
-                      null,
-                      '',
-                      `${pathname}?${params.toString()}`,
-                    );
-                  }}
+      <Tooltip title="Availability" placement="top">
+        <FilterChip
+          label="Availability"
+          renderValue={
+            filterNextSem ? displaySemesterName(latestSemester, false) : 'Any'
+          }
+          dirty={!filterNextSem}
+          popoverComponent={
+            <div className="mx-4 my-3">
+              <FormControl
+                size="small"
+                className={`${
+                  filterNextSem
+                    ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
+                    : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
+                }`}
+              >
+                <FormControlLabel
+                  className="select-none"
+                  control={
+                    <Switch
+                      checked={filterNextSem}
+                      onChange={(
+                        event: React.ChangeEvent<HTMLInputElement>,
+                      ) => {
+                        setParams((params) => {
+                          if (event.target.checked) {
+                            params.set('availability', 'true');
+                          } else {
+                            params.delete('availability');
+                          }
+                        });
+                      }}
+                    />
+                  }
+                  label={
+                    latestSemester == ''
+                      ? 'Teaching Next Semester'
+                      : 'Teaching in ' +
+                        displaySemesterName(latestSemester, false)
+                  }
                 />
-              }
-              label={
-                latestSemester == ''
-                  ? 'Teaching Next Semester'
-                  : 'Teaching in ' + displaySemesterName(latestSemester, false)
-              }
-            />
-          </FormControl>
-        </Tooltip>
-      </Grid>
+              </FormControl>
+            </div>
+          }
+        />
+      </Tooltip>
     </Grid>
   );
 }
