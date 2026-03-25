@@ -32,7 +32,7 @@ export function calculateGrades(
       for (const sectionData of session.data) {
         if (
           (typeof sectionTypes === 'undefined' ||
-          sectionTypes.includes(sectionData.type)) &&
+            sectionTypes.includes(sectionData.type)) &&
           sectionData.type !== 'Pass/Fail'
         ) {
           grade_distribution = grade_distribution.map(
