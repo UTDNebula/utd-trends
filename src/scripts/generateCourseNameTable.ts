@@ -57,26 +57,34 @@ writeFileSync(
 
 console.log('Course prefix-number table generation done.');
 
-
-const aggregateTable: { [prefix:string]: {[firstDigit:string]: {[secondDigit:string]: string[]}}} = {};
+const aggregateTable: {
+  [prefix: string]: {
+    [firstDigit: string]: { [secondDigit: string]: string[] };
+  };
+} = {};
 // adds the given course label to all of its relevant aggregates in the table
-function addToPrefixes(label: string)
-{
+function addToPrefixes(label: string) {
   const [prefix, number] = label.split(' ');
   const firstDigit = number[0];
   const secondDigit = number[1];
   if (!Object.prototype.hasOwnProperty.call(aggregateTable, prefix)) {
     aggregateTable[prefix] = {};
   }
-  if (!Object.prototype.hasOwnProperty.call(aggregateTable[prefix], firstDigit)) {
+  if (
+    !Object.prototype.hasOwnProperty.call(aggregateTable[prefix], firstDigit)
+  ) {
     aggregateTable[prefix][firstDigit] = {};
   }
-  if (!Object.prototype.hasOwnProperty.call(aggregateTable[prefix][firstDigit], secondDigit)) {
+  if (
+    !Object.prototype.hasOwnProperty.call(
+      aggregateTable[prefix][firstDigit],
+      secondDigit,
+    )
+  ) {
     aggregateTable[prefix][firstDigit][secondDigit] = [];
   }
   aggregateTable[prefix][firstDigit][secondDigit].push(label);
 }
-
 
 Object.entries(reverseTable).forEach(([label, name]) => addToPrefixes(label));
 
@@ -86,5 +94,3 @@ writeFileSync(
 );
 
 console.log('Aggregate table generation done.');
-
-
