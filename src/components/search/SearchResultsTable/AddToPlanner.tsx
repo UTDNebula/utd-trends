@@ -14,7 +14,8 @@ import {
 } from '@/types/SearchQuery';
 import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
-import { Badge, Checkbox, Tooltip } from '@mui/material';
+import EventAvailableIcon from '@mui/icons-material/EventAvailable';
+import { Checkbox, Tooltip } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 
 type addToPlannerProps = {
@@ -38,11 +39,6 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
     (s) => s.academic_session.name === latestSemester,
   );
 
-  const availableSections = searchResult.sections.filter(
-    (s) =>
-      s.academic_session.name === latestSemester,
-  );
-
   const canAddCourseOnlyToPlanner =
     typeof courseOnlySections !== 'undefined' &&
     courseOnlySections.some((section) =>
@@ -61,9 +57,8 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
   const latestSections = allResults.map((r) =>
     r.isSuccess
       ? r.data.sections.filter(
-        (s) =>
-          s.academic_session.name === latestSemester,
-      )
+          (s) => s.academic_session.name === latestSemester && s != null,
+        )
       : [],
   );
 
@@ -71,16 +66,43 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
     .map((searchQuery) => searchQueryMultiSectionSplit(searchQuery))
     .flatMap((queries, idx) => {
       return queries.map((query) => {
-        return latestSections[idx]?.find(
+        return latestSections[idx].find(
           (section) => section.section_number === query.sectionNumber,
         );
       });
     })
     .filter((section) => typeof section !== 'undefined');
 
-  const sectionsThatFitPlannerSchedule = availableSections.filter((section) => {
-    return !hasConflict(section, selectedSections); // Keep sections with no conflicts
-  });
+  const lectureSections = courseOnlySections.filter(
+    (s) => !sectionCanOverlap(s.section_number),
+  );
+  const labSections = courseOnlySections.filter((s) =>
+    sectionCanOverlap(s.section_number, 'extra'),
+  );
+  const examSections = courseOnlySections.filter((s) =>
+    sectionCanOverlap(s.section_number, 'exam'),
+  );
+
+  const fitSections = (arr: typeof courseOnlySections) =>
+    arr.filter((s) => !hasConflict(s, selectedSections));
+
+  const lectureFit = fitSections(lectureSections);
+  const labFit = fitSections(labSections);
+  const examFit = fitSections(examSections);
+
+  // "Should be" proxy: if this course ever has these section types
+  const requiresLab = searchResult.sections.some((s) =>
+    sectionCanOverlap(s.section_number, 'extra'),
+  );
+  const requiresExam = searchResult.sections.some((s) =>
+    sectionCanOverlap(s.section_number, 'exam'),
+  );
+
+  const hasRequiredExtrasAvailable =
+    (!requiresLab || labFit.length > 0) &&
+    (!requiresExam || examFit.length > 0);
+
+  const finalDisplayCount = hasRequiredExtrasAvailable ? lectureFit.length : 0;
 
   return (
     <Tooltip
@@ -89,8 +111,10 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
           ? 'Cannot add professor to planner'
           : hasLatestSemester
             ? inPlanner
-              ? `Remove from Planner (${sectionsThatFitPlannerSchedule.length} sections)`
-              : `${sectionsThatFitPlannerSchedule.length} section(s) fit your schedule!`
+              ? `Remove from Planner (${finalDisplayCount} sections)`
+              : finalDisplayCount > 0
+                ? `${finalDisplayCount} section(s) fit your schedule!`
+                : 'No Sections Available'
             : 'Not being taught'
       }
       placement="top"
@@ -127,27 +151,29 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
                 queryKey: [
                   'rmp',
                   searchQueryLabel(
-                    convertToProfOnly(
-                      removeSection(searchResult.searchQuery),
-                    ),
+                    convertToProfOnly(removeSection(searchResult.searchQuery)),
                   ),
                 ],
                 queryFn: async () => {
                   const data = await fetchSearchResult(
-                    convertToProfOnly(
-                      removeSection(searchResult.searchQuery),
-                    ),
+                    convertToProfOnly(removeSection(searchResult.searchQuery)),
                   );
                   return data;
                 },
               });
             }
           }}
-          icon={<Badge color="secondary" variant="dot" badgeContent=" " invisible={sectionsThatFitPlannerSchedule.length <= 0}><BookOutlinedIcon /></Badge>}
+          icon={
+            finalDisplayCount > 0 ? (
+              <EventAvailableIcon />
+            ) : (
+              <BookOutlinedIcon />
+            )
+          }
           checkedIcon={<BookIcon />}
           disabled={!hasLatestSemester || searchResult.type === 'professor'}
         />
       </span>
     </Tooltip>
-  )
+  );
 }
