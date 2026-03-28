@@ -116,15 +116,17 @@ export function SharedStateProvider({
   }
 
   function setPlannerSection(query: SearchQuery, section: string) {
-    if (
-      !planner.find((course) =>
-        searchQueryEqual(removeSection(course), removeSection(query)),
-      )
-    )
-      // if section's course-prof combo doesn't exist
-      setPlanner((prev: SearchQueryMultiSection[]) => prev.concat(query)); // add it to MyPlanner
-    setPlanner((prev: SearchQueryMultiSection[]) =>
-      prev.map((course) => {
+    setPlanner((prev: SearchQueryMultiSection[]) => {
+      let nextState = [...prev];
+
+      if (
+        !nextState.find((course) =>
+          searchQueryEqual(removeSection(course), removeSection(query)),
+        )
+      ) {
+        nextState.push(query); // if section's course-prof combo doesn't exist
+      }
+      return nextState.map((course) => {
         if (searchQueryEqual(removeSection(course), removeSection(query))) {
           // combo match
           if (typeof course.sectionNumbers === 'undefined') {
@@ -182,8 +184,8 @@ export function SharedStateProvider({
           };
         }
         return course;
-      }),
-    );
+      });
+    });
   }
 
   const plannerColorMap = Object.fromEntries(
