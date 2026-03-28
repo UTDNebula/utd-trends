@@ -106,7 +106,6 @@ export default function BarGraph(props: Props) {
       },
     },
     yaxis: {
-      categories: props.xaxisLabels,
       labels: {
         formatter: isMobile ? undefined : props.yaxisFormatter,
       },
