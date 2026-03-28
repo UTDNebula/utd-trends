@@ -57,7 +57,8 @@ export default function BarGraph(props: Props) {
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   // On mobile, height = 30px per bar group × number of categories
-  const mobileHeight = (props.xaxisLabels?.length ?? 14) * series.length * 20 + 80;
+  const mobileHeight =
+    (props.xaxisLabels?.length ?? 14) * series.length * 20 + 80;
 
   const options: ApexOptions = {
     chart: {

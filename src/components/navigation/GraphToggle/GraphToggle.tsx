@@ -66,13 +66,13 @@ export default function GraphToggle(props: Props) {
           </ToggleButtonGroup>
         </div>
       )}
-      
+
       {/* Graphs */}
       <div className={isMobile ? 'w-full' : 'grow h-64'}>
         {chartType === 'bar' && props.bar}
         {chartType === 'line' && props.line}
       </div>
-      
+
       {/* Toggle Button to switch chart type - positioned on right for desktop */}
       {!isMobile && (
         <ToggleButtonGroup
