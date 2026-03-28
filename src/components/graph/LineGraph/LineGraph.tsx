@@ -295,7 +295,16 @@ export default function LineGraph(props: Props) {
     colors:
       series.length === 1
         ? [theme.vars.palette.primary.main]
-        : compareColors.filter((_, i) => props.includedColors?.[i] ?? 1),
+        : series.map((_, i) => {
+            const includedIndices = props.includedColors
+              ? props.includedColors
+                  .map((inc, idx) => (inc ? idx : -1))
+                  .filter((idx) => idx !== -1)
+              : series.map((__, idx) => idx);
+            return compareColors[
+              (includedIndices[i] ?? i) % compareColors.length
+            ];
+          }),
     stroke: { curve: 'straight', width: 5 },
     title: {
       text: props.title,

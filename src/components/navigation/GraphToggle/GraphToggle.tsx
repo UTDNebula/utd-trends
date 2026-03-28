@@ -7,6 +7,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
+  useMediaQuery,
 } from '@mui/material';
 import React, { useState } from 'react';
 
@@ -24,6 +25,7 @@ type Props = {
 
 export default function GraphToggle(props: Props) {
   const [chartType, setChartType] = useState<'line' | 'bar'>('bar');
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const handleChartToggle = (
     event: React.MouseEvent<HTMLElement>,
@@ -39,33 +41,60 @@ export default function GraphToggle(props: Props) {
   }
 
   return (
-    <div className="w-full flex items-center">
+    <div className={`w-full flex ${isMobile ? 'flex-col' : 'items-center'}`}>
+      {/* Toggle Button to switch chart type - positioned at top on mobile */}
+      {isMobile && (
+        <div className="mb-4 flex justify-center">
+          <ToggleButtonGroup
+            value={chartType}
+            exclusive
+            onChange={handleChartToggle}
+            size="small"
+            orientation="horizontal"
+            aria-label="chart type"
+          >
+            <Tooltip title="Bar Chart" placement="top">
+              <ToggleButton value="bar" aria-label="bar chart">
+                <BarChartIcon />
+              </ToggleButton>
+            </Tooltip>
+            <Tooltip title="Line Chart" placement="top">
+              <ToggleButton value="line" aria-label="line chart">
+                <TimelineIcon />
+              </ToggleButton>
+            </Tooltip>
+          </ToggleButtonGroup>
+        </div>
+      )}
+      
       {/* Graphs */}
-      <div className="grow h-64">
+      <div className={isMobile ? 'w-full' : 'grow h-64'}>
         {chartType === 'bar' && props.bar}
-
         {chartType === 'line' && props.line}
       </div>
-      {/* Toggle Button to switch chart type */}
-      <ToggleButtonGroup
-        value={chartType}
-        exclusive
-        onChange={handleChartToggle}
-        size="small"
-        orientation="vertical"
-        aria-label="chart type"
-      >
-        <Tooltip title="Bar Chart" placement="top">
-          <ToggleButton value="bar" aria-label="bar chart">
-            <BarChartIcon />
-          </ToggleButton>
-        </Tooltip>
-        <Tooltip title="Line Chart" placement="bottom">
-          <ToggleButton value="line" aria-label="line chart">
-            <TimelineIcon />
-          </ToggleButton>
-        </Tooltip>
-      </ToggleButtonGroup>
+      
+      {/* Toggle Button to switch chart type - positioned on right for desktop */}
+      {!isMobile && (
+        <ToggleButtonGroup
+          value={chartType}
+          exclusive
+          onChange={handleChartToggle}
+          size="small"
+          orientation="vertical"
+          aria-label="chart type"
+        >
+          <Tooltip title="Bar Chart" placement="top">
+            <ToggleButton value="bar" aria-label="bar chart">
+              <BarChartIcon />
+            </ToggleButton>
+          </Tooltip>
+          <Tooltip title="Line Chart" placement="bottom">
+            <ToggleButton value="line" aria-label="line chart">
+              <TimelineIcon />
+            </ToggleButton>
+          </Tooltip>
+        </ToggleButtonGroup>
+      )}
     </div>
   );
 }

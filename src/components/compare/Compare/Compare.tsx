@@ -25,6 +25,14 @@ export default function Compare() {
     return <p>Click a checkbox to add something to compare.</p>;
   }
 
+  // Only chart courses that actually have grade data for the current filters
+  const compareWithData = compare.filter((course) => {
+    const categories = convertNumbersToPercents(
+      calculateGrades(course.grades, chosenSemesters, chosenSectionTypes),
+    );
+    return !Number.isNaN(categories[0]);
+  });
+
   return (
     <div className="flex flex-col gap-4">
       <GraphToggle
@@ -53,7 +61,7 @@ export default function Compare() {
             }
             tooltipFormatter={(value, { seriesIndex, dataPointIndex }) => {
               let response = Number(value).toFixed(2).toLocaleString() + '%';
-              const grade = compare[seriesIndex].grades;
+              const grade = compareWithData[seriesIndex].grades;
               response +=
                 ' (' +
                 calculateGrades(grade, chosenSemesters, chosenSectionTypes)
@@ -63,8 +71,7 @@ export default function Compare() {
 
               return response;
             }}
-            series={compare.map((course) => {
-              const grade_dist = [];
+            series={compareWithData.map((course) => {
               const categories = convertNumbersToPercents(
                 calculateGrades(
                   course.grades,
@@ -72,17 +79,13 @@ export default function Compare() {
                   chosenSectionTypes,
                 ),
               );
-              for (let idx = 0; idx < categories.length; idx++) {
-                grade_dist.push(0);
-              }
-
               return {
                 name:
                   searchQueryLabel(course.searchQuery) +
                   (course.type !== 'combo'
                     ? ' (Overall)' //Indicates that this entry is an aggregate for the entire course/professor
                     : ''),
-                data: Number.isNaN(categories[0]) ? grade_dist : categories,
+                data: categories,
               };
             })}
           />
