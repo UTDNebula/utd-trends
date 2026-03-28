@@ -57,8 +57,8 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
   const latestSections = allResults.map((r) =>
     r.isSuccess
       ? r.data.sections.filter(
-          (s) => s.academic_session.name === latestSemester && s != null,
-        )
+        (s) => s.academic_session.name === latestSemester && s != null,
+      )
       : [],
   );
 
@@ -73,36 +73,76 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
     })
     .filter((section) => typeof section !== 'undefined');
 
-  const lectureSections = courseOnlySections.filter(
-    (s) => !sectionCanOverlap(s.section_number),
+  // Extract base number from section (last 2-3 digits: "01", "02", etc.)
+  const getBaseSectionNumber = (sectionNum: string): string => {
+    const match = sectionNum.match(/(\d{2,3})$/);
+    return match ? match[1] : '';
+  };
+
+  // Separate by type using correct section codes
+  const lectureSections = courseOnlySections.filter((s) =>
+    /^[05]/.test(s.section_number) || /^0[WHL]/.test(s.section_number) || /^(HON|HN)/.test(s.section_number)
   );
   const labSections = courseOnlySections.filter((s) =>
-    sectionCanOverlap(s.section_number, 'extra'),
+    /^[1236]/.test(s.section_number)
   );
   const examSections = courseOnlySections.filter((s) =>
-    sectionCanOverlap(s.section_number, 'exam'),
+    /^7/.test(s.section_number)
   );
 
   const fitSections = (arr: typeof courseOnlySections) =>
     arr.filter((s) => !hasConflict(s, selectedSections));
 
-  const lectureFit = fitSections(lectureSections);
-  const labFit = fitSections(labSections);
-  const examFit = fitSections(examSections);
+  let finalDisplayCount = 0;
 
-  // "Should be" proxy: if this course ever has these section types
-  const requiresLab = searchResult.sections.some((s) =>
-    sectionCanOverlap(s.section_number, 'extra'),
-  );
-  const requiresExam = searchResult.sections.some((s) =>
-    sectionCanOverlap(s.section_number, 'exam'),
-  );
+  if (lectureSections.length > 0) {
+    // count lecture based sections
+    const lecturesFitWithRequiredCompanions = lectureSections.filter((lecture) => {
+      const base = getBaseSectionNumber(lecture.section_number);
+      if (!base) return true;
 
-  const hasRequiredExtrasAvailable =
-    (!requiresLab || labFit.length > 0) &&
-    (!requiresExam || examFit.length > 0);
+      const courseHasLabs = labSections.length > 0;
+      const courseHasExams = examSections.length > 0;
 
-  const finalDisplayCount = hasRequiredExtrasAvailable ? lectureFit.length : 0;
+      if (courseHasLabs) {
+        const matchingLab = labSections.find((l) => getBaseSectionNumber(l.section_number) === base);
+        if (matchingLab && fitSections([matchingLab]).length === 0) {
+          return false;
+        }
+      }
+
+      if (courseHasExams) {
+        const matchingExam = examSections.find((e) => getBaseSectionNumber(e.section_number) === base);
+        if (matchingExam && fitSections([matchingExam]).length === 0) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    finalDisplayCount = lecturesFitWithRequiredCompanions.length;
+
+
+  } else if (labSections.length > 0) {
+    // Count for lab only sections
+    const labsFitWithRequiredCompanions = labSections.filter((lab) => {
+      const base = getBaseSectionNumber(lab.section_number);
+      if (!base) return true;
+
+      const courseHasExams = examSections.length > 0;
+
+      if (courseHasExams) {
+        const matchingExam = examSections.find((e) => getBaseSectionNumber(e.section_number) === base);
+        if (matchingExam && fitSections([matchingExam]).length === 0) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+    finalDisplayCount = labsFitWithRequiredCompanions.length;
+  }
 
   return (
     <Tooltip
@@ -114,7 +154,7 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
               ? `Remove from Planner (${finalDisplayCount} sections)`
               : finalDisplayCount > 0
                 ? `${finalDisplayCount} section(s) fit your schedule!`
-                : 'No Sections Available'
+                : 'No sections fit in your schedule'
             : 'Not being taught'
       }
       placement="top"
