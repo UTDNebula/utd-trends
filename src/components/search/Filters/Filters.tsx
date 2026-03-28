@@ -5,7 +5,11 @@ import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
 import { calculateGrades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import { compareSemesters, displaySemesterName } from '@/modules/semesters';
+import {
+  compareSemesters,
+  compareSemesters2,
+  displaySemesterName,
+} from '@/modules/semesters';
 import type { SearchResult } from '@/types/SearchQuery';
 import {
   Checkbox,
@@ -25,6 +29,20 @@ import React, { use, useEffect } from 'react';
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
+function getCurrentSemester(): string {
+  const today = new Date();
+  const mm = today.getMonth() + 1;
+  const yyyy = today.getFullYear();
+
+  let season: string;
+
+  if (mm <= 5) season = 'S';
+  else if (mm <= 7)
+    season = 'U'; // include summer
+  else season = 'F';
+
+  return yyyy.toString().substring(2) + season;
+}
 
 export function LoadingFilters() {
   return (
@@ -244,7 +262,16 @@ export default function Filters({
 
     return SectionTypesMap[id] || id; // Default to ID if no mapping exists
   }
+  const currentSemester = getCurrentSemester();
+  const upcomingSemesters = availableSemesters.filter(
+    (sem) => compareSemesters2(sem, currentSemester) >= 0,
+  );
 
+  useEffect(() => {
+    console.log('availableSemesters:', availableSemesters);
+    console.log('currentSemester:', currentSemester);
+    console.log('upcoming:', upcomingSemesters);
+  }, [availableSemesters, currentSemester, upcomingSemesters]);
   return (
     <Grid
       container
@@ -588,9 +615,7 @@ export default function Filters({
                       if (event.target.checked) {
                         params.set(
                           'availability',
-                          teachingSemester ||
-                            availableSemesters[availableSemesters.length - 1] ||
-                            '',
+                          teachingSemester || upcomingSemesters[0] || '',
                         );
                       } else {
                         params.delete('availability');
@@ -612,10 +637,7 @@ export default function Filters({
               {availableSemesters.length > 0 && (
                 <Select
                   size="small"
-                  value={
-                    teachingSemester ||
-                    availableSemesters[availableSemesters.length - 1]
-                  }
+                  value={teachingSemester || upcomingSemesters[0]}
                   onChange={(e: SelectChangeEvent<string>) => {
                     const newSemester = e.target.value;
                     setTeachingSemester(newSemester);
@@ -638,7 +660,7 @@ export default function Filters({
                   }
                   className="min-w-[120px]"
                 >
-                  {availableSemesters.map((sem) => (
+                  {upcomingSemesters.map((sem) => (
                     <MenuItem key={sem} value={sem}>
                       {displaySemesterName(sem, false)}
                     </MenuItem>
