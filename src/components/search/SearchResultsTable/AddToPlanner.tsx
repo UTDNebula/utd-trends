@@ -57,8 +57,8 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
   const latestSections = allResults.map((r) =>
     r.isSuccess
       ? r.data.sections.filter(
-        (s) => s.academic_session.name === latestSemester && s != null,
-      )
+          (s) => s.academic_session.name === latestSemester && s != null,
+        )
       : [],
   );
 
@@ -80,14 +80,17 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
   };
 
   // Separate by type using correct section codes
-  const lectureSections = courseOnlySections.filter((s) =>
-    /^[05]/.test(s.section_number) || /^0[WHL]/.test(s.section_number) || /^(HON|HN)/.test(s.section_number)
+  const lectureSections = courseOnlySections.filter(
+    (s) =>
+      /^[05]/.test(s.section_number) ||
+      /^0[WHL]/.test(s.section_number) ||
+      /^(HON|HN)/.test(s.section_number),
   );
   const labSections = courseOnlySections.filter((s) =>
-    /^[1236]/.test(s.section_number)
+    /^[1236]/.test(s.section_number),
   );
   const examSections = courseOnlySections.filter((s) =>
-    /^7/.test(s.section_number)
+    /^7/.test(s.section_number),
   );
 
   const fitSections = (arr: typeof courseOnlySections) =>
@@ -97,33 +100,37 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
 
   if (lectureSections.length > 0) {
     // count lecture based sections
-    const lecturesFitWithRequiredCompanions = lectureSections.filter((lecture) => {
-      const base = getBaseSectionNumber(lecture.section_number);
-      if (!base) return true;
+    const lecturesFitWithRequiredCompanions = lectureSections.filter(
+      (lecture) => {
+        const base = getBaseSectionNumber(lecture.section_number);
+        if (!base) return true;
 
-      const courseHasLabs = labSections.length > 0;
-      const courseHasExams = examSections.length > 0;
+        const courseHasLabs = labSections.length > 0;
+        const courseHasExams = examSections.length > 0;
 
-      if (courseHasLabs) {
-        const matchingLab = labSections.find((l) => getBaseSectionNumber(l.section_number) === base);
-        if (matchingLab && fitSections([matchingLab]).length === 0) {
-          return false;
+        if (courseHasLabs) {
+          const matchingLab = labSections.find(
+            (l) => getBaseSectionNumber(l.section_number) === base,
+          );
+          if (matchingLab && fitSections([matchingLab]).length === 0) {
+            return false;
+          }
         }
-      }
 
-      if (courseHasExams) {
-        const matchingExam = examSections.find((e) => getBaseSectionNumber(e.section_number) === base);
-        if (matchingExam && fitSections([matchingExam]).length === 0) {
-          return false;
+        if (courseHasExams) {
+          const matchingExam = examSections.find(
+            (e) => getBaseSectionNumber(e.section_number) === base,
+          );
+          if (matchingExam && fitSections([matchingExam]).length === 0) {
+            return false;
+          }
         }
-      }
 
-      return true;
-    });
+        return true;
+      },
+    );
 
     finalDisplayCount = lecturesFitWithRequiredCompanions.length;
-
-
   } else if (labSections.length > 0) {
     // Count for lab only sections
     const labsFitWithRequiredCompanions = labSections.filter((lab) => {
@@ -133,7 +140,9 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
       const courseHasExams = examSections.length > 0;
 
       if (courseHasExams) {
-        const matchingExam = examSections.find((e) => getBaseSectionNumber(e.section_number) === base);
+        const matchingExam = examSections.find(
+          (e) => getBaseSectionNumber(e.section_number) === base,
+        );
         if (matchingExam && fitSections([matchingExam]).length === 0) {
           return false;
         }
