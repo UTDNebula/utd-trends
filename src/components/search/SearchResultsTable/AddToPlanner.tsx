@@ -40,8 +40,7 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
 
   const availableSections = searchResult.sections.filter(
     (s) =>
-      s.academic_session.name === latestSemester &&
-      !/^[7]/.test(s.section_number),
+      s.academic_session.name === latestSemester,
   );
 
   const canAddCourseOnlyToPlanner =
@@ -62,10 +61,9 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
   const latestSections = allResults.map((r) =>
     r.isSuccess
       ? r.data.sections.filter(
-          (s) =>
-            s.academic_session.name === latestSemester &&
-            !/^[7]/.test(s.section_number),
-        )
+        (s) =>
+          s.academic_session.name === latestSemester,
+      )
       : [],
   );
 
@@ -84,84 +82,15 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
     return !hasConflict(section, selectedSections); // Keep sections with no conflicts
   });
 
-  return sectionsThatFitPlannerSchedule.length > 0 ? (
-    <Badge color="secondary" badgeContent=" ">
-      <Tooltip
-        title={
-          searchResult.type === 'professor'
-            ? 'Cannot add professor to planner'
-            : hasLatestSemester
-              ? inPlanner
-                ? `Remove from Planner (${sectionsThatFitPlannerSchedule.length} sections)`
-                : `${sectionsThatFitPlannerSchedule.length} section(s) fit your schedule!`
-              : 'Not being taught'
-        }
-        placement="top"
-      >
-        <span>
-          <Checkbox
-            checked={inPlanner}
-            onClick={(e) => {
-              e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
-              if (inPlanner) {
-                removeFromPlanner(searchResult.searchQuery);
-              } else {
-                addToPlanner(searchResult.searchQuery);
-                if (addJustCourseToo) {
-                  addToPlanner(convertToCourseOnly(searchResult.searchQuery));
-                }
-                queryClient.prefetchQuery({
-                  queryKey: [
-                    'results',
-                    searchQueryLabel(
-                      convertToCourseOnly(
-                        removeSection(searchResult.searchQuery),
-                      ),
-                    ),
-                  ],
-                  queryFn: async () => {
-                    const data = await fetchSearchResult(
-                      convertToCourseOnly(searchResult.searchQuery),
-                    );
-                    return data;
-                  },
-                });
-                queryClient.prefetchQuery({
-                  queryKey: [
-                    'rmp',
-                    searchQueryLabel(
-                      convertToProfOnly(
-                        removeSection(searchResult.searchQuery),
-                      ),
-                    ),
-                  ],
-                  queryFn: async () => {
-                    const data = await fetchSearchResult(
-                      convertToProfOnly(
-                        removeSection(searchResult.searchQuery),
-                      ),
-                    );
-                    return data;
-                  },
-                });
-              }
-            }}
-            icon={<BookOutlinedIcon />}
-            checkedIcon={<BookIcon />}
-            disabled={!hasLatestSemester || searchResult.type === 'professor'}
-          />
-        </span>
-      </Tooltip>
-    </Badge>
-  ) : (
+  return (
     <Tooltip
       title={
         searchResult.type === 'professor'
           ? 'Cannot add professor to planner'
           : hasLatestSemester
             ? inPlanner
-              ? 'Remove from Planner'
-              : 'Add to Planner'
+              ? `Remove from Planner (${sectionsThatFitPlannerSchedule.length} sections)`
+              : `${sectionsThatFitPlannerSchedule.length} section(s) fit your schedule!`
             : 'Not being taught'
       }
       placement="top"
@@ -198,23 +127,27 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
                 queryKey: [
                   'rmp',
                   searchQueryLabel(
-                    convertToProfOnly(removeSection(searchResult.searchQuery)),
+                    convertToProfOnly(
+                      removeSection(searchResult.searchQuery),
+                    ),
                   ),
                 ],
                 queryFn: async () => {
                   const data = await fetchSearchResult(
-                    convertToProfOnly(removeSection(searchResult.searchQuery)),
+                    convertToProfOnly(
+                      removeSection(searchResult.searchQuery),
+                    ),
                   );
                   return data;
                 },
               });
             }
           }}
-          icon={<BookOutlinedIcon />}
+          icon={<Badge color="secondary" variant="dot" badgeContent=" " invisible={sectionsThatFitPlannerSchedule.length <= 0}><BookOutlinedIcon /></Badge>}
           checkedIcon={<BookIcon />}
           disabled={!hasLatestSemester || searchResult.type === 'professor'}
         />
       </span>
     </Tooltip>
-  );
+  )
 }
