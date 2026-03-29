@@ -7,3 +7,4 @@ package-lock.json
 public
 styleguide/build
 data
+next-env.d.ts

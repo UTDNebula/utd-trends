@@ -6,7 +6,6 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ThemeProvider } from '@mui/material/styles';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { SpeedInsights } from '@vercel/speed-insights/react';
 import type { Metadata } from 'next';
 import { Bai_Jamjuree, Inter } from 'next/font/google';
 import React from 'react';
@@ -85,7 +84,6 @@ export default async function RootLayout({
               </SharedStateProvider>
             </QueryProvider>
             <GitHubButton />
-            <SpeedInsights />
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>

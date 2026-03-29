@@ -33,7 +33,7 @@ jobs:
         run: npm install
 
       - name: Add API Key
-        run: echo "REACT_APP_NEBULA_API_KEY=${{ secrets.NEBULA_API_KEY }}" >> .env.local
+        run: echo "NEBULA_API_KEY=${{ secrets.NEBULA_API_KEY }}" >> .env.local
 
       - name: Fetch new data from api
         run: npm run fetchdata

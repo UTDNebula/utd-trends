@@ -11,6 +11,10 @@ Sentry.init({
 
   // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
   tracesSampleRate: 1,
+  tracePropagationTargets: [
+    'https://trends.utdnebula.com/',
+    'https://api.utdnebula.com/',
+  ],
 
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,

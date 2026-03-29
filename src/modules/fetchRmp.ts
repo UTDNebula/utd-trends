@@ -13,7 +13,7 @@ const HEADERS = {
 };
 const OVERWRITES = professor_to_alias as { [key: string]: string };
 
-function buildProfessorSearchQuery(names: string[]) {
+function buildProfessorSearchQuery(names: string[], reviews: boolean) {
   // Generate the query string with N aliased queries
   const queries = names
     .map((_, i) => {
@@ -34,6 +34,18 @@ function buildProfessorSearchQuery(names: string[]) {
                 wouldTakeAgainPercent
                 teacherRatingTags { tagName tagCount }
                 ratingsDistribution { total r1 r2 r3 r4 r5 }
+                ${
+                  reviews
+                    ? `ratings (first: 100) {
+                    edges {
+                      node {
+                        comment
+                      }
+                    }
+                  }
+                `
+                    : ''
+                }
               }
             }
           }
@@ -71,8 +83,8 @@ function buildProfessorSearchQuery(names: string[]) {
   };
 }
 
-function getGraphQlUrlProp(names: string[]) {
-  const query = buildProfessorSearchQuery(names);
+function getGraphQlUrlProp(names: string[], reviews: boolean) {
+  const query = buildProfessorSearchQuery(names, reviews);
   return {
     method: 'POST',
     headers: HEADERS,
@@ -107,6 +119,9 @@ export interface RMP {
     r5: number;
     total: number;
   };
+  ratings?: {
+    edges: { node: { comment: string } }[];
+  };
 }
 
 type TeacherSearchResponse = {
@@ -134,6 +149,7 @@ function checkProfData(
 
 export default async function fetchRmp(
   query: SearchQuery,
+  reviews: boolean = false,
 ): Promise<RMP | undefined> {
   if (
     typeof query.profFirst !== 'string' ||
@@ -154,6 +170,7 @@ export default async function fetchRmp(
   // Create fetch object for professor
   const graphQlUrlProp = getGraphQlUrlProp(
     aliasName ? [name, aliasName] : [name],
+    reviews,
   );
 
   // Fetch professor info by name with graphQL

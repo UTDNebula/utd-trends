@@ -20,6 +20,7 @@ function convertNumbersToPercents(distribution: GradesSummary): number[] {
 export default function Compare() {
   const { compare, removeFromCompare, compareColorMap } = useSharedState();
   const chosenSemesters = use(FiltersContext).chosenSemesters;
+  const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
   if (compare.length === 0) {
     return <p>Click a checkbox to add something to compare.</p>;
   }
@@ -55,7 +56,7 @@ export default function Compare() {
               const grade = compare[seriesIndex].grades;
               response +=
                 ' (' +
-                calculateGrades(grade, chosenSemesters)
+                calculateGrades(grade, chosenSemesters, chosenSectionTypes)
                   .grade_distribution[dataPointIndex].toFixed(0)
                   .toLocaleString() +
                 ')';
@@ -64,10 +65,14 @@ export default function Compare() {
             }}
             series={compare.map((course) => {
               const grade_dist = [];
-              const num_categories = convertNumbersToPercents(
-                calculateGrades(course.grades, chosenSemesters),
-              ).length;
-              for (let idx = 0; idx < num_categories; idx++) {
+              const categories = convertNumbersToPercents(
+                calculateGrades(
+                  course.grades,
+                  chosenSemesters,
+                  chosenSectionTypes,
+                ),
+              );
+              for (let idx = 0; idx < categories.length; idx++) {
                 grade_dist.push(0);
               }
 
@@ -77,15 +82,7 @@ export default function Compare() {
                   (course.type !== 'combo'
                     ? ' (Overall)' //Indicates that this entry is an aggregate for the entire course/professor
                     : ''),
-                data: Number.isNaN(
-                  convertNumbersToPercents(
-                    calculateGrades(course.grades, chosenSemesters),
-                  )[0],
-                )
-                  ? grade_dist
-                  : convertNumbersToPercents(
-                      calculateGrades(course.grades, chosenSemesters),
-                    ),
+                data: Number.isNaN(categories[0]) ? grade_dist : categories,
               };
             })}
           />
@@ -111,6 +108,7 @@ export default function Compare() {
         removeFromCompare={removeFromCompare}
         colorMap={compareColorMap}
         chosenSemesters={chosenSemesters}
+        chosenSectionTypes={chosenSectionTypes}
       />
     </div>
   );
