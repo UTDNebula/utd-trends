@@ -3,6 +3,7 @@
 import { FiltersContext } from '@/app/dashboard/FilterContext';
 import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
+import TeachingSemesterSelector from '@/components/common/TeachingSemesterSelector/TeachingSemesterSelector';
 import {
   clearAvailabilitySemester,
   setAvailabilitySemester,
@@ -567,84 +568,42 @@ export default function Filters({
 
       {/* Teaching Next Semester switch + semester dropdown */}
       <Grid size={{ xs: 12, sm: 12 / 5 }} className="px-2">
-        <Tooltip title="Select Availability" placement="top">
-          <FormControl
-            size="small"
-            className={`w-full ${
-              filterNextSem
-                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
-                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
-            }`}
-          >
-            <div className="flex flex-wrap items-center gap-2">
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={filterNextSem}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      const params = new URLSearchParams(
-                        searchParams.toString(),
-                      );
-                      if (event.target.checked) {
-                        if (effectiveTeachingSemester) {
-                          setAvailabilitySemester(
-                            params,
-                            effectiveTeachingSemester,
-                          );
-                        }
-                      } else {
-                        clearAvailabilitySemester(params);
-                      }
-                      window.history.replaceState(
-                        null,
-                        '',
-                        `${pathname}?${params.toString()}`,
-                      );
-                    }}
-                  />
-                }
-                label={
-                  effectiveTeachingSemester === ''
-                    ? 'Teaching Next Semester'
-                    : 'Teaching in'
-                }
-              />
-              {availableSemesters.length > 0 && (
-                <Select
-                  size="small"
-                  value={effectiveTeachingSemester}
-                  onChange={(e: SelectChangeEvent<string>) => {
-                    const newSemester = e.target.value;
-                    setTeachingSemester(newSemester);
-                    if (filterNextSem) {
-                      const params = new URLSearchParams(
-                        searchParams.toString(),
-                      );
-                      setAvailabilitySemester(params, newSemester);
-                      window.history.replaceState(
-                        null,
-                        '',
-                        `${pathname}?${params.toString()}`,
-                      );
-                    }
-                  }}
-                  displayEmpty
-                  disabled={!filterNextSem}
-                  renderValue={(v) =>
-                    v ? displaySemesterName(v, false) : 'Teaching Next Semester'
-                  }
-                  className="min-w-[120px]"
-                >
-                  {availableSemesters.map((sem) => (
-                    <MenuItem key={sem} value={sem}>
-                      {displaySemesterName(sem, false)}
-                    </MenuItem>
-                  ))}
-                </Select>
-              )}
-            </div>
-          </FormControl>
-        </Tooltip>
+        <TeachingSemesterSelector
+          enabled={filterNextSem}
+          onEnabledChangeAction={(enabled) => {
+            const params = new URLSearchParams(searchParams.toString());
+            if (enabled) {
+              if (effectiveTeachingSemester) {
+                setAvailabilitySemester(params, effectiveTeachingSemester);
+              }
+            } else {
+              clearAvailabilitySemester(params);
+            }
+            window.history.replaceState(
+              null,
+              '',
+              `${pathname}?${params.toString()}`,
+            );
+          }}
+          semester={effectiveTeachingSemester}
+          onSemesterChangeAction={(newSemester) => {
+            setTeachingSemester(newSemester);
+            if (!filterNextSem) return;
+            const params = new URLSearchParams(searchParams.toString());
+            setAvailabilitySemester(params, newSemester);
+            window.history.replaceState(
+              null,
+              '',
+              `${pathname}?${params.toString()}`,
+            );
+          }}
+          availableSemesters={availableSemesters}
+          formControlClassName={
+            filterNextSem
+              ? '[&_div.MuiInputBase-root]:bg-cornflower-50 dark:[&_div.MuiInputBase-root]:bg-cornflower-900'
+              : '[&_div.MuiInputBase-root]:bg-white dark:[&_div.MuiInputBase-root]:bg-black'
+          }
+        />
       </Grid>
     </Grid>
   );

@@ -2,21 +2,13 @@
 
 import Background from '@/../public/background.png';
 import { useSharedState } from '@/app/SharedStateProvider';
+import TeachingSemesterSelector from '@/components/common/TeachingSemesterSelector/TeachingSemesterSelector';
 import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
 import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 import SearchBar, {
   updateRecentSearches,
 } from '@/components/search/SearchBar/SearchBar';
-import { displaySemesterName } from '@/modules/semesters';
 import { searchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Tooltip,
-} from '@mui/material';
-import type { SelectChangeEvent } from '@mui/material/Select';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useTransition } from 'react';
@@ -28,6 +20,8 @@ export default function Home() {
   const { effectiveTeachingSemester, setTeachingSemester, availableSemesters } =
     useSharedState();
   const router = useRouter();
+  const [filterByTeachingSemester, setFilterByTeachingSemester] =
+    React.useState(true);
 
   //for spinner after router.push
   const [isPending, startTransition] = useTransition();
@@ -37,7 +31,7 @@ export default function Home() {
       const params = new URLSearchParams({
         searchTerms: chosenOptions.map(searchQueryLabel).join(','),
       });
-      if (effectiveTeachingSemester) {
+      if (filterByTeachingSemester && effectiveTeachingSemester) {
         params.set('availability', effectiveTeachingSemester);
       }
       startTransition(() => {
@@ -104,39 +98,15 @@ export default function Home() {
         />
         {/* Teaching in semester selector */}
         {availableSemesters.length > 0 && (
-          <FormControl size="small" className="min-w-[160px] mt-4">
-            <InputLabel id="home-teaching-semester">
-              <Tooltip
-                title="Filter results to courses teaching in this semester"
-                placement="bottom-start"
-              >
-                <span>Teaching in</span>
-              </Tooltip>
-            </InputLabel>
-            <Select
-              labelId="home-teaching-semester"
-              label="Teaching in"
-              size="small"
-              value={effectiveTeachingSemester}
-              onChange={(e: SelectChangeEvent<string>) =>
-                setTeachingSemester(e.target.value)
-              }
-              displayEmpty
-              renderValue={(v) =>
-                v ? displaySemesterName(v, false) : 'Teaching Next Semester'
-              }
-              className="bg-white dark:bg-haiti"
-            >
-              {availableSemesters.map((sem) => (
-                <MenuItem key={sem} value={sem}>
-                  {displaySemesterName(sem, false)}
-                </MenuItem>
-              ))}
-            </Select>
-            <p className="text-xs text-gray-500 mt-1">
-              Filter courses by semester
-            </p>
-          </FormControl>
+          <TeachingSemesterSelector
+            enabled={filterByTeachingSemester}
+            onEnabledChangeAction={setFilterByTeachingSemester}
+            semester={effectiveTeachingSemester}
+            onSemesterChangeAction={setTeachingSemester}
+            availableSemesters={availableSemesters}
+            formControlClassName="mt-4"
+            selectClassName="min-w-[160px] bg-white dark:bg-haiti"
+          />
         )}
       </div>
     </div>
