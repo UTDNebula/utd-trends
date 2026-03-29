@@ -5,7 +5,7 @@ import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import { calculateGrades } from '@/modules/fetchGrades';
 import type { Sections, SectionsData } from '@/modules/fetchSections';
 import { useSearchResult } from '@/modules/plannerFetch';
-import { checkConflict } from '@/modules/scheduleGenerator';
+import { checkConflict, parseTime } from '@/modules/scheduleGenerator';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -83,7 +83,32 @@ function hasConflict(
   if (!newSection || !selectedSections) return false;
 
   for (const selectedSection of selectedSections) {
-    if (checkConflict(newSection, selectedSection)) {
+    const newSectionMeetings = newSection.meetings
+      .filter((m) => m && m.meeting_days && m.start_time && m.end_time)
+      .map((m) => ({
+        days: m.meeting_days,
+        start: parseTime(m.start_time),
+        end: parseTime(m.end_time),
+      }));
+    const selectedSectionMeetings = selectedSection.meetings
+      .filter((m) => m && m.meeting_days && m.start_time && m.end_time)
+      .map((m) => ({
+        days: m.meeting_days,
+        start: parseTime(m.start_time),
+        end: parseTime(m.end_time),
+      }));
+    if (checkConflict(newSectionMeetings, selectedSectionMeetings)) {
+      if (
+        selectedSection.course_details &&
+        selectedSection.course_details[0] &&
+        newSection.course_details &&
+        newSection.course_details[0] &&
+        selectedSection.course_details[0].subject_prefix ==
+          newSection.course_details[0].subject_prefix &&
+        selectedSection.course_details[0].course_number ==
+          newSection.course_details[0].course_number
+      )
+        return false; // if times overlap, but same course, we can switch it out without conflict
       return true; // A conflict was found with one of the existing sections
     }
   }
