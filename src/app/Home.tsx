@@ -25,8 +25,11 @@ import React, { useTransition } from 'react';
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
 export default function Home() {
-  const { teachingSemester, setTeachingSemester, availableSemesters } =
-    useSharedState();
+  const {
+    effectiveTeachingSemester,
+    setTeachingSemester,
+    availableSemesters,
+  } = useSharedState();
   const router = useRouter();
 
   //for spinner after router.push
@@ -37,8 +40,8 @@ export default function Home() {
       const params = new URLSearchParams({
         searchTerms: chosenOptions.map(searchQueryLabel).join(','),
       });
-      if (teachingSemester) {
-        params.set('availability', teachingSemester);
+      if (effectiveTeachingSemester) {
+        params.set('availability', effectiveTeachingSemester);
       }
       startTransition(() => {
         router.push(`/dashboard?${params.toString()}`);
@@ -117,7 +120,7 @@ export default function Home() {
               labelId="home-teaching-semester"
               label="Teaching in"
               size="small"
-              value={teachingSemester || availableSemesters[0] || ''}
+              value={effectiveTeachingSemester}
               onChange={(e: SelectChangeEvent<string>) =>
                 setTeachingSemester(e.target.value)
               }

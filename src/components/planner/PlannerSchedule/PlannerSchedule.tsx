@@ -58,10 +58,11 @@ function HourRow(props: HourRowProps) {
 }
 
 export default function PlannerSchedule() {
-  const { planner, plannerColorMap, teachingSemester } = useSharedState();
+  const { planner, plannerColorMap, effectiveTeachingSemester } =
+    useSharedState();
 
   const plannerForSemester = planner.filter(
-    (entry) => entry.semester === teachingSemester,
+    (entry) => entry.semester === effectiveTeachingSemester,
   );
   const courses = plannerForSemester.flatMap((entry) =>
     searchQueryMultiSectionSplit(entry.query),

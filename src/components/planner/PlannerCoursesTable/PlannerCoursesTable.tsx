@@ -4,6 +4,7 @@ import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerCard, {
   LoadingPlannerCard,
 } from '@/components/planner/PlannerCoursesTable/PlannerCard';
+import { setAvailabilitySemester } from '@/modules/availability';
 import { useSearchresults } from '@/modules/plannerFetch';
 import { displaySemesterName } from '@/modules/semesters';
 import {
@@ -48,7 +49,7 @@ export default function PlannerCoursesTable() {
     removeFromPlanner,
     setPlannerSection,
     plannerColorMap,
-    teachingSemester,
+    effectiveTeachingSemester,
     setTeachingSemester,
     availableSemesters,
   } = useSharedState();
@@ -62,18 +63,15 @@ export default function PlannerCoursesTable() {
     }
     setOpenConflictMessage(false);
   };
-  const effectiveSemester =
-    teachingSemester ||
-    (availableSemesters.length > 0 ? availableSemesters[0] : '');
   const plannerForSemester = planner.filter(
-    (entry) => entry.semester === effectiveSemester,
+    (entry) => entry.semester === effectiveTeachingSemester,
   );
   const queriesForSemester = plannerForSemester.map((e) => e.query);
   const allResults = useSearchresults(queriesForSemester);
   const latestSections = allResults.map((r) =>
     r.isSuccess
       ? r.data.sections.filter(
-          (s) => s.academic_session.name === teachingSemester,
+          (s) => s.academic_session.name === effectiveTeachingSemester,
         )
       : [],
   );
@@ -86,8 +84,8 @@ export default function PlannerCoursesTable() {
           className="leading-tight text-3xl font-bold shrink-0"
         >
           {'My Planner' +
-            (effectiveSemester
-              ? ' — ' + displaySemesterName(effectiveSemester, false)
+            (effectiveTeachingSemester
+              ? ' — ' + displaySemesterName(effectiveTeachingSemester, false)
               : '')}
         </Typography>
         {availableSemesters.length > 0 && (
@@ -97,12 +95,12 @@ export default function PlannerCoursesTable() {
               labelId="planner-teaching-semester"
               label="Semester"
               size="small"
-              value={effectiveSemester}
+              value={effectiveTeachingSemester}
               onChange={(e: SelectChangeEvent) => {
                 const newSemester = e.target.value;
                 setTeachingSemester(newSemester);
                 const params = new URLSearchParams(searchParams.toString());
-                params.set('availability', newSemester);
+                setAvailabilitySemester(params, newSemester);
                 router.replace(`/planner?${params.toString()}`, {
                   scroll: false,
                 });
@@ -152,7 +150,7 @@ export default function PlannerCoursesTable() {
                 color={
                   plannerColorMap[searchQueryLabel(convertToCourseOnly(query))]
                 }
-                teachingSemester={teachingSemester}
+                teachingSemester={effectiveTeachingSemester}
               />
             );
           })}

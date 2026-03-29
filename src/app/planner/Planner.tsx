@@ -6,6 +6,10 @@ import StickySide from '@/components/common/Split/StickySide';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
 import PlannerEmpty from '@/components/planner/PlannerEmpty/PlannerEmpty';
 import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedule';
+import {
+  getValidAvailabilitySemester,
+  setAvailabilitySemester,
+} from '@/modules/availability';
 import { usePathname, useSearchParams } from 'next/navigation';
 import React, { useEffect } from 'react';
 
@@ -13,25 +17,30 @@ import React, { useEffect } from 'react';
  * Returns the My Planner page
  */
 export default function Planner() {
-  const { planner, setTeachingSemester, availableSemesters, teachingSemester } =
-    useSharedState();
+  const {
+    planner,
+    setTeachingSemester,
+    availableSemesters,
+    effectiveTeachingSemester,
+  } = useSharedState();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   // Sync planner URL with teaching semester: URL is source of truth
   useEffect(() => {
     if (pathname !== '/planner') return;
-    const availability = searchParams.get('availability');
-    if (availability && availableSemesters.includes(availability)) {
+    const availability = getValidAvailabilitySemester(
+      searchParams,
+      availableSemesters,
+    );
+    if (availability) {
       setTeachingSemester(availability);
-    } else if (
-      !availability &&
-      teachingSemester &&
-      availableSemesters.length > 0
-    ) {
-      // No param: push current semester to URL so link is shareable
-      const params = new URLSearchParams();
-      params.set('availability', teachingSemester);
+    }
+
+    const rawAvailability = searchParams.get('availability');
+    if (effectiveTeachingSemester && rawAvailability !== effectiveTeachingSemester) {
+      const params = new URLSearchParams(searchParams.toString());
+      setAvailabilitySemester(params, effectiveTeachingSemester);
       window.history.replaceState(null, '', `${pathname}?${params.toString()}`);
     }
   }, [
@@ -39,7 +48,7 @@ export default function Planner() {
     searchParams,
     availableSemesters,
     setTeachingSemester,
-    teachingSemester,
+    effectiveTeachingSemester,
   ]);
 
   return (

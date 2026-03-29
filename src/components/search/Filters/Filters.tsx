@@ -5,6 +5,11 @@ import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
 import { calculateGrades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import {
+  clearAvailabilitySemester,
+  getValidAvailabilitySemester,
+  setAvailabilitySemester,
+} from '@/modules/availability';
 import { compareSemesters, displaySemesterName } from '@/modules/semesters';
 import type { SearchResult } from '@/types/SearchQuery';
 import {
@@ -94,8 +99,11 @@ export default function Filters({
 }: {
   searchResultsPromise: Promise<SearchResult[]>;
 }) {
-  const { teachingSemester, setTeachingSemester, availableSemesters } =
-    useSharedState();
+  const {
+    setTeachingSemester,
+    availableSemesters,
+    effectiveTeachingSemester,
+  } = useSharedState();
   const searchResults = use(searchResultsPromise);
   const semesters = use(FiltersContext).semesters;
   const chosenSemesters = use(FiltersContext).chosenSemesters;
@@ -118,18 +126,37 @@ export default function Filters({
   if (Array.isArray(minRating)) {
     minRating = minRating[0]; // if minRating is an array, make it a string
   }
-  const availabilitySemester = searchParams.get('availability');
-  const filterNextSem = !!availabilitySemester;
+  const rawAvailability = searchParams.get('availability');
+  const availabilitySemester = getValidAvailabilitySemester(
+    searchParams,
+    availableSemesters,
+  );
+  const filterNextSem = rawAvailability !== null;
 
   // Sync teaching semester from URL so dropdown matches shared links
   useEffect(() => {
-    if (
-      availabilitySemester &&
-      availableSemesters.includes(availabilitySemester)
-    ) {
+    if (availabilitySemester) {
       setTeachingSemester(availabilitySemester);
     }
   }, [availabilitySemester, availableSemesters, setTeachingSemester]);
+
+  useEffect(() => {
+    if (
+      rawAvailability !== null &&
+      availabilitySemester === null &&
+      effectiveTeachingSemester
+    ) {
+      const params = new URLSearchParams(searchParams.toString());
+      setAvailabilitySemester(params, effectiveTeachingSemester);
+      window.history.replaceState(null, '', `${pathname}?${params.toString()}`);
+    }
+  }, [
+    rawAvailability,
+    availabilitySemester,
+    effectiveTeachingSemester,
+    pathname,
+    searchParams,
+  ]);
 
   function getRecentSemesters() {
     // get current month and year
@@ -165,7 +192,7 @@ export default function Filters({
   const rmpCounts: Record<string, number> = {};
 
   const semFilteredResults = searchResults.filter((result) => {
-    const semesterToFilter = availabilitySemester || teachingSemester;
+    const semesterToFilter = availabilitySemester || effectiveTeachingSemester;
     const availableThisSemester =
       filterNextSem &&
       semesterToFilter &&
@@ -585,12 +612,11 @@ export default function Filters({
                         searchParams.toString(),
                       );
                       if (event.target.checked) {
-                        params.set(
-                          'availability',
-                          teachingSemester || availableSemesters[0] || '',
-                        );
+                        if (effectiveTeachingSemester) {
+                          setAvailabilitySemester(params, effectiveTeachingSemester);
+                        }
                       } else {
-                        params.delete('availability');
+                        clearAvailabilitySemester(params);
                       }
                       window.history.replaceState(
                         null,
@@ -601,7 +627,7 @@ export default function Filters({
                   />
                 }
                 label={
-                  teachingSemester === ''
+                  effectiveTeachingSemester === ''
                     ? 'Teaching Next Semester'
                     : 'Teaching in'
                 }
@@ -609,7 +635,7 @@ export default function Filters({
               {availableSemesters.length > 0 && (
                 <Select
                   size="small"
-                  value={teachingSemester || availableSemesters[0]}
+                  value={effectiveTeachingSemester}
                   onChange={(e: SelectChangeEvent<string>) => {
                     const newSemester = e.target.value;
                     setTeachingSemester(newSemester);
@@ -617,7 +643,7 @@ export default function Filters({
                       const params = new URLSearchParams(
                         searchParams.toString(),
                       );
-                      params.set('availability', newSemester);
+                      setAvailabilitySemester(params, newSemester);
                       window.history.replaceState(
                         null,
                         '',

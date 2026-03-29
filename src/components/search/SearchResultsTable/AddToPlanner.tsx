@@ -15,21 +15,25 @@ type addToPlannerProps = {
 
 export default function AddToPlanner({ searchResult }: addToPlannerProps) {
   const sections = searchResult.sections;
-  const { teachingSemester, planner, addToPlanner, removeFromPlanner } =
-    useSharedState();
+  const {
+    effectiveTeachingSemester,
+    planner,
+    addToPlanner,
+    removeFromPlanner,
+  } = useSharedState();
   // Check if the course section has the latest semester data
   const hasLatestSemester = sections.some(
-    (s) => s.academic_session.name === teachingSemester,
+    (s) => s.academic_session.name === effectiveTeachingSemester,
   );
 
   const inPlanner = planner.some(
     (entry) =>
       searchQueryEqual(entry.query, searchResult.searchQuery) &&
-      entry.semester === teachingSemester,
+      entry.semester === effectiveTeachingSemester,
   );
 
   const courseOnlySections = searchResult.sections.filter(
-    (s) => s.academic_session.name === teachingSemester,
+    (s) => s.academic_session.name === effectiveTeachingSemester,
   );
   const canAddCourseOnlyToPlanner =
     typeof courseOnlySections !== 'undefined' &&
@@ -60,13 +64,16 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
           onClick={(e) => {
             e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
             if (inPlanner) {
-              removeFromPlanner(searchResult.searchQuery, teachingSemester);
+              removeFromPlanner(
+                searchResult.searchQuery,
+                effectiveTeachingSemester,
+              );
             } else {
-              addToPlanner(searchResult.searchQuery, teachingSemester);
+              addToPlanner(searchResult.searchQuery, effectiveTeachingSemester);
               if (addJustCourseToo) {
                 addToPlanner(
                   convertToCourseOnly(searchResult.searchQuery),
-                  teachingSemester,
+                  effectiveTeachingSemester,
                 );
               }
             }

@@ -36,6 +36,18 @@ function migratePlanner(
 type SetterValue<T> = T | ((prev: T) => T);
 type Setter<T> = (value: SetterValue<T>) => void;
 
+function resolveTeachingSemester(
+  availableSemesters: string[],
+  ...candidates: (string | null | undefined)[]
+): string {
+  for (const candidate of candidates) {
+    if (candidate && availableSemesters.includes(candidate)) {
+      return candidate;
+    }
+  }
+  return availableSemesters[0] ?? '';
+}
+
 const SharedStateContext = createContext<
   | {
       compare: SearchResult[];
@@ -54,6 +66,7 @@ const SharedStateContext = createContext<
       availableSemesters: string[];
       teachingSemester: string;
       setTeachingSemester: (semester: string) => void;
+      effectiveTeachingSemester: string;
     }
   | undefined
 >(undefined);
@@ -68,6 +81,11 @@ export function SharedStateProvider({
   defaultTeachingSemester: string;
 }) {
   const [teachingSemester, setTeachingSemester] = useState<string>(
+    defaultTeachingSemester,
+  );
+  const effectiveTeachingSemester = resolveTeachingSemester(
+    availableSemesters,
+    teachingSemester,
     defaultTeachingSemester,
   );
   const [compare, setCompare] = useState<SearchResult[]>([]);
@@ -161,7 +179,7 @@ export function SharedStateProvider({
       : migratePlanner(plannerRaw, defaultTeachingSemester);
     const matchIdx = currentEntries.findIndex(
       (e) =>
-        e.semester === teachingSemester &&
+        e.semester === effectiveTeachingSemester &&
         searchQueryEqual(removeSection(e.query), removeSection(query)),
     );
     if (matchIdx === -1) {
@@ -172,7 +190,7 @@ export function SharedStateProvider({
         return entries.concat([
           {
             query: query as SearchQueryMultiSection,
-            semester: teachingSemester,
+            semester: effectiveTeachingSemester,
           },
         ]);
       });
@@ -282,6 +300,7 @@ export function SharedStateProvider({
         availableSemesters,
         teachingSemester,
         setTeachingSemester,
+        effectiveTeachingSemester,
       }}
     >
       {children}

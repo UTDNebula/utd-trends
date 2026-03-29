@@ -126,7 +126,7 @@ function HeaderChildrenInner(props: HeaderProps) {
   const [openWhatsNewModal, setOpenWhatsNewModal] = useState(false);
   const closeWhatsNewModal = useCallback(() => setOpenWhatsNewModal(false), []);
 
-  const { teachingSemester } = useSharedState();
+  const { effectiveTeachingSemester } = useSharedState();
   const [dashboardSearchTerms, setDashboardSearchTerms] = useState<
     null | string
   >(null);
@@ -143,8 +143,8 @@ function HeaderChildrenInner(props: HeaderProps) {
     href: props.isPlanner
       ? dashboardSearchTerms != null
         ? '/dashboard?' + dashboardSearchTerms
-        : teachingSemester
-          ? '/dashboard?availability=' + teachingSemester
+        : effectiveTeachingSemester
+          ? '/dashboard?availability=' + effectiveTeachingSemester
           : '/dashboard'
       : '/planner',
     onClick: () =>

@@ -3,6 +3,7 @@
 import { useSharedState } from '@/app/SharedStateProvider';
 import SearchResultsTable from '@/components/search/SearchResultsTable/SearchResultsTable';
 import { calculateGrades } from '@/modules/fetchGrades';
+import { getValidAvailabilitySemester } from '@/modules/availability';
 import { matchSectionTypesFromSectionNumber } from '@/modules/semesters';
 import { type SearchResult } from '@/types/SearchQuery';
 import { useSearchParams } from 'next/navigation';
@@ -18,7 +19,7 @@ interface Props {
  * Returns the left side
  */
 export default function ClientLeft(props: Props) {
-  const { teachingSemester } = useSharedState();
+  const { effectiveTeachingSemester, availableSemesters } = useSharedState();
 
   const searchParams = useSearchParams();
 
@@ -31,8 +32,13 @@ export default function ClientLeft(props: Props) {
   const minGPA = searchParams.get('minGPA');
   const minRating = searchParams.get('minRating');
   const maxDiff = searchParams.get('maxDiff');
-  const availabilitySemester = searchParams.get('availability');
-  const availability = !!availabilitySemester;
+  const availabilitySemester = getValidAvailabilitySemester(
+    searchParams,
+    availableSemesters,
+  );
+  const availability = searchParams.get('availability') !== null;
+  const semesterForAvailability =
+    availabilitySemester ?? effectiveTeachingSemester;
 
   const results = use(props.resultsPromise);
   const semesters = use(FiltersContext).semesters;
@@ -72,9 +78,7 @@ export default function ClientLeft(props: Props) {
   //Filter results based on gpa, rmp, rmp difficulty, availability, and grade section type
   const availableResults = filteredResults.filter((result) => {
     const availableThisSemester = result.sections.some(
-      (section) =>
-        section.academic_session.name ===
-        (availabilitySemester ?? teachingSemester),
+      (section) => section.academic_session.name === semesterForAvailability,
     );
     if (availability && !availableThisSemester) return false;
 
@@ -103,8 +107,7 @@ export default function ClientLeft(props: Props) {
   availableResults.forEach((result) => {
     const sectionsWithTypeNextSem = result.sections.filter(
       (section) =>
-        section.academic_session.name ===
-          (availabilitySemester ?? teachingSemester) &&
+        section.academic_session.name === semesterForAvailability &&
         matchSectionTypesFromSectionNumber(
           section.section_number,
           chosenSectionTypes,
@@ -127,8 +130,7 @@ export default function ClientLeft(props: Props) {
     const availableThisSemester =
       result.sections.filter(
         (section) =>
-          section.academic_session.name ===
-          (availabilitySemester ?? teachingSemester),
+          section.academic_session.name === semesterForAvailability,
       ).length > 0;
     if (availability && availableThisSemester) return false;
 

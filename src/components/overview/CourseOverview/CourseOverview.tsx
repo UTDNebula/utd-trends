@@ -249,7 +249,7 @@ function link(linkText: string, availabilitySemester?: string) {
 }
 
 export default function CourseOverview({ course, courseData, grades }: Props) {
-  const { teachingSemester } = useSharedState();
+  const { effectiveTeachingSemester } = useSharedState();
   let courseComponent = null;
   if (
     courseData.message === 'success' &&
@@ -284,7 +284,7 @@ export default function CourseOverview({ course, courseData, grades }: Props) {
               return (
                 <span key={i}>
                   {text}
-                  {link(linkTextSameAs[i], teachingSemester)}
+                  {link(linkTextSameAs[i], effectiveTeachingSemester)}
                 </span>
               );
             }
@@ -299,7 +299,7 @@ export default function CourseOverview({ course, courseData, grades }: Props) {
               return (
                 <span key={i}>
                   {text}
-                  {link(linkTextDescription[i], teachingSemester)}
+                  {link(linkTextDescription[i], effectiveTeachingSemester)}
                 </span>
               );
             }
@@ -323,7 +323,7 @@ export default function CourseOverview({ course, courseData, grades }: Props) {
                   return (
                     <span key={i}>
                       {text}
-                      {link(linkTextReqs[i], teachingSemester)}
+                      {link(linkTextReqs[i], effectiveTeachingSemester)}
                     </span>
                   );
                 }
