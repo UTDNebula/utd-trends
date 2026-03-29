@@ -13,9 +13,9 @@ export function LoadingSyllabusSummary() {
       <Skeleton variant="text" className="w-1/2" />
       <Typography
         variant="overline"
-        className="text-gray-700 dark:text-gray-300"
+        className="text-gray-700 dark:text-gray-300 pr-5"
       >
-        AI REVIEW SUMMARY
+        AI GENERATED SYLLABUS SUMMARY
       </Typography>
     </>
   );
@@ -40,16 +40,16 @@ export default function SyllabusSummary({
   syllabus_uri,
   showSyllabus,
 }: Props) {
-  const [state, setState] = useState<'closed' | 'error' | 'done'>(
-    'closed',
-  );
+  const [state, setState] = useState<'closed' | 'error' | 'done'>('closed');
   const [syllabus, setSyllabus] = useState<SyllabusData | null>(null);
 
   useEffect(() => {
     if (open && showSyllabus && !syllabus && state !== 'error') {
       const params = new URLSearchParams();
       if (syllabus_uri) params.append('syllabus_uri', syllabus_uri);
-      console.log("fetching syllabus summary with params: " + params.toString());
+      console.log(
+        'fetching syllabus summary with params: ' + params.toString(),
+      );
       fetch(`/api/syllabusSummary?${params.toString()}`, {
         method: 'GET',
         next: { revalidate: 3600 },
@@ -76,14 +76,16 @@ export default function SyllabusSummary({
         {!syllabus ? (
           <LoadingSyllabusSummary />
         ) : (
-          <div className="mt-4 rounded p-3" >
-            <h3 className="font-bold text-xl mb-2">Syllabus Grading Summary</h3>
+          <div className="mt-2 rounded p-3 max-w-dvw">
+            <h3 className="font-bold text-md mb-2 text-center">
+              Syllabus Grading Summary
+            </h3>
             <hr className="mb-4" />
 
             {/* Outer flex row: tables + AI summary */}
-            <div className="flex gap-8 items-start mt-2 flex-wrap max-w-dvw">
+            <div className="flex gap-8 items-start mt-2 flex-wrap rounded p-4 dark:bg-gray-800 border dark:border-gray-700">
               {/* Tables wrapper */}
-              <div className="tables-container flex items-start gap-8">
+              <div className="tables-container flex items-start gap-8 width-full max-w-dvw">
                 {/* Weighting Table */}
                 {syllabus.grade_weights != null &&
                   syllabus.grade_weights.length > 0 && (
@@ -113,12 +115,8 @@ export default function SyllabusSummary({
                     <table className="text-sm">
                       <thead>
                         <tr>
-                          <th className="px-2 py-1 font-bold text-md">
-                            Grade
-                          </th>
-                          <th className="px-2 py-1 font-bold text-md">
-                            Scale
-                          </th>
+                          <th className="px-2 py-1 font-bold text-md">Grade</th>
+                          <th className="px-2 py-1 font-bold text-md">Scale</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -136,8 +134,9 @@ export default function SyllabusSummary({
               {/* AI Summary / Placeholder */}
               <div
                 id="ai-summary"
-                className="text-sm flex flex-col items-center flex-1 min-h-[100px]"
+                className="text-sm flex flex-col items-start flex-1 min-h-[100px] max-w-dvw"
               >
+                <p className="py-1 font-bold text-md">Course Notes</p>
                 {syllabus.summary != null ? (
                   <p>{syllabus.summary}</p>
                 ) : (
@@ -146,18 +145,14 @@ export default function SyllabusSummary({
               </div>
             </div>
             <Typography
-                      variant="overline"
-                      className="text-gray-700 dark:text-gray-300"
-                    >
-                      AI GENERATED SYLLABUS SUMMARY
-                    </Typography> 
-                    <Link
-                  href={syllabus_uri}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View Syllabus
-                </Link>
+              variant="overline"
+              className="text-gray-700 dark:text-gray-300 pr-5"
+            >
+              AI GENERATED SYLLABUS SUMMARY
+            </Typography>
+            <Link href={syllabus_uri} target="_blank" rel="noopener noreferrer">
+              View Syllabus
+            </Link>
           </div>
         )}
       </Collapse>
