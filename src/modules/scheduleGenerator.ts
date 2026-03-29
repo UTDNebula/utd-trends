@@ -78,12 +78,12 @@ function scoreSection(section: Section, searchResult?: SearchResult): number {
       searchResult.RMP &&
       searchResult.RMP.numRatings > 5
     ) {
-      score += searchResult.RMP.avgRating * 2;
+      score += (searchResult.RMP.avgRating - 3.0) * 10; // [-20, 20]
       if (searchResult.RMP.avgDifficulty > 0)
-        score += 10 / searchResult.RMP.avgDifficulty;
+        score += (3.0 - searchResult.RMP.avgDifficulty) * 5; // [-10, 10]
     }
   } else {
-    score -= 20; // Penalize "Staff" or unassigned sections
+    score -= 10; // Penalize "Staff" or unassigned sections
   }
 
   // grades-based prioritization
@@ -94,7 +94,10 @@ function scoreSection(section: Section, searchResult?: SearchResult): number {
     const grades = calculateGrades(searchResult.grades);
     // grades data
     if (grades.total > 0) {
-      score += (grades.gpa - 3.0) * 10; // median
+      score += (grades.gpa - 3.0) * 15; // median
+    }
+    else {
+      score -= 5;
     }
   }
 
