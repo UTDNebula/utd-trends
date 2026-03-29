@@ -35,7 +35,11 @@ export function calculateGrades(
           sectionTypes.includes(sectionData.type)
         ) {
           grade_distribution = grade_distribution.map(
-            (item, i) => item + sectionData.grade_distribution[i],
+            (item, i) =>
+              item +
+              (sectionData.grade_distribution.length > i
+                ? sectionData.grade_distribution[i]
+                : 0),
           );
         }
       }
@@ -51,6 +55,7 @@ export function calculateGrades(
     4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
   ];
 
+  // exclude all entries after F from total
   const totalLetterGrades =
     total -
     grade_distribution
@@ -66,7 +71,6 @@ export function calculateGrades(
           accumulator + currentValue * grade_distribution[index],
         0,
       ) / totalLetterGrades;
-    // sum the rest of the array (values without GPAs)
   }
 
   let median_gpa = -1;

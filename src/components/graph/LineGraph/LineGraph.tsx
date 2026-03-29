@@ -51,23 +51,25 @@ function getSemesterGPAs(
         Array(14).fill(0) as number[],
       );
 
-      const total = aggregate.reduce((a, c) => a + c, 0);
-
-      const totalGrades = total - aggregate[aggregate.length - 1];
-      // No valid grades to compute GPA
-      if (totalGrades <= 0) {
-        return null;
-      }
-
       const GPALookup = [
         4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
       ];
+
+      const totalLetterGrades = aggregate
+        .slice(0, GPALookup.length)
+        .reduce((a, c) => a + c, 0);
+
+      // No valid grades to compute GPA
+      if (totalLetterGrades <= 0) {
+        return null;
+      }
+
       const gpa =
         GPALookup.reduce(
           (accumulator, currentValue, index) =>
             accumulator + currentValue * aggregate[index],
           0,
-        ) / totalGrades;
+        ) / totalLetterGrades;
 
       const xValue = semesterMapping.get(semester._id);
       if (xValue !== undefined) {
