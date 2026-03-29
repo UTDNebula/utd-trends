@@ -5,6 +5,7 @@ import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import { calculateGrades } from '@/modules/fetchGrades';
 import type { Sections, SectionsData } from '@/modules/fetchSections';
 import { useSearchResult } from '@/modules/plannerFetch';
+import { checkConflict } from '@/modules/scheduleGenerator';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -75,18 +76,6 @@ export function LoadingPlannerCard() {
   );
 }
 
-function parseTime(time: string): number {
-  const [hour, minute] = time.split(':').map((s) => parseInt(s));
-  const isPM = time.includes('pm');
-  let hourNum = hour;
-  if (isPM && hour !== 12) {
-    hourNum += 12;
-  } else if (!isPM && hour === 12) {
-    hourNum = 0; // Midnight case
-  }
-  return hourNum + minute / 60;
-}
-
 function hasConflict(
   newSection: Sections['all'][number],
   selectedSections: Sections['all'],
@@ -94,46 +83,8 @@ function hasConflict(
   if (!newSection || !selectedSections) return false;
 
   for (const selectedSection of selectedSections) {
-    for (const newMeeting of newSection.meetings) {
-      if (!newMeeting || !newMeeting.meeting_days) continue;
-
-      for (const existingMeeting of selectedSection.meetings) {
-        if (!existingMeeting || !existingMeeting.meeting_days) continue;
-
-        // Check if days overlap
-        const overlappingDays = newMeeting.meeting_days.some((day) =>
-          existingMeeting.meeting_days.includes(day),
-        );
-
-        if (overlappingDays) {
-          // Convert times to comparable values
-          const newStart = parseTime(newMeeting.start_time);
-          const newEnd = parseTime(newMeeting.end_time);
-          const existingStart = parseTime(existingMeeting.start_time);
-          const existingEnd = parseTime(existingMeeting.end_time);
-
-          // Check if times overlap
-          if (
-            (newStart < existingEnd && newStart >= existingStart) ||
-            (newEnd > existingStart && newEnd <= existingEnd) ||
-            (newStart <= existingStart && newEnd >= existingEnd) ||
-            (newStart >= existingStart && newEnd <= existingEnd)
-          ) {
-            if (
-              selectedSection.course_details &&
-              selectedSection.course_details[0] &&
-              newSection.course_details &&
-              newSection.course_details[0] &&
-              selectedSection.course_details[0].subject_prefix ==
-                newSection.course_details[0].subject_prefix &&
-              selectedSection.course_details[0].course_number ==
-                newSection.course_details[0].course_number
-            )
-              return false; // if times overlap, but same course, we can switch it out without conflict
-            return true; // Conflict detected
-          }
-        }
-      }
+    if (checkConflict(newSection, selectedSection)) {
+      return true; // A conflict was found with one of the existing sections
     }
   }
 
