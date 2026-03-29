@@ -5,12 +5,12 @@ import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
 import {
   clearAvailabilitySemester,
-  getValidAvailabilitySemester,
   setAvailabilitySemester,
 } from '@/modules/availability';
 import { calculateGrades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 import { compareSemesters, displaySemesterName } from '@/modules/semesters';
+import { useAvailabilityUrlSync } from '@/modules/useAvailabilityUrlSync';
 import type { SearchResult } from '@/types/SearchQuery';
 import {
   Checkbox,
@@ -26,7 +26,7 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { usePathname, useSearchParams } from 'next/navigation';
-import React, { use, useEffect } from 'react';
+import React, { use } from 'react';
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
@@ -123,37 +123,14 @@ export default function Filters({
   if (Array.isArray(minRating)) {
     minRating = minRating[0]; // if minRating is an array, make it a string
   }
-  const rawAvailability = searchParams.get('availability');
-  const availabilitySemester = getValidAvailabilitySemester(
-    searchParams,
-    availableSemesters,
-  );
-  const filterNextSem = rawAvailability !== null;
-
-  // Sync teaching semester from URL so dropdown matches shared links
-  useEffect(() => {
-    if (availabilitySemester) {
-      setTeachingSemester(availabilitySemester);
-    }
-  }, [availabilitySemester, availableSemesters, setTeachingSemester]);
-
-  useEffect(() => {
-    if (
-      rawAvailability !== null &&
-      availabilitySemester === null &&
-      effectiveTeachingSemester
-    ) {
-      const params = new URLSearchParams(searchParams.toString());
-      setAvailabilitySemester(params, effectiveTeachingSemester);
-      window.history.replaceState(null, '', `${pathname}?${params.toString()}`);
-    }
-  }, [
-    rawAvailability,
-    availabilitySemester,
-    effectiveTeachingSemester,
+  const { rawAvailability, availabilitySemester } = useAvailabilityUrlSync({
     pathname,
     searchParams,
-  ]);
+    availableSemesters,
+    effectiveTeachingSemester,
+    setTeachingSemester,
+  });
+  const filterNextSem = rawAvailability !== null;
 
   function getRecentSemesters() {
     // get current month and year

@@ -36,7 +36,7 @@ export default function ClientLeft(props: Props) {
     searchParams,
     availableSemesters,
   );
-  const availability = searchParams.get('availability') !== null;
+  const availability = availabilitySemester !== null;
   const semesterForAvailability =
     availabilitySemester ?? effectiveTeachingSemester;
 
