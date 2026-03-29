@@ -1,9 +1,7 @@
 import '@/styles/globals.css';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
-import {
-  fetchAvailableSemesters,
-  fetchLatestSemester,
-} from '@/modules/fetchSections';
+import { fetchAvailableSemesters } from '@/modules/fetchSections';
+import { getCurrentSemester, getInWindowSemesters } from '@/modules/semesters';
 import theme from '@/modules/theme';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ThemeProvider } from '@mui/material/styles';
@@ -69,15 +67,17 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [availableSemesters, defaultTeachingSemester]: [string[], string] =
-    await Promise.all([
-      fetchAvailableSemesters().catch(() => []),
-      fetchLatestSemester().catch(() => ''),
-    ]).then(([available, defaultSem]) => [
-      available,
-      defaultSem ||
-        (available.length > 0 ? available[available.length - 1] : ''),
-    ]);
+  const allSemesters = await fetchAvailableSemesters().catch(
+    () => [] as string[],
+  );
+  const latestSemester =
+    allSemesters.length > 0 ? allSemesters[allSemesters.length - 1] : '';
+  const availableSemesters = getInWindowSemesters(
+    allSemesters,
+    getCurrentSemester(),
+    latestSemester,
+  );
+
   return (
     <html lang="en">
       {process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' && (
@@ -91,7 +91,7 @@ export default async function RootLayout({
             <QueryProvider>
               <SharedStateProvider
                 availableSemesters={availableSemesters}
-                defaultTeachingSemester={defaultTeachingSemester}
+                defaultTeachingSemester={latestSemester}
               >
                 {children}
                 <ReactQueryDevtools initialIsOpen={false} />

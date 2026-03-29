@@ -5,7 +5,7 @@ import PlannerCard, {
   LoadingPlannerCard,
 } from '@/components/planner/PlannerCoursesTable/PlannerCard';
 import { useSearchresults } from '@/modules/plannerFetch';
-import { compareSemesters2, displaySemesterName } from '@/modules/semesters';
+import { displaySemesterName } from '@/modules/semesters';
 import {
   convertToCourseOnly,
   removeSection,
@@ -24,18 +24,6 @@ import {
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
-
-const getCurrentSemester = () => {
-  const now = new Date();
-  const year = now.getFullYear() % 100;
-  const month = now.getMonth() + 1;
-
-  let term = 'S';
-  if (month >= 5 && month < 8) term = 'U';
-  else if (month >= 8) term = 'F';
-
-  return `${year}${term}`;
-};
 
 export function LoadingPlannerCoursesTable() {
   const { planner } = useSharedState();
@@ -74,13 +62,9 @@ export default function PlannerCoursesTable() {
     }
     setOpenConflictMessage(false);
   };
-  const currentSemester = getCurrentSemester();
-  const upcomingSemesters = availableSemesters.filter(
-    (sem) => compareSemesters2(sem, currentSemester) >= 0,
-  );
-
   const effectiveSemester =
-    teachingSemester || upcomingSemesters[upcomingSemesters.length - 1] || '';
+    teachingSemester ||
+    (availableSemesters.length > 0 ? availableSemesters[0] : '');
   const plannerForSemester = planner.filter(
     (entry) => entry.semester === effectiveSemester,
   );
@@ -128,7 +112,7 @@ export default function PlannerCoursesTable() {
               }
               className="bg-white dark:bg-haiti"
             >
-              {upcomingSemesters.map((sem) => (
+              {availableSemesters.map((sem) => (
                 <MenuItem key={sem} value={sem}>
                   {displaySemesterName(sem, false)}
                 </MenuItem>

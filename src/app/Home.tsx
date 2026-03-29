@@ -7,7 +7,7 @@ import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 import SearchBar, {
   updateRecentSearches,
 } from '@/components/search/SearchBar/SearchBar';
-import { compareSemesters2, displaySemesterName } from '@/modules/semesters';
+import { displaySemesterName } from '@/modules/semesters';
 import { searchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
 import {
   FormControl,
@@ -51,24 +51,6 @@ export default function Home() {
       updateRecentSearches(chosenRecentOptions);
     }
   }
-
-  const getCurrentSemester = () => {
-    const now = new Date();
-    const year = now.getFullYear() % 100;
-    const month = now.getMonth() + 1;
-
-    let term = 'S';
-    if (month >= 5 && month < 8) term = 'U';
-    else if (month >= 8) term = 'F';
-
-    return `${year}${term}`;
-  };
-
-  const currentSemester = getCurrentSemester();
-
-  const upcomingSemesters = availableSemesters.filter(
-    (sem) => compareSemesters2(sem, currentSemester) >= 0,
-  );
 
   return (
     <div className="relative bg-lighten dark:bg-darken h-full w-full flex flex-col items-center gap-4 px-8 py-4">
@@ -121,7 +103,7 @@ export default function Home() {
           isPending={isPending}
         />
         {/* Teaching in semester selector */}
-        {upcomingSemesters.length > 0 && (
+        {availableSemesters.length > 0 && (
           <FormControl size="small" className="min-w-[160px] mt-4">
             <InputLabel id="home-teaching-semester">
               <Tooltip
@@ -135,12 +117,7 @@ export default function Home() {
               labelId="home-teaching-semester"
               label="Teaching in"
               size="small"
-              value={
-                teachingSemester ||
-                upcomingSemesters[1] ||
-                upcomingSemesters[0] ||
-                ''
-              }
+              value={teachingSemester || availableSemesters[0] || ''}
               onChange={(e: SelectChangeEvent<string>) =>
                 setTeachingSemester(e.target.value)
               }
@@ -150,7 +127,7 @@ export default function Home() {
               }
               className="bg-white dark:bg-haiti"
             >
-              {upcomingSemesters.map((sem) => (
+              {availableSemesters.map((sem) => (
                 <MenuItem key={sem} value={sem}>
                   {displaySemesterName(sem, false)}
                 </MenuItem>

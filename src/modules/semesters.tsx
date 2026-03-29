@@ -19,19 +19,46 @@ const typeRegexes: Record<string, RegExp> = {
 };
 const others = 'OTHERS';
 
-/** A comparator function used when sorting semesters by name. Returns -1 if semester 'a' is more older than semester 'b'. */
-export function compareSemesters(a: string, b: string) {
-  const x = a.substring(0, 2).localeCompare(b.substring(0, 2));
-  if (x == 0) {
-    const a_char = a[2];
-    const b_char = b[2];
-    // a_char and b_char cannot both be the same semester because x == 0
-    if (a_char == 'S') return -1;
-    if (a_char == 'U' && b_char == 'S') return 1;
-    if (a_char == 'U' && b_char == 'F') return -1;
-    if (a_char == 'F') return 1;
-    return 0;
-  } else return x;
+/** A comparator function used when sorting semesters by name. Negative if semester `a` is older than `b`, positive if newer, zero if equal. */
+export function compareSemesters(a: string, b: string): number {
+  const yearA = parseInt(a.slice(0, 2), 10);
+  const yearB = parseInt(b.slice(0, 2), 10);
+  if (yearA !== yearB) return yearA - yearB;
+  const sa = 'SUF'.indexOf(a[2]);
+  const sb = 'SUF'.indexOf(b[2]);
+  if (sa === -1 || sb === -1) return a.slice(2).localeCompare(b.slice(2));
+  return sa - sb;
+}
+
+/** Calendar semester id for "today" (Spring Jan–May, Summer Jun–Aug, Fall Sep–Dec). */
+export function getCurrentSemester(): string {
+  const today = new Date();
+  const year = today.getFullYear() % 100;
+  const month = today.getMonth();
+  const semester = month < 5 ? 'S' : month < 8 ? 'U' : 'F';
+  return `${year}${semester}`;
+}
+
+/** Semesters in `available` that fall in the inclusive window between `current` and `latest`. If `latest` is empty, keeps terms >= `current`.*/
+export function getInWindowSemesters(
+  available: string[],
+  current: string,
+  latest: string,
+): string[] {
+  if (available.length === 0) return [];
+  if (!latest) {
+    return available
+      .filter((sem) => compareSemesters(sem, current) >= 0)
+      .reverse();
+  }
+  const low = compareSemesters(current, latest) <= 0 ? current : latest;
+  const high = compareSemesters(current, latest) <= 0 ? latest : current;
+  return available
+    .filter(
+      (sem) =>
+        compareSemesters(sem, low) >= 0 && compareSemesters(high, sem) >= 0,
+    )
+    .reverse();
 }
 
 export function displaySemesterName(id: string, yearFirst = true) {
@@ -98,20 +125,4 @@ export function matchSectionTypesFromSectionNumber(
         Object.keys(typeRegexes),
       ))
   );
-}
-
-const order = { S: 1, U: 2, F: 3 };
-
-export function compareSemesters2(a: string, b: string) {
-  const yearA = parseInt(a.slice(0, 2));
-  const yearB = parseInt(b.slice(0, 2));
-
-  if (yearA !== yearB) {
-    return yearA - yearB;
-  }
-
-  const seasonA = order[a[2] as keyof typeof order];
-  const seasonB = order[b[2] as keyof typeof order];
-
-  return seasonA - seasonB;
 }
