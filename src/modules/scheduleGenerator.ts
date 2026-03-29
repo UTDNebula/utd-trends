@@ -92,8 +92,9 @@ function scoreSection(section: Section, searchResult?: SearchResult): number {
       searchResult.RMP &&
       searchResult.RMP.numRatings > 5
     ) {
-      score += searchResult.RMP.avgRating * 10;
-      score += 10 / searchResult.RMP.avgDifficulty;
+      score += searchResult.RMP.avgRating * 2;
+      if (searchResult.RMP.avgDifficulty > 0)
+        score += 10 / searchResult.RMP.avgDifficulty;
     }
   } else {
     score -= 20; // Penalize "Staff" or unassigned sections
@@ -112,11 +113,14 @@ function scoreSection(section: Section, searchResult?: SearchResult): number {
   }
 
   // prioritize middle of the day
-  if (section.meetings[0]?.start_time) {
-    const startTime = parseTime(section.meetings[0].start_time);
-    if (startTime < 9) score -= 5; // Penalize classes before 9 AM
-    if (startTime > 17) score -= 5; // Penalize evening classes
-  }
+  section.meetings.forEach((meeting) => {
+    if (meeting.start_time && meeting.end_time) {
+      const startTime = parseTime(meeting.start_time);
+      const endTime = parseTime(meeting.end_time);
+      if (startTime < 9) score -= 5; // Penalize classes before 9 AM
+      if (startTime > 17 || endTime > 18) score -= 5; // Penalize evening classes
+    }
+  });
 
   return score;
 }
