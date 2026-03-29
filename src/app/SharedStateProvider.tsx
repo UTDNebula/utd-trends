@@ -11,27 +11,9 @@ import {
   sectionCanOverlap,
   type PlannerEntry,
   type SearchQuery,
-  type SearchQueryMultiSection,
   type SearchResult,
 } from '@/types/SearchQuery';
-import React, { createContext, useContext, useEffect, useState } from 'react';
-
-function isPlannerEntry(
-  x: SearchQueryMultiSection | PlannerEntry,
-): x is PlannerEntry {
-  return 'semester' in x;
-}
-
-function migratePlanner(
-  raw: (SearchQueryMultiSection | PlannerEntry)[],
-  defaultSemester: string,
-): PlannerEntry[] {
-  return raw.map((item) =>
-    isPlannerEntry(item)
-      ? item
-      : { query: item as SearchQueryMultiSection, semester: defaultSemester },
-  );
-}
+import React, { createContext, useContext, useState } from 'react';
 
 type SetterValue<T> = T | ((prev: T) => T);
 type Setter<T> = (value: SetterValue<T>) => void;
@@ -129,77 +111,50 @@ export function SharedStateProvider({
   );
 
   //Store planner entries (query + semester added for)
-  const [plannerRaw, setPlanner] = usePersistantState<
-    (SearchQueryMultiSection | PlannerEntry)[]
-  >('planner', []);
-
-  // Migrate old format (SearchQueryMultiSection[]) to PlannerEntry[]
-  const planner: PlannerEntry[] = plannerRaw.every(isPlannerEntry)
-    ? (plannerRaw as PlannerEntry[])
-    : migratePlanner(plannerRaw, defaultTeachingSemester);
-
-  useEffect(() => {
-    if (plannerRaw.length > 0 && !plannerRaw.every(isPlannerEntry)) {
-      setPlanner(migratePlanner(plannerRaw, defaultTeachingSemester));
-    }
-  }, [plannerRaw, defaultTeachingSemester, setPlanner]);
+  const [planner, setPlanner] = usePersistantState<PlannerEntry[]>(
+    'planner_v2',
+    [],
+  );
 
   //Add a course+prof combo to planner (happens from search results); semester = selected semester when adding
   function addToPlanner(query: SearchQuery, semester: string) {
-    setPlanner((prev: (SearchQueryMultiSection | PlannerEntry)[]) => {
-      const entries = prev.every(isPlannerEntry)
-        ? (prev as PlannerEntry[])
-        : migratePlanner(prev, defaultTeachingSemester);
+    setPlanner((prev) => {
       if (
-        entries.some(
+        prev.some(
           (e) => searchQueryEqual(e.query, query) && e.semester === semester,
         )
       )
-        return entries;
-      return entries.concat([
-        { query: query as SearchQueryMultiSection, semester },
-      ]);
+        return prev;
+      return prev.concat([{ query, semester }]);
     });
   }
 
   function removeFromPlanner(query: SearchQuery, semester: string) {
-    setPlanner((prev: (SearchQueryMultiSection | PlannerEntry)[]) => {
-      const entries = prev.every(isPlannerEntry)
-        ? (prev as PlannerEntry[])
-        : migratePlanner(prev, defaultTeachingSemester);
-      return entries.filter(
+    setPlanner((prev) => {
+      return prev.filter(
         (e) => !(searchQueryEqual(e.query, query) && e.semester === semester),
       );
     });
   }
 
   function setPlannerSection(query: SearchQuery, section: string) {
-    const currentEntries = planner.every(isPlannerEntry)
-      ? planner
-      : migratePlanner(plannerRaw, defaultTeachingSemester);
-    const matchIdx = currentEntries.findIndex(
+    const matchIdx = planner.findIndex(
       (e) =>
         e.semester === effectiveTeachingSemester &&
         searchQueryEqual(removeSection(e.query), removeSection(query)),
     );
     if (matchIdx === -1) {
-      setPlanner((prev: (SearchQueryMultiSection | PlannerEntry)[]) => {
-        const entries = prev.every(isPlannerEntry)
-          ? (prev as PlannerEntry[])
-          : migratePlanner(prev, defaultTeachingSemester);
-        return entries.concat([
+      setPlanner((prev) => {
+        return prev.concat([
           {
-            query: query as SearchQueryMultiSection,
+            query,
             semester: effectiveTeachingSemester,
           },
         ]);
       });
     }
-    setPlanner((prev: (SearchQueryMultiSection | PlannerEntry)[]) => {
-      const entries = prev.every(isPlannerEntry)
-        ? (prev as PlannerEntry[])
-        : migratePlanner(prev, defaultTeachingSemester);
-      return entries.map((entry, idx) => {
+    setPlanner((prev) => {
+      return prev.map((entry, idx) => {
         if (idx !== matchIdx) return entry;
         const course = entry.query;
         if (searchQueryEqual(removeSection(course), removeSection(query))) {
