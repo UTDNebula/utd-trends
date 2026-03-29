@@ -46,12 +46,18 @@ export default function PlannerCoursesTable() {
   } = useSharedState();
 
   const [openConflictMessage, setOpenConflictMessage] = useState(false);
+  const [showAutoScheduleSnackbar, setShowAutoScheduleSnackbar] =
+    useState(false);
   const [autoScheduleResultMessage, setAutoScheduleResultMessage] =
     useState('');
 
   const conflictMessageClose = (_: unknown, reason?: string) => {
     if (reason === 'clickaway') return;
     setOpenConflictMessage(false);
+  };
+  const autoScheduleResultMessageClose = (_: unknown, reason?: string) => {
+    if (reason === 'clickaway') return;
+    setShowAutoScheduleSnackbar(false);
   };
 
   const allResults = useSearchresults(planner);
@@ -105,6 +111,7 @@ export default function PlannerCoursesTable() {
         }`,
       );
     }
+    setShowAutoScheduleSnackbar(true);
   };
 
   return (
@@ -182,17 +189,17 @@ export default function PlannerCoursesTable() {
 
       {/* Auto-Schedule notification snackbar */}
       <Snackbar
-        open={!!autoScheduleResultMessage}
+        open={showAutoScheduleSnackbar}
         autoHideDuration={3000}
-        onClose={() => setAutoScheduleResultMessage('')}
+        onClose={autoScheduleResultMessageClose}
       >
         <Alert
-          onClose={() => setAutoScheduleResultMessage('')}
           severity={
             autoScheduleResultMessage.includes('No new') ? 'warning' : 'success'
           }
           variant="filled"
           className="w-full"
+          onClose={autoScheduleResultMessageClose}
         >
           {autoScheduleResultMessage}
         </Alert>
