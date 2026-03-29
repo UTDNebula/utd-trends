@@ -64,7 +64,11 @@ export function checkConflict(
 }
 
 // heuristic to core a section based on its desirability
-function scoreSection(section: Section, searchResult?: SearchResult): number {
+function scoreSection(
+  section: Section,
+  meetings: ParsedMeeting[],
+  searchResult?: SearchResult,
+): number {
   let score = 0;
 
   // professor-based prioritization
@@ -87,29 +91,25 @@ function scoreSection(section: Section, searchResult?: SearchResult): number {
   }
 
   // grades-based prioritization
-  if (
-    searchResult &&
-    (searchResult?.type == 'combo' || searchResult?.type == 'course')
-  ) {
+  if (searchResult) {
     const grades = calculateGrades(searchResult.grades);
     // grades data
     if (grades.total > 0) {
       score += (grades.gpa - 3.0) * 15; // median
-    }
-    else {
+    } else {
       score -= 5;
     }
   }
 
   // prioritize middle of the day
-  section.meetings.forEach((meeting) => {
-    if (meeting.start_time && meeting.end_time) {
-      const startTime = parseTime(meeting.start_time);
-      const endTime = parseTime(meeting.end_time);
-      if (startTime < 9) score -= 5; // Penalize classes before 9 AM
-      if (startTime > 17 || endTime > 18) score -= 5; // Penalize evening classes
-    }
-  });
+  if (meetings.length > 0) {
+    if (meetings[0].start < 9) score -= 5; // Penalize classes before 9 AM
+    if (meetings[0].start > 17 || meetings[0].end > 18) score -= 5; // Penalize evening classes
+  }
+
+  if (!searchResult) {
+    score -= 5;
+  }
 
   return score;
 }
@@ -152,7 +152,7 @@ export function generateOptimalSchedule(
         lockedSections.push({
           query,
           section,
-          score: scoreSection(section, searchResult),
+          score: scoreSection(section, parsedMeetings, searchResult),
           meetings: parsedMeetings,
         });
         lockedCourseKeys.add(courseKey);
@@ -192,7 +192,7 @@ export function generateOptimalSchedule(
         existingOptions.push({
           query,
           section,
-          score: scoreSection(section, searchResult),
+          score: scoreSection(section, parsedMeetings, searchResult),
           meetings: parsedMeetings,
         });
       }
