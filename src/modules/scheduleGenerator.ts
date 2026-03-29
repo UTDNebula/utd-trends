@@ -1,4 +1,4 @@
-import { Sections } from '@/modules/fetchSections';
+import { type Sections } from '@/modules/fetchSections';
 import {
   SearchQuery,
   SearchQueryMultiSection,
