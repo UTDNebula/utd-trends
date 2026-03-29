@@ -38,7 +38,10 @@ export default function Planner() {
     }
 
     const rawAvailability = searchParams.get('availability');
-    if (effectiveTeachingSemester && rawAvailability !== effectiveTeachingSemester) {
+    if (
+      effectiveTeachingSemester &&
+      rawAvailability !== effectiveTeachingSemester
+    ) {
       const params = new URLSearchParams(searchParams.toString());
       setAvailabilitySemester(params, effectiveTeachingSemester);
       window.history.replaceState(null, '', `${pathname}?${params.toString()}`);

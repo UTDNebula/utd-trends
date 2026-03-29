@@ -698,7 +698,10 @@ export default function SearchResultsTable({
                       {'Not teaching ' +
                         (effectiveTeachingSemester !== ''
                           ? 'in ' +
-                            displaySemesterName(effectiveTeachingSemester, false)
+                            displaySemesterName(
+                              effectiveTeachingSemester,
+                              false,
+                            )
                           : 'Next Semester')}
                     </Typography>
                     <Divider className="grow" />

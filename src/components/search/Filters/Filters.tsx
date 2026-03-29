@@ -3,13 +3,13 @@
 import { FiltersContext } from '@/app/dashboard/FilterContext';
 import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
-import { calculateGrades } from '@/modules/fetchGrades';
-import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 import {
   clearAvailabilitySemester,
   getValidAvailabilitySemester,
   setAvailabilitySemester,
 } from '@/modules/availability';
+import { calculateGrades } from '@/modules/fetchGrades';
+import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 import { compareSemesters, displaySemesterName } from '@/modules/semesters';
 import type { SearchResult } from '@/types/SearchQuery';
 import {
@@ -99,11 +99,8 @@ export default function Filters({
 }: {
   searchResultsPromise: Promise<SearchResult[]>;
 }) {
-  const {
-    setTeachingSemester,
-    availableSemesters,
-    effectiveTeachingSemester,
-  } = useSharedState();
+  const { setTeachingSemester, availableSemesters, effectiveTeachingSemester } =
+    useSharedState();
   const searchResults = use(searchResultsPromise);
   const semesters = use(FiltersContext).semesters;
   const chosenSemesters = use(FiltersContext).chosenSemesters;
@@ -613,7 +610,10 @@ export default function Filters({
                       );
                       if (event.target.checked) {
                         if (effectiveTeachingSemester) {
-                          setAvailabilitySemester(params, effectiveTeachingSemester);
+                          setAvailabilitySemester(
+                            params,
+                            effectiveTeachingSemester,
+                          );
                         }
                       } else {
                         clearAvailabilitySemester(params);

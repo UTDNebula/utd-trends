@@ -25,11 +25,8 @@ import React, { useTransition } from 'react';
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
 export default function Home() {
-  const {
-    effectiveTeachingSemester,
-    setTeachingSemester,
-    availableSemesters,
-  } = useSharedState();
+  const { effectiveTeachingSemester, setTeachingSemester, availableSemesters } =
+    useSharedState();
   const router = useRouter();
 
   //for spinner after router.push

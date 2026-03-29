@@ -2,8 +2,8 @@
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import SearchResultsTable from '@/components/search/SearchResultsTable/SearchResultsTable';
-import { calculateGrades } from '@/modules/fetchGrades';
 import { getValidAvailabilitySemester } from '@/modules/availability';
+import { calculateGrades } from '@/modules/fetchGrades';
 import { matchSectionTypesFromSectionNumber } from '@/modules/semesters';
 import { type SearchResult } from '@/types/SearchQuery';
 import { useSearchParams } from 'next/navigation';
@@ -129,8 +129,7 @@ export default function ClientLeft(props: Props) {
     if (!availability) return false;
     const availableThisSemester =
       result.sections.filter(
-        (section) =>
-          section.academic_session.name === semesterForAvailability,
+        (section) => section.academic_session.name === semesterForAvailability,
       ).length > 0;
     if (availability && availableThisSemester) return false;
 
