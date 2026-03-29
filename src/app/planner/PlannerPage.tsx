@@ -1,7 +1,7 @@
 'use client';
 
+import Header from '@/components/navigation/Header/Header';
 import React, { useRef } from 'react';
-import TopMenu from '../../components/navigation/TopMenu/TopMenu';
 import Planner from './Planner';
 import PlannerDownloadUI from './PlannerDownloadUI';
 
@@ -10,7 +10,7 @@ export default function PlannerPage() {
 
   return (
     <>
-      <TopMenu isPlanner={true} downloadRef={downloadRef} />
+      <Header isPlanner={true} downloadRef={downloadRef} />
       <main className="p-4">
         <Planner />
       </main>

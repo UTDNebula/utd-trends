@@ -22,9 +22,9 @@ export default function Planner() {
           <PlannerSchedule />
         </StickySide>
       }
-      minLeft={30}
-      minRight={50}
-      defaultLeft={40}
+      minLeft="30%"
+      minRight="50%"
+      defaultLeft="40%"
     />
   );
 }

@@ -183,7 +183,11 @@ export default function SingleProfInfo({
       )}
 
       <Grid size={12}>
-        <RmpSummary open={open} searchQuery={searchQuery} />
+        <RmpSummary
+          key={JSON.stringify(searchQuery)}
+          open={open}
+          searchQuery={searchQuery}
+        />
       </Grid>
 
       <Grid size={12}>

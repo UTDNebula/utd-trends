@@ -4,7 +4,7 @@ import { useSharedState } from '@/app/SharedStateProvider';
 import { TabNavMenu } from '@/components/navigation/TabNavMenu/TabNavMenu';
 import { Collapse, useMediaQuery } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 
 interface CarouselProps {
   names: React.ReactNode;
@@ -48,17 +48,6 @@ export default function Carousel({ names, children }: CarouselProps) {
   const [direction, setDirection] = useState(0);
 
   const { compare } = useSharedState();
-  const lastCompareLength = useRef(compare.length);
-
-  useEffect(() => {
-    /**
-     * On each re-render, ensure currentCard is within valid bounds
-     */
-    if (Array.isArray(children) && currentCard >= children.length) {
-      // If currentCard is out of bounds, reset it to 0
-      setCurrentCard(0);
-    }
-  }, [currentCard, children]);
 
   /**
    * Turn
@@ -77,21 +66,7 @@ export default function Carousel({ names, children }: CarouselProps) {
   };
 
   const isSmallScreen = useMediaQuery('(max-width: 640px)');
-  const [open, setOpen] = useState(false);
-  useEffect(() => setOpen(!isSmallScreen), [isSmallScreen]);
-  useEffect(() => {
-    if (compare.length !== lastCompareLength.current) {
-      if (lastCompareLength.current <= compare.length) {
-        setDirection(1);
-        setCurrentCard(Array.isArray(children) ? children.length - 1 : 0);
-      }
-      if (lastCompareLength.current == 1 && compare.length == 0) {
-        setDirection(-1);
-        setCurrentCard(0);
-      }
-      lastCompareLength.current = compare.length;
-    }
-  }, [compare.length, children]);
+  const [open, setOpen] = useState(() => !isSmallScreen);
 
   return (
     <>
