@@ -117,7 +117,7 @@ export function SharedStateProvider({
 
   function setPlannerSection(query: SearchQuery, section: string) {
     setPlanner((prev: SearchQueryMultiSection[]) => {
-      let nextState = [...prev];
+      const nextState = [...prev];
 
       if (
         !nextState.find((course) =>
