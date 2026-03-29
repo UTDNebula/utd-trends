@@ -1,8 +1,8 @@
 'use client';
 
-import { searchQueryEqual, type SearchQuery } from '@/types/SearchQuery';
+import { type SearchQuery } from '@/types/SearchQuery';
 import { Collapse, Link, Skeleton, Typography } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export function LoadingSyllabusSummary() {
   return (
@@ -40,22 +40,16 @@ export default function SyllabusSummary({
   syllabus_uri,
   showSyllabus,
 }: Props) {
-  const searchQueryRef = useRef(searchQuery);
-  const [state, setState] = useState<'closed' | 'loading' | 'error' | 'done'>(
+  const [state, setState] = useState<'closed' | 'error' | 'done'>(
     'closed',
   );
   const [syllabus, setSyllabus] = useState<SyllabusData | null>(null);
 
   useEffect(() => {
-    if (!searchQueryEqual(searchQueryRef.current, searchQuery)) {
-      searchQueryRef.current = searchQuery;
-      setState('closed');
-      setSyllabus(null);
-    }
-    if (open && state === 'closed') {
-      setState('loading');
+    if (open && showSyllabus && !syllabus && state !== 'error') {
       const params = new URLSearchParams();
       if (syllabus_uri) params.append('syllabus_uri', syllabus_uri);
+      console.log("fetching syllabus summary with params: " + params.toString());
       fetch(`/api/syllabusSummary?${params.toString()}`, {
         method: 'GET',
         next: { revalidate: 3600 },
@@ -70,10 +64,10 @@ export default function SyllabusSummary({
           setSyllabus(data.data);
         });
     }
-  }, [open, state, searchQuery]);
+  }, [open, state, searchQuery, syllabus_uri, showSyllabus, syllabus]);
 
   if (state === 'error') {
-    return <p>Problem loading AI review summary.</p>;
+    return <p>Problem loading AI syllabus summary.</p>;
   }
 
   return (
@@ -82,24 +76,24 @@ export default function SyllabusSummary({
         {!syllabus ? (
           <LoadingSyllabusSummary />
         ) : (
-          <div className="mt-4 rounded p-3">
+          <div className="mt-4 rounded p-3" >
             <h3 className="font-bold text-xl mb-2">Syllabus Grading Summary</h3>
             <hr className="mb-4" />
 
             {/* Outer flex row: tables + AI summary */}
-            <div className="flex gap-8 items-center mt-2">
+            <div className="flex gap-8 items-start mt-2 flex-wrap max-w-dvw">
               {/* Tables wrapper */}
-              <div className="tables-container flex gap-8">
+              <div className="tables-container flex items-start gap-8">
                 {/* Weighting Table */}
                 {syllabus.grade_weights != null &&
                   syllabus.grade_weights.length > 0 && (
                     <table className="text-sm">
                       <thead>
                         <tr>
-                          <th className="px-2 py-1 font-semibold text-lg">
+                          <th className="px-2 py-1 font-bold text-md">
                             Weighting
                           </th>
-                          <th className="px-2 py-1 font-semibold text-lg">%</th>
+                          <th className="px-2 py-1 font-bold text-md">%</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -119,10 +113,10 @@ export default function SyllabusSummary({
                     <table className="text-sm">
                       <thead>
                         <tr>
-                          <th className="px-2 py-1 font-semibold text-lg">
+                          <th className="px-2 py-1 font-bold text-md">
                             Grade
                           </th>
-                          <th className="px-2 py-1 font-semibold text-lg">
+                          <th className="px-2 py-1 font-bold text-md">
                             Scale
                           </th>
                         </tr>
@@ -149,15 +143,21 @@ export default function SyllabusSummary({
                 ) : (
                   <p>Could not summarize the syllabus</p>
                 )}
-                <Link
+              </div>
+            </div>
+            <Typography
+                      variant="overline"
+                      className="text-gray-700 dark:text-gray-300"
+                    >
+                      AI GENERATED SYLLABUS SUMMARY
+                    </Typography> 
+                    <Link
                   href={syllabus_uri}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   View Syllabus
                 </Link>
-              </div>
-            </div>
           </div>
         )}
       </Collapse>
