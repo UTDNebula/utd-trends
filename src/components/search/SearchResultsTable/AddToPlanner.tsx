@@ -12,7 +12,7 @@ import {
 import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
-import { Checkbox, Tooltip } from '@mui/material';
+import { Badge, Checkbox, Tooltip } from '@mui/material';
 
 type addToPlannerProps = {
   searchResult: SearchResult;
@@ -165,29 +165,30 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
       placement="top"
     >
       <span>
-        <Checkbox
-          checked={inPlanner}
-          onClick={(e) => {
-            e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
-            if (inPlanner) {
-              removeFromPlanner(searchResult.searchQuery);
-            } else {
-              addToPlanner(searchResult.searchQuery);
-              if (addJustCourseToo) {
-                addToPlanner(convertToCourseOnly(searchResult.searchQuery));
+        <Badge
+          badgeContent={<EventAvailableIcon sx={{ fontSize: 12 }} />}
+          invisible={finalDisplayCount === 0}
+          overlap="circular"
+          color="secondary"
+        >
+          <Checkbox
+            checked={inPlanner}
+            onClick={(e) => {
+              e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
+              if (inPlanner) {
+                removeFromPlanner(searchResult.searchQuery);
+              } else {
+                addToPlanner(searchResult.searchQuery);
+                if (addJustCourseToo) {
+                  addToPlanner(convertToCourseOnly(searchResult.searchQuery));
+                }
               }
-            }
-          }}
-          icon={
-            finalDisplayCount > 0 ? (
-              <EventAvailableIcon />
-            ) : (
-              <BookOutlinedIcon />
-            )
-          }
-          checkedIcon={<BookIcon />}
-          disabled={!hasLatestSemester || searchResult.type === 'professor'}
-        />
+            }}
+            icon={<BookOutlinedIcon />}
+            checkedIcon={<BookIcon />}
+            disabled={!hasLatestSemester || searchResult.type === 'professor'}
+          />
+        </Badge>
       </span>
     </Tooltip>
   );
