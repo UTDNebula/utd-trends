@@ -9,10 +9,16 @@ import { calculateGrades } from './fetchGrades';
 
 type Section = Sections['all'][number];
 
+interface ParsedMeeting {
+  days: string[];
+  start: number;
+  end: number;
+}
 interface CourseOption {
   query: SearchQuery;
   section: Section;
   score: number;
+  meetings: ParsedMeeting[];
 }
 
 export function parseTime(time: string): number {
@@ -30,47 +36,27 @@ export function parseTime(time: string): number {
   return hourNum + minute / 60;
 }
 
-export function checkConflict(sec1: Section, sec2: Section): boolean {
-  if (!sec1 || !sec2) return false;
+export function checkConflict(
+  sec1Meetings: ParsedMeeting[],
+  sec2Meetings: ParsedMeeting[],
+): boolean {
+  for (const sec1Meeting of sec1Meetings) {
+    if (!sec1Meeting || !sec1Meeting.days) continue;
 
-  for (const sec1Meeting of sec1.meetings) {
-    if (!sec1Meeting || !sec1Meeting.meeting_days) continue;
-
-    for (const sec2Meeting of sec2.meetings) {
-      if (!sec2Meeting || !sec2Meeting.meeting_days) continue;
+    for (const sec2Meeting of sec2Meetings) {
+      if (!sec2Meeting || !sec2Meeting.days) continue;
 
       // Check if days overlap
-      const overlappingDays = sec1Meeting.meeting_days.some((day) =>
-        sec2Meeting.meeting_days.includes(day),
+      const overlappingDays = sec1Meeting.days.some((day) =>
+        sec2Meeting.days.includes(day),
       );
 
-      if (overlappingDays) {
-        // Convert times to comparable values
-        const newStart = parseTime(sec1Meeting.start_time);
-        const newEnd = parseTime(sec1Meeting.end_time);
-        const existingStart = parseTime(sec2Meeting.start_time);
-        const existingEnd = parseTime(sec2Meeting.end_time);
-
-        // Check if times overlap
-        if (
-          (newStart < existingEnd && newStart >= existingStart) ||
-          (newEnd > existingStart && newEnd <= existingEnd) ||
-          (newStart <= existingStart && newEnd >= existingEnd) ||
-          (newStart >= existingStart && newEnd <= existingEnd)
-        ) {
-          if (
-            sec2.course_details &&
-            sec2.course_details[0] &&
-            sec1.course_details &&
-            sec1.course_details[0] &&
-            sec2.course_details[0].subject_prefix ==
-              sec1.course_details[0].subject_prefix &&
-            sec2.course_details[0].course_number ==
-              sec1.course_details[0].course_number
-          )
-            return false; // if times overlap, but same course, we can switch it out without conflict
-          return true; // Conflict detected
-        }
+      if (
+        overlappingDays &&
+        sec1Meeting.start < sec2Meeting.end &&
+        sec1Meeting.end > sec2Meeting.start
+      ) {
+        return true; // Conflict detected
       }
     }
   }
@@ -153,10 +139,18 @@ export function generateOptimalSchedule(
 
     sections.forEach((section) => {
       if (selectedIds.includes(section.section_number)) {
+        const parsedMeetings = section.meetings
+          .filter((m) => m && m.meeting_days && m.start_time && m.end_time)
+          .map((m) => ({
+            days: m.meeting_days,
+            start: parseTime(m.start_time),
+            end: parseTime(m.end_time),
+          }));
         lockedSections.push({
           query,
           section,
           score: scoreSection(section, searchResult),
+          meetings: parsedMeetings,
         });
         lockedCourseKeys.add(courseKey);
       }
@@ -184,10 +178,19 @@ export function generateOptimalSchedule(
           (opt) => opt.section.section_number === section.section_number,
         )
       ) {
+        const parsedMeetings = section.meetings
+          .filter((m) => m && m.meeting_days && m.start_time && m.end_time)
+          .map((m) => ({
+            days: m.meeting_days,
+            start: parseTime(m.start_time),
+            end: parseTime(m.end_time),
+          }));
+
         existingOptions.push({
           query,
           section,
           score: scoreSection(section, searchResult),
+          meetings: parsedMeetings,
         });
       }
     });
@@ -234,7 +237,7 @@ export function generateOptimalSchedule(
     // Try assigning each available section (already sorted best to worst)
     for (const option of options) {
       const hasConflict = currentSchedule.some((existing) =>
-        checkConflict(existing.section, option.section),
+        checkConflict(existing.meetings, option.meetings),
       );
 
       if (!hasConflict) {
