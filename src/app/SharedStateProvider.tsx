@@ -27,7 +27,15 @@ const SharedStateContext = createContext<
       planner: SearchQueryMultiSection[];
       addToPlanner: (query: SearchQuery) => void;
       removeFromPlanner: (query: SearchQuery) => void;
-      setPlannerSection: (query: SearchQuery, section: string) => void;
+      setPlannerSection: (
+        query: SearchQuery,
+        section: string,
+        isAutoAction?: boolean,
+      ) => void;
+      lastAutoAssignments: { query: SearchQuery; sectionNumber: string }[];
+      setLastAutoAssignments: React.Dispatch<
+        React.SetStateAction<{ query: SearchQuery; sectionNumber: string }[]>
+      >;
       plannerColorMap: {
         [key: string]: { fill: string; outline: string; font: string };
       };
@@ -46,6 +54,9 @@ export function SharedStateProvider({
   latestSemester: string;
 }) {
   const [compare, setCompare] = useState<SearchResult[]>([]);
+  const [lastAutoAssignments, setLastAutoAssignments] = useState<
+    { query: SearchQuery; sectionNumber: string }[]
+  >([]);
 
   //Add a course+prof combo to compare (happens from search results)
   //copy over data basically
@@ -93,6 +104,7 @@ export function SharedStateProvider({
 
   //Add a course+prof combo to planner (happens from search results)
   function addToPlanner(query: SearchQuery) {
+    setLastAutoAssignments([]); // Clear undo state
     setPlanner((prev: SearchQueryMultiSection[]) => {
       //If not already there
       if (prev.findIndex((obj) => searchQueryEqual(obj, query)) === -1) {
@@ -105,6 +117,7 @@ export function SharedStateProvider({
 
   //Remove a course+prof combo from compare
   function removeFromPlanner(query: SearchQuery) {
+    setLastAutoAssignments([]); // Clear undo state
     setPlanner((prev: SearchQueryMultiSection[]) => {
       //If already there
       if (planner.some((obj) => searchQueryEqual(obj, query))) {
@@ -115,7 +128,13 @@ export function SharedStateProvider({
     });
   }
 
-  function setPlannerSection(query: SearchQuery, section: string) {
+  function setPlannerSection(
+    query: SearchQuery,
+    section: string,
+    isAutoAction = false,
+  ) {
+    if (!isAutoAction) setLastAutoAssignments([]); // Clear undo state if user manually modified planner sections
+
     setPlanner((prev: SearchQueryMultiSection[]) => {
       const nextState = [...prev];
 
@@ -210,6 +229,8 @@ export function SharedStateProvider({
         addToPlanner,
         removeFromPlanner,
         setPlannerSection,
+        lastAutoAssignments,
+        setLastAutoAssignments,
         plannerColorMap,
         courseNames,
         setCourseNames,
