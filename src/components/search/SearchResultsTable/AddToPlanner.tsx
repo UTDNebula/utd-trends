@@ -1,6 +1,5 @@
 import { useSharedState } from '@/app/SharedStateProvider';
 import { hasConflict } from '@/components/planner/PlannerCoursesTable/PlannerCard';
-import { fetchSearchResult } from '@/modules/fetchSearchResult';
 import { useSearchresults } from '@/modules/plannerFetch';
 import {
   convertToCourseOnly,
@@ -104,6 +103,10 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
         const courseHasLabs = labSections.length > 0;
         const courseHasExams = examSections.length > 0;
 
+        if (fitSections([lecture]).length === 0) {
+          return false;
+        }
+
         if (courseHasLabs) {
           const matchingLab = labSections.find(
             (l) => getBaseSectionNumber(l.section_number) === base,
@@ -134,6 +137,10 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
       if (!base) return true;
 
       const courseHasExams = examSections.length > 0;
+
+      if (fitSections([lab]).length === 0) {
+        return false;
+      }
 
       if (courseHasExams) {
         const matchingExam = examSections.find(
