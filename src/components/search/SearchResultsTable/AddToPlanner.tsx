@@ -21,8 +21,7 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
     addToPlanner,
     removeFromPlanner,
   } = useSharedState();
-  // Check if the course section has the latest semester data
-  const hasLatestSemester = sections.some(
+  const hasSectionsForTeachingSemester = sections.some(
     (s) => s.academic_session.name === effectiveTeachingSemester,
   );
 
@@ -50,7 +49,7 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
       title={
         searchResult.type === 'professor'
           ? 'Cannot add professor to planner'
-          : hasLatestSemester
+          : hasSectionsForTeachingSemester
             ? inPlanner
               ? 'Remove from Planner'
               : 'Add to Planner'
@@ -80,7 +79,9 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
           }}
           icon={<BookOutlinedIcon />}
           checkedIcon={<BookIcon />}
-          disabled={!hasLatestSemester || searchResult.type === 'professor'}
+          disabled={
+            !hasSectionsForTeachingSemester || searchResult.type === 'professor'
+          }
         />
       </span>
     </Tooltip>

@@ -1,4 +1,5 @@
 import type { ReadonlyURLSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import {
   getValidAvailabilitySemester,
@@ -22,6 +23,7 @@ export function useAvailabilityUrlSync({
   setTeachingSemester,
   enabled = true,
 }: UseAvailabilityUrlSyncArgs) {
+  const router = useRouter();
   const params = new URLSearchParams(searchParams.toString());
   const rawAvailability = params.get('availability');
   const availabilitySemester = getValidAvailabilitySemester(
@@ -40,11 +42,20 @@ export function useAvailabilityUrlSync({
     if (rawAvailability !== null && effectiveTeachingSemester) {
       const updatedParams = new URLSearchParams(searchParams.toString());
       setAvailabilitySemester(updatedParams, effectiveTeachingSemester);
-      window.history.replaceState(
-        null,
-        '',
-        `${pathname}?${updatedParams.toString()}`,
-      );
+      const qs = updatedParams.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      return;
+    }
+
+    if (
+      pathname === '/planner' &&
+      rawAvailability === null &&
+      effectiveTeachingSemester
+    ) {
+      const updatedParams = new URLSearchParams(searchParams.toString());
+      setAvailabilitySemester(updatedParams, effectiveTeachingSemester);
+      const qs = updatedParams.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     }
   }, [
     enabled,
@@ -52,6 +63,7 @@ export function useAvailabilityUrlSync({
     rawAvailability,
     effectiveTeachingSemester,
     pathname,
+    router,
     searchParams,
     setTeachingSemester,
   ]);

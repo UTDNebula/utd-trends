@@ -138,22 +138,22 @@ export function SharedStateProvider({
   }
 
   function setPlannerSection(query: SearchQuery, section: string) {
-    const matchIdx = planner.findIndex(
-      (e) =>
-        e.semester === effectiveTeachingSemester &&
-        searchQueryEqual(removeSection(e.query), removeSection(query)),
-    );
-    if (matchIdx === -1) {
-      setPlanner((prev) => {
+    setPlanner((prev) => {
+      const matchIdx = prev.findIndex(
+        (e) =>
+          e.semester === effectiveTeachingSemester &&
+          searchQueryEqual(removeSection(e.query), removeSection(query)),
+      );
+
+      if (matchIdx === -1) {
         return prev.concat([
           {
             query,
             semester: effectiveTeachingSemester,
           },
         ]);
-      });
-    }
-    setPlanner((prev) => {
+      }
+
       return prev.map((entry, idx) => {
         if (idx !== matchIdx) return entry;
         const course = entry.query;

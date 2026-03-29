@@ -57,7 +57,7 @@ export default function Home() {
       <div className="absolute top-4 left-4 right-4 flex gap-2 place-content-between flex-wrap-reverse">
         {/*Ad for Spring 2026*/}
         {/*<a
-          href="https://trends.utdnebula.com/dashboard?searchTerms=GOVT+2306&availability=true"
+          href="https://trends.utdnebula.com/dashboard?searchTerms=GOVT+2306&availability=26S"
           target="_blank"
           rel="noreferrer"
           className="bg-royal dark:bg-cornflower-300 text-cornflower-50 dark:text-haiti rounded transition hover:scale-[1.01] text-center flex gap-2 items-center mr-auto"
