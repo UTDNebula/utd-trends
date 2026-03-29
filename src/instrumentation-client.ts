@@ -21,6 +21,10 @@ Sentry.init({
 
   // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
   tracesSampleRate: 1,
+  tracePropagationTargets: [
+    'https://trends.utdnebula.com/',
+    'https://api.utdnebula.com/',
+  ],
 
   // Define how likely Replay events are sampled.
   // This sets the sample rate to be 10%. You may want this to be 100% while

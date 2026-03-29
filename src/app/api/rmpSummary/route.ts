@@ -58,7 +58,7 @@ export async function GET(request: Request) {
       new Date(cacheData.data.updated) >
       new Date(Date.now() - 1000 * 60 * 60 * 24 * 30)
     ) {
-      const mediaData = await fetch(cacheData.data.media_link);
+      const mediaData = await fetch(cacheData.data.public_url);
       if (mediaData.ok) {
         return NextResponse.json(
           { message: 'success', data: await mediaData.text() },

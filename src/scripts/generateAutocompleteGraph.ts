@@ -8,9 +8,13 @@ import aggregatedData from '../data/aggregated_data.json';
 import professor_to_alias from '../data/professor_to_alias.json';
 import { decodeSearchQueryLabel, type SearchQuery } from '../types/SearchQuery';
 
+type SearchQueryWithTotalStudents = SearchQuery & {
+  totalStudents?: number;
+};
+
 export type NodeAttributes = {
   c: string;
-  d?: SearchQuery;
+  d?: SearchQueryWithTotalStudents;
   visited?: boolean;
 };
 
@@ -29,7 +33,7 @@ const root = graph.addNode(numNodes++, {
 function addSearchQueryCharacter(
   node: string,
   characters: string,
-  data?: SearchQuery,
+  data?: SearchQueryWithTotalStudents,
 ): string {
   characters = characters.toUpperCase();
   const preExisting = graph.findOutNeighbor(
@@ -71,7 +75,7 @@ function addWithParents(
   //main parent must be first!!! Otherwise can lead to accessing unmatched data like typing GEOS 2305 CE and getting ce2305 because it looped back
   nodes: string[],
   characters: string,
-  data?: SearchQuery,
+  data?: SearchQueryWithTotalStudents,
 ) {
   const nodeFirstChar = addSearchQueryCharacter(
     nodes.shift() as string,
@@ -92,13 +96,14 @@ function addWithParents(
 
 //Add node in format: <prefix>[<number>| <number>[.<section>]
 //and: (<number>|<number> )<prefix>[.<section>]
-function addCourse(prefix: string, number: string) {
+function addCourse(prefix: string, number: string, students: number) {
   //<prefix>[ ]<number>
   const prefixNode = addSearchQueryCharacter(root, prefix);
   const prefixSpaceNode = addSearchQueryCharacter(prefixNode, ' ');
   addWithParents([prefixNode, prefixSpaceNode], number, {
     prefix: prefix,
     number: number,
+    totalStudents: students,
   });
 
   //<number>[ ]<prefix>
@@ -107,6 +112,7 @@ function addCourse(prefix: string, number: string) {
   addWithParents([classNode2, classSpaceNode], prefix, {
     prefix: prefix,
     number: number,
+    totalStudents: students,
   });
 }
 
@@ -115,6 +121,7 @@ function addProfessor(
   profFirst: string,
   profLast: string,
   originalProf?: SearchQuery,
+  sectionStudents: number = 0,
 ) {
   //seperate first names so you can skip them when searching
   const firstNames = profFirst.split(' ');
@@ -124,11 +131,22 @@ function addProfessor(
     nodes.unshift(addSearchQueryCharacter(nodes[0], name + ' '));
   }
   // if it is an alias, map the alias path to the original professor, else, just insert the professor as graph data
-  const data = originalProf ?? {
+  const data: SearchQueryWithTotalStudents = originalProf ?? {
     profFirst: profFirst,
     profLast: profLast,
   };
-  addWithParents(nodes, profLast, data);
+
+  // saves the node with the data
+  const profNode = addWithParents(nodes, profLast, data);
+
+  // uses the prof node to update the student counter
+  graph.updateNodeAttribute(profNode, 'd', (prev) => {
+    const attrs = (prev ?? data) as SearchQueryWithTotalStudents;
+    return {
+      ...attrs,
+      totalStudents: (attrs.totalStudents ?? 0) + sectionStudents,
+    };
+  });
 }
 
 for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
@@ -139,7 +157,8 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
     courseNumberItr++
   ) {
     const courseNumberData = prefixData.course_numbers[courseNumberItr];
-    addCourse(prefixData.subject_prefix, courseNumberData.course_number);
+    // add course was moved downwards, since we needed section data to sum all students
+    let courseStudents = 0;
     for (
       let academicSessionItr = 0;
       academicSessionItr < courseNumberData.academic_sessions.length;
@@ -153,23 +172,43 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
         sectionItr++
       ) {
         const sectionData = academicSessionData.sections[sectionItr];
+        const uniqueProfessorSet = new Set<string>();
+
+        courseStudents += sectionData.total_students ?? 0;
         for (
           let professorItr = 0;
           professorItr < sectionData.professors.length;
           professorItr++
         ) {
           const professorData = sectionData.professors[professorItr];
+          // Makes sure that we don't double count professors in the same section
+
           if (
             'first_name' in professorData && //handle empty professor: {}
             'last_name' in professorData &&
             professorData.first_name !== '' && //handle blank name
             professorData.last_name !== ''
           ) {
-            addProfessor(professorData.first_name, professorData.last_name);
+            const uniqueSetKey = `${professorData.first_name}|${professorData.last_name}`;
+            if (uniqueProfessorSet.has(uniqueSetKey)) {
+              continue;
+            }
+            uniqueProfessorSet.add(uniqueSetKey);
+            addProfessor(
+              professorData.first_name,
+              professorData.last_name,
+              undefined,
+              sectionData.total_students ?? 0,
+            );
           }
         }
       }
     }
+    addCourse(
+      prefixData.subject_prefix,
+      courseNumberData.course_number,
+      courseStudents,
+    );
   }
 }
 
