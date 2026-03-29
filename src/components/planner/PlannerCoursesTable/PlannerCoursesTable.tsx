@@ -17,7 +17,7 @@ import {
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh'; // Added Icon
 import { Alert, Button, Snackbar, Typography } from '@mui/material'; // Added Button
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export function LoadingPlannerCoursesTable() {
   const { planner } = useSharedState();
@@ -50,6 +50,18 @@ export default function PlannerCoursesTable() {
     useState(false);
   const [autoScheduleResultMessage, setAutoScheduleResultMessage] =
     useState('');
+  const [lastAssignments, setLastAssignments] = useState<
+    { query: SearchQuery; sectionNumber: string }[]
+  >([]); // for undo
+  const isUndoAction = useRef(false);
+
+  useEffect(() => {
+    // if user manually changes courses in planner by other means
+    if (!isUndoAction.current && lastAssignments.length > 0) {
+      setLastAssignments([]); // disable undo
+      setShowAutoScheduleSnackbar(false);
+    }
+  }, [planner, lastAssignments.length]);
 
   const conflictMessageClose = (_: unknown, reason?: string) => {
     if (reason === 'clickaway') return;
@@ -71,6 +83,23 @@ export default function PlannerCoursesTable() {
       : [],
   );
 
+  // undo an auto-schedule
+  const handleUndoSchedule = () => {
+    isUndoAction.current = true; // UNLOCK planner modifications via undo
+
+    lastAssignments.forEach((assignment) => {
+      setPlannerSection(assignment.query, assignment.sectionNumber); // un-toggle
+    });
+
+    setLastAssignments([]); // not a long-term undo history
+    setShowAutoScheduleSnackbar(false);
+
+    // LOCK undo updates after batched state updates
+    setTimeout(() => {
+      isUndoAction.current = false;
+    }, 100);
+  };
+
   // Auto-Schedule Handler
   const handleGenerateSchedule = () => {
     if (isLoading) return;
@@ -85,7 +114,14 @@ export default function PlannerCoursesTable() {
       setAutoScheduleResultMessage(
         'No new non-conflicting sections could be added to your schedule.',
       );
+      setLastAssignments([]); // no need to undo
     } else {
+      isUndoAction.current = true; // UNLOCK planner modifications via undo
+      const appliedAssignments: {
+        query: SearchQuery;
+        sectionNumber: string;
+      }[] = []; // track assignments about to be added for undo
+
       newAssignments.forEach((assignment) => {
         const comboQuery = {
           prefix: assignment.section.course_details![0].subject_prefix,
@@ -102,14 +138,25 @@ export default function PlannerCoursesTable() {
               : undefined,
         } as SearchQuery;
 
+        appliedAssignments.push({
+          query: comboQuery,
+          sectionNumber: assignment.section.section_number,
+        });
         setPlannerSection(comboQuery, assignment.section.section_number);
       });
+
+      setLastAssignments(appliedAssignments); // save auto-filled assignments for undo
 
       setAutoScheduleResultMessage(
         `Successfully scheduled ${newAssignments.length} new course${newAssignments.length > 1 ? 's' : ''}! ${
           stoppedEarly ? '(Select different sections and try again)' : ''
         }`,
       );
+
+      // LOCK undo updates after batched state updates
+      setTimeout(() => {
+        isUndoAction.current = false;
+      }, 100);
     }
     setShowAutoScheduleSnackbar(true);
   };
@@ -126,11 +173,15 @@ export default function PlannerCoursesTable() {
         <Button
           variant="contained"
           startIcon={<AutoFixHighIcon />}
-          onClick={handleGenerateSchedule}
+          onClick={
+            lastAssignments.length > 0
+              ? handleUndoSchedule
+              : handleGenerateSchedule
+          }
           disabled={isLoading || planner.length === 0}
           className="bg-royal dark:bg-cornflower-300 normal-case rounded-full whitespace-nowrap"
         >
-          Auto-Schedule
+          {lastAssignments.length > 0 ? 'Undo Changes' : 'Auto-Schedule'}
         </Button>
       </div>
       <div className="flex flex-col gap-4 mb-4 sm:mb-0">
@@ -200,6 +251,13 @@ export default function PlannerCoursesTable() {
           variant="filled"
           className="w-full"
           onClose={autoScheduleResultMessageClose}
+          action={
+            lastAssignments.length > 0 && (
+              <Button color="inherit" size="small" onClick={handleUndoSchedule}>
+                UNDO
+              </Button>
+            )
+          }
         >
           {autoScheduleResultMessage}
         </Alert>
