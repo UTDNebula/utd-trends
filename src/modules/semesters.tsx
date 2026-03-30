@@ -127,17 +127,15 @@ export function matchSectionTypesFromSectionNumber(
   );
 }
 
-export function getLatestSyllabusUri(searchResult: SearchResult) {
+export function getLatestSyllabusSection(searchResult: SearchResult) {
   const sections = searchResult.sections.filter(
     (s) => !!s.syllabus_uri && !!s.academic_session?.start_date,
   );
   if (sections.length === 0) return null;
-  return (
-    sections.reduce((a, b) =>
-      new Date(a.academic_session.start_date).getTime() >
-        new Date(b.academic_session.start_date).getTime() || b == null
-        ? a
-        : b,
-    ).syllabus_uri || null
+  return sections.reduce((a, b) =>
+    new Date(a.academic_session.start_date).getTime() >
+      new Date(b.academic_session.start_date).getTime() || b == null
+      ? a
+      : b,
   );
 }

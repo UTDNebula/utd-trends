@@ -81,6 +81,7 @@ type Props = {
   searchQuery: SearchQuery;
   rmp: RMP;
   syllabus_uri?: string | null;
+  syllabus_sem?: string | null;
 };
 
 export default function SingleProfInfo({
@@ -88,6 +89,7 @@ export default function SingleProfInfo({
   searchQuery,
   rmp,
   syllabus_uri,
+  syllabus_sem,
 }: Props) {
   const [showMore, setShowMore] = useState(false);
   const [showSyllabus, setShowSyllabus] = useState(false);
@@ -201,7 +203,8 @@ export default function SingleProfInfo({
           </Link>
 
           <button onClick={() => setShowSyllabus(!showSyllabus)}>
-            View Syllabus Summary{' '}
+            View Syllabus Summary
+            {syllabus_sem ? ` for ${syllabus_sem}` : ''}{' '}
             <ChevronRightIcon
               className={`transition-transform ${showSyllabus ? 'rotate-90' : ''}`}
             />

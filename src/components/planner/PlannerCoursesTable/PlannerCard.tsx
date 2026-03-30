@@ -5,7 +5,7 @@ import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import { calculateGrades } from '@/modules/fetchGrades';
 import type { Sections, SectionsData } from '@/modules/fetchSections';
 import { useSearchResult } from '@/modules/plannerFetch';
-import { getLatestSyllabusUri } from '@/modules/semesters';
+import { getLatestSyllabusSection } from '@/modules/semesters';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -512,6 +512,8 @@ export default function PlannerCard(props: PlannerCardProps) {
               latestMatchedSections.sections![0].meetings[0].end_date,
         )
       : false;
+
+  const latestSyllabusSection = getLatestSyllabusSection(latestMatchedSections);
   return (
     <Box
       component={Paper}
@@ -836,8 +838,9 @@ export default function PlannerCard(props: PlannerCardProps) {
                   rmp={latestMatchedSections.RMP}
                   open={open && whichOpen === 'grades'}
                   searchQuery={props.query}
-                  syllabus_uri={
-                    getLatestSyllabusUri(latestMatchedSections) || null
+                  syllabus_uri={latestSyllabusSection?.syllabus_uri || null}
+                  syllabus_sem={
+                    latestSyllabusSection?.academic_session.name || null
                   }
                 />
               )}
