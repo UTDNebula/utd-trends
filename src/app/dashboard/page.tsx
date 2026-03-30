@@ -71,8 +71,7 @@ export async function generateMetadata({
             decodedSearchTerms
               .toSorted(searchQuerySort)
               .map((term) => searchQueryLabel(term).split(' ').join('+'))
-              .join(',') +
-            '&availability=true'
+              .join(',')
           : ''),
     },
   };
