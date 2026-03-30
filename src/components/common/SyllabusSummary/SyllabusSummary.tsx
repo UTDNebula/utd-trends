@@ -7,9 +7,6 @@ import React, { useEffect, useState } from 'react';
 export function LoadingSyllabusSummary() {
   return (
     <div className="mt-2 rounded pv-3 max-w-dvw">
-      <h3 className="font-bold text-md mb-2 text-center">
-        Syllabus Grading Summary
-      </h3>
       <div className="rounded p-4 dark:bg-gray-900 bg-gray-100 border border-cornflower-500">
         <Skeleton variant="text" />
         <Skeleton variant="text" />
@@ -52,9 +49,6 @@ export default function SyllabusSummary({
     if (open && showSyllabus && !syllabus && state !== 'error') {
       const params = new URLSearchParams();
       if (syllabus_uri) params.append('syllabus_uri', syllabus_uri);
-      console.log(
-        'fetching syllabus summary with params: ' + params.toString(),
-      );
       fetch(`/api/syllabusSummary?${params.toString()}`, {
         method: 'GET',
         next: { revalidate: 3600 },
@@ -82,10 +76,6 @@ export default function SyllabusSummary({
           <LoadingSyllabusSummary />
         ) : (
           <div className="mt-2 rounded pv-3 max-w-dvw">
-            <h3 className="font-bold text-md mb-2 text-center">
-              Syllabus Grading Summary
-            </h3>
-
             {/* Outer flex row: tables + AI summary */}
             <div className="flex gap-8 items-start mt-2 flex-wrap rounded p-4 dark:bg-gray-900 bg-gray-100 border border-cornflower-500">
               {/* Tables wrapper */}
