@@ -11,6 +11,7 @@
 # next.js
 /.next/
 /out/
+next-env.d.ts
 
 # production
 /build
@@ -29,6 +30,7 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+.env
 
 # vercel
 .vercel
@@ -45,3 +47,9 @@ yarn-error.log*
 
 # vs code
 .vscode
+
+# jetbrains
+.idea
+
+# cursor
+/.cursor

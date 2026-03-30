@@ -15,19 +15,24 @@ type addToPlannerProps = {
 
 export default function AddToPlanner({ searchResult }: addToPlannerProps) {
   const sections = searchResult.sections;
-  const { latestSemester, planner, addToPlanner, removeFromPlanner } =
-    useSharedState();
-  // Check if the course section has the latest semester data
-  const hasLatestSemester = sections.some(
-    (s) => s.academic_session.name === latestSemester,
+  const {
+    effectiveTeachingSemester,
+    planner,
+    addToPlanner,
+    removeFromPlanner,
+  } = useSharedState();
+  const hasSectionsForTeachingSemester = sections.some(
+    (s) => s.academic_session.name === effectiveTeachingSemester,
   );
 
-  const inPlanner = planner.some((obj) =>
-    searchQueryEqual(obj, searchResult.searchQuery),
+  const inPlanner = planner.some(
+    (entry) =>
+      searchQueryEqual(entry.query, searchResult.searchQuery) &&
+      entry.semester === effectiveTeachingSemester,
   );
 
   const courseOnlySections = searchResult.sections.filter(
-    (s) => s.academic_session.name === latestSemester,
+    (s) => s.academic_session.name === effectiveTeachingSemester,
   );
   const canAddCourseOnlyToPlanner =
     typeof courseOnlySections !== 'undefined' &&
@@ -44,11 +49,28 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
       title={
         searchResult.type === 'professor'
           ? 'Cannot add professor to planner'
-          : hasLatestSemester
+          : hasSectionsForTeachingSemester
             ? inPlanner
-              ? 'Remove from Planner'
-              : 'Add to Planner'
-            : 'Not being taught'
+              ? 'Remove from' +
+                (effectiveTeachingSemester !== ''
+                  ? ' ' +
+                    effectiveTeachingSemester.slice(2) +
+                    effectiveTeachingSemester.slice(0, 2)
+                  : '') +
+                ' Planner'
+              : 'Add to' +
+                (effectiveTeachingSemester !== ''
+                  ? ' ' +
+                    effectiveTeachingSemester.slice(2) +
+                    effectiveTeachingSemester.slice(0, 2)
+                  : '') +
+                ' Planner'
+            : 'Not being taught' +
+              (effectiveTeachingSemester !== ''
+                ? ' in ' +
+                  effectiveTeachingSemester.slice(2) +
+                  effectiveTeachingSemester.slice(0, 2)
+                : '')
       }
       placement="top"
     >
@@ -58,17 +80,25 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
           onClick={(e) => {
             e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
             if (inPlanner) {
-              removeFromPlanner(searchResult.searchQuery);
+              removeFromPlanner(
+                searchResult.searchQuery,
+                effectiveTeachingSemester,
+              );
             } else {
-              addToPlanner(searchResult.searchQuery);
+              addToPlanner(searchResult.searchQuery, effectiveTeachingSemester);
               if (addJustCourseToo) {
-                addToPlanner(convertToCourseOnly(searchResult.searchQuery));
+                addToPlanner(
+                  convertToCourseOnly(searchResult.searchQuery),
+                  effectiveTeachingSemester,
+                );
               }
             }
           }}
           icon={<BookOutlinedIcon />}
           checkedIcon={<BookIcon />}
-          disabled={!hasLatestSemester || searchResult.type === 'professor'}
+          disabled={
+            !hasSectionsForTeachingSemester || searchResult.type === 'professor'
+          }
         />
       </span>
     </Tooltip>
