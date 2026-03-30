@@ -11,6 +11,7 @@ import {
   sectionCanOverlap,
   type PlannerEntry,
   type SearchQuery,
+  type SearchQueryMultiSection,
   type SearchResult,
 } from '@/types/SearchQuery';
 import React, { createContext, useContext, useState } from 'react';
@@ -139,23 +140,24 @@ export function SharedStateProvider({
 
   function setPlannerSection(query: SearchQuery, section: string) {
     setPlanner((prev) => {
-      const matchIdx = prev.findIndex(
+      const hasMatchingRow = prev.some(
         (e) =>
           e.semester === effectiveTeachingSemester &&
           searchQueryEqual(removeSection(e.query), removeSection(query)),
       );
 
-      if (matchIdx === -1) {
-        return prev.concat([
-          {
-            query,
-            semester: effectiveTeachingSemester,
-          },
-        ]);
-      }
+      const base = hasMatchingRow
+        ? prev
+        : prev.concat([
+            {
+              query: removeSection(query) as SearchQueryMultiSection,
+              semester: effectiveTeachingSemester,
+            },
+          ]);
 
-      return prev.map((entry, idx) => {
-        if (idx !== matchIdx) return entry;
+      return base.map((entry) => {
+        if (entry.semester !== effectiveTeachingSemester) return entry;
+
         const course = entry.query;
         if (searchQueryEqual(removeSection(course), removeSection(query))) {
           if (typeof course.sectionNumbers === 'undefined') {
