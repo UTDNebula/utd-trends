@@ -162,6 +162,11 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
     finalDisplayCount = labsFitWithRequiredCompanions.length;
   }
 
+  // only show badge if a) they have something in planner for the current semester and b) the class fits in their schedule
+  const displayBadge =
+    finalDisplayCount > 0 &&
+    planner.some((entry) => entry.semester == effectiveTeachingSemester);
+
   return (
     <Tooltip
       title={
@@ -182,10 +187,10 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
                     effectiveTeachingSemester.slice(2) +
                     effectiveTeachingSemester.slice(0, 2)
                   : '') +
-                ' Planner,' +
-                (finalDisplayCount > 0
-                  ? ` ${finalDisplayCount} section(s) fit your schedule!`
-                  : ' No sections fit in your schedule')
+                ' Planner' +
+                (displayBadge
+                  ? `, ${finalDisplayCount} ${finalDisplayCount > 1 ? 'sections fit' : 'section fits'} your schedule!`
+                  : '')
             : 'Not being taught' +
               (effectiveTeachingSemester !== ''
                 ? ' in ' +
@@ -198,9 +203,9 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
       <span>
         <Badge
           badgeContent={<EventAvailableIcon sx={{ fontSize: 12 }} />}
-          invisible={finalDisplayCount === 0}
+          invisible={!displayBadge}
           overlap="circular"
-          color="secondary"
+          color="primary"
         >
           <Checkbox
             checked={inPlanner}
