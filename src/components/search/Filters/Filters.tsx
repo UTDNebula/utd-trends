@@ -3,9 +3,15 @@
 import { FiltersContext } from '@/app/dashboard/FilterContext';
 import { useSharedState } from '@/app/SharedStateProvider';
 import Rating from '@/components/common/Rating/Rating';
+import TeachingSemesterSelector from '@/components/common/TeachingSemesterSelector/TeachingSemesterSelector';
+import {
+  clearAvailabilitySemester,
+  setAvailabilitySemester,
+} from '@/modules/availability';
 import { calculateGrades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 import { compareSemesters, displaySemesterName } from '@/modules/semesters';
+import { useAvailabilityUrlSync } from '@/modules/useAvailabilityUrlSync';
 import type { SearchResult } from '@/types/SearchQuery';
 import {
   Checkbox,
@@ -30,7 +36,7 @@ export function LoadingFilters() {
   return (
     <Grid container spacing={2} className="mb-4 sm:m-0">
       {/* min letter grade dropdown*/}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 9 / 5 }} className="px-2">
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
@@ -41,7 +47,7 @@ export function LoadingFilters() {
       </Grid>
 
       {/* min rating dropdown*/}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 9 / 5 }} className="px-2">
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
@@ -52,7 +58,7 @@ export function LoadingFilters() {
       </Grid>
 
       {/* semester dropdown */}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 9 / 5 }} className="px-2">
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
@@ -63,7 +69,7 @@ export function LoadingFilters() {
       </Grid>
 
       {/* section type dropdown */}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 9 / 5 }} className="px-2">
         <FormControl
           size="small"
           className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
@@ -74,7 +80,7 @@ export function LoadingFilters() {
       </Grid>
 
       {/* Teaching Next Semester switch*/}
-      <Grid size={{ xs: 12, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 12, sm: 24 / 5 }} className="px-2">
         <FormControl size="small">
           <FormControlLabel
             control={<Switch checked={true} />}
@@ -94,7 +100,8 @@ export default function Filters({
 }: {
   searchResultsPromise: Promise<SearchResult[]>;
 }) {
-  const { latestSemester } = useSharedState();
+  const { setTeachingSemester, availableSemesters, effectiveTeachingSemester } =
+    useSharedState();
   const searchResults = use(searchResultsPromise);
   const semesters = use(FiltersContext).semesters;
   const chosenSemesters = use(FiltersContext).chosenSemesters;
@@ -117,7 +124,14 @@ export default function Filters({
   if (Array.isArray(minRating)) {
     minRating = minRating[0]; // if minRating is an array, make it a string
   }
-  const filterNextSem = searchParams.get('availability') === 'true';
+  const { rawAvailability, availabilitySemester } = useAvailabilityUrlSync({
+    pathname,
+    searchParams,
+    availableSemesters,
+    effectiveTeachingSemester,
+    setTeachingSemester,
+  });
+  const filterNextSem = rawAvailability !== null;
 
   function getRecentSemesters() {
     // get current month and year
@@ -125,7 +139,7 @@ export default function Filters({
     const mm = today.getMonth() + 1; // January is 1
     let yyyy = today.getFullYear();
 
-    let season = 'F';
+    let season: string;
     if (mm <= 5)
       // jan - may
       season = 'S';
@@ -153,10 +167,12 @@ export default function Filters({
   const rmpCounts: Record<string, number> = {};
 
   const semFilteredResults = searchResults.filter((result) => {
+    const semesterToFilter = availabilitySemester || effectiveTeachingSemester;
     const availableThisSemester =
       filterNextSem &&
+      semesterToFilter &&
       result.sections.some(
-        (section) => section.academic_session.name === latestSemester,
+        (section) => section.academic_session.name === semesterToFilter,
       );
     const hasChosenSectionTypes = result.grades.some((section) =>
       section.data.some((s) => chosenSectionTypes.includes(s.type)),
@@ -175,11 +191,7 @@ export default function Filters({
     const gpaNum = parseFloat(gpaString);
     gradeCounts[gpaString] = semFilteredResults.filter((result) => {
       if (result.type !== 'course') {
-        if (
-          typeof minRating === 'string' &&
-          result.RMP &&
-          result.RMP.avgRating < parseFloat(minRating)
-        )
+        if (result.RMP && result.RMP.avgRating < parseFloat(minRating))
           return false;
       }
       const courseGrades = result.grades;
@@ -203,10 +215,8 @@ export default function Filters({
         chosenSemesters,
         chosenSectionTypes,
       );
-      if (typeof minGPA === 'string' && calculated.gpa < parseFloat(minGPA))
-        return false;
+      if (calculated.gpa < parseFloat(minGPA)) return false;
       if (
-        typeof ratingNum === 'number' &&
         result.type !== 'course' &&
         result.RMP &&
         result.RMP.avgRating < ratingNum
@@ -236,7 +246,6 @@ export default function Filters({
 
     return SectionTypesMap[id] || id; // Default to ID if no mapping exists
   }
-
   return (
     <Grid
       container
@@ -245,7 +254,7 @@ export default function Filters({
       className="mb-4 sm:m-0"
     >
       {/* min letter grade dropdown*/}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 9 / 5 }} className="px-2">
         <Tooltip title={'Select Minimum Letter Grade Average'} placement="top">
           <FormControl
             size="small"
@@ -294,7 +303,7 @@ export default function Filters({
       </Grid>
 
       {/* min rating dropdown*/}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 9 / 5 }} className="px-2">
         <Tooltip title={'Select Minimum Professor Rating'} placement="top">
           <FormControl
             size="small"
@@ -356,7 +365,7 @@ export default function Filters({
       </Grid>
 
       {/* semester dropdown */}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 9 / 5 }} className="px-2">
         <Tooltip
           title={'Select Semesters to Include Grades from'}
           placement="top"
@@ -476,7 +485,7 @@ export default function Filters({
       </Grid>
 
       {/* section type dropdown */}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
+      <Grid size={{ xs: 6, sm: 9 / 5 }} className="px-2">
         <Tooltip
           title={'Select Section Types to Include Grades from'}
           placement="top"
@@ -557,44 +566,44 @@ export default function Filters({
         </Tooltip>
       </Grid>
 
-      {/* Teaching Next Semester switch*/}
-      <Grid size={{ xs: 12, sm: 12 / 5 }} className="px-2">
-        <Tooltip title="Select Availability" placement="top">
-          <FormControl
-            size="small"
-            className={`${
-              filterNextSem
-                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
-                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
-            }`}
-          >
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={filterNextSem}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    const params = new URLSearchParams(searchParams.toString());
-                    if (event.target.checked) {
-                      params.set('availability', 'true');
-                    } else {
-                      params.delete('availability');
-                    }
-                    window.history.replaceState(
-                      null,
-                      '',
-                      `${pathname}?${params.toString()}`,
-                    );
-                  }}
-                />
+      {/* Teaching Next Semester switch + semester dropdown */}
+      <Grid size={{ xs: 12, sm: 24 / 5 }} className="px-2">
+        <TeachingSemesterSelector
+          enabled={filterNextSem}
+          onEnabledChangeAction={(enabled) => {
+            const params = new URLSearchParams(searchParams.toString());
+            if (enabled) {
+              if (effectiveTeachingSemester) {
+                setAvailabilitySemester(params, effectiveTeachingSemester);
               }
-              label={
-                latestSemester == ''
-                  ? 'Teaching Next Semester'
-                  : 'Teaching in ' + displaySemesterName(latestSemester, false)
-              }
-            />
-          </FormControl>
-        </Tooltip>
+            } else {
+              clearAvailabilitySemester(params);
+            }
+            window.history.replaceState(
+              null,
+              '',
+              `${pathname}?${params.toString()}`,
+            );
+          }}
+          semester={effectiveTeachingSemester}
+          onSemesterChangeAction={(newSemester) => {
+            setTeachingSemester(newSemester);
+            if (!filterNextSem) return;
+            const params = new URLSearchParams(searchParams.toString());
+            setAvailabilitySemester(params, newSemester);
+            window.history.replaceState(
+              null,
+              '',
+              `${pathname}?${params.toString()}`,
+            );
+          }}
+          availableSemesters={availableSemesters}
+          formControlClassName={
+            filterNextSem
+              ? '[&_div.MuiInputBase-root]:bg-cornflower-50 dark:[&_div.MuiInputBase-root]:bg-cornflower-900'
+              : '[&_div.MuiInputBase-root]:bg-white dark:[&_div.MuiInputBase-root]:bg-black'
+          }
+        />
       </Grid>
     </Grid>
   );

@@ -15,7 +15,7 @@ interface PlannerSectionComponentProps {
 }
 
 export default function PlannerSection(props: PlannerSectionComponentProps) {
-  const { latestSemester } = useSharedState();
+  const { effectiveTeachingSemester } = useSharedState();
   const result = useSearchResult(props.course);
   if (!result.isSuccess || result.data.type === 'professor') {
     return null;
@@ -23,7 +23,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
   const selectedSection = result.data.sections.find(
     (s) =>
       s.section_number === props.selectedSection &&
-      s.academic_session.name === latestSemester,
+      s.academic_session.name === effectiveTeachingSemester,
   );
   if (selectedSection === undefined) return null;
   const courseName = result.data.courseName;
