@@ -5,14 +5,18 @@ import PlannerCard, {
   LoadingPlannerCard,
 } from '@/components/planner/PlannerCoursesTable/PlannerCard';
 import { useSearchresults } from '@/modules/plannerFetch';
+import { generateOptimalSchedule } from '@/modules/scheduleGenerator'; // Import your new function
 import { displaySemesterName } from '@/modules/semesters';
 import {
   convertToCourseOnly,
   removeSection,
   searchQueryLabel,
   searchQueryMultiSectionSplit,
+  type SearchQuery,
 } from '@/types/SearchQuery';
-import { Alert, Snackbar, Typography } from '@mui/material';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh'; // Added Icon
+import { Alert, Button, Snackbar, Typography } from '@mui/material'; // Added Button
+
 import React, { useState } from 'react';
 
 export function LoadingPlannerCoursesTable() {
@@ -37,18 +41,30 @@ export default function PlannerCoursesTable() {
     planner,
     removeFromPlanner,
     setPlannerSection,
+    lastAutoAssignments,
+    setLastAutoAssignments,
     plannerColorMap,
     latestSemester,
   } = useSharedState();
 
   const [openConflictMessage, setOpenConflictMessage] = useState(false);
+  const [showAutoScheduleSnackbar, setShowAutoScheduleSnackbar] =
+    useState(false);
+  const [autoScheduleResultMessage, setAutoScheduleResultMessage] =
+    useState('');
+
   const conflictMessageClose = (_: unknown, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
+    if (reason === 'clickaway') return;
     setOpenConflictMessage(false);
   };
+  const autoScheduleResultMessageClose = (_: unknown, reason?: string) => {
+    if (reason === 'clickaway') return;
+    setShowAutoScheduleSnackbar(false);
+  };
+
   const allResults = useSearchresults(planner);
+  const isLoading = allResults.some((r) => !r.isSuccess);
+
   const latestSections = allResults.map((r) =>
     r.isSuccess
       ? r.data.sections.filter(
@@ -56,13 +72,95 @@ export default function PlannerCoursesTable() {
         )
       : [],
   );
+
+  // undo an auto-schedule
+  const handleUndoSchedule = () => {
+    lastAutoAssignments.forEach((assignment) => {
+      setPlannerSection(assignment.query, assignment.sectionNumber, true); // un-toggle
+    });
+
+    setLastAutoAssignments([]); // not a long-term undo history
+    setShowAutoScheduleSnackbar(false);
+  };
+
+  // Auto-Schedule Handler
+  const handleGenerateSchedule = () => {
+    if (isLoading) return;
+
+    const { newAssignments, stoppedEarly } = generateOptimalSchedule(
+      planner,
+      allResults,
+      latestSemester,
+    );
+
+    if (newAssignments.length === 0) {
+      setAutoScheduleResultMessage(
+        'No new non-conflicting sections could be added to your schedule.',
+      );
+      setLastAutoAssignments([]); // no need to undo
+    } else {
+      const appliedAssignments: {
+        query: SearchQuery;
+        sectionNumber: string;
+      }[] = []; // track assignments about to be added for undo
+
+      newAssignments.forEach((assignment) => {
+        const comboQuery = {
+          prefix: assignment.section.course_details![0].subject_prefix,
+          number: assignment.section.course_details![0].course_number,
+          profFirst:
+            assignment.section.professor_details &&
+            assignment.section.professor_details[0]
+              ? assignment.section.professor_details[0].first_name
+              : undefined,
+          profLast:
+            assignment.section.professor_details &&
+            assignment.section.professor_details[0]
+              ? assignment.section.professor_details[0].last_name
+              : undefined,
+        } as SearchQuery;
+
+        appliedAssignments.push({
+          query: comboQuery,
+          sectionNumber: assignment.section.section_number,
+        });
+        setPlannerSection(comboQuery, assignment.section.section_number, true);
+      });
+
+      setLastAutoAssignments(appliedAssignments); // save auto-filled assignments for undo
+
+      setAutoScheduleResultMessage(
+        `Successfully scheduled ${newAssignments.length} new course${newAssignments.length > 1 ? 's' : ''}! ${
+          stoppedEarly ? '(Select different sections and try again)' : ''
+        }`,
+      );
+    }
+    setShowAutoScheduleSnackbar(true);
+  };
+
   return (
     <>
-      <Typography variant="h2" className="leading-tight text-3xl font-bold p-4">
-        {'My Planner' +
-          (typeof latestSemester !== 'undefined' &&
-            ' — ' + displaySemesterName(latestSemester, false))}
-      </Typography>
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center p-4 gap-4">
+        <Typography variant="h2" className="leading-tight text-3xl font-bold">
+          {'My Planner' +
+            (typeof latestSemester !== 'undefined' &&
+              ' — ' + displaySemesterName(latestSemester, false))}
+        </Typography>
+
+        <Button
+          variant="contained"
+          startIcon={<AutoFixHighIcon />}
+          onClick={
+            lastAutoAssignments.length > 0
+              ? handleUndoSchedule
+              : handleGenerateSchedule
+          }
+          disabled={isLoading || planner.length === 0}
+          className="bg-royal dark:bg-cornflower-300 normal-case rounded-full whitespace-nowrap"
+        >
+          {lastAutoAssignments.length > 0 ? 'Undo Changes' : 'Auto-Schedule'}
+        </Button>
+      </div>
       <div className="flex flex-col gap-4 mb-4 sm:mb-0">
         {planner
           .toSorted((query1, query2) => {
@@ -101,6 +199,7 @@ export default function PlannerCoursesTable() {
             );
           })}
       </div>
+
       <Snackbar
         open={openConflictMessage}
         autoHideDuration={6000}
@@ -113,6 +212,31 @@ export default function PlannerCoursesTable() {
           className="w-full"
         >
           This section conflicts with your schedule!
+        </Alert>
+      </Snackbar>
+
+      {/* Auto-Schedule notification snackbar */}
+      <Snackbar
+        open={showAutoScheduleSnackbar}
+        autoHideDuration={3000}
+        onClose={autoScheduleResultMessageClose}
+      >
+        <Alert
+          severity={
+            autoScheduleResultMessage.includes('No new') ? 'warning' : 'success'
+          }
+          variant="filled"
+          className="w-full"
+          onClose={autoScheduleResultMessageClose}
+          action={
+            lastAutoAssignments.length > 0 && (
+              <Button color="inherit" size="small" onClick={handleUndoSchedule}>
+                UNDO
+              </Button>
+            )
+          }
+        >
+          {autoScheduleResultMessage}
         </Alert>
       </Snackbar>
     </>
