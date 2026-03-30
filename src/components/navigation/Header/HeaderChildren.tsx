@@ -141,18 +141,18 @@ function HeaderChildrenInner(props: HeaderProps) {
 
   /** Preserve saved dashboard filters but always align `availability` with current teaching semester (planner URL / context). */
   const plannerToDashboardHref = useMemo(() => {
-    if (dashboardSearchTerms) {
-      const params = new URLSearchParams(dashboardSearchTerms);
-      if (effectiveTeachingSemester) {
-        setAvailabilitySemester(params, effectiveTeachingSemester);
-      }
-      const qs = params.toString();
-      return qs ? `/dashboard?${qs}` : '/dashboard';
-    }
+    const params = new URLSearchParams(dashboardSearchTerms || '');
+
     if (effectiveTeachingSemester) {
-      return `/dashboard?availability=${effectiveTeachingSemester}`;
+      setAvailabilitySemester(params, effectiveTeachingSemester);
     }
-    return '/dashboard';
+
+    const keys = Array.from(params.keys());
+
+    if (keys.length === 0 || keys.every((key) => key === 'availability')) {
+      return '/';
+    }
+    return `/dashboard?${params.toString()}`;
   }, [dashboardSearchTerms, effectiveTeachingSemester]);
 
   const plannerButtonProps = {
