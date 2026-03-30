@@ -125,7 +125,7 @@ export default function LineGraph(props: Props) {
     idx += 2;
   });
 
-  let sectionTypes = props.chosenSectionTypes;
+  const sectionTypes = props.chosenSectionTypes;
   const series = props.series.map((single) => ({
     name: single.name,
     data: getSemesterGPAs(single, semesterMapping, sectionTypes).map(
