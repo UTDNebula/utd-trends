@@ -410,7 +410,7 @@ export default function SearchResultsTable({
     addToCompare,
     removeFromCompare,
     compareColorMap,
-    latestSemester,
+    effectiveTeachingSemester,
   } = useSharedState();
 
   //Table sorting category
@@ -662,7 +662,16 @@ export default function SearchResultsTable({
                   <div className="flex items-center py-2 my-2">
                     <Divider className="grow" />
                     <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
-                      {'Teaching Next Semester, Filters Do Not Match'}
+                      {`Teaching  
+                        ${
+                          effectiveTeachingSemester !== ''
+                            ? 'in ' +
+                              displaySemesterName(
+                                effectiveTeachingSemester,
+                                false,
+                              )
+                            : 'Next Semester'
+                        }, Filters Do Not Match`}
                     </Typography>
                     <Divider className="grow" />
                   </div>
@@ -696,8 +705,12 @@ export default function SearchResultsTable({
                     <Divider className="grow" />
                     <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
                       {'Not teaching ' +
-                        (latestSemester !== ''
-                          ? 'in ' + displaySemesterName(latestSemester, false)
+                        (effectiveTeachingSemester !== ''
+                          ? 'in ' +
+                            displaySemesterName(
+                              effectiveTeachingSemester,
+                              false,
+                            )
                           : 'Next Semester')}
                     </Typography>
                     <Divider className="grow" />

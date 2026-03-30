@@ -19,19 +19,24 @@ type addToPlannerProps = {
 
 export default function AddToPlanner({ searchResult }: addToPlannerProps) {
   const sections = searchResult.sections;
-  const { latestSemester, planner, addToPlanner, removeFromPlanner } =
-    useSharedState();
-  // Check if the course section has the latest semester data
-  const hasLatestSemester = sections.some(
-    (s) => s.academic_session.name === latestSemester,
+  const {
+    effectiveTeachingSemester,
+    planner,
+    addToPlanner,
+    removeFromPlanner,
+  } = useSharedState();
+  const hasSectionsForTeachingSemester = sections.some(
+    (s) => s.academic_session.name === effectiveTeachingSemester,
   );
 
-  const inPlanner = planner.some((obj) =>
-    searchQueryEqual(obj, searchResult.searchQuery),
+  const inPlanner = planner.some(
+    (entry) =>
+      searchQueryEqual(entry.query, searchResult.searchQuery) &&
+      entry.semester === effectiveTeachingSemester,
   );
 
   const courseOnlySections = searchResult.sections.filter(
-    (s) => s.academic_session.name === latestSemester,
+    (s) => s.academic_session.name === effectiveTeachingSemester,
   );
 
   const canAddCourseOnlyToPlanner =
@@ -47,18 +52,19 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
     ) && canAddCourseOnlyToPlanner;
 
   // Fetch data for all planner queries
-  const allResults = useSearchresults(planner);
+  const allResults = useSearchresults(planner.map((entry) => entry.query));
 
   const latestSections = allResults.map((r) =>
     r.isSuccess
       ? r.data.sections.filter(
-          (s) => s.academic_session.name === latestSemester && s != null,
+          (s) =>
+            s.academic_session.name === effectiveTeachingSemester && s != null,
         )
       : [],
   );
 
   const selectedSections = planner
-    .map((searchQuery) => searchQueryMultiSectionSplit(searchQuery))
+    .map((plannerEntry) => searchQueryMultiSectionSplit(plannerEntry.query))
     .flatMap((queries, idx) => {
       return queries.map((query) => {
         return latestSections[idx].find(
@@ -161,13 +167,31 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
       title={
         searchResult.type === 'professor'
           ? 'Cannot add professor to planner'
-          : hasLatestSemester
+          : hasSectionsForTeachingSemester
             ? inPlanner
-              ? `Remove from Planner (${finalDisplayCount} sections)`
-              : finalDisplayCount > 0
-                ? `${finalDisplayCount} section(s) fit your schedule!`
-                : 'No sections fit in your schedule'
-            : 'Not being taught'
+              ? 'Remove from' +
+                (effectiveTeachingSemester !== ''
+                  ? ' ' +
+                    effectiveTeachingSemester.slice(2) +
+                    effectiveTeachingSemester.slice(0, 2)
+                  : '') +
+                ` Planner (${finalDisplayCount} sections)`
+              : 'Add to' +
+                (effectiveTeachingSemester !== ''
+                  ? ' ' +
+                    effectiveTeachingSemester.slice(2) +
+                    effectiveTeachingSemester.slice(0, 2)
+                  : '') +
+                ' Planner' +
+                (finalDisplayCount > 0
+                  ? `${finalDisplayCount} section(s) fit your schedule!`
+                  : 'No sections fit in your schedule')
+            : 'Not being taught' +
+              (effectiveTeachingSemester !== ''
+                ? ' in ' +
+                  effectiveTeachingSemester.slice(2) +
+                  effectiveTeachingSemester.slice(0, 2)
+                : '')
       }
       placement="top"
     >
@@ -183,17 +207,29 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
             onClick={(e) => {
               e.stopPropagation(); // prevents opening/closing the card when clicking on the compare checkbox
               if (inPlanner) {
-                removeFromPlanner(searchResult.searchQuery);
+                removeFromPlanner(
+                  searchResult.searchQuery,
+                  effectiveTeachingSemester,
+                );
               } else {
-                addToPlanner(searchResult.searchQuery);
+                addToPlanner(
+                  searchResult.searchQuery,
+                  effectiveTeachingSemester,
+                );
                 if (addJustCourseToo) {
-                  addToPlanner(convertToCourseOnly(searchResult.searchQuery));
+                  addToPlanner(
+                    convertToCourseOnly(searchResult.searchQuery),
+                    effectiveTeachingSemester,
+                  );
                 }
               }
             }}
             icon={<BookOutlinedIcon />}
             checkedIcon={<BookIcon />}
-            disabled={!hasLatestSemester || searchResult.type === 'professor'}
+            disabled={
+              !hasSectionsForTeachingSemester ||
+              searchResult.type === 'professor'
+            }
           />
         </Badge>
       </span>

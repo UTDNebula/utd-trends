@@ -6,13 +6,31 @@ import StickySide from '@/components/common/Split/StickySide';
 import PlannerCoursesTable from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
 import PlannerEmpty from '@/components/planner/PlannerEmpty/PlannerEmpty';
 import PlannerSchedule from '@/components/planner/PlannerSchedule/PlannerSchedule';
+import { useAvailabilityUrlSync } from '@/modules/useAvailabilityUrlSync';
+import { usePathname, useSearchParams } from 'next/navigation';
 import React from 'react';
 
 /**
  * Returns the My Planner page
  */
 export default function Planner() {
-  const { planner } = useSharedState();
+  const {
+    planner,
+    setTeachingSemester,
+    availableSemesters,
+    effectiveTeachingSemester,
+  } = useSharedState();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  useAvailabilityUrlSync({
+    pathname,
+    searchParams,
+    availableSemesters,
+    effectiveTeachingSemester,
+    setTeachingSemester,
+    enabled: pathname === '/planner',
+  });
 
   return (
     <Split
