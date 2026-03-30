@@ -151,9 +151,9 @@ export async function GET(request: Request) {
           {
             text:
               // Original - '
-             // ` Extract the grading weights and grade scale exactly as shown in the tables. Provide a concise summary of the course structure & professor style for students.`,
-            //polished version after meeting
-          ` Extract the grading weights and grade scale exactly as shown in the tables.
+              // ` Extract the grading weights and grade scale exactly as shown in the tables. Provide a concise summary of the course structure & professor style for students.`,
+              //polished version after meeting
+              ` Extract the grading weights and grade scale exactly as shown in the tables.
 
                   Then write a concise, student-focused summary that helps a student decide 
                   whether this professor is a good fit.
@@ -174,12 +174,9 @@ export async function GET(request: Request) {
                   Avoid course topic descriptions unless they affect workload or difficulty.
                   Be direct and practical.
                   Do not mention academic honesty policies.
-                  Write 2–3 natural sentences, around 30–40 words. `
-            
-            
-            
-            
-              //POLISHED VERSION THE ORIGINAL
+                  Write 2–3 natural sentences, around 30–40 words. `,
+
+            //POLISHED VERSION THE ORIGINAL
             /*    `  
             Extract the grading weights and grade scale exactly as shown in the tables.
 
@@ -219,7 +216,6 @@ export async function GET(request: Request) {
                          No need to talk about Grading scale, until its not standard
                          Write 2-3 natural sentences (30-40 words).
                      `, */
-
 
             //(SNAPSHOT VERSION - NEEDS TO BE PROPERLY FORMATTED!)
             /*      `   

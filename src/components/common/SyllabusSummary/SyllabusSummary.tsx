@@ -6,18 +6,23 @@ import React, { useEffect, useState } from 'react';
 
 export function LoadingSyllabusSummary() {
   return (
-    <>
-      <Skeleton variant="text" />
-      <Skeleton variant="text" />
-      <Skeleton variant="text" />
-      <Skeleton variant="text" className="w-1/2" />
+    <div className="mt-2 rounded pv-3 max-w-dvw">
+      <h3 className="font-bold text-md mb-2 text-center">
+        Syllabus Grading Summary
+      </h3>
+      <div className="rounded p-4 dark:bg-gray-900 bg-gray-100 border border-cornflower-500">
+        <Skeleton variant="text" />
+        <Skeleton variant="text" />
+        <Skeleton variant="text" />
+        <Skeleton variant="text" className="w-1/2" />
+      </div>
       <Typography
         variant="overline"
         className="text-gray-700 dark:text-gray-300 pr-5"
       >
         AI GENERATED SYLLABUS SUMMARY
       </Typography>
-    </>
+    </div>
   );
 }
 
@@ -76,14 +81,13 @@ export default function SyllabusSummary({
         {!syllabus ? (
           <LoadingSyllabusSummary />
         ) : (
-          <div className="mt-2 rounded p-3 max-w-dvw">
+          <div className="mt-2 rounded pv-3 max-w-dvw">
             <h3 className="font-bold text-md mb-2 text-center">
               Syllabus Grading Summary
             </h3>
-            <hr className="mb-4" />
 
             {/* Outer flex row: tables + AI summary */}
-            <div className="flex gap-8 items-start mt-2 flex-wrap rounded p-4 dark:bg-gray-800 border dark:border-gray-700">
+            <div className="flex gap-8 items-start mt-2 flex-wrap rounded p-4 dark:bg-gray-900 bg-gray-100 border border-cornflower-500">
               {/* Tables wrapper */}
               <div className="tables-container flex items-start gap-8 width-full max-w-dvw">
                 {/* Weighting Table */}
@@ -142,17 +146,21 @@ export default function SyllabusSummary({
                 ) : (
                   <p>Could not summarize the syllabus</p>
                 )}
+                <Link
+                  href={syllabus_uri}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Syllabus
+                </Link>
               </div>
             </div>
             <Typography
               variant="overline"
-              className="text-gray-700 dark:text-gray-300 pr-5"
+              className="text-gray-700 dark:text-gray-300"
             >
               AI GENERATED SYLLABUS SUMMARY
             </Typography>
-            <Link href={syllabus_uri} target="_blank" rel="noopener noreferrer">
-              View Syllabus
-            </Link>
           </div>
         )}
       </Collapse>
