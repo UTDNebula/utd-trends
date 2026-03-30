@@ -6,7 +6,6 @@ import Rating from '@/components/common/Rating/Rating';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
-import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
 import { calculateGrades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
@@ -181,18 +180,34 @@ function Row({
   color,
   showTutorial,
 }: RowProps) {
+  const sectionTypes = use(FiltersContext).sectionTypes;
   const chosenSemesters = use(FiltersContext).chosenSemesters;
   const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
   const [open, setOpen] = useState(false);
-  const sectionTypesOverride = use(FiltersContext).sectionTypesOverride;
+  const sectionTypesOverride = ['all', 'in-person', 'online', 'hybrid'];
   const [chosenSectionTypesOverride, setChosenSectionTypesOverride] =
-    useState<string>('all');
+    useState<string>();
 
+  const secTypes = useMemo(() => {
+      switch (chosenSectionTypesOverride) {
+        case 'all':
+          return sectionTypes;
+        case 'in-person':
+          return ['0Lx', '0xx', '5xx', 'HON'];
+        case 'online':
+          return ['0Wx'];
+        case 'hybrid':
+          return ['0Hx'];
+        default:
+          return chosenSectionTypes
+      }
+    }, [chosenSectionTypesOverride, sectionTypes]);
   const rainbowColors = useRainbowColors();
   const filteredGrades = useMemo(
-    () =>
-      calculateGrades(searchResult.grades, chosenSemesters, chosenSectionTypes),
-    [searchResult.grades, chosenSemesters, chosenSectionTypes],
+    () => {
+      return calculateGrades(searchResult.grades, chosenSemesters, secTypes);
+    },
+    [searchResult.grades, chosenSemesters, secTypes],
   );
 
   const canOpen = searchResult.type === 'course' || searchResult.RMP;
@@ -405,6 +420,7 @@ function Row({
                 course={course}
                 grades={searchResult.grades}
                 filteredGrades={filteredGrades}
+                chosenSectionTypes={secTypes}
               />
               {searchResult.type !== 'course' && searchResult.RMP && (
                 <SingleProfInfo
