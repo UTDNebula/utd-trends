@@ -51,9 +51,26 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
           ? 'Cannot add professor to planner'
           : hasSectionsForTeachingSemester
             ? inPlanner
-              ? 'Remove from Planner'
-              : 'Add to Planner'
-            : 'Not being taught'
+              ? 'Remove from' +
+                (effectiveTeachingSemester !== ''
+                  ? ' ' +
+                    effectiveTeachingSemester.slice(2) +
+                    effectiveTeachingSemester.slice(0, 2)
+                  : '') +
+                ' Planner'
+              : 'Add to' +
+                (effectiveTeachingSemester !== ''
+                  ? ' ' +
+                    effectiveTeachingSemester.slice(2) +
+                    effectiveTeachingSemester.slice(0, 2)
+                  : '') +
+                ' Planner'
+            : 'Not being taught' +
+              (effectiveTeachingSemester !== ''
+                ? ' in ' +
+                  effectiveTeachingSemester.slice(2) +
+                  effectiveTeachingSemester.slice(0, 2)
+                : '')
       }
       placement="top"
     >
