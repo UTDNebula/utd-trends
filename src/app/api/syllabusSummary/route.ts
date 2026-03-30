@@ -1,3 +1,4 @@
+import crypto from 'crypto'; // <-- Added for hashing
 import { GoogleGenAI } from '@google/genai';
 import { NextResponse } from 'next/server';
 
@@ -51,17 +52,18 @@ export async function GET(request: Request) {
       { status: 500 },
     );
   }
-  const API_STORAGE_BUCKET = process.env.NEBULA_API_STORAGE_BUCKET;
-  if (typeof API_STORAGE_BUCKET !== 'string') {
+  const API_SYLLABUS_STORAGE_BUCKET =
+    process.env.NEBULA_API_SYLLABUS_STORAGE_BUCKET;
+  if (typeof API_SYLLABUS_STORAGE_BUCKET !== 'string') {
     return NextResponse.json(
-      { message: 'error', data: 'API storage bucket is undefined' },
+      { message: 'error', data: 'API Syllabus storage bucket is undefined' },
       { status: 500 },
     );
   }
   const API_STORAGE_KEY = process.env.NEBULA_API_STORAGE_KEY;
   if (typeof API_STORAGE_KEY !== 'string') {
     return NextResponse.json(
-      { message: 'error', data: 'API storage key is undefined' },
+      { message: 'error', data: 'API Syllabus storage key is undefined' },
       { status: 500 },
     );
   }
@@ -75,31 +77,6 @@ export async function GET(request: Request) {
     );
   }
 
-  //   // Check cache
-  //   const filename = syllabus_uri + '.txt';
-  //   const url = API_URL + 'storage/' + API_STORAGE_BUCKET + '/' + filename;
-  //   const headers = {
-  //     'x-api-key': API_KEY,
-  //     'x-storage-key': API_STORAGE_KEY,
-  //   };
-  //   const cache = await fetch(url, { headers });
-  //   if (cache.ok) {
-  //     const cacheData = await cache.json();
-  //     // Cache is valid for 30 days
-  //     if (
-  //       new Date(cacheData.data.updated) >
-  //       new Date(Date.now() - 1000 * 60 * 60 * 24 * 30)
-  //     ) {
-  //       const mediaData = await fetch(cacheData.data.media_link); //TODO: what is media_link?
-  //       if (mediaData.ok) {
-  //         return NextResponse.json(
-  //           { message: 'success', data: await mediaData.text() },
-  //           { status: 200 },
-  //         );
-  //       }
-  //     }
-  //   }
-
   // Fetch Syllabus from URI
   const syllabus = await fetch(syllabus_uri);
 
@@ -111,9 +88,37 @@ export async function GET(request: Request) {
   }
 
   const arrayBuffer = await syllabus.arrayBuffer();
-  const pdfBase64 = Buffer.from(arrayBuffer).toString('base64');
+  const buffer = Buffer.from(arrayBuffer);
+  // generate hash
+  const fileHash = crypto.createHash('sha256').update(buffer).digest('hex');
+  const filename = fileHash + '.txt';
 
-  // AI
+  // check cache
+  const url =
+    API_URL + 'storage/' + API_SYLLABUS_STORAGE_BUCKET + '/' + filename;
+  const headers = {
+    'x-api-key': API_KEY,
+    'x-storage-key': API_STORAGE_KEY,
+  };
+
+  const cache = await fetch(url, { headers });
+  if (cache.ok) {
+    const cacheData = await cache.json();
+
+    const mediaData = await fetch(cacheData.data.public_url);
+    if (mediaData.ok) {
+      const cachedText = await mediaData.text();
+
+      return NextResponse.json(
+        { message: 'success', data: JSON.parse(cachedText) },
+        { status: 200 },
+      );
+    }
+  }
+
+  // LLM (if not in cache)
+  const pdfBase64 = buffer.toString('base64');
+
   const GEMINI_SERVICE_ACCOUNT = process.env.GEMINI_SERVICE_ACCOUNT;
   if (typeof GEMINI_SERVICE_ACCOUNT !== 'string') {
     return NextResponse.json(
@@ -267,20 +272,21 @@ export async function GET(request: Request) {
     ],
   });
 
-  //   // Cache response
-  //   const cacheResponse = await fetch(url, {
-  //     method: 'POST',
-  //     headers: headers,
-  //     body: response.text,
-  //   });
+  // cache LLM response
+  const cacheResponse = await fetch(url, {
+    method: 'POST',
+    headers: headers,
+    body: response.text,
+  });
 
-  //   if (!cacheResponse.ok) {
-  //     return NextResponse.json(
-  //       { message: 'error', data: 'Failed to cache response' },
-  //       { status: 500 },
-  //     );
-  //   }
-  const responseData = JSON.parse(response.text ?? '');
+  if (!cacheResponse.ok) {
+    return NextResponse.json(
+      { message: 'error', data: 'Failed to cache response' },
+      { status: 500 },
+    );
+  }
+  const responseData = JSON.parse(response.text ?? '{}');
+
   // Return
   return NextResponse.json(
     { message: 'success', data: responseData },
