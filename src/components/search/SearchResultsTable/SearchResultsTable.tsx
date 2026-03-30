@@ -201,7 +201,7 @@ function Row({
       default:
         return chosenSectionTypes;
     }
-  }, [chosenSectionTypesOverride, sectionTypes]);
+  }, [chosenSectionTypesOverride, sectionTypes, chosenSectionTypes]);
   const rainbowColors = useRainbowColors();
   const filteredGrades = useMemo(() => {
     return calculateGrades(searchResult.grades, chosenSemesters, secTypes);

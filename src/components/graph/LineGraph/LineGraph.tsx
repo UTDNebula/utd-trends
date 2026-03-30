@@ -86,11 +86,11 @@ type Props = {
   title: string;
   series: { name: string; data: Grades['grades'] }[];
   includedColors?: boolean[];
-  chosenSectionTypes: string[];
+  chosenSectionTypes?: string[];
 };
 
 export default function LineGraph(props: Props) {
-  const { semesters, chosenSemesters, setChosenSemesters } =
+  const { semesters, chosenSemesters, setChosenSemesters, chosenSectionTypes } =
     use(FiltersContext);
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
@@ -125,7 +125,7 @@ export default function LineGraph(props: Props) {
     idx += 2;
   });
 
-  const sectionTypes = props.chosenSectionTypes;
+  const sectionTypes = props.chosenSectionTypes ?? chosenSectionTypes;
   const series = props.series.map((single) => ({
     name: single.name,
     data: getSemesterGPAs(single, semesterMapping, sectionTypes).map((p) => ({

@@ -38,7 +38,7 @@ type Props = {
   course: SearchQuery;
   grades: GradesData;
   filteredGrades: GradesSummary;
-  chosenSectionTypes: string[];
+  chosenSectionTypes?: string[];
 };
 
 export default function SingleGradesInfo({
