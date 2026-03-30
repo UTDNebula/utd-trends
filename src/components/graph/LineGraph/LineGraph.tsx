@@ -90,7 +90,7 @@ type Props = {
 };
 
 export default function LineGraph(props: Props) {
-  const { semesters, chosenSemesters, setChosenSemesters} =
+  const { semesters, chosenSemesters, setChosenSemesters } =
     use(FiltersContext);
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
@@ -128,13 +128,11 @@ export default function LineGraph(props: Props) {
   const sectionTypes = props.chosenSectionTypes;
   const series = props.series.map((single) => ({
     name: single.name,
-    data: getSemesterGPAs(single, semesterMapping, sectionTypes).map(
-      (p) => ({
-        x: p.x,
-        y: p.y,
-        semester: p.semester,
-      }),
-    ),
+    data: getSemesterGPAs(single, semesterMapping, sectionTypes).map((p) => ({
+      x: p.x,
+      y: p.y,
+      semester: p.semester,
+    })),
   }));
 
   const theme = useTheme();

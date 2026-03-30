@@ -189,26 +189,23 @@ function Row({
     useState<string>();
 
   const secTypes = useMemo(() => {
-      switch (chosenSectionTypesOverride) {
-        case 'all':
-          return sectionTypes;
-        case 'in-person':
-          return ['0Lx', '0xx', '5xx', 'HON'];
-        case 'online':
-          return ['0Wx'];
-        case 'hybrid':
-          return ['0Hx'];
-        default:
-          return chosenSectionTypes
-      }
-    }, [chosenSectionTypesOverride, sectionTypes]);
+    switch (chosenSectionTypesOverride) {
+      case 'all':
+        return sectionTypes;
+      case 'in-person':
+        return ['0Lx', '0xx', '5xx', 'HON'];
+      case 'online':
+        return ['0Wx'];
+      case 'hybrid':
+        return ['0Hx'];
+      default:
+        return chosenSectionTypes;
+    }
+  }, [chosenSectionTypesOverride, sectionTypes]);
   const rainbowColors = useRainbowColors();
-  const filteredGrades = useMemo(
-    () => {
-      return calculateGrades(searchResult.grades, chosenSemesters, secTypes);
-    },
-    [searchResult.grades, chosenSemesters, secTypes],
-  );
+  const filteredGrades = useMemo(() => {
+    return calculateGrades(searchResult.grades, chosenSemesters, secTypes);
+  }, [searchResult.grades, chosenSemesters, secTypes]);
 
   const canOpen = searchResult.type === 'course' || searchResult.RMP;
   const nameCell = (
