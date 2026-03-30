@@ -171,6 +171,7 @@ export default function Filters({
     const availableThisSemester =
       filterNextSem &&
       semesterToFilter &&
+      result.sections !== undefined &&
       result.sections.some(
         (section) => section.academic_session.name === semesterToFilter,
       );

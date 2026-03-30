@@ -77,7 +77,7 @@ export default function ClientLeft(props: Props) {
 
   //Filter results based on gpa, rmp, rmp difficulty, availability, and grade section type
   const availableResults = filteredResults.filter((result) => {
-    const availableThisSemester = result.sections.some(
+    const availableThisSemester = result.sections !== undefined && result.sections.some(
       (section) => section.academic_session.name === semesterForAvailability,
     );
     if (availability && !availableThisSemester) return false;
