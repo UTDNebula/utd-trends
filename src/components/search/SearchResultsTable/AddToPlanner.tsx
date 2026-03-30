@@ -182,10 +182,10 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
                     effectiveTeachingSemester.slice(2) +
                     effectiveTeachingSemester.slice(0, 2)
                   : '') +
-                ' Planner' +
+                ' Planner,' +
                 (finalDisplayCount > 0
-                  ? `${finalDisplayCount} section(s) fit your schedule!`
-                  : 'No sections fit in your schedule')
+                  ? ` ${finalDisplayCount} section(s) fit your schedule!`
+                  : ' No sections fit in your schedule')
             : 'Not being taught' +
               (effectiveTeachingSemester !== ''
                 ? ' in ' +
