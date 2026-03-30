@@ -35,7 +35,11 @@ export function calculateGrades(
           sectionTypes.includes(sectionData.type)
         ) {
           grade_distribution = grade_distribution.map(
-            (item, i) => item + sectionData.grade_distribution[i],
+            (item, i) =>
+              item +
+              (sectionData.grade_distribution.length > i
+                ? sectionData.grade_distribution[i]
+                : 0),
           );
         }
       }
@@ -50,21 +54,29 @@ export function calculateGrades(
   const GPALookup = [
     4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
   ];
+
+  // exclude all entries after F from total
+  const totalLetterGrades =
+    total -
+    grade_distribution
+      .slice(GPALookup.length)
+      .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+
   let mean_gpa = -1;
-  if (total !== 0) {
+
+  if (totalLetterGrades !== 0) {
     mean_gpa =
       GPALookup.reduce(
         (accumulator, currentValue, index) =>
           accumulator + currentValue * grade_distribution[index],
         0,
-      ) /
-      (total - grade_distribution[grade_distribution.length - 1]);
+      ) / totalLetterGrades;
   }
 
   let median_gpa = -1;
   let medianIndex = -1;
-  if (total != 0) {
-    let i = Math.floor(total / 2);
+  if (totalLetterGrades != 0) {
+    let i = Math.floor(totalLetterGrades / 2);
     while (i > 0) {
       medianIndex++;
       i -= grade_distribution[medianIndex];
