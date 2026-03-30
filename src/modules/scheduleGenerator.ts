@@ -1,8 +1,10 @@
 import { type Sections } from '@/modules/fetchSections';
-import type {
-  SearchQuery,
-  SearchQueryMultiSection,
-  SearchResult,
+import {
+  convertToProfOnly,
+  searchQueryLabel,
+  type SearchQuery,
+  type SearchQueryMultiSection,
+  type SearchResult,
 } from '@/types/SearchQuery';
 import type { UseQueryResult } from '@tanstack/react-query';
 import { calculateGrades } from './fetchGrades';
@@ -160,20 +162,54 @@ export function generateOptimalSchedule(
     });
   });
 
+  // check if professors need to be constrained for courses based on who is added to MyPlanner
+  const professorConstraints = new Map<string, Set<string>>();
+  const hasOverallQuery = new Map<string, boolean>();
+
+  planner.forEach((query) => {
+    const courseKey = `${query.prefix} ${query.number}`;
+
+    if (query.profFirst && query.profLast) {
+      if (!professorConstraints.has(courseKey))
+        professorConstraints.set(courseKey, new Set());
+
+      const targetProf = searchQueryLabel(convertToProfOnly(query));
+
+      if (targetProf) {
+        professorConstraints.get(courseKey)!.add(targetProf);
+      }
+    } else {
+      hasOverallQuery.set(courseKey, true);
+    }
+  });
+
   // score valid unassigned options
   planner.forEach((query, idx) => {
     const courseKey = `${query.prefix} ${query.number}`;
     if (lockedCourseKeys.has(courseKey)) return;
 
-    const sections = latestSections[idx] || [];
-    const searchResult = allResults[idx].isSuccess
-      ? allResults[idx].data
-      : undefined;
+    const result = allResults[idx];
+    if (!result.isSuccess) return;
+
+    const searchResult = result.data;
+    const sections = searchResult.sections.filter(
+      (s) => s.academic_session.name === latestSemester,
+    );
+
+    const constraints = professorConstraints.get(courseKey);
+    const isOverallOnly = !constraints || constraints.size === 0;
 
     if (!courseOptions.has(courseKey)) courseOptions.set(courseKey, []);
+    const existingOptions = courseOptions.get(courseKey)!;
 
     sections.forEach((section) => {
-      const existingOptions = courseOptions.get(courseKey)!;
+      const isPreferredProf = section.professor_details?.some((prof) =>
+        constraints?.has(prof.first_name + ' ' + prof.last_name),
+      );
+
+      // if Only combo is added, don't allow any other sections
+      if (!isOverallOnly && !hasOverallQuery.get(courseKey) && !isPreferredProf)
+        return;
 
       // prevent duplicates if planner has overall and combo result
       if (
@@ -189,10 +225,21 @@ export function generateOptimalSchedule(
             end: parseTime(m.end_time),
           }));
 
+        let score = scoreSection(section, parsedMeetings, searchResult);
+
+        // if both overall & combo exist, penalize non-combo profs
+        if (!isOverallOnly && hasOverallQuery.get(courseKey)) {
+          if (!isPreferredProf) {
+            score -= 20; // penalty but still available if others conflict
+          } else {
+            score += 20; // preferred
+          }
+        }
+
         existingOptions.push({
           query,
           section,
-          score: scoreSection(section, parsedMeetings, searchResult),
+          score,
           meetings: parsedMeetings,
         });
       }
