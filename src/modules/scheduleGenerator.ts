@@ -65,7 +65,7 @@ export function checkConflict(
   return false;
 }
 
-// heuristic to core a section based on its desirability
+// heuristic to score a section based on its desirability
 function scoreSection(
   section: Section,
   meetings: ParsedMeeting[],
