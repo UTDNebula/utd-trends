@@ -264,6 +264,15 @@ function HeaderChildrenInner(props: HeaderProps) {
         open={openMenu}
         anchorEl={menuAnchorEl}
         onClose={handleCloseMenu}
+        disableScrollLock={true}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
         slotProps={{
           list: {
             'aria-labelledby': 'header-menu-button',

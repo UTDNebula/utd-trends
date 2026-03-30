@@ -15,7 +15,7 @@ export default function PlannerDownloadUI({
 
   return (
     <div
-      className="bg-black p-4 absolute -left-[-9999px] top-0"
+      className="bg-black p-4 absolute -left-[9999px] top-0"
       ref={downloadRef}
     >
       <div className="flex flex-row mb-4 justify-start gap-2 pl-2 items-center">
