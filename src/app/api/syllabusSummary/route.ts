@@ -153,7 +153,6 @@ export async function GET(request: Request) {
               data: pdfBase64,
             },
           },
-
           {
             // prettier-ignore
             text:

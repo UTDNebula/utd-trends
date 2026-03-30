@@ -5,6 +5,7 @@ import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import { calculateGrades } from '@/modules/fetchGrades';
 import type { Sections, SectionsData } from '@/modules/fetchSections';
 import { useSearchResult } from '@/modules/plannerFetch';
+import { getLatestSyllabusUri } from '@/modules/semesters';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -836,16 +837,7 @@ export default function PlannerCard(props: PlannerCardProps) {
                   open={open && whichOpen === 'grades'}
                   searchQuery={props.query}
                   syllabus_uri={
-                    latestMatchedSections.sections
-                      .filter(
-                        (s) =>
-                          !!s.syllabus_uri && !!s.academic_session?.start_date,
-                      )
-                      .sort(
-                        (a, b) =>
-                          new Date(b.academic_session.start_date).getTime() -
-                          new Date(a.academic_session.start_date).getTime(),
-                      )[0]?.syllabus_uri || null
+                    getLatestSyllabusUri(latestMatchedSections) || null
                   }
                 />
               )}

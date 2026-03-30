@@ -9,7 +9,7 @@ import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
 import { calculateGrades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import { displaySemesterName } from '@/modules/semesters';
+import { displaySemesterName, getLatestSyllabusUri } from '@/modules/semesters';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -382,18 +382,7 @@ function Row({
                   open={open}
                   searchQuery={course}
                   rmp={searchResult.RMP}
-                  syllabus_uri={
-                    searchResult.sections
-                      .filter(
-                        (s) =>
-                          !!s.syllabus_uri && !!s.academic_session?.start_date,
-                      )
-                      .sort(
-                        (a, b) =>
-                          new Date(b.academic_session.start_date).getTime() -
-                          new Date(a.academic_session.start_date).getTime(),
-                      )[0]?.syllabus_uri || null
-                  }
+                  syllabus_uri={getLatestSyllabusUri(searchResult)}
                 />
               )}
             </div>
