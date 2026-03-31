@@ -142,7 +142,9 @@ export default async function Page({ searchParams }: Props) {
                     }
                   >
                     <Right
-                      courses={courses}
+                      courses={courses.filter(
+                        (course) => !course.number?.includes('X'), // Don't try to show overview for aggregate course searches
+                      )}
                       professors={professors}
                       searchResultsPromise={searchResults}
                     />
