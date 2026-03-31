@@ -1,5 +1,6 @@
 import autocompleteGraph from '@/data/autocomplete_graph.json';
 import { getGraph, searchAutocomplete } from '@/modules/autocomplete';
+import { getAggregateOption } from '@/modules/aggregateAutocomplete';
 import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery } from '@/types/SearchQuery';
 import { NextResponse } from 'next/server';
@@ -29,7 +30,10 @@ export async function GET(request: Request) {
   }
 
   const results = searchAutocomplete(graph, input, limit, searchBy);
-
+  const aggregateOption = getAggregateOption(input);
+  if (aggregateOption) {
+    results.unshift(aggregateOption); // add aggregate option to beginning of results
+  }
   return NextResponse.json(
     {
       message: 'success',
