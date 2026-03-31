@@ -311,7 +311,6 @@ export default function SearchBar(props: Props) {
     filtered.forEach((el) => {
       el.isRecent = recents.some((rec) => searchQueryEqual(el, rec)); // deals with removals from recents
     });
-    // TODO: CHECK FOR RETURNED AGGREGATES!
     return [...matchedRecents, ...filtered];
   }
 

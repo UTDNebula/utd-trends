@@ -42,13 +42,24 @@ export function createSearchQuery(
                 : []
               : Object.values(firstDigitTable).flat();
 
-          return courses
+          const courseQueries = courses
             .map((courseNumber) => {
               return {
                 prefix: courseNumber.substring(0, courseNumber.length - 5),
                 number: courseNumber.substring(courseNumber.length - 4),
               };
-            })
+            });
+          if (filterTerms.length > 0) {            
+              // add all combos, to be filtered later
+              const allCombos : SearchQuery[] = courseQueries.flatMap((courseQuery) => {
+                  return comboTable[searchQueryLabel(courseQuery)].map((combo) => ({
+                ...courseQuery,
+                ...combo,
+              }));});        
+              return allCombos;    
+          }
+
+          return courseQueries
             .filter(
               (x: SearchQuery) =>
                 !searchTerms.some((course) =>
