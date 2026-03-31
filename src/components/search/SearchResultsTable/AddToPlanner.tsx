@@ -57,9 +57,9 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
   const latestSections = allResults.map((r) =>
     r.isSuccess
       ? r.data.sections.filter(
-          (s) =>
-            s.academic_session.name === effectiveTeachingSemester && s != null,
-        )
+        (s) =>
+          s.academic_session.name === effectiveTeachingSemester && s != null,
+      )
       : [],
   );
 
@@ -74,16 +74,10 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
     })
     .filter((section) => typeof section !== 'undefined');
 
-  // Extract base number from section (last 2-3 digits: "01", "02", etc.)
-  const getBaseSectionNumber = (sectionNum: string): string => {
-    const match = sectionNum.match(/(\d{2,3})$/);
-    return match ? match[1] : '';
-  };
-
   // Separate by type using correct section codes
   const lectureSections = courseOnlySections.filter(
     (s) =>
-      /^[05]/.test(s.section_number) ||
+      /^[058]/.test(s.section_number) ||
       /^0[WHL]/.test(s.section_number) ||
       /^(HON|HN)/.test(s.section_number),
   );
@@ -94,72 +88,85 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
     /^7/.test(s.section_number),
   );
 
-  const fitSections = (arr: typeof courseOnlySections) =>
-    arr.filter((s) => !hasConflict(s, selectedSections));
+  const fitSections = (
+    arr: typeof courseOnlySections,
+    otherSections: typeof courseOnlySections,
+  ) => arr.filter((s) => !hasConflict(s, otherSections));
 
   let finalDisplayCount = 0;
-
   if (lectureSections.length > 0) {
-    // count lecture based sections
-    const lecturesFitWithRequiredCompanions = lectureSections.filter(
-      (lecture) => {
-        const base = getBaseSectionNumber(lecture.section_number);
-        if (!base) return true;
+    const fitLectures = fitSections(lectureSections, selectedSections);
+    // lecture section
+    finalDisplayCount = fitLectures.length;
 
-        const courseHasLabs = labSections.length > 0;
-        const courseHasExams = examSections.length > 0;
+    if (labSections.length > 0 && examSections.length > 0) {
+      // both lab and exam sections also
+      const availableLabSections = labSections.filter(
+        (sec) =>
+          !hasConflict(sec, selectedSections),
+      );
 
-        if (fitSections([lecture]).length === 0) {
-          return false;
-        }
+      const availableExamSections = examSections.filter(
+        (sec) =>
+          !hasConflict(sec, selectedSections),
+      );
 
-        if (courseHasLabs) {
-          const matchingLab = labSections.find(
-            (l) => getBaseSectionNumber(l.section_number) === base,
-          );
-          if (matchingLab && fitSections([matchingLab]).length === 0) {
-            return false;
-          }
-        }
+      let numSec = 0;
+      for (let i = 0; i < fitLectures.length; i++) {
+        const labsForLec = availableLabSections.filter((lab) => !hasConflict(fitLectures[i], [lab]) && !hasConflict(fitLectures[i], availableExamSections))
+        if (labsForLec.length > 0)
+          numSec++
+      }
+      finalDisplayCount = numSec;
+    }
+    else if (labSections.length > 0) {
+      // has a lab section also
+      const availableLabSections = labSections.filter(
+        (sec) =>
+          !hasConflict(sec, selectedSections)
+      );
 
-        if (courseHasExams) {
-          const matchingExam = examSections.find(
-            (e) => getBaseSectionNumber(e.section_number) === base,
-          );
-          if (matchingExam && fitSections([matchingExam]).length === 0) {
-            return false;
-          }
-        }
-
-        return true;
-      },
-    );
-
-    finalDisplayCount = lecturesFitWithRequiredCompanions.length;
+      let numSec = 0;
+      for (let i = 0; i < fitLectures.length; i++) {
+        const labsForLec = availableLabSections.filter((lab) => !hasConflict(fitLectures[i], [lab]))
+        if (labsForLec.length > 0)
+          numSec++
+      }
+      finalDisplayCount = numSec;
+    }
+    else if (examSections.length > 0) {
+      // has an exam section also
+      const availableSections = examSections.filter(
+        (sec) =>
+          !hasConflict(sec, selectedSections)
+      );
+      let numSec = 0;
+      for (let i = 0; i < fitLectures.length; i++) {
+        const examForLec = availableSections.filter((exam) => !hasConflict(fitLectures[i], [exam]))
+        if (examForLec.length > 0)
+          numSec++
+      }
+      finalDisplayCount = numSec;
+    }
   } else if (labSections.length > 0) {
-    // Count for lab only sections
-    const labsFitWithRequiredCompanions = labSections.filter((lab) => {
-      const base = getBaseSectionNumber(lab.section_number);
-      if (!base) return true;
+    const fitLabs = fitSections(labSections, selectedSections);
+    // lab section
+    finalDisplayCount = fitLabs.length;
 
-      const courseHasExams = examSections.length > 0;
-
-      if (fitSections([lab]).length === 0) {
-        return false;
+    if (examSections.length > 0) {
+      // has an exam
+      const availableExamSections = examSections.filter(
+        (sec) =>
+          fitSections([sec], selectedSections),
+      );
+      let numSec = 0;
+      for (let i = 0; i < fitLabs.length; i++) {
+        const examForLab = availableExamSections.filter((exam) => !hasConflict(fitLabs[i], [exam]))
+        if (examForLab.length > 0)
+          numSec++
       }
-
-      if (courseHasExams) {
-        const matchingExam = examSections.find(
-          (e) => getBaseSectionNumber(e.section_number) === base,
-        );
-        if (matchingExam && fitSections([matchingExam]).length === 0) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-    finalDisplayCount = labsFitWithRequiredCompanions.length;
+      finalDisplayCount = numSec;
+    }
   }
 
   // only show badge if a) they have something in planner for the current semester and b) the class fits in their schedule
@@ -175,28 +182,28 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
           : hasSectionsForTeachingSemester
             ? inPlanner
               ? 'Remove from' +
-                (effectiveTeachingSemester !== ''
-                  ? ' ' +
-                    effectiveTeachingSemester.slice(2) +
-                    effectiveTeachingSemester.slice(0, 2)
-                  : '') +
-                ` Planner (${finalDisplayCount} sections)`
-              : 'Add to' +
-                (effectiveTeachingSemester !== ''
-                  ? ' ' +
-                    effectiveTeachingSemester.slice(2) +
-                    effectiveTeachingSemester.slice(0, 2)
-                  : '') +
-                ' Planner' +
-                (displayBadge
-                  ? `, ${finalDisplayCount} ${finalDisplayCount > 1 ? 'sections fit' : 'section fits'} your schedule!`
-                  : '')
-            : 'Not being taught' +
               (effectiveTeachingSemester !== ''
-                ? ' in ' +
-                  effectiveTeachingSemester.slice(2) +
-                  effectiveTeachingSemester.slice(0, 2)
+                ? ' ' +
+                effectiveTeachingSemester.slice(2) +
+                effectiveTeachingSemester.slice(0, 2)
+                : '') +
+              ` Planner (${finalDisplayCount} sections)`
+              : 'Add to' +
+              (effectiveTeachingSemester !== ''
+                ? ' ' +
+                effectiveTeachingSemester.slice(2) +
+                effectiveTeachingSemester.slice(0, 2)
+                : '') +
+              ' Planner' +
+              (displayBadge
+                ? `, ${finalDisplayCount} ${finalDisplayCount > 1 ? 'sections fit' : 'section fits'} your schedule!`
                 : '')
+            : 'Not being taught' +
+            (effectiveTeachingSemester !== ''
+              ? ' in ' +
+              effectiveTeachingSemester.slice(2) +
+              effectiveTeachingSemester.slice(0, 2)
+              : '')
       }
       placement="top"
     >
