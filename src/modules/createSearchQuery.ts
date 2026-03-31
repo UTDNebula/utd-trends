@@ -48,7 +48,8 @@ export function createSearchQuery(
                 prefix: courseNumber.substring(0, courseNumber.length - 5),
                 number: courseNumber.substring(courseNumber.length - 4),
               };
-            }).filter(
+            })
+            .filter(
               (x: SearchQuery) =>
                 !searchTerms.some((course) =>
                   searchQueryEqual(
@@ -57,18 +58,22 @@ export function createSearchQuery(
                   ),
                 ),
             ); // filter out courses that are already in searchTerms to avoid duplicate search results
-          if (filterTerms.length > 0) {            
-              // add all combos, to be filtered later
-              const allCombos : SearchQuery[] = courseQueries.flatMap((courseQuery) => {
-                  return comboTable[searchQueryLabel(courseQuery)].map((combo) => ({
-                ...courseQuery,
-                ...combo,
-              }));});        
-              return allCombos;    
+          if (filterTerms.length > 0) {
+            // add all combos, to be filtered later
+            const allCombos: SearchQuery[] = courseQueries.flatMap(
+              (courseQuery) => {
+                return comboTable[searchQueryLabel(courseQuery)].map(
+                  (combo) => ({
+                    ...courseQuery,
+                    ...combo,
+                  }),
+                );
+              },
+            );
+            return allCombos;
           }
 
           return courseQueries;
-            
         }
         return [];
       }
