@@ -42,12 +42,22 @@ export function createSearchQuery(
                 : []
               : Object.values(firstDigitTable).flat();
 
-          return courses.map((courseNumber) => {
-            return {
-              prefix: courseNumber.substring(0, courseNumber.length - 5),
-              number: courseNumber.substring(courseNumber.length - 4),
-            };
-          });
+          return courses
+            .map((courseNumber) => {
+              return {
+                prefix: courseNumber.substring(0, courseNumber.length - 5),
+                number: courseNumber.substring(courseNumber.length - 4),
+              };
+            })
+            .filter(
+              (x: SearchQuery) =>
+                !searchTerms.some((course) =>
+                  searchQueryEqual(
+                    convertToCourseOnly(course),
+                    convertToCourseOnly(x),
+                  ),
+                ),
+            ); // filter out courses that are already in searchTerms
         }
         return [];
       }
