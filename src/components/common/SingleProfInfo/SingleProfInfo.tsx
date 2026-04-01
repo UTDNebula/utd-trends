@@ -202,13 +202,15 @@ export default function SingleProfInfo({
             Visit Rate My Professors
           </Link>
 
-          <button onClick={() => setShowSyllabus(!showSyllabus)}>
-            View Syllabus Summary
-            {syllabus_sem ? ` for ${syllabus_sem}` : ''}{' '}
-            <ChevronRightIcon
-              className={`transition-transform ${showSyllabus ? 'rotate-90' : ''}`}
-            />
-          </button>
+          {syllabus_uri && (
+            <button onClick={() => setShowSyllabus(!showSyllabus)}>
+              View Syllabus Summary
+              {syllabus_sem ? ` for ${syllabus_sem}` : ''}{' '}
+              <ChevronRightIcon
+                className={`transition-transform ${showSyllabus ? 'rotate-90' : ''}`}
+              />
+            </button>
+          )}
         </div>
         {syllabus_uri && (
           <SyllabusSummary
