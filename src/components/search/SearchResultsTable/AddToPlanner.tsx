@@ -57,9 +57,9 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
   const latestSections = allResults.map((r) =>
     r.isSuccess
       ? r.data.sections.filter(
-        (s) =>
-          s.academic_session.name === effectiveTeachingSemester && s != null,
-      )
+          (s) =>
+            s.academic_session.name === effectiveTeachingSemester && s != null,
+        )
       : [],
   );
 
@@ -102,49 +102,48 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
     if (labSections.length > 0 && examSections.length > 0) {
       // both lab and exam sections also
       const availableLabSections = labSections.filter(
-        (sec) =>
-          !hasConflict(sec, selectedSections),
+        (sec) => !hasConflict(sec, selectedSections),
       );
 
       const availableExamSections = examSections.filter(
-        (sec) =>
-          !hasConflict(sec, selectedSections),
+        (sec) => !hasConflict(sec, selectedSections),
       );
 
       let numSec = 0;
       for (let i = 0; i < fitLectures.length; i++) {
-        const labsForLec = availableLabSections.filter((lab) => !hasConflict(fitLectures[i], [lab]) && !hasConflict(fitLectures[i], availableExamSections))
-        if (labsForLec.length > 0)
-          numSec++
+        const labsForLec = availableLabSections.filter(
+          (lab) =>
+            !hasConflict(fitLectures[i], [lab]) &&
+            !hasConflict(fitLectures[i], availableExamSections),
+        );
+        if (labsForLec.length > 0) numSec++;
       }
       finalDisplayCount = numSec;
-    }
-    else if (labSections.length > 0) {
+    } else if (labSections.length > 0) {
       // has a lab section also
       const availableLabSections = labSections.filter(
-        (sec) =>
-          !hasConflict(sec, selectedSections)
+        (sec) => !hasConflict(sec, selectedSections),
       );
 
       let numSec = 0;
       for (let i = 0; i < fitLectures.length; i++) {
-        const labsForLec = availableLabSections.filter((lab) => !hasConflict(fitLectures[i], [lab]))
-        if (labsForLec.length > 0)
-          numSec++
+        const labsForLec = availableLabSections.filter(
+          (lab) => !hasConflict(fitLectures[i], [lab]),
+        );
+        if (labsForLec.length > 0) numSec++;
       }
       finalDisplayCount = numSec;
-    }
-    else if (examSections.length > 0) {
+    } else if (examSections.length > 0) {
       // has an exam section also
       const availableSections = examSections.filter(
-        (sec) =>
-          !hasConflict(sec, selectedSections)
+        (sec) => !hasConflict(sec, selectedSections),
       );
       let numSec = 0;
       for (let i = 0; i < fitLectures.length; i++) {
-        const examForLec = availableSections.filter((exam) => !hasConflict(fitLectures[i], [exam]))
-        if (examForLec.length > 0)
-          numSec++
+        const examForLec = availableSections.filter(
+          (exam) => !hasConflict(fitLectures[i], [exam]),
+        );
+        if (examForLec.length > 0) numSec++;
       }
       finalDisplayCount = numSec;
     }
@@ -155,15 +154,15 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
 
     if (examSections.length > 0) {
       // has an exam
-      const availableExamSections = examSections.filter(
-        (sec) =>
-          fitSections([sec], selectedSections),
+      const availableExamSections = examSections.filter((sec) =>
+        fitSections([sec], selectedSections),
       );
       let numSec = 0;
       for (let i = 0; i < fitLabs.length; i++) {
-        const examForLab = availableExamSections.filter((exam) => !hasConflict(fitLabs[i], [exam]))
-        if (examForLab.length > 0)
-          numSec++
+        const examForLab = availableExamSections.filter(
+          (exam) => !hasConflict(fitLabs[i], [exam]),
+        );
+        if (examForLab.length > 0) numSec++;
       }
       finalDisplayCount = numSec;
     }
@@ -182,28 +181,28 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
           : hasSectionsForTeachingSemester
             ? inPlanner
               ? 'Remove from' +
-              (effectiveTeachingSemester !== ''
-                ? ' ' +
-                effectiveTeachingSemester.slice(2) +
-                effectiveTeachingSemester.slice(0, 2)
-                : '') +
-              ` Planner (${finalDisplayCount} sections)`
+                (effectiveTeachingSemester !== ''
+                  ? ' ' +
+                    effectiveTeachingSemester.slice(2) +
+                    effectiveTeachingSemester.slice(0, 2)
+                  : '') +
+                ` Planner (${finalDisplayCount} sections)`
               : 'Add to' +
-              (effectiveTeachingSemester !== ''
-                ? ' ' +
-                effectiveTeachingSemester.slice(2) +
-                effectiveTeachingSemester.slice(0, 2)
-                : '') +
-              ' Planner' +
-              (displayBadge
-                ? `, ${finalDisplayCount} ${finalDisplayCount > 1 ? 'sections fit' : 'section fits'} your schedule!`
-                : '')
+                (effectiveTeachingSemester !== ''
+                  ? ' ' +
+                    effectiveTeachingSemester.slice(2) +
+                    effectiveTeachingSemester.slice(0, 2)
+                  : '') +
+                ' Planner' +
+                (displayBadge
+                  ? `, ${finalDisplayCount} ${finalDisplayCount > 1 ? 'sections fit' : 'section fits'} your schedule!`
+                  : '')
             : 'Not being taught' +
-            (effectiveTeachingSemester !== ''
-              ? ' in ' +
-              effectiveTeachingSemester.slice(2) +
-              effectiveTeachingSemester.slice(0, 2)
-              : '')
+              (effectiveTeachingSemester !== ''
+                ? ' in ' +
+                  effectiveTeachingSemester.slice(2) +
+                  effectiveTeachingSemester.slice(0, 2)
+                : '')
       }
       placement="top"
     >
