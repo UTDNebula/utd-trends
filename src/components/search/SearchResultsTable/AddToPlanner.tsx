@@ -3,6 +3,9 @@ import { hasConflict } from '@/components/planner/PlannerCoursesTable/PlannerCar
 import { useSearchresults } from '@/modules/plannerFetch';
 import {
   convertToCourseOnly,
+  getExamSections,
+  getLabSections,
+  getLectureSections,
   searchQueryEqual,
   searchQueryMultiSectionSplit,
   sectionCanOverlap,
@@ -75,18 +78,9 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
     .filter((section) => typeof section !== 'undefined');
 
   // Separate by type using correct section codes
-  const lectureSections = courseOnlySections.filter(
-    (s) =>
-      /^[058]/.test(s.section_number) ||
-      /^0[WHL]/.test(s.section_number) ||
-      /^(HON|HN)/.test(s.section_number),
-  );
-  const labSections = courseOnlySections.filter((s) =>
-    /^[1236]/.test(s.section_number),
-  );
-  const examSections = courseOnlySections.filter((s) =>
-    /^7/.test(s.section_number),
-  );
+  const lectureSections = getLectureSections(courseOnlySections);
+  const labSections = getLabSections(courseOnlySections);
+  const examSections = getExamSections(courseOnlySections);
 
   const fitSections = (
     arr: typeof courseOnlySections,
