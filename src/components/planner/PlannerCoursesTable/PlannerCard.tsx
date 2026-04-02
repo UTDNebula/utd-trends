@@ -5,6 +5,7 @@ import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import { calculateGrades } from '@/modules/fetchGrades';
 import type { Sections, SectionsData } from '@/modules/fetchSections';
 import { useSearchResult } from '@/modules/plannerFetch';
+import { getLatestSyllabusSection } from '@/modules/semesters';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -469,13 +470,13 @@ export default function PlannerCard(props: PlannerCardProps) {
     allSectionsWithSyllabus = allSectionsWithSyllabus.filter(() => false); // No syllabi should be shown
 
   let latestMatchedSections: SearchResult = result; // fallback if filtering is null, at least it will have correct grade/rmp data
+  let allMatchedSections: SearchResult = result; // all sections of a course (not filtered by sem) -- using this for the latest syllabus per professor
   let latestExtraSections: SearchResult | null = null;
   if (!props.extraSections) {
-    latestMatchedSections = {
+    allMatchedSections = {
       ...result,
       sections: result.sections.filter(
         (section) =>
-          section.academic_session.name == props.teachingSemester && // selected teaching semester only
           ((!props.query.profFirst && !props.query.profLast) || // if overall, should show every prof's section
             (section.professor_details &&
               section.professor_details.find(
@@ -485,6 +486,12 @@ export default function PlannerCard(props: PlannerCardProps) {
                 (prof) => prof.last_name == props.query.profLast,
               ))) && // else, show only this professor's sections (a section *can* have multiple profs)
           !sectionCanOverlap(section.section_number), // that are not "Extra"
+      ),
+    };
+    latestMatchedSections = {
+      ...allMatchedSections,
+      sections: allMatchedSections.sections.filter(
+        (section) => section.academic_session.name == props.teachingSemester, // selected teaching semester only
       ),
     };
     latestExtraSections = {
@@ -511,6 +518,8 @@ export default function PlannerCard(props: PlannerCardProps) {
               latestMatchedSections.sections![0].meetings[0].end_date,
         )
       : false;
+
+  const latestSyllabusSection = getLatestSyllabusSection(allMatchedSections);
   return (
     <Box
       component={Paper}
@@ -832,9 +841,13 @@ export default function PlannerCard(props: PlannerCardProps) {
               latestMatchedSections.type === 'combo') &&
               latestMatchedSections.RMP && (
                 <SingleProfInfo
+                  rmp={latestMatchedSections.RMP}
                   open={open && whichOpen === 'grades'}
                   searchQuery={props.query}
-                  rmp={latestMatchedSections.RMP}
+                  syllabus_uri={latestSyllabusSection?.syllabus_uri || null}
+                  syllabus_sem={
+                    latestSyllabusSection?.academic_session.name || null
+                  }
                 />
               )}
           </div>

@@ -3,8 +3,10 @@
 import RmpSummary, {
   LoadingRmpSummary,
 } from '@/components/common/RmpSummary/RmpSummary';
+import SyllabusSummary from '@/components/common/SyllabusSummary/SyllabusSummary';
 import type { RMP } from '@/modules/fetchRmp';
 import type { SearchQuery } from '@/types/SearchQuery';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Chip, Collapse, Grid, IconButton, Skeleton } from '@mui/material';
 import Link from 'next/link';
@@ -78,10 +80,19 @@ type Props = {
   open: boolean;
   searchQuery: SearchQuery;
   rmp: RMP;
+  syllabus_uri?: string | null;
+  syllabus_sem?: string | null;
 };
 
-export default function SingleProfInfo({ open, searchQuery, rmp }: Props) {
+export default function SingleProfInfo({
+  open,
+  searchQuery,
+  rmp,
+  syllabus_uri,
+  syllabus_sem,
+}: Props) {
   const [showMore, setShowMore] = useState(false);
+  const [showSyllabus, setShowSyllabus] = useState(false);
 
   if (rmp.numRatings == 0) {
     return (
@@ -182,13 +193,33 @@ export default function SingleProfInfo({ open, searchQuery, rmp }: Props) {
       </Grid>
 
       <Grid size={12}>
-        <Link
-          href={'https://www.ratemyprofessors.com/professor/' + rmp.legacyId}
-          target="_blank"
-          className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-        >
-          Visit Rate My Professors
-        </Link>
+        <div className="flex gap-7">
+          <Link
+            href={'https://www.ratemyprofessors.com/professor/' + rmp.legacyId}
+            target="_blank"
+            className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+          >
+            Visit Rate My Professors
+          </Link>
+
+          {syllabus_uri && (
+            <button onClick={() => setShowSyllabus(!showSyllabus)}>
+              View Syllabus Summary
+              {syllabus_sem ? ` for ${syllabus_sem}` : ''}{' '}
+              <ChevronRightIcon
+                className={`transition-transform ${showSyllabus ? 'rotate-90' : ''}`}
+              />
+            </button>
+          )}
+        </div>
+        {syllabus_uri && (
+          <SyllabusSummary
+            open={open}
+            searchQuery={searchQuery}
+            showSyllabus={showSyllabus}
+            syllabus_uri={syllabus_uri}
+          />
+        )}
       </Grid>
     </Grid>
   );
