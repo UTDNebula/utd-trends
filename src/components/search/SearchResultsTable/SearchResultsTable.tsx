@@ -9,7 +9,10 @@ import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
 import { calculateGrades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import { displaySemesterName } from '@/modules/semesters';
+import {
+  displaySemesterName,
+  getLatestSyllabusSection,
+} from '@/modules/semesters';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -232,6 +235,8 @@ function Row({
     </Typography>
   );
 
+  const latestSyllabusSection = getLatestSyllabusSection(searchResult);
+
   return (
     <>
       <TableRow
@@ -382,6 +387,10 @@ function Row({
                   open={open}
                   searchQuery={course}
                   rmp={searchResult.RMP}
+                  syllabus_uri={latestSyllabusSection?.syllabus_uri || null}
+                  syllabus_sem={
+                    latestSyllabusSection?.academic_session.name || null
+                  }
                 />
               )}
             </div>
