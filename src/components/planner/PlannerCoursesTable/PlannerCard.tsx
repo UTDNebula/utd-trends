@@ -470,13 +470,13 @@ export default function PlannerCard(props: PlannerCardProps) {
     allSectionsWithSyllabus = allSectionsWithSyllabus.filter(() => false); // No syllabi should be shown
 
   let latestMatchedSections: SearchResult = result; // fallback if filtering is null, at least it will have correct grade/rmp data
+  let allMatchedSections: SearchResult = result; // all sections of a course (not filtered by sem) -- using this for the latest syllabus per professor
   let latestExtraSections: SearchResult | null = null;
   if (!props.extraSections) {
-    latestMatchedSections = {
+    allMatchedSections = {
       ...result,
       sections: result.sections.filter(
         (section) =>
-          section.academic_session.name == props.teachingSemester && // selected teaching semester only
           ((!props.query.profFirst && !props.query.profLast) || // if overall, should show every prof's section
             (section.professor_details &&
               section.professor_details.find(
@@ -486,6 +486,12 @@ export default function PlannerCard(props: PlannerCardProps) {
                 (prof) => prof.last_name == props.query.profLast,
               ))) && // else, show only this professor's sections (a section *can* have multiple profs)
           !sectionCanOverlap(section.section_number), // that are not "Extra"
+      ),
+    };
+    latestMatchedSections = {
+      ...allMatchedSections,
+      sections: allMatchedSections.sections.filter(
+        (section) => section.academic_session.name == props.teachingSemester, // selected teaching semester only
       ),
     };
     latestExtraSections = {
@@ -513,7 +519,7 @@ export default function PlannerCard(props: PlannerCardProps) {
         )
       : false;
 
-  const latestSyllabusSection = getLatestSyllabusSection(latestMatchedSections);
+  const latestSyllabusSection = getLatestSyllabusSection(allMatchedSections);
   return (
     <Box
       component={Paper}
