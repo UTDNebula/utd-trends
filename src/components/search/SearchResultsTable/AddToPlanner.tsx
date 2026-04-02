@@ -112,11 +112,20 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
       let numSec = 0;
       for (let i = 0; i < fitLectures.length; i++) {
         const labsForLec = availableLabSections.filter(
-          (lab) =>
-            !hasConflict(fitLectures[i], [lab]) &&
-            !hasConflict(fitLectures[i], availableExamSections),
+          (lab) => !hasConflict(fitLectures[i], [lab]),
         );
-        if (labsForLec.length > 0) numSec++;
+        const examsForLec = availableExamSections.filter(
+          (exam) => !hasConflict(fitLectures[i], [exam]),
+        );
+
+        // check if at least 1 lab and 1 exam fit with the lecture
+        if (
+          labsForLec.some((lab) =>
+            examsForLec.some((exam) => !hasConflict(lab, [exam])),
+          )
+        ) {
+          numSec++;
+        }
       }
       finalDisplayCount = numSec;
     } else if (labSections.length > 0) {
@@ -140,10 +149,10 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
       );
       let numSec = 0;
       for (let i = 0; i < fitLectures.length; i++) {
-        const examForLec = availableSections.filter(
+        const examsForLec = availableSections.filter(
           (exam) => !hasConflict(fitLectures[i], [exam]),
         );
-        if (examForLec.length > 0) numSec++;
+        if (examsForLec.length > 0) numSec++;
       }
       finalDisplayCount = numSec;
     }
