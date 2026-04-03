@@ -38,6 +38,7 @@ type Props = {
   course: SearchQuery;
   grades: GradesData;
   filteredGrades: GradesSummary;
+  chosenSectionTypes?: string[];
 };
 
 export default function SingleGradesInfo({
@@ -45,6 +46,7 @@ export default function SingleGradesInfo({
   course,
   grades,
   filteredGrades,
+  chosenSectionTypes,
 }: Props) {
   const percents = convertNumbersToPercents(filteredGrades);
 
@@ -97,6 +99,7 @@ export default function SingleGradesInfo({
             <LineGraph
               title="GPA Trend"
               series={[{ name: searchQueryLabel(course), data: grades }]}
+              chosenSectionTypes={chosenSectionTypes}
             />
           }
         />
