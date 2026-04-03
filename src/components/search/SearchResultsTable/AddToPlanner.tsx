@@ -174,7 +174,9 @@ export default function AddToPlanner({ searchResult }: addToPlannerProps) {
   // only show badge if a) they have something in planner for the current semester and b) the class fits in their schedule
   const displayBadge =
     finalDisplayCount > 0 &&
-    planner.some((entry) => entry.semester == effectiveTeachingSemester);
+    planner.some((entry) => entry.semester == effectiveTeachingSemester) &&
+    hasSectionsForTeachingSemester &&
+    searchResult.type !== 'professor';
 
   return (
     <Tooltip
