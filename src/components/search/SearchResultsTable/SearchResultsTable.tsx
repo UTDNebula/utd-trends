@@ -192,7 +192,10 @@ function Row({
     [searchResult.grades, chosenSemesters, chosenSectionTypes],
   );
 
-  const canOpen = searchResult.type === 'course' || searchResult.RMP;
+  const canOpen =
+    searchResult.grades.length > 0 ||
+    (searchResult.type !== 'course' && searchResult.RMP);
+
   const nameCell = (
     <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit">
       <Tooltip

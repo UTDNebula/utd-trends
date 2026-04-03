@@ -140,6 +140,23 @@ export function searchQueryMultiSectionSplit(
   });
 }
 
+export function getLectureSections(sections: SectionsData): SectionsData {
+  return sections.filter(
+    (s) =>
+      /^[058]/.test(s.section_number) ||
+      /^0[WHL]/.test(s.section_number) ||
+      /^(HON|HN)/.test(s.section_number),
+  );
+}
+
+export function getLabSections(sections: SectionsData): SectionsData {
+  return sections.filter((s) => /^[1236]/.test(s.section_number));
+}
+
+export function getExamSections(sections: SectionsData): SectionsData {
+  return sections.filter((s) => /^7/.test(s.section_number));
+}
+
 export function sectionCanOverlap(section: string, type?: string): boolean {
   if (type == 'exam') return /^[7]/.test(section);
   else if (type == 'extra') return /^[1236]/.test(section);
