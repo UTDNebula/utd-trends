@@ -54,6 +54,11 @@ export default function BarGraph(props: Props) {
 
   const rainbowColors = useRainbowColors();
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
+  // On mobile, height = 30px per bar group × number of categories
+  const mobileHeight =
+    (props.xaxisLabels?.length ?? 14) * series.length * 20 + 80;
 
   const options: ApexOptions = {
     chart: {
@@ -84,7 +89,7 @@ export default function BarGraph(props: Props) {
     plotOptions: {
       bar: {
         distributed: series.length === 1,
-        horizontal: false,
+        horizontal: isMobile,
       },
     },
     dataLabels: {
@@ -92,21 +97,32 @@ export default function BarGraph(props: Props) {
     },
     legend: {
       show: series.length !== 1,
+      position: isMobile ? 'bottom' : 'top',
     },
     xaxis: {
       categories: props.xaxisLabels,
+      labels: {
+        formatter: isMobile ? props.yaxisFormatter : undefined,
+      },
     },
     yaxis: {
       labels: {
-        formatter: props.yaxisFormatter,
+        formatter: isMobile ? undefined : props.yaxisFormatter,
       },
     },
     colors:
       series.length === 1
         ? rainbowColors
-        : compareColors.filter(
-            (searchQuery, i) => props.includedColors?.[i] ?? 1,
-          ),
+        : series.map((_, i) => {
+            const includedIndices = props.includedColors
+              ? props.includedColors
+                  .map((inc, idx) => (inc ? idx : -1))
+                  .filter((idx) => idx !== -1)
+              : series.map((__, idx) => idx);
+            return compareColors[
+              (includedIndices[i] ?? i) % compareColors.length
+            ];
+          }),
     stroke: {
       width: 2,
     },
@@ -146,8 +162,13 @@ export default function BarGraph(props: Props) {
   };
 
   const graph = (
-    <div className="h-full">
-      <Chart options={options} series={series} type="bar" height={'100%'} />
+    <div className={isMobile ? '' : 'h-full'}>
+      <Chart
+        options={options}
+        series={series}
+        type="bar"
+        height={isMobile ? mobileHeight : '100%'}
+      />
     </div>
   );
 
