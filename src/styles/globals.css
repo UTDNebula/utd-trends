@@ -1,5 +1,9 @@
 @import 'tailwindcss' important;
 
+:root {
+  --mobile-nav-height: calc(56px + env(safe-area-inset-bottom));
+}
+
 /*If changing be sure to update in layout.tsx too*/
 @theme {
   --color-haiti: #090b2c;

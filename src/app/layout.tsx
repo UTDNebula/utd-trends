@@ -80,7 +80,7 @@ export default async function RootLayout({
           <ThemeProvider theme={theme}>
             <QueryProvider>
               <SharedStateProvider latestSemester={latestSemester}>
-                <div className="flex-1 pb-[calc(56px+env(safe-area-inset-bottom))] md:pb-0">
+                <div className="flex-1 pb-[var(--mobile-nav-height)] md:pb-0">
                   {children}
                 </div>
                 <Suspense fallback={null}>
