@@ -69,18 +69,18 @@ export default async function RootLayout({
 }) {
   const latestSemester = await fetchLatestSemester();
   return (
-    <html lang="en" className="h-full overscroll-none">
+    <html lang="en" className="h-full">
       {process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' && (
         <GoogleAnalytics gaId="G-CC86XR1562" />
       )}
       <body
-        className={`bg-[rgb(246,246,246)] dark:bg-black ${inter.variable} font-main ${baiJamjuree.variable} text-haiti dark:text-white min-h-full flex flex-col overscroll-none`}
+        className={`bg-[rgb(246,246,246)] dark:bg-black ${inter.variable} font-main ${baiJamjuree.variable} text-haiti dark:text-white h-full flex flex-col overflow-hidden`}
       >
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>
             <QueryProvider>
               <SharedStateProvider latestSemester={latestSemester}>
-                <div className="flex-1 pb-[var(--mobile-nav-height)] md:pb-0">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden pb-[var(--mobile-nav-height)] md:pb-0">
                   {children}
                 </div>
                 <Suspense fallback={null}>

@@ -91,7 +91,7 @@ export default function Carousel({
               x: { type: 'spring', stiffness: 300, damping: 30 },
               opacity: { duration: 0.2 },
             }}
-            className="col-start-1 row-start-1 w-full"
+            className="col-start-1 row-start-1 w-full max-w-full overflow-x-auto"
           >
             {Array.isArray(children)
               ? children.map((child, index) => (
