@@ -1,6 +1,7 @@
 'use client';
 
 import { useSharedState } from '@/app/SharedStateProvider';
+import { BookOutlined } from '@mui/icons-material';
 import BookIcon from '@mui/icons-material/Book';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import SearchIcon from '@mui/icons-material/Search';
@@ -113,7 +114,7 @@ export default function MobileNavBar() {
                 '& .MuiBadge-badge': { right: -15, top: 4 },
               }}
             >
-              <BookIcon />
+              {activeTab === 'planner' ? <BookIcon /> : <BookOutlined />}
             </Badge>
           }
         />
