@@ -38,9 +38,10 @@ function getSemesterGPAs(
       const aggregate = (semester.data ?? []).reduce(
         (acc, section) => {
           if (
-            !chosenSectionTypes ||
-            chosenSectionTypes.length === 0 ||
-            chosenSectionTypes.includes(section.type)
+            (!chosenSectionTypes ||
+              chosenSectionTypes.length === 0 ||
+              chosenSectionTypes.includes(section.type)) &&
+            section.type !== 'Pass/Fail'
           ) {
             return acc.map(
               (v, i) => v + (section.grade_distribution?.[i] ?? 0),
