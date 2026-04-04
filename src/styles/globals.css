@@ -73,3 +73,13 @@
     z-index: 0 !important;
   }
 }
+
+@media (max-width: 768px) {
+  .tsqd-open-btn-container {
+    bottom: calc(var(--mobile-nav-height) + 16px) !important;
+  }
+
+  #sentry-feedback {
+    bottom: calc(var(--mobile-nav-height) + 16px) !important;
+  }
+}
