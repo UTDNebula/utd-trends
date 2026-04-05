@@ -80,12 +80,12 @@ export default async function RootLayout({
   );
 
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full bg-[rgb(246,246,246)] dark:bg-black">
       {process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' && (
         <GoogleAnalytics gaId="G-CC86XR1562" />
       )}
       <body
-        className={`bg-[rgb(246,246,246)] dark:bg-black ${inter.variable} font-main ${baiJamjuree.variable} text-haiti dark:text-white min-h-full flex flex-col`}
+        className={`${inter.variable} font-main ${baiJamjuree.variable} text-haiti dark:text-white min-h-full flex flex-col`}
       >
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>
