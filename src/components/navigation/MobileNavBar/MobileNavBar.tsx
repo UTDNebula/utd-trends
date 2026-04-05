@@ -33,14 +33,10 @@ export default function MobileNavBar() {
         : 'search';
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[1000] block bg-white dark:bg-haiti shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] md:hidden pb-[env(safe-area-inset-bottom)]">
+    <div className="fixed inset-x-0 -bottom-[150px] z-[1000] block bg-white dark:bg-black shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] md:hidden pb-[calc(150px+env(safe-area-inset-bottom))]">
       <BottomNavigation
         showLabels
         value={activeTab}
-        sx={{
-          bgcolor: 'transparent', // forces mui to use bg of container and allows backdrop-blur-none to work
-          backgroundImage: 'none',
-        }}
         onChange={(event, newValue) => {
           // store search terms in session storage when navigating away from the dashboard
           if (
