@@ -1,7 +1,8 @@
 import '@/styles/globals.css';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
 import MobileNavBar from '@/components/navigation/MobileNavBar/MobileNavBar';
-import { fetchLatestSemester } from '@/modules/fetchSections';
+import { fetchAvailableSemesters } from '@/modules/fetchSections';
+import { getCurrentSemester, getInWindowSemesters } from '@/modules/semesters';
 import theme from '@/modules/theme';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ThemeProvider } from '@mui/material/styles';
@@ -67,7 +68,17 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const latestSemester = await fetchLatestSemester();
+  const allSemesters = await fetchAvailableSemesters().catch(
+    () => [] as string[],
+  );
+  const latestSemester =
+    allSemesters.length > 0 ? allSemesters[allSemesters.length - 1] : '';
+  const availableSemesters = getInWindowSemesters(
+    allSemesters,
+    getCurrentSemester(),
+    latestSemester,
+  );
+
   return (
     <html lang="en" className="h-full">
       {process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' && (
@@ -79,7 +90,10 @@ export default async function RootLayout({
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>
             <QueryProvider>
-              <SharedStateProvider latestSemester={latestSemester}>
+              <SharedStateProvider
+                availableSemesters={availableSemesters}
+                defaultTeachingSemester={latestSemester}
+              >
                 <div className="flex-1 pb-[var(--mobile-nav-height)] md:pb-0">
                   {children}
                 </div>

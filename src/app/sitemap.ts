@@ -21,8 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...Object.keys(comboTable).map((query) => ({
       url:
         'https://trends.utdnebula.com/dashboard?searchTerms=' +
-        query.split(' ').join('+') +
-        '&amp;availability=true',
+        query.split(' ').join('+'),
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.9,
@@ -41,8 +40,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
           'https://trends.utdnebula.com/dashboard?searchTerms=' +
           query.split(' ').join('+') +
           ',' +
-          searchQueryLabel(combo).split(' ').join('+') +
-          '&amp;availability=true',
+          searchQueryLabel(combo).split(' ').join('+'),
         lastModified: new Date(),
         changeFrequency: 'monthly' as const,
         priority: 0.8,

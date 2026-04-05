@@ -38,6 +38,7 @@ export default function Compare({ isMobile = false }: { isMobile?: boolean }) {
     }
   }, [isMobile]);
 
+  const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
   if (compare.length === 0) {
     if (isMobile) {
       return (
@@ -90,7 +91,7 @@ export default function Compare({ isMobile = false }: { isMobile?: boolean }) {
               const grade = compare[seriesIndex].grades;
               response +=
                 ' (' +
-                calculateGrades(grade, chosenSemesters)
+                calculateGrades(grade, chosenSemesters, chosenSectionTypes)
                   .grade_distribution[dataPointIndex].toFixed(0)
                   .toLocaleString() +
                 ')';
@@ -100,7 +101,11 @@ export default function Compare({ isMobile = false }: { isMobile?: boolean }) {
             series={compare.map((course) => {
               const grade_dist = [];
               const categories = convertNumbersToPercents(
-                calculateGrades(course.grades, chosenSemesters),
+                calculateGrades(
+                  course.grades,
+                  chosenSemesters,
+                  chosenSectionTypes,
+                ),
               );
               for (let idx = 0; idx < categories.length; idx++) {
                 grade_dist.push(0);
@@ -138,6 +143,7 @@ export default function Compare({ isMobile = false }: { isMobile?: boolean }) {
         removeFromCompare={removeFromCompare}
         colorMap={compareColorMap}
         chosenSemesters={chosenSemesters}
+        chosenSectionTypes={chosenSectionTypes}
       />
     </div>
   );

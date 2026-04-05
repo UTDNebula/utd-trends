@@ -2,7 +2,9 @@
 
 import { useSharedState } from '@/app/SharedStateProvider';
 import SearchResultsTable from '@/components/search/SearchResultsTable/SearchResultsTable';
+import { getValidAvailabilitySemester } from '@/modules/availability';
 import { calculateGrades } from '@/modules/fetchGrades';
+import { matchSectionTypesFromSectionNumber } from '@/modules/semesters';
 import { type SearchResult } from '@/types/SearchQuery';
 import { useSearchParams } from 'next/navigation';
 import React, { use, useMemo } from 'react';
@@ -17,30 +19,39 @@ interface Props {
  * Returns the left side
  */
 export default function ClientLeft(props: Props) {
-  const { latestSemester } = useSharedState();
+  const { effectiveTeachingSemester, availableSemesters } = useSharedState();
 
   const searchParams = useSearchParams();
 
   //Filtered results
-  let includedResults: SearchResult[] = [];
+  const includedResults: SearchResult[] = [];
+  const secondaryIncludedResults: SearchResult[] = [];
   let unIncludedResults: SearchResult[] = [];
 
   //Filters
   const minGPA = searchParams.get('minGPA');
   const minRating = searchParams.get('minRating');
   const maxDiff = searchParams.get('maxDiff');
-  const availability = searchParams.get('availability') === 'true';
+  const availabilitySemester = getValidAvailabilitySemester(
+    searchParams,
+    availableSemesters,
+  );
+  const availability = availabilitySemester !== null;
+  const semesterForAvailability =
+    availabilitySemester ?? effectiveTeachingSemester;
 
   const results = use(props.resultsPromise);
-
+  const semesters = use(FiltersContext).semesters;
   const chosenSemesters = use(FiltersContext).chosenSemesters;
+  const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
+  const sectionTypes = use(FiltersContext).sectionTypes;
   const filteredResults = useMemo(
     () =>
       results.filter((result) => {
         if (
           typeof minGPA === 'string' &&
-          calculateGrades(result.grades, chosenSemesters).gpa <
-            parseFloat(minGPA)
+          calculateGrades(result.grades, chosenSemesters, chosenSectionTypes)
+            .gpa < parseFloat(minGPA)
         )
           return false;
 
@@ -61,33 +72,83 @@ export default function ClientLeft(props: Props) {
         }
         return true;
       }),
-    [results, minGPA, minRating, maxDiff, chosenSemesters],
+    [results, minGPA, minRating, maxDiff, chosenSemesters, chosenSectionTypes],
   );
 
-  //Filter results based on gpa, rmp, and rmp difficulty
-  includedResults = filteredResults.filter((result) => {
+  //Filter results based on gpa, rmp, rmp difficulty, availability, and grade section type
+  const availableResults = filteredResults.filter((result) => {
     const availableThisSemester = result.sections.some(
-      (section) => section.academic_session.name === latestSemester,
+      (section) => section.academic_session.name === semesterForAvailability,
     );
     if (availability && !availableThisSemester) return false;
+
+    // for grades - at least one section has been taught with section types
+    const hasChosenSectionTypes = result.grades.some((section) =>
+      section.data.some((s) => chosenSectionTypes.includes(s.type)),
+    );
     const hasChosenSemester = result.grades.some((s) =>
       chosenSemesters.includes(s._id),
     );
-    if (!availability && !hasChosenSemester && result.grades.length !== 0)
+    // only show courses without grades if no semester/section filters are enabled
+    const noSemesterOrSectionFilter =
+      chosenSemesters.length === semesters.length &&
+      chosenSectionTypes.length === sectionTypes.length;
+    if (
+      !availability &&
+      (!hasChosenSemester || !hasChosenSectionTypes) &&
+      !(result.grades.length === 0 && noSemesterOrSectionFilter)
+    )
       return false;
     return true;
   });
+  // for all "available" results, check if section types are available next semester
+  // if not, keep in separate section
+  const sectionTypeFiltering = chosenSectionTypes.length < sectionTypes.length;
+  availableResults.forEach((result) => {
+    const sectionsWithTypeNextSem = result.sections.filter(
+      (section) =>
+        section.academic_session.name === semesterForAvailability &&
+        matchSectionTypesFromSectionNumber(
+          section.section_number,
+          chosenSectionTypes,
+        ),
+    );
+    if (
+      availability &&
+      sectionTypeFiltering &&
+      sectionsWithTypeNextSem.length === 0
+    ) {
+      secondaryIncludedResults.push(result);
+    } else {
+      // if not filtered out by section filters
+      includedResults.push(result);
+    }
+  });
+  // filter results that are not available next semester
   unIncludedResults = filteredResults.filter((result) => {
     if (!availability) return false;
     const availableThisSemester =
       result.sections.filter(
-        (section) => section.academic_session.name === latestSemester,
+        (section) => section.academic_session.name === semesterForAvailability,
       ).length > 0;
     if (availability && availableThisSemester) return false;
+
     const hasChosenSemester = result.grades.some((s) =>
       chosenSemesters.includes(s._id),
     );
-    if (!hasChosenSemester && result.grades.length !== 0) return false;
+    // for grades - at least one section has been taught with section types
+    const hasChosenSectionTypes = result.grades.some((section) =>
+      section.data.some((s) => chosenSectionTypes.includes(s.type)),
+    );
+    // only show courses without grades if no semester/section filters are enabled
+    const noSemesterOrSectionFilter =
+      chosenSemesters.length === semesters.length &&
+      chosenSectionTypes.length === sectionTypes.length;
+    if (
+      (!hasChosenSemester || !hasChosenSectionTypes) &&
+      !(result.grades.length === 0 && noSemesterOrSectionFilter)
+    )
+      return false;
     return true;
   });
 
@@ -95,6 +156,7 @@ export default function ClientLeft(props: Props) {
     <SearchResultsTable
       numSearches={props.numSearches}
       includedResults={includedResults}
+      secondaryIncludedResults={secondaryIncludedResults}
       unIncludedResults={unIncludedResults}
     />
   );

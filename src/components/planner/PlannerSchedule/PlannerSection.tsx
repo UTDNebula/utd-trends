@@ -15,7 +15,7 @@ interface PlannerSectionComponentProps {
 }
 
 export default function PlannerSection(props: PlannerSectionComponentProps) {
-  const { latestSemester } = useSharedState();
+  const { effectiveTeachingSemester } = useSharedState();
   const result = useSearchResult(props.course);
   if (!result.isSuccess || result.data.type === 'professor') {
     return null;
@@ -23,7 +23,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
   const selectedSection = result.data.sections.find(
     (s) =>
       s.section_number === props.selectedSection &&
-      s.academic_session.name === latestSemester,
+      s.academic_session.name === effectiveTeachingSemester,
   );
   if (selectedSection === undefined) return null;
   const courseName = result.data.courseName;
@@ -112,50 +112,64 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               '--start-row': x[1],
               '--offset': x[3] + '%',
               '--height': x[2] + '%',
+            } as React.CSSProperties
+          }
+          className={`group col-start-[var(--start-col)] col-span-1
+            row-start-[var(--start-row)] row-span-1
+            relative top-[var(--offset)]
+            overflow-visible z-0 hover:z-50`}
+        >
+          <div
+            style={{
               backgroundColor: props.color.fill,
               borderColor: props.color.outline,
               color: props.color.font,
-            } as React.CSSProperties
-          }
-          className={`col-start-[var(--start-col)] col-span-1 
-            row-start-[var(--start-row)] row-span-1 relative 
-            top-[var(--offset)] h-[var(--height)] overflow-hidden 
-            rounded-xl border-2
-            ml-1 leading-relaxed`}
-        >
-          <div
-            className={
-              'font-semibold text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
-              (makeBigger ? 'text-sm' : 'text-xs leading-none')
-            }
+              height: 'var(--height)',
+            }}
+            className={`ml-1 w-full rounded-xl border-2
+              leading-relaxed
+              overflow-hidden
+              min-h-[var(--height)]
+              group-hover:h-auto
+              group-hover:overflow-visible`}
           >
-            {selectedSection.course_details && selectedSection.course_details[0]
-              ? selectedSection.course_details[0].subject_prefix +
-                ' ' +
-                selectedSection.course_details[0].course_number
-              : ''}
-            .{selectedSection.section_number}
-          </div>
-          {selectedSection.professor_details &&
-            selectedSection.professor_details.map((prof) => (
-              <div
-                key={prof._id}
-                className={
-                  'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
-                  (makeBigger ? '' : 'leading-none')
-                }
-              >
-                {prof.first_name + ' ' + prof.last_name}
-              </div>
-            ))}
-          <div
-            className={
-              'text-xs text-center whitespace-nowrap text-ellipsis overflow-hidden ' +
-              (makeBigger ? '' : 'leading-none')
-            }
-          >
-            {selectedSection.meetings[0]?.location?.building}{' '}
-            {selectedSection.meetings[0]?.location?.room}
+            <div
+              className={
+                'font-semibold text-center whitespace-nowrap group-hover:whitespace-normal break-words hyphens-auto ' +
+                (makeBigger ? 'text-sm' : 'text-xs leading-none')
+              }
+            >
+              {selectedSection.course_details &&
+              selectedSection.course_details[0]
+                ? selectedSection.course_details[0].subject_prefix +
+                  ' ' +
+                  selectedSection.course_details[0].course_number
+                : ''}
+              .{selectedSection.section_number}
+            </div>
+
+            {selectedSection.professor_details &&
+              selectedSection.professor_details.map((prof) => (
+                <div
+                  key={prof._id}
+                  className={
+                    'text-xs text-center whitespace-nowrap group-hover:whitespace-normal break-words hyphens-auto ' +
+                    (makeBigger ? '' : 'leading-none')
+                  }
+                >
+                  {prof.first_name + ' ' + prof.last_name}
+                </div>
+              ))}
+
+            <div
+              className={
+                'text-xs text-center whitespace-nowrap group-hover:whitespace-normal break-words hyphens-auto ' +
+                (makeBigger ? '' : 'leading-none')
+              }
+            >
+              {selectedSection.meetings[0]?.location?.building}{' '}
+              {selectedSection.meetings[0]?.location?.room}
+            </div>
           </div>
         </div>
       </Tooltip>

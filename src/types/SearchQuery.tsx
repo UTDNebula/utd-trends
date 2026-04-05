@@ -28,6 +28,12 @@ export type SearchQueryMultiSection = {
   sectionNumbers?: string[];
 };
 
+/** Planner entry: course (and optional prof/sections) plus the semester it was added for. */
+export type PlannerEntry = {
+  query: SearchQueryMultiSection;
+  semester: string;
+};
+
 export type SearchResult =
   | {
       type: 'course';
