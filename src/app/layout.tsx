@@ -1,5 +1,6 @@
 import '@/styles/globals.css';
 import GitHubButton from '@/components/common/GitHubButton/GitHubButton';
+import MobileNavBar from '@/components/navigation/MobileNavBar/MobileNavBar';
 import { fetchAvailableSemesters } from '@/modules/fetchSections';
 import { getCurrentSemester, getInWindowSemesters } from '@/modules/semesters';
 import theme from '@/modules/theme';
@@ -9,7 +10,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import type { Metadata } from 'next';
 import { Bai_Jamjuree, Inter } from 'next/font/google';
-import React from 'react';
+import React, { Suspense } from 'react';
 import QueryProvider from './QueryProvider';
 import { SharedStateProvider } from './SharedStateProvider';
 
@@ -79,12 +80,12 @@ export default async function RootLayout({
   );
 
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       {process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' && (
         <GoogleAnalytics gaId="G-CC86XR1562" />
       )}
       <body
-        className={`bg-[rgb(246,246,246)] dark:bg-black ${inter.variable} font-main ${baiJamjuree.variable} text-haiti dark:text-white`}
+        className={`bg-[rgb(246,246,246)] dark:bg-black ${inter.variable} font-main ${baiJamjuree.variable} text-haiti dark:text-white min-h-full flex flex-col`}
       >
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>
@@ -93,7 +94,12 @@ export default async function RootLayout({
                 availableSemesters={availableSemesters}
                 defaultTeachingSemester={latestSemester}
               >
-                {children}
+                <div className="flex-1 pb-[var(--mobile-nav-height)] md:pb-0">
+                  {children}
+                </div>
+                <Suspense fallback={null}>
+                  <MobileNavBar />
+                </Suspense>
                 <ReactQueryDevtools initialIsOpen={false} />
               </SharedStateProvider>
             </QueryProvider>
