@@ -2,7 +2,6 @@
 
 :root {
   --mobile-nav-height: calc(56px + env(safe-area-inset-bottom));
-  color-scheme: light dark;
 }
 
 /*If changing be sure to update in layout.tsx too*/
@@ -63,6 +62,7 @@
     margin: 0;
     height: 100%;
     width: 100%;
+    background-color: rgb(var(--light-DEFAULT));
   }
 
   * {
