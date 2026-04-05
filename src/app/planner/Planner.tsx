@@ -34,7 +34,14 @@ export default function Planner() {
 
   return (
     <Split
-      left={planner.length === 0 ? <PlannerEmpty /> : <PlannerCoursesTable />}
+      left={
+        planner.filter((entry) => entry.semester === effectiveTeachingSemester)
+          .length === 0 ? (
+          <PlannerEmpty />
+        ) : (
+          <PlannerCoursesTable />
+        )
+      }
       right={
         <StickySide>
           <PlannerSchedule />
