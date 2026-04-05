@@ -33,7 +33,7 @@ export default function MobileNavBar() {
         : 'search';
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[1000] block bg-white bg-opacity-100 dark:bg-haiti dark:bg-opacity-100 shadow-md md:hidden pb-[env(safe-area-inset-bottom)] isolate backdrop-blur-none transform-gpu">
+    <div className="fixed inset-x-0 bottom-0 z-[1000] block bg-white dark:bg-haiti shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] md:hidden pb-[env(safe-area-inset-bottom)]">
       <BottomNavigation
         showLabels
         value={activeTab}
@@ -123,6 +123,8 @@ export default function MobileNavBar() {
           }
         />
       </BottomNavigation>
+      {/* Add a tail under the navbar to prevent browser (webkit) glassmorphism */}
+      <div className="absolute top-full left-0 w-full h-[50vh] bg-white dark:bg-haiti" />
     </div>
   );
 }
