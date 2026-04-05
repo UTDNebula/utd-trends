@@ -40,7 +40,7 @@ export default function MobileNavBar() {
         onChange={(event, newValue) => {
           // store search terms in session storage when navigating away from the dashboard
           if (
-            pathname === '/dashboard' && //TODO:
+            pathname === '/dashboard' &&
             !(
               usefulParams.size === 1 &&
               usefulParams.get('availability') === 'true'

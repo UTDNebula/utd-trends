@@ -74,6 +74,7 @@
   }
 }
 
+/* move buttons above the mobile nav */
 @media (max-width: 768px) {
   .tsqd-open-btn-container {
     bottom: calc(var(--mobile-nav-height) + 16px) !important;
