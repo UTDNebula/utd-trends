@@ -2,6 +2,7 @@
 
 :root {
   --mobile-nav-height: calc(56px + env(safe-area-inset-bottom));
+  color-scheme: light dark;
 }
 
 /*If changing be sure to update in layout.tsx too*/
