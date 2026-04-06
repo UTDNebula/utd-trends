@@ -33,7 +33,7 @@ export default function MobileNavBar() {
         : 'search';
 
   return (
-    <div className="block bg-white shadow-md dark:bg-haiti md:hidden pb-[env(safe-area-inset-bottom)]">
+    <div className="fixed inset-x-0 bottom-0 z-[1000] block bg-white shadow-md dark:bg-haiti md:hidden pb-[env(safe-area-inset-bottom)]">
       <BottomNavigation
         showLabels
         value={activeTab}

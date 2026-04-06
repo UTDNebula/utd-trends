@@ -80,34 +80,32 @@ export default async function RootLayout({
   );
 
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       {process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' && (
         <GoogleAnalytics gaId="G-CC86XR1562" />
       )}
       <body
-        className={`bg-[rgb(246,246,246)] dark:bg-black ${inter.variable} font-main ${baiJamjuree.variable} text-haiti dark:text-white`}
+        className={`bg-[rgb(246,246,246)] dark:bg-black ${inter.variable} font-main ${baiJamjuree.variable} text-haiti dark:text-white min-h-full flex flex-col`}
       >
-        <div className="flex flex-col h-[100dvh] w-full overflow-hidden">
-          <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-            <ThemeProvider theme={theme}>
-              <QueryProvider>
-                <SharedStateProvider
-                  availableSemesters={availableSemesters}
-                  defaultTeachingSemester={latestSemester}
-                >
-                  <div className="flex-1 overflow-y-auto overscroll-y-contain relative">
-                    {children}
-                  </div>
-                  <Suspense fallback={null}>
-                    <MobileNavBar />
-                  </Suspense>
-                  <ReactQueryDevtools initialIsOpen={false} />
-                </SharedStateProvider>
-              </QueryProvider>
-              <GitHubButton />
-            </ThemeProvider>
-          </AppRouterCacheProvider>
-        </div>
+        <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+          <ThemeProvider theme={theme}>
+            <QueryProvider>
+              <SharedStateProvider
+                availableSemesters={availableSemesters}
+                defaultTeachingSemester={latestSemester}
+              >
+                <div className="flex-1 pb-[var(--mobile-nav-height)] md:pb-0">
+                  {children}
+                </div>
+                <Suspense fallback={null}>
+                  <MobileNavBar />
+                </Suspense>
+                <ReactQueryDevtools initialIsOpen={false} />
+              </SharedStateProvider>
+            </QueryProvider>
+            <GitHubButton />
+          </ThemeProvider>
+        </AppRouterCacheProvider>
       </body>
     </html>
   );

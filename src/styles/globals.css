@@ -54,13 +54,6 @@
   background-color: var(--mui-palette-background-paper);
 }
 
-html,
-body {
-  height: 100dvh;
-  overflow: hidden;
-  overscroll-behavior-y: none;
-}
-
 @layer utilities {
   html,
   body,
