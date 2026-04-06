@@ -55,7 +55,7 @@ const theme = createTheme({
     MuiBottomNavigation: {
       styleOverrides: {
         root: {
-          height: '64px', // more height for easier tapping
+          height: 'var(--mobile-nav-bar)', // more height for easier tapping
         },
       },
     },

@@ -1,7 +1,10 @@
 @import 'tailwindcss' important;
 
 :root {
-  --mobile-nav-height: calc(56px + env(safe-area-inset-bottom));
+  --mobile-nav-bar: 64px;
+  --mobile-nav-height: calc(
+    var(--mobile-nav-bar) + env(safe-area-inset-bottom)
+  );
 }
 
 /*If changing be sure to update in layout.tsx too*/
@@ -81,6 +84,6 @@
   }
 
   #sentry-feedback {
-    bottom: calc(var(--mobile-nav-height) + 16px) !important;
+    --page-margin: calc(var(--mobile-nav-height) + 16px) 10px;
   }
 }
