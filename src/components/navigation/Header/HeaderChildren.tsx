@@ -26,6 +26,8 @@ import MenuItem from '@mui/material/MenuItem';
 import Snackbar from '@mui/material/Snackbar';
 import Tooltip from '@mui/material/Tooltip';
 import html2canvas from 'html2canvas-pro';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { type HeaderProps } from './Header';
 
@@ -216,6 +218,24 @@ function HeaderChildrenInner(props: HeaderProps) {
       <div className="flex gap-x-2 sm:hidden">
         {/* TODO: When PlannerButton is moved to a bottom nav bar, remove the small size props from all the children in this div */}
         <PlannerButton {...plannerButtonProps} size="small" />
+
+        {/* Comet Giving Days button */}
+        <Tooltip title="Support Nebula Labs on Comet Giving Days">
+          <Link
+            href="https://givingday.utdallas.edu/giving-day/115742/department/118896"
+            target="_blank"
+          >
+            <Image
+              unoptimized
+              width={128}
+              height={128}
+              src="/comet-giving-days.png"
+              alt="UTD Giving Days Comet Logo"
+              className="h-8 w-8 max-w-none"
+            />
+          </Link>
+        </Tooltip>
+
         {tutorialHint && !props.isPlanner ? (
           moreVertIcon
         ) : (
@@ -224,9 +244,26 @@ function HeaderChildrenInner(props: HeaderProps) {
       </div>
 
       {/* Shown on large screens */}
-      <div className="flex gap-x-4 max-sm:hidden">
+      <div className="flex items-center gap-x-4 max-sm:hidden">
         {/* Planner button */}
         <PlannerButton {...plannerButtonProps} />
+
+        {/* Comet Giving Days button */}
+        <Tooltip title="Support Nebula Labs on Comet Giving Days">
+          <Link
+            href="https://givingday.utdallas.edu/giving-day/115742/department/118896"
+            target="_blank"
+          >
+            <Image
+              unoptimized
+              width={128}
+              height={128}
+              src="/comet-giving-days.png"
+              alt="UTD Giving Days Comet Logo"
+              className="h-12 w-12 max-w-none"
+            />
+          </Link>
+        </Tooltip>
 
         {/* Whats new button */}
         <div className="ml-auto">
