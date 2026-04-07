@@ -9,7 +9,9 @@ import SearchBar, {
   updateRecentSearches,
 } from '@/components/search/SearchBar/SearchBar';
 import { searchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
+import { Tooltip } from '@mui/material';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useTransition } from 'react';
 
@@ -54,7 +56,7 @@ export default function Home() {
         fill
         className="object-cover -z-20"
       />
-      <div className="absolute top-4 left-4 right-4 flex gap-2 place-content-between flex-wrap-reverse">
+      <div className="absolute top-4 left-4 right-4 flex gap-2 flex-wrap-reverse">
         {/*Ad for Spring 2026*/}
         {/*<a
           href="https://trends.utdnebula.com/dashboard?searchTerms=GOVT+2306&availability=26S"
@@ -67,7 +69,25 @@ export default function Home() {
             <b>Spring 2026</b> courses are now on Trends!
           </span>
         </a>*/}
-        <PlannerButton className="ml-auto" />
+
+        {/* Comet Giving Days button */}
+        <Tooltip title="Support Nebula Labs on Comet Giving Days">
+          <Link
+            href="https://givingday.utdallas.edu/giving-day/115742/department/118896"
+            target="_blank"
+            className="ml-auto"
+          >
+            <Image
+              unoptimized
+              width={128}
+              height={128}
+              src="/comet-giving-days.png"
+              alt="UTD Giving Days Comet Logo"
+              className="h-12 w-12 max-w-none"
+            />
+          </Link>
+        </Tooltip>
+        <PlannerButton />
       </div>
       <div className="max-w-xl grow flex flex-col justify-center">
         <h2 className="text-sm font-semibold mb-3 text-royal dark:text-cornflower-300 tracking-wider flex gap-1 items-center">
