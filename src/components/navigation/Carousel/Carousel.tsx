@@ -52,6 +52,15 @@ export default function Carousel({
   const [direction, setDirection] = useState(0);
 
   const { compare } = useSharedState();
+  const [previousCompare, setPreviousCompare] = useState(compare);
+  if (
+    compare != previousCompare &&
+    compare.length > previousCompare.length &&
+    !isMobile
+  ) {
+    setCurrentCard(Array.isArray(names) ? names.length - 1 : 0);
+    setPreviousCompare(compare);
+  }
 
   /**
    * Turn
