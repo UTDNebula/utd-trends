@@ -88,7 +88,7 @@ function parseTime(time: string): number {
   return hourNum + minute / 60;
 }
 
-function hasConflict(
+export function hasConflict(
   newSection: Sections['all'][number],
   selectedSections: Sections['all'],
 ): boolean {
