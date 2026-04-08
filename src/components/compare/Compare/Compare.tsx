@@ -8,7 +8,10 @@ import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
 import { calculateGrades, type GradesSummary } from '@/modules/fetchGrades';
 import { searchQueryLabel } from '@/types/SearchQuery';
-import React, { use } from 'react';
+import SearchIcon from '@mui/icons-material/Search';
+import { Button } from '@mui/material';
+import Link from 'next/link';
+import React, { use, useEffect, useState } from 'react';
 
 function convertNumbersToPercents(distribution: GradesSummary): number[] {
   const total = distribution.total;
@@ -17,12 +20,44 @@ function convertNumbersToPercents(distribution: GradesSummary): number[] {
   );
 }
 
-export default function Compare() {
+export default function Compare({ isMobile = false }: { isMobile?: boolean }) {
   const { compare, removeFromCompare, compareColorMap } = useSharedState();
   const chosenSemesters = use(FiltersContext).chosenSemesters;
+
+  const [searchUrl, setSearchUrl] = useState('/');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+    if (isMobile) {
+      const terms = window.sessionStorage.getItem('dashboardSearchTerms');
+      if (terms) {
+        setSearchUrl('/dashboard?' + terms);
+      }
+    }
+  }, [isMobile]);
+
   const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
   if (compare.length === 0) {
-    return <p>Click a checkbox to add something to compare.</p>;
+    if (isMobile) {
+      return (
+        <div className="flex flex-col gap-4 items-center">
+          <p> Select a course on the Search page to add something to Compare</p>
+          <Button
+            variant="contained"
+            loading={!mounted}
+            size={'small'}
+            className={`normal-case rounded-full whitespace-nowrap w-fit px-4 py-2`}
+            component={Link}
+            href={searchUrl}
+            startIcon={<SearchIcon />}
+          >
+            Search Page
+          </Button>
+        </div>
+      );
+    } else return <p>Click a checkbox to add something to compare.</p>;
   }
 
   return (

@@ -1,5 +1,12 @@
 @import 'tailwindcss' important;
 
+:root {
+  --mobile-nav-bar: 64px;
+  --mobile-nav-height: calc(
+    var(--mobile-nav-bar) + env(safe-area-inset-bottom)
+  );
+}
+
 /*If changing be sure to update in layout.tsx too*/
 @theme {
   --color-haiti: #090b2c;
@@ -67,5 +74,16 @@
 
   .apexcharts-toolbar {
     z-index: 0 !important;
+  }
+}
+
+/* move buttons above the mobile nav */
+@media (max-width: 768px) {
+  .tsqd-open-btn-container {
+    bottom: calc(var(--mobile-nav-height) + 16px) !important;
+  }
+
+  #sentry-feedback {
+    --page-margin: calc(var(--mobile-nav-height) + 16px) 10px;
   }
 }
