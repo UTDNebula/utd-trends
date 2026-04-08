@@ -88,6 +88,7 @@ type Props = {
   title: string;
   series: { name: string; data: Grades['grades'] }[];
   includedColors?: boolean[];
+  chosenSectionTypes?: string[];
 };
 
 export default function LineGraph(props: Props) {
@@ -126,15 +127,14 @@ export default function LineGraph(props: Props) {
     idx += 2;
   });
 
+  const sectionTypes = props.chosenSectionTypes ?? chosenSectionTypes;
   const series = props.series.map((single) => ({
     name: single.name,
-    data: getSemesterGPAs(single, semesterMapping, chosenSectionTypes).map(
-      (p) => ({
-        x: p.x,
-        y: p.y,
-        semester: p.semester,
-      }),
-    ),
+    data: getSemesterGPAs(single, semesterMapping, sectionTypes).map((p) => ({
+      x: p.x,
+      y: p.y,
+      semester: p.semester,
+    })),
   }));
 
   const theme = useTheme();
