@@ -79,10 +79,7 @@ export default function PlannerCoursesTable() {
   return (
     <>
       <div className="flex flex-wrap items-center gap-3 p-4 pb-0">
-        <Typography
-          variant="h2"
-          className="leading-tight text-3xl font-bold shrink-0"
-        >
+        <Typography variant="h2" className="leading-tight text-3xl font-bold">
           {'My Planner' +
             (effectiveTeachingSemester
               ? ' — ' + displaySemesterName(effectiveTeachingSemester, false)

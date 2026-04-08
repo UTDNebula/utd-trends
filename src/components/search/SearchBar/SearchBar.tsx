@@ -257,6 +257,7 @@ export default function SearchBar(props: Props) {
     } else {
       params.delete('searchTerms');
     }
+    params.delete('compare');
     startTransition(() => {
       router.push(`${pathname}?${params.toString()}`);
     });

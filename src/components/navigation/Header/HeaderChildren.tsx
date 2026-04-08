@@ -195,7 +195,6 @@ function HeaderChildrenInner(props: HeaderProps) {
       >
         <IconButton
           id="header-menu-button"
-          size="small"
           aria-controls={openMenu ? 'header-menu' : undefined}
           aria-haspopup="true"
           aria-expanded={openMenu ? 'true' : undefined}
@@ -204,7 +203,6 @@ function HeaderChildrenInner(props: HeaderProps) {
           }}
         >
           <MoreVertIcon
-            fontSize="small"
             className={`${tutorialHint && !openMenu && !props.isPlanner ? ' text-white dark:text-haiti' : ''}`}
           />
         </IconButton>
@@ -217,7 +215,6 @@ function HeaderChildrenInner(props: HeaderProps) {
       {/* Shown on small screens */}
       <div className="flex gap-x-2 sm:hidden">
         {/* TODO: When PlannerButton is moved to a bottom nav bar, remove the small size props from all the children in this div */}
-        <PlannerButton {...plannerButtonProps} size="small" />
 
         {/* Comet Giving Days button */}
         <Tooltip title="Support Nebula Labs on Comet Giving Days">

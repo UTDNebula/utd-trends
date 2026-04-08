@@ -9,7 +9,10 @@ import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
 import { calculateGrades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import { displaySemesterName } from '@/modules/semesters';
+import {
+  displaySemesterName,
+  getLatestSyllabusSection,
+} from '@/modules/semesters';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -189,7 +192,10 @@ function Row({
     [searchResult.grades, chosenSemesters, chosenSectionTypes],
   );
 
-  const canOpen = searchResult.type === 'course' || searchResult.RMP;
+  const canOpen =
+    searchResult.grades.length > 0 ||
+    (searchResult.type !== 'course' && searchResult.RMP);
+
   const nameCell = (
     <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit">
       <Tooltip
@@ -231,6 +237,8 @@ function Row({
           typeof course.number === 'undefined')) && <span> (Overall)</span>}
     </Typography>
   );
+
+  const latestSyllabusSection = getLatestSyllabusSection(searchResult);
 
   return (
     <>
@@ -382,6 +390,10 @@ function Row({
                   open={open}
                   searchQuery={course}
                   rmp={searchResult.RMP}
+                  syllabus_uri={latestSyllabusSection?.syllabus_uri || null}
+                  syllabus_sem={
+                    latestSyllabusSection?.academic_session.name || null
+                  }
                 />
               )}
             </div>
