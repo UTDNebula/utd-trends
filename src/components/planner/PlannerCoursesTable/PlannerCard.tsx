@@ -525,9 +525,7 @@ export default function PlannerCard(props: PlannerCardProps) {
       component={Paper}
       className={
         'border border-royal dark:border-cornflower-300 rounded-lg' +
-        (props.extraSections
-          ? ' my-4 mx-5 bg-light dark:bg-dark'
-          : '')
+        (props.extraSections ? ' my-4 mx-5 bg-light dark:bg-dark' : '')
       }
     >
       <div
