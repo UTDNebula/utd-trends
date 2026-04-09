@@ -99,7 +99,7 @@ function HourRow(props: HourRowProps) {
         {props.hour > 12 ? props.hour - 12 : props.hour}:00
         {props.hour >= 12 ? 'PM' : 'AM'}
       </p>
-      <div className="col-start-2 col-span-full bg-white dark:bg-black border-t border-gray-300 dark:border-gray-600">
+      <div className="col-start-2 col-span-full bg-light dark:bg-dark border-t border-gray-300 dark:border-gray-600">
         <div className="relative top-1/4 col-span-full border-t border-gray-100 dark:border-gray-800"></div>
         <div className="relative top-1/2 col-span-full border-t border-gray-200 dark:border-gray-700"></div>
         <div className="relative top-3/4 col-span-full border-t border-gray-100 dark:border-gray-800"></div>
