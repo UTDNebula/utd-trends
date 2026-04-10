@@ -62,7 +62,7 @@ export const WhatsNewContents = ({ onClose }: WhatsNewContentsProps) => {
                     }
                   }}
                   title="Click to view release details"
-                  className="flex flex-col gap-1 hover:bg-gray-100 dark:hover:bg-gray-900 p-2 rounded-md transition-colors"
+                  className="flex flex-col gap-1 hover:bg-neutral-200 dark:hover:bg-neutral-900/50 p-2 rounded-md transition-colors"
                 >
                   <div className="flex justify-between">
                     <span
