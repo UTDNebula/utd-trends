@@ -131,7 +131,10 @@ export default function PlannerSchedule() {
             key={i}
             className="text-sm text-white dark:text-haiti col-span-1 border-l text-center h-min overflow-hidden"
           >
-            {x}
+            {/* Hidden on small screens, shown on medium+ */}
+            <span className="hidden md:inline">{x}</span>
+            {/* Shown on small screens, hidden on medium+ */}
+            <span className="inline md:hidden">{x.slice(0, 3)}.</span>
           </p>
         ))}
       </div>
