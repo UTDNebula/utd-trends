@@ -254,7 +254,8 @@ export default function Filters({
           label="Min Letter Grade"
           renderValue={minGPA ? gpaToLetterGrade(Number(minGPA)) : undefined}
           dirty={Boolean(minGPA)}
-          popoverComponent={(ctx) => (
+        >
+          {(ctx) => (
             <MenuList autoFocusItem={ctx.open}>
               <MenuItem
                 className="h-10"
@@ -292,7 +293,7 @@ export default function Filters({
               ))}
             </MenuList>
           )}
-        />
+        </FilterChip>
       </Tooltip>
 
       <Tooltip title="Minimum professor rating" placement="top">
@@ -310,7 +311,8 @@ export default function Filters({
             ) : undefined
           }
           dirty={Boolean(minRating)}
-          popoverComponent={(ctx) => (
+        >
+          {(ctx) => (
             <MenuList autoFocusItem={ctx.open}>
               <MenuItem
                 className="h-10"
@@ -353,7 +355,7 @@ export default function Filters({
               ))}
             </MenuList>
           )}
-        />
+        </FilterChip>
       </Tooltip>
 
       <Tooltip title="Semesters to include grades from" placement="top">
@@ -367,104 +369,101 @@ export default function Filters({
               : 'None'
           }
           dirty={chosenSemesters.length !== semesters.length}
-          popoverComponent={
-            <MenuList className="*:pr-6">
+        >
+          <MenuList className="*:pr-6">
+            <MenuItem
+              className="h-10 items-center"
+              value="select-all"
+              onClick={() => {
+                if (chosenSemesters.length === semesters.length) {
+                  setChosenSemesters([]);
+                } else {
+                  setChosenSemesters(semesters);
+                }
+              }}
+            >
+              <Checkbox
+                checked={
+                  semesters.length > 0 &&
+                  chosenSemesters.length === semesters.length
+                }
+                indeterminate={
+                  chosenSemesters.length !== semesters.length &&
+                  chosenSemesters.length !== 0 &&
+                  !(
+                    chosenSemesters.length === recentSemesters.length &&
+                    chosenSemesters.every((el) => recentSemesters.includes(el))
+                  ) // select-all is not indeterminate when recent is checked
+                }
+                disabled={semesters.length == 0}
+              />
+              <ListItemText
+                className={semesters.length > 0 ? '' : 'text-gray-400'}
+                primary="Select All"
+              />
+            </MenuItem>
+
+            {/* recent sessions -- last <recentSemesters.length> long-semesters from current semester*/}
+            <MenuItem
+              className="h-10 items-center"
+              value="recent"
+              onClick={() => {
+                if (
+                  chosenSemesters.length === recentSemesters.length &&
+                  chosenSemesters.every((el) => recentSemesters.includes(el))
+                ) {
+                  setChosenSemesters(semesters);
+                } else {
+                  setChosenSemesters(recentSemesters);
+                }
+              }}
+            >
+              <Checkbox
+                checked={
+                  recentSemesters.length > 0 &&
+                  chosenSemesters.length === recentSemesters.length &&
+                  chosenSemesters.every((el) => recentSemesters.includes(el))
+                }
+                disabled={recentSemesters.length == 0}
+              />
+              <ListItemText
+                className={recentSemesters.length > 0 ? '' : 'text-gray-400'}
+                primary="Recent"
+              />
+            </MenuItem>
+
+            <Divider component="li" />
+
+            {/* individual options */}
+            {semesters.map((session) => (
               <MenuItem
                 className="h-10 items-center"
-                value="select-all"
+                key={session}
+                value={session}
                 onClick={() => {
+                  /* If all are selected, select only the clicked item */
                   if (chosenSemesters.length === semesters.length) {
-                    setChosenSemesters([]);
+                    setChosenSemesters([session]);
                   } else {
-                    setChosenSemesters(semesters);
+                    setChosenSemesters((prev) => {
+                      const newArray = [...prev];
+                      const index = newArray.indexOf(session);
+                      if (index > -1) {
+                        newArray.splice(index, 1);
+                      } else {
+                        newArray.push(session);
+                      }
+                      return newArray;
+                    });
                   }
                 }}
               >
-                <Checkbox
-                  checked={
-                    semesters.length > 0 &&
-                    chosenSemesters.length === semesters.length
-                  }
-                  indeterminate={
-                    chosenSemesters.length !== semesters.length &&
-                    chosenSemesters.length !== 0 &&
-                    !(
-                      chosenSemesters.length === recentSemesters.length &&
-                      chosenSemesters.every((el) =>
-                        recentSemesters.includes(el),
-                      )
-                    ) // select-all is not indeterminate when recent is checked
-                  }
-                  disabled={semesters.length == 0}
-                />
-                <ListItemText
-                  className={semesters.length > 0 ? '' : 'text-gray-400'}
-                  primary="Select All"
-                />
+                <Checkbox checked={chosenSemesters.includes(session)} />
+                <ListItemText primary={displaySemesterName(session)} />
               </MenuItem>
-
-              {/* recent sessions -- last <recentSemesters.length> long-semesters from current semester*/}
-              <MenuItem
-                className="h-10 items-center"
-                value="recent"
-                onClick={() => {
-                  if (
-                    chosenSemesters.length === recentSemesters.length &&
-                    chosenSemesters.every((el) => recentSemesters.includes(el))
-                  ) {
-                    setChosenSemesters(semesters);
-                  } else {
-                    setChosenSemesters(recentSemesters);
-                  }
-                }}
-              >
-                <Checkbox
-                  checked={
-                    recentSemesters.length > 0 &&
-                    chosenSemesters.length === recentSemesters.length &&
-                    chosenSemesters.every((el) => recentSemesters.includes(el))
-                  }
-                  disabled={recentSemesters.length == 0}
-                />
-                <ListItemText
-                  className={recentSemesters.length > 0 ? '' : 'text-gray-400'}
-                  primary="Recent"
-                />
-              </MenuItem>
-
-              <Divider component="li" />
-
-              {/* individual options */}
-              {semesters.map((session) => (
-                <MenuItem
-                  className="h-10 items-center"
-                  key={session}
-                  value={session}
-                  onClick={() => {
-                    /* If all are selected, select only the clicked item */
-                    if (chosenSemesters.length === semesters.length) {
-                      setChosenSemesters([session]);
-                    } else {
-                      setChosenSemesters((prev) => {
-                        const newArray = [...prev];
-                        const index = newArray.indexOf(session);
-                        if (index > -1) {
-                          newArray.splice(index, 1);
-                        } else {
-                          newArray.push(session);
-                        }
-                        return newArray;
-                      });
-                    }
-                  }}
-                >
-                  <Checkbox checked={chosenSemesters.includes(session)} />
-                  <ListItemText primary={displaySemesterName(session)} />
-                </MenuItem>
-              ))}
-            </MenuList>
-          }
-        />
+            ))}
+          </MenuList>
+        </FilterChip>
       </Tooltip>
 
       <Tooltip title="Section types to include grades from" placement="top">
@@ -478,70 +477,69 @@ export default function Filters({
               : 'None'
           }
           dirty={chosenSectionTypes.length !== sectionTypes.length}
-          popoverComponent={
-            <MenuList className="*:pr-6">
-              {/* select all section types */}
+        >
+          <MenuList className="*:pr-6">
+            {/* select all section types */}
+            <MenuItem
+              className="h-10 items-center"
+              value="select-all"
+              onClick={() => {
+                if (chosenSectionTypes.length === sectionTypes.length) {
+                  setChosenSectionTypes([]);
+                } else {
+                  setChosenSectionTypes(sectionTypes);
+                }
+              }}
+            >
+              <Checkbox
+                checked={
+                  sectionTypes.length > 0 &&
+                  chosenSectionTypes.length === sectionTypes.length
+                }
+                indeterminate={
+                  chosenSectionTypes.length !== sectionTypes.length &&
+                  chosenSectionTypes.length !== 0
+                }
+                disabled={sectionTypes.length == 0}
+              />
+              <ListItemText
+                className={sectionTypes.length > 0 ? '' : 'text-gray-400'}
+                primary="Select All"
+              />
+            </MenuItem>
+
+            <Divider component="li" />
+
+            {/* individual options */}
+            {sectionTypes.map((section) => (
               <MenuItem
                 className="h-10 items-center"
-                value="select-all"
+                key={section}
+                value={section}
                 onClick={() => {
+                  /* If all are selected, select only the clicked item */
                   if (chosenSectionTypes.length === sectionTypes.length) {
-                    setChosenSectionTypes([]);
+                    setChosenSectionTypes([section]);
                   } else {
-                    setChosenSectionTypes(sectionTypes);
+                    setChosenSectionTypes((prev) => {
+                      const newArray = [...prev];
+                      const index = newArray.indexOf(section);
+                      if (index > -1) {
+                        newArray.splice(index, 1);
+                      } else {
+                        newArray.push(section);
+                      }
+                      return newArray;
+                    });
                   }
                 }}
               >
-                <Checkbox
-                  checked={
-                    sectionTypes.length > 0 &&
-                    chosenSectionTypes.length === sectionTypes.length
-                  }
-                  indeterminate={
-                    chosenSectionTypes.length !== sectionTypes.length &&
-                    chosenSectionTypes.length !== 0
-                  }
-                  disabled={sectionTypes.length == 0}
-                />
-                <ListItemText
-                  className={sectionTypes.length > 0 ? '' : 'text-gray-400'}
-                  primary="Select All"
-                />
+                <Checkbox checked={chosenSectionTypes.includes(section)} />
+                <ListItemText primary={displaySectionTypeName(section)} />
               </MenuItem>
-
-              <Divider component="li" />
-
-              {/* individual options */}
-              {sectionTypes.map((section) => (
-                <MenuItem
-                  className="h-10 items-center"
-                  key={section}
-                  value={section}
-                  onClick={() => {
-                    /* If all are selected, select only the clicked item */
-                    if (chosenSectionTypes.length === sectionTypes.length) {
-                      setChosenSectionTypes([section]);
-                    } else {
-                      setChosenSectionTypes((prev) => {
-                        const newArray = [...prev];
-                        const index = newArray.indexOf(section);
-                        if (index > -1) {
-                          newArray.splice(index, 1);
-                        } else {
-                          newArray.push(section);
-                        }
-                        return newArray;
-                      });
-                    }
-                  }}
-                >
-                  <Checkbox checked={chosenSectionTypes.includes(section)} />
-                  <ListItemText primary={displaySectionTypeName(section)} />
-                </MenuItem>
-              ))}
-            </MenuList>
-          }
-        />
+            ))}
+          </MenuList>
+        </FilterChip>
       </Tooltip>
 
       <Tooltip title="Availability" placement="top">
@@ -551,45 +549,42 @@ export default function Filters({
             filterNextSem ? displaySemesterName(latestSemester, false) : 'Any'
           }
           dirty={!filterNextSem}
-          popoverComponent={
-            <div className="mx-4 my-3">
-              <FormControl
-                size="small"
-                className={`${
-                  filterNextSem
-                    ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
-                    : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
-                }`}
-              >
-                <FormControlLabel
-                  className="select-none"
-                  control={
-                    <Switch
-                      checked={filterNextSem}
-                      onChange={(
-                        event: React.ChangeEvent<HTMLInputElement>,
-                      ) => {
-                        setParams((params) => {
-                          if (event.target.checked) {
-                            params.set('availability', 'true');
-                          } else {
-                            params.delete('availability');
-                          }
-                        });
-                      }}
-                    />
-                  }
-                  label={
-                    latestSemester == ''
-                      ? 'Teaching Next Semester'
-                      : 'Teaching in ' +
-                        displaySemesterName(latestSemester, false)
-                  }
-                />
-              </FormControl>
-            </div>
-          }
-        />
+        >
+          <div className="mx-4 my-3">
+            <FormControl
+              size="small"
+              className={`${
+                filterNextSem
+                  ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
+                  : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
+              }`}
+            >
+              <FormControlLabel
+                className="select-none"
+                control={
+                  <Switch
+                    checked={filterNextSem}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      setParams((params) => {
+                        if (event.target.checked) {
+                          params.set('availability', 'true');
+                        } else {
+                          params.delete('availability');
+                        }
+                      });
+                    }}
+                  />
+                }
+                label={
+                  latestSemester == ''
+                    ? 'Teaching Next Semester'
+                    : 'Teaching in ' +
+                      displaySemesterName(latestSemester, false)
+                }
+              />
+            </FormControl>
+          </div>
+        </FilterChip>
       </Tooltip>
     </Grid>
   );

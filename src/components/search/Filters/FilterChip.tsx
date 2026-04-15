@@ -9,9 +9,12 @@ import React, { useEffect, useRef, useState, type ReactNode } from 'react';
 type PopoverComponentCtx = {
   open: boolean;
   closePopover: () => void;
+  popoverWidth: number;
 };
 
-type FilterChipProps = ChipProps & {
+type ChildrenPopoverContextFactory = (ctx: PopoverComponentCtx) => ReactNode;
+
+type FilterChipProps = Omit<ChipProps, 'children'> & {
   /**
    * Label text of chip. Is typically the name of the filter
    */
@@ -28,9 +31,11 @@ type FilterChipProps = ChipProps & {
   delimiterLabel?: ReactNode;
   /**
    * Component to be displayed as a popover when clicking on the chip.
-   * NOTE: Will forcibly enable the {@linkcode FilterChipProps.disableDelete | disableDelete} prop.
+   * If a function is passed, will pass an object of {@linkcode PopoverComponentCtx} as an argument.
+   *
+   * NOTE: If provided, will forcibly enable the {@linkcode FilterChipProps.disableDelete | disableDelete} prop.
    */
-  popoverComponent?: ReactNode | ((ctx: PopoverComponentCtx) => ReactNode);
+  children?: ReactNode | ChildrenPopoverContextFactory;
   /**
    * Normally, the minimum width of the popover component matches the chip's width. This prop disables that.
    * @default false
@@ -58,7 +63,7 @@ export default function FilterChip({
   label,
   renderValue,
   delimiterLabel = ': ',
-  popoverComponent,
+  children,
   popoverNoMinWidth,
   disableDelete,
   onDelete,
@@ -72,9 +77,7 @@ export default function FilterChip({
   // Matches width of popover to chip
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
-      entries.forEach((entry) => {
-        setPopoverWidth(entry.contentRect.width);
-      });
+      setPopoverWidth(entries[0].contentRect.width);
     });
 
     if (chipRef.current) {
@@ -106,15 +109,16 @@ export default function FilterChip({
   const ctx: PopoverComponentCtx = {
     open: openPopover,
     closePopover: handleClosePopover,
+    popoverWidth,
   };
 
   const popoverComponentFactory = () => {
-    if (typeof popoverComponent === 'function') {
+    if (typeof children === 'function') {
       // Is factory component, with context
-      return popoverComponent(ctx);
+      return children(ctx);
     }
     // Is regular component
-    return popoverComponent;
+    return children;
   };
 
   return (
@@ -142,7 +146,7 @@ export default function FilterChip({
                   </span>
                 )}
               </span>
-              {popoverComponent ? (
+              {children ? (
                 <ArrowDropDownIcon
                   fontSize="small"
                   className="-ml-1.5 mr-1.25 fill-[rgba(var(--mui-palette-text-primaryChannel)/0.26)] group-hover/chip:fill-[rgba(var(--mui-palette-text-primaryChannel)/0.4)]"
@@ -157,7 +161,7 @@ export default function FilterChip({
           }
           className={`group/chip ${dirty ? 'bg-cornflower-100 hover:bg-cornflower-200 dark:bg-cornflower-900 dark:hover:bg-cornflower-800' : ''} ${className}`}
           onClick={
-            popoverComponent
+            children
               ? handleOpenPopover
               : disableDelete
                 ? undefined
@@ -165,7 +169,7 @@ export default function FilterChip({
           }
           slotProps={{
             label: {
-              className: `${popoverComponent || !disableDelete ? 'pr-0' : ''}`,
+              className: `${children || !disableDelete ? 'pr-0' : ''}`,
             },
           }}
           aria-haspopup="menu"
