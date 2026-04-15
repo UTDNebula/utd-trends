@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 export function LoadingSyllabusSummary() {
   return (
     <div className="mt-2 rounded pv-3 max-w-dvw">
-      <div className="rounded p-4 dark:bg-gray-900 bg-gray-100 border border-cornflower-500">
+      <div className="rounded p-4 dark:bg-neutral-900/50 bg-neutral-200 border border-cornflower-500">
         <Skeleton variant="text" />
         <Skeleton variant="text" />
         <Skeleton variant="text" />
@@ -77,7 +77,7 @@ export default function SyllabusSummary({
         ) : (
           <div className="mt-2 rounded pv-3 max-w-dvw">
             {/* Outer flex row: tables + AI summary */}
-            <div className="flex gap-8 items-start mt-2 flex-wrap rounded p-4 dark:bg-gray-900 bg-gray-100 border border-cornflower-500">
+            <div className="flex gap-8 items-start mt-2 flex-wrap rounded p-4 dark:bg-neutral-900/50 bg-neutral-200 border border-cornflower-500">
               {/* Tables wrapper */}
               <div className="tables-container flex items-start gap-8 width-full max-w-dvw">
                 {/* Weighting Table */}

@@ -32,6 +32,9 @@
   --color-cornflower-700: #45449f; /* ~royal*/
   --color-cornflower-800: #363475;
   --color-cornflower-900: #28254d;
+  --color-cornflower-950: #141327;
+  --color-light: #f6f6f6;
+  --color-dark: #101010;
   --color-periwinkle: #c2c8ff; /* brand secondary (light)*/
   --color-shade: #101828; /* drop shadow color from shipfaster ui*/
 

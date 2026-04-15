@@ -50,9 +50,9 @@ const AddToPlanner = dynamic(() => import('./AddToPlanner'), {
 // sets the color for the table head cells
 function getCellSx() {
   return {
-    backgroundColor: 'rgb(252,252,252)',
+    backgroundColor: 'var(--bg-neutral-200)',
     '@media (prefers-color-scheme: dark)': {
-      backgroundColor: 'var(--mui-palette-background-default)',
+      backgroundColor: 'var(--bg-neutral-800)',
     },
   };
 }
