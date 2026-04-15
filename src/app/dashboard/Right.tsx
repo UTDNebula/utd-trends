@@ -12,9 +12,17 @@ import fetchGrades from '@/modules/fetchGrades';
 import fetchProfessor from '@/modules/fetchProfessor';
 import fetchRmp from '@/modules/fetchRmp';
 import { type SearchQuery, type SearchResult } from '@/types/SearchQuery';
-import { Card } from '@mui/material';
-import React, { Suspense } from 'react';
+import { Card, Skeleton } from '@mui/material';
+import React from 'react';
 import ServerLeft from './ServerLeft';
+
+export function LoadingCompare() {
+  return (
+    <div className="p-4">
+      <Skeleton variant="rounded" className="h-56 w-full" />
+    </div>
+  );
+}
 
 interface LoadingRightProps {
   courses?: SearchQuery[];
@@ -50,7 +58,7 @@ export function LoadingRight(props: LoadingRightProps) {
 
   if (!props.isMobile) {
     names.push('Compare');
-    tabs.push(<Compare key="compare" />);
+    tabs.push(<LoadingCompare key="compare" />);
   }
 
   return (
@@ -82,13 +90,12 @@ export default async function Right(props: Props) {
   if (props.isMobile) {
     names.push('Search');
     tabs.push(
-      <Suspense key="search-results" fallback={<LoadingSearchResultsTable />}>
-        <ServerLeft
-          courses={props.courses}
-          professors={props.professors}
-          searchResultsPromise={props.searchResultsPromise}
-        />
-      </Suspense>,
+      <ServerLeft
+        key="search-results"
+        courses={props.courses}
+        professors={props.professors}
+        searchResultsPromise={props.searchResultsPromise}
+      />,
     );
   }
 

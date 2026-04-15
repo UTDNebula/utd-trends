@@ -2,7 +2,7 @@ import Background from '@/../public/background.png';
 import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
 import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 import { LoadingSearchBar } from '@/components/search/SearchBar/SearchBar';
-import { FormControl, FormControlLabel, Switch, Tooltip } from '@mui/material';
+import { Skeleton } from '@mui/material';
 import Image from 'next/image';
 import React from 'react';
 
@@ -18,7 +18,9 @@ export default function Loading() {
         fill
         className="object-cover -z-20"
       />
-      <PlannerButton className="absolute top-4 right-4" />
+      <div className="absolute top-4 left-4 right-4 flex gap-2 place-content-between flex-wrap-reverse">
+        <PlannerButton className="ml-auto" />
+      </div>
       <div className="max-w-xl grow flex flex-col justify-center">
         <h2 className="text-sm font-semibold mb-3 text-royal dark:text-cornflower-300 tracking-wider flex gap-1 items-center">
           <span className="leading-none">POWERED BY</span>
@@ -41,15 +43,14 @@ export default function Loading() {
           find the perfect class.
         </p>
         <LoadingSearchBar input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti" />
-        {/* Teaching Next Semester switch*/}
-        <Tooltip title="Select Availability" placement="bottom-start">
-          <FormControl size="small" className="min-w-max flex-row items-center">
-            <FormControlLabel
-              control={<Switch checked disabled />}
-              label="Teaching Next Semester"
-            />
-          </FormControl>
-        </Tooltip>
+        {/* Matches TeachingSemesterSelector on Home (Teaching in + semester) */}
+        <div className="mt-4 flex w-full flex-wrap items-center gap-2">
+          <Skeleton variant="rounded" className="h-[38px] w-[140px]" />
+          <Skeleton
+            variant="rounded"
+            className="h-10 min-w-[160px] flex-1 sm:flex-none"
+          />
+        </div>
       </div>
     </div>
   );
