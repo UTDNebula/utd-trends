@@ -3,14 +3,7 @@
 import { FiltersContext } from '@/app/dashboard/FilterContext';
 import { useSharedState } from '@/app/SharedStateProvider';
 import type { SearchResult } from '@/types/SearchQuery';
-import {
-  FormControl,
-  FormControlLabel,
-  Grid,
-  InputLabel,
-  Select,
-  Switch,
-} from '@mui/material';
+import { Grid, Skeleton } from '@mui/material';
 import { useSearchParams } from 'next/navigation';
 import React, { use } from 'react';
 import AvailabilityFilterChip from './Chips/AvailabilityFilterChip';
@@ -20,61 +13,22 @@ import SectionTypeFilterChip from './Chips/SectionTypeFilterChip';
 import SemesterFilterChip from './Chips/SemesterFilterChip';
 
 export function LoadingFilters() {
+  const ChipSkeleton = (
+    <Skeleton
+      variant="rectangular"
+      className="rounded-full"
+      height={32}
+      width={128}
+    />
+  );
+
   return (
-    <Grid container spacing={2} className="mb-4 sm:m-0">
-      {/* min letter grade dropdown*/}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
-        <FormControl
-          size="small"
-          className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
-        >
-          <InputLabel id="minGPA">Min Letter Grade</InputLabel>
-          <Select label="Min Letter Grade" labelId="minGPA" value=""></Select>
-        </FormControl>
-      </Grid>
-
-      {/* min rating dropdown*/}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
-        <FormControl
-          size="small"
-          className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
-        >
-          <InputLabel id="minRating">Min Rating</InputLabel>
-          <Select label="Min Rating" labelId="minRating" value=""></Select>
-        </FormControl>
-      </Grid>
-
-      {/* semester dropdown */}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
-        <FormControl
-          size="small"
-          className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
-        >
-          <InputLabel id="Semesters">Semesters</InputLabel>
-          <Select label="Semesters" labelId="Semesters" value=""></Select>
-        </FormControl>
-      </Grid>
-
-      {/* section type dropdown */}
-      <Grid size={{ xs: 6, sm: 12 / 5 }} className="px-2">
-        <FormControl
-          size="small"
-          className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
-        >
-          <InputLabel id="SectionTypes">Section Types</InputLabel>
-          <Select label="SectionTypes" labelId="SectionTypes" value=""></Select>
-        </FormControl>
-      </Grid>
-
-      {/* Teaching Next Semester switch*/}
-      <Grid size={{ xs: 12, sm: 12 / 5 }} className="px-2">
-        <FormControl size="small">
-          <FormControlLabel
-            control={<Switch checked={true} />}
-            label="Teaching Next Semester"
-          />
-        </FormControl>
-      </Grid>
+    <Grid container spacing={{ xs: 1, md: 2 }} className="mb-4 sm:m-0">
+      {ChipSkeleton} {/* Min Letter Grade */}
+      {ChipSkeleton} {/* Min Rating */}
+      {ChipSkeleton} {/* Semesters */}
+      {ChipSkeleton} {/* Section Types */}
+      {ChipSkeleton} {/* Availability */}
     </Grid>
   );
 }
