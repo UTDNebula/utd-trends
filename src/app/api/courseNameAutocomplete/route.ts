@@ -240,8 +240,7 @@ export async function GET(request: Request) {
   const resultsWithoutDistance: Result[] = results
     .filter((r) => r.distance <= oneStdCutoff)
     .sort(
-      (a, b) =>
-        (b.result.totalStudents ?? -1) - (a.result.totalStudents ?? -1),
+      (a, b) => (b.result.totalStudents ?? -1) - (a.result.totalStudents ?? -1),
     )
     .map((result) => ({
       title: result.title,
