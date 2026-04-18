@@ -12,6 +12,7 @@ import {
   removeSection,
   searchQueryLabel,
   sectionCanOverlap,
+  type Course,
   type SearchQuery,
   type SearchQueryMultiSection,
   type SearchResult,
@@ -23,6 +24,7 @@ import EventIcon from '@mui/icons-material/Event';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Box,
+  Button,
   Checkbox,
   Collapse,
   IconButton,
@@ -33,6 +35,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  TableFooter,
   TableHead,
   TableRow,
   ToggleButton,
@@ -371,6 +374,41 @@ function SectionTableRow(props: SectionTableRowProps) {
             ''
           )}
         </div>
+      </TableCell>
+    </TableRow>
+  );
+}
+
+function SearchOtherProfessorFooter(props: {
+  course: Course | Record<string, never>;
+  teachingSemester: string;
+}) {
+  const params = new URLSearchParams();
+  if (
+    typeof props.course.number != 'undefined' &&
+    typeof props.course.prefix != 'undefined'
+  ) {
+    params.set(
+      'searchTerms',
+      decodeURIComponent(
+        `${props.course.prefix}+${props.course.number}`,
+      ).replaceAll('+', ' '),
+    );
+    params.set('availability', props.teachingSemester);
+  }
+  return (
+    <TableRow>
+      <TableCell colSpan={6} className="py-0" align="right">
+        <Button
+          href={`dashboard?${params.toString()}`}
+          onClick={() => {
+            // User may navigates between pages
+            // instead of clicking "Search Results"
+            sessionStorage.setItem('dashboardSearchTerms', params.toString());
+          }}
+        >
+          See other professors
+        </Button>
       </TableCell>
     </TableRow>
   );
@@ -743,6 +781,12 @@ export default function PlannerCard(props: PlannerCardProps) {
                   />
                 ))}
               </TableBody>
+              <TableFooter>
+                <SearchOtherProfessorFooter
+                  course={convertToCourseOnly(props.query)}
+                  teachingSemester={props.teachingSemester}
+                />
+              </TableFooter>
             </Table>
           </TableContainer>
           {/* Unassigned Professor Sections -- only show for a non-overall card */}
