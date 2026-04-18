@@ -2,6 +2,7 @@
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
+import { setAvailabilitySemester } from '@/modules/availability';
 import { calculateGrades } from '@/modules/fetchGrades';
 import type { Sections, SectionsData } from '@/modules/fetchSections';
 import { useSearchResult } from '@/modules/plannerFetch';
@@ -388,18 +389,16 @@ function SearchOtherProfessorFooter(props: {
     typeof props.course.number != 'undefined' &&
     typeof props.course.prefix != 'undefined'
   ) {
-    params.set(
-      'searchTerms',
-      decodeURIComponent(
-        `${props.course.prefix}+${props.course.number}`,
-      ).replaceAll('+', ' '),
-    );
-    params.set('availability', props.teachingSemester);
+    const combo = `${props.course.prefix}+${props.course.number}`;
+    params.set('searchTerms', decodeURIComponent(combo).replaceAll('+', ' '));
+    setAvailabilitySemester(params, props.teachingSemester);
   }
   return (
     <TableRow>
-      <TableCell colSpan={6} className="py-0" align="right">
+      <TableCell colSpan={6} className="py-1" align="center">
         <Button
+          className="normal-case"
+          LinkComponent={Link}
           href={`dashboard?${params.toString()}`}
           onClick={() => {
             // User may navigates between pages
