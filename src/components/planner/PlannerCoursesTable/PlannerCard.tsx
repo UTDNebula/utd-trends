@@ -385,23 +385,28 @@ function SearchOtherProfessorFooter(props: {
   teachingSemester: string;
 }) {
   const params = new URLSearchParams();
-  if (
-    typeof props.course.number != 'undefined' &&
-    typeof props.course.prefix != 'undefined'
-  ) {
-    const combo = `${props.course.prefix}+${props.course.number}`;
-    params.set('searchTerms', decodeURIComponent(combo).replaceAll('+', ' '));
+  if ('prefix' in props.course && 'number' in props.course) {
+    params.set(
+      'searchTerms',
+      decodeURIComponent(
+        `${props.course.prefix}+${props.course.number}`,
+      ).replaceAll('+', ' '),
+    );
     setAvailabilitySemester(params, props.teachingSemester);
   }
   return (
     <TableRow>
-      <TableCell colSpan={6} className="py-1" align="center">
+      <TableCell
+        colSpan={6}
+        className="py-1 border-t-1 border-t-royal dark:border-t-cornflower-300"
+        align="center"
+      >
         <Button
           className="normal-case"
           LinkComponent={Link}
           href={`dashboard?${params.toString()}`}
           onClick={() => {
-            // User may navigates between pages
+            // User might navigates between pages
             // instead of clicking "Search Results"
             sessionStorage.setItem('dashboardSearchTerms', params.toString());
           }}
