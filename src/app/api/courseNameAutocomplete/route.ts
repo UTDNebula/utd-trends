@@ -3,8 +3,10 @@ import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery } from '@/types/SearchQuery';
 import { NextResponse } from 'next/server';
 
+type CourseNameEntry = SearchQuery & { totalStudents: number };
+
 const courseNameTable = untypedCourseNameTable as {
-  [key: string]: SearchQuery[];
+  [key: string]: CourseNameEntry[];
 };
 
 //find all the prefixes in the course name table
@@ -105,7 +107,7 @@ const LIMIT = 20;
 
 interface Result {
   title: string;
-  result: SearchQuery;
+  result: CourseNameEntry;
 }
 
 type ResultWDistance = Result & {
@@ -237,6 +239,10 @@ export async function GET(request: Request) {
   const oneStdCutoff = cut + 1 * stdDev; // 1 standard deviation cutoff
   const resultsWithoutDistance: Result[] = results
     .filter((r) => r.distance <= oneStdCutoff)
+    .sort(
+      (a, b) =>
+        (b.result.totalStudents ?? -1) - (a.result.totalStudents ?? -1),
+    )
     .map((result) => ({
       title: result.title,
       result: result.result,
