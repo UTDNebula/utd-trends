@@ -108,6 +108,10 @@ function LoadingRow() {
   );
 }
 
+/**
+ * This component returns a table of search results after the search button or the 'Enter' key is pressed.
+ *
+ */
 export function LoadingSearchResultsTable() {
   return (
     //TODO: sticky header
