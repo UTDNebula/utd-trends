@@ -28,6 +28,12 @@ export type SearchQueryMultiSection = {
   sectionNumbers?: string[];
 };
 
+/** Planner entry: course (and optional prof/sections) plus the semester it was added for. */
+export type PlannerEntry = {
+  query: SearchQueryMultiSection;
+  semester: string;
+};
+
 export type SearchResult =
   | {
       type: 'course';
@@ -132,6 +138,23 @@ export function searchQueryMultiSectionSplit(
     delete result.sectionNumbers;
     return result;
   });
+}
+
+export function getLectureSections(sections: SectionsData): SectionsData {
+  return sections.filter(
+    (s) =>
+      /^[058]/.test(s.section_number) ||
+      /^0[WHL]/.test(s.section_number) ||
+      /^(HON|HN)/.test(s.section_number),
+  );
+}
+
+export function getLabSections(sections: SectionsData): SectionsData {
+  return sections.filter((s) => /^[1236]/.test(s.section_number));
+}
+
+export function getExamSections(sections: SectionsData): SectionsData {
+  return sections.filter((s) => /^7/.test(s.section_number));
 }
 
 export function sectionCanOverlap(section: string, type?: string): boolean {

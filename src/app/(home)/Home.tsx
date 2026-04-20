@@ -1,41 +1,41 @@
 'use client';
 
 import Background from '@/../public/background.png';
+import { useSharedState } from '@/app/SharedStateProvider';
+import TeachingSemesterSelector from '@/components/common/TeachingSemesterSelector/TeachingSemesterSelector';
 import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
 import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 import SearchBar, {
   updateRecentSearches,
 } from '@/components/search/SearchBar/SearchBar';
-import { displaySemesterName } from '@/modules/semesters';
 import { searchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
-import { FormControl, FormControlLabel, Switch, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useState, useTransition } from 'react';
-
-interface Props {
-  latestSemester: string;
-}
+import React, { useTransition } from 'react';
 
 /**
  * Returns the home page with Nebula Branding, waved background, and SearchBar Components
  */
-export default function Home(props: Props) {
+export default function Home() {
+  const { effectiveTeachingSemester, setTeachingSemester, availableSemesters } =
+    useSharedState();
   const router = useRouter();
+  const [filterByTeachingSemester, setFilterByTeachingSemester] =
+    React.useState(true);
 
   //for spinner after router.push
   const [isPending, startTransition] = useTransition();
 
-  const [filterNextSem, setFilterNextSem] = useState('true');
-
   async function searchOptionChosen(chosenOptions: SearchQuery[]) {
     if (chosenOptions.length) {
-      const searchParams = new URLSearchParams({
+      const params = new URLSearchParams({
         searchTerms: chosenOptions.map(searchQueryLabel).join(','),
-        availability: filterNextSem,
       });
+      if (filterByTeachingSemester && effectiveTeachingSemester) {
+        params.set('availability', effectiveTeachingSemester);
+      }
       startTransition(() => {
-        router.push(`/dashboard?${searchParams.toString()}`);
+        router.push(`/dashboard?${params.toString()}`);
       });
       // add to recent searches
       const chosenRecentOptions = chosenOptions.map((option) => ({
@@ -57,7 +57,7 @@ export default function Home(props: Props) {
       <div className="absolute top-4 left-4 right-4 flex gap-2 place-content-between flex-wrap-reverse">
         {/*Ad for Spring 2026*/}
         {/*<a
-          href="https://trends.utdnebula.com/dashboard?searchTerms=GOVT+2306&availability=true"
+          href="https://trends.utdnebula.com/dashboard?searchTerms=GOVT+2306&availability=26S"
           target="_blank"
           rel="noreferrer"
           className="bg-royal dark:bg-cornflower-300 text-cornflower-50 dark:text-haiti rounded transition hover:scale-[1.01] text-center flex gap-2 items-center mr-auto"
@@ -96,27 +96,18 @@ export default function Home(props: Props) {
           input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
           isPending={isPending}
         />
-        {/* Teaching Next Semester switch*/}
-        <Tooltip title="Select Availability" placement="bottom-start">
-          <FormControl size="small" className="min-w-max flex-row items-center">
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={filterNextSem == 'true'}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    setFilterNextSem(event.target.checked ? 'true' : 'false');
-                  }}
-                />
-              }
-              label={
-                props.latestSemester == ''
-                  ? 'Teaching Next Semester'
-                  : 'Teaching in ' +
-                    displaySemesterName(props.latestSemester, false)
-              }
-            />
-          </FormControl>
-        </Tooltip>
+        {/* Teaching in semester selector */}
+        {availableSemesters.length > 0 && (
+          <TeachingSemesterSelector
+            enabled={filterByTeachingSemester}
+            onEnabledChangeAction={setFilterByTeachingSemester}
+            semester={effectiveTeachingSemester}
+            onSemesterChangeAction={setTeachingSemester}
+            availableSemesters={availableSemesters}
+            formControlClassName="mt-4"
+            selectClassName="min-w-[160px] bg-white dark:bg-haiti"
+          />
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 'use client';
 
+import { useSharedState } from '@/app/SharedStateProvider';
 import {
   WhatsNewBadge,
   WhatsNewButton,
@@ -12,6 +13,7 @@ import Tutorial, {
   TutorialProvider,
 } from '@/components/dashboard/Tutorial/Tutorial';
 import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
+import { setAvailabilitySemester } from '@/modules/availability';
 import DownloadIcon from '@mui/icons-material/Download';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -24,7 +26,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Snackbar from '@mui/material/Snackbar';
 import Tooltip from '@mui/material/Tooltip';
 import html2canvas from 'html2canvas-pro';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { type HeaderProps } from './Header';
 
 export default function HeaderChildren(props: HeaderProps) {
@@ -125,6 +127,7 @@ function HeaderChildrenInner(props: HeaderProps) {
   const [openWhatsNewModal, setOpenWhatsNewModal] = useState(false);
   const closeWhatsNewModal = useCallback(() => setOpenWhatsNewModal(false), []);
 
+  const { effectiveTeachingSemester } = useSharedState();
   const [dashboardSearchTerms, setDashboardSearchTerms] = useState<
     null | string
   >(null);
@@ -136,20 +139,38 @@ function HeaderChildrenInner(props: HeaderProps) {
     );
   }, []);
 
+  /** Preserve saved dashboard filters but always align `availability` with current teaching semester (planner URL / context). */
+  const plannerToDashboardHref = useMemo(() => {
+    const params = new URLSearchParams(dashboardSearchTerms || '');
+
+    if (effectiveTeachingSemester) {
+      setAvailabilitySemester(params, effectiveTeachingSemester);
+    }
+
+    const keys = Array.from(params.keys());
+
+    if (keys.length === 0 || keys.every((key) => key === 'availability')) {
+      return '/';
+    }
+    return `/dashboard?${params.toString()}`;
+  }, [dashboardSearchTerms, effectiveTeachingSemester]);
+
   const plannerButtonProps = {
     isPlanner: props.isPlanner,
-    href: props.isPlanner
-      ? dashboardSearchTerms != null
-        ? '/dashboard?' + dashboardSearchTerms
-        : '/'
-      : '/planner',
-    onClick: () =>
-      !props.isPlanner
-        ? sessionStorage.setItem(
-            'dashboardSearchTerms',
-            new URLSearchParams(window.location.search).toString(),
-          )
-        : null,
+    href: props.isPlanner ? plannerToDashboardHref : '/planner',
+    onClick: () => {
+      if (!props.isPlanner) {
+        sessionStorage.setItem(
+          'dashboardSearchTerms',
+          new URLSearchParams(window.location.search).toString(),
+        );
+        return;
+      }
+      const q = plannerToDashboardHref.includes('?')
+        ? plannerToDashboardHref.slice(plannerToDashboardHref.indexOf('?') + 1)
+        : '';
+      sessionStorage.setItem('dashboardSearchTerms', q);
+    },
   };
 
   const tutorialButton = <TutorialButton handleCloseMenu={handleCloseMenu} />;
@@ -172,7 +193,6 @@ function HeaderChildrenInner(props: HeaderProps) {
       >
         <IconButton
           id="header-menu-button"
-          size="small"
           aria-controls={openMenu ? 'header-menu' : undefined}
           aria-haspopup="true"
           aria-expanded={openMenu ? 'true' : undefined}
@@ -181,7 +201,6 @@ function HeaderChildrenInner(props: HeaderProps) {
           }}
         >
           <MoreVertIcon
-            fontSize="small"
             className={`${tutorialHint && !openMenu && !props.isPlanner ? ' text-white dark:text-haiti' : ''}`}
           />
         </IconButton>
@@ -193,8 +212,6 @@ function HeaderChildrenInner(props: HeaderProps) {
     <>
       {/* Shown on small screens */}
       <div className="flex gap-x-2 sm:hidden">
-        {/* TODO: When PlannerButton is moved to a bottom nav bar, remove the small size props from all the children in this div */}
-        <PlannerButton {...plannerButtonProps} size="small" />
         {tutorialHint && !props.isPlanner ? (
           moreVertIcon
         ) : (
@@ -203,7 +220,7 @@ function HeaderChildrenInner(props: HeaderProps) {
       </div>
 
       {/* Shown on large screens */}
-      <div className="flex gap-x-4 max-sm:hidden">
+      <div className="flex items-center gap-x-4 max-sm:hidden">
         {/* Planner button */}
         <PlannerButton {...plannerButtonProps} />
 
@@ -243,6 +260,15 @@ function HeaderChildrenInner(props: HeaderProps) {
         open={openMenu}
         anchorEl={menuAnchorEl}
         onClose={handleCloseMenu}
+        disableScrollLock={true}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
         slotProps={{
           list: {
             'aria-labelledby': 'header-menu-button',

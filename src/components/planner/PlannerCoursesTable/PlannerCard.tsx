@@ -5,6 +5,7 @@ import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import { calculateGrades } from '@/modules/fetchGrades';
 import type { Sections, SectionsData } from '@/modules/fetchSections';
 import { useSearchResult } from '@/modules/plannerFetch';
+import { getLatestSyllabusSection } from '@/modules/semesters';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -87,7 +88,7 @@ function parseTime(time: string): number {
   return hourNum + minute / 60;
 }
 
-function hasConflict(
+export function hasConflict(
   newSection: Sections['all'][number],
   selectedSections: Sections['all'],
 ): boolean {
@@ -429,7 +430,7 @@ type PlannerCardProps = {
   selectedSections: Sections['all'];
   openConflictMessage: () => void;
   color: { fill: string; outline: string; font: string };
-  latestSemester: string;
+  teachingSemester: string;
   extraSections?: SearchResult;
   extraLabel?: string;
 };
@@ -469,13 +470,13 @@ export default function PlannerCard(props: PlannerCardProps) {
     allSectionsWithSyllabus = allSectionsWithSyllabus.filter(() => false); // No syllabi should be shown
 
   let latestMatchedSections: SearchResult = result; // fallback if filtering is null, at least it will have correct grade/rmp data
+  let allMatchedSections: SearchResult = result; // all sections of a course (not filtered by sem) -- using this for the latest syllabus per professor
   let latestExtraSections: SearchResult | null = null;
   if (!props.extraSections) {
-    latestMatchedSections = {
+    allMatchedSections = {
       ...result,
       sections: result.sections.filter(
         (section) =>
-          section.academic_session.name == props.latestSemester && // latest sem's sections only
           ((!props.query.profFirst && !props.query.profLast) || // if overall, should show every prof's section
             (section.professor_details &&
               section.professor_details.find(
@@ -487,11 +488,17 @@ export default function PlannerCard(props: PlannerCardProps) {
           !sectionCanOverlap(section.section_number), // that are not "Extra"
       ),
     };
+    latestMatchedSections = {
+      ...allMatchedSections,
+      sections: allMatchedSections.sections.filter(
+        (section) => section.academic_session.name == props.teachingSemester, // selected teaching semester only
+      ),
+    };
     latestExtraSections = {
       ...result,
       sections: result.sections.filter(
         (section) =>
-          section.academic_session.name == props.latestSemester && // latest sem's sections only
+          section.academic_session.name == props.teachingSemester && // selected teaching semester only
           (!(section.professor_details && section.professor_details[0]) || // either have no professor assigned, or
             sectionCanOverlap(section.section_number)), // be an "Extra" section (labs, exams, etc)
       ),
@@ -511,14 +518,14 @@ export default function PlannerCard(props: PlannerCardProps) {
               latestMatchedSections.sections![0].meetings[0].end_date,
         )
       : false;
+
+  const latestSyllabusSection = getLatestSyllabusSection(allMatchedSections);
   return (
     <Box
       component={Paper}
       className={
         'border border-royal dark:border-cornflower-300 rounded-lg' +
-        (props.extraSections
-          ? ' my-4 mx-5 bg-[rgb(250,250,250)] dark:bg-[rgb(10,10,10)]'
-          : '')
+        (props.extraSections ? ' my-4 mx-5 bg-light dark:bg-dark' : '')
       }
     >
       <div
@@ -755,7 +762,7 @@ export default function PlannerCard(props: PlannerCardProps) {
                 selectedSections={props.selectedSections}
                 openConflictMessage={props.openConflictMessage}
                 color={props.color}
-                latestSemester={props.latestSemester}
+                teachingSemester={props.teachingSemester}
                 extraSections={{
                   ...latestExtraSections,
                   sections: latestExtraSections.sections.filter(
@@ -780,7 +787,7 @@ export default function PlannerCard(props: PlannerCardProps) {
                 selectedSections={props.selectedSections}
                 openConflictMessage={props.openConflictMessage}
                 color={props.color}
-                latestSemester={props.latestSemester}
+                teachingSemester={props.teachingSemester}
                 extraSections={{
                   ...latestExtraSections,
                   sections: latestExtraSections.sections.filter((section) =>
@@ -803,7 +810,7 @@ export default function PlannerCard(props: PlannerCardProps) {
                 selectedSections={props.selectedSections}
                 openConflictMessage={props.openConflictMessage}
                 color={props.color}
-                latestSemester={props.latestSemester}
+                teachingSemester={props.teachingSemester}
                 extraSections={{
                   ...latestExtraSections,
                   sections: latestExtraSections.sections.filter((section) =>
@@ -832,9 +839,13 @@ export default function PlannerCard(props: PlannerCardProps) {
               latestMatchedSections.type === 'combo') &&
               latestMatchedSections.RMP && (
                 <SingleProfInfo
+                  rmp={latestMatchedSections.RMP}
                   open={open && whichOpen === 'grades'}
                   searchQuery={props.query}
-                  rmp={latestMatchedSections.RMP}
+                  syllabus_uri={latestSyllabusSection?.syllabus_uri || null}
+                  syllabus_sem={
+                    latestSyllabusSection?.academic_session.name || null
+                  }
                 />
               )}
           </div>

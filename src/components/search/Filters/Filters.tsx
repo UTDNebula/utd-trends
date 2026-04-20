@@ -2,9 +2,19 @@
 
 import { FiltersContext } from '@/app/dashboard/FilterContext';
 import { useSharedState } from '@/app/SharedStateProvider';
+import Rating from '@/components/common/Rating/Rating';
+import TeachingSemesterSelector from '@/components/common/TeachingSemesterSelector/TeachingSemesterSelector';
+import {
+  clearAvailabilitySemester,
+  setAvailabilitySemester,
+} from '@/modules/availability';
+import { calculateGrades } from '@/modules/fetchGrades';
+import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import { compareSemesters, displaySemesterName } from '@/modules/semesters';
+import { useAvailabilityUrlSync } from '@/modules/useAvailabilityUrlSync';
 import type { SearchResult } from '@/types/SearchQuery';
 import { Grid, Skeleton } from '@mui/material';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import React, { use } from 'react';
 import AvailabilityFilterChip from './Chips/AvailabilityFilterChip';
 import MinLetterGradeFilterChip from './Chips/MinLetterGradeFilterChip';
@@ -41,7 +51,8 @@ export default function Filters({
 }: {
   searchResultsPromise: Promise<SearchResult[]>;
 }) {
-  const { latestSemester } = useSharedState();
+  const { setTeachingSemester, availableSemesters, effectiveTeachingSemester } =
+    useSharedState();
   const searchResults = use(searchResultsPromise);
   const semesters = use(FiltersContext).semesters;
   const chosenSemesters = use(FiltersContext).chosenSemesters;
@@ -51,6 +62,7 @@ export default function Filters({
   const sectionTypes = use(FiltersContext).sectionTypes;
 
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   let minGPA = searchParams.get('minGPA') ?? '';
   if (Array.isArray(minGPA)) {
@@ -60,13 +72,22 @@ export default function Filters({
   if (Array.isArray(minRating)) {
     minRating = minRating[0]; // if minRating is an array, make it a string
   }
-  const filterNextSem = searchParams.get('availability') === 'true';
+  const { rawAvailability, availabilitySemester } = useAvailabilityUrlSync({
+    pathname,
+    searchParams,
+    availableSemesters,
+    effectiveTeachingSemester,
+    setTeachingSemester,
+  });
+  const filterNextSem = rawAvailability !== null;
 
   const semFilteredResults = searchResults.filter((result) => {
+    const semesterToFilter = availabilitySemester || effectiveTeachingSemester;
     const availableThisSemester =
       filterNextSem &&
+      semesterToFilter &&
       result.sections.some(
-        (section) => section.academic_session.name === latestSemester,
+        (section) => section.academic_session.name === semesterToFilter,
       );
     const hasChosenSectionTypes = result.grades.some((section) =>
       section.data.some((s) => chosenSectionTypes.includes(s.type)),
@@ -118,10 +139,50 @@ export default function Filters({
         setChosenSectionTypes={setChosenSectionTypes}
       />
 
-      <AvailabilityFilterChip
+      {/* <AvailabilityFilterChip
         filterNextSem={filterNextSem}
         latestSemester={latestSemester}
-      />
+      /> */}
+
+      {/* Teaching Next Semester switch + semester dropdown */}
+      <Grid size={{ xs: 12, sm: 24 / 5 }} className="px-2">
+        <TeachingSemesterSelector
+          enabled={filterNextSem}
+          onEnabledChangeAction={(enabled) => {
+            const params = new URLSearchParams(searchParams.toString());
+            if (enabled) {
+              if (effectiveTeachingSemester) {
+                setAvailabilitySemester(params, effectiveTeachingSemester);
+              }
+            } else {
+              clearAvailabilitySemester(params);
+            }
+            window.history.replaceState(
+              null,
+              '',
+              `${pathname}?${params.toString()}`,
+            );
+          }}
+          semester={effectiveTeachingSemester}
+          onSemesterChangeAction={(newSemester) => {
+            setTeachingSemester(newSemester);
+            if (!filterNextSem) return;
+            const params = new URLSearchParams(searchParams.toString());
+            setAvailabilitySemester(params, newSemester);
+            window.history.replaceState(
+              null,
+              '',
+              `${pathname}?${params.toString()}`,
+            );
+          }}
+          availableSemesters={availableSemesters}
+          formControlClassName={
+            filterNextSem
+              ? '[&_div.MuiInputBase-root]:bg-cornflower-50 dark:[&_div.MuiInputBase-root]:bg-cornflower-900'
+              : '[&_div.MuiInputBase-root]:bg-white dark:[&_div.MuiInputBase-root]:bg-black'
+          }
+        />
+      </Grid>
     </Grid>
   );
 }

@@ -1,8 +1,8 @@
 'use client';
 
 import Header from '@/components/navigation/Header/Header';
-import React, { useRef } from 'react';
-import Planner from './Planner';
+import React, { Suspense, useRef } from 'react';
+import Planner, { PlannerLoadingSkeleton } from './Planner';
 import PlannerDownloadUI from './PlannerDownloadUI';
 
 export default function PlannerPage() {
@@ -12,7 +12,9 @@ export default function PlannerPage() {
     <>
       <Header isPlanner={true} downloadRef={downloadRef} />
       <main className="p-4">
-        <Planner />
+        <Suspense fallback={<PlannerLoadingSkeleton />}>
+          <Planner />
+        </Suspense>
       </main>
       <PlannerDownloadUI downloadRef={downloadRef} />
     </>
