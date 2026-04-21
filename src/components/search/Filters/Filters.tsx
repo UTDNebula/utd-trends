@@ -16,13 +16,12 @@ import type { SearchResult } from '@/types/SearchQuery';
 import {
   Checkbox,
   FormControl,
-  FormControlLabel,
   Grid,
   InputLabel,
   ListItemText,
   MenuItem,
   Select,
-  Switch,
+  Skeleton,
   Tooltip,
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
@@ -37,56 +36,36 @@ export function LoadingFilters() {
     <Grid container spacing={2} className="mb-4 sm:m-0">
       {/* min letter grade dropdown*/}
       <Grid size={{ xs: 6, sm: 9 / 5 }} className="px-2">
-        <FormControl
-          size="small"
-          className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
-        >
-          <InputLabel id="minGPA">Min Letter Grade</InputLabel>
-          <Select label="Min Letter Grade" labelId="minGPA" value=""></Select>
-        </FormControl>
+        <Skeleton variant="rounded" className="h-10 w-full" />
       </Grid>
 
       {/* min rating dropdown*/}
       <Grid size={{ xs: 6, sm: 9 / 5 }} className="px-2">
-        <FormControl
-          size="small"
-          className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
-        >
-          <InputLabel id="minRating">Min Rating</InputLabel>
-          <Select label="Min Rating" labelId="minRating" value=""></Select>
-        </FormControl>
+        <Skeleton variant="rounded" className="h-10 w-full" />
       </Grid>
 
       {/* semester dropdown */}
       <Grid size={{ xs: 6, sm: 9 / 5 }} className="px-2">
-        <FormControl
-          size="small"
-          className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
-        >
-          <InputLabel id="Semesters">Semesters</InputLabel>
-          <Select label="Semesters" labelId="Semesters" value=""></Select>
-        </FormControl>
+        <Skeleton variant="rounded" className="h-10 w-full" />
       </Grid>
 
       {/* section type dropdown */}
       <Grid size={{ xs: 6, sm: 9 / 5 }} className="px-2">
-        <FormControl
-          size="small"
-          className="w-full [&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black"
-        >
-          <InputLabel id="SectionTypes">Section Types</InputLabel>
-          <Select label="SectionTypes" labelId="SectionTypes" value=""></Select>
-        </FormControl>
+        <Skeleton variant="rounded" className="h-10 w-full" />
       </Grid>
 
-      {/* Teaching Next Semester switch*/}
+      {/* Teaching in + semester (matches TeachingSemesterSelector) */}
       <Grid size={{ xs: 12, sm: 24 / 5 }} className="px-2">
-        <FormControl size="small">
-          <FormControlLabel
-            control={<Switch checked={true} />}
-            label="Teaching Next Semester"
+        <div className="flex w-full flex-wrap items-center gap-2">
+          <Skeleton
+            variant="rounded"
+            className="h-[38px] min-w-[140px] flex-1 sm:flex-none"
           />
-        </FormControl>
+          <Skeleton
+            variant="rounded"
+            className="h-10 min-w-[120px] flex-1 sm:w-[120px]"
+          />
+        </div>
       </Grid>
     </Grid>
   );
@@ -566,7 +545,7 @@ export default function Filters({
         </Tooltip>
       </Grid>
 
-      {/* Teaching Next Semester switch + semester dropdown */}
+      {/* Teaching in semester selector */}
       <Grid size={{ xs: 12, sm: 24 / 5 }} className="px-2">
         <TeachingSemesterSelector
           enabled={filterNextSem}
