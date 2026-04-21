@@ -2,15 +2,6 @@
 
 import { FiltersContext } from '@/app/dashboard/FilterContext';
 import { useSharedState } from '@/app/SharedStateProvider';
-import Rating from '@/components/common/Rating/Rating';
-import TeachingSemesterSelector from '@/components/common/TeachingSemesterSelector/TeachingSemesterSelector';
-import {
-  clearAvailabilitySemester,
-  setAvailabilitySemester,
-} from '@/modules/availability';
-import { calculateGrades } from '@/modules/fetchGrades';
-import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import { compareSemesters, displaySemesterName } from '@/modules/semesters';
 import { useAvailabilityUrlSync } from '@/modules/useAvailabilityUrlSync';
 import type { SearchResult } from '@/types/SearchQuery';
 import { Grid, Skeleton } from '@mui/material';
@@ -139,50 +130,11 @@ export default function Filters({
         setChosenSectionTypes={setChosenSectionTypes}
       />
 
-      {/* <AvailabilityFilterChip
-        filterNextSem={filterNextSem}
-        latestSemester={latestSemester}
-      /> */}
-
-      {/* Teaching Next Semester switch + semester dropdown */}
-      <Grid size={{ xs: 12, sm: 24 / 5 }} className="px-2">
-        <TeachingSemesterSelector
-          enabled={filterNextSem}
-          onEnabledChangeAction={(enabled) => {
-            const params = new URLSearchParams(searchParams.toString());
-            if (enabled) {
-              if (effectiveTeachingSemester) {
-                setAvailabilitySemester(params, effectiveTeachingSemester);
-              }
-            } else {
-              clearAvailabilitySemester(params);
-            }
-            window.history.replaceState(
-              null,
-              '',
-              `${pathname}?${params.toString()}`,
-            );
-          }}
-          semester={effectiveTeachingSemester}
-          onSemesterChangeAction={(newSemester) => {
-            setTeachingSemester(newSemester);
-            if (!filterNextSem) return;
-            const params = new URLSearchParams(searchParams.toString());
-            setAvailabilitySemester(params, newSemester);
-            window.history.replaceState(
-              null,
-              '',
-              `${pathname}?${params.toString()}`,
-            );
-          }}
-          availableSemesters={availableSemesters}
-          formControlClassName={
-            filterNextSem
-              ? '[&_div.MuiInputBase-root]:bg-cornflower-50 dark:[&_div.MuiInputBase-root]:bg-cornflower-900'
-              : '[&_div.MuiInputBase-root]:bg-white dark:[&_div.MuiInputBase-root]:bg-black'
-          }
-        />
-      </Grid>
+      <AvailabilityFilterChip
+        enabled={filterNextSem}
+        semester={effectiveTeachingSemester}
+        availableSemesters={availableSemesters}
+      />
     </Grid>
   );
 }

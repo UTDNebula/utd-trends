@@ -1,60 +1,86 @@
 import { setParams } from '@/modules/searchParams';
 import { displaySemesterName } from '@/modules/semesters';
-import { FormControl, FormControlLabel, Switch, Tooltip } from '@mui/material';
+import { MenuItem, MenuList, Tooltip } from '@mui/material';
 import React from 'react';
 import FilterChip from '../FilterChip';
 
 type AvailabilityFilterChipProps = {
-  filterNextSem: boolean;
-  latestSemester: string;
+  enabled: boolean;
+  semester: string;
+  availableSemesters: string[];
+  /**
+   * Prevents component from storing new value in URL search params.
+   * @default false
+   */
+  disableSearchParams?: boolean;
+  disableDirty?: boolean;
+  onChange?: (enabled: boolean, semester: string) => void;
+  className?: string;
 };
 
 export default function AvailabilityFilterChip({
-  filterNextSem,
-  latestSemester,
+  enabled,
+  semester,
+  availableSemesters,
+  disableSearchParams = false,
+  disableDirty = false,
+  onChange,
+  className,
 }: AvailabilityFilterChipProps) {
   return (
-    <Tooltip title="Availability" placement="top">
+    <Tooltip
+      title="Filter results to courses taught in this semester"
+      placement="top"
+    >
       <FilterChip
-        label="Availability"
-        renderValue={
-          filterNextSem ? displaySemesterName(latestSemester, false) : 'Any'
+        label="Teaching in"
+        renderValue={enabled ? displaySemesterName(semester, false) : 'Any'}
+        dirty={
+          !disableDirty && (!enabled || semester !== availableSemesters[0])
         }
-        dirty={!filterNextSem}
+        className={className}
       >
-        <div className="mx-4 my-3">
-          <FormControl
-            size="small"
-            className={`${
-              filterNextSem
-                ? '[&>.MuiInputBase-root]:bg-cornflower-50 dark:[&>.MuiInputBase-root]:bg-cornflower-900'
-                : '[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-black'
-            }`}
-          >
-            <FormControlLabel
-              className="select-none"
-              control={
-                <Switch
-                  checked={filterNextSem}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+        {(ctx) => (
+          <MenuList autoFocusItem={ctx.open}>
+            <MenuItem
+              className="h-10"
+              value=""
+              selected={!enabled}
+              aria-selected={!enabled}
+              onClick={() => {
+                if (!disableSearchParams) {
+                  setParams((params) => {
+                    params.delete('availability');
+                  });
+                }
+                onChange?.(false, semester);
+                ctx.closePopover();
+              }}
+            >
+              <em className="italic">Any</em>
+            </MenuItem>
+            {availableSemesters.map((sem) => (
+              <MenuItem
+                className="h-10"
+                key={sem}
+                value={sem}
+                selected={enabled && semester === sem}
+                aria-selected={enabled && semester === sem}
+                onClick={() => {
+                  if (!disableSearchParams) {
                     setParams((params) => {
-                      if (event.target.checked) {
-                        params.set('availability', 'true');
-                      } else {
-                        params.delete('availability');
-                      }
+                      params.set('availability', sem);
                     });
-                  }}
-                />
-              }
-              label={
-                latestSemester == ''
-                  ? 'Teaching Next Semester'
-                  : 'Teaching in ' + displaySemesterName(latestSemester, false)
-              }
-            />
-          </FormControl>
-        </div>
+                  }
+                  onChange?.(true, sem);
+                  ctx.closePopover();
+                }}
+              >
+                {displaySemesterName(sem, false)}
+              </MenuItem>
+            ))}
+          </MenuList>
+        )}
       </FilterChip>
     </Tooltip>
   );
