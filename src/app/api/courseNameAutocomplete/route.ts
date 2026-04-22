@@ -202,12 +202,16 @@ export async function GET(request: Request) {
             })
             .sort((a, b) => b - a)[0] ?? 0;
 
+        const popularityBonus =
+          result.totalStudents > 0 ? -Math.log10(result.totalStudents + 1) : 0;
+
         return {
           distance:
             (smartNumberMatch < 0 ? 0 : distanceMetric) + // if checking course number, ignore distance metric
             2 * smartWordCapture + // double weight for word capture
             prefixPriority +
-            smartNumberMatch,
+            smartNumberMatch +
+            popularityBonus,
           title: title,
           result: result,
         };
@@ -239,9 +243,6 @@ export async function GET(request: Request) {
   const oneStdCutoff = cut + 1 * stdDev; // 1 standard deviation cutoff
   const resultsWithoutDistance: Result[] = results
     .filter((r) => r.distance <= oneStdCutoff)
-    .sort(
-      (a, b) => (b.result.totalStudents ?? 0) - (a.result.totalStudents ?? 0),
-    )
     .map((result) => ({
       title: result.title,
       result: result.result,
