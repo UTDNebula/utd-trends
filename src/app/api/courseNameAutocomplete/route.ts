@@ -211,7 +211,7 @@ export async function GET(request: Request) {
             2 * smartWordCapture + // double weight for word capture
             prefixPriority +
             smartNumberMatch +
-            popularityBonus,
+            5 * popularityBonus,
           title: title,
           result: result,
         };
