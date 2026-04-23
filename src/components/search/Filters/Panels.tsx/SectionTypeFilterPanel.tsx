@@ -28,7 +28,7 @@ export default function SectionTypeFilterPanel({
   }));
 
   return (
-    <FilterPanel heading="Section Type">
+    <FilterPanel heading="Section Type" id="filter-section-type">
       <FilterList
         options={[
           {
@@ -50,7 +50,7 @@ export default function SectionTypeFilterPanel({
         type="checkbox"
         disableSelectedBackdrop={isDefault}
         selectedValues={chosenSectionTypes}
-        renderOptionContent={(option) => (
+        renderOptionContent={(props, option) => (
           <ListItemText
             primary={option.label ?? option.value}
             secondary={
@@ -60,7 +60,10 @@ export default function SectionTypeFilterPanel({
                 ? option.value
                 : undefined
             }
-            slotProps={{ primary: { className: 'text-sm' } }}
+            slotProps={{
+              primary: { className: 'text-sm' },
+              secondary: { className: 'text-xs' },
+            }}
           />
         )}
         onChange={(newSelectedValues) => {

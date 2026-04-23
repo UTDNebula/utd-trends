@@ -241,6 +241,9 @@ export default function FilterChip(props: FilterChipProps) {
           }
           className={`group/chip ${dirty ? `bg-cornflower-100 dark:bg-cornflower-900 ${hasClickHandler ? 'hover:bg-cornflower-200 dark:hover:bg-cornflower-800' : ''}` : ''} ${className}`}
           onClick={hasClickHandler ? handleClick : undefined}
+          onMouseDown={
+            action === 'popover' && hasClickHandler ? handleClick : undefined
+          }
           slotProps={{
             label: {
               className: `${action === 'popover' || action === 'delete' ? 'pr-0' : ''}`,

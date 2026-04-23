@@ -11,7 +11,6 @@ import {
   FormControl,
   FormHelperText,
   Grid,
-  InputLabel,
   ListItemText,
   MenuItem,
   Select,
@@ -29,12 +28,10 @@ export default function SemesterFilterPanel({
   const recentSemesters = getRecentSemesters(semesters);
 
   return (
-    <FilterPanel heading="Included grade data">
+    <FilterPanel heading="Semesters" id="filter-semesters">
       <Grid container spacing={3} marginTop={1}>
         <FormControl size="small" className="w-full">
-          <InputLabel id="Semesters">Semesters</InputLabel>
           <Select
-            label="Semesters"
             labelId="Semesters"
             multiple
             value={chosenSemesters}
@@ -81,9 +78,12 @@ export default function SemesterFilterPanel({
                 }
               }
             }}
+            displayEmpty
             renderValue={(selected) => {
-              if (chosenSemesters.length === semesters.length) {
-                return 'All selected';
+              if (selected.length === semesters.length) {
+                return <span className="italic">All selected</span>;
+              } else if (selected.length === 0) {
+                return <span className="italic">None selected</span>;
               }
               return selected.sort(compareSemesters).join(', ');
             }}

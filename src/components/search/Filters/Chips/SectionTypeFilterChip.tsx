@@ -33,7 +33,7 @@ export default function SectionTypeFilterChip({
 
   return (
     <Tooltip
-      title="Section types to include grades from"
+      title="Include grade data from these sections"
       placement="top"
       disableInteractive
     >

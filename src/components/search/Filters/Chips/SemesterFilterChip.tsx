@@ -33,7 +33,7 @@ export default function SemesterFilterChip({
   const recentSemesters = getRecentSemesters(semesters);
 
   return (
-    <Tooltip title="Semesters to include grades from" placement="top">
+    <Tooltip title="Include grade data from these semesters" placement="top">
       <FilterChip
         action={type}
         onDelete={() => {

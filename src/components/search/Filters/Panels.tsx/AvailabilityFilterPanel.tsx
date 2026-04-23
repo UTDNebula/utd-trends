@@ -5,6 +5,7 @@ import FilterPanel from '@/components/search/Filters/base/FilterPanel';
 import type { FilterModalPanelProps } from '@/modules/filters';
 import { setParams } from '@/modules/searchParams';
 import { displaySemesterName } from '@/modules/semesters';
+import ListItemText from '@mui/material/ListItemText';
 
 type AvailabilityFilterPanelProps = FilterModalPanelProps<{
   enabled: boolean;
@@ -23,12 +24,28 @@ export default function AvailabilityFilterPanel({
   }));
 
   return (
-    <FilterPanel heading="Teaching in">
+    <FilterPanel
+      heading="Teaching in"
+      description="Show courses being taught in this semester"
+      id="filter-availability"
+    >
       <FilterList
         options={[{ label: 'Any semester', value: 'any' }, ...semesterOptions]}
         type="radio"
         selectedValues={[value]}
         disallowDeselecting
+        renderOptionContent={(props, option) => (
+          <ListItemText
+            primary={
+              option.value === 'any' ? (
+                <span className="italic">{option.label}</span>
+              ) : (
+                option.label
+              )
+            }
+            {...props}
+          />
+        )}
         onChange={(newSelectedValues) => {
           const newValue = newSelectedValues[0];
           setParams((params) => {

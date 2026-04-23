@@ -91,7 +91,7 @@ export default function FilterPanel({
         <div className={`flex flex-col gap-2 ${hasHeading ? 'pt-2' : ''}`}>
           {description && (
             <div
-              className={`mb-4 text-slate-600 dark:text-slate-400 text-sm ${slotClassNames?.description}`}
+              className={`text-neutral-600 dark:text-neutral-400 text-sm ${slotClassNames?.description}`}
             >
               {description}
             </div>

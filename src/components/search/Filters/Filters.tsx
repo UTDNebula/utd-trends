@@ -26,6 +26,9 @@ export function LoadingFilters() {
   return (
     <>
       <Grid container spacing={1} className="max-md:hidden">
+        <span className="h-8 mx-2 flex items-center text-sm text-neutral-600 dark:text-neutral-400 select-none text-nowrap">
+          Filters:
+        </span>
         {ChipSkeleton} {/* Min Letter Grade */}
         {ChipSkeleton} {/* Min Rating */}
         {ChipSkeleton} {/* Semesters */}

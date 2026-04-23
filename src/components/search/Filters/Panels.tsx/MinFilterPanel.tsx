@@ -37,7 +37,7 @@ export default function MinFilterPanel({ data }: MinFilterPanelProps) {
   const rmpCounts: Record<string, number> = getRmpCounts(data);
 
   return (
-    <FilterPanel heading="Minimum">
+    <FilterPanel heading="Minimum" id="filter-minimum">
       <Grid container spacing={3} marginTop={1}>
         <FormControl size="small" className="w-full">
           <InputLabel id="minGPA">Letter Grade</InputLabel>

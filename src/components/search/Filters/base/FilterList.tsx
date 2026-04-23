@@ -114,7 +114,10 @@ export type FilterListProps = {
   /**
    * Render the option's content. By default, uses `option.label`, then `option.value`
    */
-  renderOptionContent?: (option: FilterListItemBase) => ReactNode;
+  renderOptionContent?: (
+    props: object,
+    option: FilterListItemBase,
+  ) => ReactNode;
 };
 
 export default function FilterList({
@@ -300,7 +303,10 @@ export default function FilterList({
               </ListItemIcon>
               {renderOptionContent ? (
                 <div className="flex flex-row justify-start items-center">
-                  {renderOptionContent(option)}
+                  {renderOptionContent(
+                    { slotProps: { primary: { className: 'text-sm' } } },
+                    option,
+                  )}
                 </div>
               ) : (
                 <ListItemText

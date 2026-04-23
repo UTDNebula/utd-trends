@@ -34,7 +34,7 @@ export default function MinLetterGradeFilterChip({
 
   return (
     <Tooltip
-      title="Minimum letter grade average"
+      title="Minimum course letter grade average"
       placement="top"
       disableInteractive
     >

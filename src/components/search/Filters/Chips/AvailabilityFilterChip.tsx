@@ -33,7 +33,7 @@ export default function AvailabilityFilterChip({
 
   return (
     <Tooltip
-      title="Filter results to courses taught in this semester"
+      title="Show courses being taught in this semester"
       placement="top"
       disableInteractive
     >
