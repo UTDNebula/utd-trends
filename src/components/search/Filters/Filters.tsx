@@ -5,15 +5,7 @@ import { useSharedState } from '@/app/SharedStateProvider';
 import { useAvailabilityUrlSync } from '@/modules/useAvailabilityUrlSync';
 import type { SearchResult } from '@/types/SearchQuery';
 import TuneIcon from '@mui/icons-material/Tune';
-import {
-  Button,
-  Chip,
-  Grid,
-  Skeleton,
-  SwipeableDrawer,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
+import { Button, Chip, Grid, Skeleton, SwipeableDrawer } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname, useSearchParams } from 'next/navigation';
 import React, { use } from 'react';
@@ -39,13 +31,24 @@ export function LoadingFilters() {
   );
 
   return (
-    <Grid container spacing={{ xs: 1, md: 2 }} className="mb-4 sm:m-0">
-      {ChipSkeleton} {/* Min Letter Grade */}
-      {ChipSkeleton} {/* Min Rating */}
-      {ChipSkeleton} {/* Semesters */}
-      {ChipSkeleton} {/* Section Types */}
-      {ChipSkeleton} {/* Availability */}
-    </Grid>
+    <>
+      <Grid container spacing={1} className="max-md:hidden">
+        {ChipSkeleton} {/* Min Letter Grade */}
+        {ChipSkeleton} {/* Min Rating */}
+        {ChipSkeleton} {/* Semesters */}
+        {ChipSkeleton} {/* Section Types */}
+        {ChipSkeleton} {/* Availability */}
+      </Grid>
+      <Grid container spacing={1} className="md:hidden">
+        <Chip
+          label="Filters"
+          icon={<TuneIcon fontSize="small" />}
+          variant="outlined"
+          className="border-[var(--mui-palette-divider)]"
+        />
+        {ChipSkeleton}
+      </Grid>
+    </>
   );
 }
 
@@ -57,6 +60,11 @@ export default function Filters({
 }: {
   searchResultsPromise: Promise<SearchResult[]>;
 }) {
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const { setTeachingSemester, availableSemesters, effectiveTeachingSemester } =
     useSharedState();
   const searchResults = use(searchResultsPromise);
@@ -69,9 +77,6 @@ export default function Filters({
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
-
-  const theme = useTheme();
-  const smallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   let minGPA = searchParams.get('minGPA') ?? '';
   if (Array.isArray(minGPA)) {
@@ -111,10 +116,6 @@ export default function Filters({
     );
   });
 
-  const filterChipType: FilterBarChipProps['type'] = smallScreen
-    ? 'delete'
-    : 'popover';
-
   const [openModal, setOpenModal] = React.useState(false);
 
   const handleOpenModal = () => {
@@ -150,119 +151,127 @@ export default function Filters({
       filterNextSem === Boolean(defaults.availability),
   };
 
-  const dirtyFieldsCount = Object.values(defaultChecks).filter(
+  const changedFiltersCount = Object.values(defaultChecks).filter(
     (check) => !check,
   ).length;
 
-  return (
-    <Grid container spacing={1} data-tutorial-id="filters">
-      {!smallScreen && (
-        <span className="h-8 mx-2 flex items-center text-sm text-neutral-600 dark:text-neutral-400 select-none text-nowrap">
+  function FilterBarFactory(filterChipType: FilterBarChipProps['type']) {
+    return (
+      <Grid container spacing={1} data-tutorial-id="filters">
+        <span className="h-8 mx-2 flex items-center text-sm text-neutral-600 dark:text-neutral-400 select-none text-nowrap max-md:hidden">
           Filters:
         </span>
-      )}
-      {smallScreen && (
         <Chip
           label="Filters"
           icon={<TuneIcon fontSize="small" />}
           variant="outlined"
           onClick={handleOpenModal}
-          className="border-[var(--mui-palette-divider)]"
+          className="border-[var(--mui-palette-divider)] md:hidden"
         />
-      )}
-      {smallScreen && dirtyFieldsCount <= 0 && (
-        <span className="relative">
-          <span className="absolute h-full ml-2 flex items-center text-sm text-neutral-600 dark:text-neutral-400 italic select-none text-nowrap">
-            No filters selected
+        {changedFiltersCount <= 0 && (
+          <span className="relative md:hidden">
+            <span className="absolute h-full ml-2 flex items-center text-sm text-neutral-600 dark:text-neutral-400 italic select-none text-nowrap">
+              No filters selected
+            </span>
           </span>
-        </span>
-      )}
-      <AnimatePresence>
-        {[
-          <MinLetterGradeFilterChip
-            type={filterChipType}
-            dirty={!defaultChecks.minGPA}
-            disableAutoDirty
-            key="minLetterGrade"
-            chosenSectionTypes={chosenSectionTypes}
-            chosenSemesters={chosenSemesters}
-            minGPA={minGPA}
-            minRating={minRating}
-            sectionTypes={sectionTypes}
-            semFilteredResults={semFilteredResults}
-            semesters={semesters}
-          />,
-          <MinRatingFilterChip
-            type={filterChipType}
-            dirty={!defaultChecks.minRating}
-            disableAutoDirty
-            key="minRating"
-            chosenSectionTypes={chosenSectionTypes}
-            chosenSemesters={chosenSemesters}
-            minGPA={minGPA}
-            minRating={minRating}
-            semFilteredResults={semFilteredResults}
-          />,
-          <SemesterFilterChip
-            type={filterChipType}
-            dirty={!defaultChecks.chosenSemesters}
-            disableAutoDirty
-            key="semester"
-            semesters={semesters}
-            chosenSemesters={chosenSemesters}
-            setChosenSemesters={setChosenSemesters}
-          />,
-          <SectionTypeFilterChip
-            type={filterChipType}
-            dirty={!defaultChecks.chosenSectionTypes}
-            disableAutoDirty
-            key="sectionType"
-            sectionTypes={sectionTypes}
-            chosenSectionTypes={chosenSectionTypes}
-            setChosenSectionTypes={setChosenSectionTypes}
-          />,
-          <AvailabilityFilterChip
-            type={filterChipType}
-            dirty={!defaultChecks.availability}
-            disableAutoDirty
-            key="availability"
-            enabled={filterNextSem}
-            semester={effectiveTeachingSemester}
-            availableSemesters={availableSemesters}
-          />,
-        ].map((chip) => (
-          <motion.div
-            key={chip.key}
-            layout
-            initial={{ opacity: 0, x: 16 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, scale: 0.5 }}
-            transition={{ duration: 0.1 }}
-            className="empty:hidden" // If chip is empty (i.e. filter not enabled), then hide
-          >
-            {chip}
-          </motion.div>
-        ))}
-        {!smallScreen && dirtyFieldsCount > 1 && (
-          <motion.div
-            layout
-            initial={{ opacity: 0, x: 16 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -16 }}
-            transition={{ duration: 0.1 }}
-            className="flex items-center"
-          >
-            <Button
-              size="small"
-              color="inherit"
-              className="rounded-full normal-case whitespace-nowrap min-h-8 text-neutral-600 dark:text-neutral-400"
-              onClick={handleClearAllFilters}
-            >
-              Reset {dirtyFieldsCount} filters
-            </Button>
-          </motion.div>
         )}
-      </AnimatePresence>
+        <AnimatePresence>
+          {[
+            <MinLetterGradeFilterChip
+              type={filterChipType}
+              dirty={!defaultChecks.minGPA}
+              disableAutoDirty
+              key="minLetterGrade"
+              chosenSectionTypes={chosenSectionTypes}
+              chosenSemesters={chosenSemesters}
+              minGPA={minGPA}
+              minRating={minRating}
+              sectionTypes={sectionTypes}
+              semFilteredResults={semFilteredResults}
+              semesters={semesters}
+            />,
+            <MinRatingFilterChip
+              type={filterChipType}
+              dirty={!defaultChecks.minRating}
+              disableAutoDirty
+              key="minRating"
+              chosenSectionTypes={chosenSectionTypes}
+              chosenSemesters={chosenSemesters}
+              minGPA={minGPA}
+              minRating={minRating}
+              semFilteredResults={semFilteredResults}
+            />,
+            <SemesterFilterChip
+              type={filterChipType}
+              dirty={!defaultChecks.chosenSemesters}
+              disableAutoDirty
+              key="semester"
+              semesters={semesters}
+              chosenSemesters={chosenSemesters}
+              setChosenSemesters={setChosenSemesters}
+            />,
+            <SectionTypeFilterChip
+              type={filterChipType}
+              dirty={!defaultChecks.chosenSectionTypes}
+              disableAutoDirty
+              key="sectionType"
+              sectionTypes={sectionTypes}
+              chosenSectionTypes={chosenSectionTypes}
+              setChosenSectionTypes={setChosenSectionTypes}
+            />,
+            <AvailabilityFilterChip
+              type={filterChipType}
+              dirty={filterNextSem} // Exception: Show dirty if specific semester is selected
+              disableAutoDirty
+              key="availability"
+              enabled={filterNextSem}
+              semester={effectiveTeachingSemester}
+              availableSemesters={availableSemesters}
+            />,
+          ].map((chip) => (
+            <motion.div
+              key={chip.key}
+              layout
+              initial={mounted ? { opacity: 0, x: 16 } : false} // Ensures filter bar loads instantly when page loads, so Framer Motion doesn't wait for page to finish loading
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, scale: 0.5 }}
+              transition={{ duration: 0.1 }}
+              className="empty:hidden" // If chip is empty (i.e. filter not enabled), then hide
+            >
+              {chip}
+            </motion.div>
+          ))}
+          {changedFiltersCount >= 1 && (
+            <motion.div
+              layout
+              initial={mounted ? { opacity: 0, x: 16 } : false} // Ensures filter bar loads instantly when page loads, so Framer Motion doesn't wait for page to finish loading
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -16 }}
+              transition={{ duration: 0.1 }}
+              className="flex items-center max-md:hidden"
+            >
+              <Button
+                size="small"
+                color="inherit"
+                className="rounded-full normal-case whitespace-nowrap min-h-8 text-neutral-600 dark:text-neutral-400"
+                onClick={handleClearAllFilters}
+              >
+                Reset {changedFiltersCount} filter
+                {changedFiltersCount === 1 ? '' : 's'}
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </Grid>
+    );
+  }
+
+  return (
+    <>
+      {/* Desktop */}
+      <div className="max-md:hidden">{FilterBarFactory('popover')}</div>
+      {/* Mobile */}
+      <div className="md:hidden">{FilterBarFactory('delete')}</div>
       <SwipeableDrawer
         open={openModal}
         onOpen={handleOpenModal}
@@ -283,11 +292,11 @@ export default function Filters({
           <Button
             onClick={handleClearAllFilters}
             color="warning"
-            className={`rounded-full normal-case ${dirtyFieldsCount <= 0 ? 'invisible' : ''}`}
-            disabled={dirtyFieldsCount <= 0}
+            className={`rounded-full normal-case ${changedFiltersCount <= 0 ? 'invisible' : ''}`}
+            disabled={changedFiltersCount <= 0}
           >
-            {dirtyFieldsCount
-              ? `Reset ${dirtyFieldsCount} filter${dirtyFieldsCount === 1 ? '' : 's'}`
+            {changedFiltersCount
+              ? `Reset ${changedFiltersCount} filter${changedFiltersCount === 1 ? '' : 's'}`
               : 'Reset all'}
           </Button>
           <Button
@@ -299,6 +308,6 @@ export default function Filters({
           </Button>
         </div>
       </SwipeableDrawer>
-    </Grid>
+    </>
   );
 }

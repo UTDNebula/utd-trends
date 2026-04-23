@@ -103,7 +103,7 @@ export default function Home() {
             semester={effectiveTeachingSemester}
             availableSemesters={availableSemesters}
             disableSearchParams
-            disableDirty
+            disableAutoDirty
             onChange={(enabled, semester) => {
               setFilterByTeachingSemester(enabled);
               setTeachingSemester(semester);

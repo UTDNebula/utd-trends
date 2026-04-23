@@ -202,7 +202,7 @@ export default function FilterChip(props: FilterChipProps) {
 
   return (
     <>
-      <span ref={chipRef}>
+      <div ref={chipRef} className="w-fit">
         <Chip
           variant="filled"
           label={
@@ -250,7 +250,7 @@ export default function FilterChip(props: FilterChipProps) {
           aria-expanded={action === 'popover' ? openPopover : undefined}
           {...rest}
         />
-      </span>
+      </div>
       <Popover
         open={openPopover}
         onClose={handleClosePopover}
