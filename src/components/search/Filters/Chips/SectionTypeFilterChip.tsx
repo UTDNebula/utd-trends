@@ -8,8 +8,9 @@ import {
 } from '@mui/material';
 import React, { type Dispatch, type SetStateAction } from 'react';
 import FilterChip from '../FilterChip';
+import { type FilterBarChipProps } from '../types';
 
-type SectionTypeFilterChipProps = {
+type SectionTypeFilterChipProps = FilterBarChipProps & {
   sectionTypes: string[];
   chosenSectionTypes: string[];
   setChosenSectionTypes: Dispatch<SetStateAction<string[]>>;
@@ -37,13 +38,26 @@ function displaySectionTypeName(id: string): string {
 }
 
 export default function SectionTypeFilterChip({
+  type,
   sectionTypes,
   chosenSectionTypes,
   setChosenSectionTypes,
 }: SectionTypeFilterChipProps) {
+  const defaultSectionTypes = sectionTypes;
+  const isDefault = chosenSectionTypes.length === sectionTypes.length;
+  if (type === 'delete' && isDefault) return;
+
   return (
-    <Tooltip title="Section types to include grades from" placement="top">
+    <Tooltip
+      title="Section types to include grades from"
+      placement="top"
+      disableInteractive
+    >
       <FilterChip
+        action={type}
+        onDelete={() => {
+          setChosenSectionTypes(defaultSectionTypes);
+        }}
         label="Section Types"
         renderValue={
           chosenSectionTypes.length > 0
@@ -52,7 +66,7 @@ export default function SectionTypeFilterChip({
               : chosenSectionTypes.sort().join(', ')
             : 'None'
         }
-        dirty={chosenSectionTypes.length !== sectionTypes.length}
+        dirty={!isDefault}
       >
         <MenuList className="*:pr-6">
           {/* select all section types */}
@@ -63,7 +77,7 @@ export default function SectionTypeFilterChip({
               if (chosenSectionTypes.length === sectionTypes.length) {
                 setChosenSectionTypes([]);
               } else {
-                setChosenSectionTypes(sectionTypes);
+                setChosenSectionTypes(defaultSectionTypes);
               }
             }}
           >

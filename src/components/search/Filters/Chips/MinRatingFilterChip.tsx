@@ -4,8 +4,9 @@ import { setParams } from '@/modules/searchParams';
 import type { SearchResult } from '@/types/SearchQuery';
 import { MenuItem, MenuList, Tooltip } from '@mui/material';
 import FilterChip from '../FilterChip';
+import { type FilterBarChipProps } from '../types';
 
-type MinRatingFilterChipProps = {
+type MinRatingFilterChipProps = FilterBarChipProps & {
   chosenSectionTypes: string[];
   chosenSemesters: string[];
   minGPA: string;
@@ -16,12 +17,16 @@ type MinRatingFilterChipProps = {
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
 
 export default function MinRatingFilterChip({
+  type,
   chosenSectionTypes,
   chosenSemesters,
   minGPA,
   minRating,
   semFilteredResults,
 }: MinRatingFilterChipProps) {
+  const isDefault = !Boolean(minRating);
+  if (type === 'delete' && isDefault) return;
+
   const rmpCounts: Record<string, number> = {};
 
   minRatings.forEach((ratingString) => {
@@ -47,8 +52,18 @@ export default function MinRatingFilterChip({
   });
 
   return (
-    <Tooltip title="Minimum professor rating" placement="top">
+    <Tooltip
+      title="Minimum professor rating"
+      placement="top"
+      disableInteractive
+    >
       <FilterChip
+        action={type}
+        onDelete={() => {
+          setParams((params) => {
+            params.delete('minRating');
+          });
+        }}
         label="Min Rating"
         renderValue={
           minRating ? (
@@ -61,7 +76,7 @@ export default function MinRatingFilterChip({
             />
           ) : undefined
         }
-        dirty={Boolean(minRating)}
+        dirty={!isDefault}
       >
         {(ctx) => (
           <MenuList autoFocusItem={ctx.open}>

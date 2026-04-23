@@ -4,7 +4,8 @@ import { FiltersContext } from '@/app/dashboard/FilterContext';
 import { useSharedState } from '@/app/SharedStateProvider';
 import { useAvailabilityUrlSync } from '@/modules/useAvailabilityUrlSync';
 import type { SearchResult } from '@/types/SearchQuery';
-import { Grid, Skeleton } from '@mui/material';
+import { Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
+import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname, useSearchParams } from 'next/navigation';
 import React, { use } from 'react';
 import AvailabilityFilterChip from './Chips/AvailabilityFilterChip';
@@ -12,6 +13,7 @@ import MinLetterGradeFilterChip from './Chips/MinLetterGradeFilterChip';
 import MinRatingFilterChip from './Chips/MinRatingFilterChip';
 import SectionTypeFilterChip from './Chips/SectionTypeFilterChip';
 import SemesterFilterChip from './Chips/SemesterFilterChip';
+import type { FilterBarChipProps } from './types';
 
 export function LoadingFilters() {
   const ChipSkeleton = (
@@ -55,6 +57,9 @@ export default function Filters({
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
+  const theme = useTheme();
+  const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   let minGPA = searchParams.get('minGPA') ?? '';
   if (Array.isArray(minGPA)) {
     minGPA = minGPA[0]; // if minGPA is an array, make it a string
@@ -93,48 +98,74 @@ export default function Filters({
     );
   });
 
+  const filterChipType: FilterBarChipProps['type'] = smallScreen
+    ? 'delete'
+    : 'popover';
+
   return (
     <Grid
       container
-      spacing={{ xs: 1, md: 2 }}
+      spacing={1}
       data-tutorial-id="filters"
       className="mb-4 sm:m-0"
     >
-      <MinLetterGradeFilterChip
-        chosenSectionTypes={chosenSectionTypes}
-        chosenSemesters={chosenSemesters}
-        minGPA={minGPA}
-        minRating={minRating}
-        sectionTypes={sectionTypes}
-        semFilteredResults={semFilteredResults}
-        semesters={semesters}
-      />
-
-      <MinRatingFilterChip
-        chosenSectionTypes={chosenSectionTypes}
-        chosenSemesters={chosenSemesters}
-        minGPA={minGPA}
-        minRating={minRating}
-        semFilteredResults={semFilteredResults}
-      />
-
-      <SemesterFilterChip
-        semesters={semesters}
-        chosenSemesters={chosenSemesters}
-        setChosenSemesters={setChosenSemesters}
-      />
-
-      <SectionTypeFilterChip
-        sectionTypes={sectionTypes}
-        chosenSectionTypes={chosenSectionTypes}
-        setChosenSectionTypes={setChosenSectionTypes}
-      />
-
-      <AvailabilityFilterChip
-        enabled={filterNextSem}
-        semester={effectiveTeachingSemester}
-        availableSemesters={availableSemesters}
-      />
+      <AnimatePresence>
+        {[
+          <MinLetterGradeFilterChip
+            type={filterChipType}
+            key="minLetterGrade"
+            chosenSectionTypes={chosenSectionTypes}
+            chosenSemesters={chosenSemesters}
+            minGPA={minGPA}
+            minRating={minRating}
+            sectionTypes={sectionTypes}
+            semFilteredResults={semFilteredResults}
+            semesters={semesters}
+          />,
+          <MinRatingFilterChip
+            type={filterChipType}
+            key="minRating"
+            chosenSectionTypes={chosenSectionTypes}
+            chosenSemesters={chosenSemesters}
+            minGPA={minGPA}
+            minRating={minRating}
+            semFilteredResults={semFilteredResults}
+          />,
+          <SemesterFilterChip
+            type={filterChipType}
+            key="semester"
+            semesters={semesters}
+            chosenSemesters={chosenSemesters}
+            setChosenSemesters={setChosenSemesters}
+          />,
+          <SectionTypeFilterChip
+            type={filterChipType}
+            key="sectionType"
+            sectionTypes={sectionTypes}
+            chosenSectionTypes={chosenSectionTypes}
+            setChosenSectionTypes={setChosenSectionTypes}
+          />,
+          <AvailabilityFilterChip
+            type={filterChipType}
+            key="availability"
+            enabled={filterNextSem}
+            semester={effectiveTeachingSemester}
+            availableSemesters={availableSemesters}
+          />,
+        ].map((chip) => (
+          <motion.div
+            key={chip.key}
+            layout
+            initial={{ opacity: 0, x: 16 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            transition={{ duration: 0.1 }}
+            className="empty:hidden" // If chip is empty (i.e. filter not enabled), then hide
+          >
+            {chip}
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </Grid>
   );
 }

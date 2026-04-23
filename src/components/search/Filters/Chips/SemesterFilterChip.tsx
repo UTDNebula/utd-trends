@@ -9,18 +9,24 @@ import {
 } from '@mui/material';
 import { type Dispatch, type SetStateAction } from 'react';
 import FilterChip from '../FilterChip';
+import { type FilterBarChipProps } from '../types';
 
-type SemesterFilterChipProps = {
+type SemesterFilterChipProps = FilterBarChipProps & {
   semesters: string[];
   chosenSemesters: string[];
   setChosenSemesters: Dispatch<SetStateAction<string[]>>;
 };
 
 export default function SemesterFilterChip({
+  type,
   semesters,
   chosenSemesters,
   setChosenSemesters,
 }: SemesterFilterChipProps) {
+  const defaultSemesters = semesters;
+  const isDefault = chosenSemesters.length === semesters.length;
+  if (type === 'delete' && isDefault) return;
+
   const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
   const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
 
@@ -57,6 +63,10 @@ export default function SemesterFilterChip({
   return (
     <Tooltip title="Semesters to include grades from" placement="top">
       <FilterChip
+        action={type}
+        onDelete={() => {
+          setChosenSemesters(defaultSemesters);
+        }}
         label="Semesters"
         renderValue={
           chosenSemesters.length > 0
@@ -65,7 +75,7 @@ export default function SemesterFilterChip({
               : chosenSemesters.sort(compareSemesters).join(', ')
             : 'None'
         }
-        dirty={chosenSemesters.length !== semesters.length}
+        dirty={!isDefault}
       >
         <MenuList className="*:pr-6">
           <MenuItem
@@ -75,7 +85,7 @@ export default function SemesterFilterChip({
               if (chosenSemesters.length === semesters.length) {
                 setChosenSemesters([]);
               } else {
-                setChosenSemesters(semesters);
+                setChosenSemesters(defaultSemesters);
               }
             }}
           >

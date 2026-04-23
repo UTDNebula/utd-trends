@@ -3,8 +3,9 @@ import { displaySemesterName } from '@/modules/semesters';
 import { MenuItem, MenuList, Tooltip } from '@mui/material';
 import React from 'react';
 import FilterChip from '../FilterChip';
+import { type FilterBarChipProps } from '../types';
 
-type AvailabilityFilterChipProps = {
+type AvailabilityFilterChipProps = FilterBarChipProps & {
   enabled: boolean;
   semester: string;
   availableSemesters: string[];
@@ -19,6 +20,7 @@ type AvailabilityFilterChipProps = {
 };
 
 export default function AvailabilityFilterChip({
+  type,
   enabled,
   semester,
   availableSemesters,
@@ -27,17 +29,26 @@ export default function AvailabilityFilterChip({
   onChange,
   className,
 }: AvailabilityFilterChipProps) {
+  const defaultSemester = availableSemesters[0];
+  const isDefault = enabled && semester === defaultSemester;
+  if (type === 'delete' && isDefault) return;
+
   return (
     <Tooltip
       title="Filter results to courses taught in this semester"
       placement="top"
+      disableInteractive
     >
       <FilterChip
+        action={type}
+        onDelete={() => {
+          setParams((params) => {
+            params.set('availability', defaultSemester);
+          });
+        }}
         label="Teaching in"
         renderValue={enabled ? displaySemesterName(semester, false) : 'Any'}
-        dirty={
-          !disableDirty && (!enabled || semester !== availableSemesters[0])
-        }
+        dirty={!disableDirty && !isDefault}
         className={className}
       >
         {(ctx) => (
@@ -57,7 +68,7 @@ export default function AvailabilityFilterChip({
                 ctx.closePopover();
               }}
             >
-              <em className="italic">Any</em>
+              <em className="italic">Any semester</em>
             </MenuItem>
             {availableSemesters.map((sem) => (
               <MenuItem

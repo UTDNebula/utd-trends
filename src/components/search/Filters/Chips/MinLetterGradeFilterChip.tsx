@@ -4,8 +4,9 @@ import { setParams } from '@/modules/searchParams';
 import type { SearchResult } from '@/types/SearchQuery';
 import { MenuItem, MenuList, Tooltip } from '@mui/material';
 import FilterChip from '../FilterChip';
+import { type FilterBarChipProps } from '../types';
 
-type MinLetterGradeFilterChipProps = {
+type MinLetterGradeFilterChipProps = FilterBarChipProps & {
   chosenSectionTypes: string[];
   chosenSemesters: string[];
   minGPA: string;
@@ -18,6 +19,7 @@ type MinLetterGradeFilterChipProps = {
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 
 export default function MinLetterGradeFilterChip({
+  type,
   semesters,
   sectionTypes,
   chosenSectionTypes,
@@ -26,6 +28,9 @@ export default function MinLetterGradeFilterChip({
   minRating,
   semFilteredResults,
 }: MinLetterGradeFilterChipProps) {
+  const isDefault = !Boolean(minGPA);
+  if (type === 'delete' && isDefault) return;
+
   const gradeCounts: Record<string, number> = {};
 
   minGPAs.forEach((gpaString) => {
@@ -52,11 +57,21 @@ export default function MinLetterGradeFilterChip({
   });
 
   return (
-    <Tooltip title="Minimum letter grade average" placement="top">
+    <Tooltip
+      title="Minimum letter grade average"
+      placement="top"
+      disableInteractive
+    >
       <FilterChip
+        action={type}
+        onDelete={() => {
+          setParams((params) => {
+            params.delete('minGPA');
+          });
+        }}
         label="Min Letter Grade"
         renderValue={minGPA ? gpaToLetterGrade(Number(minGPA)) : undefined}
-        dirty={Boolean(minGPA)}
+        dirty={!isDefault}
       >
         {(ctx) => (
           <MenuList autoFocusItem={ctx.open}>
