@@ -88,5 +88,7 @@
 
   #sentry-feedback {
     --page-margin: calc(var(--mobile-nav-height) + 16px) 10px;
+    /* Underneath MUI's FABs. See https://mui.com/material-ui/customization/z-index/ */
+    --z-index: 1040;
   }
 }

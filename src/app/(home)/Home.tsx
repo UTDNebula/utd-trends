@@ -2,9 +2,9 @@
 
 import Background from '@/../public/background.png';
 import { useSharedState } from '@/app/SharedStateProvider';
-import TeachingSemesterSelector from '@/components/common/TeachingSemesterSelector/TeachingSemesterSelector';
 import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
 import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
+import AvailabilityFilterChip from '@/components/search/Filters/Chips/AvailabilityFilterChip';
 import SearchBar, {
   updateRecentSearches,
 } from '@/components/search/SearchBar/SearchBar';
@@ -98,14 +98,19 @@ export default function Home() {
         />
         {/* Teaching in semester selector */}
         {availableSemesters.length > 0 && (
-          <TeachingSemesterSelector
-            enabled={filterByTeachingSemester}
-            onEnabledChangeAction={setFilterByTeachingSemester}
-            semester={effectiveTeachingSemester}
-            onSemesterChangeAction={setTeachingSemester}
-            availableSemesters={availableSemesters}
-            formControlClassName="mt-4"
-            selectClassName="min-w-[160px] bg-white dark:bg-haiti"
+          <AvailabilityFilterChip
+            data={{
+              availableSemesters,
+              enabled: filterByTeachingSemester,
+              semester: effectiveTeachingSemester,
+            }}
+            disableSearchParams
+            disableAutoDirty
+            onChange={(enabled, semester) => {
+              setFilterByTeachingSemester(enabled);
+              setTeachingSemester(semester);
+            }}
+            className="mt-4"
           />
         )}
       </div>
