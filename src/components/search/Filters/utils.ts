@@ -32,11 +32,12 @@ export function clearAllFilters(
   mutators.setChosenSectionTypes(defaults.chosenSectionTypes);
 }
 
-export type FilterBarChipProps = {
+export type FilterBarChipProps<Data extends Record<string, unknown>> = {
   type?: 'delete' | 'popover';
   dirty?: boolean;
   /**
    * By default, the filter bar chips will automatically determine if they're dirty or not. This prop disables that.
    */
   disableAutoDirty?: boolean;
+  data: Data;
 };

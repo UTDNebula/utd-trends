@@ -99,9 +99,11 @@ export default function Home() {
         {/* Teaching in semester selector */}
         {availableSemesters.length > 0 && (
           <AvailabilityFilterChip
-            enabled={filterByTeachingSemester}
-            semester={effectiveTeachingSemester}
-            availableSemesters={availableSemesters}
+            data={{
+              availableSemesters,
+              enabled: filterByTeachingSemester,
+              semester: effectiveTeachingSemester,
+            }}
             disableSearchParams
             disableAutoDirty
             onChange={(enabled, semester) => {

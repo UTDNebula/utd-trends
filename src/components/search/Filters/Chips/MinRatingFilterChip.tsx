@@ -6,13 +6,13 @@ import { MenuItem, MenuList, Tooltip } from '@mui/material';
 import FilterChip from '../FilterChip';
 import { type FilterBarChipProps } from '../utils';
 
-type MinRatingFilterChipProps = FilterBarChipProps & {
+type MinRatingFilterChipProps = FilterBarChipProps<{
   chosenSectionTypes: string[];
   chosenSemesters: string[];
   minGPA: string;
   minRating: string;
   semFilteredResults: SearchResult[];
-};
+}>;
 
 const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
 
@@ -20,11 +20,13 @@ export default function MinRatingFilterChip({
   type,
   dirty,
   disableAutoDirty,
-  chosenSectionTypes,
-  chosenSemesters,
-  minGPA,
-  minRating,
-  semFilteredResults,
+  data: {
+    chosenSectionTypes,
+    chosenSemesters,
+    minGPA,
+    minRating,
+    semFilteredResults,
+  },
 }: MinRatingFilterChipProps) {
   const isDefault = !Boolean(minRating);
   if (type === 'delete' && isDefault) return;

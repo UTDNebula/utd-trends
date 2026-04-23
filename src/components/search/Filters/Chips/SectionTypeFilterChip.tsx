@@ -10,11 +10,11 @@ import React, { type Dispatch, type SetStateAction } from 'react';
 import FilterChip from '../FilterChip';
 import { type FilterBarChipProps } from '../utils';
 
-type SectionTypeFilterChipProps = FilterBarChipProps & {
+type SectionTypeFilterChipProps = FilterBarChipProps<{
   sectionTypes: string[];
   chosenSectionTypes: string[];
   setChosenSectionTypes: Dispatch<SetStateAction<string[]>>;
-};
+}>;
 
 function displaySectionTypeName(id: string): string {
   const SectionTypesMap: Record<string, string> = {
@@ -41,9 +41,7 @@ export default function SectionTypeFilterChip({
   type,
   dirty,
   disableAutoDirty,
-  sectionTypes,
-  chosenSectionTypes,
-  setChosenSectionTypes,
+  data: { sectionTypes, chosenSectionTypes, setChosenSectionTypes },
 }: SectionTypeFilterChipProps) {
   const defaultSectionTypes = sectionTypes;
   const isDefault = chosenSectionTypes.length === sectionTypes.length;

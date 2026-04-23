@@ -5,10 +5,11 @@ import React from 'react';
 import FilterChip from '../FilterChip';
 import { type FilterBarChipProps } from '../utils';
 
-type AvailabilityFilterChipProps = FilterBarChipProps & {
+type AvailabilityFilterChipProps = FilterBarChipProps<{
   enabled: boolean;
   semester: string;
   availableSemesters: string[];
+}> & {
   /**
    * Prevents component from storing new value in URL search params.
    * @default false
@@ -22,9 +23,7 @@ export default function AvailabilityFilterChip({
   type,
   dirty,
   disableAutoDirty,
-  enabled,
-  semester,
-  availableSemesters,
+  data: { enabled, semester, availableSemesters },
   disableSearchParams = false,
   onChange,
   className,

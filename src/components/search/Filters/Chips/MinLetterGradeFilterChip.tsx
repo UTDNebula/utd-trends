@@ -6,7 +6,7 @@ import { MenuItem, MenuList, Tooltip } from '@mui/material';
 import FilterChip from '../FilterChip';
 import { type FilterBarChipProps } from '../utils';
 
-type MinLetterGradeFilterChipProps = FilterBarChipProps & {
+type MinLetterGradeFilterChipProps = FilterBarChipProps<{
   chosenSectionTypes: string[];
   chosenSemesters: string[];
   minGPA: string;
@@ -14,7 +14,7 @@ type MinLetterGradeFilterChipProps = FilterBarChipProps & {
   semesters: string[];
   semFilteredResults: SearchResult[];
   sectionTypes: string[];
-};
+}>;
 
 const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 
@@ -22,13 +22,15 @@ export default function MinLetterGradeFilterChip({
   type,
   dirty,
   disableAutoDirty,
-  semesters,
-  sectionTypes,
-  chosenSectionTypes,
-  chosenSemesters,
-  minGPA,
-  minRating,
-  semFilteredResults,
+  data: {
+    semesters,
+    sectionTypes,
+    chosenSectionTypes,
+    chosenSemesters,
+    minGPA,
+    minRating,
+    semFilteredResults,
+  },
 }: MinLetterGradeFilterChipProps) {
   const isDefault = !Boolean(minGPA);
   if (type === 'delete' && isDefault) return;

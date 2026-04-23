@@ -11,19 +11,17 @@ import { type Dispatch, type SetStateAction } from 'react';
 import FilterChip from '../FilterChip';
 import { type FilterBarChipProps } from '../utils';
 
-type SemesterFilterChipProps = FilterBarChipProps & {
+type SemesterFilterChipProps = FilterBarChipProps<{
   semesters: string[];
   chosenSemesters: string[];
   setChosenSemesters: Dispatch<SetStateAction<string[]>>;
-};
+}>;
 
 export default function SemesterFilterChip({
   type,
   dirty,
   disableAutoDirty,
-  semesters,
-  chosenSemesters,
-  setChosenSemesters,
+  data: { semesters, chosenSemesters, setChosenSemesters },
 }: SemesterFilterChipProps) {
   const defaultSemesters = semesters;
   const isDefault = chosenSemesters.length === semesters.length;

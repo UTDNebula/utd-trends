@@ -14,11 +14,7 @@ import MinLetterGradeFilterChip from './Chips/MinLetterGradeFilterChip';
 import MinRatingFilterChip from './Chips/MinRatingFilterChip';
 import SectionTypeFilterChip from './Chips/SectionTypeFilterChip';
 import SemesterFilterChip from './Chips/SemesterFilterChip';
-import {
-  clearAllFilters,
-  type FilterBarChipProps,
-  type FilterDefaultsType,
-} from './utils';
+import { clearAllFilters, type FilterDefaultsType } from './utils';
 
 export function LoadingFilters() {
   const ChipSkeleton = (
@@ -155,7 +151,7 @@ export default function Filters({
     (check) => !check,
   ).length;
 
-  function FilterBarFactory(filterChipType: FilterBarChipProps['type']) {
+  function FilterBarFactory(filterChipType: 'delete' | 'popover') {
     return (
       <Grid container spacing={1} data-tutorial-id="filters">
         <span className="h-8 mx-2 flex items-center text-sm text-neutral-600 dark:text-neutral-400 select-none text-nowrap max-md:hidden">
@@ -182,51 +178,53 @@ export default function Filters({
               dirty={!defaultChecks.minGPA}
               disableAutoDirty
               key="minLetterGrade"
-              chosenSectionTypes={chosenSectionTypes}
-              chosenSemesters={chosenSemesters}
-              minGPA={minGPA}
-              minRating={minRating}
-              sectionTypes={sectionTypes}
-              semFilteredResults={semFilteredResults}
-              semesters={semesters}
+              data={{
+                chosenSectionTypes,
+                chosenSemesters,
+                minGPA,
+                minRating,
+                sectionTypes,
+                semesters,
+                semFilteredResults,
+              }}
             />,
             <MinRatingFilterChip
               type={filterChipType}
               dirty={!defaultChecks.minRating}
               disableAutoDirty
               key="minRating"
-              chosenSectionTypes={chosenSectionTypes}
-              chosenSemesters={chosenSemesters}
-              minGPA={minGPA}
-              minRating={minRating}
-              semFilteredResults={semFilteredResults}
+              data={{
+                chosenSectionTypes,
+                chosenSemesters,
+                minGPA,
+                minRating,
+                semFilteredResults,
+              }}
             />,
             <SemesterFilterChip
               type={filterChipType}
               dirty={!defaultChecks.chosenSemesters}
               disableAutoDirty
               key="semester"
-              semesters={semesters}
-              chosenSemesters={chosenSemesters}
-              setChosenSemesters={setChosenSemesters}
+              data={{ chosenSemesters, semesters, setChosenSemesters }}
             />,
             <SectionTypeFilterChip
               type={filterChipType}
               dirty={!defaultChecks.chosenSectionTypes}
               disableAutoDirty
               key="sectionType"
-              sectionTypes={sectionTypes}
-              chosenSectionTypes={chosenSectionTypes}
-              setChosenSectionTypes={setChosenSectionTypes}
+              data={{ chosenSectionTypes, sectionTypes, setChosenSectionTypes }}
             />,
             <AvailabilityFilterChip
               type={filterChipType}
               dirty={filterNextSem} // Exception: Show dirty if specific semester is selected
               disableAutoDirty
               key="availability"
-              enabled={filterNextSem}
-              semester={effectiveTeachingSemester}
-              availableSemesters={availableSemesters}
+              data={{
+                availableSemesters,
+                enabled: filterNextSem,
+                semester: effectiveTeachingSemester,
+              }}
             />,
           ].map((chip) => (
             <motion.div
