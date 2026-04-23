@@ -4,7 +4,7 @@ import { setParams } from '@/modules/searchParams';
 import type { SearchResult } from '@/types/SearchQuery';
 import { MenuItem, MenuList, Tooltip } from '@mui/material';
 import FilterChip from '../FilterChip';
-import { type FilterBarChipProps } from '../types';
+import { type FilterBarChipProps } from '../utils';
 
 type MinRatingFilterChipProps = FilterBarChipProps & {
   chosenSectionTypes: string[];
@@ -18,6 +18,8 @@ const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
 
 export default function MinRatingFilterChip({
   type,
+  dirty,
+  disableAutoDirty,
   chosenSectionTypes,
   chosenSemesters,
   minGPA,
@@ -76,7 +78,7 @@ export default function MinRatingFilterChip({
             />
           ) : undefined
         }
-        dirty={!isDefault}
+        dirty={dirty ?? (!disableAutoDirty && !isDefault)}
       >
         {(ctx) => (
           <MenuList autoFocusItem={ctx.open}>

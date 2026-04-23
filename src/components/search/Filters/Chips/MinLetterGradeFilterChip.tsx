@@ -4,7 +4,7 @@ import { setParams } from '@/modules/searchParams';
 import type { SearchResult } from '@/types/SearchQuery';
 import { MenuItem, MenuList, Tooltip } from '@mui/material';
 import FilterChip from '../FilterChip';
-import { type FilterBarChipProps } from '../types';
+import { type FilterBarChipProps } from '../utils';
 
 type MinLetterGradeFilterChipProps = FilterBarChipProps & {
   chosenSectionTypes: string[];
@@ -20,6 +20,8 @@ const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
 
 export default function MinLetterGradeFilterChip({
   type,
+  dirty,
+  disableAutoDirty,
   semesters,
   sectionTypes,
   chosenSectionTypes,
@@ -71,7 +73,7 @@ export default function MinLetterGradeFilterChip({
         }}
         label="Min Letter Grade"
         renderValue={minGPA ? gpaToLetterGrade(Number(minGPA)) : undefined}
-        dirty={!isDefault}
+        dirty={dirty ?? (!disableAutoDirty && !isDefault)}
       >
         {(ctx) => (
           <MenuList autoFocusItem={ctx.open}>

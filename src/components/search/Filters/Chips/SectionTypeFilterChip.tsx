@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import React, { type Dispatch, type SetStateAction } from 'react';
 import FilterChip from '../FilterChip';
-import { type FilterBarChipProps } from '../types';
+import { type FilterBarChipProps } from '../utils';
 
 type SectionTypeFilterChipProps = FilterBarChipProps & {
   sectionTypes: string[];
@@ -39,6 +39,8 @@ function displaySectionTypeName(id: string): string {
 
 export default function SectionTypeFilterChip({
   type,
+  dirty,
+  disableAutoDirty,
   sectionTypes,
   chosenSectionTypes,
   setChosenSectionTypes,
@@ -66,7 +68,7 @@ export default function SectionTypeFilterChip({
               : chosenSectionTypes.sort().join(', ')
             : 'None'
         }
-        dirty={!isDefault}
+        dirty={dirty ?? (!disableAutoDirty && !isDefault)}
       >
         <MenuList className="*:pr-6">
           {/* select all section types */}

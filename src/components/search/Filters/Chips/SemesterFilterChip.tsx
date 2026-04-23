@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { type Dispatch, type SetStateAction } from 'react';
 import FilterChip from '../FilterChip';
-import { type FilterBarChipProps } from '../types';
+import { type FilterBarChipProps } from '../utils';
 
 type SemesterFilterChipProps = FilterBarChipProps & {
   semesters: string[];
@@ -19,6 +19,8 @@ type SemesterFilterChipProps = FilterBarChipProps & {
 
 export default function SemesterFilterChip({
   type,
+  dirty,
+  disableAutoDirty,
   semesters,
   chosenSemesters,
   setChosenSemesters,
@@ -75,7 +77,7 @@ export default function SemesterFilterChip({
               : chosenSemesters.sort(compareSemesters).join(', ')
             : 'None'
         }
-        dirty={!isDefault}
+        dirty={dirty ?? (!disableAutoDirty && !isDefault)}
       >
         <MenuList className="*:pr-6">
           <MenuItem

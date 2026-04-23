@@ -3,7 +3,7 @@ import { displaySemesterName } from '@/modules/semesters';
 import { MenuItem, MenuList, Tooltip } from '@mui/material';
 import React from 'react';
 import FilterChip from '../FilterChip';
-import { type FilterBarChipProps } from '../types';
+import { type FilterBarChipProps } from '../utils';
 
 type AvailabilityFilterChipProps = FilterBarChipProps & {
   enabled: boolean;
@@ -14,18 +14,18 @@ type AvailabilityFilterChipProps = FilterBarChipProps & {
    * @default false
    */
   disableSearchParams?: boolean;
-  disableDirty?: boolean;
   onChange?: (enabled: boolean, semester: string) => void;
   className?: string;
 };
 
 export default function AvailabilityFilterChip({
   type,
+  dirty,
+  disableAutoDirty,
   enabled,
   semester,
   availableSemesters,
   disableSearchParams = false,
-  disableDirty = false,
   onChange,
   className,
 }: AvailabilityFilterChipProps) {
@@ -48,7 +48,7 @@ export default function AvailabilityFilterChip({
         }}
         label="Teaching in"
         renderValue={enabled ? displaySemesterName(semester, false) : 'Any'}
-        dirty={!disableDirty && !isDefault}
+        dirty={dirty ?? (!disableAutoDirty && !isDefault)}
         className={className}
       >
         {(ctx) => (
