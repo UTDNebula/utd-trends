@@ -1,8 +1,8 @@
+import type { FilterModalPanelProps } from '@/modules/filters';
 import { setParams } from '@/modules/searchParams';
 import { displaySemesterName } from '@/modules/semesters';
 import FilterList, { type FilterListItem } from '../FilterList';
 import FilterPanel from '../FilterPanel';
-import { type FilterModalPanelProps } from '../utils';
 
 type AvailabilityFilterPanelProps = FilterModalPanelProps<{
   enabled: boolean;

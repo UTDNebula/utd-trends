@@ -2,6 +2,10 @@
 
 import { FiltersContext } from '@/app/dashboard/FilterContext';
 import { useSharedState } from '@/app/SharedStateProvider';
+import {
+  clearAllFilters,
+  type FilterDefaultsType,
+} from '@/modules/filters';
 import { useAvailabilityUrlSync } from '@/modules/useAvailabilityUrlSync';
 import type { SearchResult } from '@/types/SearchQuery';
 import TuneIcon from '@mui/icons-material/Tune';
@@ -15,7 +19,6 @@ import MinRatingFilterChip from './Chips/MinRatingFilterChip';
 import SectionTypeFilterChip from './Chips/SectionTypeFilterChip';
 import SemesterFilterChip from './Chips/SemesterFilterChip';
 import FilterPanels from './FilterPanels';
-import { clearAllFilters, type FilterDefaultsType } from './utils';
 
 export function LoadingFilters() {
   const ChipSkeleton = (
@@ -154,7 +157,12 @@ export default function Filters({
 
   function FilterBarFactory(filterChipType: 'delete' | 'popover') {
     return (
-      <Grid container spacing={1} data-tutorial-id="filters" className='overflow-x-clip'>
+      <Grid
+        container
+        spacing={1}
+        data-tutorial-id="filters"
+        className="overflow-x-clip"
+      >
         <span className="h-8 mx-2 flex items-center text-sm text-neutral-600 dark:text-neutral-400 select-none text-nowrap max-md:hidden">
           Filters:
         </span>

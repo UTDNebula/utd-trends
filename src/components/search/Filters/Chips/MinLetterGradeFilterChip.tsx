@@ -1,10 +1,13 @@
-import { calculateGrades } from '@/modules/fetchGrades';
+import {
+  filterMinGPAs,
+  getGradeCounts,
+  type FilterBarChipProps,
+} from '@/modules/filters';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 import { setParams } from '@/modules/searchParams';
 import type { SearchResult } from '@/types/SearchQuery';
 import { MenuItem, MenuList, Tooltip } from '@mui/material';
 import FilterChip from '../FilterChip';
-import { type FilterBarChipProps } from '../utils';
 
 type MinLetterGradeFilterChipProps = FilterBarChipProps<{
   chosenSectionTypes: string[];
@@ -16,49 +19,18 @@ type MinLetterGradeFilterChipProps = FilterBarChipProps<{
   sectionTypes: string[];
 }>;
 
-const minGPAs = ['3.67', '3.33', '3', '2.67', '2.33', '2'];
-
 export default function MinLetterGradeFilterChip({
   type,
   dirty,
   disableAutoDirty,
-  data: {
-    semesters,
-    sectionTypes,
-    chosenSectionTypes,
-    chosenSemesters,
-    minGPA,
-    minRating,
-    semFilteredResults,
-  },
+  data,
 }: MinLetterGradeFilterChipProps) {
+  const { minGPA } = data;
+
   const isDefault = !Boolean(minGPA);
   if (type === 'delete' && isDefault) return;
 
-  const gradeCounts: Record<string, number> = {};
-
-  minGPAs.forEach((gpaString) => {
-    const gpaNum = parseFloat(gpaString);
-    gradeCounts[gpaString] = semFilteredResults.filter((result) => {
-      if (result.type !== 'course') {
-        if (
-          typeof minRating === 'string' &&
-          result.RMP &&
-          result.RMP.avgRating < parseFloat(minRating)
-        )
-          return false;
-      }
-      const courseGrades = result.grades;
-      return (
-        (courseGrades &&
-          calculateGrades(courseGrades, chosenSemesters, chosenSectionTypes)
-            .gpa >= gpaNum) ||
-        (courseGrades === undefined &&
-          chosenSemesters.length === semesters.length &&
-          chosenSectionTypes.length === sectionTypes.length)
-      );
-    }).length;
-  });
+  const gradeCounts: Record<string, number> = getGradeCounts(data);
 
   return (
     <Tooltip
@@ -93,7 +65,7 @@ export default function MinLetterGradeFilterChip({
             >
               <em className="italic">None</em>
             </MenuItem>
-            {minGPAs.map((value) => (
+            {filterMinGPAs.map((value) => (
               <MenuItem
                 className="h-10"
                 key={value}

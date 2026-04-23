@@ -1,4 +1,9 @@
-import { compareSemesters, displaySemesterName } from '@/modules/semesters';
+import type { FilterBarChipProps } from '@/modules/filters';
+import {
+  compareSemesters,
+  displaySemesterName,
+  getRecentSemesters,
+} from '@/modules/semesters';
 import {
   Checkbox,
   Divider,
@@ -7,14 +12,12 @@ import {
   MenuList,
   Tooltip,
 } from '@mui/material';
-import { type Dispatch, type SetStateAction } from 'react';
 import FilterChip from '../FilterChip';
-import { type FilterBarChipProps } from '../utils';
 
 type SemesterFilterChipProps = FilterBarChipProps<{
   semesters: string[];
   chosenSemesters: string[];
-  setChosenSemesters: Dispatch<SetStateAction<string[]>>;
+  setChosenSemesters: React.Dispatch<React.SetStateAction<string[]>>;
 }>;
 
 export default function SemesterFilterChip({
@@ -27,38 +30,7 @@ export default function SemesterFilterChip({
   const isDefault = chosenSemesters.length === semesters.length;
   if (type === 'delete' && isDefault) return;
 
-  const MAX_NUM_RECENT_SEMESTERS = 4; // recentSemesters will have up to the last 4 long-semesters
-  const recentSemesters = getRecentSemesters(); // recentSemesters contains semesters offered in the last 2 years; recentSemesters.length = [0, 4] range
-
-  function getRecentSemesters() {
-    // get current month and year
-    const today = new Date();
-    const mm = today.getMonth() + 1; // January is 1
-    let yyyy = today.getFullYear();
-
-    let season = 'F';
-    if (mm <= 5)
-      // jan - may
-      season = 'S';
-    else season = 'F';
-
-    // generate recent semesters dynamically from the current day
-    const recentSemesters: string[] = [];
-    for (let i = MAX_NUM_RECENT_SEMESTERS; i >= 1; i--) {
-      if (season === 'S') {
-        // then the previous semester is last year's Fall
-        yyyy = yyyy - 1;
-        season = 'F';
-      } else {
-        // then the previous long-semester is this year's Spring
-        season = 'S';
-      }
-
-      recentSemesters.push(yyyy.toString().substring(2) + season);
-    }
-
-    return recentSemesters.filter((value) => semesters.includes(value));
-  }
+  const recentSemesters = getRecentSemesters(semesters);
 
   return (
     <Tooltip title="Semesters to include grades from" placement="top">

@@ -1,34 +1,13 @@
-import { type Dispatch, type SetStateAction } from 'react';
+import type { FilterModalPanelProps } from '@/modules/filters';
+import { displaySectionTypeName } from '@/modules/semesters';
 import FilterList, { type FilterListItem } from '../FilterList';
 import FilterPanel from '../FilterPanel';
-import { type FilterModalPanelProps } from '../utils';
 
 type SectionTypeFilterPanelProps = FilterModalPanelProps<{
   sectionTypes: string[];
   chosenSectionTypes: string[];
-  setChosenSectionTypes: Dispatch<SetStateAction<string[]>>;
+  setChosenSectionTypes: React.Dispatch<React.SetStateAction<string[]>>;
 }>;
-
-function displaySectionTypeName(id: string): string {
-  const SectionTypesMap: Record<string, string> = {
-    '0xx': 'Normal day lecture',
-    '0Wx': 'Online class',
-    '0Hx': 'Hybrid day class (online + face-to-face)',
-    '0Lx': 'LLC-only section',
-    '5Hx': 'Hybrid night class (online + face-to-face)',
-    '1xx': 'Lab section (sciences)',
-    '2xx': 'Discussion section (humanities)',
-    '3xx': 'Problem section (maths)',
-    '5xx': 'Night lecture (past 5 PM)',
-    '6xx': 'Lab night section (past 7 PM)',
-    '7xx': 'Exam section',
-    HNx: 'Honors-only',
-    HON: 'Honors-only',
-    xUx: 'Summer Class',
-  };
-
-  return SectionTypesMap[id] || id; // Default to ID if no mapping exists
-}
 
 export default function SectionTypeFilterPanel({
   data: { chosenSectionTypes, sectionTypes, setChosenSectionTypes },
@@ -59,6 +38,7 @@ export default function SectionTypeFilterPanel({
           ...sectionTypeOptions,
         ]}
         type="checkbox"
+        disableSelectedBackdrop
         selectedValues={chosenSectionTypes}
         onChange={(newSelectedValues) => {
           if (newSelectedValues.includes('select-all')) {

@@ -1,9 +1,8 @@
+import type { FilterBarChipProps } from '@/modules/filters';
 import { setParams } from '@/modules/searchParams';
 import { displaySemesterName } from '@/modules/semesters';
 import { MenuItem, MenuList, Tooltip } from '@mui/material';
-import React from 'react';
 import FilterChip from '../FilterChip';
-import { type FilterBarChipProps } from '../utils';
 
 type AvailabilityFilterChipProps = FilterBarChipProps<{
   enabled: boolean;

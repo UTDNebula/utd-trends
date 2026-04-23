@@ -19,14 +19,16 @@ type FilterListItemBase<Value = string> = {
    */
   type?: 'item' | 'divider';
   /**
-   * Controls the checkbox status of this item.
-   * By default, the checkbox is selected only if the item is in {@linkcode FilterListProps.selectedValues | selectedValues}
+   * Overrides whether this item is visually selected. Also provides additional checkbox controls.
    */
   checkboxOverride?: {
     checked?: boolean;
     indeterminate?: boolean;
     disabled?: boolean;
   };
+  /**
+   * Disables exclusion for this item
+   */
   disableExclusion?: boolean;
   /**
    * Modifies the secondary action of the item
@@ -100,6 +102,16 @@ export type FilterListProps = {
    */
   disallowDeselecting?: boolean;
   /**
+   * Removes the backdrop fill of selected items
+   * @default false
+   */
+  disableSelectedBackdrop?: boolean;
+  /**
+   * Removes the backdrop gradient of excluded items
+   * @default false
+   */
+  disableExcludedBackdrop?: boolean;
+  /**
    * Render the option's content. By default, uses `option.label`, then `option.value`
    */
   renderOptionContent?: (option: FilterListItemBase) => ReactNode;
@@ -113,6 +125,8 @@ export default function FilterList({
   onChange,
   enableExclusion = false,
   disallowDeselecting = false,
+  disableSelectedBackdrop = false,
+  disableExcludedBackdrop = false,
   renderOptionContent,
 }: FilterListProps) {
   const [selectedUncontrolled, setSelected] = useState<
@@ -244,13 +258,15 @@ export default function FilterList({
             <ListItemButton
               role={undefined}
               onClick={() => handleToggle(option)}
-              className={`p-0 rounded-lg transition-colors ${selected.includes(option.value) ? 'bg-royal/10 dark:bg-cornflower-300/10' : ''}`}
+              className={`p-0 rounded-lg transition-colors ${!disableSelectedBackdrop && (option.checkboxOverride?.checked ?? selected.includes(option.value)) ? 'bg-royal/10 dark:bg-cornflower-300/10' : ''}`}
             >
-              {enableExclusion && !option.disableExclusion && (
-                <div
-                  className={`absolute inset-0 rounded-lg bg-linear-to-l from-rose-300/20 dark:from-rose-800/20 to-transparent to-75% transition-opacity opacity-0 ${excluded.includes(option.value) ? 'opacity-100' : ''}`}
-                />
-              )}
+              {enableExclusion &&
+                !disableExcludedBackdrop &&
+                !option.disableExclusion && (
+                  <div
+                    className={`absolute inset-0 rounded-lg bg-linear-to-l from-rose-300/20 dark:from-rose-800/20 to-transparent to-75% transition-opacity opacity-0 ${excluded.includes(option.value) ? 'opacity-100' : ''}`}
+                  />
+                )}
               <ListItemIcon className="min-w-8">
                 {type === 'checkbox' ? (
                   <Checkbox

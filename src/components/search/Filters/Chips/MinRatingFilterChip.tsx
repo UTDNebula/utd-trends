@@ -1,10 +1,13 @@
 import Rating from '@/components/common/Rating/Rating';
-import { calculateGrades } from '@/modules/fetchGrades';
+import {
+  filterMinRatings,
+  getRmpCounts,
+  type FilterBarChipProps,
+} from '@/modules/filters';
 import { setParams } from '@/modules/searchParams';
 import type { SearchResult } from '@/types/SearchQuery';
 import { MenuItem, MenuList, Tooltip } from '@mui/material';
 import FilterChip from '../FilterChip';
-import { type FilterBarChipProps } from '../utils';
 
 type MinRatingFilterChipProps = FilterBarChipProps<{
   chosenSectionTypes: string[];
@@ -14,46 +17,18 @@ type MinRatingFilterChipProps = FilterBarChipProps<{
   semFilteredResults: SearchResult[];
 }>;
 
-const minRatings = ['4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5'];
-
 export default function MinRatingFilterChip({
   type,
   dirty,
   disableAutoDirty,
-  data: {
-    chosenSectionTypes,
-    chosenSemesters,
-    minGPA,
-    minRating,
-    semFilteredResults,
-  },
+  data,
 }: MinRatingFilterChipProps) {
+  const { minRating } = data;
+
   const isDefault = !Boolean(minRating);
   if (type === 'delete' && isDefault) return;
 
-  const rmpCounts: Record<string, number> = {};
-
-  minRatings.forEach((ratingString) => {
-    const ratingNum = parseFloat(ratingString);
-    rmpCounts[ratingString] = semFilteredResults.filter((result) => {
-      // gpa filter
-      const calculated = calculateGrades(
-        result.grades,
-        chosenSemesters,
-        chosenSectionTypes,
-      );
-      if (typeof minGPA === 'string' && calculated.gpa < parseFloat(minGPA))
-        return false;
-      if (
-        typeof ratingNum === 'number' &&
-        result.type !== 'course' &&
-        result.RMP &&
-        result.RMP.avgRating < ratingNum
-      )
-        return false;
-      return true;
-    }).length;
-  });
+  const rmpCounts: Record<string, number> = getRmpCounts(data);
 
   return (
     <Tooltip
@@ -98,7 +73,7 @@ export default function MinRatingFilterChip({
             >
               <em className="italic">None</em>
             </MenuItem>
-            {minRatings.map((value) => (
+            {filterMinRatings.map((value) => (
               <MenuItem
                 className="h-10"
                 key={value}
