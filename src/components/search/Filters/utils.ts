@@ -1,5 +1,5 @@
 import { setParams } from '@/modules/searchParams';
-import type { Dispatch, SetStateAction } from 'react';
+import { type Dispatch, type SetStateAction } from 'react';
 
 export type FilterDefaultsType = {
   minGPA: string;
@@ -39,5 +39,9 @@ export type FilterBarChipProps<Data extends Record<string, unknown>> = {
    * By default, the filter bar chips will automatically determine if they're dirty or not. This prop disables that.
    */
   disableAutoDirty?: boolean;
+  data: Data;
+};
+
+export type FilterModalPanelProps<Data extends Record<string, unknown>> = {
   data: Data;
 };

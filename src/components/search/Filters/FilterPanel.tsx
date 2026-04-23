@@ -7,6 +7,11 @@ interface FilterPanelPropsBase {
   description?: ReactNode;
   startAdornment?: React.JSX.Element;
   endAdornment?: React.JSX.Element;
+  /**
+   * Whether the panel is collapsed on first render
+   * @default "open"
+   */
+  defaultCollapseState?: 'collapsed' | 'open';
 }
 
 export interface FilterPanelProps extends FilterPanelPropsBase {
@@ -28,6 +33,7 @@ export default function FilterPanel({
   description,
   startAdornment,
   endAdornment,
+  defaultCollapseState = 'open',
   className,
   slotClassNames,
   style,
@@ -35,7 +41,9 @@ export default function FilterPanel({
 }: FilterPanelProps) {
   const hasHeading = Boolean(startAdornment || heading || endAdornment);
 
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(
+    defaultCollapseState === 'collapsed' ? true : false,
+  );
 
   const CollapseButton = (
     <IconButton

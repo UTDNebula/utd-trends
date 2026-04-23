@@ -14,6 +14,7 @@ import MinLetterGradeFilterChip from './Chips/MinLetterGradeFilterChip';
 import MinRatingFilterChip from './Chips/MinRatingFilterChip';
 import SectionTypeFilterChip from './Chips/SectionTypeFilterChip';
 import SemesterFilterChip from './Chips/SemesterFilterChip';
+import FilterPanels from './FilterPanels';
 import { clearAllFilters, type FilterDefaultsType } from './utils';
 
 export function LoadingFilters() {
@@ -153,7 +154,7 @@ export default function Filters({
 
   function FilterBarFactory(filterChipType: 'delete' | 'popover') {
     return (
-      <Grid container spacing={1} data-tutorial-id="filters">
+      <Grid container spacing={1} data-tutorial-id="filters" className='overflow-x-clip'>
         <span className="h-8 mx-2 flex items-center text-sm text-neutral-600 dark:text-neutral-400 select-none text-nowrap max-md:hidden">
           Filters:
         </span>
@@ -284,7 +285,22 @@ export default function Filters({
         }}
       >
         <div className="relative overflow-auto max-h-[calc(100dvh-6rem)] px-2 pt-5">
-          {/* TODO: Add filter panels */}
+          <FilterPanels
+            data={{
+              chosenSectionTypes,
+              chosenSemesters,
+              minGPA,
+              minRating,
+              sectionTypes,
+              semesters,
+              semFilteredResults,
+              setChosenSectionTypes,
+              setChosenSemesters,
+              availableSemesters,
+              enabled: filterNextSem,
+              semester: effectiveTeachingSemester,
+            }}
+          />
         </div>
         <div className="flex flex-wrap justify-between items-center gap-2 px-5 pb-5">
           <Button
