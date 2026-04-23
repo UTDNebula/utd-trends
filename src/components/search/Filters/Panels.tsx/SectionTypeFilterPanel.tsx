@@ -3,7 +3,13 @@ import FilterList, {
 } from '@/components/search/Filters/base/FilterList';
 import FilterPanel from '@/components/search/Filters/base/FilterPanel';
 import type { FilterModalPanelProps } from '@/modules/filters';
-import { displaySectionTypeName } from '@/modules/semesters';
+import {
+  displaySectionTypeName,
+  othersSentinalValue,
+} from '@/modules/semesters';
+import ListItemText from '@mui/material/ListItemText';
+
+const selectAllSentinelValue = 'select-all';
 
 type SectionTypeFilterPanelProps = FilterModalPanelProps<{
   sectionTypes: string[];
@@ -27,7 +33,7 @@ export default function SectionTypeFilterPanel({
         options={[
           {
             label: 'Select all',
-            value: 'select-all',
+            value: selectAllSentinelValue,
             checkboxOverride: {
               checked:
                 sectionTypes.length > 0 &&
@@ -44,8 +50,21 @@ export default function SectionTypeFilterPanel({
         type="checkbox"
         disableSelectedBackdrop={isDefault}
         selectedValues={chosenSectionTypes}
+        renderOptionContent={(option) => (
+          <ListItemText
+            primary={option.label ?? option.value}
+            secondary={
+              ![selectAllSentinelValue, othersSentinalValue].includes(
+                option.value,
+              )
+                ? option.value
+                : undefined
+            }
+            slotProps={{ primary: { className: 'text-sm' } }}
+          />
+        )}
         onChange={(newSelectedValues) => {
-          if (newSelectedValues.includes('select-all')) {
+          if (newSelectedValues.includes(selectAllSentinelValue)) {
             if (chosenSectionTypes.length === sectionTypes.length) {
               setChosenSectionTypes([]);
             } else {

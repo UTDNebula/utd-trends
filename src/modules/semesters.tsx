@@ -134,7 +134,7 @@ const typeRegexes: Record<string, RegExp> = {
   xUx: /[0-9]U[0-9]/,
   OTHERS: /.*/,
 };
-const others = 'OTHERS';
+export const othersSentinalValue = 'OTHERS';
 
 export function displaySectionTypeName(id: string): string {
   const SectionTypesMap: Record<string, string> = {
@@ -167,7 +167,12 @@ export function getSectionTypesFromSearchResults(
         r.grades.flatMap((g) => g.data.map((sectionData) => sectionData.type)),
       ),
     ),
-  ].sort();
+  ].sort((a, b) => {
+    // Keep "OTHERS" at end of array
+    if (a === othersSentinalValue) return 1;
+    if (b === othersSentinalValue) return -1;
+    return a.localeCompare(b);
+  });
 }
 
 export function getSectionTypesFromSearchResult(searchResult: SearchResult) {
@@ -190,7 +195,7 @@ export function matchSectionTypesFromSectionNumber(
   );
   return (
     matchesChosenSectionType ||
-    (chosenSectionTypes.includes(others) &&
+    (chosenSectionTypes.includes(othersSentinalValue) &&
       !matchSectionTypesFromSectionNumber(
         sectionNumber,
         Object.keys(typeRegexes),

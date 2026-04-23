@@ -1,6 +1,9 @@
 import FilterChip from '@/components/search/Filters/base/FilterChip';
 import type { FilterBarChipProps } from '@/modules/filters';
-import { displaySectionTypeName } from '@/modules/semesters';
+import {
+  displaySectionTypeName,
+  othersSentinalValue,
+} from '@/modules/semesters';
 import {
   Checkbox,
   Divider,
@@ -9,6 +12,8 @@ import {
   MenuList,
   Tooltip,
 } from '@mui/material';
+
+const selectAllSentinelValue = 'select-all';
 
 type SectionTypeFilterChipProps = FilterBarChipProps<{
   sectionTypes: string[];
@@ -50,7 +55,6 @@ export default function SectionTypeFilterChip({
         <MenuList className="*:pr-6">
           {/* select all section types */}
           <MenuItem
-            className="h-10 items-center"
             value="select-all"
             onClick={() => {
               if (chosenSectionTypes.length === sectionTypes.length) {
@@ -82,7 +86,6 @@ export default function SectionTypeFilterChip({
           {/* individual options */}
           {sectionTypes.map((section) => (
             <MenuItem
-              className="h-10 items-center"
               key={section}
               value={section}
               onClick={() => {
@@ -104,7 +107,16 @@ export default function SectionTypeFilterChip({
               }}
             >
               <Checkbox checked={chosenSectionTypes.includes(section)} />
-              <ListItemText primary={displaySectionTypeName(section)} />
+              <ListItemText
+                primary={displaySectionTypeName(section)}
+                secondary={
+                  ![selectAllSentinelValue, othersSentinalValue].includes(
+                    section,
+                  )
+                    ? section
+                    : undefined
+                }
+              />
             </MenuItem>
           ))}
         </MenuList>
