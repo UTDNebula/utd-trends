@@ -2,7 +2,7 @@ import { ChevronRight } from '@mui/icons-material';
 import { Collapse, IconButton, Typography } from '@mui/material';
 import React, { useState, type ReactNode } from 'react';
 
-interface FilterPanelPropsBase {
+interface FilterPanelBaseProps {
   heading?: ReactNode;
   description?: ReactNode;
   startAdornment?: React.JSX.Element;
@@ -14,7 +14,7 @@ interface FilterPanelPropsBase {
   defaultCollapseState?: 'collapsed' | 'open';
 }
 
-export interface FilterPanelProps extends FilterPanelPropsBase {
+export interface FilterPanelProps extends FilterPanelBaseProps {
   className?: string;
   slotClassNames?: {
     heading?: string;

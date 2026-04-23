@@ -1,4 +1,5 @@
 import Rating from '@/components/common/Rating/Rating';
+import FilterChip from '@/components/search/Filters/base/FilterChip';
 import {
   filterMinRatings,
   getRmpCounts,
@@ -7,7 +8,6 @@ import {
 import { setParams } from '@/modules/searchParams';
 import type { SearchResult } from '@/types/SearchQuery';
 import { MenuItem, MenuList, Tooltip } from '@mui/material';
-import FilterChip from '../FilterChip';
 
 type MinRatingFilterChipProps = FilterBarChipProps<{
   chosenSectionTypes: string[];

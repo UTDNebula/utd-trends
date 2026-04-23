@@ -1,3 +1,4 @@
+import FilterPanel from '@/components/search/Filters/base/FilterPanel';
 import type { FilterModalPanelProps } from '@/modules/filters';
 import {
   compareSemesters,
@@ -15,7 +16,6 @@ import {
   MenuItem,
   Select,
 } from '@mui/material';
-import FilterPanel from '../FilterPanel';
 
 type SemesterFilterPanelProps = FilterModalPanelProps<{
   semesters: string[];

@@ -1,8 +1,10 @@
+import FilterList, {
+  type FilterListItem,
+} from '@/components/search/Filters/base/FilterList';
+import FilterPanel from '@/components/search/Filters/base/FilterPanel';
 import type { FilterModalPanelProps } from '@/modules/filters';
 import { setParams } from '@/modules/searchParams';
 import { displaySemesterName } from '@/modules/semesters';
-import FilterList, { type FilterListItem } from '../FilterList';
-import FilterPanel from '../FilterPanel';
 
 type AvailabilityFilterPanelProps = FilterModalPanelProps<{
   enabled: boolean;

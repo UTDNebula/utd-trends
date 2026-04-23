@@ -1,3 +1,4 @@
+import FilterChip from '@/components/search/Filters/base/FilterChip';
 import type { FilterBarChipProps } from '@/modules/filters';
 import {
   compareSemesters,
@@ -12,7 +13,6 @@ import {
   MenuList,
   Tooltip,
 } from '@mui/material';
-import FilterChip from '../FilterChip';
 
 type SemesterFilterChipProps = FilterBarChipProps<{
   semesters: string[];

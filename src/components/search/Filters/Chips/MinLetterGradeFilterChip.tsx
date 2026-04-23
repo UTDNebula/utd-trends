@@ -1,3 +1,4 @@
+import FilterChip from '@/components/search/Filters/base/FilterChip';
 import {
   filterMinGPAs,
   getGradeCounts,
@@ -7,7 +8,6 @@ import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 import { setParams } from '@/modules/searchParams';
 import type { SearchResult } from '@/types/SearchQuery';
 import { MenuItem, MenuList, Tooltip } from '@mui/material';
-import FilterChip from '../FilterChip';
 
 type MinLetterGradeFilterChipProps = FilterBarChipProps<{
   chosenSectionTypes: string[];

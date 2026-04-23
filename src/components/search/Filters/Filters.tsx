@@ -2,10 +2,7 @@
 
 import { FiltersContext } from '@/app/dashboard/FilterContext';
 import { useSharedState } from '@/app/SharedStateProvider';
-import {
-  clearAllFilters,
-  type FilterDefaultsType,
-} from '@/modules/filters';
+import { clearAllFilters, type FilterDefaultsType } from '@/modules/filters';
 import { useAvailabilityUrlSync } from '@/modules/useAvailabilityUrlSync';
 import type { SearchResult } from '@/types/SearchQuery';
 import TuneIcon from '@mui/icons-material/Tune';
@@ -13,11 +10,7 @@ import { Button, Chip, Grid, Skeleton, SwipeableDrawer } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname, useSearchParams } from 'next/navigation';
 import React, { use } from 'react';
-import AvailabilityFilterChip from './Chips/AvailabilityFilterChip';
-import MinLetterGradeFilterChip from './Chips/MinLetterGradeFilterChip';
-import MinRatingFilterChip from './Chips/MinRatingFilterChip';
-import SectionTypeFilterChip from './Chips/SectionTypeFilterChip';
-import SemesterFilterChip from './Chips/SemesterFilterChip';
+import { getFilterChipsArray } from './FilterChips';
 import FilterPanels from './FilterPanels';
 
 export function LoadingFilters() {
@@ -156,6 +149,25 @@ export default function Filters({
   ).length;
 
   function FilterBarFactory(filterChipType: 'delete' | 'popover') {
+    const filterChipsArray = getFilterChipsArray({
+      filterChipType,
+      defaultChecks,
+      data: {
+        availableSemesters,
+        chosenSectionTypes,
+        chosenSemesters,
+        effectiveTeachingSemester,
+        filterNextSem,
+        minGPA,
+        minRating,
+        sectionTypes,
+        semesters,
+        semFilteredResults,
+        setChosenSectionTypes,
+        setChosenSemesters,
+      },
+    });
+
     return (
       <Grid
         container
@@ -181,61 +193,7 @@ export default function Filters({
           </span>
         )}
         <AnimatePresence>
-          {[
-            <MinLetterGradeFilterChip
-              type={filterChipType}
-              dirty={!defaultChecks.minGPA}
-              disableAutoDirty
-              key="minLetterGrade"
-              data={{
-                chosenSectionTypes,
-                chosenSemesters,
-                minGPA,
-                minRating,
-                sectionTypes,
-                semesters,
-                semFilteredResults,
-              }}
-            />,
-            <MinRatingFilterChip
-              type={filterChipType}
-              dirty={!defaultChecks.minRating}
-              disableAutoDirty
-              key="minRating"
-              data={{
-                chosenSectionTypes,
-                chosenSemesters,
-                minGPA,
-                minRating,
-                semFilteredResults,
-              }}
-            />,
-            <SemesterFilterChip
-              type={filterChipType}
-              dirty={!defaultChecks.chosenSemesters}
-              disableAutoDirty
-              key="semester"
-              data={{ chosenSemesters, semesters, setChosenSemesters }}
-            />,
-            <SectionTypeFilterChip
-              type={filterChipType}
-              dirty={!defaultChecks.chosenSectionTypes}
-              disableAutoDirty
-              key="sectionType"
-              data={{ chosenSectionTypes, sectionTypes, setChosenSectionTypes }}
-            />,
-            <AvailabilityFilterChip
-              type={filterChipType}
-              dirty={filterNextSem} // Exception: Show dirty if specific semester is selected
-              disableAutoDirty
-              key="availability"
-              data={{
-                availableSemesters,
-                enabled: filterNextSem,
-                semester: effectiveTeachingSemester,
-              }}
-            />,
-          ].map((chip) => (
+          {filterChipsArray.map((chip) => (
             <motion.div
               key={chip.key}
               layout

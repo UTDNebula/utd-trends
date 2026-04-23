@@ -1,3 +1,4 @@
+import FilterChip from '@/components/search/Filters/base/FilterChip';
 import type { FilterBarChipProps } from '@/modules/filters';
 import { displaySectionTypeName } from '@/modules/semesters';
 import {
@@ -8,7 +9,6 @@ import {
   MenuList,
   Tooltip,
 } from '@mui/material';
-import FilterChip from '../FilterChip';
 
 type SectionTypeFilterChipProps = FilterBarChipProps<{
   sectionTypes: string[];

@@ -1,4 +1,5 @@
 import Rating from '@/components/common/Rating/Rating';
+import FilterPanel from '@/components/search/Filters/base/FilterPanel';
 import {
   filterMinGPAs,
   filterMinRatings,
@@ -18,7 +19,6 @@ import {
   Select,
   type SelectChangeEvent,
 } from '@mui/material';
-import FilterPanel from '../FilterPanel';
 
 type MinFilterPanelProps = FilterModalPanelProps<{
   chosenSectionTypes: string[];

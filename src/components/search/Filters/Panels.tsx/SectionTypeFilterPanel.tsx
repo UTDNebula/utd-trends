@@ -1,7 +1,9 @@
+import FilterList, {
+  type FilterListItem,
+} from '@/components/search/Filters/base/FilterList';
+import FilterPanel from '@/components/search/Filters/base/FilterPanel';
 import type { FilterModalPanelProps } from '@/modules/filters';
 import { displaySectionTypeName } from '@/modules/semesters';
-import FilterList, { type FilterListItem } from '../FilterList';
-import FilterPanel from '../FilterPanel';
 
 type SectionTypeFilterPanelProps = FilterModalPanelProps<{
   sectionTypes: string[];
@@ -12,6 +14,8 @@ type SectionTypeFilterPanelProps = FilterModalPanelProps<{
 export default function SectionTypeFilterPanel({
   data: { chosenSectionTypes, sectionTypes, setChosenSectionTypes },
 }: SectionTypeFilterPanelProps) {
+  const isDefault = chosenSectionTypes.length === sectionTypes.length;
+
   const sectionTypeOptions: FilterListItem[] = sectionTypes.map((section) => ({
     label: displaySectionTypeName(section),
     value: section,
@@ -38,7 +42,7 @@ export default function SectionTypeFilterPanel({
           ...sectionTypeOptions,
         ]}
         type="checkbox"
-        disableSelectedBackdrop
+        disableSelectedBackdrop={isDefault}
         selectedValues={chosenSectionTypes}
         onChange={(newSelectedValues) => {
           if (newSelectedValues.includes('select-all')) {

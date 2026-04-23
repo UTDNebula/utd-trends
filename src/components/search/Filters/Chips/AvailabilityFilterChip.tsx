@@ -1,8 +1,8 @@
+import FilterChip from '@/components/search/Filters/base/FilterChip';
 import type { FilterBarChipProps } from '@/modules/filters';
 import { setParams } from '@/modules/searchParams';
 import { displaySemesterName } from '@/modules/semesters';
 import { MenuItem, MenuList, Tooltip } from '@mui/material';
-import FilterChip from '../FilterChip';
 
 type AvailabilityFilterChipProps = FilterBarChipProps<{
   enabled: boolean;

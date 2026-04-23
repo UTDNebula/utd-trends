@@ -2,8 +2,8 @@ import type { SearchResult } from '@/types/SearchQuery';
 import Divider from '@mui/material/Divider';
 import AvailabilityFilterPanel from './Panels.tsx/AvailabilityFilterPanel';
 import MinFilterPanel from './Panels.tsx/MinFilterPanel';
-import SemesterFilterPanel from './Panels.tsx/SemesterFilterPanel';
 import SectionTypeFilterPanel from './Panels.tsx/SectionTypeFilterPanel';
+import SemesterFilterPanel from './Panels.tsx/SemesterFilterPanel';
 
 type FilterPanelProps = {
   data: {
