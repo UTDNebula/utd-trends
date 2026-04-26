@@ -9,7 +9,10 @@ import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
 import { calculateGrades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import { displaySemesterName } from '@/modules/semesters';
+import {
+  displaySemesterName,
+  getLatestSyllabusSection,
+} from '@/modules/semesters';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -47,9 +50,9 @@ const AddToPlanner = dynamic(() => import('./AddToPlanner'), {
 // sets the color for the table head cells
 function getCellSx() {
   return {
-    backgroundColor: 'rgb(252,252,252)',
+    backgroundColor: 'var(--bg-neutral-200)',
     '@media (prefers-color-scheme: dark)': {
-      backgroundColor: 'var(--mui-palette-background-default)',
+      backgroundColor: 'var(--bg-neutral-800)',
     },
   };
 }
@@ -189,7 +192,10 @@ function Row({
     [searchResult.grades, chosenSemesters, chosenSectionTypes],
   );
 
-  const canOpen = searchResult.type === 'course' || searchResult.RMP;
+  const canOpen =
+    searchResult.grades.length > 0 ||
+    (searchResult.type !== 'course' && searchResult.RMP);
+
   const nameCell = (
     <Typography className="leading-tight text-lg text-gray-600 dark:text-gray-200 w-fit">
       <Tooltip
@@ -231,6 +237,8 @@ function Row({
           typeof course.number === 'undefined')) && <span> (Overall)</span>}
     </Typography>
   );
+
+  const latestSyllabusSection = getLatestSyllabusSection(searchResult);
 
   return (
     <>
@@ -382,6 +390,10 @@ function Row({
                   open={open}
                   searchQuery={course}
                   rmp={searchResult.RMP}
+                  syllabus_uri={latestSyllabusSection?.syllabus_uri || null}
+                  syllabus_sem={
+                    latestSyllabusSection?.academic_session.name || null
+                  }
                 />
               )}
             </div>
@@ -410,7 +422,7 @@ export default function SearchResultsTable({
     addToCompare,
     removeFromCompare,
     compareColorMap,
-    latestSemester,
+    effectiveTeachingSemester,
   } = useSharedState();
 
   //Table sorting category
@@ -662,7 +674,16 @@ export default function SearchResultsTable({
                   <div className="flex items-center py-2 my-2">
                     <Divider className="grow" />
                     <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
-                      {'Teaching Next Semester, Filters Do Not Match'}
+                      {`Teaching  
+                        ${
+                          effectiveTeachingSemester !== ''
+                            ? 'in ' +
+                              displaySemesterName(
+                                effectiveTeachingSemester,
+                                false,
+                              )
+                            : 'Next Semester'
+                        }, Filters Do Not Match`}
                     </Typography>
                     <Divider className="grow" />
                   </div>
@@ -696,8 +717,12 @@ export default function SearchResultsTable({
                     <Divider className="grow" />
                     <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
                       {'Not teaching ' +
-                        (latestSemester !== ''
-                          ? 'in ' + displaySemesterName(latestSemester, false)
+                        (effectiveTeachingSemester !== ''
+                          ? 'in ' +
+                            displaySemesterName(
+                              effectiveTeachingSemester,
+                              false,
+                            )
                           : 'Next Semester')}
                     </Typography>
                     <Divider className="grow" />
