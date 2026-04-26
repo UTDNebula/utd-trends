@@ -6,7 +6,7 @@ import type { FilterModalPanelProps } from '@/modules/filters';
 import {
   displaySectionTypeName,
   othersSentinalValue,
-} from '@/modules/semesters';
+} from '@/modules/sections';
 import ListItemText from '@mui/material/ListItemText';
 
 const selectAllSentinelValue = 'select-all';

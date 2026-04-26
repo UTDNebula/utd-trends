@@ -3,7 +3,7 @@ import type { FilterBarChipProps } from '@/modules/filters';
 import {
   displaySectionTypeName,
   othersSentinalValue,
-} from '@/modules/semesters';
+} from '@/modules/sections';
 import {
   Checkbox,
   Divider,
