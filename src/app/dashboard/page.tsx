@@ -3,8 +3,7 @@ import StickySide from '@/components/common/Split/StickySide';
 import ComparePage from '@/components/compare/ComparePage/ComparePage';
 import DashboardEmpty from '@/components/dashboard/DashboardEmpty/DashboardEmpty';
 import Header from '@/components/navigation/Header/Header';
-import Filters, { LoadingFilters } from '@/components/search/Filters/Filters';
-import { LoadingSearchResultsTable } from '@/components/search/SearchResultsTable/SearchResultsTable';
+import Filters from '@/components/search/Filters/Filters';
 import { createSearchQuery } from '@/modules/createSearchQuery';
 import { fetchSearchResults } from '@/modules/fetchSearchResult';
 import {
@@ -12,6 +11,7 @@ import {
   searchQueryLabel,
   searchQuerySort,
   type SearchQuery,
+  type SearchResult,
 } from '@/types/SearchQuery';
 import {
   dehydrate,
@@ -27,6 +27,62 @@ import ServerLeft from './ServerLeft';
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
+
+async function DashboardContent({
+  searchResultsPromise,
+  queryClient,
+  courses,
+  professors,
+  isCompare,
+}: {
+  searchResultsPromise: Promise<SearchResult[]>;
+  queryClient: QueryClient;
+  courses: SearchQuery[];
+  professors: SearchQuery[];
+  isCompare: boolean;
+}) {
+  const searchResults = await searchResultsPromise;
+  return (
+    <FiltersProvider searchResults={searchResults}>
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <main className="p-4">
+          <Filters searchResultsPromise={searchResultsPromise} />
+          {isCompare ? (
+            <ComparePage />
+          ) : (
+            <Split
+              left={
+                <ServerLeft
+                  searchResultsPromise={searchResultsPromise}
+                  courses={courses}
+                  professors={professors}
+                />
+              }
+              right={
+                <StickySide>
+                  <Suspense
+                    fallback={
+                      <LoadingRight courses={courses} professors={professors} />
+                    }
+                  >
+                    <Right
+                      courses={courses}
+                      professors={professors}
+                      searchResultsPromise={searchResultsPromise}
+                    />
+                  </Suspense>
+                </StickySide>
+              }
+              minLeft="40%"
+              minRight="30%"
+              defaultLeft="50%"
+            />
+          )}
+        </main>
+      </HydrationBoundary>
+    </FiltersProvider>
+  );
+}
 
 export async function generateMetadata({
   searchParams,
@@ -82,6 +138,9 @@ export async function generateMetadata({
  * Returns the results page
  */
 export default async function Page({ searchParams }: Props) {
+  if (process.env.NEXT_PUBLIC_DEBUG_LOADING === '1') {
+    await new Promise<void>((resolve) => setTimeout(resolve, 30_000));
+  }
   const resolvedParams = await searchParams;
   let searchTerms = resolvedParams.searchTerms;
   const isCompare = resolvedParams.compare === 'true';
@@ -119,81 +178,17 @@ export default async function Page({ searchParams }: Props) {
     results = createSearchQuery(professors, []);
   }
   const queryClient = new QueryClient();
-  const searchResults = fetchSearchResults(results);
+  const searchResultsPromise = fetchSearchResults(results);
   return (
     <>
-      <FiltersProvider searchResults={await searchResults}>
-        <HydrationBoundary state={dehydrate(queryClient)}>
-          <Header isPlanner={false} />
-          <main className="p-4">
-            <Suspense fallback={<LoadingFilters />}>
-              <Filters searchResultsPromise={searchResults} />
-            </Suspense>
-
-            {isCompare ? (
-              <ComparePage />
-            ) : (
-              <>
-                {/* Desktop Layout */}
-                <div className="hidden md:block">
-                  <Split
-                    left={
-                      <Suspense fallback={<LoadingSearchResultsTable />}>
-                        <ServerLeft
-                          searchResultsPromise={searchResults}
-                          courses={courses}
-                          professors={professors}
-                        />
-                      </Suspense>
-                    }
-                    right={
-                      <StickySide>
-                        <Suspense
-                          fallback={
-                            <LoadingRight
-                              courses={courses}
-                              professors={professors}
-                            />
-                          }
-                        >
-                          <Right
-                            courses={courses}
-                            professors={professors}
-                            searchResultsPromise={searchResults}
-                          />
-                        </Suspense>
-                      </StickySide>
-                    }
-                    minLeft="40%"
-                    minRight="30%"
-                    defaultLeft="50%"
-                  />
-                </div>
-
-                {/* Mobile Layout */}
-                <div className="block md:hidden mt-4">
-                  <Suspense
-                    fallback={
-                      <LoadingRight
-                        courses={courses}
-                        professors={professors}
-                        isMobile={true}
-                      />
-                    }
-                  >
-                    <Right
-                      courses={courses}
-                      professors={professors}
-                      searchResultsPromise={searchResults}
-                      isMobile={true}
-                    />
-                  </Suspense>
-                </div>
-              </>
-            )}
-          </main>
-        </HydrationBoundary>
-      </FiltersProvider>
+      <Header isPlanner={false} />
+      <DashboardContent
+        searchResultsPromise={searchResultsPromise}
+        queryClient={queryClient}
+        courses={courses}
+        professors={professors}
+        isCompare={isCompare}
+      />
     </>
   );
 }

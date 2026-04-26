@@ -7,6 +7,7 @@ import {
 import type { SearchResult } from '@/types/SearchQuery';
 import {
   createContext,
+  useEffect,
   useMemo,
   useState,
   type Dispatch,
@@ -53,17 +54,14 @@ export default function FiltersProvider({
     getSectionTypesFromSearchResults(searchResults),
   );
 
-  const [prevSearchResults, setPrevSearchResults] =
-    useState<SearchResult[]>(searchResults);
-  if (searchResults != prevSearchResults) {
-    setPrevSearchResults(searchResults);
+  useEffect(() => {
     setChosenSemesters(
       getSemestersFromSearchResults(searchResults.concat(compare)),
     );
     setChosenSectionTypes(
       getSectionTypesFromSearchResults(searchResults.concat(compare)),
     );
-  }
+  }, [searchResults, compare]);
 
   return (
     <FiltersContext.Provider

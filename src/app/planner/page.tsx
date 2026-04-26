@@ -14,7 +14,10 @@ export const metadata: Metadata = {
 /**
  * Returns the My Planner page
  */
-export default function Page() {
+export default async function Page() {
+  if (process.env.NEXT_PUBLIC_DEBUG_LOADING === '1') {
+    await new Promise<void>((resolve) => setTimeout(resolve, 30_000));
+  }
   return (
     <>
       <PlannerPage />
