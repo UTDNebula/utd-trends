@@ -2,10 +2,10 @@ import FilterChip from '@/components/search/Filters/base/FilterChip';
 import {
   filterMinGPAs,
   getGradeCounts,
+  setFilterParams,
   type FilterBarChipProps,
 } from '@/modules/filters';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import { setParams } from '@/modules/searchParams';
 import type { SearchResult } from '@/types/SearchQuery';
 import { MenuItem, MenuList, Tooltip } from '@mui/material';
 
@@ -41,7 +41,7 @@ export default function MinLetterGradeFilterChip({
       <FilterChip
         action={type}
         onDelete={() => {
-          setParams((params) => {
+          setFilterParams((params) => {
             params.delete('minGPA');
           });
         }}
@@ -57,7 +57,7 @@ export default function MinLetterGradeFilterChip({
               selected={minGPA === ''}
               aria-selected={minGPA === ''}
               onClick={() => {
-                setParams((params) => {
+                setFilterParams((params) => {
                   params.delete('minGPA');
                 });
                 ctx.closePopover();
@@ -73,7 +73,7 @@ export default function MinLetterGradeFilterChip({
                 selected={minGPA === value}
                 aria-selected={minGPA === value}
                 onClick={() => {
-                  setParams((params) => {
+                  setFilterParams((params) => {
                     params.set('minGPA', value);
                   });
                   ctx.closePopover();

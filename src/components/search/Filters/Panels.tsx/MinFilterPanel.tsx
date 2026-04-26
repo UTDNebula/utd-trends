@@ -5,10 +5,10 @@ import {
   filterMinRatings,
   getGradeCounts,
   getRmpCounts,
+  setFilterParams,
   type FilterModalPanelProps,
 } from '@/modules/filters';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import { setParams } from '@/modules/searchParams';
 import type { SearchResult } from '@/types/SearchQuery';
 import {
   FormControl,
@@ -54,7 +54,7 @@ export default function MinFilterPanel({ data }: MinFilterPanelProps) {
             }}
             onChange={(event: SelectChangeEvent) => {
               const newValue = event.target.value;
-              setParams((params) => {
+              setFilterParams((params) => {
                 if (newValue !== '') {
                   params.set('minGPA', newValue);
                 } else {
@@ -94,7 +94,7 @@ export default function MinFilterPanel({ data }: MinFilterPanelProps) {
             }}
             onChange={(event: SelectChangeEvent) => {
               const newValue = event.target.value;
-              setParams((params) => {
+              setFilterParams((params) => {
                 if (newValue !== '') {
                   params.set('minRating', newValue);
                 } else {

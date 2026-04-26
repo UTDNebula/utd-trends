@@ -2,8 +2,7 @@ import FilterList, {
   type FilterListItem,
 } from '@/components/search/Filters/base/FilterList';
 import FilterPanel from '@/components/search/Filters/base/FilterPanel';
-import type { FilterModalPanelProps } from '@/modules/filters';
-import { setParams } from '@/modules/searchParams';
+import { setFilterParams, type FilterModalPanelProps } from '@/modules/filters';
 import { displaySemesterName } from '@/modules/semesters';
 import ListItemText from '@mui/material/ListItemText';
 
@@ -48,7 +47,7 @@ export default function AvailabilityFilterPanel({
         )}
         onChange={(newSelectedValues) => {
           const newValue = newSelectedValues[0];
-          setParams((params) => {
+          setFilterParams((params) => {
             if (newValue !== 'any') {
               params.set('availability', newValue);
             } else {

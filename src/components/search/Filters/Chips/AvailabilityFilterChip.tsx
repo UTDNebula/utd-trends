@@ -1,6 +1,5 @@
 import FilterChip from '@/components/search/Filters/base/FilterChip';
-import type { FilterBarChipProps } from '@/modules/filters';
-import { setParams } from '@/modules/searchParams';
+import { setFilterParams, type FilterBarChipProps } from '@/modules/filters';
 import { displaySemesterName } from '@/modules/semesters';
 import { MenuItem, MenuList, Tooltip } from '@mui/material';
 
@@ -40,7 +39,7 @@ export default function AvailabilityFilterChip({
       <FilterChip
         action={type}
         onDelete={() => {
-          setParams((params) => {
+          setFilterParams((params) => {
             params.set('availability', defaultSemester);
           });
         }}
@@ -58,7 +57,7 @@ export default function AvailabilityFilterChip({
               aria-selected={!enabled}
               onClick={() => {
                 if (!disableSearchParams) {
-                  setParams((params) => {
+                  setFilterParams((params) => {
                     params.delete('availability');
                   });
                 }
@@ -77,7 +76,7 @@ export default function AvailabilityFilterChip({
                 aria-selected={enabled && semester === sem}
                 onClick={() => {
                   if (!disableSearchParams) {
-                    setParams((params) => {
+                    setFilterParams((params) => {
                       params.set('availability', sem);
                     });
                   }

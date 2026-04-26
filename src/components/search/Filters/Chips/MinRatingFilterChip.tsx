@@ -3,9 +3,9 @@ import FilterChip from '@/components/search/Filters/base/FilterChip';
 import {
   filterMinRatings,
   getRmpCounts,
+  setFilterParams,
   type FilterBarChipProps,
 } from '@/modules/filters';
-import { setParams } from '@/modules/searchParams';
 import type { SearchResult } from '@/types/SearchQuery';
 import { MenuItem, MenuList, Tooltip } from '@mui/material';
 
@@ -39,7 +39,7 @@ export default function MinRatingFilterChip({
       <FilterChip
         action={type}
         onDelete={() => {
-          setParams((params) => {
+          setFilterParams((params) => {
             params.delete('minRating');
           });
         }}
@@ -65,7 +65,7 @@ export default function MinRatingFilterChip({
               selected={minRating === ''}
               aria-selected={minRating === ''}
               onClick={() => {
-                setParams((params) => {
+                setFilterParams((params) => {
                   params.delete('minRating');
                 });
                 ctx.closePopover();
@@ -81,7 +81,7 @@ export default function MinRatingFilterChip({
                 selected={minRating === value}
                 aria-selected={minRating === value}
                 onClick={() => {
-                  setParams((params) => {
+                  setFilterParams((params) => {
                     params.set('minRating', value);
                   });
                   ctx.closePopover();

@@ -1,6 +1,14 @@
 import { calculateGrades } from '@/modules/fetchGrades';
-import { setParams } from '@/modules/searchParams';
+import { createParamSetter } from '@/modules/searchParams';
 import { type SearchResult } from '@/types/SearchQuery';
+
+export type FilterParamsSchema = {
+  minGPA: string;
+  minRating: string;
+  availability: string;
+};
+
+export const setFilterParams = createParamSetter<FilterParamsSchema>();
 
 export type FilterDefaultsType = {
   minGPA: string;
@@ -17,8 +25,8 @@ export function clearAllFilters(
     setChosenSectionTypes: React.Dispatch<React.SetStateAction<string[]>>;
   },
 ) {
-  setParams((params) => {
-    const setOrDelete = (name: string, value: string) => {
+  setFilterParams((params) => {
+    const setOrDelete = (name: keyof FilterParamsSchema, value: string) => {
       if (value) {
         params.set(name, value);
       } else {
