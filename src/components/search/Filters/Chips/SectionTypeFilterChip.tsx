@@ -26,6 +26,7 @@ export default function SectionTypeFilterChip({
   dirty,
   disableAutoDirty,
   data: { sectionTypes, chosenSectionTypes, setChosenSectionTypes },
+  ...props
 }: SectionTypeFilterChipProps) {
   const defaultSectionTypes = sectionTypes;
   const isDefault = chosenSectionTypes.length === sectionTypes.length;
@@ -51,6 +52,7 @@ export default function SectionTypeFilterChip({
             : 'None'
         }
         dirty={dirty ?? (!disableAutoDirty && !isDefault)}
+        {...props}
       >
         <MenuList className="*:pr-6">
           {/* select all section types */}

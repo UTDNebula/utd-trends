@@ -17,6 +17,10 @@ type ChildrenPopoverContextFactory = (ctx: PopoverComponentCtx) => ReactNode;
 
 type FilterChipBaseProps = Omit<ChipProps, 'children' | 'onChange'> & {
   /**
+   * Used for ARIA accessibility
+   */
+  id?: string;
+  /**
    * What happens whenever you click the chip. If omitted, this prop is determined automatically based on what other props are provided.
    *
    * In order of precedence:
@@ -110,6 +114,7 @@ export default function FilterChip(props: FilterChipProps) {
   const onChangeToggle = props.action === 'toggle' ? props.onChange : undefined;
 
   const {
+    id,
     className,
     action: actionProp,
     label,
@@ -249,12 +254,29 @@ export default function FilterChip(props: FilterChipProps) {
               className: `${action === 'popover' || action === 'delete' ? 'pr-0' : ''}`,
             },
           }}
-          aria-haspopup={action === 'popover' ? 'menu' : 'false'}
+          role={action !== 'none' ? 'button' : undefined}
+          aria-label={`${
+            action
+              ? {
+                  button: 'trigger',
+                  delete: 'delete',
+                  none: '',
+                  popover: 'open',
+                  toggle: 'toggle',
+                }[action]
+              : ''
+          } ${id}`}
+          aria-haspopup={action === 'popover' ? 'true' : 'false'}
           aria-expanded={action === 'popover' ? openPopover : undefined}
+          aria-owns={
+            action === 'popover' && openPopover ? `${id}-popover` : undefined
+          }
           {...rest}
         />
       </div>
       <Popover
+        id={`${id}-popover`}
+        role="menu"
         open={openPopover}
         onClose={handleClosePopover}
         anchorEl={popoverAnchorEl}

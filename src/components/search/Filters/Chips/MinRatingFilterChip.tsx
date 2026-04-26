@@ -22,6 +22,7 @@ export default function MinRatingFilterChip({
   dirty,
   disableAutoDirty,
   data,
+  ...props
 }: MinRatingFilterChipProps) {
   const { minRating } = data;
 
@@ -56,6 +57,7 @@ export default function MinRatingFilterChip({
           ) : undefined
         }
         dirty={dirty ?? (!disableAutoDirty && !isDefault)}
+        {...props}
       >
         {(ctx) => (
           <MenuList autoFocusItem={ctx.open}>

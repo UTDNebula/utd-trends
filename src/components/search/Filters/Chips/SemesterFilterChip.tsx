@@ -25,6 +25,7 @@ export default function SemesterFilterChip({
   dirty,
   disableAutoDirty,
   data: { semesters, chosenSemesters, setChosenSemesters },
+  ...props
 }: SemesterFilterChipProps) {
   const defaultSemesters = semesters;
   const isDefault = chosenSemesters.length === semesters.length;
@@ -48,6 +49,7 @@ export default function SemesterFilterChip({
             : 'None'
         }
         dirty={dirty ?? (!disableAutoDirty && !isDefault)}
+        {...props}
       >
         <MenuList className="*:pr-6">
           <MenuItem

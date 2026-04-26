@@ -211,12 +211,20 @@ export default function FilterList({
   });
 
   return (
-    <List className="flex flex-col gap-1 p-0">
+    <List
+      className="flex flex-col gap-1 p-0"
+      aria-multiselectable={type === 'checkbox'}
+    >
       {options.map((option) =>
         option.type === 'divider' ? (
           <Divider component="li" key={option.value} />
         ) : (
           <ListItem
+            aria-selected={
+              option.checkboxOverride?.checked ??
+              selected.includes(option.value)
+            }
+            aria-label={option.label ?? option.value}
             key={option.value}
             disablePadding
             className="group/li"
@@ -259,7 +267,6 @@ export default function FilterList({
             slotProps={{ secondaryAction: { className: 'right-1' } }}
           >
             <ListItemButton
-              role={undefined}
               onClick={() => handleToggle(option)}
               className={`p-0 rounded-lg transition-colors ${!disableSelectedBackdrop && (option.checkboxOverride?.checked ?? selected.includes(option.value)) ? 'bg-royal/10 dark:bg-cornflower-300/10' : ''}`}
             >
@@ -279,6 +286,7 @@ export default function FilterList({
                     }
                     indeterminate={option.checkboxOverride?.indeterminate}
                     disabled={option.checkboxOverride?.disabled}
+                    aria-disabled={option.checkboxOverride?.disabled}
                     disableRipple
                     tabIndex={-1}
                     size="small"
@@ -292,6 +300,7 @@ export default function FilterList({
                       selected.includes(option.value)
                     }
                     disabled={option.checkboxOverride?.disabled}
+                    aria-disabled={option.checkboxOverride?.disabled}
                     disableRipple
                     disableTouchRipple
                     tabIndex={-1}

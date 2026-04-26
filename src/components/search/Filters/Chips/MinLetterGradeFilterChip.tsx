@@ -24,6 +24,7 @@ export default function MinLetterGradeFilterChip({
   dirty,
   disableAutoDirty,
   data,
+  ...props
 }: MinLetterGradeFilterChipProps) {
   const { minGPA } = data;
 
@@ -48,6 +49,7 @@ export default function MinLetterGradeFilterChip({
         label="Min Letter Grade"
         renderValue={minGPA ? gpaToLetterGrade(Number(minGPA)) : undefined}
         dirty={dirty ?? (!disableAutoDirty && !isDefault)}
+        {...props}
       >
         {(ctx) => (
           <MenuList autoFocusItem={ctx.open}>

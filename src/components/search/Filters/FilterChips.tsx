@@ -51,6 +51,7 @@ export function getFilterChipsArray({
       dirty={!defaultChecks.minGPA}
       disableAutoDirty
       key="minLetterGrade"
+      id="min-letter-grade"
       data={{
         chosenSectionTypes,
         chosenSemesters,
@@ -66,6 +67,7 @@ export function getFilterChipsArray({
       dirty={!defaultChecks.minRating}
       disableAutoDirty
       key="minRating"
+      id="min-rating"
       data={{
         chosenSectionTypes,
         chosenSemesters,
@@ -79,6 +81,7 @@ export function getFilterChipsArray({
       dirty={!defaultChecks.chosenSemesters}
       disableAutoDirty
       key="semester"
+      id="semester"
       data={{ chosenSemesters, semesters, setChosenSemesters }}
     />,
     <SectionTypeFilterChip
@@ -86,6 +89,7 @@ export function getFilterChipsArray({
       dirty={!defaultChecks.chosenSectionTypes}
       disableAutoDirty
       key="sectionType"
+      id="section-type"
       data={{ chosenSectionTypes, sectionTypes, setChosenSectionTypes }}
     />,
     <AvailabilityFilterChip
@@ -93,6 +97,7 @@ export function getFilterChipsArray({
       dirty={filterNextSem} // Exception: Show dirty if specific semester is selected
       disableAutoDirty
       key="availability"
+      id="availability"
       data={{
         availableSemesters,
         enabled: filterNextSem,

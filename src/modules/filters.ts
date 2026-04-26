@@ -42,12 +42,28 @@ export function clearAllFilters(
 }
 
 export type FilterBarChipProps<Data extends Record<string, unknown>> = {
+  id?: string;
+  className?: string;
+  /**
+   * Determines the action of the filter chip
+   * - `"delete"` Clicking chip reverts the filter to its default value, which also hides the chip
+   * - `"popover"` Clicking chip reveals a popover menu to change the filter's value
+   * @default "popover"
+   */
   type?: 'delete' | 'popover';
+  /**
+   * Whether the field is not its default value. If `undefined`, then filter chip will determine its default state itself
+   * @default false
+   */
   dirty?: boolean;
   /**
    * By default, the filter bar chips will automatically determine if they're dirty or not. This prop disables that.
+   * @default false
    */
   disableAutoDirty?: boolean;
+  /**
+   * Data required for the specific filter bar chip
+   */
   data: Data;
 };
 

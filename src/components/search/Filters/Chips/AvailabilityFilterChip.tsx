@@ -14,7 +14,6 @@ type AvailabilityFilterChipProps = FilterBarChipProps<{
    */
   disableSearchParams?: boolean;
   onChange?: (enabled: boolean, semester: string) => void;
-  className?: string;
 };
 
 export default function AvailabilityFilterChip({
@@ -24,7 +23,7 @@ export default function AvailabilityFilterChip({
   data: { enabled, semester, availableSemesters },
   disableSearchParams = false,
   onChange,
-  className,
+  ...props
 }: AvailabilityFilterChipProps) {
   const defaultSemester = availableSemesters[0];
   const isDefault = enabled && semester === defaultSemester;
@@ -46,7 +45,7 @@ export default function AvailabilityFilterChip({
         label="Teaching in"
         renderValue={enabled ? displaySemesterName(semester, false) : 'Any'}
         dirty={dirty ?? (!disableAutoDirty && !isDefault)}
-        className={className}
+        {...props}
       >
         {(ctx) => (
           <MenuList autoFocusItem={ctx.open}>
