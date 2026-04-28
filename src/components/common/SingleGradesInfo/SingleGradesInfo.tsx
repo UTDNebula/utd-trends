@@ -39,6 +39,7 @@ type Props = {
   grades: GradesData;
   filteredGrades: GradesSummary;
   chosenSectionTypes?: string[];
+  sectionTypesChip?: React.ReactNode;
 };
 
 export default function SingleGradesInfo({
@@ -47,6 +48,7 @@ export default function SingleGradesInfo({
   grades,
   filteredGrades,
   chosenSectionTypes,
+  sectionTypesChip,
 }: Props) {
   const percents = convertNumbersToPercents(filteredGrades);
 
@@ -130,6 +132,7 @@ export default function SingleGradesInfo({
               : filteredGrades.mean_gpa.toFixed(3)}
           </b>
         </p>
+        {sectionTypesChip && <span>{sectionTypesChip}</span>}
       </div>
     </div>
   );

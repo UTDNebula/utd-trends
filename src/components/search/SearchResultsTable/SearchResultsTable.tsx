@@ -25,6 +25,8 @@ import {
   Collapse,
   Divider,
   IconButton,
+  MenuItem,
+  MenuList,
   Paper,
   Skeleton,
   Table,
@@ -33,13 +35,12 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  ToggleButton,
-  ToggleButtonGroup,
   Tooltip,
   Typography,
 } from '@mui/material';
 import dynamic from 'next/dynamic';
 import React, { use, useMemo, useState } from 'react';
+import FilterChip from '../Filters/FilterChip';
 
 const AddToPlanner = dynamic(() => import('./AddToPlanner'), {
   ssr: false,
@@ -184,24 +185,15 @@ function Row({
   const chosenSemesters = use(FiltersContext).chosenSemesters;
   const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
   const [open, setOpen] = useState(false);
-  const sectionTypesOverride = ['all', 'in-person', 'online', 'hybrid'];
-  const [chosenSectionTypesOverride, setChosenSectionTypesOverride] =
-    useState<string>();
+  const [chosenSectionTypesOverride, setChosenSectionTypesOverride] = useState<
+    string[]
+  >([]);
 
   const secTypes = useMemo(() => {
-    switch (chosenSectionTypesOverride) {
-      case 'all':
-        return sectionTypes;
-      case 'in-person':
-        return ['0Lx', '0xx', '5xx', 'HON'];
-      case 'online':
-        return ['0Wx'];
-      case 'hybrid':
-        return ['0Hx'];
-      default:
-        return chosenSectionTypes;
-    }
-  }, [chosenSectionTypesOverride, sectionTypes, chosenSectionTypes]);
+    if (chosenSectionTypesOverride.length > 0)
+      return chosenSectionTypesOverride;
+    else return chosenSectionTypes;
+  }, [chosenSectionTypesOverride, chosenSectionTypes]);
   const rainbowColors = useRainbowColors();
   const filteredGrades = useMemo(() => {
     return calculateGrades(searchResult.grades, chosenSemesters, secTypes);
@@ -390,34 +382,74 @@ function Row({
         <TableCell className="p-0" colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <div className="p-2 md:p-4 flex flex-col gap-2">
-              {/* section type override toggle */}
-              <Tooltip
-                title={
-                  'Override filters to show only one section type (in-person, online, or hybrid)'
-                }
-                placement="top"
-              >
-                <ToggleButtonGroup
-                  color="primary"
-                  value={chosenSectionTypesOverride}
-                  exclusive
-                  onChange={(_event, value: string) => {
-                    setChosenSectionTypesOverride(value);
-                  }}
-                  aria-label="Platform"
-                >
-                  {sectionTypesOverride.map((t) => (
-                    <ToggleButton key={t} value={t}>
-                      {t}
-                    </ToggleButton>
-                  ))}
-                </ToggleButtonGroup>
-              </Tooltip>
               <SingleGradesInfo
                 course={course}
                 grades={searchResult.grades}
                 filteredGrades={filteredGrades}
                 chosenSectionTypes={secTypes}
+                sectionTypesChip={
+                  <Tooltip
+                    title={
+                      'Override filters to show only one section type (in-person, online, or hybrid)'
+                    }
+                    placement="top"
+                  >
+                    <FilterChip
+                      label="Section Type"
+                      renderValue={
+                        chosenSectionTypesOverride.length > 0 ? (
+                          <span>{chosenSectionTypesOverride.join(', ')}</span>
+                        ) : chosenSectionTypes ? (
+                          <span>{chosenSectionTypes.join(', ')}</span>
+                        ) : undefined
+                      }
+                      dirty={chosenSectionTypesOverride.length > 0}
+                    >
+                      {(ctx) => (
+                        <MenuList autoFocusItem={ctx.open}>
+                          <MenuItem
+                            className="h-10"
+                            value=""
+                            selected={chosenSectionTypesOverride.length === 0}
+                            aria-selected={
+                              chosenSectionTypesOverride.length === 0
+                            }
+                            onClick={() => {
+                              setChosenSectionTypesOverride([]);
+                              ctx.closePopover();
+                            }}
+                          >
+                            <em className="italic">No Override</em>
+                          </MenuItem>
+                          {sectionTypes.map((type) => (
+                            <MenuItem
+                              key={type}
+                              value={type}
+                              selected={chosenSectionTypesOverride.includes(
+                                type,
+                              )}
+                              aria-selected={chosenSectionTypesOverride.includes(
+                                type,
+                              )}
+                              onClick={() => {
+                                setChosenSectionTypesOverride(
+                                  chosenSectionTypesOverride.includes(type)
+                                    ? chosenSectionTypesOverride.filter(
+                                        (t) => t !== type,
+                                      )
+                                    : [...chosenSectionTypesOverride, type],
+                                );
+                                ctx.closePopover();
+                              }}
+                            >
+                              {type}
+                            </MenuItem>
+                          ))}
+                        </MenuList>
+                      )}
+                    </FilterChip>
+                  </Tooltip>
+                }
               />
               {searchResult.type !== 'course' && searchResult.RMP && (
                 <SingleProfInfo
