@@ -67,7 +67,7 @@ export default function Home() {
             <b>Spring 2026</b> courses are now on Trends!
           </span>
         </a>*/}
-        <PlannerButton className="ml-auto" />
+        <PlannerButton className="ml-auto max-md:hidden" />
       </div>
       <div className="max-w-xl grow flex flex-col justify-center">
         <h2 className="text-sm font-semibold mb-3 text-royal dark:text-cornflower-300 tracking-wider flex gap-1 items-center">

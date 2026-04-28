@@ -1,17 +1,8 @@
 'use client';
 
 import { useSharedState } from '@/app/SharedStateProvider';
-import {
-  WhatsNewBadge,
-  WhatsNewButton,
-  WhatsNewModal,
-  WhatsNewProvider,
-} from '@/components/common/WhatsNew/WhatsNew';
-import Tutorial, {
-  TutorialButton,
-  TutorialContext,
-  TutorialProvider,
-} from '@/components/dashboard/Tutorial/Tutorial';
+import { WhatsNewBadge, WhatsNewButton, WhatsNewModal, WhatsNewProvider } from '@/components/common/WhatsNew/WhatsNew';
+import Tutorial, { TutorialButton, TutorialContext, TutorialProvider } from '@/components/dashboard/Tutorial/Tutorial';
 import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 import { setAvailabilitySemester } from '@/modules/availability';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -28,6 +19,7 @@ import Tooltip from '@mui/material/Tooltip';
 import html2canvas from 'html2canvas-pro';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { type HeaderProps } from './Header';
+
 
 export default function HeaderChildren(props: HeaderProps) {
   return (
@@ -222,7 +214,7 @@ function HeaderChildrenInner(props: HeaderProps) {
       {/* Shown on large screens */}
       <div className="flex items-center gap-x-4 max-sm:hidden">
         {/* Planner button */}
-        <PlannerButton {...plannerButtonProps} />
+        <PlannerButton className="max-md:hidden" {...plannerButtonProps} />
 
         {/* Whats new button */}
         <div className="ml-auto">
