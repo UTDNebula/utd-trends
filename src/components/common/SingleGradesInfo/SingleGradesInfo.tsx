@@ -38,6 +38,8 @@ type Props = {
   course: SearchQuery;
   grades: GradesData;
   filteredGrades: GradesSummary;
+  chosenSectionTypes?: string[];
+  sectionTypesChip?: React.ReactNode;
 };
 
 export default function SingleGradesInfo({
@@ -45,6 +47,8 @@ export default function SingleGradesInfo({
   course,
   grades,
   filteredGrades,
+  chosenSectionTypes,
+  sectionTypesChip,
 }: Props) {
   const percents = convertNumbersToPercents(filteredGrades);
 
@@ -97,6 +101,7 @@ export default function SingleGradesInfo({
             <LineGraph
               title="GPA Trend"
               series={[{ name: searchQueryLabel(course), data: grades }]}
+              chosenSectionTypes={chosenSectionTypes}
             />
           }
         />
@@ -127,6 +132,7 @@ export default function SingleGradesInfo({
               : filteredGrades.mean_gpa.toFixed(3)}
           </b>
         </p>
+        {sectionTypesChip && <span>{sectionTypesChip}</span>}
       </div>
     </div>
   );
