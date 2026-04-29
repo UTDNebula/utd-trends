@@ -9,10 +9,8 @@ import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
 import { calculateGrades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import {
-  displaySemesterName,
-  getLatestSyllabusSection,
-} from '@/modules/semesters';
+import { getLatestSyllabusSection } from '@/modules/sections';
+import { displaySemesterName } from '@/modules/semesters';
 import {
   convertToCourseOnly,
   convertToProfOnly,
