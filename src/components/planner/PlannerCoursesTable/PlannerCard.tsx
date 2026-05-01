@@ -22,8 +22,8 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import EventIcon from '@mui/icons-material/Event';
-import SearchIcon from '@mui/icons-material/Search';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
+import SearchIcon from '@mui/icons-material/Search';
 import {
   Box,
   Button,
@@ -412,7 +412,7 @@ function SearchOtherProfessorFooter(props: {
       >
         <Button
           className="normal-case rounded-full"
-          variant='contained'
+          variant="contained"
           LinkComponent={Link}
           href={`dashboard?${params.toString()}`}
           onClick={() => {
