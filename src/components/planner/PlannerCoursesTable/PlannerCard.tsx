@@ -22,6 +22,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import EventIcon from '@mui/icons-material/Event';
+import SearchIcon from '@mui/icons-material/Search';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Box,
@@ -383,6 +384,7 @@ function SectionTableRow(props: SectionTableRowProps) {
 function SearchOtherProfessorFooter(props: {
   course: Course | Record<string, never>;
   teachingSemester: string;
+  bottomBorder: boolean;
 }) {
   const params = new URLSearchParams();
   if ('prefix' in props.course && 'number' in props.course) {
@@ -398,11 +400,19 @@ function SearchOtherProfessorFooter(props: {
     <TableRow>
       <TableCell
         colSpan={6}
-        className="py-1 border-t-1 border-t-royal dark:border-t-cornflower-300"
+        className={`
+          py-2 border-t border-t-royal dark:border-t-cornflower-300
+          ${
+            props.bottomBorder
+              ? 'border-b border-b-royal dark:border-b-cornflower-300'
+              : 'border-b-0'
+          }
+        `}
         align="center"
       >
         <Button
-          className="normal-case"
+          className="normal-case rounded-full"
+          variant='contained'
           LinkComponent={Link}
           href={`dashboard?${params.toString()}`}
           onClick={() => {
@@ -410,6 +420,7 @@ function SearchOtherProfessorFooter(props: {
             // instead of clicking "Search Results"
             sessionStorage.setItem('dashboardSearchTerms', params.toString());
           }}
+          startIcon={<SearchIcon />}
         >
           See other professors
         </Button>
@@ -789,6 +800,10 @@ export default function PlannerCard(props: PlannerCardProps) {
                 <SearchOtherProfessorFooter
                   course={convertToCourseOnly(props.query)}
                   teachingSemester={props.teachingSemester}
+                  bottomBorder={
+                    latestExtraSections !== null &&
+                    latestExtraSections.sections.length > 0
+                  }
                 />
               </TableFooter>
             </Table>
