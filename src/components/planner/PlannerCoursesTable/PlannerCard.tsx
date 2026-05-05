@@ -5,7 +5,7 @@ import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import { calculateGrades } from '@/modules/fetchGrades';
 import type { Sections, SectionsData } from '@/modules/fetchSections';
 import { useSearchResult } from '@/modules/plannerFetch';
-import { getLatestSyllabusSection } from '@/modules/semesters';
+import { getLatestSyllabusSection } from '@/modules/sections';
 import {
   convertToCourseOnly,
   convertToProfOnly,
