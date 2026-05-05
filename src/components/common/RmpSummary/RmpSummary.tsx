@@ -28,76 +28,116 @@ export function LoadingRmpSummary() {
 export default function RmpSummary({ open, searchQuery }: Props) {
   const [summary, setSummary] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const status = !open ? 'closed' : errorMsg ? 'error' : summary === null ? 'loading' : 'done';
+  const status = !open
+    ? 'closed'
+    : loading
+      ? 'loading'
+      : errorMsg
+        ? 'error'
+        : summary
+          ? 'done'
+          : 'idle';
 
   useEffect(() => {
     if (!open) {
       setSummary(null);
       setErrorMsg(null);
+      setLoading(false);
       return;
     }
 
     let cancelled = false;
+
     const fetchSummary = async () => {
+      setLoading(true);
+      setErrorMsg(null);
+      setSummary(null);
+
       try {
         const params = new URLSearchParams();
         if (searchQuery.profFirst) params.append('profFirst', searchQuery.profFirst);
         if (searchQuery.profLast) params.append('profLast', searchQuery.profLast);
-        
+
         const res = await fetch(`/api/rmpSummary?${params.toString()}`);
-        
-        // Safety check for non-JSON or error responses
-        if (!res.ok) throw new Error('Fetch failed');
+
         const data = await res.json();
-        
+
         if (cancelled) return;
 
-        if (data.message === 'error') {
+        // Handle API-level errors (your backend "message: error")
+        if (!res.ok || data.message === 'error') {
           setErrorMsg(data.data || 'Problem loading AI review summary.');
-        } else {
-          setSummary(data.data);
+          return;
         }
+
+        setSummary(data.data);
       } catch (err) {
-        if (!cancelled) setErrorMsg('Problem loading AI review summary.');
+        if (!cancelled) {
+          setErrorMsg('Problem loading AI review summary.');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchSummary();
+
     return () => {
       cancelled = true;
     };
   }, [open, searchQuery.profFirst, searchQuery.profLast]);
 
+  // ----------------------------
+  // ERROR UI
+  // ----------------------------
   if (status === 'error') {
-    if (errorMsg?.includes('Not enough ratings')) {
+    const msg = errorMsg?.toLowerCase() || '';
+
+    if (msg.includes('not enough')) {
       return (
         <div className="p-4 my-2 border border-blue-500/20 bg-blue-500/5 rounded-xl">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            <strong>Summary Unavailable:</strong> We need at least 5 student reviews to generate an accurate AI summary.
+            <strong>Summary Unavailable:</strong>{' '}
+            We need at least 5 student reviews to generate an accurate AI summary.
           </p>
         </div>
       );
     }
+
     return (
       <div className="p-3 border border-red-500/10 bg-red-500/5 rounded-lg">
-        <p className="text-red-400 text-sm italic">Problem loading AI review summary.</p>
+        <p className="text-red-400 text-sm italic">
+          {errorMsg || 'Problem loading AI review summary.'}
+        </p>
       </div>
     );
   }
 
-  if (status === 'loading') return <LoadingRmpSummary />;
+  // ----------------------------
+  // LOADING UI
+  // ----------------------------
+  if (status === 'loading') {
+    return <LoadingRmpSummary />;
+  }
 
-  if (status === 'done') {
+  // ----------------------------
+  // SUCCESS UI
+  // ----------------------------
+  if (status === 'done' && summary) {
     return (
       <>
         <p className="text-sm leading-relaxed text-gray-800 dark:text-gray-200">
           {summary}
         </p>
+
         <Tooltip title="AI generated summary" placement="right">
-          {/* Wrap in span to fix the 'children' type error from your screenshot */}
           <span className="inline-block">
-            <Typography variant="overline" className="text-gray-700 dark:text-gray-300 cursor-help">
+            <Typography
+              variant="overline"
+              className="text-gray-700 dark:text-gray-300 cursor-help"
+            >
               AI REVIEW SUMMARY
             </Typography>
           </span>
