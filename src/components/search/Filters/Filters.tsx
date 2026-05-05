@@ -213,7 +213,7 @@ export default function Filters({
               <Button
                 size="small"
                 color="inherit"
-                className="rounded-full normal-case whitespace-nowrap min-h-8 px-4 text-neutral-600 dark:text-neutral-400"
+                className="rounded-full normal-case whitespace-nowrap min-h-8 px-2 text-neutral-600 dark:text-neutral-400"
                 onClick={handleClearAllFilters}
               >
                 Reset {changedFiltersCount} filter
