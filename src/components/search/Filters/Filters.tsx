@@ -6,34 +6,26 @@ import { clearAllFilters, type FilterDefaultsType } from '@/modules/filters';
 import { useAvailabilityUrlSync } from '@/modules/useAvailabilityUrlSync';
 import type { SearchResult } from '@/types/SearchQuery';
 import TuneIcon from '@mui/icons-material/Tune';
-import { Button, Chip, Grid, Skeleton, SwipeableDrawer } from '@mui/material';
+import { Button, Chip, Grid, SwipeableDrawer } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname, useSearchParams } from 'next/navigation';
 import React, { use } from 'react';
+import { FilterChipSkeleton } from './base/FilterChip';
 import { getFilterChipsArray } from './FilterChips';
 import FilterPanels from './FilterPanels';
 
 export function LoadingFilters() {
-  const ChipSkeleton = (
-    <Skeleton
-      variant="rectangular"
-      className="rounded-full"
-      height={32}
-      width={128}
-    />
-  );
-
   return (
     <>
       <Grid container spacing={1} className="max-md:hidden">
         <span className="h-8 mx-2 flex items-center text-sm text-neutral-600 dark:text-neutral-400 select-none text-nowrap">
           Filters:
         </span>
-        {ChipSkeleton} {/* Min Letter Grade */}
-        {ChipSkeleton} {/* Min Rating */}
-        {ChipSkeleton} {/* Semesters */}
-        {ChipSkeleton} {/* Section Types */}
-        {ChipSkeleton} {/* Availability */}
+        <FilterChipSkeleton action="popover" /> {/* Min Letter Grade */}
+        <FilterChipSkeleton action="popover" /> {/* Min Rating */}
+        <FilterChipSkeleton action="popover" /> {/* Semesters */}
+        <FilterChipSkeleton action="popover" /> {/* Section Types */}
+        <FilterChipSkeleton action="popover" /> {/* Availability */}
       </Grid>
       <Grid container spacing={1} className="md:hidden">
         <Chip
@@ -42,7 +34,7 @@ export function LoadingFilters() {
           variant="outlined"
           className="border-[var(--mui-palette-divider)]"
         />
-        {ChipSkeleton}
+        <FilterChipSkeleton action="delete" />
       </Grid>
     </>
   );

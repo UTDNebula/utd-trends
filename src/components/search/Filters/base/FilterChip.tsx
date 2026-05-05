@@ -5,6 +5,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import Chip, { type ChipProps } from '@mui/material/Chip';
 import Popover from '@mui/material/Popover';
+import Skeleton, { type SkeletonProps } from '@mui/material/Skeleton';
 import React, { useEffect, useRef, useState, type ReactNode } from 'react';
 
 type PopoverComponentCtx = {
@@ -294,5 +295,36 @@ export default function FilterChip(props: FilterChipProps) {
         {childrenFactory()}
       </Popover>
     </>
+  );
+}
+
+type FilterChipSkeletonProps = SkeletonProps &
+  Pick<FilterChipProps, 'action'> & {};
+
+export function FilterChipSkeleton({
+  className,
+  action,
+  ...props
+}: FilterChipSkeletonProps) {
+  return (
+    <Skeleton
+      variant="rectangular"
+      height={32}
+      width={128}
+      {...props}
+      className={`rounded-full flex justify-end items-center ${className}`}
+    >
+      {action === 'popover' ? (
+        <ArrowDropDownIcon
+          fontSize="small"
+          className="visible mr-1.25 fill-[rgba(var(--mui-palette-text-primaryChannel)/0.26)] group-hover/chip:fill-[rgba(var(--mui-palette-text-primaryChannel)/0.4)]"
+        />
+      ) : action === 'delete' ? (
+        <ClearIcon
+          fontSize="small"
+          className="visible mr-1.25 fill-[rgba(var(--mui-palette-text-primaryChannel)/0.26)] group-hover/chip:fill-[rgba(var(--mui-palette-text-primaryChannel)/0.4)]"
+        />
+      ) : undefined}
+    </Skeleton>
   );
 }
