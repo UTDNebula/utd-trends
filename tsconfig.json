@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -9,20 +13,21 @@
     "noEmit": false,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "verbatimModuleSyntax": true,
+    "baseUrl": ".",
     "paths": {
-      // remap rsg-components/anything to its version in react-styleguidist
       "rsg-components/*": [
         "./node_modules/react-styleguidist/lib/client/rsg-components/*"
       ],
-      "@/*": ["*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
-    "baseUrl": "src",
-    "verbatimModuleSyntax": true,
     "plugins": [
       {
         "name": "next"
@@ -30,15 +35,15 @@
     ]
   },
   "include": [
+    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "/**/**/*/.tsx",
-    "next-env.d.ts",
-    "src",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"],
+  "exclude": [
+    "node_modules"
+  ],
   "ts-node": {
     "transpileOnly": true,
     "moduleTypes": {
