@@ -2,6 +2,7 @@
 
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
+import { setAvailabilitySemester } from '@/modules/availability';
 import { calculateGrades } from '@/modules/fetchGrades';
 import type { Sections, SectionsData } from '@/modules/fetchSections';
 import { useSearchResult } from '@/modules/plannerFetch';
@@ -12,6 +13,7 @@ import {
   removeSection,
   searchQueryLabel,
   sectionCanOverlap,
+  type Course,
   type SearchQuery,
   type SearchQueryMultiSection,
   type SearchResult,
@@ -21,8 +23,10 @@ import BookIcon from '@mui/icons-material/Book';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import EventIcon from '@mui/icons-material/Event';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
+import SearchIcon from '@mui/icons-material/Search';
 import {
   Box,
+  Button,
   Checkbox,
   Collapse,
   IconButton,
@@ -33,6 +37,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  TableFooter,
   TableHead,
   TableRow,
   ToggleButton,
@@ -371,6 +376,54 @@ function SectionTableRow(props: SectionTableRowProps) {
             ''
           )}
         </div>
+      </TableCell>
+    </TableRow>
+  );
+}
+
+function SearchOtherProfessorFooter(props: {
+  course: Course | Record<string, never>;
+  teachingSemester: string;
+  bottomBorder: boolean;
+}) {
+  const params = new URLSearchParams();
+  if ('prefix' in props.course && 'number' in props.course) {
+    params.set(
+      'searchTerms',
+      decodeURIComponent(
+        `${props.course.prefix}+${props.course.number}`,
+      ).replaceAll('+', ' '),
+    );
+    setAvailabilitySemester(params, props.teachingSemester);
+  }
+  return (
+    <TableRow>
+      <TableCell
+        colSpan={6}
+        className={`
+          py-2 border-t border-t-royal dark:border-t-cornflower-300
+          ${
+            props.bottomBorder
+              ? 'border-b border-b-royal dark:border-b-cornflower-300'
+              : 'border-b-0'
+          }
+        `}
+        align="center"
+      >
+        <Button
+          className="normal-case rounded-full"
+          variant="contained"
+          LinkComponent={Link}
+          href={`dashboard?${params.toString()}`}
+          onClick={() => {
+            // User might navigates between pages
+            // instead of clicking "Search Results"
+            sessionStorage.setItem('dashboardSearchTerms', params.toString());
+          }}
+          startIcon={<SearchIcon />}
+        >
+          See other professors
+        </Button>
       </TableCell>
     </TableRow>
   );
@@ -743,6 +796,16 @@ export default function PlannerCard(props: PlannerCardProps) {
                   />
                 ))}
               </TableBody>
+              <TableFooter>
+                <SearchOtherProfessorFooter
+                  course={convertToCourseOnly(props.query)}
+                  teachingSemester={props.teachingSemester}
+                  bottomBorder={
+                    latestExtraSections !== null &&
+                    latestExtraSections.sections.length > 0
+                  }
+                />
+              </TableFooter>
             </Table>
           </TableContainer>
           {/* Unassigned Professor Sections -- only show for a non-overall card */}
