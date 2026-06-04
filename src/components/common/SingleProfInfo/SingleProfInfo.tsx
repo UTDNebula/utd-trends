@@ -5,8 +5,7 @@ import RmpSummary, {
 } from '@/components/common/RmpSummary/RmpSummary';
 import SyllabusSummary from '@/components/common/SyllabusSummary/SyllabusSummary';
 import type { RMP } from '@/modules/fetchRmp';
-import type { SearchQuery } from '@/types/SearchQuery';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { isComboQuery, type SearchQuery } from '@/types/SearchQuery';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   Button,
@@ -212,7 +211,7 @@ function Syllabus({
   syllabus_uri,
   syllabus_sem,
 }: SyllabusProps) {
-  if (!syllabus_uri || !syllabus_sem) {
+  if (!syllabus_uri || !syllabus_sem || !isComboQuery(searchQuery)) {
     return null;
   }
   return (

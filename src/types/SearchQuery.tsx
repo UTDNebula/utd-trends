@@ -114,6 +114,22 @@ export function isCourseQuery(
   return searchQuery.prefix !== undefined && searchQuery.number !== undefined;
 }
 
+export function isComboQuery(
+  searchQuery: SearchQuery,
+): searchQuery is SearchQuery & {
+  prefix: string;
+  number: string;
+  profFirst: string;
+  profLast: string;
+} {
+  return (
+    searchQuery.prefix !== undefined &&
+    searchQuery.number !== undefined &&
+    searchQuery.profFirst !== undefined &&
+    searchQuery.profLast !== undefined
+  );
+}
+
 export function removeSection(
   searchQuery: SearchQuery | SearchQueryMultiSection,
 ): SearchQuery {
