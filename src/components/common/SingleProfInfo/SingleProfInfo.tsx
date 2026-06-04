@@ -7,13 +7,7 @@ import SyllabusSummary from '@/components/common/SyllabusSummary/SyllabusSummary
 import type { RMP } from '@/modules/fetchRmp';
 import { isComboQuery, type SearchQuery } from '@/types/SearchQuery';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {
-  Chip,
-  Collapse,
-  Grid,
-  IconButton,
-  Skeleton,
-} from '@mui/material';
+import { Chip, Collapse, Grid, IconButton, Skeleton } from '@mui/material';
 import Link from 'next/link';
 import React, { useState } from 'react';
 
