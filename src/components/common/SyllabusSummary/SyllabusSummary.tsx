@@ -21,22 +21,151 @@ import React, { useEffect, useState } from 'react';
 
 const MAX_VISIBLE_ROWS = 2;
 
-export function LoadingSyllabusSummary() {
+type LoadingSyllabusSummaryProps = {
+  syllabus_uri?: string;
+  syllabus_sem?: string;
+};
+
+export function LoadingSyllabusSummary({
+  syllabus_uri,
+  syllabus_sem,
+}: LoadingSyllabusSummaryProps) {
   return (
-    <div className="mt-2 rounded pv-3 max-w-dvw">
-      <div className="rounded p-4 dark:bg-neutral-900/50 bg-neutral-200 border border-cornflower-500">
-        <Skeleton variant="text" />
+    <>
+      {/* Weighting Table */}
+      <Grid size={6}>
+        <BaseCard className="dark:bg-neutral-700">
+          <TableContainer>
+            <Table size="small" aria-label="grade weighting table">
+              <colgroup>
+                <col className="w-1/2" />
+                <col className="w-1/2" />
+              </colgroup>
+              <TableHead>
+                <TableRow>
+                  <TableCell className="font-bold">Weighting</TableCell>
+                  <TableCell className="font-bold">%</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Array(2)
+                  .fill(0)
+                  .map((_, idx) => (
+                    <TableRow
+                      key={idx}
+                      sx={{
+                        '&:last-child td, &:last-child th': {
+                          border: 0,
+                        },
+                      }}
+                    >
+                      <TableCell component="th" scope="row">
+                        <Skeleton variant="text" className="w-1/2" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" className="w-1/4" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                <TableRow
+                  sx={{
+                    '&:last-child td, &:last-child th': {
+                      border: 0,
+                    },
+                  }}
+                >
+                  <TableCell align="center" className="py-0" colSpan={2}>
+                    <Button className="normal-case" size="small" disabled>
+                      Show More
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </BaseCard>
+      </Grid>
+
+      {/* Grade Scale Table */}
+      <Grid size={6}>
+        <BaseCard className="dark:bg-neutral-700">
+          <TableContainer>
+            <Table size="small" aria-label="grade scale table">
+              <colgroup>
+                <col className="w-1/2" />
+                <col className="w-1/2" />
+              </colgroup>
+              <TableHead>
+                <TableRow>
+                  <TableCell className="font-bold">Grade</TableCell>
+                  <TableCell className="font-bold">Scale</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Array(2)
+                  .fill(0)
+                  .map((_, idx) => (
+                    <TableRow
+                      key={idx}
+                      sx={{
+                        '&:last-child td, &:last-child th': {
+                          border: 0,
+                        },
+                      }}
+                    >
+                      <TableCell component="th" scope="row">
+                        <Skeleton variant="text" className="w-1/4" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" className="w-1/4" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                <TableRow
+                  sx={{
+                    '&:last-child td, &:last-child th': {
+                      border: 0,
+                    },
+                  }}
+                >
+                  <TableCell align="center" className="py-0" colSpan={2}>
+                    <Button className="normal-case" size="small" disabled>
+                      Show More
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </BaseCard>
+      </Grid>
+
+      {/* AI Summary / Placeholder */}
+      <Grid size={12}>
         <Skeleton variant="text" />
         <Skeleton variant="text" />
         <Skeleton variant="text" className="w-1/2" />
-      </div>
-      <Typography
-        variant="overline"
-        className="text-gray-700 dark:text-gray-300 pr-5"
-      >
-        AI GENERATED SYLLABUS SUMMARY
-      </Typography>
-    </div>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Typography
+            variant="overline"
+            className="text-gray-700 dark:text-gray-300"
+          >
+            AI SYLLABUS SUMMARY
+          </Typography>
+          {syllabus_uri && syllabus_sem ? (
+            <Link
+              href={syllabus_uri}
+              target="_blank"
+              className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+            >
+              View {syllabus_sem} Syllabus
+            </Link>
+          ) : (
+            <p>View Syllabus</p>
+          )}
+        </div>
+      </Grid>
+    </>
   );
 }
 
@@ -105,7 +234,10 @@ export default function SyllabusSummary({
   return (
     <>
       {!syllabus ? (
-        <LoadingSyllabusSummary />
+        <LoadingSyllabusSummary
+          syllabus_uri={syllabus_uri}
+          syllabus_sem={syllabus_sem}
+        />
       ) : (
         <>
           {/* Weighting Table */}

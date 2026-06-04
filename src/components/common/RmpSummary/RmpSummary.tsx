@@ -5,14 +5,13 @@ import { Skeleton, Tooltip, Typography } from '@mui/material';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
-type LoadingProps = {
+type LoadingRmpSummaryProps = {
   legacyId?: string;
 };
 
-export function LoadingRmpSummary({ legacyId }: LoadingProps) {
+export function LoadingRmpSummary({ legacyId }: LoadingRmpSummaryProps) {
   return (
     <>
-      <Skeleton variant="text" />
       <Skeleton variant="text" />
       <Skeleton variant="text" />
       <Skeleton variant="text" className="w-1/2" />
