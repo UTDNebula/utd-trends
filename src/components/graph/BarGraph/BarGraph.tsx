@@ -1,5 +1,6 @@
 'use client';
 
+import BaseCard from '@/components/common/BaseCard/BaseCard';
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
 import { compareColors, useRainbowColors } from '@/modules/colors';
@@ -160,7 +161,9 @@ export default function BarGraph(props: Props) {
         className="flex justify-stretch align-stretch"
       >
         <Fade in={fullScreenOpen}>
-          <Card className="p-4 m-12 flex-auto">{graph}</Card>
+          <div className="m-12 flex-auto flex justify-stretch align-stretch">
+            <BaseCard className="p-4 flex-auto">{graph}</BaseCard>
+          </div>
         </Fade>
       </Modal>
     </>
