@@ -3,7 +3,7 @@
 import BaseCard from '@/components/common/BaseCard/BaseCard';
 import Compare from '@/components/compare/Compare/Compare';
 import SearchIcon from '@mui/icons-material/Search';
-import { Button, Card, Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 

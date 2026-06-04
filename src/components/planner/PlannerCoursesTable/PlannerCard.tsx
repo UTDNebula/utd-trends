@@ -23,11 +23,9 @@ import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import EventIcon from '@mui/icons-material/Event';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
-  Box,
   Checkbox,
   Collapse,
   IconButton,
-  Paper,
   Radio,
   Skeleton,
   Table,

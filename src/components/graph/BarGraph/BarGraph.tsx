@@ -4,7 +4,7 @@ import BaseCard from '@/components/common/BaseCard/BaseCard';
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
 import { compareColors, useRainbowColors } from '@/modules/colors';
-import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
+import { Fade, Modal, useMediaQuery } from '@mui/material';
 import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';

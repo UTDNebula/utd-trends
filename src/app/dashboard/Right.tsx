@@ -13,7 +13,6 @@ import fetchGrades from '@/modules/fetchGrades';
 import fetchProfessor from '@/modules/fetchProfessor';
 import fetchRmp from '@/modules/fetchRmp';
 import { type SearchQuery, type SearchResult } from '@/types/SearchQuery';
-import { Card } from '@mui/material';
 import React, { Suspense } from 'react';
 import ServerLeft from './ServerLeft';
 

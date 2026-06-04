@@ -7,7 +7,7 @@ import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullsc
 import { compareColors } from '@/modules/colors';
 import type { Grades } from '@/modules/fetchGrades';
 import { displaySemesterName } from '@/modules/semesters';
-import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
+import { Fade, Modal, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';

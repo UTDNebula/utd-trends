@@ -8,7 +8,6 @@ import type { RMP } from '@/modules/fetchRmp';
 import { isComboQuery, type SearchQuery } from '@/types/SearchQuery';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
-  Button,
   Chip,
   Collapse,
   Grid,
