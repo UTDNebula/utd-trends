@@ -125,7 +125,7 @@ function LinkGroup({ name, links }: LinkGroupProps) {
   return (
     <div>
       <h3 className="text-md md:text-lg font-bold">{name}</h3>
-      <div className="mt-6 flex flex-col gap-5 text-sm md:text-base">
+      <div className="mt-6 flex flex-col items-start gap-5 text-sm md:text-base">
         {links.map(({ name, href }) => (
           <Link
             key={name + href}
@@ -143,7 +143,7 @@ function LinkGroup({ name, links }: LinkGroupProps) {
 
 function GetToKnowUs() {
   return (
-    <div className="flex flex-col gap-5 text-sm md:text-base">
+    <div className="flex flex-col items-start gap-5 text-sm md:text-base">
       <Link
         className={
           linkClasses +
