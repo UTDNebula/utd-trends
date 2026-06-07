@@ -34,7 +34,7 @@ export function LoadingSyllabusSummary({
     <>
       {/* Weighting Table */}
       <Grid size={6}>
-        <BaseCard className="dark:bg-neutral-700">
+        <BaseCard className="bg-neutral-100 dark:bg-neutral-700">
           <TableContainer>
             <Table size="small" aria-label="grade weighting table">
               <colgroup>
@@ -88,7 +88,7 @@ export function LoadingSyllabusSummary({
 
       {/* Grade Scale Table */}
       <Grid size={6}>
-        <BaseCard className="dark:bg-neutral-700">
+        <BaseCard className="bg-neutral-100 dark:bg-neutral-700">
           <TableContainer>
             <Table size="small" aria-label="grade scale table">
               <colgroup>
@@ -244,7 +244,7 @@ export default function SyllabusSummary({
           {syllabus.grade_weights != null &&
             syllabus.grade_weights.length > 0 && (
               <Grid size={6}>
-                <BaseCard className="dark:bg-neutral-700">
+                <BaseCard className="bg-neutral-100 dark:bg-neutral-700">
                   <TableContainer>
                     <Table size="small" aria-label="grade weighting table">
                       <colgroup>
@@ -346,7 +346,7 @@ export default function SyllabusSummary({
           {syllabus.letter_grade_scale != null &&
             syllabus.letter_grade_scale.length > 0 && (
               <Grid size={6}>
-                <BaseCard className="dark:bg-neutral-700">
+                <BaseCard className="bg-neutral-100 dark:bg-neutral-700">
                   <TableContainer>
                     <Table size="small" aria-label="grade scale table">
                       <colgroup>
