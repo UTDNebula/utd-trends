@@ -81,18 +81,6 @@ const links = [
     ],
   },
   {
-    name: 'Projects',
-    links: [
-      { name: 'Clubs', href: 'https://clubs.utdnebula.com/' },
-      { name: 'Skedge', href: 'https://www.utdnebula.com/projects/skedge' },
-      { name: 'Rooms', href: 'https://rooms.utdnebula.com/' },
-      {
-        name: 'API & Platform',
-        href: 'https://www.utdnebula.com/projects/api',
-      },
-    ],
-  },
-  {
     name: 'Data',
     links: [
       { name: 'Nebula API', href: 'https://www.utdnebula.com/projects/api' },
@@ -106,6 +94,18 @@ const links = [
       },
       { name: 'CourseBook', href: 'https://coursebook.utdallas.edu/' },
       { name: 'Profiles', href: 'https://profiles.utdallas.edu/' },
+    ],
+  },
+  {
+    name: 'Projects',
+    links: [
+      { name: 'Clubs', href: 'https://clubs.utdnebula.com/' },
+      { name: 'Skedge', href: 'https://www.utdnebula.com/projects/skedge' },
+      { name: 'Rooms', href: 'https://rooms.utdnebula.com/' },
+      {
+        name: 'API & Platform',
+        href: 'https://www.utdnebula.com/projects/api',
+      },
     ],
   },
 ];
