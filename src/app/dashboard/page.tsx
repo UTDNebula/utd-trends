@@ -1,3 +1,4 @@
+import Footer from '@/components/common/Footer/Footer';
 import Split from '@/components/common/Split/Split';
 import StickySide from '@/components/common/Split/StickySide';
 import ComparePage from '@/components/compare/ComparePage/ComparePage';
@@ -98,6 +99,7 @@ export default async function Page({ searchParams }: Props) {
           <main className="p-4">
             {isCompare ? <ComparePage /> : <DashboardEmpty />}
           </main>
+          <Footer />
         </FiltersProvider>
       </>
     );
@@ -196,6 +198,7 @@ export default async function Page({ searchParams }: Props) {
               </>
             )}
           </main>
+          <Footer />
         </HydrationBoundary>
       </FiltersProvider>
     </>
