@@ -7,7 +7,14 @@ import SyllabusSummary from '@/components/common/SyllabusSummary/SyllabusSummary
 import type { RMP } from '@/modules/fetchRmp';
 import { isComboQuery, type SearchQuery } from '@/types/SearchQuery';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Chip, Collapse, Grid, IconButton, Skeleton } from '@mui/material';
+import {
+  Chip,
+  Collapse,
+  Divider,
+  Grid,
+  IconButton,
+  Skeleton,
+} from '@mui/material';
 import Link from 'next/link';
 import React, { useState } from 'react';
 
@@ -191,32 +198,6 @@ function Rmp({ open, searchQuery, rmp }: RmpProps) {
   );
 }
 
-type SyllabusProps = {
-  open: boolean;
-  searchQuery: SearchQuery;
-  syllabus_uri?: string | null;
-  syllabus_sem?: string | null;
-};
-
-function Syllabus({
-  open,
-  searchQuery,
-  syllabus_uri,
-  syllabus_sem,
-}: SyllabusProps) {
-  if (!syllabus_uri || !syllabus_sem || !isComboQuery(searchQuery)) {
-    return null;
-  }
-  return (
-    <SyllabusSummary
-      open={open}
-      searchQuery={searchQuery}
-      syllabus_uri={syllabus_uri}
-      syllabus_sem={syllabus_sem}
-    />
-  );
-}
-
 type Props = {
   open: boolean;
   searchQuery: SearchQuery;
@@ -233,14 +214,24 @@ export default function SingleProfInfo({
   syllabus_sem,
 }: Props) {
   return (
-    <Grid container spacing={2} className="p-4">
-      <Rmp open={open} searchQuery={searchQuery} rmp={rmp} />
-      <Syllabus
-        open={open}
-        searchQuery={searchQuery}
-        syllabus_uri={syllabus_uri}
-        syllabus_sem={syllabus_sem}
-      />
-    </Grid>
+    <>
+      <Divider />
+      <Grid container spacing={2} className="p-4">
+        <Rmp open={open} searchQuery={searchQuery} rmp={rmp} />
+      </Grid>
+      {syllabus_uri && syllabus_sem && isComboQuery(searchQuery) && (
+        <>
+          <Divider />
+          <Grid container spacing={2} className="p-4">
+            <SyllabusSummary
+              open={open}
+              searchQuery={searchQuery}
+              syllabus_uri={syllabus_uri}
+              syllabus_sem={syllabus_sem}
+            />
+          </Grid>
+        </>
+      )}
+    </>
   );
 }
