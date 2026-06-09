@@ -200,21 +200,21 @@ export default function Footer() {
     <footer className="lg:px-40 px-8 pt-6 bg-royal dark:bg-cornflower-300 text-white dark:text-haiti w-full">
       <div className="flex gap-8 justify-between items-center">
         {/* Logo */}
-        <div className="font-display flex flex-row items-center gap-4">
-          <UTDTrendsLogoCombination
-            className="h-22 w-auto shrink-0"
-            duotone
-            slotClassNames={{
-              nebulaLogo: 'fill-current',
-              projectLogo: 'fill-cornflower-300 dark:fill-royal',
-            }}
-          />
+        <div className="font-display flex flex-row items-center gap-6">
+          <UTDTrendsLogoCombination className="h-22 w-auto shrink-0 fill-white dark:fill-haiti" />
           <div className="flex flex-col max-sm:hidden">
-            <span className="whitespace-nowrap text-2xl md:text-4xl font-bold leading-tight">
+            <span className="whitespace-nowrap text-4xl font-bold leading-tight">
               UTD TRENDS
             </span>
-            <span className="whitespace-nowrap text-sm md:text-lg font-medium">
-              by Nebula Labs
+            <span className="whitespace-nowrap text-xl font-medium">
+              by{' '}
+              <Link
+                target="_blank"
+                href="https://www.utdnebula.com/"
+                className="underline decoration-transparent hover:decoration-inherit transition decoration-2"
+              >
+                Nebula Labs
+              </Link>
             </span>
           </div>
         </div>
