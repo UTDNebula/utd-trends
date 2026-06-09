@@ -21,6 +21,154 @@ import React, { useEffect, useState } from 'react';
 
 const MAX_VISIBLE_ROWS = 2;
 
+interface LoadingGradeTableProps {
+  title: [string, string];
+  dataWidths: [string, string];
+}
+
+function LoadingGradeTable({ title, dataWidths }: LoadingGradeTableProps) {
+  return (
+    <BaseCard className="bg-neutral-100 dark:bg-neutral-700">
+      <TableContainer>
+        <Table size="small" aria-label="grade weighting table">
+          <colgroup>
+            <col className="w-1/2" />
+            <col className="w-1/2" />
+          </colgroup>
+          <TableHead>
+            <TableRow>
+              <TableCell className="font-bold">{title[0]}</TableCell>
+              <TableCell className="font-bold">{title[1]}</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {Array(2)
+              .fill(0)
+              .map((_, idx) => (
+                <TableRow
+                  key={idx}
+                  sx={{
+                    '&:last-child td, &:last-child th': {
+                      border: 0,
+                    },
+                  }}
+                >
+                  <TableCell component="th" scope="row">
+                    <Skeleton variant="text" className={dataWidths[0]} />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton variant="text" className={dataWidths[1]} />
+                  </TableCell>
+                </TableRow>
+              ))}
+            <TableRow
+              sx={{
+                '&:last-child td, &:last-child th': {
+                  border: 0,
+                },
+              }}
+            >
+              <TableCell align="center" className="py-0" colSpan={2}>
+                <Button className="normal-case" size="small" disabled>
+                  Show More
+                </Button>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </BaseCard>
+  );
+}
+
+interface GradeTableProps {
+  title: [string, string];
+  data: [string, string][];
+}
+
+function GradeTable({ title, data }: GradeTableProps) {
+  const [showMore, setShowMore] = useState(false);
+
+  return (
+    <BaseCard className="bg-neutral-100 dark:bg-neutral-700">
+      <TableContainer>
+        <Table size="small" aria-label="grade weighting table">
+          <colgroup>
+            <col className="w-1/2" />
+            <col className="w-1/2" />
+          </colgroup>
+          <TableHead>
+            <TableRow>
+              <TableCell className="font-bold">{title[0]}</TableCell>
+              <TableCell className="font-bold">{title[1]}</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.slice(0, MAX_VISIBLE_ROWS).map((row, idx) => (
+              <TableRow
+                key={idx}
+                sx={{
+                  '&:last-child td, &:last-child th': {
+                    border: 0,
+                  },
+                }}
+              >
+                <TableCell component="th" scope="row">
+                  {row[0]}
+                </TableCell>
+                <TableCell>{row[1]}</TableCell>
+              </TableRow>
+            ))}
+            {data.length > MAX_VISIBLE_ROWS && (
+              <>
+                <TableRow>
+                  <TableCell colSpan={2} className="p-0 border-0">
+                    <Collapse in={showMore} timeout="auto" unmountOnExit>
+                      <Table size="small">
+                        <colgroup>
+                          <col className="w-1/2" />
+                          <col className="w-1/2" />
+                        </colgroup>
+                        <TableBody>
+                          {data.slice(MAX_VISIBLE_ROWS).map((row, idx) => (
+                            <TableRow key={idx}>
+                              <TableCell component="th" scope="row">
+                                {row[0]}
+                              </TableCell>
+                              <TableCell>{row[1]}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </Collapse>
+                  </TableCell>
+                </TableRow>
+                <TableRow
+                  sx={{
+                    '&:last-child td, &:last-child th': {
+                      border: 0,
+                    },
+                  }}
+                >
+                  <TableCell align="center" className="py-0" colSpan={2}>
+                    <Button
+                      className="normal-case"
+                      size="small"
+                      onClick={() => setShowMore(!showMore)}
+                    >
+                      {showMore ? 'Show Less' : 'Show More'}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              </>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </BaseCard>
+  );
+}
+
 type LoadingSyllabusSummaryProps = {
   syllabus_uri?: string;
   syllabus_sem?: string;
@@ -34,110 +182,18 @@ export function LoadingSyllabusSummary({
     <>
       {/* Weighting Table */}
       <Grid size={6}>
-        <BaseCard className="bg-neutral-100 dark:bg-neutral-700">
-          <TableContainer>
-            <Table size="small" aria-label="grade weighting table">
-              <colgroup>
-                <col className="w-1/2" />
-                <col className="w-1/2" />
-              </colgroup>
-              <TableHead>
-                <TableRow>
-                  <TableCell className="font-bold">Weighting</TableCell>
-                  <TableCell className="font-bold">%</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {Array(2)
-                  .fill(0)
-                  .map((_, idx) => (
-                    <TableRow
-                      key={idx}
-                      sx={{
-                        '&:last-child td, &:last-child th': {
-                          border: 0,
-                        },
-                      }}
-                    >
-                      <TableCell component="th" scope="row">
-                        <Skeleton variant="text" className="w-1/2" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" className="w-1/4" />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                <TableRow
-                  sx={{
-                    '&:last-child td, &:last-child th': {
-                      border: 0,
-                    },
-                  }}
-                >
-                  <TableCell align="center" className="py-0" colSpan={2}>
-                    <Button className="normal-case" size="small" disabled>
-                      Show More
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </BaseCard>
+        <LoadingGradeTable
+          title={['Weighting', '%']}
+          dataWidths={['w-1/2', 'w-1/4']}
+        />
       </Grid>
 
       {/* Grade Scale Table */}
       <Grid size={6}>
-        <BaseCard className="bg-neutral-100 dark:bg-neutral-700">
-          <TableContainer>
-            <Table size="small" aria-label="grade scale table">
-              <colgroup>
-                <col className="w-1/2" />
-                <col className="w-1/2" />
-              </colgroup>
-              <TableHead>
-                <TableRow>
-                  <TableCell className="font-bold">Grade</TableCell>
-                  <TableCell className="font-bold">Scale</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {Array(2)
-                  .fill(0)
-                  .map((_, idx) => (
-                    <TableRow
-                      key={idx}
-                      sx={{
-                        '&:last-child td, &:last-child th': {
-                          border: 0,
-                        },
-                      }}
-                    >
-                      <TableCell component="th" scope="row">
-                        <Skeleton variant="text" className="w-1/4" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" className="w-1/4" />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                <TableRow
-                  sx={{
-                    '&:last-child td, &:last-child th': {
-                      border: 0,
-                    },
-                  }}
-                >
-                  <TableCell align="center" className="py-0" colSpan={2}>
-                    <Button className="normal-case" size="small" disabled>
-                      Show More
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </BaseCard>
+        <LoadingGradeTable
+          title={['Grade', 'Scale']}
+          dataWidths={['w-1/4', 'w-1/4']}
+        />
       </Grid>
 
       {/* AI Summary / Placeholder */}
@@ -211,9 +267,6 @@ export default function SyllabusSummary({
     }
   }, [open, state, searchQuery, syllabus_uri, syllabus]);
 
-  const [showMoreWeights, setShowMoreWeights] = useState(false);
-  const [showMoreGrades, setShowMoreGrades] = useState(false);
-
   if (state === 'error') {
     return (
       <Grid size={12}>
@@ -244,101 +297,13 @@ export default function SyllabusSummary({
           {syllabus.grade_weights != null &&
             syllabus.grade_weights.length > 0 && (
               <Grid size={6}>
-                <BaseCard className="bg-neutral-100 dark:bg-neutral-700">
-                  <TableContainer>
-                    <Table size="small" aria-label="grade weighting table">
-                      <colgroup>
-                        <col className="w-1/2" />
-                        <col className="w-1/2" />
-                      </colgroup>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell className="font-bold">Weighting</TableCell>
-                          <TableCell className="font-bold">%</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {syllabus.grade_weights
-                          .slice(0, MAX_VISIBLE_ROWS)
-                          .map((row, idx) => (
-                            <TableRow
-                              key={idx}
-                              sx={{
-                                '&:last-child td, &:last-child th': {
-                                  border: 0,
-                                },
-                              }}
-                            >
-                              <TableCell component="th" scope="row">
-                                {row.category}
-                              </TableCell>
-                              <TableCell>{row.percentage}</TableCell>
-                            </TableRow>
-                          ))}
-                        {syllabus.grade_weights.length > MAX_VISIBLE_ROWS && (
-                          <>
-                            <TableRow>
-                              <TableCell colSpan={2} className="p-0 border-0">
-                                <Collapse
-                                  in={showMoreWeights}
-                                  timeout="auto"
-                                  unmountOnExit
-                                >
-                                  <Table size="small">
-                                    <colgroup>
-                                      <col className="w-1/2" />
-                                      <col className="w-1/2" />
-                                    </colgroup>
-                                    <TableBody>
-                                      {syllabus.grade_weights
-                                        .slice(MAX_VISIBLE_ROWS)
-                                        .map((row, idx) => (
-                                          <TableRow key={idx}>
-                                            <TableCell
-                                              component="th"
-                                              scope="row"
-                                            >
-                                              {row.category}
-                                            </TableCell>
-                                            <TableCell>
-                                              {row.percentage}
-                                            </TableCell>
-                                          </TableRow>
-                                        ))}
-                                    </TableBody>
-                                  </Table>
-                                </Collapse>
-                              </TableCell>
-                            </TableRow>
-                            <TableRow
-                              sx={{
-                                '&:last-child td, &:last-child th': {
-                                  border: 0,
-                                },
-                              }}
-                            >
-                              <TableCell
-                                align="center"
-                                className="py-0"
-                                colSpan={2}
-                              >
-                                <Button
-                                  className="normal-case"
-                                  size="small"
-                                  onClick={() =>
-                                    setShowMoreWeights(!showMoreWeights)
-                                  }
-                                >
-                                  {showMoreWeights ? 'Show Less' : 'Show More'}
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          </>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </BaseCard>
+                <GradeTable
+                  title={['Weighting', '%']}
+                  data={syllabus.grade_weights.map((row) => [
+                    row.category,
+                    row.percentage,
+                  ])}
+                />
               </Grid>
             )}
 
@@ -346,100 +311,13 @@ export default function SyllabusSummary({
           {syllabus.letter_grade_scale != null &&
             syllabus.letter_grade_scale.length > 0 && (
               <Grid size={6}>
-                <BaseCard className="bg-neutral-100 dark:bg-neutral-700">
-                  <TableContainer>
-                    <Table size="small" aria-label="grade scale table">
-                      <colgroup>
-                        <col className="w-1/2" />
-                        <col className="w-1/2" />
-                      </colgroup>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell className="font-bold">Grade</TableCell>
-                          <TableCell className="font-bold">Scale</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {syllabus.letter_grade_scale
-                          .slice(0, MAX_VISIBLE_ROWS)
-                          .map((row, idx) => (
-                            <TableRow
-                              key={idx}
-                              sx={{
-                                '&:last-child td, &:last-child th': {
-                                  border: 0,
-                                },
-                              }}
-                            >
-                              <TableCell component="th" scope="row">
-                                {row.grade}
-                              </TableCell>
-                              <TableCell>{row.range}</TableCell>
-                            </TableRow>
-                          ))}
-                        {syllabus.letter_grade_scale.length >
-                          MAX_VISIBLE_ROWS && (
-                          <>
-                            <TableRow>
-                              <TableCell colSpan={2} className="p-0 border-0">
-                                <Collapse
-                                  in={showMoreGrades}
-                                  timeout="auto"
-                                  unmountOnExit
-                                >
-                                  <Table size="small">
-                                    <colgroup>
-                                      <col className="w-1/2" />
-                                      <col className="w-1/2" />
-                                    </colgroup>
-                                    <TableBody>
-                                      {syllabus.letter_grade_scale
-                                        .slice(MAX_VISIBLE_ROWS)
-                                        .map((row, idx) => (
-                                          <TableRow key={idx}>
-                                            <TableCell
-                                              component="th"
-                                              scope="row"
-                                            >
-                                              {row.grade}
-                                            </TableCell>
-                                            <TableCell>{row.range}</TableCell>
-                                          </TableRow>
-                                        ))}
-                                    </TableBody>
-                                  </Table>
-                                </Collapse>
-                              </TableCell>
-                            </TableRow>
-                            <TableRow
-                              sx={{
-                                '&:last-child td, &:last-child th': {
-                                  border: 0,
-                                },
-                              }}
-                            >
-                              <TableCell
-                                align="center"
-                                className="py-0"
-                                colSpan={2}
-                              >
-                                <Button
-                                  className="normal-case"
-                                  size="small"
-                                  onClick={() =>
-                                    setShowMoreGrades(!showMoreGrades)
-                                  }
-                                >
-                                  {showMoreGrades ? 'Show Less' : 'Show More'}
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          </>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </BaseCard>
+                <GradeTable
+                  title={['Grade', 'Scale']}
+                  data={syllabus.letter_grade_scale.map((row) => [
+                    row.grade,
+                    row.range,
+                  ])}
+                />
               </Grid>
             )}
 
