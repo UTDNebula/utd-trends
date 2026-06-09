@@ -160,7 +160,7 @@ function GetToKnowUs() {
         href="https://www.utdnebula.com/"
       >
         <NebulaLogo className="h-6 w-auto fill-white dark:fill-haiti" />
-        Wesbite
+        Website
       </Link>
       <Link
         className={linkClasses + ' flex items-center gap-2'}
