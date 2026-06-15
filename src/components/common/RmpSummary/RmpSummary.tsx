@@ -2,21 +2,38 @@
 
 import { type SearchQuery } from '@/types/SearchQuery';
 import { Skeleton, Tooltip, Typography } from '@mui/material';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
-export function LoadingRmpSummary() {
+type LoadingRmpSummaryProps = {
+  legacyId?: string;
+};
+
+export function LoadingRmpSummary({ legacyId }: LoadingRmpSummaryProps) {
   return (
     <>
       <Skeleton variant="text" />
       <Skeleton variant="text" />
-      <Skeleton variant="text" />
       <Skeleton variant="text" className="w-1/2" />
-      <Typography
-        variant="overline"
-        className="text-gray-700 dark:text-gray-300"
-      >
-        AI REVIEW SUMMARY
-      </Typography>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Typography
+          variant="overline"
+          className="text-gray-700 dark:text-gray-300"
+        >
+          AI REVIEW SUMMARY
+        </Typography>
+        {legacyId ? (
+          <Link
+            href={'https://www.ratemyprofessors.com/professor/' + legacyId}
+            target="_blank"
+            className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+          >
+            Visit Rate My Professors
+          </Link>
+        ) : (
+          <p>Visit Rate My Professors</p>
+        )}
+      </div>
     </>
   );
 }
@@ -24,9 +41,10 @@ export function LoadingRmpSummary() {
 type Props = {
   open: boolean;
   searchQuery: SearchQuery;
+  legacyId: string;
 };
 
-export default function RmpSummary({ open, searchQuery }: Props) {
+export default function RmpSummary({ open, searchQuery, legacyId }: Props) {
   const [summary, setSummary] = useState<string | null>(null);
   const [error, setError] = useState(false);
 
@@ -72,27 +90,47 @@ export default function RmpSummary({ open, searchQuery }: Props) {
   }, [open, searchQuery]);
 
   if (status === 'error') {
-    return <p>Problem loading AI review summary.</p>;
+    return (
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p>Problem loading AI review summary.</p>
+        <Link
+          href={'https://www.ratemyprofessors.com/professor/' + legacyId}
+          target="_blank"
+          className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+        >
+          Visit Rate My Professors
+        </Link>
+      </div>
+    );
   }
 
   if (!summary) {
-    return <LoadingRmpSummary />;
+    return <LoadingRmpSummary legacyId={legacyId} />;
   }
 
   return (
     <>
       <p>{summary}</p>
-      <Tooltip
-        title="This summary is AI generated. Please double check any important information"
-        placement="right"
-      >
-        <Typography
-          variant="overline"
-          className="text-gray-700 dark:text-gray-300"
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Tooltip
+          title="This summary is AI generated. Please double check any important information"
+          placement="right"
         >
-          AI REVIEW SUMMARY
-        </Typography>
-      </Tooltip>
+          <Typography
+            variant="overline"
+            className="text-gray-700 dark:text-gray-300"
+          >
+            AI REVIEW SUMMARY
+          </Typography>
+        </Tooltip>
+        <Link
+          href={'https://www.ratemyprofessors.com/professor/' + legacyId}
+          target="_blank"
+          className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+        >
+          Visit Rate My Professors
+        </Link>
+      </div>
     </>
   );
 }
