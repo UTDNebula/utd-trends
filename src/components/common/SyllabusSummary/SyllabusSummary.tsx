@@ -22,15 +22,20 @@ import React, { useEffect, useState } from 'react';
 const MAX_VISIBLE_ROWS = 2;
 
 interface LoadingGradeTableProps {
+  ariaLabel: string;
   title: [string, string];
   dataWidths: [string, string];
 }
 
-function LoadingGradeTable({ title, dataWidths }: LoadingGradeTableProps) {
+function LoadingGradeTable({
+  ariaLabel,
+  title,
+  dataWidths,
+}: LoadingGradeTableProps) {
   return (
     <BaseCard className="bg-neutral-100 dark:bg-neutral-700">
       <TableContainer>
-        <Table size="small" aria-label="grade weighting table">
+        <Table size="small" aria-label={ariaLabel}>
           <colgroup>
             <col className="w-1/2" />
             <col className="w-1/2" />
@@ -82,17 +87,18 @@ function LoadingGradeTable({ title, dataWidths }: LoadingGradeTableProps) {
 }
 
 interface GradeTableProps {
+  ariaLabel: string;
   title: [string, string];
   data: [string, string][];
 }
 
-function GradeTable({ title, data }: GradeTableProps) {
+function GradeTable({ ariaLabel, title, data }: GradeTableProps) {
   const [showMore, setShowMore] = useState(false);
 
   return (
     <BaseCard className="bg-neutral-100 dark:bg-neutral-700">
       <TableContainer>
-        <Table size="small" aria-label="grade weighting table">
+        <Table size="small" aria-label={ariaLabel}>
           <colgroup>
             <col className="w-1/2" />
             <col className="w-1/2" />
@@ -183,6 +189,7 @@ export function LoadingSyllabusSummary({
       {/* Weighting Table */}
       <Grid size={6}>
         <LoadingGradeTable
+          ariaLabel="grade weighting table"
           title={['Weighting', '%']}
           dataWidths={['w-1/2', 'w-1/4']}
         />
@@ -191,6 +198,7 @@ export function LoadingSyllabusSummary({
       {/* Grade Scale Table */}
       <Grid size={6}>
         <LoadingGradeTable
+          ariaLabel="grade scale table"
           title={['Grade', 'Scale']}
           dataWidths={['w-1/4', 'w-1/4']}
         />
@@ -298,6 +306,7 @@ export default function SyllabusSummary({
             syllabus.grade_weights.length > 0 && (
               <Grid size={6}>
                 <GradeTable
+                  ariaLabel="grade weighting table"
                   title={['Weighting', '%']}
                   data={syllabus.grade_weights.map((row) => [
                     row.category,
@@ -312,6 +321,7 @@ export default function SyllabusSummary({
             syllabus.letter_grade_scale.length > 0 && (
               <Grid size={6}>
                 <GradeTable
+                  ariaLabel="grade scale table"
                   title={['Grade', 'Scale']}
                   data={syllabus.letter_grade_scale.map((row) => [
                     row.grade,
