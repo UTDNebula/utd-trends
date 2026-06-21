@@ -3,7 +3,7 @@
 import usePersistantState from '@/modules/usePersistantState';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import CloseIcon from '@mui/icons-material/Close';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import {
   Backdrop,
   Button,
@@ -218,7 +218,7 @@ export function TutorialButton({ handleCloseMenu }: TutorialButtonProps) {
           }
         >
           <ListItemIcon>
-            <HelpOutlineIcon />
+            <HelpOutlinedIcon />
           </ListItemIcon>
           <ListItemText>Tutorial</ListItemText>
         </MenuItem>
@@ -243,7 +243,7 @@ export function TutorialButton({ handleCloseMenu }: TutorialButtonProps) {
               size="medium"
               onClick={openTutorial}
             >
-              <HelpOutlineIcon
+              <HelpOutlinedIcon
                 className={'text-3xl' + (tutorialHint ? ' text-white' : '')}
               />
             </IconButton>

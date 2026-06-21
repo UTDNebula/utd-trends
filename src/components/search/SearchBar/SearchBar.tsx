@@ -503,18 +503,22 @@ export default function SearchBar(props: Props) {
           setInputValue(newInputValue);
           loadNewOptions(newInputValue);
         }}
-        renderInput={(params) => {
-          params.inputProps.onKeyDown = handleKeyDown;
-          return (
-            <TextField
-              {...params}
-              variant="outlined"
-              className={`[&>.MuiInputBase-root]:rounded-r-none ${props.input_className}`}
-              placeholder={searchBarHints[searchBarHintIndex]}
-              autoFocus={props.autoFocus}
-            />
-          );
-        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            slotProps={{
+              ...params.slotProps,
+              htmlInput: {
+                ...params.slotProps?.htmlInput,
+                onKeyDown: handleKeyDown,
+              },
+            }}
+            variant="outlined"
+            className={`[&>.MuiInputBase-root]:rounded-r-none ${props.input_className}`}
+            placeholder={searchBarHints[searchBarHintIndex]}
+            autoFocus={props.autoFocus}
+          />
+        )}
         //for handling spaces, when options are already loaded
         onInput={(event) => {
           const value = (event.target as HTMLInputElement).value;
