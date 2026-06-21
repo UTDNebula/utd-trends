@@ -11,6 +11,7 @@ import {
   IconButton,
   ListItemText,
   MenuItem,
+  MenuList,
   Popover,
   Tooltip,
 } from '@mui/material';
@@ -200,14 +201,7 @@ export function TutorialButton({ handleCloseMenu }: TutorialButtonProps) {
   return (
     <>
       {/* Shown on small screens */}
-      <div className="relative sm:hidden">
-        <div
-          className={
-            tutorialHint
-              ? 'absolute w-full h-1/2 translate-y-1/2 bg-royal dark:bg-cornflower-300 animate-ping'
-              : 'hidden'
-          }
-        />
+      <MenuList className="relative sm:hidden">
         <MenuItem
           onClick={() => {
             openTutorial();
@@ -217,12 +211,19 @@ export function TutorialButton({ handleCloseMenu }: TutorialButtonProps) {
             tutorialHint ? 'bg-royal/20 dark:bg-cornflower-300/20' : ''
           }
         >
+          <div
+            className={
+              tutorialHint
+                ? 'absolute w-full h-full bg-royal dark:bg-cornflower-300 animate-ping'
+                : 'hidden'
+            }
+          />
           <ListItemIcon>
             <HelpOutlinedIcon />
           </ListItemIcon>
           <ListItemText>Tutorial</ListItemText>
         </MenuItem>
-      </div>
+      </MenuList>
       {/* Shown on large screens */}
       <div className="relative max-sm:hidden">
         <div

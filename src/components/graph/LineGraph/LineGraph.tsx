@@ -97,7 +97,7 @@ export default function LineGraph(props: Props) {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
-    '<div class="apexcharts-menu-icon">' +
+    '<div class="apexcharts-menu-icon custom">' +
     (fullScreenOpen ? FullscreenCloseIcon : FullscreenOpenIcon) +
     '</div>';
 
@@ -210,28 +210,27 @@ export default function LineGraph(props: Props) {
       },
       events: {
         markerClick: (event, chartContext, opts) => {
-          if (chartContext && opts) {
-            const semester =
-              chartContext.getState().series[opts.seriesIndex]?.data[
-                opts.dataPointIndex
-              ].semester;
+          if (!opts) return;
 
-            let newSemesters = chosenSemesters;
+          const semester =
+            series[opts.seriesIndex]?.data?.[opts.dataPointIndex].semester;
 
-            if (semester === null) return;
-            if (chosenSemesters?.length === semesters.length) {
-              newSemesters = [semester];
-            } else if (chosenSemesters.includes(semester)) {
-              newSemesters = chosenSemesters.filter((s) => s !== semester);
-              if (newSemesters.length == 0) {
-                newSemesters = semesters;
-              }
-            } else {
-              newSemesters = [...chosenSemesters, semester];
+          if (!semester) return;
+
+          let newSemesters = chosenSemesters;
+
+          if (chosenSemesters?.length === semesters.length) {
+            newSemesters = [semester];
+          } else if (chosenSemesters.includes(semester)) {
+            newSemesters = chosenSemesters.filter((s) => s !== semester);
+            if (newSemesters.length == 0) {
+              newSemesters = semesters;
             }
-
-            setChosenSemesters(newSemesters);
+          } else {
+            newSemesters = [...chosenSemesters, semester];
           }
+
+          setChosenSemesters(newSemesters);
         },
       },
     },
