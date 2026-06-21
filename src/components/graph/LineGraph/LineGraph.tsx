@@ -209,26 +209,29 @@ export default function LineGraph(props: Props) {
         enabled: !fullScreenOpen && !singleLabelMode && multiplePoints,
       },
       events: {
-        markerClick: (event, chartContext, { seriesIndex, dataPointIndex }) => {
-          const semester =
-            chartContext.w.config?.series[seriesIndex]?.data[dataPointIndex]
-              .semester;
+        markerClick: (event, chartContext, opts) => {
+          if (chartContext && opts) {
+            const semester =
+              chartContext.getState().series[opts.seriesIndex]?.data[
+                opts.dataPointIndex
+              ].semester;
 
-          let newSemesters = chosenSemesters;
+            let newSemesters = chosenSemesters;
 
-          if (semester === null) return;
-          if (chosenSemesters?.length === semesters.length) {
-            newSemesters = [semester];
-          } else if (chosenSemesters.includes(semester)) {
-            newSemesters = chosenSemesters.filter((s) => s !== semester);
-            if (newSemesters.length == 0) {
-              newSemesters = semesters;
+            if (semester === null) return;
+            if (chosenSemesters?.length === semesters.length) {
+              newSemesters = [semester];
+            } else if (chosenSemesters.includes(semester)) {
+              newSemesters = chosenSemesters.filter((s) => s !== semester);
+              if (newSemesters.length == 0) {
+                newSemesters = semesters;
+              }
+            } else {
+              newSemesters = [...chosenSemesters, semester];
             }
-          } else {
-            newSemesters = [...chosenSemesters, semester];
-          }
 
-          setChosenSemesters(newSemesters);
+            setChosenSemesters(newSemesters);
+          }
         },
       },
     },
@@ -330,10 +333,10 @@ export default function LineGraph(props: Props) {
     theme: { mode: prefersDarkMode ? 'dark' : 'light' },
   };
 
-  const highlightedMarkers: ApexDiscretePoint[] =
+  const highlightedMarkers =
     chosenSemesters.length === semesters.length
       ? []
-      : ((chosenSemesters?.flatMap((sem) => {
+      : (chosenSemesters?.flatMap((sem) => {
           return series.flatMap((s, seriesIndex) => {
             const dataPointIndex = s.data.findIndex((d) => d.semester === sem);
             if (dataPointIndex === -1) return [];
@@ -351,7 +354,7 @@ export default function LineGraph(props: Props) {
               },
             ];
           });
-        }) ?? []) as ApexDiscretePoint[]);
+        }) ?? []);
 
   options.markers = {
     ...options.markers,

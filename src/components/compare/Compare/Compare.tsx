@@ -86,15 +86,17 @@ export default function Compare({ isMobile = false }: { isMobile?: boolean }) {
             yaxisFormatter={(value) =>
               Number(value).toFixed(0).toLocaleString() + '%'
             }
-            tooltipFormatter={(value, { seriesIndex, dataPointIndex }) => {
+            tooltipFormatter={(value, opts) => {
               let response = Number(value).toFixed(2).toLocaleString() + '%';
-              const grade = compare[seriesIndex].grades;
-              response +=
-                ' (' +
-                calculateGrades(grade, chosenSemesters, chosenSectionTypes)
-                  .grade_distribution[dataPointIndex].toFixed(0)
-                  .toLocaleString() +
-                ')';
+              if (opts) {
+                const grade = compare[opts.seriesIndex].grades;
+                response +=
+                  ' (' +
+                  calculateGrades(grade, chosenSemesters, chosenSectionTypes)
+                    .grade_distribution[opts.dataPointIndex].toFixed(0)
+                    .toLocaleString() +
+                  ')';
+              }
 
               return response;
             }}

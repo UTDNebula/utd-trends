@@ -17,7 +17,7 @@ type Props = {
   yaxisFormatter?: (val: number) => string;
   tooltipFormatter?: (
     val: number,
-    extra: { series: number[]; seriesIndex: number; dataPointIndex: number },
+    opts?: { seriesIndex: number; dataPointIndex: number },
   ) => string;
   series: {
     name: string;
