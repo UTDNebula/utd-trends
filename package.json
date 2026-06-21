@@ -15,7 +15,8 @@
     "lint:check": "eslint .",
     "docs": "styleguidist server",
     "docs:build": "styleguidist build",
-    "test": "jest"
+    "test": "jest",
+    "type:check": "next typegen && tsc --noEmit"
   },
   "engines": {
     "node": "22.x"
