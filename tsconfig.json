@@ -14,6 +14,7 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "rootDir": ".",
     "paths": {
       // remap rsg-components/anything to its version in react-styleguidist
       "rsg-components/*": [
