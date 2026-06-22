@@ -452,7 +452,7 @@ export default function SearchBar(props: Props) {
         autoHighlight={true}
         clearOnBlur={false}
         className="grow"
-        onHighlightChange={(option) => {
+        onHighlightChange={(_, option) => {
           setHighlightedOption(option !== null); // whether an option is highlighted
         }}
         getOptionLabel={(option) => {
@@ -478,11 +478,12 @@ export default function SearchBar(props: Props) {
           event: React.SyntheticEvent,
           newValue: (string | SearchQuery)[],
         ) => {
-          //should never happen
+          // Value can be string on enter before hitting down arrow
           if (newValue.some((el) => typeof el === 'string')) {
-            return;
+            newValue = newValue.filter((el) => typeof el !== 'string');
+            newValue.push(options[0]);
           }
-          //remove from options
+          // Remove from options
           if (newValue.length > value.length) {
             setOptions((prev) =>
               prev.filter(
