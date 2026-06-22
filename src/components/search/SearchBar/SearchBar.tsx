@@ -485,7 +485,9 @@ export default function SearchBar(props: Props) {
           // Value can be string on enter before hitting down arrow
           if (newValue.some((el) => typeof el === 'string')) {
             newValue = newValue.filter((el) => typeof el !== 'string');
-            newValue.push(options[0]);
+            if (options[0]) {
+              newValue.push(options[0]);
+            }
           }
           // Remove from options
           if (newValue.length > value.length) {
