@@ -10,7 +10,13 @@ import { mockSearchQuery } from '../mocks/SearchQuery.mocks';
 
 describe('SingleProfInfo', () => {
   it('displays average rating', () => {
-    render(<SingleProfInfo open={false} rmp={mockRMP} searchQuery={mockSearchQuery} />);
+    render(
+      <SingleProfInfo
+        open={false}
+        rmp={mockRMP}
+        searchQuery={mockSearchQuery}
+      />,
+    );
 
     // displays average rating
     const rating = screen.getByText(mockRMP.avgRating.toFixed(1));
@@ -20,7 +26,11 @@ describe('SingleProfInfo', () => {
 
   it('displays N/A given no ratings', () => {
     render(
-      <SingleProfInfo open={false} rmp={mockRmpNoRatings} searchQuery={mockSearchQuery} />,
+      <SingleProfInfo
+        open={false}
+        rmp={mockRmpNoRatings}
+        searchQuery={mockSearchQuery}
+      />,
     );
 
     // displays average rating
