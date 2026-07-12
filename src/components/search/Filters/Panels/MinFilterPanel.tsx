@@ -38,7 +38,7 @@ export default function MinFilterPanel({ data }: MinFilterPanelProps) {
 
   return (
     <FilterPanel heading="Minimum" id="filter-minimum">
-      <Grid container spacing={3} marginTop={1}>
+      <Grid container spacing={3} className="mt-2">
         <FormControl size="small" className="w-full">
           <InputLabel id="minGPA">Letter Grade</InputLabel>
           <Select

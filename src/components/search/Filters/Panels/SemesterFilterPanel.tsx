@@ -29,7 +29,7 @@ export default function SemesterFilterPanel({
 
   return (
     <FilterPanel heading="Semesters" id="filter-semesters">
-      <Grid container spacing={3} marginTop={1}>
+      <Grid container spacing={3} className="mt-2">
         <FormControl size="small" className="w-full">
           <Select
             labelId="Semesters"

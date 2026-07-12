@@ -78,6 +78,12 @@
   .apexcharts-toolbar {
     z-index: 0 !important;
   }
+  .apexcharts-menu-icon.custom svg {
+    fill: currentColor !important;
+    stroke-width: unset !important;
+    stroke-linecap: unset !important;
+    stroke-linejoin: unset !important;
+  }
 }
 
 /* move buttons above the mobile nav */

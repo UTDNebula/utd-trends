@@ -9,7 +9,7 @@ import TuneIcon from '@mui/icons-material/Tune';
 import { Button, Chip, Grid, SwipeableDrawer } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname, useSearchParams } from 'next/navigation';
-import React, { use } from 'react';
+import React, { use, useSyncExternalStore } from 'react';
 import { FilterChipSkeleton } from './base/FilterChip';
 import { getFilterChipsArray } from './FilterChips';
 import FilterPanels from './FilterPanels';
@@ -40,6 +40,8 @@ export function LoadingFilters() {
   );
 }
 
+const emptySubscribe = () => () => {};
+
 /**
  * This component returns a set of filters with which to sort results.
  */
@@ -48,10 +50,11 @@ export default function Filters({
 }: {
   searchResultsPromise: Promise<SearchResult[]>;
 }) {
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true, // Client
+    () => false, // Server
+  );
 
   const { setTeachingSemester, availableSemesters, effectiveTeachingSemester } =
     useSharedState();

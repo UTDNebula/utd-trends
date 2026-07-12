@@ -17,7 +17,7 @@ type Props = {
   yaxisFormatter?: (val: number) => string;
   tooltipFormatter?: (
     val: number,
-    extra: { series: number[]; seriesIndex: number; dataPointIndex: number },
+    opts?: { seriesIndex: number; dataPointIndex: number },
   ) => string;
   series: {
     name: string;
@@ -37,7 +37,7 @@ export default function BarGraph(props: Props) {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
-    '<div class="apexcharts-menu-icon">' +
+    '<div class="apexcharts-menu-icon custom">' +
     (fullScreenOpen ? FullscreenCloseIcon : FullscreenOpenIcon) +
     '</div>';
 

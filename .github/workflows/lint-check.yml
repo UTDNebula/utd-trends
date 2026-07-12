@@ -4,7 +4,7 @@ on: push
 
 jobs:
   main:
-    name: Run ESLint, Jest, and Prettier
+    name: Run ESLint, Jest, Prettier, and TypeScript
     runs-on: ubuntu-latest
 
     steps:
@@ -27,3 +27,6 @@ jobs:
 
       - name: Run Prettier
         run: npm run format:check
+
+      - name: Run TypeScript
+        run: npm run type:check

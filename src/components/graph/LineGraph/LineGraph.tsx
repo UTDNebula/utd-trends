@@ -97,7 +97,7 @@ export default function LineGraph(props: Props) {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
-    '<div class="apexcharts-menu-icon">' +
+    '<div class="apexcharts-menu-icon custom">' +
     (fullScreenOpen ? FullscreenCloseIcon : FullscreenOpenIcon) +
     '</div>';
 
@@ -209,14 +209,16 @@ export default function LineGraph(props: Props) {
         enabled: !fullScreenOpen && !singleLabelMode && multiplePoints,
       },
       events: {
-        markerClick: (event, chartContext, { seriesIndex, dataPointIndex }) => {
+        markerClick: (event, chartContext, opts) => {
+          if (!opts) return;
+
           const semester =
-            chartContext.w.config?.series[seriesIndex]?.data[dataPointIndex]
-              .semester;
+            series[opts.seriesIndex]?.data?.[opts.dataPointIndex].semester;
+
+          if (!semester) return;
 
           let newSemesters = chosenSemesters;
 
-          if (semester === null) return;
           if (chosenSemesters?.length === semesters.length) {
             newSemesters = [semester];
           } else if (chosenSemesters.includes(semester)) {
@@ -330,10 +332,10 @@ export default function LineGraph(props: Props) {
     theme: { mode: prefersDarkMode ? 'dark' : 'light' },
   };
 
-  const highlightedMarkers: ApexDiscretePoint[] =
+  const highlightedMarkers =
     chosenSemesters.length === semesters.length
       ? []
-      : ((chosenSemesters?.flatMap((sem) => {
+      : (chosenSemesters?.flatMap((sem) => {
           return series.flatMap((s, seriesIndex) => {
             const dataPointIndex = s.data.findIndex((d) => d.semester === sem);
             if (dataPointIndex === -1) return [];
@@ -351,7 +353,7 @@ export default function LineGraph(props: Props) {
               },
             ];
           });
-        }) ?? []) as ApexDiscretePoint[]);
+        }) ?? []);
 
   options.markers = {
     ...options.markers,
