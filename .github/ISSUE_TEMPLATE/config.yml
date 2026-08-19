@@ -1,8 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Nebula Labs Website
-    url: https://www.utdnebula.com/
-    about: Get information about how to contribute to the project here.
-  - name: Nebula Labs Discord
-    url: discord.utdnebula.com
-    about: Please ask and answer questions about development here.
+  - name: General Contact
+    url: https://about.utdnebula.com/about/contact
+    about: Get in touch here
