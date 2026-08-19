@@ -21,5 +21,4 @@
 <!-- Please check off that you've completed each item below -->
 
 - [x] Create this PR
-- [ ] Evaluate this PR against the [PR checklist](https://github.com/UTDNebula/engineeringSandbox/wiki/How-to-Contribute)
 - [ ] Perform final self-review
