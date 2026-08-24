@@ -3,6 +3,7 @@
 import Background from '@/../public/background.png';
 import { useSharedState } from '@/app/SharedStateProvider';
 import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
+import UTDClubsLogo from '@/components/icons/UTDClubsLogo/UTDClubsLogo';
 import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
 import AvailabilityFilterChip from '@/components/search/Filters/Chips/AvailabilityFilterChip';
 import SearchBar, {
@@ -55,18 +56,17 @@ export default function Home() {
         className="object-cover -z-20"
       />
       <div className="absolute top-4 left-4 right-4 flex gap-2 place-content-between flex-wrap-reverse">
-        {/*Ad for Spring 2026*/}
-        {/*<a
-          href="https://trends.utdnebula.com/dashboard?searchTerms=GOVT+2306&availability=26S"
+        <a
+          href="https://clubs.utdnebula.com/"
           target="_blank"
           rel="noreferrer"
           className="bg-royal dark:bg-cornflower-300 text-cornflower-50 dark:text-haiti rounded transition hover:scale-[1.01] text-center flex gap-2 items-center mr-auto"
         >
-          <UTDTrendsLogoStandalone className="h-12 w-auto ml-2 fill-white dark:fill-haiti shrink-0" />
-          <span className="my-3 mr-5">
-            <b>Spring 2026</b> courses are now on Trends!
+          <UTDClubsLogo className="h-12 w-auto ml-1 fill-white dark:fill-haiti shrink-0" />
+          <span className="my-3 mr-4">
+            Discover student organizations on <b>UTD Clubs</b>!
           </span>
-        </a>*/}
+        </a>
         <PlannerButton className="ml-auto" />
       </div>
       <div className="max-w-xl grow flex flex-col justify-center">
