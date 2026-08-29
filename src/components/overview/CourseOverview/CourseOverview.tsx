@@ -47,7 +47,7 @@ export function LoadingCourseOverview() {
   );
 }
 
-function parseDescription(course: Course): {
+export function parseDescription(course: Course): {
   formattedDescription: string;
   requisites: string[];
   sameAsText: string;
@@ -212,11 +212,16 @@ function parseDescription(course: Course): {
       0,
       requisites[lastRequisite].lastIndexOf('.') + 1,
     );
-  } else
-    formattedDescription = formattedDescription.substring(
-      0,
-      formattedDescription.lastIndexOf('.') + 1,
+  } else {
+    const lastPeriod = formattedDescription.lastIndexOf('.');
+    const textAfterLastPeriod = formattedDescription.substring(lastPeriod + 1);
+    const hasOnlyCourseMetadata = /^\s+\([\d-]+\)\s+[SYTRPFU]\s*$/.test(
+      textAfterLastPeriod,
     );
+    if (lastPeriod != -1 && hasOnlyCourseMetadata) {
+      formattedDescription = formattedDescription.substring(0, lastPeriod + 1);
+    }
+  }
 
   return {
     formattedDescription,
