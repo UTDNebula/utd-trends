@@ -1,3 +1,4 @@
+import Footer from '@/components/common/Footer/Footer';
 import Split from '@/components/common/Split/Split';
 import StickySide from '@/components/common/Split/StickySide';
 import ComparePage from '@/components/compare/ComparePage/ComparePage';
@@ -92,14 +93,15 @@ export default async function Page({ searchParams }: Props) {
   }
   if (typeof searchTerms === 'undefined' || searchTerms.length === 0) {
     return (
-      <>
-        <FiltersProvider searchResults={[]}>
+      <FiltersProvider searchResults={[]}>
+        <div className="flex min-h-full flex-col">
           <Header isPlanner={false} />
-          <main className="p-4">
+          <main className="flex-1 p-4">
             {isCompare ? <ComparePage /> : <DashboardEmpty />}
           </main>
-        </FiltersProvider>
-      </>
+          <Footer />
+        </div>
+      </FiltersProvider>
     );
   }
   searchTerms = decodeURIComponent(searchTerms);
@@ -196,6 +198,7 @@ export default async function Page({ searchParams }: Props) {
               </>
             )}
           </main>
+          <Footer />
         </HydrationBoundary>
       </FiltersProvider>
     </>
