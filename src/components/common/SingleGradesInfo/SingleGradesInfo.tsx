@@ -1,11 +1,18 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+'use client';
+
+import { FiltersContext } from '@/app/dashboard/FilterContext';
 import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
 import type { GradesData, GradesSummary } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
+import { calculateGpaTrend } from '@/modules/gpaTrend';
 import { searchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
+import TrendingDownSharpIcon from '@mui/icons-material/TrendingDownSharp';
+import TrendingUpSharpIcon from '@mui/icons-material/TrendingUpSharp';
 import { Skeleton } from '@mui/material';
-import React from 'react';
+import React, { use, useMemo } from 'react';
 
 export function LoadingSingleGradesInfo() {
   return (
@@ -47,6 +54,16 @@ export default function SingleGradesInfo({
   filteredGrades,
 }: Props) {
   const percents = convertNumbersToPercents(filteredGrades);
+  const chosenSectionTypes = use(FiltersContext).chosenSectionTypes;
+
+  const trend = useMemo(
+    () =>
+      calculateGpaTrend({
+        grades,
+        chosenSectionTypes,
+      }),
+    [grades, chosenSectionTypes],
+  );
 
   return (
     <div className="p-2">
@@ -121,11 +138,28 @@ export default function SingleGradesInfo({
         </p>
         <p>
           Mean GPA:{' '}
-          <b>
-            {filteredGrades.mean_gpa === -1
-              ? 'None'
-              : filteredGrades.mean_gpa.toFixed(3)}
-          </b>
+          <span className="inline-flex items-center gap-1">
+            <b>
+              {filteredGrades.mean_gpa === -1
+                ? 'None'
+                : filteredGrades.mean_gpa.toFixed(3)}
+            </b>
+            {trend.direction && (
+              <span className="inline-flex">
+                {trend.direction === 'up' ? (
+                  <TrendingUpSharpIcon
+                    className="text-green-700 dark:text-green-400"
+                    sx={{ fontSize: 18 }}
+                  />
+                ) : (
+                  <TrendingDownSharpIcon
+                    className="text-red-700 dark:text-red-400"
+                    sx={{ fontSize: 18 }}
+                  />
+                )}
+              </span>
+            )}
+          </span>
         </p>
       </div>
     </div>
