@@ -432,7 +432,7 @@ export default function SearchBar(props: Props) {
   }
 
   useEffect(() => {
-    void fetch('/api/autocomplete?input=someSearchTerm');
+    void fetch('/api/autocomplete?input=someSearchTerm').catch(() => {});
   }, []);
 
   const [highlightedOption, setHighlightedOption] = useState<boolean>(false);
