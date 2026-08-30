@@ -6,12 +6,18 @@ import {
   type SearchQuery,
 } from '../types/SearchQuery';
 
-export type TableType = { [key: string]: SearchQuery[] };
+export type TableEntry = SearchQuery & { totalStudents: number };
+export type TableType = { [key: string]: TableEntry[] };
 
 const table: TableType = {};
 
-function addCourse(title: string, prefix: string, number: string) {
-  const courseObject: SearchQuery = { prefix, number };
+function addCourse(
+  title: string,
+  prefix: string,
+  number: string,
+  totalStudents: number,
+) {
+  const courseObject: TableEntry = { prefix, number, totalStudents };
 
   if (!Object.prototype.hasOwnProperty.call(table, title)) {
     table[title] = [courseObject];
@@ -28,10 +34,26 @@ for (let prefixItr = 0; prefixItr < aggregatedData.data.length; prefixItr++) {
     courseNumberItr++
   ) {
     const courseNumberData = prefixData.course_numbers[courseNumberItr];
+    let courseStudents = 0;
+    for (
+      let sessionItr = 0;
+      sessionItr < courseNumberData.academic_sessions.length;
+      sessionItr++
+    ) {
+      const sessionData = courseNumberData.academic_sessions[sessionItr];
+      for (
+        let sectionItr = 0;
+        sectionItr < sessionData.sections.length;
+        sectionItr++
+      ) {
+        courseStudents += sessionData.sections[sectionItr].total_students ?? 0;
+      }
+    }
     addCourse(
       courseNumberData.title,
       prefixData.subject_prefix,
       courseNumberData.course_number,
+      courseStudents,
     );
   }
 }
