@@ -77,6 +77,12 @@ module.exports = {
       new webpack.DefinePlugin({
         'process.env': JSON.stringify(dotenv.parsed),
       }),
+      new webpack.DefinePlugin({
+        'process.env.NEXT_PUBLIC_VERCEL_ENV': JSON.stringify('preview'),
+        'process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA': JSON.stringify(
+          '8f186aa333b80c386e6752d72abc272d6869d529',
+        ),
+      }),
     ],
     module: {
       rules: [
