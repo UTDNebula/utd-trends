@@ -9,19 +9,19 @@
     "noEmit": false,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "rootDir": ".",
     "paths": {
       // remap rsg-components/anything to its version in react-styleguidist
       "rsg-components/*": [
         "./node_modules/react-styleguidist/lib/client/rsg-components/*"
       ],
-      "@/*": ["*"]
+      "@/*": ["./src/*"]
     },
-    "baseUrl": "src",
     "verbatimModuleSyntax": true,
     "plugins": [
       {

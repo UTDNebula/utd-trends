@@ -1,9 +1,7 @@
 'use client';
 
-import {
-  getSectionTypesFromSearchResults,
-  getSemestersFromSearchResults,
-} from '@/modules/semesters';
+import { getSectionTypesFromSearchResults } from '@/modules/sections';
+import { getSemestersFromSearchResults } from '@/modules/semesters';
 import type { SearchResult } from '@/types/SearchQuery';
 import {
   createContext,

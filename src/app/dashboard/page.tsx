@@ -125,7 +125,7 @@ export default async function Page({ searchParams }: Props) {
       <FiltersProvider searchResults={await searchResults}>
         <HydrationBoundary state={dehydrate(queryClient)}>
           <Header isPlanner={false} />
-          <main className="p-4">
+          <main className="p-4 max-md:pt-0">
             <Suspense fallback={<LoadingFilters />}>
               <Filters searchResultsPromise={searchResults} />
             </Suspense>
@@ -157,7 +157,9 @@ export default async function Page({ searchParams }: Props) {
                           }
                         >
                           <Right
-                            courses={courses}
+                            courses={courses.filter(
+                              (course) => !course.number?.includes('X'), //  Don't try to show overview for aggregate course searches
+                            )}
                             professors={professors}
                             searchResultsPromise={searchResults}
                           />
@@ -182,7 +184,9 @@ export default async function Page({ searchParams }: Props) {
                     }
                   >
                     <Right
-                      courses={courses}
+                      courses={courses.filter(
+                        (course) => !course.number?.includes('X'), // Don't try to show overview for aggregate course searches
+                      )}
                       professors={professors}
                       searchResultsPromise={searchResults}
                       isMobile={true}

@@ -147,15 +147,19 @@ export default function SearchBar(props: Props) {
   //set value from query
   const searchParams = useSearchParams();
   const searchTerms = searchParams ? searchParams.get('searchTerms') : null;
-  useEffect(() => {
+  const [prevSearchTerms, setPrevSearchTerms] = useState<string | null>(null);
+
+  if (searchTerms !== prevSearchTerms) {
+    setPrevSearchTerms(searchTerms);
     if (searchTerms != null) {
       const arrayParam = searchTerms;
       const array = Array.isArray(arrayParam)
         ? arrayParam
         : arrayParam.split(',');
+      // Called every time the query changes
       setValue(array.map((el) => decodeSearchQueryLabel(el)));
     }
-  }, [searchTerms]); // useEffect is called every time the query changes
+  }
 
   const searchBarHints = [
     'ex. GOVT 2306, Sara Johnson',
@@ -169,13 +173,17 @@ export default function SearchBar(props: Props) {
   const [searchBarHintIndex, setSearchBarHintIndex] = useState<number>(0);
 
   useEffect(() => {
-    setSearchBarHintIndex(Math.floor(Math.random() * searchBarHints.length));
-
-    const interval = setInterval(() => {
+    const pickRandomSearchBarHint = () =>
       setSearchBarHintIndex(Math.floor(Math.random() * searchBarHints.length));
-    }, 7000);
 
-    return () => clearInterval(interval); // Cleanup when component unmounts
+    const timeout = setTimeout(pickRandomSearchBarHint, 0);
+    const interval = setInterval(pickRandomSearchBarHint, 7000);
+
+    return () => {
+      // Cleanup when component unmounts
+      clearTimeout(timeout);
+      clearInterval(interval);
+    };
   }, [searchBarHints.length]); // Only recreate if hints array changes
 
   // updateValue -> onSelect_internal -> updateQueries - clicking enter on an autocomplete suggestion in topMenu Searchbar
@@ -209,7 +217,6 @@ export default function SearchBar(props: Props) {
   }
 
   function onSelect(newValue: SearchQuery[]) {
-    setSearchBarHintIndex(Math.floor(Math.random() * searchBarHints.length));
     if (searchTerms == newValue.map((el) => searchQueryLabel(el)).join(','))
       // do not initiate a new search when the searchTerms haven't changed
       return;
@@ -425,10 +432,7 @@ export default function SearchBar(props: Props) {
   }
 
   useEffect(() => {
-    fetch('/api/autocomplete?input=someSearchTerm');
-    prePopulateRecents();
-    // disable warning fpr prePopulateRecents because we only want this to run at the start
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    void fetch('/api/autocomplete?input=someSearchTerm').catch(() => {});
   }, []);
 
   const [highlightedOption, setHighlightedOption] = useState<boolean>(false);
@@ -452,7 +456,7 @@ export default function SearchBar(props: Props) {
         autoHighlight={true}
         clearOnBlur={false}
         className="grow"
-        onHighlightChange={(option) => {
+        onHighlightChange={(_, option) => {
           setHighlightedOption(option !== null); // whether an option is highlighted
         }}
         getOptionLabel={(option) => {
@@ -478,11 +482,14 @@ export default function SearchBar(props: Props) {
           event: React.SyntheticEvent,
           newValue: (string | SearchQuery)[],
         ) => {
-          //should never happen
+          // Value can be string on enter before hitting down arrow
           if (newValue.some((el) => typeof el === 'string')) {
-            return;
+            newValue = newValue.filter((el) => typeof el !== 'string');
+            if (options[0]) {
+              newValue.push(options[0]);
+            }
           }
-          //remove from options
+          // Remove from options
           if (newValue.length > value.length) {
             setOptions((prev) =>
               prev.filter(
@@ -503,18 +510,22 @@ export default function SearchBar(props: Props) {
           setInputValue(newInputValue);
           loadNewOptions(newInputValue);
         }}
-        renderInput={(params) => {
-          params.inputProps.onKeyDown = handleKeyDown;
-          return (
-            <TextField
-              {...params}
-              variant="outlined"
-              className={`[&>.MuiInputBase-root]:rounded-r-none ${props.input_className}`}
-              placeholder={searchBarHints[searchBarHintIndex]}
-              autoFocus={props.autoFocus}
-            />
-          );
-        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            slotProps={{
+              ...params.slotProps,
+              htmlInput: {
+                ...params.slotProps?.htmlInput,
+                onKeyDown: handleKeyDown,
+              },
+            }}
+            variant="outlined"
+            className={`[&>.MuiInputBase-root]:rounded-r-none ${props.input_className}`}
+            placeholder={searchBarHints[searchBarHintIndex]}
+            autoFocus={props.autoFocus}
+          />
+        )}
         //for handling spaces, when options are already loaded
         onInput={(event) => {
           const value = (event.target as HTMLInputElement).value;

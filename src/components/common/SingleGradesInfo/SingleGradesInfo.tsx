@@ -78,12 +78,12 @@ export default function SingleGradesInfo({
               }
               tooltipFormatter={(
                 value: number,
-                { dataPointIndex }: { dataPointIndex: number },
+                opts?: { dataPointIndex: number },
               ) =>
                 Number(value).toFixed(0).toLocaleString() +
-                ' (' +
-                percents[dataPointIndex].toFixed(2) +
-                '%)'
+                (opts
+                  ? ' (' + percents[opts.dataPointIndex].toFixed(2) + '%)'
+                  : '')
               }
               series={[
                 {

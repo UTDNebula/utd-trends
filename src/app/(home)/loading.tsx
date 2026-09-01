@@ -1,8 +1,8 @@
 import Background from '@/../public/background.png';
 import NebulaLogo from '@/components/icons/NebulaLogo/NebulaLogo';
 import PlannerButton from '@/components/planner/PlannerButton/PlannerButton';
+import { FilterChipSkeleton } from '@/components/search/Filters/base/FilterChip';
 import { LoadingSearchBar } from '@/components/search/SearchBar/SearchBar';
-import { FormControl, FormControlLabel, Switch, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import React from 'react';
 
@@ -41,15 +41,8 @@ export default function Loading() {
           find the perfect class.
         </p>
         <LoadingSearchBar input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti" />
-        {/* Teaching Next Semester switch*/}
-        <Tooltip title="Select Availability" placement="bottom-start">
-          <FormControl size="small" className="min-w-max flex-row items-center">
-            <FormControlLabel
-              control={<Switch checked disabled />}
-              label="Teaching Next Semester"
-            />
-          </FormControl>
-        </Tooltip>
+        {/* Teaching in semester selector */}
+        <FilterChipSkeleton action="popover" width={160} className="mt-4" />
       </div>
     </div>
   );

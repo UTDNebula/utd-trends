@@ -8,7 +8,7 @@ import React from 'react';
 
 export default function DocsWrapper({ children }: React.PropsWithChildren) {
   return (
-    <div className="bg-white dark:bg-black text-haiti dark:text-white">
+    <div className="bg-light dark:bg-dark text-haiti dark:text-white">
       <ThemeProvider theme={theme}>
         <SharedStateProvider
           availableSemesters={['25S', '25U', '25F']}

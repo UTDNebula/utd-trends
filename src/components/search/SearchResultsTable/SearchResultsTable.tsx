@@ -2,6 +2,7 @@
 
 import { FiltersContext } from '@/app/dashboard/FilterContext';
 import { useSharedState } from '@/app/SharedStateProvider';
+import BaseCard from '@/components/common/BaseCard/BaseCard';
 import Rating from '@/components/common/Rating/Rating';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
@@ -9,10 +10,8 @@ import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
 import { calculateGrades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
-import {
-  displaySemesterName,
-  getLatestSyllabusSection,
-} from '@/modules/semesters';
+import { getLatestSyllabusSection } from '@/modules/sections';
+import { displaySemesterName } from '@/modules/semesters';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -46,16 +45,6 @@ const AddToPlanner = dynamic(() => import('./AddToPlanner'), {
   ssr: false,
   loading: () => <Checkbox disabled icon={<BookOutlinedIcon />} />,
 });
-
-// sets the color for the table head cells
-function getCellSx() {
-  return {
-    backgroundColor: 'rgb(252,252,252)',
-    '@media (prefers-color-scheme: dark)': {
-      backgroundColor: 'var(--mui-palette-background-default)',
-    },
-  };
-}
 
 function LoadingRow() {
   const nameCell = (
@@ -119,15 +108,15 @@ export function LoadingSearchResultsTable() {
         <Table stickyHeader aria-label="collapsible table">
           <TableHead>
             <TableRow>
-              <TableCell className="hidden sm:table-cell" sx={getCellSx()}>
+              <TableCell className="hidden sm:table-cell dark:bg-neutral-800">
                 Actions
               </TableCell>
-              <TableCell sx={getCellSx()}>
+              <TableCell className="dark:bg-neutral-800">
                 <TableSortLabel active direction="asc">
                   Name
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="center" sx={getCellSx()}>
+              <TableCell align="center" className="dark:bg-neutral-800">
                 <Tooltip
                   title="Median Letter Grade Across Course Sections"
                   placement="top"
@@ -137,7 +126,7 @@ export function LoadingSearchResultsTable() {
                   </div>
                 </Tooltip>
               </TableCell>
-              <TableCell align="center" sx={getCellSx()}>
+              <TableCell align="center" className="dark:bg-neutral-800">
                 <Tooltip
                   title="Average Professor Rating from Rate My Professors"
                   placement="top"
@@ -592,89 +581,92 @@ export default function SearchResultsTable({
       <Typography className="leading-tight text-3xl font-bold p-4">
         Search Results
       </Typography>
-      <TableContainer component={Paper}>
-        <Table stickyHeader aria-label="collapsible table">
-          <TableHead>
-            <TableRow>
-              <TableCell className="hidden sm:table-cell" sx={getCellSx()}>
-                Actions
-              </TableCell>
-              <TableCell sx={getCellSx()}>
-                <TableSortLabel
-                  active={orderBy === 'name'}
-                  direction={orderBy === 'name' ? order : 'asc'}
-                  onClick={() => {
-                    handleClick('name');
-                  }}
-                >
-                  Name
-                </TableSortLabel>
-              </TableCell>
-              <TableCell align="center" sx={getCellSx()}>
-                <Tooltip
-                  title="Average Letter Grade Across Course Sections"
-                  placement="top"
-                >
-                  <div>
-                    <TableSortLabel
-                      active={orderBy === 'gpa'}
-                      direction={orderBy === 'gpa' ? order : 'desc'}
-                      onClick={() => {
-                        handleClick('gpa');
-                      }}
-                    >
-                      Grades
-                    </TableSortLabel>
-                  </div>
-                </Tooltip>
-              </TableCell>
-              <TableCell align="center" sx={getCellSx()}>
-                <Tooltip
-                  title="Average Professor Rating from Rate My Professors"
-                  placement="top"
-                >
-                  <div>
-                    <TableSortLabel
-                      active={orderBy === 'rating'}
-                      direction={orderBy === 'rating' ? order : 'desc'}
-                      onClick={() => {
-                        handleClick('rating');
-                      }}
-                    >
-                      Rating
-                    </TableSortLabel>
-                  </div>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {/* Included Results */}
-            {sortedResults.map((result, index) => {
-              return (
-                <Row
-                  searchResult={result}
-                  key={searchQueryLabel(result.searchQuery)}
-                  course={result.searchQuery}
-                  inCompare={compare.some((obj) =>
-                    searchQueryEqual(obj.searchQuery, result.searchQuery),
-                  )}
-                  addToCompare={addToCompare}
-                  removeFromCompare={removeFromCompare}
-                  color={compareColorMap[searchQueryLabel(result.searchQuery)]}
-                  showTutorial={index === numSearches}
-                />
-              );
-            })}
-
-            {/* First Divider row */}
-            {sortedSecondaryIncludedResults.length > 0 && (
+      <BaseCard className="overflow-hidden">
+        <TableContainer>
+          <Table stickyHeader aria-label="collapsible table">
+            <TableHead>
               <TableRow>
-                <TableCell colSpan={5} className="p-0">
-                  <div className="flex items-center py-2 my-2">
-                    <Divider className="grow" />
-                    <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
-                      {`Teaching  
+                <TableCell className="hidden sm:table-cell dark:bg-neutral-800">
+                  Actions
+                </TableCell>
+                <TableCell className="dark:bg-neutral-800">
+                  <TableSortLabel
+                    active={orderBy === 'name'}
+                    direction={orderBy === 'name' ? order : 'asc'}
+                    onClick={() => {
+                      handleClick('name');
+                    }}
+                  >
+                    Name
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell align="center" className="dark:bg-neutral-800">
+                  <Tooltip
+                    title="Average Letter Grade Across Course Sections"
+                    placement="top"
+                  >
+                    <div>
+                      <TableSortLabel
+                        active={orderBy === 'gpa'}
+                        direction={orderBy === 'gpa' ? order : 'desc'}
+                        onClick={() => {
+                          handleClick('gpa');
+                        }}
+                      >
+                        Grades
+                      </TableSortLabel>
+                    </div>
+                  </Tooltip>
+                </TableCell>
+                <TableCell align="center" className="dark:bg-neutral-800">
+                  <Tooltip
+                    title="Average Professor Rating from Rate My Professors"
+                    placement="top"
+                  >
+                    <div>
+                      <TableSortLabel
+                        active={orderBy === 'rating'}
+                        direction={orderBy === 'rating' ? order : 'desc'}
+                        onClick={() => {
+                          handleClick('rating');
+                        }}
+                      >
+                        Rating
+                      </TableSortLabel>
+                    </div>
+                  </Tooltip>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {/* Included Results */}
+              {sortedResults.map((result, index) => {
+                return (
+                  <Row
+                    searchResult={result}
+                    key={searchQueryLabel(result.searchQuery)}
+                    course={result.searchQuery}
+                    inCompare={compare.some((obj) =>
+                      searchQueryEqual(obj.searchQuery, result.searchQuery),
+                    )}
+                    addToCompare={addToCompare}
+                    removeFromCompare={removeFromCompare}
+                    color={
+                      compareColorMap[searchQueryLabel(result.searchQuery)]
+                    }
+                    showTutorial={index === numSearches}
+                  />
+                );
+              })}
+
+              {/* First Divider row */}
+              {sortedSecondaryIncludedResults.length > 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="p-0">
+                    <div className="flex items-center py-2 my-2">
+                      <Divider className="grow" />
+                      <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
+                        {`Teaching  
                         ${
                           effectiveTeachingSemester !== ''
                             ? 'in ' +
@@ -684,73 +676,78 @@ export default function SearchResultsTable({
                               )
                             : 'Next Semester'
                         }, Filters Do Not Match`}
-                    </Typography>
-                    <Divider className="grow" />
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
+                      </Typography>
+                      <Divider className="grow" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
 
-            {/* Secondary Included Results (Available but do not match filters) */}
-            {sortedSecondaryIncludedResults.map((result) => {
-              return (
-                <Row
-                  searchResult={result}
-                  key={searchQueryLabel(result.searchQuery)}
-                  course={result.searchQuery}
-                  inCompare={compare.some((obj) =>
-                    searchQueryEqual(obj.searchQuery, result.searchQuery),
-                  )}
-                  addToCompare={addToCompare}
-                  removeFromCompare={removeFromCompare}
-                  color={compareColorMap[searchQueryLabel(result.searchQuery)]}
-                  showTutorial={false}
-                />
-              );
-            })}
+              {/* Secondary Included Results (Available but do not match filters) */}
+              {sortedSecondaryIncludedResults.map((result) => {
+                return (
+                  <Row
+                    searchResult={result}
+                    key={searchQueryLabel(result.searchQuery)}
+                    course={result.searchQuery}
+                    inCompare={compare.some((obj) =>
+                      searchQueryEqual(obj.searchQuery, result.searchQuery),
+                    )}
+                    addToCompare={addToCompare}
+                    removeFromCompare={removeFromCompare}
+                    color={
+                      compareColorMap[searchQueryLabel(result.searchQuery)]
+                    }
+                    showTutorial={false}
+                  />
+                );
+              })}
 
-            {/* Divider row */}
-            {sortedUnIncludedResults.length > 0 && (
-              <TableRow>
-                <TableCell colSpan={5} className="p-0">
-                  <div className="flex items-center py-2 my-2">
-                    <Divider className="grow" />
-                    <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
-                      {'Not teaching ' +
-                        (effectiveTeachingSemester !== ''
-                          ? 'in ' +
-                            displaySemesterName(
-                              effectiveTeachingSemester,
-                              false,
-                            )
-                          : 'Next Semester')}
-                    </Typography>
-                    <Divider className="grow" />
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
+              {/* Divider row */}
+              {sortedUnIncludedResults.length > 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="p-0">
+                    <div className="flex items-center py-2 my-2">
+                      <Divider className="grow" />
+                      <Typography className="px-4 text-base font-bold text-gray-500 dark:text-gray-300">
+                        {'Not teaching ' +
+                          (effectiveTeachingSemester !== ''
+                            ? 'in ' +
+                              displaySemesterName(
+                                effectiveTeachingSemester,
+                                false,
+                              )
+                            : 'Next Semester')}
+                      </Typography>
+                      <Divider className="grow" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
 
-            {/* Unincluded Results (Unavailable courses) */}
-            {sortedUnIncludedResults.map((result) => {
-              return (
-                <Row
-                  searchResult={result}
-                  key={searchQueryLabel(result.searchQuery)}
-                  course={result.searchQuery}
-                  inCompare={compare.some((obj) =>
-                    searchQueryEqual(obj.searchQuery, result.searchQuery),
-                  )}
-                  addToCompare={addToCompare}
-                  removeFromCompare={removeFromCompare}
-                  color={compareColorMap[searchQueryLabel(result.searchQuery)]}
-                  showTutorial={false}
-                />
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              {/* Unincluded Results (Unavailable courses) */}
+              {sortedUnIncludedResults.map((result) => {
+                return (
+                  <Row
+                    searchResult={result}
+                    key={searchQueryLabel(result.searchQuery)}
+                    course={result.searchQuery}
+                    inCompare={compare.some((obj) =>
+                      searchQueryEqual(obj.searchQuery, result.searchQuery),
+                    )}
+                    addToCompare={addToCompare}
+                    removeFromCompare={removeFromCompare}
+                    color={
+                      compareColorMap[searchQueryLabel(result.searchQuery)]
+                    }
+                    showTutorial={false}
+                  />
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </BaseCard>
     </>
   );
 }

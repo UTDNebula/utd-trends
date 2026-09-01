@@ -27,7 +27,7 @@ export default function Header(props: HeaderProps) {
       <SearchBar
         manageQuery="onSelect"
         className="order-last basis-full sm:order-none sm:basis-[32rem] shrink"
-        input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-haiti"
+        input_className="[&>.MuiInputBase-root]:bg-white dark:[&>.MuiInputBase-root]:bg-neutral-900 md:dark:[&>.MuiInputBase-root]:bg-haiti"
       />
     </Suspense>
   ) : undefined;
