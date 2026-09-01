@@ -41,6 +41,10 @@ interface LoadingSearchBarProps {
   input_className?: string;
 }
 
+/**
+ * This component renders a search bar UI that makes use of the Material UI Autocomplete component and a Material UI search button.
+ *
+ */
 export function LoadingSearchBar(props: LoadingSearchBarProps) {
   return (
     <div className={'flex items-center ' + (props.className ?? '')}>
