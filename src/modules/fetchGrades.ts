@@ -3,6 +3,7 @@ import { type SearchQuery } from '@/types/SearchQuery';
 export type GradesSummary = {
   mean_gpa: number;
   gpa: number;
+  median_letter_grade: string | null;
   total: number;
   grade_distribution: number[];
 };
@@ -54,6 +55,21 @@ export function calculateGrades(
   const GPALookup = [
     4, 4, 3.67, 3.33, 3, 2.67, 2.33, 2, 1.67, 1.33, 1, 0.67, 0,
   ];
+  const letterGrades = [
+    'A+',
+    'A',
+    'A-',
+    'B+',
+    'B',
+    'B-',
+    'C+',
+    'C',
+    'C-',
+    'D+',
+    'D',
+    'D-',
+    'F',
+  ];
 
   // exclude all entries after F from total
   const totalLetterGrades =
@@ -74,19 +90,24 @@ export function calculateGrades(
   }
 
   let median_gpa = -1;
-  let medianIndex = -1;
+  let median_letter_grade: string | null = null;
   if (totalLetterGrades != 0) {
-    let i = Math.floor(totalLetterGrades / 2);
-    while (i > 0) {
-      medianIndex++;
-      i -= grade_distribution[medianIndex];
+    const medianPosition = Math.ceil(totalLetterGrades / 2);
+    let cumulativeGrades = 0;
+    for (let index = 0; index < GPALookup.length; index++) {
+      cumulativeGrades += grade_distribution[index];
+      if (cumulativeGrades >= medianPosition) {
+        median_gpa = GPALookup[index];
+        median_letter_grade = letterGrades[index];
+        break;
+      }
     }
-    median_gpa = GPALookup[medianIndex];
   }
 
   return {
     mean_gpa: mean_gpa,
     gpa: median_gpa,
+    median_letter_grade,
     total: total,
     grade_distribution: grade_distribution,
   };
