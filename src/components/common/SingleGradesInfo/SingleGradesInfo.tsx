@@ -2,7 +2,6 @@ import BarGraph from '@/components/graph/BarGraph/BarGraph';
 import LineGraph from '@/components/graph/LineGraph/LineGraph';
 import GraphToggle from '@/components/navigation/GraphToggle/GraphToggle';
 import type { GradesData, GradesSummary } from '@/modules/fetchGrades';
-import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 import { searchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
 import { Skeleton } from '@mui/material';
 import React from 'react';
@@ -116,7 +115,7 @@ export default function SingleGradesInfo({
           <b>
             {filteredGrades.gpa === -1
               ? 'None'
-              : gpaToLetterGrade(filteredGrades.gpa)}
+              : filteredGrades.median_letter_grade}
           </b>
         </p>
         <p>

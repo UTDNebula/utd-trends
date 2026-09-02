@@ -9,7 +9,6 @@ import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import TableSortLabel from '@/components/common/TableSortLabel/TableSortLabel';
 import { gpaToColor, useRainbowColors } from '@/modules/colors';
 import { calculateGrades } from '@/modules/fetchGrades';
-import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 import { getLatestSyllabusSection } from '@/modules/sections';
 import { displaySemesterName } from '@/modules/semesters';
 import {
@@ -337,7 +336,7 @@ function Row({
                   ),
                 }}
               >
-                {gpaToLetterGrade(filteredGrades.gpa)}
+                {filteredGrades.median_letter_grade}
               </Typography>
             </Tooltip>
           )) ||
