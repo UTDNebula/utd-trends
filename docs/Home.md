@@ -20,7 +20,7 @@ New contributors should begin with the [Getting Started Guide](Getting-Started.m
 
 ## Community & Support
 
-Join the [Nebula Labs Discord](https://discord.utdnebula.com) and drop into the `#trends-general` or `#trends-dev` channels for real-time collaboration and questions.
+Join the [Nebula Labs Discord](https://discord.utdnebula.com) and drop into the `#portfolio-engineering` channel for real-time collaboration and questions.
 
 ## Suggesting Documentation Changes
 

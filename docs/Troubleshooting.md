@@ -44,7 +44,7 @@ Ensure you have created a `.env` file at the root of `utd-trends` containing:
 REACT_APP_NEBULA_API_KEY="your_api_key_here"
 ```
 
-If you do not have an API key, request one from the Trends Project Lead in `#trends-dev` on the [Nebula Labs Discord](https://discord.utdnebula.com).
+If you do not have an API key, request one from the Trends Project Lead in `#portfolio-engineering` on the [Nebula Labs Discord](https://discord.utdnebula.com).
 
 ---
 
@@ -136,5 +136,4 @@ npm run lint
 
 Reach out to the team on Discord:
 
-- `#trends-dev` for codebase architecture, debugging, and API keys.
-- `#trends-general` for general questions and product discussions.
+- `#portfolio-engineering` for codebase architecture, debugging, and API keys.

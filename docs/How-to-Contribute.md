@@ -8,11 +8,11 @@ Thank you for your interest in contributing to UTD Trends! We welcome contributi
 
 Check our open issues on [GitHub Issues](https://github.com/UTDNebula/utd-trends/issues).
 
-- **`Special: Good First Issue`**: Ideal for newcomers wanting to learn the codebase and project structure.
+- **`Good First Issue`**: Ideal for newcomers wanting to learn the codebase and project structure.
 - **`Type: Feature Request`**: New capabilities or enhancements.
 - **`Type: Bug Report`**: Confirmed issues needing reproduction and fixes.
 
-Before writing code, leave a comment on the issue you wish to tackle so a maintainer can assign it to you. If you have an idea that isn't logged yet, feel free to open an issue or ask in `#trends-dev` on [Discord](https://discord.utdnebula.com).
+Before writing code, leave a comment on the issue you wish to tackle so a maintainer can assign it to you. If you have an idea that isn't logged yet, feel free to open an issue or ask in `#portfolio-engineering` on [Discord](https://discord.utdnebula.com).
 
 > [!NOTE]
 > For beginner-friendly issues, we encourage writing code yourself rather than relying on automated generators. Review Nebula Labs' [AI Policy](https://nebula-labs.atlassian.net/wiki/spaces/NLG/pages/1135607810/AI+Policy) for acceptable tooling usage.
@@ -102,4 +102,4 @@ npm run lint
    - Detail the changes made.
    - Attach screenshots or screen recordings for UI adjustments.
 4. Mark the PR as a **Draft** if work is still in progress.
-5. Once ready, request review from the Trends maintainers in `#trends-dev` on Discord.
+5. Once ready, request review from the Trends maintainers in `#portfolio-engineering` on Discord.

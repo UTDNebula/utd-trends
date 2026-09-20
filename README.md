@@ -2,9 +2,13 @@
 
 _Intuitive course grade distributions, professor metrics, and schedule planning for UT Dallas._
 
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Project maintained by [Nebula Labs](https://about.utdnebula.com).
 
-> [!TIP] > **Developer Wiki**: If you are interested in contributing or developing on this project, head over to our [**Developer Wiki**](docs/Home.md)!
+> [!TIP]
+> **Developer Wiki**: If you are interested in contributing or developing on this project, head over to our [**Developer Wiki**](docs/Home.md)!
 
 ---
 
@@ -67,7 +71,7 @@ Visit [http://localhost:3000](http://localhost:3000) to view the running app.
 
 | Command                     | Description                                                          |
 | :-------------------------- | :------------------------------------------------------------------- |
-| `npm run dev`               | Starts Next.js development server with Turbopack at `localhost:3000` |
+| `npm run dev`               | Starts Next.js development server at `localhost:3000` (Turbopack default) |
 | `npm run build`             | Compiles production-ready Next.js application                        |
 | `npm start`                 | Runs the compiled production server                                  |
 | `npm run format`            | Auto-formats codebase with Prettier                                  |
@@ -95,7 +99,7 @@ We welcome community contributions! Please review [docs/How-to-Contribute.md](do
 
 ## Community & Support
 
-Have questions, suggestions, or need an API key? Reach out to the team on our [Discord](https://discord.utdnebula.com)!
+Have questions, suggestions, or need an API key? Reach out to the team on our [Discord](https://discord.utdnebula.com) in `#portfolio-engineering`!
 
 ## License
 

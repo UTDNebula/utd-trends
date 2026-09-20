@@ -48,16 +48,14 @@ Create a file named `.env` in the root of the repository:
 ```env
 REACT_APP_NEBULA_API_KEY="your_api_key_here"
 NEXT_PUBLIC_SENTRY_DSN=""
-__NEXT_CONCURRENT_FEATURES=true
 ```
 
 ### Key Descriptions
 
-| Variable                     | Required | Description                                                                                                                                                                                                       |
-| :--------------------------- | :------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `REACT_APP_NEBULA_API_KEY`   | **Yes**  | Authenticates requests against the [Nebula API](https://api.utdnebula.com/). Contact the Trends Project Lead or ask in `#trends-dev` on the [Nebula Labs Discord](https://discord.utdnebula.com) to obtain a key. |
-| `NEXT_PUBLIC_SENTRY_DSN`     | Optional | Data Source Name for Sentry client-side error reporting. Can be left empty for local development.                                                                                                                 |
-| `__NEXT_CONCURRENT_FEATURES` | Optional | Internal Next.js flag enabling concurrent rendering features. Defaults to `true`.                                                                                                                                 |
+| Variable                   | Required | Description                                                                                                                                                                                                            |
+| :------------------------- | :------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `REACT_APP_NEBULA_API_KEY` | **Yes**  | Authenticates requests against the [Nebula API](https://api.utdnebula.com/). Contact the Trends Project Lead or ask in `#portfolio-engineering` on the [Nebula Labs Discord](https://discord.utdnebula.com) to obtain a key. |
+| `NEXT_PUBLIC_SENTRY_DSN`   | Optional | Data Source Name for Sentry client-side error reporting. Can be left empty for local development.                                                                                                                      |
 
 ---
 
@@ -65,7 +63,7 @@ __NEXT_CONCURRENT_FEATURES=true
 
 ### 1. Start the Development Server
 
-Launch the Next.js development server powered by Turbopack:
+Launch the Next.js development server (Turbopack enabled by default in Next.js 16):
 
 ```bash
 npm run dev

@@ -11,7 +11,7 @@ UTD Trends provides fast, intuitive access to university grade history and instr
 flowchart LR
     User([Student / Faculty]) --> Frontend
 
-    subgraph Frontend["Frontend Tier (Next.js 15)"]
+    subgraph Frontend["Frontend Tier (Next.js 16)"]
         direction TB
         ClientUI["React 19 Dashboard"]
         Autocomplete["Graphology Search Engine"]
@@ -41,8 +41,8 @@ flowchart LR
 
 ### 1. Application Framework & Rendering
 
-- **Next.js 15 & React 19**: Server and client rendering using the Next.js App Router.
-- **Turbopack**: Fast incremental bundling in local development (`next dev --turbopack`).
+- **Next.js 16 & React 19**: Server and client rendering using the Next.js App Router.
+- **Turbopack**: Default incremental bundler in Next.js 16 for local development (`npm run dev`).
 - **TypeScript**: Strict type definitions covering all API response models, component props, and grade records.
 
 ### 2. Styling & Component Library
