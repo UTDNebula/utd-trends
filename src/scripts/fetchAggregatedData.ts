@@ -5,8 +5,8 @@ import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 import { config } from 'dotenv';
 
-config({ path: resolve(__dirname, '../../.env.local') });
-config({ path: resolve(__dirname, '../../.env') });
+const envPath = resolve(__dirname, '../../.env.local');
+config({ path: envPath });
 
 const API_URL = process.env.NEBULA_API_URL;
 const API_KEY = process.env.NEBULA_API_KEY;
@@ -20,8 +20,7 @@ if (typeof API_URL !== 'string') {
     Accept: 'application/json',
   };
 
-  const baseUrl = API_URL.endsWith('/') ? API_URL : `${API_URL}/`;
-  fetch(`${baseUrl}autocomplete/dag`, {
+  fetch(API_URL + 'autocomplete/dag', {
     method: 'GET',
     headers: headers,
   })
