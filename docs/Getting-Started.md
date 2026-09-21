@@ -52,7 +52,7 @@ cp .env.example .env
 Your `.env` file should configure the following variables:
 
 ```env
-NEBULA_API_URL="https://api.utdnebula.com"
+NEBULA_API_URL="https://api.utdnebula.com/"
 NEBULA_API_KEY="your_api_key_here"
 
 # Optional: Sentry error tracking
@@ -70,7 +70,7 @@ GEMINI_SERVICE_ACCOUNT=""
 | Variable                             | Required | Category   | Description                                                                                                                                                                                                              |
 | :----------------------------------- | :------- | :--------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `NEBULA_API_KEY`                     | **Yes**  | Core       | Authenticates server-side requests against the [Nebula API](https://api.utdnebula.com/). Contact the Trends Project Lead or ask in `#portfolio-engineering` on the [Nebula Labs Discord](https://discord.utdnebula.com). |
-| `NEBULA_API_URL`                     | **Yes**  | Core       | Base URL for the Nebula API. Defaults to `https://api.utdnebula.com`.                                                                                                                                                    |
+| `NEBULA_API_URL`                     | **Yes**  | Core       | Base URL for the Nebula API. Defaults to `https://api.utdnebula.com/` (trailing slash required).                                                                                                                         |
 | `NEXT_PUBLIC_SENTRY_DSN`             | Optional | Analytics  | Data Source Name for Sentry client-side error reporting. Can be left empty for local development.                                                                                                                        |
 | `NEBULA_API_STORAGE_BUCKET`          | Optional | AI Summary | Storage bucket name for cached Rate My Professor summaries. Leave empty unless developing summarization features.                                                                                                        |
 | `NEBULA_API_SYLLABUS_STORAGE_BUCKET` | Optional | AI Summary | Storage bucket name for cached syllabus summaries. Leave empty unless developing summarization features.                                                                                                                 |
@@ -93,7 +93,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to view the 
 
 ### 2. Code Verification & Formatting
 
-Always run formatting and lint checks before committing code:
+Always run formatting, lint, and type checks before committing code:
 
 ```bash
 # Check code formatting with Prettier
@@ -107,6 +107,9 @@ npm run lint:check
 
 # Auto-fix ESLint issues
 npm run lint
+
+# Verify TypeScript types
+npm run type:check
 ```
 
 ### 3. Production Build Verification

@@ -47,7 +47,7 @@ flowchart LR
 
 ### 2. Styling & Component Library
 
-- **Material-UI (MUI) v7**: Core component library providing accessible design primitives, dialogs, sliders, and form elements.
+- **Material-UI (MUI) v9**: Core component library providing accessible design primitives, dialogs, sliders, and form elements.
 - **Tailwind CSS v4**: Utility styling for rapid layout adjustments and custom spacing.
 - **Emotion**: CSS-in-JS engine managing MUI component theming and dynamic dark/light styles.
 - **Framer Motion**: Smooth spring transitions for expanding cards, search drawers, and mobile layouts.

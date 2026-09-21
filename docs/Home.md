@@ -2,7 +2,7 @@
 
 Welcome to the **UTD Trends Developer Wiki**.
 
-This documentation is written for developers, contributors, and maintainers building and maintaining [UTD Trends](https://trends.utdnebula.com). For general user information, see the [README.md](../README.md).
+This documentation is written for developers, contributors, and maintainers building and maintaining [UTD Trends](https://trends.utdnebula.com). For general user information, see the [README.md](https://github.com/UTDNebula/utd-trends/blob/develop/README.md).
 
 New contributors should begin with the [Getting Started Guide](Getting-Started.md).
 

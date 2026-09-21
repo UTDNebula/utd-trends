@@ -79,6 +79,7 @@ Visit [http://localhost:3000](http://localhost:3000) to view the running app.
 | `npm run format:check`      | Verifies code formatting against Prettier rules                           |
 | `npm run lint`              | Auto-fixes linting issues with ESLint                                     |
 | `npm run lint:check`        | Validates codebase against ESLint rules                                   |
+| `npm run type:check`        | Verifies TypeScript types without emitting JavaScript                     |
 | `npm run fetchdata`         | Fetches fresh aggregated grade data from the Nebula API                   |
 | `npm run buildautocomplete` | Compiles Graphology search autocomplete graph                             |
 | `npm run buildcoursenames`  | Generates course code to title mapping tables                             |

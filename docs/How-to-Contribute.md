@@ -97,7 +97,7 @@ npm run lint
    git push origin <branch-type>/<short-description>
    ```
 2. Open a Pull Request targeting the **`develop`** branch.
-3. Fill out the [Pull Request Template](../.github/pull_request_template.md) completely:
+3. Fill out the [Pull Request Template](https://github.com/UTDNebula/utd-trends/blob/develop/.github/pull_request_template.md) completely:
    - Link the relevant issue number (`Fixes #123`).
    - Detail the changes made.
    - Attach screenshots or screen recordings for UI adjustments.

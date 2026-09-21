@@ -8,7 +8,7 @@ UTD Trends is organized around modular domain boundaries separating UI presentat
 
 | Layer                         | Primary Directories            | Purpose & Responsibilities                                                           |
 | :---------------------------- | :----------------------------- | :----------------------------------------------------------------------------------- |
-| **Presentation (App Router)** | `src/app/`                     | Next.js 15 App Router pages, global layouts, and proxy API handlers (`/api/*`).      |
+| **Presentation (App Router)** | `src/app/`                     | Next.js 16 App Router pages, global layouts, and proxy API handlers (`/api/*`).      |
 | **UI Components**             | `src/components/`              | Domain-driven UI modules (search, graphs, dashboard panels, planner).                |
 | **Data & Fetching**           | `src/modules/`<br/>`src/data/` | Upstream Nebula API client methods, query fetchers, and pre-indexed static datasets. |
 | **Pre-computation Pipeline**  | `src/scripts/`                 | Offline data aggregation and Graphology search graph generation scripts.             |
@@ -31,7 +31,7 @@ All interface elements are grouped by feature domain:
 | `planner/`    | Schedule planning views, section times, and room allocation grids.    | TanStack Query, MUI Grid          |
 | `overview/`   | Summary metric cards, average GPA badges, and section counts.         | MUI Cards, Emotion                |
 | `navigation/` | Top app bar, navigation drawer, theme switchers, and external links.  | Next.js Link, MUI AppBar          |
-| `common/`     | Shared atomic primitives (custom buttons, badges, loaders, tooltips). | MUI v7 Primitives                 |
+| `common/`     | Shared atomic primitives (custom buttons, badges, loaders, tooltips). | MUI v9 Primitives                 |
 | `icons/`      | Custom SVG icon components and brand logos.                           | React SVG Primitives              |
 
 ---
@@ -72,7 +72,7 @@ utd-trends/
 │   └── types/                   # Shared TypeScript interfaces
 ├── .env.example                 # Template for required environment variables
 ├── eslint.config.mjs            # ESLint rules and plugin configurations
-├── next.config.js               # Next.js bundler and compiler settings
+├── next.config.ts               # Next.js bundler and compiler settings
 ├── package.json                 # Project dependencies and script definitions
 └── tsconfig.json                # TypeScript compiler configuration
 ```

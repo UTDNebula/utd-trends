@@ -9,7 +9,7 @@ This guide provides resolutions to common configuration, runtime, and build issu
 ### Symptoms
 
 - Dependency installation fails with engine warnings or errors.
-- Syntax errors on modern ECMAScript or Next.js 15 features.
+- Syntax errors on modern ECMAScript or Next.js 16 features.
 
 ### Solution
 
@@ -41,7 +41,7 @@ nvm use 22
 Ensure you have created a `.env` file at the root of `utd-trends` (copied from `.env.example`) containing:
 
 ```env
-NEBULA_API_URL="https://api.utdnebula.com"
+NEBULA_API_URL="https://api.utdnebula.com/"
 NEBULA_API_KEY="your_api_key_here"
 ```
 
