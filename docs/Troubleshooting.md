@@ -38,13 +38,14 @@ nvm use 22
 
 ### Solution
 
-Ensure you have created a `.env` file at the root of `utd-trends` containing:
+Ensure you have created a `.env` file at the root of `utd-trends` (copied from `.env.example`) containing:
 
 ```env
-REACT_APP_NEBULA_API_KEY="your_api_key_here"
+NEBULA_API_URL="https://api.utdnebula.com"
+NEBULA_API_KEY="your_api_key_here"
 ```
 
-If you do not have an API key, request one from the Trends Project Lead in `#portfolio-engineering` on the [Nebula Labs Discord](https://discord.utdnebula.com).
+If you do not have an API key, request one from the Trends Project Lead in `#portfolio-engineering` on the [Nebula Labs Discord](https://discord.utdnebula.com). Note that storage and Gemini keys (`NEBULA_API_STORAGE_*`, `GEMINI_SERVICE_ACCOUNT`) are optional and only needed when actively testing AI summarization features.
 
 ---
 

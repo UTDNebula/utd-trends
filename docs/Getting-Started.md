@@ -43,19 +43,39 @@ npm install
 
 ## Environment Variables
 
-Create a file named `.env` in the root of the repository:
+Copy the example environment configuration into `.env` at the root of the repository:
+
+```bash
+cp .env.example .env
+```
+
+Your `.env` file should configure the following variables:
 
 ```env
-REACT_APP_NEBULA_API_KEY="your_api_key_here"
+NEBULA_API_URL="https://api.utdnebula.com"
+NEBULA_API_KEY="your_api_key_here"
+
+# Optional: Sentry error tracking
 NEXT_PUBLIC_SENTRY_DSN=""
+
+# Optional: Required only for RMP and syllabus AI summarization features
+NEBULA_API_STORAGE_BUCKET=""
+NEBULA_API_SYLLABUS_STORAGE_BUCKET=""
+NEBULA_API_STORAGE_KEY=""
+GEMINI_SERVICE_ACCOUNT=""
 ```
 
 ### Key Descriptions
 
-| Variable                   | Required | Description                                                                                                                                                                                                                  |
-| :------------------------- | :------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `REACT_APP_NEBULA_API_KEY` | **Yes**  | Authenticates requests against the [Nebula API](https://api.utdnebula.com/). Contact the Trends Project Lead or ask in `#portfolio-engineering` on the [Nebula Labs Discord](https://discord.utdnebula.com) to obtain a key. |
-| `NEXT_PUBLIC_SENTRY_DSN`   | Optional | Data Source Name for Sentry client-side error reporting. Can be left empty for local development.                                                                                                                            |
+| Variable                             | Required | Category   | Description                                                                                                                                                                                                              |
+| :----------------------------------- | :------- | :--------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEBULA_API_KEY`                     | **Yes**  | Core       | Authenticates server-side requests against the [Nebula API](https://api.utdnebula.com/). Contact the Trends Project Lead or ask in `#portfolio-engineering` on the [Nebula Labs Discord](https://discord.utdnebula.com). |
+| `NEBULA_API_URL`                     | **Yes**  | Core       | Base URL for the Nebula API. Defaults to `https://api.utdnebula.com`.                                                                                                                                                    |
+| `NEXT_PUBLIC_SENTRY_DSN`             | Optional | Analytics  | Data Source Name for Sentry client-side error reporting. Can be left empty for local development.                                                                                                                        |
+| `NEBULA_API_STORAGE_BUCKET`          | Optional | AI Summary | Storage bucket name for cached Rate My Professor summaries. Leave empty unless developing summarization features.                                                                                                        |
+| `NEBULA_API_SYLLABUS_STORAGE_BUCKET` | Optional | AI Summary | Storage bucket name for cached syllabus summaries. Leave empty unless developing summarization features.                                                                                                                 |
+| `NEBULA_API_STORAGE_KEY`             | Optional | AI Summary | Storage authentication key for syllabus and RMP caches.                                                                                                                                                                  |
+| `GEMINI_SERVICE_ACCOUNT`             | Optional | AI Summary | Google GenAI service account credentials JSON string for Gemini summaries.                                                                                                                                               |
 
 ---
 
@@ -112,7 +132,7 @@ Trends uses pre-indexed graphs and datasets to power instant search autocomplete
 | `buildcombos`       | `npm run buildcombos`       | Generates professor-course combination indexes.                        |
 
 > [!NOTE]
-> Running `fetchdata` requires a valid `REACT_APP_NEBULA_API_KEY` in your `.env` file.
+> Running `fetchdata` requires a valid `NEBULA_API_KEY` in your `.env` file.
 
 ---
 

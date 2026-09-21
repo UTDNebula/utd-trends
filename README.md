@@ -56,8 +56,9 @@ cd utd-trends
 npm install
 
 # 3. Configure environment variables
-# Create a .env file and add your Nebula API key:
-echo "REACT_APP_NEBULA_API_KEY=your_key_here" > .env
+cp .env.example .env
+# Add your Nebula API key to .env:
+# NEBULA_API_KEY="your_key_here"
 
 # 4. Start local development server
 npm run dev
