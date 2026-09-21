@@ -52,10 +52,10 @@ NEXT_PUBLIC_SENTRY_DSN=""
 
 ### Key Descriptions
 
-| Variable                   | Required | Description                                                                                                                                                                                                            |
-| :------------------------- | :------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Variable                   | Required | Description                                                                                                                                                                                                                  |
+| :------------------------- | :------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `REACT_APP_NEBULA_API_KEY` | **Yes**  | Authenticates requests against the [Nebula API](https://api.utdnebula.com/). Contact the Trends Project Lead or ask in `#portfolio-engineering` on the [Nebula Labs Discord](https://discord.utdnebula.com) to obtain a key. |
-| `NEXT_PUBLIC_SENTRY_DSN`   | Optional | Data Source Name for Sentry client-side error reporting. Can be left empty for local development.                                                                                                                      |
+| `NEXT_PUBLIC_SENTRY_DSN`   | Optional | Data Source Name for Sentry client-side error reporting. Can be left empty for local development.                                                                                                                            |
 
 ---
 

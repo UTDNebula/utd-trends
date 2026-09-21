@@ -69,19 +69,19 @@ Visit [http://localhost:3000](http://localhost:3000) to view the running app.
 
 ## Available Scripts
 
-| Command                     | Description                                                          |
-| :-------------------------- | :------------------------------------------------------------------- |
+| Command                     | Description                                                               |
+| :-------------------------- | :------------------------------------------------------------------------ |
 | `npm run dev`               | Starts Next.js development server at `localhost:3000` (Turbopack default) |
-| `npm run build`             | Compiles production-ready Next.js application                        |
-| `npm start`                 | Runs the compiled production server                                  |
-| `npm run format`            | Auto-formats codebase with Prettier                                  |
-| `npm run format:check`      | Verifies code formatting against Prettier rules                      |
-| `npm run lint`              | Auto-fixes linting issues with ESLint                                |
-| `npm run lint:check`        | Validates codebase against ESLint rules                              |
-| `npm run fetchdata`         | Fetches fresh aggregated grade data from the Nebula API              |
-| `npm run buildautocomplete` | Compiles Graphology search autocomplete graph                        |
-| `npm run buildcoursenames`  | Generates course code to title mapping tables                        |
-| `npm run buildcombos`       | Generates professor-course combination indexes                       |
+| `npm run build`             | Compiles production-ready Next.js application                             |
+| `npm start`                 | Runs the compiled production server                                       |
+| `npm run format`            | Auto-formats codebase with Prettier                                       |
+| `npm run format:check`      | Verifies code formatting against Prettier rules                           |
+| `npm run lint`              | Auto-fixes linting issues with ESLint                                     |
+| `npm run lint:check`        | Validates codebase against ESLint rules                                   |
+| `npm run fetchdata`         | Fetches fresh aggregated grade data from the Nebula API                   |
+| `npm run buildautocomplete` | Compiles Graphology search autocomplete graph                             |
+| `npm run buildcoursenames`  | Generates course code to title mapping tables                             |
+| `npm run buildcombos`       | Generates professor-course combination indexes                            |
 
 ---
 
