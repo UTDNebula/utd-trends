@@ -212,11 +212,21 @@ function parseDescription(course: Course): {
       0,
       requisites[lastRequisite].lastIndexOf('.') + 1,
     );
-  } else
+  } else {
+  const lastPeriodIndex = formattedDescription.lastIndexOf('.');
+
+  if (lastPeriodIndex !== -1) {
     formattedDescription = formattedDescription.substring(
       0,
-      formattedDescription.lastIndexOf('.') + 1,
+      lastPeriodIndex + 1,
     );
+  } else {
+    formattedDescription = formattedDescription.replace(
+      /\s*\(\d+-\d+\)\s*[SYTRPFU]?\s*$/,
+      '',
+    );
+  }
+}
 
   return {
     formattedDescription,
