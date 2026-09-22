@@ -78,7 +78,7 @@ NEXT_PUBLIC_SENTRY_DSN=""
 ### Key Descriptions
 
 | Variable                             | Required | Category   | Description                                                                                                                                                                                                              |
-|:-------------------------------------|:---------|:-----------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| :----------------------------------- | :------- | :--------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `NEBULA_API_KEY`                     | **Yes**  | Core       | Authenticates server-side requests against the [Nebula API](https://api.utdnebula.com/). Contact the Trends Project Lead or ask in `#portfolio-engineering` on the [Nebula Labs Discord](https://discord.utdnebula.com). |
 | `NEBULA_API_URL`                     | **Yes**  | Core       | Base URL for the Nebula API. Defaults to `https://api.utdnebula.com/` (trailing slash required).                                                                                                                         |
 | `NEBULA_API_STORAGE_BUCKET`          | Optional | AI Summary | Storage bucket name for cached Rate My Professor summaries. Leave empty unless developing summarization features.                                                                                                        |
