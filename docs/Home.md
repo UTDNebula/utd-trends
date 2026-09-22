@@ -10,7 +10,7 @@ New contributors should begin with the [Getting Started Guide](Getting-Started.m
 
 ## Quick Navigation
 
-- **[Getting Started](Getting-Started.md)**: Prerequisites, environment setup, local development server, and build verification.
+- **[Getting Started](Getting-Started.md)**: Prerequisites, environment setup, and local development server.
 - **[Project Architecture](Project-Architecture.md)**: Technical stack, data flow, graph indexing, and visualization pipeline.
 - **[Project Structure](Project-Structure.md)**: Layout map of components, API routes, modules, and scripts.
 - **[How to Contribute](How-to-Contribute.md)**: Branching standards, conventional commits, and pull request review workflows.
