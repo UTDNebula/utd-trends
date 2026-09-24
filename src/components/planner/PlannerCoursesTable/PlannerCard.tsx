@@ -824,7 +824,7 @@ export default function PlannerCard(props: PlannerCardProps) {
           timeout="auto"
           unmountOnExit
         >
-          <div className="p-2 md:p-4 flex flex-col gap-2">
+          <div className="p-2 md:p-4 flex flex-col gap-2 text-sm">
             <SingleGradesInfo
               course={removeSection(props.query)}
               grades={latestMatchedSections.grades}
