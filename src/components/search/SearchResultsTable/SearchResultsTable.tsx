@@ -341,7 +341,14 @@ function Row({
               </Typography>
             </Tooltip>
           )) ||
-            null}
+              <Typography
+                className="text-base text-black text-center rounded-full px-5 py-2 w-16 mx-auto flex items-center justify-center"
+                sx={{
+                  backgroundColor: "#A297FD",
+                }}
+              >
+                {"NEW"}
+              </Typography>}
         </TableCell>
         <TableCell align="center" className="border-b-0">
           {(searchResult.type !== 'course' &&
