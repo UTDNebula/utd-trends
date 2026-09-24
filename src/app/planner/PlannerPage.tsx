@@ -1,5 +1,6 @@
 'use client';
 
+import Footer from '@/components/common/Footer/Footer';
 import Header from '@/components/navigation/Header/Header';
 import React, { Suspense, useRef } from 'react';
 import Planner, { PlannerLoadingSkeleton } from './Planner';
@@ -16,6 +17,7 @@ export default function PlannerPage() {
           <Planner />
         </Suspense>
       </main>
+      <Footer />
       <PlannerDownloadUI downloadRef={downloadRef} />
     </>
   );
