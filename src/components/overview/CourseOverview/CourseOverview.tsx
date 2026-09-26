@@ -221,12 +221,16 @@ function parseDescription(course: Course): {
       lastPeriodIndex + 1,
     );
   } else {
-    formattedDescription = formattedDescription.replace(
-      /\s*\(\d+-\d+\)\s*[SYTRPFU]?\s*$/,
-      '',
-    );
+    formattedDescription = formattedDescription
+      .replace(/\s*\(\d+-\d+\)\s*[SYTRPFU]?\s*$/, '')
+      .trim();
+
+    if (!/[.!?]$/.test(formattedDescription)) {
+      formattedDescription += '.';
+    }
   }
 }
+
 
   return {
     formattedDescription,
