@@ -18,7 +18,7 @@ export default function Loading() {
         fill
         className="object-cover -z-20"
       />
-      <PlannerButton className="absolute top-4 right-4" />
+      <PlannerButton className="absolute top-4 right-4 max-md:hidden" />
       <div className="max-w-xl grow flex flex-col justify-center">
         <h2 className="text-sm font-semibold mb-3 text-royal dark:text-cornflower-300 tracking-wider flex gap-1 items-center">
           <span className="leading-none">POWERED BY</span>
