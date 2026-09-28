@@ -3,6 +3,7 @@
 import { useSharedState } from '@/app/SharedStateProvider';
 import Split from '@/components/common/Split/Split';
 import StickySide from '@/components/common/Split/StickySide';
+import ClubsBanner from '@/components/planner/ClubsBanner/ClubsBanner';
 import PlannerCoursesTable, {
   LoadingPlannerCoursesTable,
 } from '@/components/planner/PlannerCoursesTable/PlannerCoursesTable';
@@ -55,12 +56,16 @@ export default function Planner() {
   return (
     <Split
       left={
-        planner.filter((entry) => entry.semester === effectiveTeachingSemester)
-          .length === 0 ? (
-          <PlannerEmpty />
-        ) : (
-          <PlannerCoursesTable />
-        )
+        <div className="flex flex-col">
+          {planner.filter(
+            (entry) => entry.semester === effectiveTeachingSemester,
+          ).length === 0 ? (
+            <PlannerEmpty />
+          ) : (
+            <PlannerCoursesTable />
+          )}
+          <ClubsBanner />
+        </div>
       }
       right={
         <StickySide>
