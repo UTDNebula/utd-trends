@@ -3,6 +3,7 @@ import { setAvailabilitySemester } from '@/modules/availability';
 import { displaySemesterName } from '@/modules/semesters';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import {
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -11,13 +12,34 @@ import {
   type SelectChangeEvent,
 } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function MyPlannerEmpty() {
   const { effectiveTeachingSemester, setTeachingSemester, availableSemesters } =
     useSharedState();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  //
+  // not sure if sync button is needed on empty scanner
+  //
+  //
+  // const [skedgeExists, setSkedgeExists] = useState(false);
+  // window.postMessage(
+  //   {
+  //     source: 'trends',
+  //     type: 'HANDSHAKE',
+  //   },
+  //   '*',
+  // );
+  // let handleSkedgeHandshake = (event: MessageEvent) => {
+  //   const message = event.data;
+  //   if (message.source === 'trends' && message.type === 'HANDSHAKE_RESPONSE') {
+  //     setSkedgeExists(true);
+  //     window.removeEventListener('message', handleSkedgeHandshake);
+  //   }
+  // };
+  // window.addEventListener('message', handleSkedgeHandshake);
 
   return (
     <>
@@ -58,6 +80,20 @@ export default function MyPlannerEmpty() {
             </Select>
           </FormControl>
         )}
+
+        {/* {skedgeExists ? (
+          <Button variant="outlined" size="small">
+            Sync
+          </Button>
+        ) : (
+          <Button
+            variant="outlined"
+            size="small"
+            href="https://www.utdnebula.com/projects/skedge"
+          >
+            Install Skedge to Sync
+          </Button>
+        )} */}
       </div>
       <Typography variant="h3" className="text-2xl p-4">
         {'Add a course on the search results page with the '}

@@ -15,6 +15,7 @@ import {
 } from '@/types/SearchQuery';
 import {
   Alert,
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -76,6 +77,33 @@ export default function PlannerCoursesTable() {
       : [],
   );
 
+  const [skedgeExists, setSkedgeExists] = useState(true);
+  const [skedgeSyncing, setSkedgeSyncing] = useState(false);
+
+  window.postMessage(
+    {
+      source: 'trends',
+      type: 'HANDSHAKE',
+    },
+    '*',
+  );
+  let handleSkedgeHandshake = (event: MessageEvent) => {
+    const message = event.data;
+    if (message.source === 'trends' && message.type === 'HANDSHAKE_RESPONSE') {
+      setSkedgeExists(true);
+      window.removeEventListener('message', handleSkedgeHandshake);
+    }
+  };
+  window.addEventListener('message', handleSkedgeHandshake);
+
+  let handleSkedgeSync = (event: MessageEvent) => {
+    const message = event.data;
+    if (message.source === 'trends' && message.type === 'MANUAL_SYNC_CONFIRM') {
+      setSkedgeSyncing(false);
+      window.removeEventListener('message', handleSkedgeSync);
+    }
+  };
+
   return (
     <>
       <div className="flex flex-wrap items-center gap-3 p-4 pb-0">
@@ -114,6 +142,35 @@ export default function PlannerCoursesTable() {
               ))}
             </Select>
           </FormControl>
+        )}
+
+        {skedgeExists ? (
+          <Button
+            variant="outlined"
+            size="small"
+            loading={skedgeSyncing}
+            onClick={() => {
+              window.postMessage(
+                {
+                  source: 'trends',
+                  type: 'MANUAL_SYNC',
+                },
+                '*',
+              );
+              window.addEventListener('message', handleSkedgeSync);
+              setSkedgeSyncing(true);
+            }}
+          >
+            Sync
+          </Button>
+        ) : (
+          <Button
+            variant="outlined"
+            size="small"
+            href="https://www.utdnebula.com/projects/skedge"
+          >
+            Install Skedge to Sync
+          </Button>
         )}
       </div>
       <div className="flex flex-col gap-4 mb-4 sm:mb-0 pt-4">
