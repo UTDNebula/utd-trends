@@ -1,5 +1,6 @@
 import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection';
+import { useSearchresults } from '@/modules/plannerFetch';
 import {
   convertToCourseOnly,
   searchQueryLabel,
@@ -108,6 +109,7 @@ function HourRow(props: HourRowProps) {
   );
 }
 
+// Display the My Planner schedule
 export default function PlannerSchedule() {
   const { planner, plannerColorMap, effectiveTeachingSemester } =
     useSharedState();
@@ -119,14 +121,68 @@ export default function PlannerSchedule() {
     searchQueryMultiSectionSplit(entry.query),
   );
 
+  // Find out if we need to show the saturday column
+  // because most students don't have saturday classes
+
+  // fetch full course data (with section meeting times) for every course query currently in the planner
+  // returns one react query result per course (in same order)
+  const allSearchResults = useSearchresults(
+    plannerForSemester.map((entry) => entry.query),
+  );
+
+  // from each course data, keep only the sections that are being taught during the semester
+  // the user is currently viewing
+  //
+  // if a course data query is not successful, return empty data
+  const sectionsBySemester = allSearchResults.map((result) => {
+    if (!result.isSuccess) {
+      return [];
+    }
+    return result.data.sections.filter(
+      (section) => section.academic_session.name === effectiveTeachingSemester,
+    );
+  });
+
+  // match each course with the specific section the user chose
+  // courses can have multiple sections, ex. lecture + lab
+  // so use flat list of section objects the user chose
+  const selectedSections = plannerForSemester
+    .map((entry) => searchQueryMultiSectionSplit(entry.query))
+    .flatMap((sectionQueriesForCourse, courseIndex) =>
+      sectionQueriesForCourse.map((sectionQuery) =>
+        sectionsBySemester[courseIndex].find(
+          (section) => section.section_number === sectionQuery.sectionNumber,
+        ),
+      ),
+    )
+      //if the .find() above returns no match then filter it out
+    .filter((section) => section !== undefined);
+
+  // check if any of the user's selected sections is on a saturday
+  // some() is used to return true as soon as it finds one match
+  const hasSaturdayClass = selectedSections.some((section) =>
+    section.meetings.some((meeting) =>
+      meeting.meeting_days.includes('Saturday'),
+    ),
+  );
+
+  // decide how many day columns to display
+  // minus by 1 if we dont have saturday classes
+  const effectiveEndDay = hasSaturdayClass ? END_DAY : END_DAY - 1;
+
+  // CSS for defining how many grid columns
+  const dayColumnsClass = hasSaturdayClass
+    ? 'grid-cols-[max-content_repeat(6,minmax(0,1fr))]'
+    : 'grid-cols-[max-content_repeat(5,minmax(0,1fr))]';
+
   return (
     <div
-      className={`w-full h-[calc(100vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-auto rounded-2xl grid-rows-[max-content_repeat(14,minmax(0,1fr))]`}
+      className={`w-full h-[calc(100vh-2rem)] grid grid-flow-row ${dayColumnsClass} overflow-auto rounded-2xl grid-rows-[max-content_repeat(14,minmax(0,1fr))]`}
     >
       {/*Weekday Headers*/}
       <div className="grid col-span-full grid-flow-row bg-royal dark:bg-cornflower-300 grid-cols-subgrid grid-rows-subgrid">
         <div className="col-span-1 h-min"></div>
-        {DAYS.slice(START_DAY, END_DAY + 1).map((x, i) => (
+        {DAYS.slice(START_DAY, effectiveEndDay + 1).map((x, i) => (
           <p
             key={i}
             className="text-sm text-white dark:text-haiti col-span-1 border-l text-center h-min overflow-hidden"
