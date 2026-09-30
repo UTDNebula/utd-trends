@@ -155,7 +155,7 @@ export default function PlannerSchedule() {
         ),
       ),
     )
-      //if the .find() above returns no match then filter it out
+    //if the .find() above returns no match then filter it out
     .filter((section) => section !== undefined);
 
   // check if any of the user's selected sections is on a saturday
