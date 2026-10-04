@@ -25,7 +25,7 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export function LoadingPlannerCoursesTable() {
   const { planner } = useSharedState();
@@ -77,32 +77,39 @@ export default function PlannerCoursesTable() {
       : [],
   );
 
-  const [skedgeExists, setSkedgeExists] = useState(true);
+  const [skedgeExists, setSkedgeExists] = useState(false);
   const [skedgeSyncing, setSkedgeSyncing] = useState(false);
 
-  window.postMessage(
-    {
-      source: 'trends',
-      type: 'HANDSHAKE',
-    },
-    '*',
-  );
   let handleSkedgeHandshake = (event: MessageEvent) => {
     const message = event.data;
-    if (message.source === 'trends' && message.type === 'HANDSHAKE_RESPONSE') {
+    if (message.source === 'skedge' && message.type === 'HANDSHAKE_RESPONSE') {
       setSkedgeExists(true);
       window.removeEventListener('message', handleSkedgeHandshake);
     }
   };
-  window.addEventListener('message', handleSkedgeHandshake);
 
   let handleSkedgeSync = (event: MessageEvent) => {
     const message = event.data;
-    if (message.source === 'trends' && message.type === 'MANUAL_SYNC_CONFIRM') {
+    if (message.source === 'skedge' && message.type === 'MANUAL_SYNC_CONFIRM') {
       setSkedgeSyncing(false);
       window.removeEventListener('message', handleSkedgeSync);
     }
   };
+
+  useEffect(() => {
+    window.addEventListener('message', handleSkedgeHandshake);
+    window.postMessage(
+      {
+        source: 'trends',
+        type: 'HANDSHAKE',
+      },
+      '*',
+    );
+
+    return () => {
+      window.removeEventListener('message', handleSkedgeHandshake);
+    };
+  }, []);
 
   return (
     <>
@@ -144,34 +151,37 @@ export default function PlannerCoursesTable() {
           </FormControl>
         )}
 
-        {skedgeExists ? (
-          <Button
-            variant="outlined"
-            size="small"
-            loading={skedgeSyncing}
-            onClick={() => {
-              window.postMessage(
-                {
-                  source: 'trends',
-                  type: 'MANUAL_SYNC',
-                },
-                '*',
-              );
-              window.addEventListener('message', handleSkedgeSync);
-              setSkedgeSyncing(true);
-            }}
-          >
-            Sync
-          </Button>
-        ) : (
-          <Button
-            variant="outlined"
-            size="small"
-            href="https://www.utdnebula.com/projects/skedge"
-          >
-            Install Skedge to Sync
-          </Button>
-        )}
+        <div style={{ marginLeft: 'auto' }}>
+          {skedgeExists ? (
+            <Button
+              variant="outlined"
+              size="small"
+              loading={skedgeSyncing}
+              onClick={() => {
+                window.postMessage(
+                  {
+                    source: 'trends',
+                    type: 'MANUAL_SYNC',
+                  },
+                  '*',
+                );
+                window.addEventListener('message', handleSkedgeSync);
+                setSkedgeSyncing(true);
+              }}
+            >
+              Sync
+            </Button>
+          ) : (
+            <Button
+              variant="outlined"
+              size="small"
+              href="https://www.utdnebula.com/projects/skedge"
+              target="_blank"
+            >
+              Install Skedge to Sync
+            </Button>
+          )}
+        </div>
       </div>
       <div className="flex flex-col gap-4 mb-4 sm:mb-0 pt-4">
         {plannerForSemester
