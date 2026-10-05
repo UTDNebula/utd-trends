@@ -80,24 +80,30 @@ export default function PlannerCoursesTable() {
   const [skedgeExists, setSkedgeExists] = useState(false);
   const [skedgeSyncing, setSkedgeSyncing] = useState(false);
 
-  let handleSkedgeHandshake = (event: MessageEvent) => {
-    const message = event.data;
-    if (message.source === 'skedge' && message.type === 'HANDSHAKE_RESPONSE') {
-      setSkedgeExists(true);
-      window.removeEventListener('message', handleSkedgeHandshake);
-    }
-  };
-
-  let handleSkedgeSync = (event: MessageEvent) => {
-    const message = event.data;
-    if (message.source === 'skedge' && message.type === 'MANUAL_SYNC_CONFIRM') {
-      setSkedgeSyncing(false);
-      window.removeEventListener('message', handleSkedgeSync);
-    }
-  };
-
   useEffect(() => {
+    const handleSkedgeHandshake = (event: MessageEvent) => {
+      const message = event.data;
+      if (
+        message?.source === 'skedge' &&
+        message.type === 'HANDSHAKE_RESPONSE'
+      ) {
+        setSkedgeExists(true);
+        window.removeEventListener('message', handleSkedgeHandshake);
+      }
+    };
+
+    const handleSkedgeSync = (event: MessageEvent) => {
+      const message = event.data;
+      if (
+        message?.source === 'skedge' &&
+        message.type === 'MANUAL_SYNC_CONFIRM'
+      ) {
+        setSkedgeSyncing(false);
+      }
+    };
+
     window.addEventListener('message', handleSkedgeHandshake);
+    window.addEventListener('message', handleSkedgeSync);
     window.postMessage(
       {
         source: 'trends',
@@ -108,6 +114,7 @@ export default function PlannerCoursesTable() {
 
     return () => {
       window.removeEventListener('message', handleSkedgeHandshake);
+      window.removeEventListener('message', handleSkedgeSync);
     };
   }, []);
 
@@ -158,6 +165,7 @@ export default function PlannerCoursesTable() {
               size="small"
               loading={skedgeSyncing}
               onClick={() => {
+                setSkedgeSyncing(true);
                 window.postMessage(
                   {
                     source: 'trends',
@@ -165,8 +173,6 @@ export default function PlannerCoursesTable() {
                   },
                   '*',
                 );
-                window.addEventListener('message', handleSkedgeSync);
-                setSkedgeSyncing(true);
               }}
             >
               Sync
