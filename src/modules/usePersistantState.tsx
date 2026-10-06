@@ -12,7 +12,12 @@ export default function usePersistantState<T>(
   const defaultValueRef = useRef(defaultValue);
   useEffect(() => {
     function setFromStorage() {
-      const value = localStorage.getItem(key);
+      let value: string | null;
+      try {
+        value = localStorage.getItem(key);
+      } catch {
+        return;
+      }
       if (!value) {
         if (useDefaultValue) {
           internalSetState(defaultValueRef.current);
@@ -45,7 +50,11 @@ export default function usePersistantState<T>(
       const newValue =
         typeof value === 'function' ? (value as (prev: T) => T)(prev) : value;
 
-      localStorage.setItem(key, JSON.stringify(newValue));
+      try {
+        localStorage.setItem(key, JSON.stringify(newValue));
+      } catch {
+        //keep the in-memory state update even if persistence fails
+      }
       return newValue;
     });
   };
