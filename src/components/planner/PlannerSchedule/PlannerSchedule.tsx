@@ -96,13 +96,13 @@ function HourRow(props: HourRowProps) {
       <p
         className={`text-[0.8125rem] text-white dark:text-haiti col-span-1 col-start-1 bg-royal dark:bg-cornflower-300 border-t px-1 text-right`}
       >
-        {props.hour > 12 ? props.hour - 12 : props.hour}:00
+        {props.hour > 12 ? props.hour - 12 : props.hour}
+        <span className="hidden sm:inline">:00</span>
         {props.hour >= 12 ? 'PM' : 'AM'}
       </p>
-      <div className="col-start-2 col-span-full bg-light dark:bg-dark border-t border-gray-300 dark:border-gray-600">
-        <div className="relative top-1/4 col-span-full border-t border-gray-100 dark:border-gray-800"></div>
-        <div className="relative top-1/2 col-span-full border-t border-gray-200 dark:border-gray-700"></div>
-        <div className="relative top-3/4 col-span-full border-t border-gray-100 dark:border-gray-800"></div>
+        <div className="col-start-2 col-span-full border-t border-gray-400 dark:border-gray-500">
+          <div className="relative top-1/2 col-span-full border-t border-gray-300 dark:border-gray-600"></div>
+
       </div>
     </div>
   );
@@ -121,7 +121,7 @@ export default function PlannerSchedule() {
 
   return (
     <div
-      className={`w-full h-[calc(100vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-auto rounded-2xl grid-rows-[max-content_repeat(14,minmax(0,1fr))]`}
+      className={`w-full h-[calc(100vh-2rem)] grid grid-flow-row grid-cols-[max-content_repeat(6,minmax(0,1fr))] overflow-auto rounded-2xl grid-rows-[max-content_repeat(14,minmax(0,1fr))] bg-gray-50 dark:bg-gray-900`}
     >
       {/*Weekday Headers*/}
       <div className="grid col-span-full grid-flow-row bg-royal dark:bg-cornflower-300 grid-cols-subgrid grid-rows-subgrid">
