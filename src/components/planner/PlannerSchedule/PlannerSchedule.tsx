@@ -100,9 +100,8 @@ function HourRow(props: HourRowProps) {
         <span className="hidden sm:inline">:00</span>
         {props.hour >= 12 ? 'PM' : 'AM'}
       </p>
-        <div className="col-start-2 col-span-full border-t border-gray-400 dark:border-gray-500">
-          <div className="relative top-1/2 col-span-full border-t border-gray-300 dark:border-gray-600"></div>
-
+      <div className="col-start-2 col-span-full border-t border-gray-400 dark:border-gray-500">
+        <div className="relative top-1/2 col-span-full border-t border-gray-300 dark:border-gray-600"></div>
       </div>
     </div>
   );
