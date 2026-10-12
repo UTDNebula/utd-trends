@@ -80,25 +80,21 @@ export default function PlannerCoursesTable() {
   const [skedgeExists, setSkedgeExists] = useState(false);
   const [skedgeSyncing, setSkedgeSyncing] = useState(false);
 
+  const handleSkedgeSync = (event: MessageEvent) => {
+    const message = event.data;
+    if (message.source === 'skedge' && message.type === 'MANUAL_SYNC_CONFIRM')
+      setSkedgeSyncing(false);
+  };
+
   useEffect(() => {
     const handleSkedgeHandshake = (event: MessageEvent) => {
       const message = event.data;
       if (
-        message?.source === 'skedge' &&
+        message.source === 'skedge' &&
         message.type === 'HANDSHAKE_RESPONSE'
       ) {
         setSkedgeExists(true);
         window.removeEventListener('message', handleSkedgeHandshake);
-      }
-    };
-
-    const handleSkedgeSync = (event: MessageEvent) => {
-      const message = event.data;
-      if (
-        message?.source === 'skedge' &&
-        message.type === 'MANUAL_SYNC_CONFIRM'
-      ) {
-        setSkedgeSyncing(false);
       }
     };
 
@@ -117,6 +113,12 @@ export default function PlannerCoursesTable() {
       window.removeEventListener('message', handleSkedgeSync);
     };
   }, []);
+
+  const ua = navigator.userAgent.toLowerCase();
+  const skedgeURL =
+    ua.indexOf('chrome') != -1 // if browser is chrome
+      ? 'https://chromewebstore.google.com/detail/skedge/ghipfanpcodcmkjacmmfjdmccdiaahab'
+      : 'https://addons.mozilla.org/en-US/firefox/addon/sk-edge/';
 
   return (
     <>
@@ -181,7 +183,7 @@ export default function PlannerCoursesTable() {
             <Button
               variant="outlined"
               size="small"
-              href="https://www.utdnebula.com/projects/skedge"
+              href={skedgeURL}
               target="_blank"
             >
               Install Skedge to Sync

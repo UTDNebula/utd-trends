@@ -3,7 +3,6 @@ import { setAvailabilitySemester } from '@/modules/availability';
 import { displaySemesterName } from '@/modules/semesters';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import {
-  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -12,7 +11,6 @@ import {
   type SelectChangeEvent,
 } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useState } from 'react';
 
 export default function MyPlannerEmpty() {
   const { effectiveTeachingSemester, setTeachingSemester, availableSemesters } =
