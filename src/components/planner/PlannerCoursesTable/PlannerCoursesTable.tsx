@@ -15,6 +15,7 @@ import {
 } from '@/types/SearchQuery';
 import {
   Alert,
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -24,7 +25,7 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export function LoadingPlannerCoursesTable() {
   const { planner } = useSharedState();
@@ -76,6 +77,49 @@ export default function PlannerCoursesTable() {
       : [],
   );
 
+  const [skedgeExists, setSkedgeExists] = useState(false);
+  const [skedgeSyncing, setSkedgeSyncing] = useState(false);
+
+  const handleSkedgeSync = (event: MessageEvent) => {
+    const message = event.data;
+    if (message.source === 'skedge' && message.type === 'MANUAL_SYNC_CONFIRM')
+      setSkedgeSyncing(false);
+  };
+
+  useEffect(() => {
+    const handleSkedgeHandshake = (event: MessageEvent) => {
+      const message = event.data;
+      if (
+        message.source === 'skedge' &&
+        message.type === 'HANDSHAKE_RESPONSE'
+      ) {
+        setSkedgeExists(true);
+        window.removeEventListener('message', handleSkedgeHandshake);
+      }
+    };
+
+    window.addEventListener('message', handleSkedgeHandshake);
+    window.addEventListener('message', handleSkedgeSync);
+    window.postMessage(
+      {
+        source: 'trends',
+        type: 'HANDSHAKE',
+      },
+      '*',
+    );
+
+    return () => {
+      window.removeEventListener('message', handleSkedgeHandshake);
+      window.removeEventListener('message', handleSkedgeSync);
+    };
+  }, []);
+
+  const ua = navigator.userAgent.toLowerCase();
+  const skedgeURL =
+    ua.indexOf('chrome') != -1 // if browser is chrome
+      ? 'https://chromewebstore.google.com/detail/skedge/ghipfanpcodcmkjacmmfjdmccdiaahab'
+      : 'https://addons.mozilla.org/en-US/firefox/addon/sk-edge/';
+
   return (
     <>
       <div className="flex flex-wrap items-center gap-3 p-4 pb-0">
@@ -115,6 +159,37 @@ export default function PlannerCoursesTable() {
             </Select>
           </FormControl>
         )}
+
+        <div style={{ marginLeft: 'auto' }}>
+          {skedgeExists ? (
+            <Button
+              variant="outlined"
+              size="small"
+              loading={skedgeSyncing}
+              onClick={() => {
+                setSkedgeSyncing(true);
+                window.postMessage(
+                  {
+                    source: 'trends',
+                    type: 'MANUAL_SYNC',
+                  },
+                  '*',
+                );
+              }}
+            >
+              Sync
+            </Button>
+          ) : (
+            <Button
+              variant="outlined"
+              size="small"
+              href={skedgeURL}
+              target="_blank"
+            >
+              Install Skedge to Sync
+            </Button>
+          )}
+        </div>
       </div>
       <div className="flex flex-col gap-4 mb-4 sm:mb-0 pt-4">
         {plannerForSemester
