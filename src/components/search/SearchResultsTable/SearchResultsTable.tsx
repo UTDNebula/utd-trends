@@ -12,6 +12,7 @@ import { calculateGrades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 import { getLatestSyllabusSection } from '@/modules/sections';
 import { displaySemesterName } from '@/modules/semesters';
+import { compareSemesters } from '@/modules/semesters';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -229,6 +230,11 @@ function Row({
 
   const latestSyllabusSection = getLatestSyllabusSection(searchResult);
 
+  const hasTaughtBefore = searchResult.sections.some((section) => 
+  compareSemesters(section.academic_session.name, chosenSemesters[0]) < 0);
+  const teachesSelectedSemester = searchResult.sections.some(
+  (section) => section.academic_session.name === chosenSemesters[0],);
+
   return (
     <>
       <TableRow
@@ -347,7 +353,12 @@ function Row({
                 {gpaToLetterGrade(filteredGrades.gpa)}
               </Typography>
             </Tooltip>
-          ) : null}
+          ) : searchResult.type === 'combo' && teachesSelectedSemester && !hasTaughtBefore ? <Typography
+              className="text-base text-black text-center rounded-full px-5 py-2 w-16 mx-auto flex items-center justify-center"
+              sx={{ backgroundColor: '#A297FD' }}
+            >
+              NEW
+            </Typography> : null}
         </TableCell>
         <TableCell align="center" className="border-b-0">
           {(searchResult.type !== 'course' &&
