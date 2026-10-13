@@ -37,6 +37,7 @@ export type PlannerEntry = {
 export type SearchResult =
   | {
       type: 'course';
+      isNew?: boolean;
       grades: GradesData;
       searchQuery: {
         prefix: string;
@@ -63,6 +64,7 @@ export type SearchResult =
     }
   | {
       type: 'combo';
+      isNew?: boolean;
       grades: GradesData;
       RMP?: RMP;
       searchQuery: {
