@@ -318,7 +318,14 @@ function Row({
           {nameCell}
         </TableCell>
         <TableCell align="center" className="border-b-0">
-          {(filteredGrades.gpa >= 0 && (
+          {searchResult.type !== 'professor' && searchResult.isNew ? (
+            <Typography
+              className="text-base text-black text-center rounded-full px-5 py-2 w-16 mx-auto flex items-center justify-center"
+              sx={{ backgroundColor: '#A297FD' }}
+            >
+              NEW
+            </Typography>
+          ) : filteredGrades.gpa >= 0 ? (
             <Tooltip
               title={
                 'Median GPA: ' +
@@ -340,15 +347,7 @@ function Row({
                 {gpaToLetterGrade(filteredGrades.gpa)}
               </Typography>
             </Tooltip>
-          )) ||
-              <Typography
-                className="text-base text-black text-center rounded-full px-5 py-2 w-16 mx-auto flex items-center justify-center"
-                sx={{
-                  backgroundColor: "#A297FD",
-                }}
-              >
-                {"NEW"}
-              </Typography>}
+          ) : null}
         </TableCell>
         <TableCell align="center" className="border-b-0">
           {(searchResult.type !== 'course' &&
