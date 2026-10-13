@@ -117,15 +117,17 @@ function GradeOrRmpRow<T>({
             <Tooltip
               title={tooltipTitles[name]}
               placement="left"
-              PopperProps={{
-                modifiers: [
-                  {
-                    name: 'offset',
-                    options: {
-                      offset: [0, 10], // Adjust these values as needed
+              slotProps={{
+                popper: {
+                  modifiers: [
+                    {
+                      name: 'offset',
+                      options: {
+                        offset: [0, 10],
+                      },
                     },
-                  },
-                ],
+                  ],
+                },
               }}
             >
               <span>{name}</span>
@@ -209,15 +211,17 @@ function GradeAndRmpRow({
         <Tooltip
           title="Total # of Grades & Ratings"
           placement="left"
-          PopperProps={{
-            modifiers: [
-              {
-                name: 'offset',
-                options: {
-                  offset: [0, -8], // Adjust these values as needed
+          slotProps={{
+            popper: {
+              modifiers: [
+                {
+                  name: 'offset',
+                  options: {
+                    offset: [0, -8],
+                  },
                 },
-              },
-            ],
+              ],
+            },
           }}
         >
           <span>{name}</span>

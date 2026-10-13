@@ -3,8 +3,10 @@ import type { GenericFetchedData } from '@/types/GenericFetchedData';
 import { type SearchQuery } from '@/types/SearchQuery';
 import { NextResponse } from 'next/server';
 
+type CourseNameEntry = SearchQuery & { totalStudents: number };
+
 const courseNameTable = untypedCourseNameTable as {
-  [key: string]: SearchQuery[];
+  [key: string]: CourseNameEntry[];
 };
 
 //find all the prefixes in the course name table
@@ -105,7 +107,7 @@ const LIMIT = 20;
 
 interface Result {
   title: string;
-  result: SearchQuery;
+  result: CourseNameEntry;
 }
 
 type ResultWDistance = Result & {
@@ -200,12 +202,16 @@ export async function GET(request: Request) {
             })
             .sort((a, b) => b - a)[0] ?? 0;
 
+        const popularityBonus =
+          result.totalStudents > 0 ? -Math.log10(result.totalStudents + 1) : 0;
+
         return {
           distance:
             (smartNumberMatch < 0 ? 0 : distanceMetric) + // if checking course number, ignore distance metric
             2 * smartWordCapture + // double weight for word capture
             prefixPriority +
-            smartNumberMatch,
+            smartNumberMatch +
+            5 * popularityBonus,
           title: title,
           result: result,
         };

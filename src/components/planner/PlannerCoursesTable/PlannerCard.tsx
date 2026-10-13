@@ -1,11 +1,12 @@
 'use client';
 
+import BaseCard from '@/components/common/BaseCard/BaseCard';
 import SingleGradesInfo from '@/components/common/SingleGradesInfo/SingleGradesInfo';
 import SingleProfInfo from '@/components/common/SingleProfInfo/SingleProfInfo';
 import { calculateGrades } from '@/modules/fetchGrades';
 import type { Sections, SectionsData } from '@/modules/fetchSections';
 import { useSearchResult } from '@/modules/plannerFetch';
-import { getLatestSyllabusSection } from '@/modules/semesters';
+import { getLatestSyllabusSection } from '@/modules/sections';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -22,11 +23,9 @@ import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import EventIcon from '@mui/icons-material/Event';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
-  Box,
   Checkbox,
   Collapse,
   IconButton,
-  Paper,
   Radio,
   Skeleton,
   Table,
@@ -45,10 +44,7 @@ import React, { useState } from 'react';
 
 export function LoadingPlannerCard() {
   return (
-    <Box
-      component={Paper}
-      className="border border-royal dark:border-cornflower-300 rounded-lg"
-    >
+    <BaseCard className="border border-royal dark:border-cornflower-300">
       <div className="p-4 flex items-center gap-4">
         <div className="flex items-center">
           <IconButton aria-label="expand row" size="medium" disabled>
@@ -72,7 +68,7 @@ export function LoadingPlannerCard() {
           <Skeleton />
         </Typography>
       </div>
-    </Box>
+    </BaseCard>
   );
 }
 
@@ -521,11 +517,10 @@ export default function PlannerCard(props: PlannerCardProps) {
 
   const latestSyllabusSection = getLatestSyllabusSection(allMatchedSections);
   return (
-    <Box
-      component={Paper}
+    <BaseCard
       className={
-        'border border-royal dark:border-cornflower-300 rounded-lg' +
-        (props.extraSections ? ' my-4 mx-5 bg-light dark:bg-dark' : '')
+        'border border-royal dark:border-cornflower-300' +
+        (props.extraSections ? ' my-4 mx-5 dark:bg-neutral-700' : '')
       }
     >
       <div
@@ -829,7 +824,7 @@ export default function PlannerCard(props: PlannerCardProps) {
           timeout="auto"
           unmountOnExit
         >
-          <div className="p-2 md:p-4 flex flex-col gap-2">
+          <div className="p-2 md:p-4 flex flex-col gap-2 text-sm">
             <SingleGradesInfo
               course={removeSection(props.query)}
               grades={latestMatchedSections.grades}
@@ -851,6 +846,6 @@ export default function PlannerCard(props: PlannerCardProps) {
           </div>
         </Collapse>
       }
-    </Box>
+    </BaseCard>
   );
 }

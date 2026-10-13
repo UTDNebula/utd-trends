@@ -18,16 +18,14 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "verbatimModuleSyntax": true,
-    "baseUrl": ".",
+    "rootDir": ".",
     "paths": {
       "rsg-components/*": [
         "./node_modules/react-styleguidist/lib/client/rsg-components/*"
       ],
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
+    "verbatimModuleSyntax": true,
     "plugins": [
       {
         "name": "next"

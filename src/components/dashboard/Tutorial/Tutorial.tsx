@@ -3,7 +3,7 @@
 import usePersistantState from '@/modules/usePersistantState';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import CloseIcon from '@mui/icons-material/Close';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import {
   Backdrop,
   Button,
@@ -11,6 +11,7 @@ import {
   IconButton,
   ListItemText,
   MenuItem,
+  MenuList,
   Popover,
   Tooltip,
 } from '@mui/material';
@@ -200,14 +201,7 @@ export function TutorialButton({ handleCloseMenu }: TutorialButtonProps) {
   return (
     <>
       {/* Shown on small screens */}
-      <div className="relative sm:hidden">
-        <div
-          className={
-            tutorialHint
-              ? 'absolute w-full h-1/2 translate-y-1/2 bg-royal dark:bg-cornflower-300 animate-ping'
-              : 'hidden'
-          }
-        />
+      <MenuList className="relative sm:hidden">
         <MenuItem
           onClick={() => {
             openTutorial();
@@ -217,12 +211,19 @@ export function TutorialButton({ handleCloseMenu }: TutorialButtonProps) {
             tutorialHint ? 'bg-royal/20 dark:bg-cornflower-300/20' : ''
           }
         >
+          <div
+            className={
+              tutorialHint
+                ? 'absolute w-full h-full bg-royal dark:bg-cornflower-300 animate-ping'
+                : 'hidden'
+            }
+          />
           <ListItemIcon>
-            <HelpOutlineIcon />
+            <HelpOutlinedIcon />
           </ListItemIcon>
           <ListItemText>Tutorial</ListItemText>
         </MenuItem>
-      </div>
+      </MenuList>
       {/* Shown on large screens */}
       <div className="relative max-sm:hidden">
         <div
@@ -243,7 +244,7 @@ export function TutorialButton({ handleCloseMenu }: TutorialButtonProps) {
               size="medium"
               onClick={openTutorial}
             >
-              <HelpOutlineIcon
+              <HelpOutlinedIcon
                 className={'text-3xl' + (tutorialHint ? ' text-white' : '')}
               />
             </IconButton>

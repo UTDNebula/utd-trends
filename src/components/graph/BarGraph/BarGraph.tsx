@@ -1,9 +1,10 @@
 'use client';
 
+import BaseCard from '@/components/common/BaseCard/BaseCard';
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
 import { compareColors, useRainbowColors } from '@/modules/colors';
-import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
+import { Fade, Modal, useMediaQuery } from '@mui/material';
 import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
@@ -16,7 +17,7 @@ type Props = {
   yaxisFormatter?: (val: number) => string;
   tooltipFormatter?: (
     val: number,
-    extra: { series: number[]; seriesIndex: number; dataPointIndex: number },
+    opts?: { seriesIndex: number; dataPointIndex: number },
   ) => string;
   series: {
     name: string;
@@ -36,7 +37,7 @@ export default function BarGraph(props: Props) {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
-    '<div class="apexcharts-menu-icon">' +
+    '<div class="apexcharts-menu-icon custom">' +
     (fullScreenOpen ? FullscreenCloseIcon : FullscreenOpenIcon) +
     '</div>';
 
@@ -160,7 +161,9 @@ export default function BarGraph(props: Props) {
         className="flex justify-stretch align-stretch"
       >
         <Fade in={fullScreenOpen}>
-          <Card className="p-4 m-12 flex-auto">{graph}</Card>
+          <div className="m-12 flex-auto flex justify-stretch align-stretch">
+            <BaseCard className="p-4 flex-auto">{graph}</BaseCard>
+          </div>
         </Fade>
       </Modal>
     </>

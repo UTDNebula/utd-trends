@@ -5,10 +5,16 @@ import RmpSummary, {
 } from '@/components/common/RmpSummary/RmpSummary';
 import SyllabusSummary from '@/components/common/SyllabusSummary/SyllabusSummary';
 import type { RMP } from '@/modules/fetchRmp';
-import type { SearchQuery } from '@/types/SearchQuery';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { isComboQuery, type SearchQuery } from '@/types/SearchQuery';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Chip, Collapse, Grid, IconButton, Skeleton } from '@mui/material';
+import {
+  Chip,
+  Collapse,
+  Divider,
+  Grid,
+  IconButton,
+  Skeleton,
+} from '@mui/material';
 import Link from 'next/link';
 import React, { useState } from 'react';
 
@@ -76,27 +82,18 @@ export function LoadingSingleProfInfo() {
   );
 }
 
-type Props = {
+type RmpProps = {
   open: boolean;
   searchQuery: SearchQuery;
   rmp: RMP;
-  syllabus_uri?: string | null;
-  syllabus_sem?: string | null;
 };
 
-export default function SingleProfInfo({
-  open,
-  searchQuery,
-  rmp,
-  syllabus_uri,
-  syllabus_sem,
-}: Props) {
-  const [showMore, setShowMore] = useState(false);
-  const [showSyllabus, setShowSyllabus] = useState(false);
+function Rmp({ open, searchQuery, rmp }: RmpProps) {
+  const [showMoreTags, setShowMoreTags] = useState(false);
 
   if (rmp.numRatings == 0) {
     return (
-      <Grid container spacing={2} className="p-4">
+      <>
         <Grid size={6}>
           <p className="text-xl font-bold">{rmp.numRatings.toLocaleString()}</p>
           <p>Ratings given</p>
@@ -110,7 +107,7 @@ export default function SingleProfInfo({
             Visit Rate My Professors
           </Link>
         </Grid>
-      </Grid>
+      </>
     );
   }
 
@@ -119,7 +116,7 @@ export default function SingleProfInfo({
   const next5 = topTags.slice(5, 10);
 
   return (
-    <Grid container spacing={2} className="p-4">
+    <>
       <Grid size={6}>
         <p className="text-xl font-bold">
           {rmp.avgRating > 0 ? rmp.avgRating : 'N/A'}
@@ -159,7 +156,11 @@ export default function SingleProfInfo({
             {next5.length > 0 && (
               <>
                 {next5.map((tag, index) => (
-                  <Collapse key={index} in={showMore} orientation="horizontal">
+                  <Collapse
+                    key={index}
+                    in={showMoreTags}
+                    orientation="horizontal"
+                  >
                     <Chip
                       label={`${tag.tagName} (${tag.tagCount})`}
                       variant="outlined"
@@ -170,11 +171,12 @@ export default function SingleProfInfo({
                 <IconButton
                   size="small"
                   aria-label="show more"
-                  onClick={() => setShowMore(!showMore)}
+                  onClick={() => setShowMoreTags(!showMoreTags)}
                 >
                   <ExpandMoreIcon
                     className={
-                      'transition ' + (showMore ? 'rotate-90' : '-rotate-90')
+                      'transition ' +
+                      (showMoreTags ? 'rotate-90' : '-rotate-90')
                     }
                   />
                 </IconButton>
@@ -189,38 +191,47 @@ export default function SingleProfInfo({
           key={JSON.stringify(searchQuery)}
           open={open}
           searchQuery={searchQuery}
+          legacyId={rmp.legacyId}
         />
       </Grid>
+    </>
+  );
+}
 
-      <Grid size={12}>
-        <div className="flex gap-7">
-          <Link
-            href={'https://www.ratemyprofessors.com/professor/' + rmp.legacyId}
-            target="_blank"
-            className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-          >
-            Visit Rate My Professors
-          </Link>
+type Props = {
+  open: boolean;
+  searchQuery: SearchQuery;
+  rmp: RMP;
+  syllabus_uri?: string | null;
+  syllabus_sem?: string | null;
+};
 
-          {syllabus_uri && (
-            <button onClick={() => setShowSyllabus(!showSyllabus)}>
-              View Syllabus Summary
-              {syllabus_sem ? ` for ${syllabus_sem}` : ''}{' '}
-              <ChevronRightIcon
-                className={`transition-transform ${showSyllabus ? 'rotate-90' : ''}`}
-              />
-            </button>
-          )}
-        </div>
-        {syllabus_uri && (
-          <SyllabusSummary
-            open={open}
-            searchQuery={searchQuery}
-            showSyllabus={showSyllabus}
-            syllabus_uri={syllabus_uri}
-          />
-        )}
+export default function SingleProfInfo({
+  open,
+  searchQuery,
+  rmp,
+  syllabus_uri,
+  syllabus_sem,
+}: Props) {
+  return (
+    <>
+      <Divider />
+      <Grid container spacing={2} className="p-4">
+        <Rmp open={open} searchQuery={searchQuery} rmp={rmp} />
       </Grid>
-    </Grid>
+      {syllabus_uri && syllabus_sem && isComboQuery(searchQuery) && (
+        <>
+          <Divider />
+          <Grid container spacing={2} className="p-4">
+            <SyllabusSummary
+              open={open}
+              searchQuery={searchQuery}
+              syllabus_uri={syllabus_uri}
+              syllabus_sem={syllabus_sem}
+            />
+          </Grid>
+        </>
+      )}
+    </>
   );
 }

@@ -216,19 +216,20 @@ export const BaseHeader = ({
   return (
     <BaseHeaderContext.Provider value={{ openCollapsibleSearchBar }}>
       <div
-        className={`${disableSticky ? '' : 'sticky'} overflow-hidden min-h-17 top-0 z-50 flex w-full justify-between items-center gap-y-2 gap-x-2 md:gap-x-4 lg:gap-x-8 py-2 px-4 ${menu || openCollapsibleSearchBar ? 'max-sm:pl-2' : ''} flex-wrap sm:flex-nowrap ${transparent ? '' : 'bg-lighten dark:bg-darken'} ${className}`}
+        className={`${disableSticky ? 'relative' : 'sticky'} overflow-hidden min-h-17 top-0 z-50 flex w-full justify-between items-center gap-y-2 gap-x-2 md:gap-x-4 lg:gap-x-8 py-2 px-4 ${menu || openCollapsibleSearchBar ? 'max-sm:pl-2' : ''} flex-wrap sm:flex-nowrap ${transparent ? '' : 'bg-lighten dark:bg-darken'} ${className}`}
       >
         {!transparent && (
-          <>
+          <div className="absolute -z-20 inset-0">
             <Image
               src={gradientBG}
               alt="gradient background"
               fill
-              className="object-cover -z-20 select-none"
+              className="object-cover -z-10 select-none"
               sizes="120vw"
+              loading="eager"
             />
-            <div className="absolute inset-0 bg-lighten dark:bg-darken -z-10"></div>
-          </>
+            <div className="absolute inset-0 bg-lighten dark:bg-darken"></div>
+          </div>
         )}
         {!openCollapsibleSearchBar ? (
           // Main header

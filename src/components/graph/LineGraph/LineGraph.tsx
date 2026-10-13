@@ -1,12 +1,13 @@
 'use client';
 
 import { FiltersContext } from '@/app/dashboard/FilterContext';
+import BaseCard from '@/components/common/BaseCard/BaseCard';
 import { FullscreenCloseIcon } from '@/components/icons/FullscreenCloseIcon/fullscreenCloseIcon';
 import { FullscreenOpenIcon } from '@/components/icons/FullscreenOpenIcon/fullscreenOpenIcon';
 import { compareColors } from '@/modules/colors';
 import type { Grades } from '@/modules/fetchGrades';
 import { displaySemesterName } from '@/modules/semesters';
-import { Card, Fade, Modal, useMediaQuery } from '@mui/material';
+import { Fade, Modal, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
@@ -96,7 +97,7 @@ export default function LineGraph(props: Props) {
   const [fullScreenOpen, setFullScreenOpen] = useState<boolean>(false);
 
   const icon =
-    '<div class="apexcharts-menu-icon">' +
+    '<div class="apexcharts-menu-icon custom">' +
     (fullScreenOpen ? FullscreenCloseIcon : FullscreenOpenIcon) +
     '</div>';
 
@@ -208,14 +209,16 @@ export default function LineGraph(props: Props) {
         enabled: !fullScreenOpen && !singleLabelMode && multiplePoints,
       },
       events: {
-        markerClick: (event, chartContext, { seriesIndex, dataPointIndex }) => {
+        markerClick: (event, chartContext, opts) => {
+          if (!opts) return;
+
           const semester =
-            chartContext.w.config?.series[seriesIndex]?.data[dataPointIndex]
-              .semester;
+            series[opts.seriesIndex]?.data?.[opts.dataPointIndex].semester;
+
+          if (!semester) return;
 
           let newSemesters = chosenSemesters;
 
-          if (semester === null) return;
           if (chosenSemesters?.length === semesters.length) {
             newSemesters = [semester];
           } else if (chosenSemesters.includes(semester)) {
@@ -329,10 +332,10 @@ export default function LineGraph(props: Props) {
     theme: { mode: prefersDarkMode ? 'dark' : 'light' },
   };
 
-  const highlightedMarkers: ApexDiscretePoint[] =
+  const highlightedMarkers =
     chosenSemesters.length === semesters.length
       ? []
-      : ((chosenSemesters?.flatMap((sem) => {
+      : (chosenSemesters?.flatMap((sem) => {
           return series.flatMap((s, seriesIndex) => {
             const dataPointIndex = s.data.findIndex((d) => d.semester === sem);
             if (dataPointIndex === -1) return [];
@@ -350,7 +353,7 @@ export default function LineGraph(props: Props) {
               },
             ];
           });
-        }) ?? []) as ApexDiscretePoint[]);
+        }) ?? []);
 
   options.markers = {
     ...options.markers,
@@ -372,7 +375,9 @@ export default function LineGraph(props: Props) {
         className="flex justify-stretch align-stretch"
       >
         <Fade in={fullScreenOpen}>
-          <Card className="p-4 m-12 flex-auto">{graph}</Card>
+          <div className="m-12 flex-auto flex justify-stretch align-stretch">
+            <BaseCard className="p-4 flex-auto">{graph}</BaseCard>
+          </div>
         </Fade>
       </Modal>
     </>

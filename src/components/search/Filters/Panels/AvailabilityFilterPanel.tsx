@@ -1,0 +1,61 @@
+import FilterList, {
+  type FilterListItem,
+} from '@/components/search/Filters/base/FilterList';
+import FilterPanel from '@/components/search/Filters/base/FilterPanel';
+import { setFilterParams, type FilterModalPanelProps } from '@/modules/filters';
+import { displaySemesterName } from '@/modules/semesters';
+import ListItemText from '@mui/material/ListItemText';
+
+type AvailabilityFilterPanelProps = FilterModalPanelProps<{
+  enabled: boolean;
+  semester: string;
+  availableSemesters: string[];
+}>;
+
+export default function AvailabilityFilterPanel({
+  data: { availableSemesters, enabled, semester },
+}: AvailabilityFilterPanelProps) {
+  const value = enabled ? semester : 'any';
+
+  const semesterOptions: FilterListItem[] = availableSemesters.map((sem) => ({
+    label: displaySemesterName(sem, false),
+    value: sem,
+  }));
+
+  return (
+    <FilterPanel
+      heading="Teaching in"
+      description="Show courses being taught in this semester"
+      id="filter-availability"
+    >
+      <FilterList
+        options={[{ label: 'Any semester', value: 'any' }, ...semesterOptions]}
+        type="radio"
+        selectedValues={[value]}
+        disallowDeselecting
+        renderOptionContent={(props, option) => (
+          <ListItemText
+            primary={
+              option.value === 'any' ? (
+                <span className="italic">{option.label}</span>
+              ) : (
+                option.label
+              )
+            }
+            {...props}
+          />
+        )}
+        onChange={(newSelectedValues) => {
+          const newValue = newSelectedValues[0];
+          setFilterParams((params) => {
+            if (newValue !== 'any') {
+              params.set('availability', newValue);
+            } else {
+              params.delete('availability');
+            }
+          });
+        }}
+      />
+    </FilterPanel>
+  );
+}

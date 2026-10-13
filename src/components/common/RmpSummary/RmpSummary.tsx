@@ -1,31 +1,49 @@
 'use client';
 
 import { Skeleton, Tooltip, Typography } from '@mui/material';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
-interface Props {
-  open: boolean;
-  searchQuery: {
-    profFirst?: string;
-    profLast?: string;
-  };
-}
+type LoadingRmpSummaryProps = {
+  legacyId?: string;
+};
 
-export function LoadingRmpSummary() {
+export function LoadingRmpSummary({ legacyId }: LoadingRmpSummaryProps) {
   return (
     <>
-      {[1, 2, 3].map((i) => (
-        <Skeleton key={i} variant="text" />
-      ))}
-      <Skeleton variant="text" width="50%" />
-      <Typography variant="overline" className="text-gray-700 dark:text-gray-300">
-        AI REVIEW SUMMARY
-      </Typography>
+      <Skeleton variant="text" />
+      <Skeleton variant="text" />
+      <Skeleton variant="text" className="w-1/2" />
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Typography
+          variant="overline"
+          className="text-gray-700 dark:text-gray-300"
+        >
+          AI REVIEW SUMMARY
+        </Typography>
+        {legacyId ? (
+          <Link
+            href={'https://www.ratemyprofessors.com/professor/' + legacyId}
+            target="_blank"
+            className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+          >
+            Visit Rate My Professors
+          </Link>
+        ) : (
+          <p>Visit Rate My Professors</p>
+        )}
+      </div>
     </>
   );
 }
 
-export default function RmpSummary({ open, searchQuery }: Props) {
+type Props = {
+  open: boolean;
+  searchQuery: SearchQuery;
+  legacyId: string;
+};
+
+export default function RmpSummary({ open, searchQuery, legacyId }: Props) {
   const [summary, setSummary] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -93,58 +111,47 @@ export default function RmpSummary({ open, searchQuery }: Props) {
   // ERROR UI
   // ----------------------------
   if (status === 'error') {
-    const msg = errorMsg?.toLowerCase() || '';
-
-    if (msg.includes('not enough')) {
-      return (
-        <div className="p-4 my-2 border border-blue-500/20 bg-blue-500/5 rounded-xl">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            <strong>Summary Unavailable:</strong>{' '}
-            We need at least 5 student reviews to generate an accurate AI summary.
-          </p>
-        </div>
-      );
-    }
-
     return (
-      <div className="p-3 border border-red-500/10 bg-red-500/5 rounded-lg">
-        <p className="text-red-400 text-sm italic">
-          {errorMsg || 'Problem loading AI review summary.'}
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p>Problem loading AI review summary.</p>
+        <Link
+          href={'https://www.ratemyprofessors.com/professor/' + legacyId}
+          target="_blank"
+          className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+        >
+          Visit Rate My Professors
+        </Link>
       </div>
     );
   }
 
-  // ----------------------------
-  // LOADING UI
-  // ----------------------------
-  if (status === 'loading') {
-    return <LoadingRmpSummary />;
+  if (!summary) {
+    return <LoadingRmpSummary legacyId={legacyId} />;
   }
 
-  // ----------------------------
-  // SUCCESS UI
-  // ----------------------------
-  if (status === 'done' && summary) {
-    return (
-      <>
-        <p className="text-sm leading-relaxed text-gray-800 dark:text-gray-200">
-          {summary}
-        </p>
-
-        <Tooltip title="AI generated summary" placement="right">
-          <span className="inline-block">
-            <Typography
-              variant="overline"
-              className="text-gray-700 dark:text-gray-300 cursor-help"
-            >
-              AI REVIEW SUMMARY
-            </Typography>
-          </span>
+  return (
+    <>
+      <p>{summary}</p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Tooltip
+          title="This summary is AI generated. Please double check any important information"
+          placement="right"
+        >
+          <Typography
+            variant="overline"
+            className="text-gray-700 dark:text-gray-300"
+          >
+            AI REVIEW SUMMARY
+          </Typography>
         </Tooltip>
-      </>
-    );
-  }
-
-  return null;
+        <Link
+          href={'https://www.ratemyprofessors.com/professor/' + legacyId}
+          target="_blank"
+          className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+        >
+          Visit Rate My Professors
+        </Link>
+      </div>
+    </>
+  );
 }

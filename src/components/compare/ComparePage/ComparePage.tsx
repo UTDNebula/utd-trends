@@ -1,8 +1,9 @@
 'use client';
 
+import BaseCard from '@/components/common/BaseCard/BaseCard';
 import Compare from '@/components/compare/Compare/Compare';
 import SearchIcon from '@mui/icons-material/Search';
-import { Button, Card, Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
@@ -37,9 +38,9 @@ export default function ComparePage() {
           Go back to search
         </Button>
       </div>
-      <Card className="w-full p-4">
+      <BaseCard className="w-full p-4">
         <Compare isMobile={true} />
-      </Card>
+      </BaseCard>
     </>
   );
 }

@@ -138,7 +138,7 @@ export async function GET(request: Request) {
     },
   });
   const response = await geminiClient.models.generateContent({
-    model: 'gemini-2.5-flash-lite',
+    model: 'gemini-3.1-flash-lite',
     config: {
       responseMimeType: 'application/json',
       responseSchema: syllabusResponseSchema,

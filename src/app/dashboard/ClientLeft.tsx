@@ -4,7 +4,7 @@ import { useSharedState } from '@/app/SharedStateProvider';
 import SearchResultsTable from '@/components/search/SearchResultsTable/SearchResultsTable';
 import { getValidAvailabilitySemester } from '@/modules/availability';
 import { calculateGrades } from '@/modules/fetchGrades';
-import { matchSectionTypesFromSectionNumber } from '@/modules/semesters';
+import { matchSectionTypesFromSectionNumber } from '@/modules/sections';
 import { type SearchResult } from '@/types/SearchQuery';
 import { useSearchParams } from 'next/navigation';
 import React, { use, useMemo } from 'react';

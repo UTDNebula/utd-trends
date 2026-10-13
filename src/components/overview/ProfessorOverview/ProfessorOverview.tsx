@@ -13,7 +13,7 @@ import { searchQueryLabel, type SearchQuery } from '@/types/SearchQuery';
 import { Skeleton } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 export function LoadingProfessorOverview() {
   return (
@@ -46,12 +46,14 @@ export default function ProfessorOverview({
   grades,
   rmp,
 }: Props) {
-  const [src, setSrc] = useState(
-    profData.image_uri !== '' ? profData.image_uri : fallbackSrc,
-  );
-  useEffect(() => {
-    setSrc(profData.image_uri);
-  }, [profData]);
+  const computedSrc =
+    profData.image_uri !== '' ? profData.image_uri : fallbackSrc;
+  const [src, setSrc] = useState(computedSrc);
+
+  // Reset fallback when netId changes
+  if (src !== computedSrc && src !== fallbackSrc) {
+    setSrc(computedSrc);
+  }
 
   return (
     <div className="flex flex-col gap-2">

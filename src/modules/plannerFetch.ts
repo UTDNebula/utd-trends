@@ -181,10 +181,7 @@ export function useSearchresults(queries: SearchQuery[]) {
   const queriesHook = useQueries({
     queries: queries.map((q) => {
       return {
-        queryKey: [
-          'results',
-          searchQueryLabel(convertToCourseOnly(removeSection(q))),
-        ],
+        queryKey: ['results', searchQueryLabel(removeSection(q))],
         queryFn: async () => {
           return await fetchSearchResult(q);
         },

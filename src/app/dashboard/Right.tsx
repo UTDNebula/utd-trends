@@ -1,3 +1,4 @@
+import BaseCard from '@/components/common/BaseCard/BaseCard';
 import Compare from '@/components/compare/Compare/Compare';
 import Carousel from '@/components/navigation/Carousel/Carousel';
 import CourseOverview, {
@@ -12,7 +13,6 @@ import fetchGrades from '@/modules/fetchGrades';
 import fetchProfessor from '@/modules/fetchProfessor';
 import fetchRmp from '@/modules/fetchRmp';
 import { type SearchQuery, type SearchResult } from '@/types/SearchQuery';
-import { Card } from '@mui/material';
 import React, { Suspense } from 'react';
 import ServerLeft from './ServerLeft';
 
@@ -54,13 +54,13 @@ export function LoadingRight(props: LoadingRightProps) {
   }
 
   return (
-    <Card
+    <BaseCard
       className={`${props.isMobile ? 'bg-transparent bg-none shadow-none overflow-visible' : ''}`}
     >
       <Carousel key={names.join()} names={names} isMobile={props.isMobile}>
         {tabs}
       </Carousel>
-    </Card>
+    </BaseCard>
   );
 }
 
@@ -118,7 +118,7 @@ export default async function Right(props: Props) {
     const [profData, grades, rmp] = professorResults;
     names.push('Professor');
     tabs.push(
-      <Card
+      <BaseCard
         key="professor"
         className={`${props.isMobile ? 'p-6' : 'bg-transparent bg-none shadow-none'}`}
       >
@@ -128,7 +128,7 @@ export default async function Right(props: Props) {
           grades={grades}
           rmp={rmp}
         />
-      </Card>,
+      </BaseCard>,
     );
   }
 
@@ -136,7 +136,7 @@ export default async function Right(props: Props) {
     const [courseData, grades] = courseResults;
     names.push('Class');
     tabs.push(
-      <Card
+      <BaseCard
         key="course"
         className={`${props.isMobile ? 'p-6' : 'bg-transparent bg-none shadow-none'}`}
       >
@@ -145,7 +145,7 @@ export default async function Right(props: Props) {
           courseData={courseData}
           grades={grades}
         />
-      </Card>,
+      </BaseCard>,
     );
   }
 
@@ -155,12 +155,12 @@ export default async function Right(props: Props) {
   }
 
   return (
-    <Card
+    <BaseCard
       className={`${props.isMobile ? 'bg-transparent bg-none shadow-none overflow-visible' : ''}`}
     >
       <Carousel key={names.join()} names={names} isMobile={props.isMobile}>
         {tabs}
       </Carousel>
-    </Card>
+    </BaseCard>
   );
 }
