@@ -1,13 +1,15 @@
 import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
 
-const nextConfig: NextConfig = {};
-
-module.exports = nextConfig;
+const nextConfig: NextConfig = {
+  experimental: {
+    turbopackFileSystemCacheForDev: false,
+  },
+};
 
 // Injected content via Sentry wizard below
 
-module.exports = withSentryConfig(module.exports, {
+module.exports = withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
