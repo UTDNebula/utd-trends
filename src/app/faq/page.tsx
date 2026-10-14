@@ -1,43 +1,50 @@
+'use client';
+
+import { Button } from '@mui/material';
+import { useState } from 'react';
+
+type QuestionProps = {
+  question?: string;
+  answer?: string;
+};
+
+function Question(props: QuestionProps) {
+  function handleClick() {
+    console.log('Clicked!');
+    setVisible(!visible);
+  }
+
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <div>
+      <h2 className="text-2xl">
+        <Button variant="contained" onClick={handleClick}>
+          {visible ? 'Close' : 'Open'}
+        </Button>
+        {props.question}
+      </h2>
+      {visible && <p>{props.answer}</p>}
+    </div>
+  );
+}
+
 export default function Page() {
   return (
     <div className="m-auto mt-16 flex w-128 flex-col gap-8">
       <h1 className="text-4xl">Frequently Asked Questions</h1>
-
-      <div>
-        <h2 className="text-2xl">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit.
-        </h2>
-        <p>
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque libero
-          laborum fugiat tempore ea doloribus error, non inventore commodi!
-          Tenetur, explicabo accusamus optio animi id voluptatibus dolore
-          deserunt tempore? Optio.
-        </p>
-      </div>
-
-      <div>
-        <h2 className="text-2xl">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit.
-        </h2>
-        <p>
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque libero
-          laborum fugiat tempore ea doloribus error, non inventore commodi!
-          Tenetur, explicabo accusamus optio animi id voluptatibus dolore
-          deserunt tempore? Optio.
-        </p>
-      </div>
-
-      <div>
-        <h2 className="text-2xl">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit.
-        </h2>
-        <p>
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque libero
-          laborum fugiat tempore ea doloribus error, non inventore commodi!
-          Tenetur, explicabo accusamus optio animi id voluptatibus dolore
-          deserunt tempore? Optio.
-        </p>
-      </div>
+      <Question
+        question="Do we steal your personal information?"
+        answer="Noo, we don't, we're not Facebook"
+      />
+      <Question
+        question="What is the best flavor of ice cream?"
+        answer="Mint chocolate chip"
+      />
+      <Question
+        question="Is Trends better than UTD Grades?"
+        answer="Yes. Nebula Labs on top!!!"
+      />
     </div>
   );
 }
