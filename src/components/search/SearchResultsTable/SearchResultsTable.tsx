@@ -22,6 +22,7 @@ import {
 } from '@/types/SearchQuery';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import KeyboardArrowIcon from '@mui/icons-material/KeyboardArrowRight';
+import StarIcon from '@mui/icons-material/Star';
 import {
   Checkbox,
   Collapse,
@@ -61,12 +62,22 @@ function LoadingRow() {
           className="w-full border-b-0 pb-0"
           colSpan={3}
         >
-          {nameCell}
+          <div className="flex items-center gap-1">
+            <IconButton aria-label="expand row" size="medium" disabled>
+              <KeyboardArrowIcon />
+            </IconButton>
+            {nameCell}
+          </div>
         </TableCell>
       </TableRow>
       <TableRow>
         <TableCell className="flex">
-          <IconButton aria-label="expand row" size="medium" disabled>
+          <IconButton
+            aria-label="expand row"
+            size="medium"
+            disabled
+            className="hidden sm:inline-flex"
+          >
             <KeyboardArrowIcon />
           </IconButton>
           <Checkbox disabled />
@@ -229,6 +240,38 @@ function Row({
 
   const latestSyllabusSection = getLatestSyllabusSection(searchResult);
 
+  // className lets the same button be shown/hidden per breakpoint
+  const expandButton = (className: string) =>
+    canOpen ? (
+      <Tooltip
+        title={open ? 'Minimize Result' : 'Expand Result'}
+        placement="top"
+      >
+        <IconButton
+          aria-label="expand row"
+          size="medium"
+          onClick={(e) => {
+            e.stopPropagation(); // prevents double opening/closing
+            if (canOpen) setOpen(!open);
+          }}
+          className={
+            className + ' transition-transform' + (open ? ' rotate-90' : '')
+          }
+        >
+          <KeyboardArrowIcon fontSize="inherit" />
+        </IconButton>
+      </Tooltip>
+    ) : (
+      <IconButton
+        aria-label="expand row"
+        size="medium"
+        disabled
+        className={className}
+      >
+        <KeyboardArrowIcon fontSize="inherit" />
+      </IconButton>
+    );
+
   return (
     <>
       <TableRow
@@ -243,7 +286,11 @@ function Row({
           className="w-full border-b-0 pb-0"
           colSpan={3}
         >
-          {nameCell}
+          {/* on mobile, the expand arrow sits on the same line as the name */}
+          <div className="flex items-center gap-1">
+            {expandButton('')}
+            {nameCell}
+          </div>
         </TableCell>
       </TableRow>
       <TableRow
@@ -258,30 +305,7 @@ function Row({
           data-tutorial-id={showTutorial && 'actions'}
         >
           <div className="flex items-center gap-1">
-            {canOpen ? (
-              <Tooltip
-                title={open ? 'Minimize Result' : 'Expand Result'}
-                placement="top"
-              >
-                <IconButton
-                  aria-label="expand row"
-                  size="medium"
-                  onClick={(e) => {
-                    e.stopPropagation(); // prevents double opening/closing
-                    if (canOpen) setOpen(!open);
-                  }}
-                  className={
-                    'transition-transform' + (open ? ' rotate-90' : '')
-                  }
-                >
-                  <KeyboardArrowIcon fontSize="inherit" />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <IconButton aria-label="expand row" size="medium" disabled>
-                <KeyboardArrowIcon fontSize="inherit" />
-              </IconButton>
-            )}
+            {expandButton('hidden sm:inline-flex')}
             <Tooltip
               title={inCompare ? 'Remove from Compare' : 'Add to Compare'}
               placement="top"
@@ -358,7 +382,16 @@ function Row({
                       precision={0.1}
                       sx={{ fontSize: 25 }}
                       readOnly
+                      className="hidden sm:inline-flex"
                     />
+                    {/* stars don't fit on small screens, show the number instead */}
+                    <Typography className="sm:hidden text-base flex items-center justify-center gap-0.5">
+                      {searchResult.RMP.avgRating.toFixed(1)}
+                      <StarIcon
+                        fontSize="small"
+                        sx={{ color: 'primary.main' }}
+                      />
+                    </Typography>
                   </div>
                 </Tooltip>
               )))) ||
