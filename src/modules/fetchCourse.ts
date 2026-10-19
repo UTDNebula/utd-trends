@@ -37,8 +37,6 @@ export type Course = {
   sections: string[];
   subject_prefix: string;
   title: string;
-  /** Whether the course first appeared in the 2025 or 2026 catalog. */
-  isNew: boolean;
 };
 
 export default async function fetchCourse(
@@ -81,17 +79,9 @@ export default async function fetchCourse(
       prev.catalog_year > curr.catalog_year ? prev : curr,
     );
 
-    // Find the first catalog in which the course appeared.
-    const oldestYear = data.data.reduce((prev: Course, curr: Course) =>
-      prev.catalog_year < curr.catalog_year ? prev : curr,
-    );
-
-    const firstCatalogYear = Number(oldestYear.catalog_year);
-    const isNew = [25, 26, 2025, 2026].includes(firstCatalogYear);
-
     return {
       message: 'success',
-      data: { ...mostRecent, isNew },
+      data: { ...mostRecent },
     };
   } catch (error) {
     return {
