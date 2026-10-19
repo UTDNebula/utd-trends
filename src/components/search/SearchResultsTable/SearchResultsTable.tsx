@@ -11,7 +11,7 @@ import { gpaToColor, useRainbowColors } from '@/modules/colors';
 import { calculateGrades } from '@/modules/fetchGrades';
 import gpaToLetterGrade from '@/modules/gpaToLetterGrade';
 import { getLatestSyllabusSection } from '@/modules/sections';
-import { displaySemesterName } from '@/modules/semesters';
+import { compareSemesters, displaySemesterName } from '@/modules/semesters';
 import {
   convertToCourseOnly,
   convertToProfOnly,
@@ -226,8 +226,31 @@ function Row({
           typeof course.number === 'undefined')) && <span> (Overall)</span>}
     </Typography>
   );
-
+  // use section data to determine if course is new and if professor has taught before
   const latestSyllabusSection = getLatestSyllabusSection(searchResult);
+
+  const targetSemester = chosenSemesters[0];
+
+  const hasTaughtBefore =
+    !!targetSemester &&
+    searchResult.sections.some(
+      (section) =>
+        compareSemesters(section.academic_session.name, targetSemester) < 0,
+    );
+
+  const teachesSelectedSemester =
+    !!targetSemester &&
+    searchResult.sections.some(
+      (section) => section.academic_session.name === targetSemester,
+    );
+
+  const courseExistedBefore =
+    searchResult.type === 'course' &&
+    !!targetSemester &&
+    searchResult.sections.some(
+      (section) =>
+        compareSemesters(section.academic_session.name, targetSemester) < 0,
+    );
 
   return (
     <>
@@ -318,7 +341,7 @@ function Row({
           {nameCell}
         </TableCell>
         <TableCell align="center" className="border-b-0">
-          {(filteredGrades.gpa >= 0 && (
+          {filteredGrades.gpa >= 0 ? (
             <Tooltip
               title={
                 'Median GPA: ' +
@@ -340,8 +363,28 @@ function Row({
                 {gpaToLetterGrade(filteredGrades.gpa)}
               </Typography>
             </Tooltip>
-          )) ||
-            null}
+          ) : searchResult.type === 'course' && !courseExistedBefore ? (
+            <Typography
+              className="text-base text-black text-center rounded-full px-5 py-2 w-16 mx-auto flex items-center justify-center"
+              sx={{ backgroundColor: '#A297FD' }}
+            >
+              NEW
+            </Typography>
+          ) : searchResult.type === 'combo' && !courseExistedBefore ? (
+            <Typography
+              className="text-base text-black text-center rounded-full px-5 py-2 w-16 mx-auto flex items-center justify-center"
+              sx={{ backgroundColor: '#A297FD' }}
+            >
+              NEW
+            </Typography>
+          ) : teachesSelectedSemester && !hasTaughtBefore ? (
+            <Typography
+              className="text-base text-black text-center rounded-full px-5 py-2 w-16 mx-auto flex items-center justify-center"
+              sx={{ backgroundColor: '#A297FD' }}
+            >
+              NEW
+            </Typography>
+          ) : null}
         </TableCell>
         <TableCell align="center" className="border-b-0">
           {(searchResult.type !== 'course' &&
