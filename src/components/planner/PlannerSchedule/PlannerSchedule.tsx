@@ -130,41 +130,39 @@ export default function PlannerSchedule() {
     plannerForSemester.map((entry) => entry.query),
   );
 
-  // from each course data, keep only the sections that are being taught during the semester
-  // the user is currently viewing
+  // check if any of the user's selected sections (for the current semester) is on a saturday
   //
-  // if a course data query is not successful, return empty data
-  const sectionsBySemester = allSearchResults.map((result) => {
+  // allSearchResults: queried data (sections, meetings, etc) for each course, one per course
+  // plannerForSemester: list of courses user added for this sem, in the same order as
+  // allSearchResults.
+  // use courseIndex to look up the matching course for a given result
+  const hasSaturdayClass = allSearchResults.some((result, courseIndex) => {
+    const entry = plannerForSemester[courseIndex]; // the matching course
+
+    // skip this course if its data hasn't loaded yet (or failed to load)
     if (!result.isSuccess) {
-      return [];
+      return false;
     }
-    return result.data.sections.filter(
-      (section) => section.academic_session.name === effectiveTeachingSemester,
+
+    // the section number(s) the user actually picked for this course
+    // (a course can have multiple linked sections, ex. lecture + lab)
+    const selectedSectionNumbers = searchQueryMultiSectionSplit(
+      entry.query,
+    ).map((query) => query.sectionNumber);
+
+    // loop over every section that exists for this course
+    return result.data.sections.some(
+      (section) =>
+        // only look at sections taught in the semester currently being viewed
+        section.academic_session.name === effectiveTeachingSemester &&
+        // that the user actually selected
+        selectedSectionNumbers.includes(section.section_number) &&
+        // that meet on a saturday
+        section.meetings.some((meeting) =>
+          meeting.meeting_days.includes('Saturday'),
+        ),
     );
   });
-
-  // match each course with the specific section the user chose
-  // courses can have multiple sections, ex. lecture + lab
-  // so use flat list of section objects the user chose
-  const selectedSections = plannerForSemester
-    .map((entry) => searchQueryMultiSectionSplit(entry.query))
-    .flatMap((sectionQueriesForCourse, courseIndex) =>
-      sectionQueriesForCourse.map((sectionQuery) =>
-        sectionsBySemester[courseIndex].find(
-          (section) => section.section_number === sectionQuery.sectionNumber,
-        ),
-      ),
-    )
-    //if the .find() above returns no match then filter it out
-    .filter((section) => section !== undefined);
-
-  // check if any of the user's selected sections is on a saturday
-  // some() is used to return true as soon as it finds one match
-  const hasSaturdayClass = selectedSections.some((section) =>
-    section.meetings.some((meeting) =>
-      meeting.meeting_days.includes('Saturday'),
-    ),
-  );
 
   // decide how many day columns to display
   // minus by 1 if we dont have saturday classes
