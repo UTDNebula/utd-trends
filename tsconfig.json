@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -16,7 +20,6 @@
     "incremental": true,
     "rootDir": ".",
     "paths": {
-      // remap rsg-components/anything to its version in react-styleguidist
       "rsg-components/*": [
         "./node_modules/react-styleguidist/lib/client/rsg-components/*"
       ],
@@ -30,15 +33,15 @@
     ]
   },
   "include": [
+    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "/**/**/*/.tsx",
-    "next-env.d.ts",
-    "src",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"],
+  "exclude": [
+    "node_modules"
+  ],
   "ts-node": {
     "transpileOnly": true,
     "moduleTypes": {

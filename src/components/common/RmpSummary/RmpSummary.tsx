@@ -1,6 +1,5 @@
 'use client';
 
-import { type SearchQuery } from '@/types/SearchQuery';
 import { Skeleton, Tooltip, Typography } from '@mui/material';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
@@ -46,49 +45,71 @@ type Props = {
 
 export default function RmpSummary({ open, searchQuery, legacyId }: Props) {
   const [summary, setSummary] = useState<string | null>(null);
-  const [error, setError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const status = !open
     ? 'closed'
-    : error
-      ? 'error'
-      : summary === null
-        ? 'loading'
-        : 'done';
+    : loading
+      ? 'loading'
+      : errorMsg
+        ? 'error'
+        : summary
+          ? 'done'
+          : 'idle';
 
-  // Fetch when opened
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setSummary(null);
+      setErrorMsg(null);
+      setLoading(false);
+      return;
+    }
 
     let cancelled = false;
 
-    const params = new URLSearchParams();
-    if (searchQuery.profFirst)
-      params.append('profFirst', searchQuery.profFirst);
-    if (searchQuery.profLast) params.append('profLast', searchQuery.profLast);
-    fetch(`/api/rmpSummary?${params.toString()}`, {
-      method: 'GET',
-      next: { revalidate: 3600 },
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchSummary = async () => {
+      setLoading(true);
+      setErrorMsg(null);
+      setSummary(null);
+
+      try {
+        const params = new URLSearchParams();
+        if (searchQuery.profFirst) params.append('profFirst', searchQuery.profFirst);
+        if (searchQuery.profLast) params.append('profLast', searchQuery.profLast);
+
+        const res = await fetch(`/api/rmpSummary?${params.toString()}`);
+
+        const data = await res.json();
+
         if (cancelled) return;
 
-        if (data.message !== 'success') {
-          setError(true);
+        // Handle API-level errors (your backend "message: error")
+        if (!res.ok || data.message === 'error') {
+          setErrorMsg(data.data || 'Problem loading AI review summary.');
           return;
         }
+
         setSummary(data.data);
-      })
-      .catch(() => {
-        if (!cancelled) setError(true);
-      });
+      } catch (err) {
+        if (!cancelled) {
+          setErrorMsg('Problem loading AI review summary.');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    fetchSummary();
 
     return () => {
       cancelled = true;
     };
-  }, [open, searchQuery]);
+  }, [open, searchQuery.profFirst, searchQuery.profLast]);
 
+  // ----------------------------
+  // ERROR UI
+  // ----------------------------
   if (status === 'error') {
     return (
       <div className="flex flex-wrap items-center justify-between gap-2">
