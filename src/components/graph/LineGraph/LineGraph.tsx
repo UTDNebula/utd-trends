@@ -158,7 +158,8 @@ export default function LineGraph(props: Props) {
 
   if (!multiplePoints && hasData) {
     singleLabelMode = true;
-    const point = series[0].data[0];
+    // The only point can belong to any series, not just the first one
+    const point = series.flatMap((s) => s.data)[0];
     const sem = point.semester;
 
     point.x = 0.5;
