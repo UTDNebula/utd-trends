@@ -81,7 +81,7 @@ export default async function fetchCourse(
 
     return {
       message: 'success',
-      data: mostRecent,
+      data: { ...mostRecent },
     };
   } catch (error) {
     return {
