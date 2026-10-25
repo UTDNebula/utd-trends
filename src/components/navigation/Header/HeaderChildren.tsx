@@ -211,7 +211,7 @@ function HeaderChildrenInner(props: HeaderProps) {
   return (
     <>
       {/* Shown on small screens */}
-      <div className="flex gap-x-2 sm:hidden">
+      <div className="flex gap-x-2 md:hidden">
         {tutorialHint && !props.isPlanner ? (
           moreVertIcon
         ) : (
@@ -220,7 +220,7 @@ function HeaderChildrenInner(props: HeaderProps) {
       </div>
 
       {/* Shown on large screens */}
-      <div className="flex items-center gap-x-4 max-sm:hidden">
+      <div className="flex items-center gap-x-4 max-md:hidden">
         {/* Planner button */}
         <PlannerButton {...plannerButtonProps} />
 
