@@ -74,5 +74,13 @@
     "tailwindcss": "^4.3.1",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
+  },
+  "allowScripts": {
+    "core-js": true,
+    "protobufjs@7.5.4": true,
+    "unrs-resolver@1.12.2": true,
+    "@google/genai@2.9.0": true,
+    "@sentry/cli@2.58.6": true,
+    "sharp@0.34.5": true
   }
 }
