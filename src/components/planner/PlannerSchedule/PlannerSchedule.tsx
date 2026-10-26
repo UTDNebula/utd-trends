@@ -1,12 +1,14 @@
 import { useSharedState } from '@/app/SharedStateProvider';
 import PlannerSection from '@/components/planner/PlannerSchedule/PlannerSection';
-import { useSearchresults } from '@/modules/plannerFetch';
 import {
   convertToCourseOnly,
+  removeSection,
   searchQueryLabel,
   searchQueryMultiSectionSplit,
+  type SearchResult,
 } from '@/types/SearchQuery';
-import React from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import React, { useMemo } from 'react';
 
 // hours shown (24-hour time)
 export const START_HOUR = 8;
@@ -111,61 +113,49 @@ function HourRow(props: HourRowProps) {
 
 // Display the My Planner schedule
 export default function PlannerSchedule() {
+  const queryClient = useQueryClient();
   const { planner, plannerColorMap, effectiveTeachingSemester } =
     useSharedState();
 
-  const plannerForSemester = planner.filter(
-    (entry) => entry.semester === effectiveTeachingSemester,
-  );
-  const courses = plannerForSemester.flatMap((entry) =>
-    searchQueryMultiSectionSplit(entry.query),
-  );
+  const plannerForSemester = useMemo(() => {
+    return planner.filter(
+      (entry) => entry.semester === effectiveTeachingSemester,
+    );
+  }, [planner, effectiveTeachingSemester]);
+
+  const courses = useMemo(() => {
+    return plannerForSemester.flatMap((entry) =>
+      searchQueryMultiSectionSplit(entry.query),
+    );
+  }, [plannerForSemester]);
 
   // Find out if we need to show the saturday column
-  // because most students don't have saturday classes
+  const hasSaturdayClass = useMemo(() => {
+    return courses.some((course) => {
+      if (!course.sectionNumber) return false;
 
-  // fetch full course data (with section meeting times) for every course query currently in the planner
-  // returns one react query result per course (in same order)
-  const allSearchResults = useSearchresults(
-    plannerForSemester.map((entry) => entry.query),
-  );
+      // check cache for the section data (PlannerSections will populate it)
+      const queryKey = [
+        'results',
+        searchQueryLabel(convertToCourseOnly(removeSection(course))),
+      ];
+      const cachedData = queryClient.getQueryData<SearchResult>(queryKey);
 
-  // check if any of the user's selected sections (for the current semester) is on a saturday
-  //
-  // allSearchResults: queried data (sections, meetings, etc) for each course, one per course
-  // plannerForSemester: list of courses user added for this sem, in the same order as
-  // allSearchResults.
-  // use courseIndex to look up the matching course for a given result
-  const hasSaturdayClass = allSearchResults.some((result, courseIndex) => {
-    const entry = plannerForSemester[courseIndex]; // the matching course
+      if (!cachedData || cachedData.type === 'professor') return false;
 
-    // skip this course if its data hasn't loaded yet (or failed to load)
-    if (!result.isSuccess) {
-      return false;
-    }
+      const selectedSection = cachedData.sections.find(
+        (s) =>
+          s.section_number === course.sectionNumber &&
+          s.academic_session.name === effectiveTeachingSemester,
+      );
 
-    // the section number(s) the user actually picked for this course
-    // (a course can have multiple linked sections, ex. lecture + lab)
-    const selectedSectionNumbers = searchQueryMultiSectionSplit(
-      entry.query,
-    ).map((query) => query.sectionNumber);
-
-    // loop over every section that exists for this course
-    return result.data.sections.some(
-      (section) =>
-        // only look at sections taught in the semester currently being viewed
-        section.academic_session.name === effectiveTeachingSemester &&
-        // that the user actually selected
-        selectedSectionNumbers.includes(section.section_number) &&
-        // that meet on a saturday
-        section.meetings.some((meeting) =>
-          meeting.meeting_days.includes('Saturday'),
-        ),
-    );
-  });
+      return selectedSection?.meetings.some((m) =>
+        m.meeting_days.includes('Saturday'),
+      );
+    });
+  }, [courses, queryClient, effectiveTeachingSemester]);
 
   // decide how many day columns to display
-  // minus by 1 if we dont have saturday classes
   const effectiveEndDay = hasSaturdayClass ? END_DAY : END_DAY - 1;
 
   // CSS for defining how many grid columns
