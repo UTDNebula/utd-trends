@@ -126,7 +126,7 @@ export default function PlannerSection(props: PlannerSectionComponentProps) {
               color: props.color.font,
               height: 'var(--height)',
             }}
-            className={`ml-1 w-full rounded-xl border-2
+            className={`ml-1 mx-1/2 rounded-xl border-2
               leading-relaxed
               overflow-hidden
               min-h-[var(--height)]
