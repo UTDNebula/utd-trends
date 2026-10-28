@@ -1,69 +1,108 @@
 # UTD Trends
 
-_Easy access to all the information you need to plan your schedule_
+_Intuitive course grade distributions, professor metrics, and schedule planning for UT Dallas._
 
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+Project maintained by [Nebula Labs](https://about.utdnebula.com).
+
+> [!TIP]
+> **Developer Wiki**: If you are interested in contributing or developing on this project, head over to our [**Developer Wiki**](docs/Home.md)!
+
+---
+
+## Quick Navigation
+
+- [Developer Wiki](docs/Home.md)
+- [Getting Started Guide](docs/Getting-Started.md)
+- [Project Architecture](docs/Project-Architecture.md)
+- [Project Structure & Codebase Map](docs/Project-Structure.md)
+- [Contributing Guide](docs/How-to-Contribute.md)
+- [Troubleshooting & FAQ](docs/Troubleshooting.md)
+- [Discord Community](https://discord.utdnebula.com)
+
+---
 
 ## About
 
-### Overview
+UTD Trends offers students and faculty an accessible, visual interface for analyzing historical grade distribution data stored in the [Nebula API](https://github.com/UTDNebula/nebula-api) and student feedback from Rate My Professors.
 
-UTD Trends offers students and faculty an accessible and easily digestible means
-of viewing the data stored in the Nebula API and on Rate My Professors. Providing
-data visualization tools so that students can view agregated data and make more
-informed decisions on their coursework.
+### Key Features
 
-### Features
+- **Grade Distributions**: Historical A through F and W distributions across semesters.
+- **Professor Comparisons**: Compare instructor GPA averages and grading trends across course sections.
+- **Schedule Integration**: Interactive calendar view with section meeting times and location details.
+- **Fast Autocomplete**: Sub-millisecond client-side search powered by graph indexing.
 
-- Multiple Sources
-  - Find grade distributions and Rate My Professors scores for any given class.
-- Aggregate
-  - Powerful query abilities that aggregate grade and Rate My Professors data across several years to give you a more wholistic view.
-- Compare
-  - See data for multiple courses, professors, and categories on a single graph without switching tabs.
+---
 
-## Contributing
+## Prerequisites
 
-Contributions are welcome!
+- **Node.js**: `22.x` or higher (`node -v`)
+- **npm**: Bundled with Node.js
+- **Git**: For version control
 
-This project uses the MIT License.
+---
 
-### Process
-
-To get started, see the [contribution guide](./CONTRIBUTING.md). It'll tell you
-everything you need to know.
-
-Once you're ready to make some changes, see the
-[issues](https://github.com/UTDNebula/utd-trends/issues) for the repository.
-
-If you want to brainstorm, share ideas or ask questions, start a discussion in
-our [Discord](https://discord.utdnebula.com/) section.
-
-### Set-up
-
-This project requires a working [Node.js](https://nodejs.org/en/) and NPM
-installation. To start, clone the repository, and then run `npm run dev` to launch
-a local development server at [`localhost:3000`](http://localhost:3000) by default.
+## Quick Start
 
 ```bash
+# 1. Clone the repository
 git clone https://github.com/UTDNebula/utd-trends.git
-cd utd-Trends
+cd utd-trends
+
+# 2. Install dependencies
 npm install
+
+# 3. Configure environment variables
+cp .env.example .env
+# Add your Nebula API key to .env:
+# NEBULA_API_KEY="your_key_here"
+
+# 4. Start local development server
 npm run dev
 ```
 
-### Documentation
+Visit [http://localhost:3000](http://localhost:3000) to view the running app.
 
-Available at [utdnebula.github.io/utd-trends](https://utdnebula.github.io/utd-trends/)
+---
 
-This project utilizes [React Styleguidist](https://github.com/styleguidist/react-styleguidist)
-to generate component documentation and provide a isolated development environment
-with hot-reloading support. View the doumentation for the develop branch at
-[utdnebula.github.io/utd-trends](https://utdnebula.github.io/utd-trends/) or run
-`npm run docs` to launch a local development server at
-[`localhost:6060`](http://localhost:6060).
+## Available Scripts
 
-### Contact
+| Command                     | Description                                                               |
+| :-------------------------- | :------------------------------------------------------------------------ |
+| `npm run dev`               | Starts Next.js development server at `localhost:3000` (Turbopack default) |
+| `npm run build`             | Compiles production-ready Next.js application                             |
+| `npm start`                 | Runs the compiled production server                                       |
+| `npm run format`            | Auto-formats codebase with Prettier                                       |
+| `npm run format:check`      | Verifies code formatting against Prettier rules                           |
+| `npm run lint`              | Auto-fixes linting issues with ESLint                                     |
+| `npm run lint:check`        | Validates codebase against ESLint rules                                   |
+| `npm run type:check`        | Verifies TypeScript types without emitting JavaScript                     |
+| `npm run fetchdata`         | Fetches fresh aggregated grade data from the Nebula API                   |
+| `npm run buildautocomplete` | Compiles Graphology search autocomplete graph                             |
+| `npm run buildcoursenames`  | Generates course code to title mapping tables                             |
+| `npm run buildcombos`       | Generates professor-course combination indexes                            |
 
-This project is maintained by Nebula Labs. If you have
-any questions about this project or Nebula Labs, see the [discord server](https://discord.utdnebula.com/)
+---
+
+## Contributing
+
+We welcome community contributions! Please review [docs/How-to-Contribute.md](docs/How-to-Contribute.md) and [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+
+1. Pick an open issue on [GitHub Issues](https://github.com/UTDNebula/utd-trends/issues).
+2. Branch from `develop`: `git checkout -b feature/<feature-name>`.
+3. Adhere to [Conventional Commits](https://www.conventionalcommits.org/).
+4. Verify code passes `npm run format:check` and `npm run lint:check`.
+5. Open a Pull Request against `develop`.
+
+---
+
+## Community & Support
+
+Have questions, suggestions, or need an API key? Reach out to the team on our [Discord](https://discord.utdnebula.com) in `#portfolio-engineering`!
+
+## License
+
+This project is open-source software licensed under the [MIT License](LICENSE).
