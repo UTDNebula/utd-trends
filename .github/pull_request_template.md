@@ -1,20 +1,26 @@
-## Overview
+<!--
+  Thank you for taking the time to contribute!
+  We don't expect perfection and appreciate anything you can do to help.
+  Please fill out each section below
+-->
 
-List the GitHub issues containing the issues relevant to this pull request.
+### Description
+<!-- Include related issues or PRs (e.g., "Resolves #123") -->
 
-[For example, "Resolves #1, closes #2, fixes #3", etc.]
 
-Describe your changes here at a high level, describing how this PR fits into the
-rest of the project.
 
-## What Changed
+### Testing
+<!-- How have you tested the changes in this PR? How can we test it? -->
 
-Go more into detail about key files that were modified and why they were
-updated. Do not list every file that was modified; only note the ones most
-relevant to this feature or bug fix.
 
-## Other Notes
 
-If were roadblocks encountered during development that remain unresolved or any
-future additions or changes to make, note them here. Otherwise. Feel free to
-delete this section if it isn't needed.
+### AI Disclosure
+<!-- In general, how did you use AI to help you? (see our AI policy at https://nebula-labs.atlassian.net/wiki/x/AgCwQw) -->
+
+
+
+### Checklist
+<!-- Please check off that you've completed each item below -->
+
+- [x] Create this PR
+- [ ] Perform final self-review

@@ -8,3 +8,4 @@ public
 styleguide/build
 data
 next-env.d.ts
+.github/pull_request_template.md
