@@ -33,7 +33,10 @@ async function fetchSearchResult(query: SearchQuery) {
   }
   const body = (await res.json()) as GenericFetchedData<SearchResult>;
   if (body.message === 'success') {
-    return body.data;
+    return {
+      ...body.data,
+      sections: body.data.sections ?? [],
+    };
   }
   throw new Error(body.data);
 }

@@ -97,7 +97,7 @@ async function fetchSingleSections(query: SearchQuery): Promise<SectionsData> {
       throw new Error(data.data ?? data.message);
     }
 
-    return data.data;
+    return data.data ?? [];
   } catch (error) {
     throw new Error(
       error instanceof Error ? error.message : 'An unknown error occurred',
