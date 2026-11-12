@@ -70,12 +70,16 @@ export function LoadingSearchBar(props: LoadingSearchBarProps) {
 }
 
 export function getRecentSearches() {
-  const searchesText = window.localStorage.getItem('UTDTrendsRecent');
-  let recSearches: SearchQueryWithTitle[] = [];
-  if (searchesText != null) {
-    recSearches = JSON.parse(searchesText);
+  try {
+    const searchesText = window.localStorage.getItem('UTDTrendsRecent');
+    let recSearches: SearchQueryWithTitle[] = [];
+    if (searchesText != null) {
+      recSearches = JSON.parse(searchesText);
+    }
+    return recSearches;
+  } catch {
+    return [];
   }
-  return recSearches;
 }
 
 //When new queries are made, compare them to the existing recent query cache
@@ -86,10 +90,11 @@ export function updateRecentSearches(newValue: SearchQueryWithTitle[]) {
   const dedupArray = removeDuplicates(concatArray)
     .slice(0, 3)
     .map((el) => ({ ...el, isRecent: true }));
-  window.localStorage.setItem(
-    'UTDTrendsRecent',
-    JSON.stringify(dedupArray), // ensure no title/subtitle/isRecent fields are stored
-  );
+  try {
+    window.localStorage.setItem(
+      'UTDTrendsRecent',
+      JSON.stringify(dedupArray)); // ensure no title/subtitle/isRecent fields are stored
+  } catch {}
 }
 
 type SearchQueryWithTitle = SearchQuery & {
