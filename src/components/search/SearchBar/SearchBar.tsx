@@ -91,9 +91,7 @@ export function updateRecentSearches(newValue: SearchQueryWithTitle[]) {
     .slice(0, 3)
     .map((el) => ({ ...el, isRecent: true }));
   try {
-    window.localStorage.setItem(
-      'UTDTrendsRecent',
-      JSON.stringify(dedupArray)); // ensure no title/subtitle/isRecent fields are stored
+    window.localStorage.setItem('UTDTrendsRecent', JSON.stringify(dedupArray)); // ensure no title/subtitle/isRecent fields are stored
   } catch {}
 }
 
@@ -301,15 +299,13 @@ export default function SearchBar(props: Props) {
         return false;
       } // remove currently chosen values
 
-      if (
-        !(
-          searchQueryLabel(item)
-            .toLowerCase()
-            .includes(newInputValue.toLowerCase()) ||
-          item.subtitle?.toLowerCase().includes(newInputValue.toLowerCase()) ||
-          item.title?.toLowerCase().includes(newInputValue.toLowerCase())
-        )
-      ) {
+      if (!(
+        searchQueryLabel(item)
+          .toLowerCase()
+          .includes(newInputValue.toLowerCase()) ||
+        item.subtitle?.toLowerCase().includes(newInputValue.toLowerCase()) ||
+        item.title?.toLowerCase().includes(newInputValue.toLowerCase())
+      )) {
         return false;
       } // remove non-matching recent options
       return true;
